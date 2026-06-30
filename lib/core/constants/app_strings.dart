@@ -19,7 +19,6 @@ class AppStrings {
   static const String tellAboutYourself = 'Bize kendinizden bahsedin';
   static const String selectGender = 'Cinsiyetiniz';
   static const String female = 'Kadın';
-  static const String male = 'Erkek';
   static const String next = 'İleri';
   static const String back = 'Geri';
   static const String finish = 'Tamamla';
@@ -35,14 +34,16 @@ class AppStrings {
   static const String age = 'Yaş';
   static const String relationshipStatus = 'İlişki Durumu';
   static const String sexualActivity = 'Cinsel Aktivite';
-  static const String wantsChildrenInYear = '1 yıl içinde çocuk düşünüyor musunuz?';
+  static const String wantsChildrenInYear =
+      '1 yıl içinde çocuk düşünüyor musunuz?';
   static const String bloodTestResults = 'Son 6 ayda bakılmış kan değerleri';
   static const String bloodTestHint = 'Varsa sonuçlarınızı girin veya atlayın';
   static const String chronicDiseases = 'Kronik hastalık var mı?';
 
   // ── Kadın Sağlık ────────────────────────────────────────
   static const String menstrualCycleLength = 'Regl döngüsü süresi (gün)';
-  static const String menstrualCycleHint = 'Başka uygulamadan takip ediyorsanız girin';
+  static const String menstrualCycleHint =
+      'Başka uygulamadan takip ediyorsanız girin';
   static const String menopauseStatus = 'Menopoz durumu';
   static const String preMenopause = 'Pre-menopoz';
   static const String periMenopause = 'Peri-menopoz';
@@ -69,19 +70,6 @@ class AppStrings {
     'Amenore (Adet Kesilmesi)',
     'PMS (Premenstrüel Sendrom)',
     'Vaginismus',
-    'Diğer',
-  ];
-
-  // ── Erkek Sağlık ────────────────────────────────────────
-  static const String andropauseStatus = 'Andropoz durumu';
-  static const String menDiseases = 'Erkek hastalıklarından biri var mı?';
-
-  static const List<String> menDiseasesList = [
-    'Prostat Büyümesi',
-    'Prostatit',
-    'Erektil Disfonksiyon',
-    'Varikosel',
-    'Düşük Testosteron',
     'Diğer',
   ];
 

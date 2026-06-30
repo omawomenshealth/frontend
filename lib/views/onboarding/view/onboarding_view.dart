@@ -116,83 +116,7 @@ class _OnboardingViewState extends State<OnboardingView> {
           ),
         ),
         const SizedBox(height: 32),
-
-        // Cinsiyet seçimi
-        const Text(
-          AppStrings.selectGender,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        Row(
-          children: [
-            Expanded(
-              child: _genderCard(
-                icon: Icons.female_rounded,
-                label: AppStrings.female,
-                color: AppColors.female,
-                isSelected: vm.gender == Gender.female,
-                onTap: () => vm.setGender(Gender.female),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _genderCard(
-                icon: Icons.male_rounded,
-                label: AppStrings.male,
-                color: AppColors.male,
-                isSelected: vm.gender == Gender.male,
-                onTap: () => vm.setGender(Gender.male),
-              ),
-            ),
-          ],
-        ),
       ],
-    );
-  }
-
-  Widget _genderCard({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(vertical: 32),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.12) : AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? color : AppColors.background,
-            width: 2,
-          ),
-          boxShadow: isSelected
-              ? [BoxShadow(color: color.withValues(alpha: 0.2), blurRadius: 12)]
-              : null,
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 48, color: isSelected ? color : AppColors.textHint),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? color : AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -242,15 +166,15 @@ class _OnboardingViewState extends State<OnboardingView> {
 
         // Sigara
         _sectionTitle(AppStrings.smokingStatus),
-        _yesNoSelector(
-          value: vm.isSmoker,
-          onChanged: vm.setIsSmoker,
-        ),
+        _yesNoSelector(value: vm.isSmoker, onChanged: vm.setIsSmoker),
         if (vm.isSmoker) ...[
           const SizedBox(height: 12),
           Row(
             children: [
-              const Text('Kaç yıldır: ', style: TextStyle(color: AppColors.textSecondary)),
+              const Text(
+                'Kaç yıldır: ',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
               SizedBox(
                 width: 80,
                 child: TextField(
@@ -298,9 +222,7 @@ class _OnboardingViewState extends State<OnboardingView> {
         TextField(
           onChanged: vm.setBloodTestResults,
           maxLines: 3,
-          decoration: const InputDecoration(
-            hintText: AppStrings.bloodTestHint,
-          ),
+          decoration: const InputDecoration(hintText: AppStrings.bloodTestHint),
         ),
         const SizedBox(height: 24),
 
@@ -331,11 +253,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   // ── Sayfa 3: Cinsiyete Özel Bilgiler ──────────────────
   Widget _buildGenderSpecificPage(OnboardingViewModel vm) {
-    if (vm.gender == Gender.female) {
-      return _buildFemaleSpecificPage(vm);
-    } else {
-      return _buildMaleSpecificPage(vm);
-    }
+    return _buildFemaleSpecificPage(vm);
   }
 
   Widget _buildFemaleSpecificPage(OnboardingViewModel vm) {
@@ -349,10 +267,7 @@ class _OnboardingViewState extends State<OnboardingView> {
         SwitchListTile(
           title: const Text(
             'Döngü süremi bilmiyorum',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
           subtitle: const Text(
             'Uygulama zamanla hesaplasın',
@@ -383,7 +298,10 @@ class _OnboardingViewState extends State<OnboardingView> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.periodPrimary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -422,7 +340,11 @@ class _OnboardingViewState extends State<OnboardingView> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_today, size: 20, color: AppColors.textSecondary),
+                const Icon(
+                  Icons.calendar_today,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
                 const SizedBox(width: 12),
                 Text(
                   vm.lastPeriodDate != null
@@ -459,22 +381,23 @@ class _OnboardingViewState extends State<OnboardingView> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: [
-            AppStrings.noBirthControl,
-            AppStrings.pill,
-            AppStrings.iud,
-            AppStrings.condom,
-            AppStrings.implant,
-            AppStrings.otherMethod,
-          ].map((method) {
-            final isSelected = vm.birthControlMethod == method;
-            return ChoiceChip(
-              label: Text(method),
-              selected: isSelected,
-              onSelected: (_) => vm.setBirthControlMethod(method),
-              selectedColor: AppColors.periodLight.withValues(alpha: 0.2),
-            );
-          }).toList(),
+          children:
+              [
+                AppStrings.noBirthControl,
+                AppStrings.pill,
+                AppStrings.iud,
+                AppStrings.condom,
+                AppStrings.implant,
+                AppStrings.otherMethod,
+              ].map((method) {
+                final isSelected = vm.birthControlMethod == method;
+                return ChoiceChip(
+                  label: Text(method),
+                  selected: isSelected,
+                  onSelected: (_) => vm.setBirthControlMethod(method),
+                  selectedColor: AppColors.periodLight.withValues(alpha: 0.2),
+                );
+              }).toList(),
         ),
         const SizedBox(height: 24),
 
@@ -493,46 +416,9 @@ class _OnboardingViewState extends State<OnboardingView> {
               checkmarkColor: AppColors.periodPrimary,
               labelStyle: TextStyle(
                 fontSize: 13,
-                color: isSelected ? AppColors.periodPrimary : AppColors.textPrimary,
-              ),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 32),
-      ],
-    );
-  }
-
-  Widget _buildMaleSpecificPage(OnboardingViewModel vm) {
-    return _pageWrapper(
-      title: 'Erkek Sağlığı',
-      subtitle: 'Sağlık bilgileriniz',
-      scrollable: true,
-      children: [
-        // Andropoz durumu
-        _sectionTitle(AppStrings.andropauseStatus),
-        _yesNoSelector(
-          value: vm.andropauseStatus ?? false,
-          onChanged: (v) => vm.setAndropauseStatus(v),
-        ),
-        const SizedBox(height: 24),
-
-        // Erkek hastalıkları
-        _sectionTitle(AppStrings.menDiseases),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: AppStrings.menDiseasesList.map((disease) {
-            final isSelected = vm.menDiseases.contains(disease);
-            return FilterChip(
-              label: Text(disease),
-              selected: isSelected,
-              onSelected: (_) => vm.toggleMenDisease(disease),
-              selectedColor: AppColors.male.withValues(alpha: 0.15),
-              checkmarkColor: AppColors.male,
-              labelStyle: TextStyle(
-                fontSize: 13,
-                color: isSelected ? AppColors.male : AppColors.textPrimary,
+                color: isSelected
+                    ? AppColors.periodPrimary
+                    : AppColors.textPrimary,
               ),
             );
           }).toList(),
@@ -565,12 +451,14 @@ class _OnboardingViewState extends State<OnboardingView> {
           child: Column(
             children: [
               _summaryRow('İsim', vm.userName.isEmpty ? '-' : vm.userName),
-              _summaryRow('Cinsiyet', vm.gender == Gender.female ? '👩 Kadın' : '👨 Erkek'),
               if (vm.weight != null) _summaryRow('Kilo', '${vm.weight} kg'),
               if (vm.height != null) _summaryRow('Boy', '${vm.height} cm'),
               if (vm.age != null) _summaryRow('Yaş', '${vm.age}'),
-              _summaryRow('Sigara', vm.isSmoker ? 'Evet (${vm.smokingYears} yıl)' : 'Hayır'),
-              if (vm.gender == Gender.female && vm.lastPeriodDate != null)
+              _summaryRow(
+                'Sigara',
+                vm.isSmoker ? 'Evet (${vm.smokingYears} yıl)' : 'Hayır',
+              ),
+              if (vm.lastPeriodDate != null)
                 _summaryRow('Döngü', '${vm.averageCycleLength} gün'),
             ],
           ),
@@ -585,7 +473,13 @@ class _OnboardingViewState extends State<OnboardingView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14,
+            ),
+          ),
           Flexible(
             child: Text(
               value,
@@ -664,10 +558,7 @@ class _OnboardingViewState extends State<OnboardingView> {
         const SizedBox(height: 4),
         Text(
           subtitle,
-          style: const TextStyle(
-            fontSize: 15,
-            color: AppColors.textSecondary,
-          ),
+          style: const TextStyle(fontSize: 15, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 24),
         ...children,
@@ -741,7 +632,11 @@ class _OnboardingViewState extends State<OnboardingView> {
     );
   }
 
-  Widget _menopauseChip(String label, MenopauseStatus status, OnboardingViewModel vm) {
+  Widget _menopauseChip(
+    String label,
+    MenopauseStatus status,
+    OnboardingViewModel vm,
+  ) {
     final isSelected = vm.menopauseStatus == status;
     return ChoiceChip(
       label: Text(label),
@@ -754,5 +649,4 @@ class _OnboardingViewState extends State<OnboardingView> {
       ),
     );
   }
-
 }

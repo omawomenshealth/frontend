@@ -17,7 +17,6 @@ class OnboardingViewModel extends ChangeNotifier {
 
   // ── Form verileri ─────────────────────────────────────
   String _userName = '';
-  Gender _gender = Gender.female;
   bool _isSmoker = false;
   int _smokingYears = 0;
   double? _weight;
@@ -51,7 +50,6 @@ class OnboardingViewModel extends ChangeNotifier {
 
   // ── Getter'lar ────────────────────────────────────────
   String get userName => _userName;
-  Gender get gender => _gender;
   bool get isSmoker => _isSmoker;
   int get smokingYears => _smokingYears;
   double? get weight => _weight;
@@ -77,11 +75,6 @@ class OnboardingViewModel extends ChangeNotifier {
   // ── Setter'lar ────────────────────────────────────────
   void setUserName(String value) {
     _userName = value;
-    notifyListeners();
-  }
-
-  void setGender(Gender value) {
-    _gender = value;
     notifyListeners();
   }
 
@@ -250,7 +243,6 @@ class OnboardingViewModel extends ChangeNotifier {
 
     final settings = UserSettings(
       userName: _userName,
-      gender: _gender,
       isOnboardingComplete: true,
       isSmoker: _isSmoker,
       smokingYears: _isSmoker ? _smokingYears : null,
