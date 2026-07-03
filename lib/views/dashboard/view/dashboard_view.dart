@@ -83,7 +83,7 @@ class DashboardView extends StatelessWidget {
           ),
 
           // ── Günlük Kayıt Ekle FAB ──────────────────────
-          floatingActionButton: FloatingActionButton.extended(
+          /*floatingActionButton: FloatingActionButton.extended(
             onPressed: () => _showDailyLogSheet(context, vm),
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
@@ -92,7 +92,7 @@ class DashboardView extends StatelessWidget {
               'Günlük Kayıt',
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
-          ),
+          ),*/
         );
       },
     );
@@ -213,7 +213,12 @@ class DashboardView extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.periodPrimary.withValues(alpha: 0.1),
+                    color: const Color.fromARGB(
+                      255,
+                      58,
+                      0,
+                      0,
+                    ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(

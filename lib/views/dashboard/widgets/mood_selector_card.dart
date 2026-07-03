@@ -37,14 +37,6 @@ class MoodSelectorCard extends StatelessWidget {
             children: [
               const Icon(Icons.mood, color: AppColors.moodHappy, size: 22),
               const SizedBox(width: 8),
-              const Text(
-                'Nasıl hissediyorsun?',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
               const Spacer(),
               if (selectedEmoji != null)
                 Text(selectedEmoji!, style: const TextStyle(fontSize: 24)),
@@ -85,8 +77,9 @@ class MoodSelectorCard extends StatelessWidget {
                         entry.key,
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                           color: isSelected
                               ? _getMoodColor(entry.key)
                               : AppColors.textSecondary,

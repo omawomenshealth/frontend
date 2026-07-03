@@ -25,30 +25,26 @@ class FeelingCard extends StatelessWidget {
       if (showPeriod)
         _QuickAction(
           emoji: '🩸',
-          label: 'Regl\nGirişi',
           color: AppColors.periodPrimary,
           bgColor: const Color(0xFFFFEBEE),
           onTap: onPeriodTap,
         ),
       _QuickAction(
         emoji: '🍽️',
-        label: 'Yeme\nİçme',
         color: AppColors.warning,
         bgColor: const Color(0xFFFFF8E1),
         onTap: onNutritionTap,
       ),
       _QuickAction(
         emoji: '💊',
-        label: 'İlaç\nTakibi',
         color: AppColors.medicationPrimary,
         bgColor: const Color(0xFFE0F2F1),
         onTap: onMedicationTap,
       ),
       _QuickAction(
         emoji: '😊',
-        label: 'Nasıl\nHissediyor.',
         color: AppColors.moodHappy,
-        bgColor: const Color(0xFFFFF3E0),
+        bgColor: const Color.fromARGB(69, 255, 243, 224),
         onTap: onMoodTap,
       ),
     ];
@@ -57,7 +53,7 @@ class FeelingCard extends StatelessWidget {
       children: options.map((option) {
         return Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: _QuickActionCircle(option: option),
           ),
         );
@@ -80,7 +76,6 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
-  bool _isPressed = false;
 
   @override
   void initState() {
@@ -89,9 +84,10 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
       vsync: this,
       duration: const Duration(milliseconds: 150),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.92,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -103,57 +99,22 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: widget.option.onTap,
-      onTapDown: (_) {
-        setState(() => _isPressed = true);
-        _controller.forward();
-      },
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        _controller.reverse();
-      },
-      onTapCancel: () {
-        setState(() => _isPressed = false);
-        _controller.reverse();
-      },
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) => _controller.reverse(),
+      onTapCancel: () => _controller.reverse(),
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: AspectRatio(
           aspectRatio: 1,
           child: Container(
-            decoration: BoxDecoration(
-              color: widget.option.bgColor,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: widget.option.color.withValues(alpha: 0.3),
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.option.color.withValues(alpha: _isPressed ? 0.25 : 0.12),
-                  blurRadius: _isPressed ? 12 : 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
+            // Yuvarlağı tamamen görünmez yapmak için renk şeffaf yapıldı
+            color: Colors.transparent,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  widget.option.emoji,
-                  style: const TextStyle(fontSize: 26),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.option.label,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: widget.option.color,
-                    height: 1.2,
-                  ),
-                ),
+                Text(widget.option.emoji, style: const TextStyle(fontSize: 30)),
               ],
             ),
           ),
@@ -166,14 +127,12 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
 /// Hızlı aksiyon veri modeli
 class _QuickAction {
   final String emoji;
-  final String label;
   final Color color;
   final Color bgColor;
   final VoidCallback onTap;
 
   const _QuickAction({
     required this.emoji,
-    required this.label,
     required this.color,
     required this.bgColor,
     required this.onTap,

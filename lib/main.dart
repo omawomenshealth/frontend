@@ -21,7 +21,7 @@ void main() async {
   final storage = LocalStorageService();
   await storage.init();
 
-  // BURAYI GEÇİCİ OLARAK EKLEYİN:
+  // BURAYI GEÇİCİ OLARAK EKLEYİN:""
   await storage.clearAll();
 
   runApp(MyApp(storage: storage));
