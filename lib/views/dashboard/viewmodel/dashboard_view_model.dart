@@ -17,16 +17,24 @@ class DashboardViewModel extends ChangeNotifier {
   List<DailyLog> _todayLogs = [];
   PeriodCalculator? _periodCalculator;
   bool _isLoading = true;
+  DateTime _selectedDate = DateTime.now();
 
   UserSettings? get settings => _settings;
   List<DailyLog> get todayLogs => _todayLogs;
   DailyLog? get latestLog => _todayLogs.isNotEmpty ? _todayLogs.first : null;
   PeriodCalculator? get periodCalculator => _periodCalculator;
   bool get isLoading => _isLoading;
+  DateTime get selectedDate => _selectedDate;
 
   bool get isFemale => _settings?.gender == Gender.female;
-  bool get hasPeriodTracking =>
-      isFemale && _settings?.lastPeriodDate != null;
+  bool get hasPeriodTracking => isFemale;
+
+  /// Takvimde tarih seçildiğinde çağrılır.
+  void selectDate(DateTime date) {
+    _selectedDate = date;
+    _todayLogs = _storage.loadLogsForDate(date);
+    notifyListeners();
+  }
 
   /// Karşılama mesajı (saate göre).
   String get greeting {
@@ -53,12 +61,14 @@ class DashboardViewModel extends ChangeNotifier {
     _settings = _storage.loadSettings();
     _todayLogs = _storage.loadLogsForDate(DateTime.now());
 
-    if (hasPeriodTracking) {
+    if (hasPeriodTracking && _settings?.lastPeriodDate != null) {
       _periodCalculator = PeriodCalculator(
         lastPeriodDate: _settings!.lastPeriodDate!,
         cycleLength: _settings!.averageCycleLength,
         periodLength: _settings!.averagePeriodLength,
       );
+    } else {
+      _periodCalculator = null;
     }
 
     _isLoading = false;

@@ -19,7 +19,8 @@ class LocalStorageService {
   SharedPreferences get _p {
     if (_prefs == null) {
       throw StateError(
-          'LocalStorageService henüz başlatılmadı. init() çağrın.');
+        'LocalStorageService henüz başlatılmadı. init() çağrın.',
+      );
     }
     return _prefs!;
   }
@@ -129,7 +130,7 @@ class LocalStorageService {
     final dateStr = date.toStorageKey();
     final dates = _getDatesSet();
     final toRemove = dates.where((d) => d.startsWith(dateStr)).toList();
-    
+
     bool allSuccess = true;
     for (final keyStr in toRemove) {
       final success = await _p.remove('$_logPrefix$keyStr');
@@ -142,7 +143,6 @@ class LocalStorageService {
   }
 
   // ── Yardımcılar ────────────────────────────────────────
-
   Set<String> _getDatesSet() {
     return (_p.getStringList(_logDatesKey) ?? []).toSet();
   }

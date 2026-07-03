@@ -1,3 +1,4 @@
+import 'package:app_proje_a/views/dashboard/widgets/horizontal_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
@@ -5,6 +6,7 @@ import '../../../data/models/period_log_model.dart';
 import '../viewmodel/dashboard_view_model.dart';
 import '../widgets/countdown_circle.dart';
 import '../widgets/daily_log_sheet.dart';
+import '../widgets/feeling_card.dart';
 
 /// Dashboard ana ekranı.
 class DashboardView extends StatelessWidget {
@@ -48,8 +50,12 @@ class DashboardView extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Günlük İlerleme ───────────────────
-                    _buildProgressCard(vm),
+                    // ── Küçük Takvim logosu + Yatay Takvim ──
+                    HorizontalCalendar(
+                      selectedDate: vm.selectedDate,
+                      onDateSelected: vm.selectDate,
+                      periodCalculator: vm.periodCalculator,
+                    ),
                     const SizedBox(height: 16),
 
                     // ── Regl Geri Sayım (Kadın) ───────────
@@ -58,72 +64,18 @@ class DashboardView extends StatelessWidget {
                       const SizedBox(height: 16),
                     ],
 
-                    // ── Nasıl Hissediyorsun? Kartı ────────
-                    GestureDetector(
-                      onTap: () => _showDailyLogSheet(context, vm),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              blurRadius: 15,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Nasıl Hissediyorsun?',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'Bugünkü durumunuzu kaydedin',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.add_reaction_outlined,
-                                color: AppColors.primary,
-                                size: 28,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    // ── Hızlı Erişim (4 yuvarlak) ────────
+                    FeelingCard(
+                      showPeriod: vm.hasPeriodTracking,
+                      onPeriodTap: () => _showDailyLogSheet(context, vm),
+                      onNutritionTap: () => _showDailyLogSheet(context, vm),
+                      onMedicationTap: () => _showDailyLogSheet(context, vm),
+                      onMoodTap: () => _showDailyLogSheet(context, vm),
                     ),
                     const SizedBox(height: 24),
 
                     // ── Bugünün Kayıtları (Timeline) ───────
-                    if (vm.todayLogs.isNotEmpty)
-                      _buildTimeline(vm),
+                    if (vm.todayLogs.isNotEmpty) _buildTimeline(vm),
                   ],
                 ),
               ),
@@ -146,7 +98,7 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  // ── İlerleme Kartı ──────────────────────────────────────
+  /*   // ── İlerleme Kartı ──────────────────────────────────────
   Widget _buildProgressCard(DashboardViewModel vm) {
     final percent = vm.completionPercentage;
     return Container(
@@ -222,11 +174,71 @@ class DashboardView extends StatelessWidget {
         ],
       ),
     );
-  }
+  } */
 
   // ── Regl Kartı ──────────────────────────────────────────
   Widget _buildPeriodCard(DashboardViewModel vm) {
-    final pc = vm.periodCalculator!;
+    final pc = vm.periodCalculator;
+
+    if (pc == null) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Text(
+                  '🩸 Döngü Takibi',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.periodPrimary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Bekleniyor',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.periodPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const CountdownCircle(
+              daysRemaining: null,
+              totalDays: null,
+              phaseName: 'Bilgi Eksik',
+              phaseColor: AppColors.periodPrimary,
+            ),
+          ],
+        ),
+      );
+    }
+
     final phaseColors = [
       AppColors.periodPrimary,
       AppColors.fertile,
@@ -262,7 +274,10 @@ class DashboardView extends StatelessWidget {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: phaseColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -362,13 +377,22 @@ class DashboardView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (log.mood != null)
-                          _summaryTile('Ruh Hali', '${log.moodEmoji ?? ''} ${log.mood}'),
+                          _summaryTile(
+                            'Ruh Hali',
+                            '${log.moodEmoji ?? ''} ${log.mood}',
+                          ),
                         if (log.activities.isNotEmpty)
                           _summaryTile('Hareket', log.activities.join(', ')),
                         if (log.nutritionTags.isNotEmpty)
-                          _summaryTile('Beslenme', log.nutritionTags.join(', ')),
+                          _summaryTile(
+                            'Beslenme',
+                            log.nutritionTags.join(', '),
+                          ),
                         if (log.bowelActivity.isNotEmpty)
-                          _summaryTile('Bağırsak', log.bowelActivity.join(', ')),
+                          _summaryTile(
+                            'Bağırsak',
+                            log.bowelActivity.join(', '),
+                          ),
                         if (log.painLocations.isNotEmpty)
                           _summaryTile('Ağrılar', log.painLocations.join(', ')),
                         if (log.flowIntensity != null)
@@ -425,7 +449,9 @@ class DashboardView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => DailyLogSheet(
-        initialLog: DailyLog.empty(DateTime.now()), // Her seferinde yeni bir kayıt açılır
+        initialLog: DailyLog.empty(
+          DateTime.now(),
+        ), // Her seferinde yeni bir kayıt açılır
         settings: vm.settings!,
         onSave: (log) => vm.saveLog(log),
       ),

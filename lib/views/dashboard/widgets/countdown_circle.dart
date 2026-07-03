@@ -4,15 +4,15 @@ import '../../../core/constants/color_constants.dart';
 
 /// Regl geri sayım dairesi — CustomPainter ile animasyonlu dairesel widget.
 class CountdownCircle extends StatefulWidget {
-  final int daysRemaining;
-  final int totalDays; // Döngü uzunluğu
+  final int? daysRemaining;
+  final int? totalDays; // Döngü uzunluğu
   final String phaseName;
   final Color phaseColor;
 
   const CountdownCircle({
     super.key,
-    required this.daysRemaining,
-    required this.totalDays,
+    this.daysRemaining,
+    this.totalDays,
     required this.phaseName,
     this.phaseColor = AppColors.periodPrimary,
   });
@@ -34,10 +34,16 @@ class _CountdownCircleState extends State<CountdownCircle>
       duration: const Duration(milliseconds: 1200),
     );
 
-    final progress = 1.0 - (widget.daysRemaining / widget.totalDays);
-    _animation = Tween<double>(begin: 0, end: progress).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    final progress =
+        (widget.daysRemaining != null &&
+            widget.totalDays != null &&
+            widget.totalDays! > 0)
+        ? 1.0 - (widget.daysRemaining! / widget.totalDays!)
+        : 0.0;
+    _animation = Tween<double>(
+      begin: 0,
+      end: progress,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     _controller.forward();
   }
 
@@ -45,13 +51,16 @@ class _CountdownCircleState extends State<CountdownCircle>
   void didUpdateWidget(CountdownCircle oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.daysRemaining != widget.daysRemaining) {
-      final progress = 1.0 - (widget.daysRemaining / widget.totalDays);
-      _animation = Tween<double>(
-        begin: _animation.value,
-        end: progress,
-      ).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-      );
+      final progress =
+          (widget.daysRemaining != null &&
+              widget.totalDays != null &&
+              widget.totalDays! > 0)
+          ? 1.0 - (widget.daysRemaining! / widget.totalDays!)
+          : 0.0;
+      _animation = Tween<double>(begin: _animation.value, end: progress)
+          .animate(
+            CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+          );
       _controller
         ..reset()
         ..forward();
@@ -82,26 +91,45 @@ class _CountdownCircleState extends State<CountdownCircle>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    widget.daysRemaining == 0
-                        ? '🩸'
-                        : '${widget.daysRemaining}',
-                    style: TextStyle(
-                      fontSize: widget.daysRemaining == 0 ? 36 : 42,
-                      fontWeight: FontWeight.bold,
-                      color: widget.phaseColor,
+                  if (widget.daysRemaining == null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        'Tarih Bekleniyor',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                          color: widget.phaseColor,
+                        ),
+                      ),
+                    )
+                  else ...[
+                    Text(
+                      widget.daysRemaining == 0
+                          ? '🩸'
+                          : '${widget.daysRemaining}',
+                      style: TextStyle(
+                        fontSize: widget.daysRemaining == 0 ? 36 : 42,
+                        fontWeight: FontWeight.bold,
+                        color: widget.phaseColor,
+                      ),
                     ),
-                  ),
-                  Text(
-                    widget.daysRemaining == 0 ? 'Bugün' : 'gün kaldı',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: widget.phaseColor.withValues(alpha: 0.7),
+                    Text(
+                      widget.daysRemaining == 0 ? 'Bugün' : 'gün kaldı',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: widget.phaseColor.withValues(alpha: 0.7),
+                      ),
                     ),
-                  ),
+                  ],
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: widget.phaseColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),

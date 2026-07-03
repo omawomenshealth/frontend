@@ -16,11 +16,8 @@ import 'views/calendar/viewmodel/calendar_view_model.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Türkçe locale başlat
   await initializeDateFormatting('tr_TR', null);
 
-  // Storage servisini başlat
-  // Storage servisini başlat
   final storage = LocalStorageService();
   await storage.init();
 
@@ -52,10 +49,7 @@ class MyApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('tr', 'TR'),
-          Locale('en', 'US'),
-        ],
+        supportedLocales: const [Locale('tr', 'TR'), Locale('en', 'US')],
         initialRoute: storage.isOnboardingComplete ? '/home' : '/auth',
         routes: {
           '/auth': (context) => const AuthView(),

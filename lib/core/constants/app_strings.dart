@@ -42,8 +42,7 @@ class AppStrings {
 
   // ── Kadın Sağlık ────────────────────────────────────────
   static const String menstrualCycleLength = 'Regl döngüsü süresi (gün)';
-  static const String menstrualCycleHint =
-      'Başka uygulamadan takip ediyorsanız girin';
+  static const String menstrualCycleHint = 'Döngü sürenizi biliyorsanız girin';
   static const String menopauseStatus = 'Menopoz durumu';
   static const String preMenopause = 'Pre-menopoz';
   static const String periMenopause = 'Peri-menopoz';
