@@ -124,8 +124,8 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
               boxShadow: [
                 // 1. Ana, derin alt gölge (koyu ve derin)
                 BoxShadow(
-                  color: Colors.black.withOpacity(
-                    _isPressed ? 0.3 : 0.2,
+                  color: Colors.black.withValues(
+                    alpha: _isPressed ? 0.3 : 0.2,
                   ), // Daha koyu
                   blurRadius: _isPressed ? 15 : 10, // Daha geniş yayılım
                   offset: _isPressed

@@ -21,8 +21,8 @@ void main() async {
   final storage = LocalStorageService();
   await storage.init();
 
-  // BURAYI GEÇİCİ OLARAK EKLEYİN:""
-  await storage.clearAll();
+  // Not: Test için verileri sıfırlamak isterseniz aşağıdaki satırı açın.
+  // await storage.clearAll();
 
   runApp(MyApp(storage: storage));
 }
@@ -77,11 +77,9 @@ class _HomeShellState extends State<HomeShell> {
   @override
   void initState() {
     super.initState();
-    // Verileri yeniden yükle
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DashboardViewModel>().loadData();
-      context.read<CalendarViewModel>().loadData();
-    });
+    // Not: ViewModel constructor'ları zaten loadData() çağırıyor.
+    // Sadece sayfa geri geldiğinde yeniden yükleme yapılması gerekirse
+    // bu yöntem kullanılabilir, ama ilk açılışta çift çağrım yapılmamalı.
   }
 
   @override

@@ -73,40 +73,44 @@ class OnboardingViewModel extends ChangeNotifier {
   List<String> get dailySupplements => _dailySupplements;
 
   // ── Setter'lar ────────────────────────────────────────
+  // NOT: TextField setter'larında notifyListeners() çağırmıyoruz.
+  // Her karakter girişinde tüm widget ağacını yeniden çizmek gereksiz kasma yapar.
+  // Bu değerler sadece kaydederken (saveAndComplete) veya summary sayfasında kullanılır.
+
   void setUserName(String value) {
     _userName = value;
-    notifyListeners();
+    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
   }
 
   void setIsSmoker(bool value) {
     _isSmoker = value;
     if (!value) _smokingYears = 0;
-    notifyListeners();
+    notifyListeners(); // UI gösterimi değişir (conditional widget)
   }
 
   void setSmokingYears(int value) {
     _smokingYears = value;
-    notifyListeners();
+    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
   }
 
   void setWeight(double? value) {
     _weight = value;
-    notifyListeners();
+    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
   }
 
   void setHeight(double? value) {
     _height = value;
-    notifyListeners();
+    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
   }
 
   void setAge(int? value) {
     _age = value;
-    notifyListeners();
+    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
   }
 
   void setRelationshipStatus(String value) {
     _relationshipStatus = value;
-    notifyListeners();
+    notifyListeners(); // Seçim UI'da gösterilir
   }
 
   void setSexuallyActive(bool? value) {
@@ -121,7 +125,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   void setBloodTestResults(String? value) {
     _bloodTestResults = value;
-    notifyListeners();
+    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
   }
 
   void toggleChronicDisease(String disease) {
@@ -135,7 +139,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   void setAverageCycleLength(int value) {
     _averageCycleLength = value;
-    notifyListeners();
+    notifyListeners(); // Slider label güncellenmeli
   }
 
   void setAveragePeriodLength(int value) {
@@ -148,12 +152,12 @@ class OnboardingViewModel extends ChangeNotifier {
     if (value) {
       _averageCycleLength = 28; // Bilinmiyorsa varsayılan 28 olarak kalır
     }
-    notifyListeners();
+    notifyListeners(); // Conditional widget gösterir/gizler
   }
 
   void setLastPeriodDate(DateTime? value) {
     _lastPeriodDate = value;
-    notifyListeners();
+    notifyListeners(); // Tarih gösterimini güncelle
   }
 
   void setMenopauseStatus(MenopauseStatus value) {
@@ -229,8 +233,10 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void goToPage(int page) {
-    _currentPage = page;
-    notifyListeners();
+    if (_currentPage != page) {
+      _currentPage = page;
+      notifyListeners();
+    }
   }
 
   bool get canGoNext => _currentPage < totalPages - 1;

@@ -11,6 +11,10 @@ enum CyclePhase {
 
 /// Regl döngüsü hesaplayıcı.
 /// Kullanıcının son adet tarihi ve döngü süresi ile tahmini hesaplar yapar.
+///
+/// Optimize edilmiş versiyon: while-loop yerine modüler aritmetik kullanır.
+/// Bu sayede isInPeriod, isOvulationDay, isInFertileWindow çağrıları
+/// O(n) yerine O(1) karmaşıklıkta çalışır.
 class PeriodCalculator {
   final DateTime lastPeriodDate;
   final int cycleLength;    // Varsayılan: 28
@@ -22,19 +26,28 @@ class PeriodCalculator {
     this.periodLength = 5,
   });
 
+  /// Verilen tarihin döngü içindeki gün indeksini hesaplar (0-indexed).
+  /// Negatif değerler lastPeriodDate'den önceki tarihleri temsil eder
+  /// ama modüler aritmetik ile yine doğru döngü günü bulunur.
+  int _dayInCycle(DateTime date) {
+    final diff = date.dateOnly.difference(lastPeriodDate.dateOnly).inDays;
+    if (cycleLength <= 0) return 0;
+    return ((diff % cycleLength) + cycleLength) % cycleLength;
+  }
+
   /// Sonraki adet başlangıç tarihi.
   DateTime get nextPeriodDate {
-    DateTime next = lastPeriodDate;
     final today = DateTime.now().dateOnly;
-    while (next.isBefore(today) || next.isSameDay(today)) {
-      // Eğer bugün adet günlerindeyse, mevcut döngüyü kullan
-      final endOfPeriod = next.add(Duration(days: periodLength));
-      if (!today.isBefore(next) && today.isBefore(endOfPeriod)) {
-        return next; // Şu an adet dönemindeyiz
-      }
-      next = next.add(Duration(days: cycleLength));
+    final dayInCycle = _dayInCycle(today);
+
+    // Eğer şu an adet dönemindeyse, mevcut döngünün başlangıcını döndür
+    if (dayInCycle < periodLength) {
+      return today.subtract(Duration(days: dayInCycle));
     }
-    return next;
+
+    // Değilse, bir sonraki döngünün başlangıcı
+    final daysLeft = cycleLength - dayInCycle;
+    return today.add(Duration(days: daysLeft));
   }
 
   /// Tahmini ovülasyon tarihi (döngünün ortası - 14 gün önce).
@@ -56,58 +69,37 @@ class PeriodCalculator {
   /// Sonraki adet tarihine kaç gün kaldı.
   int get daysUntilNextPeriod {
     final today = DateTime.now().dateOnly;
-    final next = nextPeriodDate;
     // Eğer şu an adet dönemindeyse 0 döndür
     if (isInPeriod(today)) return 0;
-    return today.daysUntil(next);
+    final dayInCycle = _dayInCycle(today);
+    return cycleLength - dayInCycle;
   }
 
-  /// Verilen tarih adet döneminde mi?
+  /// Verilen tarih adet döneminde mi? — O(1) modüler aritmetik
   bool isInPeriod(DateTime date) {
-    DateTime periodStart = lastPeriodDate;
-    final checkDate = date.dateOnly;
-
-    // Geçmiş ve gelecek döngüleri kontrol et
-    while (periodStart.isBefore(checkDate.add(const Duration(days: 1)))) {
-      final periodEnd = periodStart.add(Duration(days: periodLength));
-      if (!checkDate.isBefore(periodStart) && checkDate.isBefore(periodEnd)) {
-        return true;
-      }
-      periodStart = periodStart.add(Duration(days: cycleLength));
-    }
-    return false;
+    final dayInCycle = _dayInCycle(date);
+    return dayInCycle < periodLength;
   }
 
-  /// Verilen tarih ovülasyon gününde mi?
+  /// Verilen tarih ovülasyon gününde mi? — O(1) modüler aritmetik
   bool isOvulationDay(DateTime date) {
-    DateTime periodStart = lastPeriodDate;
-    final checkDate = date.dateOnly;
-
-    while (periodStart.isBefore(checkDate.add(Duration(days: cycleLength)))) {
-      final ovulationDay =
-          periodStart.add(Duration(days: cycleLength - 14));
-      if (checkDate.isSameDay(ovulationDay)) return true;
-      periodStart = periodStart.add(Duration(days: cycleLength));
-    }
-    return false;
+    final dayInCycle = _dayInCycle(date);
+    final ovulationDayInCycle = cycleLength - 14;
+    return dayInCycle == ovulationDayInCycle;
   }
 
-  /// Verilen tarih verimli dönemde mi?
+  /// Verilen tarih verimli dönemde mi? — O(1) modüler aritmetik
   bool isInFertileWindow(DateTime date) {
-    DateTime periodStart = lastPeriodDate;
-    final checkDate = date.dateOnly;
+    final dayInCycle = _dayInCycle(date);
+    final ovulationDayInCycle = cycleLength - 14;
+    final fertileStart = ovulationDayInCycle - 5;
+    final fertileEnd = ovulationDayInCycle + 1; // exclusive
 
-    while (periodStart.isBefore(checkDate.add(Duration(days: cycleLength)))) {
-      final ovulationDay =
-          periodStart.add(Duration(days: cycleLength - 14));
-      final fertileStart = ovulationDay.subtract(const Duration(days: 5));
-      final fertileEnd = ovulationDay.add(const Duration(days: 1));
-      if (!checkDate.isBefore(fertileStart) && checkDate.isBefore(fertileEnd)) {
-        return true;
-      }
-      periodStart = periodStart.add(Duration(days: cycleLength));
+    // Verimli dönemin döngü sınırını aştığı durum (kısa döngülerde)
+    if (fertileStart < 0) {
+      return dayInCycle >= (fertileStart + cycleLength) || dayInCycle < fertileEnd;
     }
-    return false;
+    return dayInCycle >= fertileStart && dayInCycle < fertileEnd;
   }
 
   /// Bugünün döngü fazı.

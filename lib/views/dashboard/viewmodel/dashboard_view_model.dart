@@ -55,11 +55,13 @@ class DashboardViewModel extends ChangeNotifier {
 
   /// Veri yükleme.
   Future<void> loadData() async {
-    _isLoading = true;
-    notifyListeners();
+    if (!_isLoading) {
+      _isLoading = true;
+      notifyListeners();
+    }
 
     _settings = _storage.loadSettings();
-    _todayLogs = _storage.loadLogsForDate(DateTime.now());
+    _todayLogs = _storage.loadLogsForDate(_selectedDate);
 
     if (hasPeriodTracking && _settings?.lastPeriodDate != null) {
       _periodCalculator = PeriodCalculator(
