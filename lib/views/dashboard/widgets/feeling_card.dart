@@ -76,6 +76,7 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
+  bool _isPressed = false;
 
   @override
   void initState() {
@@ -99,18 +100,40 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
       onTap: widget.option.onTap,
-      onTapDown: (_) => _controller.forward(),
-      onTapUp: (_) => _controller.reverse(),
-      onTapCancel: () => _controller.reverse(),
+      onTapDown: (_) {
+        setState(() => _isPressed = true);
+        _controller.forward();
+      },
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        _controller.reverse();
+      },
+      onTapCancel: () {
+        setState(() => _isPressed = false);
+        _controller.reverse();
+      },
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: AspectRatio(
           aspectRatio: 1,
           child: Container(
-            // Yuvarlağı tamamen görünmez yapmak için renk şeffaf yapıldı
-            color: Colors.transparent,
+            decoration: BoxDecoration(
+              color: widget.option.bgColor,
+              shape: BoxShape.circle,
+              boxShadow: [
+                // 1. Ana, derin alt gölge (koyu ve derin)
+                BoxShadow(
+                  color: Colors.black.withOpacity(
+                    _isPressed ? 0.3 : 0.2,
+                  ), // Daha koyu
+                  blurRadius: _isPressed ? 15 : 10, // Daha geniş yayılım
+                  offset: _isPressed
+                      ? const Offset(0, 5)
+                      : const Offset(0, 8), // Daha derin offset
+                ),
+              ],
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
