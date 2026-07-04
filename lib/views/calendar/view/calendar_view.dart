@@ -41,12 +41,31 @@ class _CalendarViewState extends State<CalendarView> {
           body: SafeArea(
             child: Column(
               children: [
-                // Başlık — sabit, hiç rebuild olmaz
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                // Başlık — geri butonu ile
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                   child: Row(
                     children: [
-                      Text(
+                      if (Navigator.of(context).canPop())
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      const Text(
                         '📅 Takvim',
                         style: TextStyle(
                           fontSize: 26,

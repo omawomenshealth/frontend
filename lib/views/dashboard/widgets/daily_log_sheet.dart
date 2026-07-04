@@ -10,12 +10,14 @@ class DailyLogSheet extends StatefulWidget {
   final DailyLog initialLog;
   final UserSettings settings;
   final ValueChanged<DailyLog> onSave;
+  final int initialTabIndex;
 
   const DailyLogSheet({
     super.key,
     required this.initialLog,
     required this.settings,
     required this.onSave,
+    this.initialTabIndex = 0,
   });
 
   @override
@@ -29,6 +31,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   final _customMedController = TextEditingController();
   final _customSupController = TextEditingController();
   bool _hasBleeding = false;
+  late int _selectedTabIndex;
 
   @override
   void initState() {
@@ -37,6 +40,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _notesController.text = _log.notes ?? '';
     _moodNoteController.text = _log.moodNote ?? '';
     _hasBleeding = _log.flowIntensity != null;
+    _selectedTabIndex = widget.initialTabIndex;
   }
 
   @override
@@ -46,6 +50,28 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _customMedController.dispose();
     _customSupController.dispose();
     super.dispose();
+  }
+
+  bool get _showPeriod => widget.settings.gender == Gender.female;
+
+  List<String> get _tabTitles {
+    final titles = <String>[];
+    if (_showPeriod) titles.add('🩸 Adet');
+    titles.add('🍽️ Beslenme');
+    titles.add('💊 İlaçlar');
+    titles.add('🌟 Ruh Hali');
+    return titles;
+  }
+
+  bool _isSectionVisible(String category) {
+    if (_tabTitles.isEmpty) return false;
+    final idx = _selectedTabIndex < _tabTitles.length ? _selectedTabIndex : 0;
+    final title = _tabTitles[idx];
+    if (title.contains('Adet') && category == 'Adet') return true;
+    if (title.contains('Beslenme') && category == 'Beslenme') return true;
+    if (title.contains('İlaçlar') && category == 'İlaçlar') return true;
+    if (title.contains('Ruh Hali') && category == 'Ruh Hali') return true;
+    return false;
   }
 
   @override
@@ -78,9 +104,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    const Text(
-                      '📝 Günlük Kayıt',
-                      style: TextStyle(
+                    Text(
+                      _tabTitles.isNotEmpty
+                          ? _tabTitles[_selectedTabIndex < _tabTitles.length ? _selectedTabIndex : 0]
+                          : 'Günlük Kayıt',
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -102,6 +130,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [
                     // 0. Ruh Hali
+                    if (_isSectionVisible('Ruh Hali'))
                     _buildSection(
                       title: '🌟 ${AppStrings.mood}',
                       child: Wrap(
@@ -149,6 +178,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
 
                     // 1. Hareket Durumu
+                    if (_isSectionVisible('Ruh Hali'))
                     _buildSection(
                       title: '🏃 ${AppStrings.activityStatus}',
                       child: _buildChipSelector(
@@ -161,6 +191,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
 
                     // 2. Beslenme Durumu
+                    if (_isSectionVisible('Beslenme'))
                     _buildSection(
                       title: '🍽️ ${AppStrings.nutritionStatus}',
                       child: _buildChipSelector(
@@ -173,6 +204,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
 
                     // 3. Takviyeler
+                    if (_isSectionVisible('İlaçlar'))
                     _buildSection(
                       title: '🌿 ${AppStrings.supplements}',
                       child: _buildMedicationList(
@@ -187,6 +219,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
 
                     // 4. İlaçlar
+                    if (_isSectionVisible('İlaçlar'))
                     _buildSection(
                       title: '💊 ${AppStrings.medications}',
                       subtitle: AppStrings.medicationDisclaimer,
@@ -202,6 +235,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
 
                     // 5. Cinsel Aktivite
+                    if (_isSectionVisible('Adet') || (!_showPeriod && _isSectionVisible('Ruh Hali')))
                     _buildSection(
                       title: '💕 ${AppStrings.sexualActivity}',
                       child: Row(
@@ -220,6 +254,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
 
                     // 6. Bağırsak Aktivitesi
+                    if (_isSectionVisible('Beslenme'))
                     _buildSection(
                       title: '🔄 ${AppStrings.bowelActivity}',
                       child: _buildChipSelector(
@@ -232,6 +267,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
 
                     // 7. Hisler & Ağrılar
+                    if (_isSectionVisible('Ruh Hali'))
                     _buildSection(
                       title: '🩹 ${AppStrings.sensations}',
                       child: _buildChipSelector(
@@ -244,7 +280,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
 
                     // 8. Regl (Kadınlar için)
-                    if (widget.settings.gender == Gender.female) ...[
+                    if (widget.settings.gender == Gender.female && _isSectionVisible('Adet')) ...[
                       _buildSection(
                         title: '🩸 Adet Kanaması',
                         child: Column(
@@ -295,6 +331,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ],
 
                     // 9. Notlar
+                    if (_isSectionVisible('Ruh Hali'))
                     _buildSection(
                       title: '📝 ${AppStrings.notes}',
                       child: TextField(

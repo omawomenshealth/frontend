@@ -142,6 +142,163 @@ class LocalStorageService {
     return allSuccess;
   }
 
+  // ── Döngü Hesaplama ─────────────────────────────────────
+
+  /// Tüm kayıtlardan kanama günlerini bulup ardışık grupları ayırarak
+  /// her döngünün başlangıç tarihini döndürür.
+  /// Döndürülen liste eskiden yeniye doğru sıralıdır.
+  List<DateTime> getPeriodStartDates() {
+    final allLogs = loadAllLogs();
+
+    // flowIntensity != null olan kayıtları filtrele ve tarihe göre sırala
+    final bleedingDays = allLogs
+        .where((log) => log.flowIntensity != null)
+        .map((log) => log.date.dateOnly)
+        .toSet() // Aynı günde birden fazla kayıt varsa tekil tut
+        .toList()
+      ..sort();
+
+    if (bleedingDays.isEmpty) return [];
+
+    // Ardışık kanama günlerini grupla
+    // 1 günden fazla arayla olan kayıtlar yeni döngü başlangıcı sayılır
+    final periodStarts = <DateTime>[bleedingDays.first];
+
+    for (int i = 1; i < bleedingDays.length; i++) {
+      final diff = bleedingDays[i].difference(bleedingDays[i - 1]).inDays;
+      if (diff > 1) {
+        // Yeni bir döngü başlangıcı
+        periodStarts.add(bleedingDays[i]);
+      }
+    }
+
+    return periodStarts;
+  }
+
+  /// Son 10 döngü verisinden (veya mevcut olanlardan) ortalama döngü
+  /// süresini ve en son adet başlangıç tarihini hesaplar.
+  /// Yeterli veri yoksa null döner.
+  ({DateTime lastPeriodDate, int averageCycleLength})? calculateCycleStats() {
+    final periodStarts = getPeriodStartDates();
+
+    if (periodStarts.isEmpty) return null;
+
+    final lastPeriodDate = periodStarts.last;
+
+    // Tek döngü başlangıcı varsa, ortalama hesaplanamaz — varsayılanı koru
+    if (periodStarts.length < 2) {
+      final settings = loadSettings();
+      return (
+        lastPeriodDate: lastPeriodDate,
+        averageCycleLength: settings?.averageCycleLength ?? 28,
+      );
+    }
+
+    // Son 10 döngü arasındaki farkları hesapla
+    final cycleLengths = <int>[];
+    // En fazla son 11 başlangıç tarihinden 10 döngü farkı elde edebiliriz
+    final startIdx = periodStarts.length > 11 ? periodStarts.length - 11 : 0;
+    for (int i = startIdx + 1; i < periodStarts.length; i++) {
+      final diff = periodStarts[i].difference(periodStarts[i - 1]).inDays;
+      // Mantıklı aralıktaki döngüleri kabul et (15-60 gün)
+      if (diff >= 15 && diff <= 60) {
+        cycleLengths.add(diff);
+      }
+    }
+
+    // Hiçbir geçerli döngü hesaplanamadıysa varsayılanı döndür
+    if (cycleLengths.isEmpty) {
+      final settings = loadSettings();
+      return (
+        lastPeriodDate: lastPeriodDate,
+        averageCycleLength: settings?.averageCycleLength ?? 28,
+      );
+    }
+
+    final totalDays = cycleLengths.reduce((a, b) => a + b);
+    final averageCycleLength = (totalDays / cycleLengths.length).round();
+
+    return (
+      lastPeriodDate: lastPeriodDate,
+      averageCycleLength: averageCycleLength,
+    );
+  }
+
+  /// Döngülerim kartı için detaylı istatistikler.
+  /// Önceki döngü süresi, önceki regl süresi, döngü değişkenliği vb.
+  CycleInsights? getCycleInsights() {
+    final allLogs = loadAllLogs();
+
+    // flowIntensity != null olan kayıtları filtrele ve tarihe göre sırala
+    final bleedingDays = allLogs
+        .where((log) => log.flowIntensity != null)
+        .map((log) => log.date.dateOnly)
+        .toSet()
+        .toList()
+      ..sort();
+
+    if (bleedingDays.isEmpty) return null;
+
+    // Ardışık kanama günlerini gruplara ayır
+    // Her grup bir regl dönemi
+    final periodGroups = <List<DateTime>>[];
+    var currentGroup = <DateTime>[bleedingDays.first];
+
+    for (int i = 1; i < bleedingDays.length; i++) {
+      final diff = bleedingDays[i].difference(bleedingDays[i - 1]).inDays;
+      if (diff > 1) {
+        periodGroups.add(currentGroup);
+        currentGroup = <DateTime>[bleedingDays[i]];
+      } else {
+        currentGroup.add(bleedingDays[i]);
+      }
+    }
+    periodGroups.add(currentGroup);
+
+    // Regl süreleri (her grubun gün sayısı)
+    final periodDurations = periodGroups.map((g) => g.length).toList();
+
+    // Döngü başlangıç tarihleri (her grubun ilk günü)
+    final periodStarts = periodGroups.map((g) => g.first).toList();
+
+    // Döngü süreleri (ardışık başlangıçlar arası fark)
+    final cycleLengths = <int>[];
+    for (int i = 1; i < periodStarts.length; i++) {
+      final diff = periodStarts[i].difference(periodStarts[i - 1]).inDays;
+      if (diff >= 10 && diff <= 90) {
+        cycleLengths.add(diff);
+      }
+    }
+
+    // Önceki döngü süresi (son iki başlangıç arası)
+    int? previousCycleLength;
+    if (cycleLengths.isNotEmpty) {
+      previousCycleLength = cycleLengths.last;
+    }
+
+    // Önceki regl süresi (son grubun uzunluğu)
+    final previousPeriodLength = periodDurations.last;
+
+    // Döngü değişkenliği (min-max)
+    int? variationMin;
+    int? variationMax;
+    if (cycleLengths.length >= 2) {
+      final sorted = List<int>.from(cycleLengths)..sort();
+      variationMin = sorted.first;
+      variationMax = sorted.last;
+    }
+
+    return CycleInsights(
+      previousCycleLength: previousCycleLength,
+      previousPeriodLength: previousPeriodLength,
+      cycleLengths: cycleLengths,
+      periodDurations: periodDurations,
+      variationMin: variationMin,
+      variationMax: variationMax,
+      totalCyclesRecorded: periodStarts.length,
+    );
+  }
+
   // ── Yardımcılar ────────────────────────────────────────
   Set<String> _getDatesSet() {
     return (_p.getStringList(_logDatesKey) ?? []).toSet();
@@ -152,3 +309,58 @@ class LocalStorageService {
     return _p.clear();
   }
 }
+
+/// Döngü istatistik verileri.
+class CycleInsights {
+  final int? previousCycleLength;
+  final int previousPeriodLength;
+  final List<int> cycleLengths;
+  final List<int> periodDurations;
+  final int? variationMin;
+  final int? variationMax;
+  final int totalCyclesRecorded;
+
+  const CycleInsights({
+    required this.previousCycleLength,
+    required this.previousPeriodLength,
+    required this.cycleLengths,
+    required this.periodDurations,
+    required this.variationMin,
+    required this.variationMax,
+    required this.totalCyclesRecorded,
+  });
+
+  /// Önceki döngü süresi durumu.
+  /// 21-35 gün arası normal kabul edilir.
+  CycleStatus get cycleStatus {
+    if (previousCycleLength == null) return CycleStatus.noData;
+    if (previousCycleLength! >= 21 && previousCycleLength! <= 35) {
+      return CycleStatus.normal;
+    }
+    return CycleStatus.abnormal;
+  }
+
+  /// Önceki regl süresi durumu.
+  /// 2-7 gün arası normal kabul edilir.
+  CycleStatus get periodStatus {
+    if (previousPeriodLength >= 2 && previousPeriodLength <= 7) {
+      return CycleStatus.normal;
+    }
+    return CycleStatus.abnormal;
+  }
+
+  /// Döngü düzenliliği durumu.
+  /// Max-min farkı 7 günden az ise düzenli.
+  CycleRegularity get regularity {
+    if (variationMin == null || variationMax == null) {
+      return CycleRegularity.noData;
+    }
+    final variation = variationMax! - variationMin!;
+    if (variation <= 7) return CycleRegularity.regular;
+    return CycleRegularity.irregular;
+  }
+}
+
+enum CycleStatus { normal, abnormal, noData }
+enum CycleRegularity { regular, irregular, noData }
+

@@ -10,8 +10,10 @@ import 'views/onboarding/view/onboarding_view.dart';
 import 'views/onboarding/viewmodel/onboarding_view_model.dart';
 import 'views/dashboard/view/dashboard_view.dart';
 import 'views/dashboard/viewmodel/dashboard_view_model.dart';
-import 'views/calendar/view/calendar_view.dart' as cal;
 import 'views/calendar/viewmodel/calendar_view_model.dart';
+import 'views/articles/view/articles_view.dart';
+import 'views/profile/view/profile_view.dart';
+import 'views/profile/viewmodel/profile_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +41,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => OnboardingViewModel(storage)),
         ChangeNotifierProvider(create: (_) => DashboardViewModel(storage)),
         ChangeNotifierProvider(create: (_) => CalendarViewModel(storage)),
+        ChangeNotifierProvider(create: (_) => ProfileViewModel(storage)),
       ],
       child: MaterialApp(
         title: 'Wellness Takip',
@@ -61,7 +64,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// Ana kabuk — Dashboard ve Takvim arasında BottomNavigationBar ile geçiş.
+/// Ana kabuk — Dashboard, Yazılar ve Profil arasında BottomNavigationBar ile geçiş.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -72,15 +75,11 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 0;
 
-  final _pages = const [DashboardView(), cal.CalendarView()];
-
-  @override
-  void initState() {
-    super.initState();
-    // Not: ViewModel constructor'ları zaten loadData() çağırıyor.
-    // Sadece sayfa geri geldiğinde yeniden yükleme yapılması gerekirse
-    // bu yöntem kullanılabilir, ama ilk açılışta çift çağrım yapılmamalı.
-  }
+  final _pages = const [
+    DashboardView(),
+    ArticlesView(),
+    ProfileView(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -106,9 +105,14 @@ class _HomeShellState extends State<HomeShell> {
               label: 'Ana Sayfa',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month_rounded),
-              activeIcon: Icon(Icons.calendar_month_rounded),
-              label: 'Takvim',
+              icon: Icon(Icons.article_rounded),
+              activeIcon: Icon(Icons.article_rounded),
+              label: 'Yazılar',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_rounded),
+              activeIcon: Icon(Icons.person_rounded),
+              label: 'Profil',
             ),
           ],
         ),

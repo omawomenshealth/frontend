@@ -4,9 +4,12 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../data/models/period_log_model.dart';
 import '../viewmodel/dashboard_view_model.dart';
+import '../../calendar/viewmodel/calendar_view_model.dart';
+import '../../calendar/view/calendar_view.dart' as cal;
 import '../widgets/countdown_circle.dart';
 import '../widgets/daily_log_sheet.dart';
 import '../widgets/feeling_card.dart';
+import '../widgets/cycle_insights_card.dart';
 
 /// Dashboard ana ekranı.
 class DashboardView extends StatelessWidget {
@@ -60,17 +63,34 @@ class DashboardView extends StatelessWidget {
 
                     // ── Regl Geri Sayım (Kadın) ───────────
                     if (vm.hasPeriodTracking) ...[
-                      _buildPeriodCard(vm),
+                      GestureDetector(
+                        onTap: () {
+                          // Takvim sayfasına git
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const cal.CalendarView(),
+                            ),
+                          );
+                        },
+                        child: _buildPeriodCard(vm),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // ── Döngülerim İstatistik Kartı ───────
+                    if (vm.hasPeriodTracking && vm.cycleInsights != null) ...[
+                      CycleInsightsCard(insights: vm.cycleInsights!),
                       const SizedBox(height: 16),
                     ],
 
                     // ── Hızlı Erişim (4 yuvarlak) ────────
                     FeelingCard(
                       showPeriod: vm.hasPeriodTracking,
-                      onPeriodTap: () => _showDailyLogSheet(context, vm),
-                      onNutritionTap: () => _showDailyLogSheet(context, vm),
-                      onMedicationTap: () => _showDailyLogSheet(context, vm),
-                      onMoodTap: () => _showDailyLogSheet(context, vm),
+                      onPeriodTap: () => _showDailyLogSheet(context, vm, initialIndex: 0),
+                      onNutritionTap: () => _showDailyLogSheet(context, vm, initialIndex: vm.hasPeriodTracking ? 1 : 0),
+                      onMedicationTap: () => _showDailyLogSheet(context, vm, initialIndex: vm.hasPeriodTracking ? 2 : 1),
+                      onMoodTap: () => _showDailyLogSheet(context, vm, initialIndex: vm.hasPeriodTracking ? 3 : 2),
                     ),
                     const SizedBox(height: 24),
 
@@ -448,7 +468,7 @@ class DashboardView extends StatelessWidget {
   }
 
   // ── Günlük Kayıt Sheet ──────────────────────────────────
-  void _showDailyLogSheet(BuildContext context, DashboardViewModel vm) {
+  void _showDailyLogSheet(BuildContext context, DashboardViewModel vm, {int initialIndex = 0}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -458,7 +478,25 @@ class DashboardView extends StatelessWidget {
           DateTime.now(),
         ), // Her seferinde yeni bir kayıt açılır
         settings: vm.settings!,
-        onSave: (log) => vm.saveLog(log),
+        initialTabIndex: initialIndex,
+        onSave: (log) {
+          // Adet verisi varsa döngü istatistiklerini yeniden hesapla
+          if (log.flowIntensity != null) {
+            vm.recordPeriodAndRecalculate(log).then((_) {
+              // Takvim viewmodel'ini de senkronize et
+              if (context.mounted) {
+                context.read<CalendarViewModel>().loadData();
+              }
+            });
+          } else {
+            vm.saveLog(log).then((_) {
+              // Takvimi de güncelle (non-period data için)
+              if (context.mounted) {
+                context.read<CalendarViewModel>().loadData();
+              }
+            });
+          }
+        },
       ),
     );
   }
