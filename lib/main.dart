@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileViewModel(storage)),
       ],
       child: MaterialApp(
-        title: 'Wellness Takip',
+        title: 'OMA',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         localizationsDelegates: const [
@@ -75,11 +75,7 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 0;
 
-  final _pages = const [
-    DashboardView(),
-    ArticlesView(),
-    ProfileView(),
-  ];
+  final _pages = const [DashboardView(), ArticlesView(), ProfileView()];
 
   @override
   Widget build(BuildContext context) {

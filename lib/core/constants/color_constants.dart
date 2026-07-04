@@ -6,27 +6,27 @@ class AppColors {
   AppColors._();
 
   // ── Ana Renkler ──────────────────────────────────────────
-  static const Color primary = Color(0xFFA1887F);       // Kahverengi
-  static const Color primaryLight = Color(0xFFD7CCC8);
-  static const Color primaryDark = Color(0xFF5D4037);
+  static const Color primary = Color(0xFFE05A7E);       // Pembe (Gül Rengi)
+  static const Color primaryLight = Color(0xFFFCD7DF);
+  static const Color primaryDark = Color(0xFF912440);
 
-  static const Color secondary = Color(0xFFAED581);     // Adaçayı Yeşili
-  static const Color secondaryLight = Color(0xFFDCEDC8);
-  static const Color secondaryDark = Color(0xFF689F38);
+  static const Color secondary = Color(0xFFC0A9BD);     // Eflatun / Lila
+  static const Color secondaryLight = Color(0xFFECE3EB);
+  static const Color secondaryDark = Color(0xFF7A6478);
 
-  static const Color accent = Color(0xFFE64A19);        // Kiremit Rengi
-  static const Color accentLight = Color(0xFFFFCCBC);
+  static const Color accent = Color(0xFFD81B60);        // Canlı Pembe
+  static const Color accentLight = Color(0xFFF8BBD0);
 
   // ── Arka Plan ────────────────────────────────────────────
-  static const Color background = Color(0xFFFAF8F5);    // Krem
+  static const Color background = Color(0xFFFFF8F9);    // Krem Pembe
   static const Color surface = Color(0xFFFFFFFF);
   static const Color cardBackground = Color(0xFFFFFFFF);
-  static const Color scaffoldBackground = Color(0xFFF7F3F0); // Açık Krem
+  static const Color scaffoldBackground = Color(0xFFFFF0F3); // Açık Pembe
 
   // ── Metin ────────────────────────────────────────────────
-  static const Color textPrimary = Color(0xFF3E2723);
-  static const Color textSecondary = Color(0xFF795548);
-  static const Color textHint = Color(0xFFBCAAA4);
+  static const Color textPrimary = Color(0xFF3B131D);   // Koyu Mürdüm / Bordo
+  static const Color textSecondary = Color(0xFF784D58);
+  static const Color textHint = Color(0xFFBCA5AA);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
   // ── Modül Renkleri ───────────────────────────────────────
@@ -60,25 +60,25 @@ class AppColors {
 
   // ── Gradient'ler ─────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primary, Color(0xFFD7CCC8)],
+    colors: [primary, Color(0xFFFCD7DF)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient accentGradient = LinearGradient(
-    colors: [accent, Color(0xFFFFCCBC)],
+    colors: [accent, Color(0xFFF8BBD0)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient tealGradient = LinearGradient(
-    colors: [secondary, Color(0xFFDCEDC8)],
+    colors: [secondary, Color(0xFFECE3EB)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient backgroundGradient = LinearGradient(
-    colors: [Color(0xFFF7F3F0), Color(0xFFEFEBE9)],
+    colors: [Color(0xFFFFF0F3), Color(0xFFF7E2E6)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
