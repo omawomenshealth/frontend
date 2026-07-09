@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../data/models/period_log_model.dart';
+import '../../dashboard/widgets/daily_log_sheet.dart';
+import '../../dashboard/viewmodel/dashboard_view_model.dart';
 import '../viewmodel/calendar_view_model.dart';
 
 /// Takvim ekranı — aylık görünüm, renkli günler, günlük kayıt detayı.
@@ -313,6 +316,28 @@ class _CalendarViewState extends State<CalendarView> {
 // Seçili Gün Detayı — kendi Selector scope'u ile
 // ══════════════════════════════════════════════════════════════
 class _DayDetailSection extends StatelessWidget {
+  void _showDailyLogSheet(BuildContext context, DateTime date, CalendarViewModel calendarVm) {
+    final dashboardVm = context.read<DashboardViewModel>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => DailyLogSheet(
+        initialLog: DailyLog.empty(date),
+        settings: calendarVm.settings ?? dashboardVm.settings!,
+        initialTabIndex: 0,
+        onSave: (log) async {
+          if (log.flowIntensity != null) {
+            await dashboardVm.recordPeriodAndRecalculate(log);
+          } else {
+            await dashboardVm.saveLog(log);
+          }
+          calendarVm.loadData();
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Selector<CalendarViewModel, DateTime>(
@@ -350,6 +375,32 @@ class _DayDetailSection extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
+                  // "Kayıt Ekle" Butonu
+                  GestureDetector(
+                    onTap: () => _showDailyLogSheet(context, selectedDay, vm),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.add_circle_outline, size: 14, color: AppColors.primary),
+                          SizedBox(width: 4),
+                          Text(
+                            'Kayıt Ekle',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   if (isPeriod)
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -391,6 +442,20 @@ class _DayDetailSection extends StatelessWidget {
                             color: AppColors.textHint,
                             fontSize: 14,
                           ),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          onPressed: () => _showDailyLogSheet(context, selectedDay, vm),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Icon(Icons.add_rounded, size: 18),
+                          label: const Text('Kayıt Ekle', style: TextStyle(fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),

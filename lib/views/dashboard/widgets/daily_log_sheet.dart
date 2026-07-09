@@ -4,6 +4,8 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/shared_widgets/custom_button.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/user_settings_model.dart';
+import '../../../core/utils/app_time.dart';
+import '../../../core/utils/date_extensions.dart';
 
 /// Günlük kayıt BottomSheet — tüm modüllerin detaylı giriş ekranı.
 class DailyLogSheet extends StatefulWidget {
@@ -350,19 +352,57 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     CustomButton(
                       text: AppStrings.save,
                       icon: Icons.check_circle_outline,
-                      onPressed: () {
-                        widget.onSave(_log);
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text(AppStrings.saved),
-                            backgroundColor: AppColors.success,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                      onPressed: () async {
+                        final today = AppTime.now.dateOnly;
+                        DateTime finalDate = _log.date;
+                        
+                        if (_log.date.dateOnly.isBefore(today)) {
+                          // Geçmiş bir gün için saat sor
+                          final TimeOfDay? pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay(hour: _log.date.hour, minute: _log.date.minute),
+                            helpText: 'Kayıt Saatini Seçin',
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: const ColorScheme.light(
+                                    primary: AppColors.primary,
+                                    onPrimary: Colors.white,
+                                    surface: AppColors.surface,
+                                    onSurface: AppColors.textPrimary,
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
+                          );
+                          if (pickedTime == null) {
+                            // Kullanıcı iptal ettiyse kaydetme işlemini durdur
+                            return;
+                          }
+                          finalDate = DateTime(
+                            _log.date.year,
+                            _log.date.month,
+                            _log.date.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                          );
+                        }
+
+                        widget.onSave(_log.copyWith(date: finalDate));
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text(AppStrings.saved),
+                              backgroundColor: AppColors.success,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       },
                     ),
                     const SizedBox(height: 32),

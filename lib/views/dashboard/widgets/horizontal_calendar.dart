@@ -11,12 +11,14 @@ class HorizontalCalendar extends StatefulWidget {
   final DateTime selectedDate;
   final ValueChanged<DateTime> onDateSelected;
   final PeriodCalculator? periodCalculator;
+  final VoidCallback? onCalendarTap;
 
   const HorizontalCalendar({
     super.key,
     required this.selectedDate,
     required this.onDateSelected,
     this.periodCalculator,
+    this.onCalendarTap,
   });
 
   @override
@@ -89,16 +91,19 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
         // ── Küçük Takvim logosu + başlık ──────
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.calendar_today_rounded,
-                color: AppColors.primary,
-                size: 18,
+            GestureDetector(
+              onTap: widget.onCalendarTap,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.calendar_today_rounded,
+                  color: AppColors.primary,
+                  size: 18,
+                ),
               ),
             ),
             const SizedBox(width: 10),

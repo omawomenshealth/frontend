@@ -2,6 +2,7 @@ import 'package:app_proje_a/views/dashboard/widgets/horizontal_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/utils/date_extensions.dart';
 import '../../../data/models/period_log_model.dart';
 import '../viewmodel/dashboard_view_model.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
@@ -58,6 +59,14 @@ class DashboardView extends StatelessWidget {
                       selectedDate: vm.selectedDate,
                       onDateSelected: vm.selectDate,
                       periodCalculator: vm.periodCalculator,
+                      onCalendarTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const cal.CalendarView(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
 
@@ -94,8 +103,8 @@ class DashboardView extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    // ── Bugünün Kayıtları (Timeline) ───────
-                    if (vm.todayLogs.isNotEmpty) _buildTimeline(vm),
+                    // ── Günlük Kayıtlar (Timeline) ──────────
+                    _buildTimeline(context, vm),
                   ],
                 ),
               ),
@@ -330,21 +339,111 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  // ── Bugünün Kayıtları (Timeline) ────────────────────────
-  Widget _buildTimeline(DashboardViewModel vm) {
+  // ── Günlük Kayıtlar (Timeline) ─────────────────────────
+  Widget _buildTimeline(BuildContext context, DashboardViewModel vm) {
+    final isToday = vm.selectedDate.isToday;
+    final title = isToday
+        ? '📋 Bugünün Kayıtları'
+        : '📋 ${vm.selectedDate.toDotFormat()} Tarihli Kayıtlar';
+
+    final hasLogs = vm.todayLogs.any((log) => log.hasData);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '📋 Bugünün Kayıtları',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
+        Row(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const Spacer(),
+            // "+ Ekle" Butonu
+            GestureDetector(
+              onTap: () => _showDailyLogSheet(context, vm),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.add_circle_outline, size: 14, color: AppColors.primary),
+                    SizedBox(width: 4),
+                    Text(
+                      'Kayıt Ekle',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
-        ...vm.todayLogs.where((log) => log.hasData).map((log) {
+        if (!hasLogs)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.event_note_outlined,
+                  size: 40,
+                  color: AppColors.textHint.withValues(alpha: 0.5),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Bu tarih için henüz bir kayıt girilmemiş.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () => _showDailyLogSheet(context, vm),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  icon: const Icon(Icons.add_rounded, size: 16),
+                  label: const Text(
+                    'Kayıt Ekle',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          ...vm.todayLogs.where((log) => log.hasData).map((log) {
           final timeStr =
               '${log.date.hour.toString().padLeft(2, '0')}:${log.date.minute.toString().padLeft(2, '0')}';
 
