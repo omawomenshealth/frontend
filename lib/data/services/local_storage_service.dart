@@ -50,20 +50,60 @@ class LocalStorageService {
   }
 
   // ── Günlük Kayıtlar ───────────────────────────────────
-
   /// Günlük kayıt kaydet.
+  /// Günlük kayıt kaydet ve istatistikleri otomatik güncelle.
   Future<bool> saveDailyLog(DailyLog log) async {
     final keyStr = log.date.toIso8601String();
     final key = '$_logPrefix$keyStr';
     final success = await _p.setString(key, log.toJsonString());
 
-    // Tarih listesine ekle
     if (success) {
       final dates = _getDatesSet();
       dates.add(keyStr);
       await _p.setStringList(_logDatesKey, dates.toList());
+
+      // SİHİRLİ DOKUNUŞ: Veri her değiştiğinde istatistikleri arka planda sessizce güncelle
+      await _syncCalculatedStatsToSettings();
     }
     return success;
+  }
+
+  /// Belirli bir günün TÜM kayıtlarını sil ve istatistikleri otomatik güncelle.
+  Future<bool> deleteLogsForDate(DateTime date) async {
+    final dateStr = date.toStorageKey();
+    final dates = _getDatesSet();
+    final toRemove = dates.where((d) => d.startsWith(dateStr)).toList();
+
+    bool allSuccess = true;
+    for (final keyStr in toRemove) {
+      final success = await _p.remove('$_logPrefix$keyStr');
+      if (!success) allSuccess = false;
+      dates.remove(keyStr);
+    }
+
+    if (allSuccess) {
+      await _p.setStringList(_logDatesKey, dates.toList());
+
+      // SİHİRLİ DOKUNUŞ: Veri silindiğinde de istatistikleri güncelle
+      await _syncCalculatedStatsToSettings();
+    }
+    return allSuccess;
+  }
+
+  /// Arka planda hesaplama yapıp ayarları güncelleyen private yardımcı metot
+  Future<void> _syncCalculatedStatsToSettings() async {
+    final stats = calculateCycleStats();
+    final settings = loadSettings();
+
+    if (stats != null && settings != null) {
+      final updatedSettings = settings.copyWith(
+        averageCycleLength: stats.averageCycleLength,
+        averagePeriodLength: stats.averagePeriodLength,
+        lastPeriodDate: stats
+            .lastPeriodDate, // Eğer modelinizde varsa son adet tarihini de eşitleyin
+      );
+      await saveSettings(updatedSettings);
+    }
   }
 
   /// Belirli bir günün tüm kayıtlarını oku.
@@ -125,23 +165,6 @@ class LocalStorageService {
     return _getDatesSet().map((s) => DateTime.parse(s).dateOnly).toSet();
   }
 
-  /// Belirli bir günün TÜM kayıtlarını sil.
-  Future<bool> deleteLogsForDate(DateTime date) async {
-    final dateStr = date.toStorageKey();
-    final dates = _getDatesSet();
-    final toRemove = dates.where((d) => d.startsWith(dateStr)).toList();
-
-    bool allSuccess = true;
-    for (final keyStr in toRemove) {
-      final success = await _p.remove('$_logPrefix$keyStr');
-      if (!success) allSuccess = false;
-      dates.remove(keyStr);
-    }
-
-    await _p.setStringList(_logDatesKey, dates.toList());
-    return allSuccess;
-  }
-
   // ── Döngü Hesaplama ─────────────────────────────────────
 
   /// Tüm kayıtlardan kanama günlerini bulup ardışık grupları ayırarak
@@ -151,12 +174,13 @@ class LocalStorageService {
     final allLogs = loadAllLogs();
 
     // flowIntensity != null olan kayıtları filtrele ve tarihe göre sırala
-    final bleedingDays = allLogs
-        .where((log) => log.flowIntensity != null)
-        .map((log) => log.date.dateOnly)
-        .toSet() // Aynı günde birden fazla kayıt varsa tekil tut
-        .toList()
-      ..sort();
+    final bleedingDays =
+        allLogs
+            .where((log) => log.flowIntensity != null)
+            .map((log) => log.date.dateOnly)
+            .toSet() // Aynı günde birden fazla kayıt varsa tekil tut
+            .toList()
+          ..sort();
 
     if (bleedingDays.isEmpty) return [];
 
@@ -175,52 +199,59 @@ class LocalStorageService {
     return periodStarts;
   }
 
-  /// Son 10 döngü verisinden (veya mevcut olanlardan) ortalama döngü
-  /// süresini ve en son adet başlangıç tarihini hesaplar.
-  /// Yeterli veri yoksa null döner.
-  ({DateTime lastPeriodDate, int averageCycleLength})? calculateCycleStats() {
+  /// Hesaplanan yeni değerleri kullanıcı ayarlarına otomatik yansıtır.
+  /// Son 10 döngü verisinden ortalama döngü süresini,
+  /// ortalama regl süresini ve en son adet başlangıç tarihini hesaplar.
+  ({DateTime lastPeriodDate, int averageCycleLength, int averagePeriodLength})?
+  calculateCycleStats() {
     final periodStarts = getPeriodStartDates();
-
     if (periodStarts.isEmpty) return null;
 
     final lastPeriodDate = periodStarts.last;
+    final settings = loadSettings();
 
-    // Tek döngü başlangıcı varsa, ortalama hesaplanamaz — varsayılanı koru
-    if (periodStarts.length < 2) {
-      final settings = loadSettings();
-      return (
-        lastPeriodDate: lastPeriodDate,
-        averageCycleLength: settings?.averageCycleLength ?? 28,
-      );
-    }
+    // 1. Adım: Varsayılan değerleri yükle
+    int finalCycleLength = settings?.averageCycleLength ?? 28;
+    int finalPeriodLength = settings?.averagePeriodLength ?? 5;
 
-    // Son 10 döngü arasındaki farkları hesapla
-    final cycleLengths = <int>[];
-    // En fazla son 11 başlangıç tarihinden 10 döngü farkı elde edebiliriz
-    final startIdx = periodStarts.length > 11 ? periodStarts.length - 11 : 0;
-    for (int i = startIdx + 1; i < periodStarts.length; i++) {
-      final diff = periodStarts[i].difference(periodStarts[i - 1]).inDays;
-      // Mantıklı aralıktaki döngüleri kabul et (15-60 gün)
-      if (diff >= 15 && diff <= 60) {
-        cycleLengths.add(diff);
+    // 2. Adım: Ortalama Döngü Süresi Hesaplama
+    if (periodStarts.length >= 2) {
+      final cycleLengths = <int>[];
+      final startIdx = periodStarts.length > 11 ? periodStarts.length - 11 : 0;
+      for (int i = startIdx + 1; i < periodStarts.length; i++) {
+        final diff = periodStarts[i].difference(periodStarts[i - 1]).inDays;
+        if (diff >= 15 && diff <= 60) {
+          cycleLengths.add(diff);
+        }
+      }
+      if (cycleLengths.isNotEmpty) {
+        finalCycleLength =
+            (cycleLengths.reduce((a, b) => a + b) / cycleLengths.length)
+                .round();
       }
     }
 
-    // Hiçbir geçerli döngü hesaplanamadıysa varsayılanı döndür
-    if (cycleLengths.isEmpty) {
-      final settings = loadSettings();
-      return (
-        lastPeriodDate: lastPeriodDate,
-        averageCycleLength: settings?.averageCycleLength ?? 28,
-      );
+    // 3. Adım: Ortalama Regl Süresi Hesaplama (Bug 1 Kesin Çözümü)
+    final insights = getCycleInsights();
+    if (insights != null && insights.periodDurations.isNotEmpty) {
+      // Son 10 regl süresinin ortalamasını al
+      final recentDurations = insights.periodDurations.length > 10
+          ? insights.periodDurations.sublist(
+              insights.periodDurations.length - 10,
+            )
+          : insights.periodDurations;
+
+      final totalPeriodDays = recentDurations.reduce((a, b) => a + b);
+      finalPeriodLength = (totalPeriodDays / recentDurations.length).round();
     }
 
-    final totalDays = cycleLengths.reduce((a, b) => a + b);
-    final averageCycleLength = (totalDays / cycleLengths.length).round();
+    // NOT: saveSettings() işlemini buradan kaldırdık.
+    // Bu metot sadece saf (pure) bir hesaplama fonksiyonu olarak kalmalı.
 
     return (
       lastPeriodDate: lastPeriodDate,
-      averageCycleLength: averageCycleLength,
+      averageCycleLength: finalCycleLength,
+      averagePeriodLength: finalPeriodLength,
     );
   }
 
@@ -230,12 +261,13 @@ class LocalStorageService {
     final allLogs = loadAllLogs();
 
     // flowIntensity != null olan kayıtları filtrele ve tarihe göre sırala
-    final bleedingDays = allLogs
-        .where((log) => log.flowIntensity != null)
-        .map((log) => log.date.dateOnly)
-        .toSet()
-        .toList()
-      ..sort();
+    final bleedingDays =
+        allLogs
+            .where((log) => log.flowIntensity != null)
+            .map((log) => log.date.dateOnly)
+            .toSet()
+            .toList()
+          ..sort();
 
     if (bleedingDays.isEmpty) return null;
 
@@ -362,5 +394,5 @@ class CycleInsights {
 }
 
 enum CycleStatus { normal, abnormal, noData }
-enum CycleRegularity { regular, irregular, noData }
 
+enum CycleRegularity { regular, irregular, noData }

@@ -177,6 +177,15 @@ class _CalendarViewState extends State<CalendarView> {
 
             // 🚀 Her gün çizilirken burası tetiklenir (Artık kasmayacak)
             calendarBuilders: CalendarBuilders(
+              defaultBuilder: (context, day, focusedDay) {
+                return _buildDayCell(context, day, vm, isSelected: false, isToday: false);
+              },
+              todayBuilder: (context, day, focusedDay) {
+                return _buildDayCell(context, day, vm, isSelected: false, isToday: true);
+              },
+              selectedBuilder: (context, day, focusedDay) {
+                return _buildDayCell(context, day, vm, isSelected: true, isToday: false);
+              },
               markerBuilder: (context, day, events) {
                 return _buildMarkers(day, vm);
               },
@@ -187,39 +196,115 @@ class _CalendarViewState extends State<CalendarView> {
     );
   }
 
-  // ── Gün Marker'ları ─────────────────────────────────────
-  Widget? _buildMarkers(DateTime day, CalendarViewModel vm) {
-    // Bu fonksiyonlar artık saniyenin binde biri hızında çalışıyor (O(1))
-    final hasLog = vm.hasLogForDay(day);
+  // ── Gün Hücresi Oluşturma (Büyük, hafif transparan daireler) ──
+  Widget _buildDayCell(
+    BuildContext context,
+    DateTime day,
+    CalendarViewModel vm, {
+    required bool isSelected,
+    required bool isToday,
+  }) {
     final isPeriod = vm.isPeriodDay(day);
     final isOvulation = vm.isOvulationDay(day);
-    final isFertile = vm.isFertileDay(
-      day,
-    ); // Not: ViewModel içinde ovülasyon elendiği için direkt çağırıyoruz
+    final isFertile = vm.isFertileDay(day);
 
-    if (!hasLog && !isPeriod && !isOvulation && !isFertile) return null;
+    Color? backgroundColor;
+    TextStyle textStyle = const TextStyle(color: AppColors.textPrimary, fontSize: 14);
 
-    return Positioned(
-      bottom:
-          4, // Noktaların gün sayısının altına düzgün oturması için hafif artırıldı
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (hasLog) _dot(AppColors.primary),
-          if (isPeriod) _dot(AppColors.periodPrimary),
-          if (isOvulation) _dot(AppColors.ovulation),
-          if (isFertile) _dot(AppColors.fertile),
-        ],
-      ),
+    if (isPeriod) {
+      backgroundColor = AppColors.periodPrimary.withValues(alpha: 0.15);
+      if (!isSelected && !isToday) {
+        textStyle = const TextStyle(
+          color: AppColors.periodPrimary,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        );
+      }
+    } else if (isOvulation) {
+      backgroundColor = AppColors.ovulation.withValues(alpha: 0.15);
+      if (!isSelected && !isToday) {
+        textStyle = const TextStyle(
+          color: AppColors.ovulation,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        );
+      }
+    } else if (isFertile) {
+      backgroundColor = AppColors.fertile.withValues(alpha: 0.15);
+      if (!isSelected && !isToday) {
+        textStyle = const TextStyle(
+          color: AppColors.fertile,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        );
+      }
+    }
+
+    Widget dayNumText = Text(
+      '${day.day}',
+      style: isSelected
+          ? const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            )
+          : isToday
+              ? const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                )
+              : textStyle,
     );
+
+    Widget cellBody;
+
+    if (isSelected) {
+      cellBody = Container(
+        width: 38,
+        height: 38,
+        decoration: const BoxDecoration(
+          color: AppColors.primary,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: dayNumText,
+      );
+    } else {
+      final decorationColor = backgroundColor ?? (isToday ? AppColors.primary.withValues(alpha: 0.15) : null);
+      final border = isToday ? Border.all(color: AppColors.primary, width: 1.5) : null;
+
+      cellBody = Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: decorationColor,
+          shape: BoxShape.circle,
+          border: border,
+        ),
+        alignment: Alignment.center,
+        child: dayNumText,
+      );
+    }
+
+    return Center(child: cellBody);
   }
 
-  Widget _dot(Color color) {
-    return Container(
-      width: 6,
-      height: 6,
-      margin: const EdgeInsets.symmetric(horizontal: 1),
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+  // ── Gün Marker'ları ─────────────────────────────────────
+  Widget? _buildMarkers(DateTime day, CalendarViewModel vm) {
+    final hasLog = vm.hasLogForDay(day);
+    if (!hasLog) return null;
+
+    return Positioned(
+      bottom: 5,
+      child: Container(
+        width: 5,
+        height: 5,
+        decoration: const BoxDecoration(
+          color: Colors.amber,
+          shape: BoxShape.circle,
+        ),
+      ),
     );
   }
 }

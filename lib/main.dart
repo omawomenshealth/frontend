@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/theme/app_theme.dart';
+import 'core/utils/app_time.dart';
 import 'data/services/local_storage_service.dart';
 import 'views/auth/view/auth_view.dart';
 import 'views/onboarding/view/onboarding_view.dart';
@@ -19,6 +20,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await initializeDateFormatting('tr_TR', null);
+  await AppTime.init();
 
   final storage = LocalStorageService();
   await storage.init();

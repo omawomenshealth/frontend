@@ -4,6 +4,7 @@ import '../../../data/models/period_log_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../core/utils/app_time.dart';
 
 /// Dashboard iş mantığı.
 class DashboardViewModel extends ChangeNotifier {
@@ -18,7 +19,7 @@ class DashboardViewModel extends ChangeNotifier {
   PeriodCalculator? _periodCalculator;
   CycleInsights? _cycleInsights;
   bool _isLoading = true;
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDate = AppTime.now;
 
   UserSettings? get settings => _settings;
   List<DailyLog> get todayLogs => _todayLogs;
@@ -40,7 +41,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   /// Karşılama mesajı (saate göre).
   String get greeting {
-    final hour = DateTime.now().hour;
+    final hour = AppTime.now.hour;
     final name = _settings?.userName ?? '';
     final nameStr = name.isNotEmpty ? ', $name' : '';
 
@@ -51,7 +52,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   /// Bugünün tarih stringi.
   String get todayDateStr {
-    final now = DateTime.now();
+    final now = AppTime.now;
     return '${now.turkishWeekday}, ${now.day}.${now.month}.${now.year}';
   }
 
@@ -84,7 +85,7 @@ class DashboardViewModel extends ChangeNotifier {
   /// Günlük kaydı ekle veya güncelle.
   Future<void> saveLog(DailyLog log) async {
     await _storage.saveDailyLog(log);
-    _todayLogs = _storage.loadLogsForDate(DateTime.now());
+    _todayLogs = _storage.loadLogsForDate(AppTime.now);
     notifyListeners();
   }
 
@@ -125,14 +126,14 @@ class DashboardViewModel extends ChangeNotifier {
 
   /// Mood güncelle (en son kaydı günceller veya yenisini oluşturur).
   Future<void> updateMood(String mood, String emoji) async {
-    final log = (latestLog ?? DailyLog.empty(DateTime.now()))
+    final log = (latestLog ?? DailyLog.empty(AppTime.now))
         .copyWith(mood: mood, moodEmoji: emoji);
     await saveLog(log);
   }
 
   /// İlaç alındı işaretle.
   Future<void> toggleMedication(int index, bool taken) async {
-    final log = latestLog ?? DailyLog.empty(DateTime.now());
+    final log = latestLog ?? DailyLog.empty(AppTime.now);
     final medications = List<MedicationEntry>.from(log.medications);
     if (index < medications.length) {
       medications[index] = medications[index].copyWith(taken: taken);
@@ -142,7 +143,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   /// Takviye alındı işaretle.
   Future<void> toggleSupplement(int index, bool taken) async {
-    final log = latestLog ?? DailyLog.empty(DateTime.now());
+    final log = latestLog ?? DailyLog.empty(AppTime.now);
     final supplements = List<MedicationEntry>.from(log.supplements);
     if (index < supplements.length) {
       supplements[index] = supplements[index].copyWith(taken: taken);

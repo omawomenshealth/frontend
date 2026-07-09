@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../utils/date_extensions.dart';
+import '../utils/app_time.dart';
 
 /// Regl döngüsü fazları.
 enum CyclePhase {
-  menstrual,    // Adet günleri
-  follicular,   // Foliküler faz
-  ovulation,    // Ovülasyon
-  luteal,       // Luteal faz
+  menstrual, // Adet günleri
+  follicular, // Foliküler faz
+  ovulation, // Ovülasyon
+  luteal, // Luteal faz
 }
 
 /// Regl döngüsü hesaplayıcı.
@@ -17,18 +18,19 @@ enum CyclePhase {
 /// O(n) yerine O(1) karmaşıklıkta çalışır.
 class PeriodCalculator {
   final DateTime lastPeriodDate;
-  final int cycleLength;    // Varsayılan: 28
-  final int periodLength;   // Varsayılan: 5
+  final int cycleLength;
+  final int periodLength;
+
+  /// Gerçekleşmiş loglarda o gün kanama girilmiş mi kontrol eden fonksiyon
+  final bool Function(DateTime date)? hasBleedingLog;
 
   PeriodCalculator({
     required this.lastPeriodDate,
     this.cycleLength = 28,
     this.periodLength = 5,
+    this.hasBleedingLog, // UI veya Servisten bu kontrolü paslayacağız
   });
 
-  /// Verilen tarihin döngü içindeki gün indeksini hesaplar (0-indexed).
-  /// Negatif değerler lastPeriodDate'den önceki tarihleri temsil eder
-  /// ama modüler aritmetik ile yine doğru döngü günü bulunur.
   int _dayInCycle(DateTime date) {
     final diff = date.dateOnly.difference(lastPeriodDate.dateOnly).inDays;
     if (cycleLength <= 0) return 0;
@@ -37,7 +39,7 @@ class PeriodCalculator {
 
   /// Sonraki adet başlangıç tarihi.
   DateTime get nextPeriodDate {
-    final today = DateTime.now().dateOnly;
+    final today = AppTime.now.dateOnly;
     final dayInCycle = _dayInCycle(today);
 
     // Eğer şu an adet dönemindeyse, mevcut döngünün başlangıcını döndür
@@ -68,7 +70,7 @@ class PeriodCalculator {
 
   /// Sonraki adet tarihine kaç gün kaldı.
   int get daysUntilNextPeriod {
-    final today = DateTime.now().dateOnly;
+    final today = AppTime.now.dateOnly;
     // Eğer şu an adet dönemindeyse 0 döndür
     if (isInPeriod(today)) return 0;
     final dayInCycle = _dayInCycle(today);
@@ -77,7 +79,18 @@ class PeriodCalculator {
 
   /// Verilen tarih adet döneminde mi? — O(1) modüler aritmetik
   bool isInPeriod(DateTime date) {
-    final dayInCycle = _dayInCycle(date);
+    final today = AppTime.now.dateOnly;
+    final targetDate = date.dateOnly;
+
+    // 1. Durum: Sorgulanan gün BUGÜN veya GEÇMİŞTE ise GERÇEK LOGA bak
+    if (targetDate.isBefore(today) || targetDate.isAtSameMomentAs(today)) {
+      if (hasBleedingLog != null) {
+        return hasBleedingLog!(targetDate);
+      }
+    }
+
+    // 2. Durum: Sorgulanan gün GELECEKTE ise TAHMİNİ matematiksel modele güven
+    final dayInCycle = _dayInCycle(targetDate);
     return dayInCycle < periodLength;
   }
 
@@ -97,14 +110,15 @@ class PeriodCalculator {
 
     // Verimli dönemin döngü sınırını aştığı durum (kısa döngülerde)
     if (fertileStart < 0) {
-      return dayInCycle >= (fertileStart + cycleLength) || dayInCycle < fertileEnd;
+      return dayInCycle >= (fertileStart + cycleLength) ||
+          dayInCycle < fertileEnd;
     }
     return dayInCycle >= fertileStart && dayInCycle < fertileEnd;
   }
 
   /// Bugünün döngü fazı.
   CyclePhase get currentPhase {
-    final today = DateTime.now().dateOnly;
+    final today = AppTime.now.dateOnly;
 
     if (isInPeriod(today)) return CyclePhase.menstrual;
     if (isOvulationDay(today)) return CyclePhase.ovulation;

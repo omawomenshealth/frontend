@@ -475,7 +475,7 @@ class DashboardView extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => DailyLogSheet(
         initialLog: DailyLog.empty(
-          DateTime.now(),
+          vm.selectedDate,
         ), // Her seferinde yeni bir kayıt açılır
         settings: vm.settings!,
         initialTabIndex: initialIndex,

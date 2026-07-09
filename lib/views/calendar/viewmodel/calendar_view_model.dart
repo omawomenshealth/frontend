@@ -4,6 +4,7 @@ import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../core/utils/app_time.dart';
 
 /// Takvim iş mantığı (Optimize Edilmiş Versiyon)
 class CalendarViewModel extends ChangeNotifier {
@@ -15,8 +16,8 @@ class CalendarViewModel extends ChangeNotifier {
 
   UserSettings? _settings;
   Map<DateTime, List<DailyLog>> _logMap = {};
-  DateTime _selectedDay = DateTime.now().dateOnly;
-  DateTime _focusedDay = DateTime.now().dateOnly;
+  DateTime _selectedDay = AppTime.now.dateOnly;
+  DateTime _focusedDay = AppTime.now.dateOnly;
   PeriodCalculator? _periodCalculator;
   bool _isLoading = true;
 

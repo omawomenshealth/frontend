@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/models/user_settings_model.dart';
+import '../../../core/utils/app_time.dart';
+import '../../../core/utils/date_extensions.dart';
+import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
 
@@ -146,6 +149,87 @@ class ProfileView extends StatelessWidget {
                         _infoRow('Takviyeler', 'Belirtilmemiş'),
                     ],
                   ),
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Text(
+                              '⏰ Zaman Yolculuğu (Test)',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const Spacer(),
+                            if (AppTime.offsetDays != 0)
+                              GestureDetector(
+                                onTap: () async {
+                                  await AppTime.setOffsetDays(0);
+                                  if (context.mounted) {
+                                    vm.loadSettings();
+                                    context.read<DashboardViewModel>().loadData();
+                                    context.read<CalendarViewModel>().loadData();
+                                  }
+                                },
+                                child: const Text(
+                                  'Sıfırla',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Sanal Tarih: ${AppTime.now.toDotFormat()} (${AppTime.now.turkishWeekday})',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        if (AppTime.offsetDays != 0) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            'Aktif Sapma: +${AppTime.offsetDays} gün ileri',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _timeTravelButton(context, vm, '+1 Gün', 1),
+                            _timeTravelButton(context, vm, '+7 Gün', 7),
+                            _timeTravelButton(context, vm, '+30 Gün', 30),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -211,6 +295,30 @@ class ProfileView extends StatelessWidget {
           ...children,
         ],
       ),
+    );
+  }
+
+  Widget _timeTravelButton(BuildContext context, ProfileViewModel vm, String label, int daysToAdd) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+        foregroundColor: AppColors.primary,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      onPressed: () async {
+        final newOffset = AppTime.offsetDays + daysToAdd;
+        await AppTime.setOffsetDays(newOffset);
+        if (context.mounted) {
+          vm.loadSettings();
+          context.read<DashboardViewModel>().loadData();
+          context.read<CalendarViewModel>().loadData();
+        }
+      },
+      child: Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
     );
   }
 
@@ -487,7 +595,7 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () async {
-                    final now = DateTime.now();
+                    final now = AppTime.now;
                     final picked = await showDatePicker(
                       context: ctx2,
                       initialDate: s.lastPeriodDate ?? now,

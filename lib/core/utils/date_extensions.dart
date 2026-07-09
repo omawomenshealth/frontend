@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'app_time.dart';
 
 /// DateTime üzerine eklenen yardımcı extension metotları.
 extension DateTimeExtensions on DateTime {
@@ -43,7 +44,7 @@ extension DateTimeExtensions on DateTime {
 
   /// Bugün mü?
   bool get isToday {
-    final now = DateTime.now();
+    final now = AppTime.now;
     return isSameDay(now);
   }
 

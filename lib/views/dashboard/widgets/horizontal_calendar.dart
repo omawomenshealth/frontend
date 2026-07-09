@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/period_calculator.dart';
+import '../../../core/utils/app_time.dart';
 
 /// Yatay kaydırılabilir günlük takvim şeridi.
 /// Sol başta küçük bir takvim ikonu, ardından yatay scroll ile günler gösterilir.
@@ -37,7 +38,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
   }
 
   void _scrollToSelected() {
-    final today = DateTime.now().dateOnly;
+    final today = AppTime.now.dateOnly;
     final diff = widget.selectedDate.dateOnly.difference(today).inDays;
     final targetIndex = _centerIndex + diff;
     // Her item ~64px genişlikte
@@ -80,7 +81,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    final today = DateTime.now().dateOnly;
+    final today = AppTime.now.dateOnly;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

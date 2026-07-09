@@ -4,6 +4,7 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/shared_widgets/custom_button.dart';
 import '../../../data/models/user_settings_model.dart';
+import '../../../core/utils/app_time.dart';
 import '../viewmodel/onboarding_view_model.dart';
 
 /// Onboarding ekranı — adım adım kullanıcı bilgisi toplama.
@@ -459,7 +460,7 @@ class _LastPeriodSection extends StatelessWidget {
             _sectionTitle(AppStrings.lastPeriodDate),
             GestureDetector(
               onTap: () async {
-                final now = DateTime.now();
+                final now = AppTime.now;
                 final picked = await showDatePicker(
                   context: context,
                   initialDate: lastPeriodDate ?? now,
