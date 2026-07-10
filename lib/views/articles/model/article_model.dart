@@ -41,7 +41,7 @@ class DummyArticles {
 
   static const Color _beslenme = Color(0xFFFF8A65);
   static const Color _egzersiz = Color(0xFF81C784);
-  static const Color _kadin = Color(0xFFE57373);
+  static const Color _kadin = Color(0xFF9CAB84);
   static const Color _ruhHali = Color(0xFF64B5F6);
   static const Color _uyku = Color(0xFF9575CD);
   static const Color _genel = Color(0xFF4DB6AC);

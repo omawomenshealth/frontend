@@ -27,7 +27,11 @@ class ArticleDetailView extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: Colors.white.withValues(alpha: 0.8),
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: AppColors.textPrimary),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 16,
+                    color: AppColors.textPrimary,
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
@@ -72,7 +76,10 @@ class ArticleDetailView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.25),
                                 borderRadius: BorderRadius.circular(12),
@@ -160,7 +167,10 @@ class ArticleDetailView extends StatelessWidget {
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.surface,
                           borderRadius: BorderRadius.circular(10),
@@ -174,7 +184,11 @@ class ArticleDetailView extends StatelessWidget {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.timer_outlined, size: 14, color: article.cardColor),
+                            Icon(
+                              Icons.timer_outlined,
+                              size: 14,
+                              color: article.cardColor,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               article.readTime,
@@ -205,10 +219,7 @@ class ArticleDetailView extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          '💡',
-                          style: TextStyle(fontSize: 22),
-                        ),
+                        const Text('💡', style: TextStyle(fontSize: 22)),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -326,7 +337,7 @@ class ArticleDetailView extends StatelessWidget {
           '### Ovülasyon Fazı (14-16. Günler)',
           'Vücut sıcaklığı ve enerjinin en üst seviyede olduğu dönemdir. Hafif, antioksidan bakımından zengin ve temiz beslenmeye özen gösterin.',
           '### Luteal Faz (17-28. Günler)',
-          'Progesteron hormonunun etkisiyle vücutta ödem artabilir ve tatlı krizleri baş gösterebilir. Kompleks karbonhidratlar tüketerek kan şekerini dengelemek bu dönemi rahat atlatmanızı sağlar.'
+          'Progesteron hormonunun etkisiyle vücutta ödem artabilir ve tatlı krizleri baş gösterebilir. Kompleks karbonhidratlar tüketerek kan şekerini dengelemek bu dönemi rahat atlatmanızı sağlar.',
         ];
       case '6':
         return [
@@ -341,7 +352,7 @@ class ArticleDetailView extends StatelessWidget {
           '• Yoga, meditasyon veya hafif yürüyüşler gibi stres azaltıcı aktivitelere vakit ayırın.',
           '• Kahve ve kafein içeren içecekler sinirliliği artırabilir, bitki çaylarına yönelin.',
           '### Takviye Desteği',
-          'B6 vitamini ve magnezyum kombinasyonunun PMS semptomları üzerinde olumlu etkileri bilimsel olarak kanıtlanmıştır. Doktorunuza danışarak uygun takviyeleri alabilirsiniz.'
+          'B6 vitamini ve magnezyum kombinasyonunun PMS semptomları üzerinde olumlu etkileri bilimsel olarak kanıtlanmıştır. Doktorunuza danışarak uygun takviyeleri alabilirsiniz.',
         ];
       default:
         return [
@@ -352,7 +363,7 @@ class ArticleDetailView extends StatelessWidget {
           '• Günlük yürüyüşler ve hafif egzersizleri bir alışkanlık haline getirin.',
           '• Düzenli uyku saatleri hormonal sisteminizin kusursuz çalışmasını destekler.',
           '### Adım Adım İyileşme',
-          'Büyük değişiklikler yerine her gün küçük adımlarla sağlıklı alışkanlıklar edinmek kalıcı sonuçlar doğuracaktır. Kendinize zaman tanıyın ve gelişiminizi takip edin.'
+          'Büyük değişiklikler yerine her gün küçük adımlarla sağlıklı alışkanlıklar edinmek kalıcı sonuçlar doğuracaktır. Kendinize zaman tanıyın ve gelişiminizi takip edin.',
         ];
     }
   }

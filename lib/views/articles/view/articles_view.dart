@@ -15,13 +15,12 @@ class ArticlesView extends StatefulWidget {
 class _ArticlesViewState extends State<ArticlesView> {
   String _selectedTopic = 'Tümü';
 
-
   Map<String, List<Article>> get _groupedArticles {
     final articles = _selectedTopic == 'Tümü'
         ? DummyArticles.articles
         : DummyArticles.articles
-            .where((a) => a.topic == _selectedTopic)
-            .toList();
+              .where((a) => a.topic == _selectedTopic)
+              .toList();
 
     final grouped = <String, List<Article>>{};
     for (final article in articles) {
@@ -54,10 +53,7 @@ class _ArticlesViewState extends State<ArticlesView> {
               padding: EdgeInsets.fromLTRB(20, 4, 20, 16),
               child: Text(
                 'Sağlığınız hakkında bilgi edinin',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
             ),
 
@@ -94,7 +90,9 @@ class _ArticlesViewState extends State<ArticlesView> {
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -148,8 +146,7 @@ class _ArticlesViewState extends State<ArticlesView> {
                       padding: const EdgeInsets.only(bottom: 100),
                       itemCount: _groupedArticles.length,
                       itemBuilder: (context, index) {
-                        final topic =
-                            _groupedArticles.keys.elementAt(index);
+                        final topic = _groupedArticles.keys.elementAt(index);
                         final articles = _groupedArticles[topic]!;
                         return _buildTopicSection(topic, articles);
                       },
@@ -250,10 +247,7 @@ class _ArticlesViewState extends State<ArticlesView> {
           children: [
             // Okuma süresi
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(8),

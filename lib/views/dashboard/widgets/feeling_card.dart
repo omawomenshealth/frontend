@@ -24,27 +24,27 @@ class FeelingCard extends StatelessWidget {
     final options = <_QuickAction>[
       if (showPeriod)
         _QuickAction(
-          emoji: '🩸',
+          imagePath: 'assets/images/period.png',
           color: AppColors.periodPrimary,
-          bgColor: const Color(0xFFFFEBEE),
+          bgColor: Color(0xFFC5D89D),
           onTap: onPeriodTap,
         ),
       _QuickAction(
-        emoji: '🍽️',
+        imagePath: 'assets/images/nutrition.png',
         color: AppColors.warning,
-        bgColor: const Color(0xFFFFF8E1),
+        bgColor: Color(0xFFC5D89D),
         onTap: onNutritionTap,
       ),
       _QuickAction(
-        emoji: '💊',
+        imagePath: 'assets/images/medication.png',
         color: AppColors.medicationPrimary,
-        bgColor: const Color(0xFFE0F2F1),
+        bgColor: Color(0xFFC5D89D),
         onTap: onMedicationTap,
       ),
       _QuickAction(
-        emoji: '😊',
+        imagePath: 'assets/images/mood.png',
         color: AppColors.moodHappy,
-        bgColor: const Color.fromARGB(69, 255, 243, 224),
+        bgColor: Color(0xFFC5D89D),
         onTap: onMoodTap,
       ),
     ];
@@ -137,7 +137,14 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(widget.option.emoji, style: const TextStyle(fontSize: 30)),
+                ClipOval(
+                  child: Image.asset(
+                    widget.option.imagePath,
+                    width: 36,
+                    height: 36,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ],
             ),
           ),
@@ -149,13 +156,13 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
 
 /// Hızlı aksiyon veri modeli
 class _QuickAction {
-  final String emoji;
+  final String imagePath;
   final Color color;
   final Color bgColor;
   final VoidCallback onTap;
 
   const _QuickAction({
-    required this.emoji,
+    required this.imagePath,
     required this.color,
     required this.bgColor,
     required this.onTap,

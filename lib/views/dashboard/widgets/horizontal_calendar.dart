@@ -46,7 +46,8 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     // Her item ~64px genişlikte
     const itemWidth = 64.0;
     final screenWidth = MediaQuery.of(context).size.width;
-    final offset = (targetIndex * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
+    final offset =
+        (targetIndex * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         offset.clamp(0.0, _scrollController.position.maxScrollExtent),
@@ -121,7 +122,10 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
               GestureDetector(
                 onTap: () => widget.onDateSelected(today),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -138,11 +142,11 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
               ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 6),
 
         // ── Yatay Takvim ──────────────────────
         SizedBox(
-          height: 80,
+          height: 60,
           child: ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
@@ -165,7 +169,10 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
                     decoration: BoxDecoration(
                       gradient: isSelected
                           ? const LinearGradient(
-                              colors: [AppColors.primary, AppColors.primaryLight],
+                              colors: [
+                                AppColors.primary,
+                                AppColors.primaryLight,
+                              ],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                             )
@@ -173,8 +180,8 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
                       color: isSelected
                           ? null
                           : isToday
-                              ? AppColors.primary.withValues(alpha: 0.08)
-                              : AppColors.surface,
+                          ? AppColors.primary.withValues(alpha: 0.08)
+                          : AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
                       border: isToday && !isSelected
                           ? Border.all(
@@ -198,27 +205,27 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
                         Text(
                           _shortWeekday(date.weekday),
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.w500,
                             color: isSelected
                                 ? Colors.white.withValues(alpha: 0.8)
                                 : AppColors.textSecondary,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           '${date.day}',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: isSelected
                                 ? Colors.white
                                 : isToday
-                                    ? AppColors.primary
-                                    : AppColors.textPrimary,
+                                ? AppColors.primary
+                                : AppColors.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         // ── Döngü göstergesi (nokta) ──────
                         _buildCycleIndicator(cycleStatus, isSelected),
                       ],
@@ -236,7 +243,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
   /// Döngü durumuna göre küçük renkli nokta göstergesi
   Widget _buildCycleIndicator(_CycleStatus status, bool isSelected) {
     if (status == _CycleStatus.none) {
-      return const SizedBox(height: 8);
+      return const SizedBox(height: 6);
     }
 
     Color dotColor;
@@ -245,18 +252,20 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     switch (status) {
       case _CycleStatus.period:
         dotColor = isSelected ? Colors.white : AppColors.periodPrimary;
-        dotSize = 8;
+        dotSize = 6;
         break;
       case _CycleStatus.ovulation:
         dotColor = isSelected ? Colors.white : AppColors.ovulation;
-        dotSize = 8;
-        break;
-      case _CycleStatus.fertile:
-        dotColor = isSelected ? Colors.white.withValues(alpha: 0.7) : AppColors.fertile;
         dotSize = 6;
         break;
+      case _CycleStatus.fertile:
+        dotColor = isSelected
+            ? Colors.white.withValues(alpha: 0.7)
+            : AppColors.fertile;
+        dotSize = 5;
+        break;
       case _CycleStatus.none:
-        return const SizedBox(height: 8);
+        return const SizedBox(height: 6);
     }
 
     return Container(
@@ -281,13 +290,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
     return days[weekday - 1];
   }
-
 }
 
 /// Döngü durumu enum
-enum _CycleStatus {
-  none,
-  period,
-  ovulation,
-  fertile,
-}
+enum _CycleStatus { none, period, ovulation, fertile }
