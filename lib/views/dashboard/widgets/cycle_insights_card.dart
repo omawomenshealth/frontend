@@ -15,7 +15,7 @@ class CycleInsightsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: const Color.fromARGB(255, 255, 255, 255),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -70,7 +70,8 @@ class CycleInsightsCard extends StatelessWidget {
           // 3. Döngü süresi değişkenliği
           _buildInsightRow(
             label: 'Döngü süresi değişkenliği',
-            value: insights.variationMin != null && insights.variationMax != null
+            value:
+                insights.variationMin != null && insights.variationMax != null
                 ? '${insights.variationMin}-${insights.variationMax} gün'
                 : 'Yeterli veri yok',
             status: _regularityToCycleStatus(insights.regularity),
@@ -215,7 +216,11 @@ class CycleInsightsCard extends StatelessWidget {
             color: Color(0xFFFF9800),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.warning_rounded, size: 14, color: Colors.white),
+          child: const Icon(
+            Icons.warning_rounded,
+            size: 14,
+            color: Colors.white,
+          ),
         );
       case CycleStatus.noData:
         return Container(

@@ -24,27 +24,27 @@ class FeelingCard extends StatelessWidget {
     final options = <_QuickAction>[
       if (showPeriod)
         _QuickAction(
-          imagePath: 'assets/images/period.png',
+          imagePath: 'assets/images/1.png',
           color: AppColors.periodPrimary,
-          bgColor: Color(0xFFC5D89D),
+          bgColor: Color(0xFFF6F0D7),
           onTap: onPeriodTap,
         ),
       _QuickAction(
-        imagePath: 'assets/images/nutrition.png',
+        imagePath: 'assets/images/2.png',
         color: AppColors.warning,
-        bgColor: Color(0xFFC5D89D),
+        bgColor: Color(0xFFF6F0D7),
         onTap: onNutritionTap,
       ),
       _QuickAction(
-        imagePath: 'assets/images/medication.png',
+        imagePath: 'assets/images/3.png',
         color: AppColors.medicationPrimary,
-        bgColor: Color(0xFFC5D89D),
+        bgColor: Color(0xFFF6F0D7),
         onTap: onMedicationTap,
       ),
       _QuickAction(
-        imagePath: 'assets/images/mood.png',
+        imagePath: 'assets/images/4.png',
         color: AppColors.moodHappy,
-        bgColor: Color(0xFFC5D89D),
+        bgColor: Color(0xFFF6F0D7),
         onTap: onMoodTap,
       ),
     ];
@@ -53,7 +53,7 @@ class FeelingCard extends StatelessWidget {
       children: options.map((option) {
         return Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: _QuickActionCircle(option: option),
           ),
         );
@@ -121,6 +121,7 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
             decoration: BoxDecoration(
               color: widget.option.bgColor,
               shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFF9CAB84), width: 3.5),
               boxShadow: [
                 // 1. Ana, derin alt gölge (koyu ve derin)
                 BoxShadow(
@@ -140,8 +141,8 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
                 ClipOval(
                   child: Image.asset(
                     widget.option.imagePath,
-                    width: 36,
-                    height: 36,
+                    width: 42,
+                    height: 42,
                     fit: BoxFit.cover,
                   ),
                 ),

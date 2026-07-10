@@ -37,6 +37,7 @@ class DashboardView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 8),
                     // ── Karşılama ──────────────────────────
                     Text(
                       vm.greeting,
