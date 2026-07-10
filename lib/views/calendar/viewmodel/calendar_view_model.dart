@@ -69,10 +69,14 @@ class CalendarViewModel extends ChangeNotifier {
 
     if (!hasPeriodTracking) return;
 
+    final periodStarts = _storage.getPeriodStartDates();
+    final firstPeriodDate = periodStarts.isNotEmpty ? periodStarts.first : null;
+
     _periodCalculator = PeriodCalculator(
       lastPeriodDate: _settings!.lastPeriodDate!,
       cycleLength: _settings!.averageCycleLength,
       periodLength: _settings!.averagePeriodLength,
+      firstPeriodDate: firstPeriodDate,
       hasBleedingLog: (date) {
         final logs = _logMap[date.dateOnly];
         if (logs == null || logs.isEmpty) return false;

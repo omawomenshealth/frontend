@@ -20,6 +20,7 @@ class PeriodCalculator {
   final DateTime lastPeriodDate;
   final int cycleLength;
   final int periodLength;
+  final DateTime? firstPeriodDate;
 
   /// Gerçekleşmiş loglarda o gün kanama girilmiş mi kontrol eden fonksiyon
   final bool Function(DateTime date)? hasBleedingLog;
@@ -28,6 +29,7 @@ class PeriodCalculator {
     required this.lastPeriodDate,
     this.cycleLength = 28,
     this.periodLength = 5,
+    this.firstPeriodDate,
     this.hasBleedingLog, // UI veya Servisten bu kontrolü paslayacağız
   });
 
@@ -82,14 +84,27 @@ class PeriodCalculator {
     final today = AppTime.now.dateOnly;
     final targetDate = date.dateOnly;
 
-    // 1. Durum: Sorgulanan gün BUGÜN veya GEÇMİŞTE ise GERÇEK LOGA bak
-    if (targetDate.isBefore(today) || targetDate.isAtSameMomentAs(today)) {
+    // 1. Durum: Sorgulanan gün ilk girilen adet başlangıç tarihinden ÖNCE ise:
+    // Tahmini matematiksel modele göre hesapla
+    if (firstPeriodDate != null && targetDate.isBefore(firstPeriodDate!)) {
+      final dayInCycle = _dayInCycle(targetDate);
+      return dayInCycle < periodLength;
+    }
+
+    // 2. Durum: Sorgulanan gün GEÇMİŞTE ise (Bugünden önce) YALNIZCA GERÇEK LOGA bak
+    if (targetDate.isBefore(today)) {
       if (hasBleedingLog != null) {
         return hasBleedingLog!(targetDate);
       }
+      return false;
     }
 
-    // 2. Durum: Sorgulanan gün GELECEKTE ise TAHMİNİ matematiksel modele güven
+    // 3. Durum: Sorgulanan gün BUGÜN veya GELECEKTE ise:
+    // Eğer bugün/gelecekte gerçek log girilmişse TRUE dön, yoksa TAHMİNİ modele güven
+    if (hasBleedingLog != null && hasBleedingLog!(targetDate)) {
+      return true;
+    }
+
     final dayInCycle = _dayInCycle(targetDate);
     return dayInCycle < periodLength;
   }

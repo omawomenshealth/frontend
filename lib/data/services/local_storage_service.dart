@@ -247,9 +247,13 @@ class LocalStorageService {
       final today = AppTime.now.dateOnly;
       final isOngoing = bleedingDays.isNotEmpty && today.difference(bleedingDays.last).inDays <= 1;
 
-      var recentDurations = insights.periodDurations;
-      if (isOngoing && recentDurations.length >= 2) {
-        recentDurations = recentDurations.sublist(0, recentDurations.length - 1);
+      var recentDurations = List<int>.from(insights.periodDurations);
+      if (isOngoing) {
+        if (recentDurations.length >= 2) {
+          recentDurations.removeLast();
+        } else {
+          recentDurations.clear();
+        }
       }
 
       // Son 10 regl süresinin ortalamasını al

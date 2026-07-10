@@ -73,11 +73,15 @@ class DashboardViewModel extends ChangeNotifier {
         .map((log) => log.date.dateOnly)
         .toSet();
 
+    final periodStarts = _storage.getPeriodStartDates();
+    final firstPeriodDate = periodStarts.isNotEmpty ? periodStarts.first : null;
+
     if (hasPeriodTracking && _settings?.lastPeriodDate != null) {
       _periodCalculator = PeriodCalculator(
         lastPeriodDate: _settings!.lastPeriodDate!,
         cycleLength: _settings!.averageCycleLength,
         periodLength: _settings!.averagePeriodLength,
+        firstPeriodDate: firstPeriodDate,
         hasBleedingLog: (date) => _bleedingDays.contains(date.dateOnly),
       );
       _cycleInsights = _storage.getCycleInsights();
@@ -101,11 +105,15 @@ class DashboardViewModel extends ChangeNotifier {
         .map((log) => log.date.dateOnly)
         .toSet();
 
+    final periodStarts = _storage.getPeriodStartDates();
+    final firstPeriodDate = periodStarts.isNotEmpty ? periodStarts.first : null;
+
     if (hasPeriodTracking && _settings?.lastPeriodDate != null) {
       _periodCalculator = PeriodCalculator(
         lastPeriodDate: _settings!.lastPeriodDate!,
         cycleLength: _settings!.averageCycleLength,
         periodLength: _settings!.averagePeriodLength,
+        firstPeriodDate: firstPeriodDate,
         hasBleedingLog: (date) => _bleedingDays.contains(date.dateOnly),
       );
       _cycleInsights = _storage.getCycleInsights();
