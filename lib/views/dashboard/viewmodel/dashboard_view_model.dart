@@ -20,6 +20,7 @@ class DashboardViewModel extends ChangeNotifier {
   CycleInsights? _cycleInsights;
   bool _isLoading = true;
   DateTime _selectedDate = AppTime.now;
+  Set<DateTime> _bleedingDays = {};
 
   UserSettings? get settings => _settings;
   List<DailyLog> get todayLogs => _todayLogs;
@@ -66,11 +67,18 @@ class DashboardViewModel extends ChangeNotifier {
     _settings = _storage.loadSettings();
     _todayLogs = _storage.loadLogsForDate(_selectedDate);
 
+    final allLogs = _storage.loadAllLogs();
+    _bleedingDays = allLogs
+        .where((log) => log.flowIntensity != null)
+        .map((log) => log.date.dateOnly)
+        .toSet();
+
     if (hasPeriodTracking && _settings?.lastPeriodDate != null) {
       _periodCalculator = PeriodCalculator(
         lastPeriodDate: _settings!.lastPeriodDate!,
         cycleLength: _settings!.averageCycleLength,
         periodLength: _settings!.averagePeriodLength,
+        hasBleedingLog: (date) => _bleedingDays.contains(date.dateOnly),
       );
       _cycleInsights = _storage.getCycleInsights();
     } else {
@@ -82,10 +90,35 @@ class DashboardViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Kayıt işleminden sonra tüm durum ve hesaplamaları senkronize eden yardımcı metot.
+  Future<void> _syncStateAfterSave(DateTime dateForLogs) async {
+    _todayLogs = _storage.loadLogsForDate(dateForLogs);
+    _settings = _storage.loadSettings();
+
+    final allLogs = _storage.loadAllLogs();
+    _bleedingDays = allLogs
+        .where((log) => log.flowIntensity != null)
+        .map((log) => log.date.dateOnly)
+        .toSet();
+
+    if (hasPeriodTracking && _settings?.lastPeriodDate != null) {
+      _periodCalculator = PeriodCalculator(
+        lastPeriodDate: _settings!.lastPeriodDate!,
+        cycleLength: _settings!.averageCycleLength,
+        periodLength: _settings!.averagePeriodLength,
+        hasBleedingLog: (date) => _bleedingDays.contains(date.dateOnly),
+      );
+      _cycleInsights = _storage.getCycleInsights();
+    } else {
+      _periodCalculator = null;
+      _cycleInsights = null;
+    }
+  }
+
   /// Günlük kaydı ekle veya güncelle.
   Future<void> saveLog(DailyLog log) async {
     await _storage.saveDailyLog(log);
-    _todayLogs = _storage.loadLogsForDate(AppTime.now);
+    await _syncStateAfterSave(log.date);
     notifyListeners();
   }
 
@@ -95,32 +128,8 @@ class DashboardViewModel extends ChangeNotifier {
   /// - Son 10 döngünün ortalaması (averageCycleLength)
   /// hesaplanır ve UserSettings güncellenir.
   Future<void> recordPeriodAndRecalculate(DailyLog log) async {
-    // 1. Log'u kaydet
     await _storage.saveDailyLog(log);
-    _todayLogs = _storage.loadLogsForDate(_selectedDate);
-
-    // 2. Döngü istatistiklerini hesapla
-    final stats = _storage.calculateCycleStats();
-
-    if (stats != null && _settings != null) {
-      // 3. UserSettings'i güncelle
-      _settings = _settings!.copyWith(
-        lastPeriodDate: stats.lastPeriodDate,
-        averageCycleLength: stats.averageCycleLength,
-      );
-      await _storage.saveSettings(_settings!);
-
-      // 4. PeriodCalculator'ı yeniden oluştur
-      _periodCalculator = PeriodCalculator(
-        lastPeriodDate: stats.lastPeriodDate,
-        cycleLength: stats.averageCycleLength,
-        periodLength: _settings!.averagePeriodLength,
-      );
-
-      // 5. Döngü istatistiklerini güncelle
-      _cycleInsights = _storage.getCycleInsights();
-    }
-
+    await _syncStateAfterSave(log.date);
     notifyListeners();
   }
 

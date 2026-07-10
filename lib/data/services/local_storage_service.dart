@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_settings_model.dart';
 import '../models/period_log_model.dart';
 import '../../core/utils/date_extensions.dart';
+import '../../core/utils/app_time.dart';
 
 /// SharedPreferences üzerinden veri okuma/yazma servisi.
 class LocalStorageService {
@@ -234,15 +235,32 @@ class LocalStorageService {
     // 3. Adım: Ortalama Regl Süresi Hesaplama (Bug 1 Kesin Çözümü)
     final insights = getCycleInsights();
     if (insights != null && insights.periodDurations.isNotEmpty) {
-      // Son 10 regl süresinin ortalamasını al
-      final recentDurations = insights.periodDurations.length > 10
-          ? insights.periodDurations.sublist(
-              insights.periodDurations.length - 10,
-            )
-          : insights.periodDurations;
+      // EĞER SON regl dönemi aktifse (ongoing ise), onu hesaba katma!
+      // Çünkü henüz bitmedi, süresi eksik çıkıp ortalamayı düşürür.
+      final allLogs = loadAllLogs();
+      final bleedingDays = allLogs
+          .where((log) => log.flowIntensity != null)
+          .map((log) => log.date.dateOnly)
+          .toSet()
+          .toList()
+        ..sort();
+      final today = AppTime.now.dateOnly;
+      final isOngoing = bleedingDays.isNotEmpty && today.difference(bleedingDays.last).inDays <= 1;
 
-      final totalPeriodDays = recentDurations.reduce((a, b) => a + b);
-      finalPeriodLength = (totalPeriodDays / recentDurations.length).round();
+      var recentDurations = insights.periodDurations;
+      if (isOngoing && recentDurations.length >= 2) {
+        recentDurations = recentDurations.sublist(0, recentDurations.length - 1);
+      }
+
+      // Son 10 regl süresinin ortalamasını al
+      final recentDurationsLimited = recentDurations.length > 10
+          ? recentDurations.sublist(recentDurations.length - 10)
+          : recentDurations;
+
+      if (recentDurationsLimited.isNotEmpty) {
+        final totalPeriodDays = recentDurationsLimited.reduce((a, b) => a + b);
+        finalPeriodLength = (totalPeriodDays / recentDurationsLimited.length).round();
+      }
     }
 
     // NOT: saveSettings() işlemini buradan kaldırdık.
@@ -308,8 +326,13 @@ class LocalStorageService {
       previousCycleLength = cycleLengths.last;
     }
 
-    // Önceki regl süresi (son grubun uzunluğu)
-    final previousPeriodLength = periodDurations.last;
+    // Önceki regl süresi (son grubun uzunluğu veya devam ediyorsa bir öncekinin)
+    final today = AppTime.now.dateOnly;
+    final isOngoing = bleedingDays.isNotEmpty && today.difference(bleedingDays.last).inDays <= 1;
+    int previousPeriodLength = periodDurations.last;
+    if (isOngoing && periodDurations.length >= 2) {
+      previousPeriodLength = periodDurations[periodDurations.length - 2];
+    }
 
     // Döngü değişkenliği (min-max)
     int? variationMin;

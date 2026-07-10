@@ -11,6 +11,8 @@ import '../widgets/countdown_circle.dart';
 import '../widgets/daily_log_sheet.dart';
 import '../widgets/feeling_card.dart';
 import '../widgets/cycle_insights_card.dart';
+import '../../articles/model/article_model.dart';
+import '../../articles/view/article_detail_view.dart';
 
 /// Dashboard ana ekranı.
 class DashboardView extends StatelessWidget {
@@ -87,12 +89,6 @@ class DashboardView extends StatelessWidget {
                       const SizedBox(height: 16),
                     ],
 
-                    // ── Döngülerim İstatistik Kartı ───────
-                    if (vm.hasPeriodTracking && vm.cycleInsights != null) ...[
-                      CycleInsightsCard(insights: vm.cycleInsights!),
-                      const SizedBox(height: 16),
-                    ],
-
                     // ── Hızlı Erişim (4 yuvarlak) ────────
                     FeelingCard(
                       showPeriod: vm.hasPeriodTracking,
@@ -101,7 +97,17 @@ class DashboardView extends StatelessWidget {
                       onMedicationTap: () => _showDailyLogSheet(context, vm, initialIndex: vm.hasPeriodTracking ? 2 : 1),
                       onMoodTap: () => _showDailyLogSheet(context, vm, initialIndex: vm.hasPeriodTracking ? 3 : 2),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
+
+                    // ── Size Özel Tavsiye / Makale Kartı ──
+                    _buildRecommendationCard(context),
+                    const SizedBox(height: 16),
+
+                    // ── Döngülerim İstatistik Kartı ───────
+                    if (vm.hasPeriodTracking && vm.cycleInsights != null) ...[
+                      CycleInsightsCard(insights: vm.cycleInsights!),
+                      const SizedBox(height: 16),
+                    ],
 
                     // ── Günlük Kayıtlar (Timeline) ──────────
                     _buildTimeline(context, vm),
@@ -335,6 +341,147 @@ class DashboardView extends StatelessWidget {
             phaseColor: phaseColor,
           ),
         ],
+      ),
+    );
+  }
+
+  // ── Size Özel Tavsiye Kartı ─────────────────────────────
+  Widget _buildRecommendationCard(BuildContext context) {
+    // ID'si 6 olan PMS makalesini veya varsayılan olarak ilk makaleyi bulalım
+    final article = DummyArticles.articles.firstWhere(
+      (a) => a.id == '6',
+      orElse: () => DummyArticles.articles.first,
+    );
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ArticleDetailView(article: article),
+          ),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primary,
+              AppColors.primary.withValues(alpha: 0.8),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.25),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -15,
+              bottom: -15,
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                size: 90,
+                color: Colors.white.withValues(alpha: 0.12),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.lightbulb_outline_rounded, color: Colors.white, size: 12),
+                          SizedBox(width: 4),
+                          Text(
+                            'GÜNÜN TAVSİYESİ',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        const Icon(Icons.timer_outlined, color: Colors.white70, size: 12),
+                        const SizedBox(width: 4),
+                        Text(
+                          article.readTime,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  article.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    height: 1.3,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  article.summary,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.85),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Row(
+                  children: [
+                    Text(
+                      'Okumaya Başla',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 14,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

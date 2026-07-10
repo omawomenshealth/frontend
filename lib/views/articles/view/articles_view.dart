@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/color_constants.dart';
 import '../model/article_model.dart';
+import 'article_detail_view.dart';
 
 /// Yazılar sayfası — konu filtreleme + yatay kartlar şablonu.
 /// İleride server'dan veri çekilecek, şimdilik dummy verilerle çalışır.
@@ -216,15 +217,10 @@ class _ArticlesViewState extends State<ArticlesView> {
   Widget _buildArticleCard(Article article) {
     return GestureDetector(
       onTap: () {
-        // İleride yazı detay sayfasına gidecek
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('"${article.title}" — Yakında!'),
-            backgroundColor: article.cardColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ArticleDetailView(article: article),
           ),
         );
       },

@@ -73,6 +73,11 @@ class CalendarViewModel extends ChangeNotifier {
       lastPeriodDate: _settings!.lastPeriodDate!,
       cycleLength: _settings!.averageCycleLength,
       periodLength: _settings!.averagePeriodLength,
+      hasBleedingLog: (date) {
+        final logs = _logMap[date.dateOnly];
+        if (logs == null || logs.isEmpty) return false;
+        return logs.any((log) => log.flowIntensity != null);
+      },
     );
 
     // Takviminizin desteklediği tarih aralığı (TableCalendar ile aynı olmalı)
