@@ -16,12 +16,15 @@ class DailyLogSheet extends StatefulWidget {
   final ValueChanged<DailyLog> onSave;
   final int initialTabIndex;
 
+  final bool isSingleTab;
+
   const DailyLogSheet({
     super.key,
     required this.initialLog,
     required this.settings,
     required this.onSave,
     this.initialTabIndex = 0,
+    this.isSingleTab = false,
   });
 
   @override
@@ -142,56 +145,58 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               ),
 
               // Yatay Kaydırılabilir Sekmeler (Tab Bar)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
-                child: Row(
-                  children: _tabTitles.asMap().entries.map((entry) {
-                    final idx = entry.key;
-                    final title = entry.value;
-                    final isSelected = _selectedTabIndex == idx;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedTabIndex = idx;
-                        });
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.background,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isSelected ? AppColors.primary : AppColors.textHint.withValues(alpha: 0.15),
-                            width: 1.5,
+              if (!widget.isSingleTab) ...[
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+                  child: Row(
+                    children: _tabTitles.asMap().entries.map((entry) {
+                      final idx = entry.key;
+                      final title = entry.value;
+                      final isSelected = _selectedTabIndex == idx;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedTabIndex = idx;
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.background,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isSelected ? AppColors.primary : AppColors.textHint.withValues(alpha: 0.15),
+                              width: 1.5,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: AppColors.primary.withValues(alpha: 0.25),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ]
+                                : null,
                           ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: AppColors.primary.withValues(alpha: 0.25),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isSelected ? Colors.white : AppColors.textSecondary,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isSelected ? Colors.white : AppColors.textSecondary,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
-              const Divider(height: 1, color: Color(0xFFEEEEEE)),
+                const Divider(height: 1, color: Color(0xFFEEEEEE)),
+              ],
 
               // İçerik
               Expanded(

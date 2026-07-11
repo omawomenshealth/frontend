@@ -213,4 +213,25 @@ class DailyLog {
 
   /// Boş günlük kayıt oluştur.
   factory DailyLog.empty(DateTime date) => DailyLog(date: date);
+
+  /// İki günlük kaydı birleştir.
+  DailyLog mergeWith(DailyLog other) {
+    return DailyLog(
+      date: date,
+      activities: activities.isNotEmpty ? activities : other.activities,
+      nutritionTags: nutritionTags.isNotEmpty ? nutritionTags : other.nutritionTags,
+      nutritionNotes: (nutritionNotes != null && nutritionNotes!.isNotEmpty) ? nutritionNotes : other.nutritionNotes,
+      supplements: supplements.isNotEmpty ? supplements : other.supplements,
+      medications: medications.isNotEmpty ? medications : other.medications,
+      mood: mood ?? other.mood,
+      moodEmoji: moodEmoji ?? other.moodEmoji,
+      moodNote: (moodNote != null && moodNote!.isNotEmpty) ? moodNote : other.moodNote,
+      sexualActivity: sexualActivity ?? other.sexualActivity,
+      bowelActivity: bowelActivity.isNotEmpty ? bowelActivity : other.bowelActivity,
+      painLocations: painLocations.isNotEmpty ? painLocations : other.painLocations,
+      flowIntensity: flowIntensity ?? other.flowIntensity,
+      periodPainLevel: periodPainLevel ?? other.periodPainLevel,
+      notes: (notes != null && notes!.isNotEmpty) ? notes : other.notes,
+    );
+  }
 }

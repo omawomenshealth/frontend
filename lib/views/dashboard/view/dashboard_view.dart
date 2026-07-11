@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../core/utils/app_time.dart';
 import '../../../data/models/period_log_model.dart';
 import '../viewmodel/dashboard_view_model.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
@@ -86,21 +87,24 @@ class DashboardView extends StatelessWidget {
                     FeelingCard(
                       showPeriod: vm.hasPeriodTracking,
                       onPeriodTap: () =>
-                          _showDailyLogSheet(context, vm, initialIndex: 0),
+                          _showDailyLogSheet(context, vm, initialIndex: 0, isSingleTab: true),
                       onNutritionTap: () => _showDailyLogSheet(
                         context,
                         vm,
                         initialIndex: vm.hasPeriodTracking ? 1 : 0,
+                        isSingleTab: true,
                       ),
                       onMedicationTap: () => _showDailyLogSheet(
                         context,
                         vm,
                         initialIndex: vm.hasPeriodTracking ? 2 : 1,
+                        isSingleTab: true,
                       ),
                       onMoodTap: () => _showDailyLogSheet(
                         context,
                         vm,
                         initialIndex: vm.hasPeriodTracking ? 3 : 2,
+                        isSingleTab: true,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -651,11 +655,13 @@ class DashboardView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (log.mood != null)
+                           if (log.mood != null)
                             _summaryTile(
                               'Ruh Hali',
                               '${log.moodEmoji ?? ''} ${log.mood}',
                             ),
+                          if (log.moodNote != null && log.moodNote!.isNotEmpty)
+                            _summaryTile('Ruh Hali Notu', log.moodNote!),
                           if (log.activities.isNotEmpty)
                             _summaryTile('Hareket', log.activities.join(', ')),
                           if (log.nutritionTags.isNotEmpty)
@@ -675,6 +681,20 @@ class DashboardView extends StatelessWidget {
                             ),
                           if (log.flowIntensity != null)
                             _summaryTile('Akış', log.flowIntensity!),
+                          if (log.periodPainLevel != null)
+                            _summaryTile('Regl Ağrısı', '${log.periodPainLevel}/5'),
+                          if (log.medications.any((m) => m.taken))
+                            _summaryTile(
+                              'İlaçlar',
+                              log.medications.where((m) => m.taken).map((m) => '${m.name} (${m.dosage})').join(', '),
+                            ),
+                          if (log.supplements.any((s) => s.taken))
+                            _summaryTile(
+                              'Takviyeler',
+                              log.supplements.where((s) => s.taken).map((s) => '${s.name} (${s.dosage})').join(', '),
+                            ),
+                          if (log.sexualActivity != null)
+                            _summaryTile('Cinsel Aktivite', log.sexualActivity! ? 'Evet' : 'Hayır'),
                           if (log.notes != null && log.notes!.isNotEmpty)
                             _summaryTile('Not', log.notes!),
                         ],
@@ -725,6 +745,7 @@ class DashboardView extends StatelessWidget {
     BuildContext context,
     DashboardViewModel vm, {
     int initialIndex = 0,
+    bool isSingleTab = false,
   }) {
     showModalBottomSheet(
       context: context,
@@ -732,10 +753,11 @@ class DashboardView extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => DailyLogSheet(
         initialLog: DailyLog.empty(
-          vm.selectedDate,
-        ), // Her seferinde yeni bir kayıt açılır
+          vm.selectedDate.isToday ? AppTime.now : vm.selectedDate,
+        ), // Her seferinde yeni bir kayıt açılır (bugün ise güncel saatle)
         settings: vm.settings!,
         initialTabIndex: initialIndex,
+        isSingleTab: isSingleTab,
         onSave: (log) {
           // Adet verisi varsa döngü istatistiklerini yeniden hesapla
           if (log.flowIntensity != null) {

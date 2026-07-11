@@ -58,7 +58,17 @@ class LocalStorageService {
   Future<bool> saveDailyLog(DailyLog log) async {
     final keyStr = log.date.toIso8601String();
     final key = '$_logPrefix$keyStr';
-    final success = await _p.setString(key, log.toJsonString());
+    
+    DailyLog logToSave = log;
+    final existingJson = _p.getString(key);
+    if (existingJson != null) {
+      try {
+        final existingLog = DailyLog.fromJsonString(existingJson);
+        logToSave = log.mergeWith(existingLog);
+      } catch (_) {}
+    }
+
+    final success = await _p.setString(key, logToSave.toJsonString());
 
     if (success) {
       final dates = _getDatesSet();
@@ -66,10 +76,10 @@ class LocalStorageService {
       await _p.setStringList(_logDatesKey, dates.toList());
 
       // SİHİRLİ DOKUNUŞ: Yeni eklenen ilaç ve takviyeleri de otomatik kaydet
-      for (var entry in log.medications) {
+      for (var entry in logToSave.medications) {
         await saveCustomMedication(entry.name);
       }
-      for (var entry in log.supplements) {
+      for (var entry in logToSave.supplements) {
         await saveCustomSupplement(entry.name);
       }
 
