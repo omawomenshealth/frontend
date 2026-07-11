@@ -448,9 +448,10 @@ class ProfileView extends StatelessWidget {
           vm.updateSmokingYears(int.tryParse(smokingYearsCtrl.text) ?? 0);
           vm.updateBloodTestResults(bloodTestCtrl.text.trim());
           await vm.saveSettings();
-          // Dashboard'ı da güncelle
+          // Dashboard ve Takvimi de güncelle
           if (ctx.mounted) {
             ctx.read<DashboardViewModel>().loadData();
+            ctx.read<CalendarViewModel>().loadData();
             Navigator.pop(ctx);
           }
         },
@@ -553,6 +554,7 @@ class ProfileView extends StatelessWidget {
           await vm.saveSettings();
           if (ctx.mounted) {
             ctx.read<DashboardViewModel>().loadData();
+            ctx.read<CalendarViewModel>().loadData();
             Navigator.pop(ctx);
           }
         },
@@ -809,6 +811,7 @@ class ProfileView extends StatelessWidget {
           await vm.saveSettings();
           if (ctx.mounted) {
             ctx.read<DashboardViewModel>().loadData();
+            ctx.read<CalendarViewModel>().loadData();
             Navigator.pop(ctx);
           }
         },
