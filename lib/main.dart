@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<LocalStorageService>.value(value: storage),
         ChangeNotifierProvider(create: (_) => OnboardingViewModel(storage)),
         ChangeNotifierProvider(create: (_) => DashboardViewModel(storage)),
         ChangeNotifierProvider(create: (_) => CalendarViewModel(storage)),

@@ -191,7 +191,6 @@ class AppStrings {
   // ── Regl Akış Yoğunluğu ─────────────────────────────────
   static const String flowIntensity = 'Akış Yoğunluğu';
   static const List<String> flowOptions = [
-    'Yok',
     'Lekelenme',
     'Hafif',
     'Orta',

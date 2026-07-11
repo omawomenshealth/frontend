@@ -9,6 +9,8 @@ class LocalStorageService {
   static const String _settingsKey = 'user_settings';
   static const String _logPrefix = 'daily_log_';
   static const String _logDatesKey = 'daily_log_dates';
+  static const String _allMedsKey = 'all_custom_medications';
+  static const String _allSupsKey = 'all_custom_supplements';
 
   SharedPreferences? _prefs;
 
@@ -62,6 +64,14 @@ class LocalStorageService {
       final dates = _getDatesSet();
       dates.add(keyStr);
       await _p.setStringList(_logDatesKey, dates.toList());
+
+      // SİHİRLİ DOKUNUŞ: Yeni eklenen ilaç ve takviyeleri de otomatik kaydet
+      for (var entry in log.medications) {
+        await saveCustomMedication(entry.name);
+      }
+      for (var entry in log.supplements) {
+        await saveCustomSupplement(entry.name);
+      }
 
       // SİHİRLİ DOKUNUŞ: Veri her değiştiğinde istatistikleri arka planda sessizce güncelle
       await _syncCalculatedStatsToSettings();
@@ -366,6 +376,38 @@ class LocalStorageService {
   /// Tüm verileri sil (test/sıfırlama için).
   Future<bool> clearAll() async {
     return _p.clear();
+  }
+
+  // ── Özel İlaç & Takviye Kayıtları ───────────────────────
+
+  /// Kayıtlı tüm özel ilaç isimlerini getir.
+  List<String> getCustomMedications() {
+    return _p.getStringList(_allMedsKey) ?? [];
+  }
+
+  /// Yeni bir özel ilaç kaydet.
+  Future<bool> saveCustomMedication(String name) async {
+    final list = getCustomMedications();
+    if (!list.contains(name)) {
+      final newList = List<String>.from(list)..add(name);
+      return _p.setStringList(_allMedsKey, newList);
+    }
+    return false;
+  }
+
+  /// Kayıtlı tüm özel takviye isimlerini getir.
+  List<String> getCustomSupplements() {
+    return _p.getStringList(_allSupsKey) ?? [];
+  }
+
+  /// Yeni bir özel takviye kaydet.
+  Future<bool> saveCustomSupplement(String name) async {
+    final list = getCustomSupplements();
+    if (!list.contains(name)) {
+      final newList = List<String>.from(list)..add(name);
+      return _p.setStringList(_allSupsKey, newList);
+    }
+    return false;
   }
 }
 

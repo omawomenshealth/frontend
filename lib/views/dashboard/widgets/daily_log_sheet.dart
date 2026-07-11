@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/shared_widgets/custom_button.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/user_settings_model.dart';
+import '../../../data/services/local_storage_service.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 
@@ -32,8 +34,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   final _moodNoteController = TextEditingController();
   final _customMedController = TextEditingController();
   final _customSupController = TextEditingController();
-  bool _hasBleeding = false;
   late int _selectedTabIndex;
+  List<String> _previouslyAddedMeds = [];
+  List<String> _previouslyAddedSups = [];
 
   @override
   void initState() {
@@ -41,8 +44,28 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _log = widget.initialLog;
     _notesController.text = _log.notes ?? '';
     _moodNoteController.text = _log.moodNote ?? '';
-    _hasBleeding = _log.flowIntensity != null;
     _selectedTabIndex = widget.initialTabIndex;
+    _loadPreviouslyAddedItems();
+  }
+
+  void _loadPreviouslyAddedItems() {
+    try {
+      final storage = Provider.of<LocalStorageService>(context, listen: false);
+      final allMeds = storage.getCustomMedications();
+      final allSups = storage.getCustomSupplements();
+
+      final medsSet = Set<String>.from(allMeds);
+      final supsSet = Set<String>.from(allSups);
+
+      // Default daily settings list items should be excluded
+      medsSet.removeAll(widget.settings.dailyMedications);
+      supsSet.removeAll(widget.settings.dailySupplements);
+
+      setState(() {
+        _previouslyAddedMeds = medsSet.toList();
+        _previouslyAddedSups = supsSet.toList();
+      });
+    } catch (_) {}
   }
 
   @override
@@ -54,19 +77,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     super.dispose();
   }
 
-  bool get _showPeriod => widget.settings.gender == Gender.female;
-
-  List<String> get _tabTitles {
-    final titles = <String>[];
-    if (_showPeriod) titles.add('🩸 Adet');
-    titles.add('🍽️ Beslenme');
-    titles.add('💊 İlaçlar');
-    titles.add('🌟 Ruh Hali');
-    return titles;
-  }
+  List<String> get _tabTitles => const [
+        '🩸 Adet',
+        '🍽️ Beslenme',
+        '💊 İlaçlar',
+        '🌟 Ruh Hali',
+      ];
 
   bool _isSectionVisible(String category) {
-    if (_tabTitles.isEmpty) return false;
     final idx = _selectedTabIndex < _tabTitles.length ? _selectedTabIndex : 0;
     final title = _tabTitles[idx];
     if (title.contains('Adet') && category == 'Adet') return true;
@@ -215,6 +233,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         color: AppColors.success,
                         customController: _customSupController,
                         customHint: 'Örn: D Vitamini',
+                        suggestions: _previouslyAddedSups,
                         onChanged: (entries) =>
                             setState(() => _log = _log.copyWith(supplements: entries)),
                       ),
@@ -231,13 +250,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         color: AppColors.medicationPrimary,
                         customController: _customMedController,
                         customHint: 'Örn: 500mg Parol',
+                        suggestions: _previouslyAddedMeds,
                         onChanged: (entries) =>
                             setState(() => _log = _log.copyWith(medications: entries)),
                       ),
                     ),
 
                     // 5. Cinsel Aktivite
-                    if (_isSectionVisible('Adet') || (!_showPeriod && _isSectionVisible('Ruh Hali')))
+                    if (_isSectionVisible('Ruh Hali'))
                     _buildSection(
                       title: '💕 ${AppStrings.sexualActivity}',
                       child: Row(
@@ -281,53 +301,16 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       ),
                     ),
 
-                    // 8. Regl (Kadınlar için)
-                    if (widget.settings.gender == Gender.female && _isSectionVisible('Adet')) ...[
+                    // 8. Regl
+                    if (_isSectionVisible('Adet')) ...[
                       _buildSection(
-                        title: '🩸 Adet Kanaması',
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SwitchListTile(
-                              title: const Text(
-                                'Bugün kanamam var',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              contentPadding: EdgeInsets.zero,
-                              value: _hasBleeding,
-                              activeTrackColor: AppColors.periodPrimary.withValues(alpha: 0.5),
-                              activeThumbColor: AppColors.periodPrimary,
-                              onChanged: (val) {
-                                setState(() {
-                                  _hasBleeding = val;
-                                  if (!val) {
-                                    _log = _log.copyWith(flowIntensity: null);
-                                  }
-                                });
-                              },
-                            ),
-                            if (_hasBleeding) ...[
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Akış Şiddeti:',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              _buildSingleChipSelector(
-                                options: AppStrings.flowOptions,
-                                selected: _log.flowIntensity,
-                                onChanged: (val) =>
-                                    setState(() => _log = _log.copyWith(flowIntensity: val)),
-                                color: AppColors.periodPrimary,
-                              ),
-                            ],
-                          ],
+                        title: '🩸 Adet Kanaması (Akış Şiddeti)',
+                        child: _buildSingleChipSelector(
+                          options: AppStrings.flowOptions,
+                          selected: _log.flowIntensity,
+                          onChanged: (val) =>
+                              setState(() => _log = _log.copyWith(flowIntensity: val)),
+                          color: AppColors.periodPrimary,
                         ),
                       ),
                     ],
@@ -501,7 +484,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   Widget _buildSingleChipSelector({
     required List<String> options,
     required String? selected,
-    required ValueChanged<String> onChanged,
+    required ValueChanged<String?> onChanged,
     required Color color,
   }) {
     return Wrap(
@@ -510,7 +493,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       children: options.map((opt) {
         final isSelected = selected == opt;
         return GestureDetector(
-          onTap: () => onChanged(opt),
+          onTap: () {
+            if (isSelected) {
+              onChanged(null);
+            } else {
+              onChanged(opt);
+            }
+          },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -544,6 +533,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     required Color color,
     required TextEditingController customController,
     required String customHint,
+    required List<String> suggestions,
     required ValueChanged<List<MedicationEntry>> onChanged,
   }) {
     // 1. Ayarlardan gelenleri topla
@@ -566,6 +556,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         allEntries.add(e);
       }
     }
+
+    // 3. Önceden eklenenlerden bugün eklenmemiş olanları bul
+    final suggestedItems = suggestions
+        .where((s) => !allEntries.any((e) => e.name == s))
+        .toList();
 
     return Column(
       children: [
@@ -663,7 +658,69 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ),
           ),
         );
-        }),
+      }),
+      if (suggestedItems.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Önceden Eklenenler:',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: suggestedItems.map((name) {
+                return GestureDetector(
+                  onTap: () {
+                    final newEntries = List<MedicationEntry>.from(allEntries);
+                    newEntries.add(MedicationEntry(
+                      name: name,
+                      time: 'Sabah',
+                      stomachState: 'Aç',
+                      taken: true,
+                    ));
+                    onChanged(newEntries);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: color.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.add, size: 12, color: color),
+                        const SizedBox(width: 2),
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: color,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
         const SizedBox(height: 8),
         Row(
           children: [
