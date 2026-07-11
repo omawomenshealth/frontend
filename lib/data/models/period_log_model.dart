@@ -214,7 +214,7 @@ class DailyLog {
   /// Boş günlük kayıt oluştur.
   factory DailyLog.empty(DateTime date) => DailyLog(date: date);
 
-  /// İki günlük kaydı birleştir.
+  /// Aynı zamana ait iki farklı kaydın verilerini birleştirir (üst üste yazmayı önler).
   DailyLog mergeWith(DailyLog other) {
     return DailyLog(
       date: date,
