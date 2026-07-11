@@ -77,6 +77,11 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateBloodTestResults(String? value) {
+    _settings = _settings.copyWith(bloodTestResults: value);
+    notifyListeners();
+  }
+
   // ── Kadın Sağlığı Güncellemeleri ─────────────────────
 
   void updateAverageCycleLength(int value) {

@@ -1,0 +1,409 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../../../core/constants/color_constants.dart';
+import '../../../core/utils/app_time.dart';
+import '../../../core/utils/date_extensions.dart';
+import '../../../data/models/period_log_model.dart';
+import '../../../data/models/user_settings_model.dart';
+import '../../../data/services/local_storage_service.dart';
+
+/// Doktor bilgilendirme raporu ekranı.
+class DoctorReportView extends StatelessWidget {
+  const DoctorReportView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final storage = Provider.of<LocalStorageService>(context, listen: false);
+    final settings = storage.loadSettings() ?? UserSettings();
+    final allLogs = storage.loadAllLogs();
+
+    return Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
+      appBar: AppBar(
+        title: const Text(
+          'Doktor Raporu',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 0.5,
+        actions: [
+          IconButton(
+            tooltip: 'Metin Olarak Kopyala',
+            icon: const Icon(Icons.share_outlined),
+            onPressed: () => _copyReportToClipboard(context, settings, allLogs),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── BAŞLIK BÖLÜMÜ ───────────────────────────────────────
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'OMA KİŞİSEL SAĞLIK RAPORU',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primary,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Rapor Tarihi: ${AppTime.now.toDotFormat()}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Tıbbi Özet',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Divider(thickness: 1.5, color: Color(0xFFEEEEEE)),
+              const SizedBox(height: 16),
+
+              // ── BÖLÜM 1: KİŞİSEL BİLGİLER ───────────────────────────
+              _sectionHeader('📋 Kullanıcı Temel Bilgileri'),
+              _infoRow('İsim / Nickname', settings.userName.isNotEmpty ? settings.userName : 'Belirtilmemiş'),
+              _infoRow('Yaş', settings.age?.toString() ?? 'Belirtilmemiş'),
+              _infoRow('Kilo / Boy', '${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm'),
+              _infoRow('Sigara Kullanımı', settings.isSmoker
+                  ? 'Evet${settings.smokingYears != null && settings.smokingYears! > 0 ? " (${settings.smokingYears} yıl)" : ""}'
+                  : 'Hayır'),
+              _infoRow('Kronik Hastalıklar', settings.chronicDiseases.isNotEmpty ? settings.chronicDiseases.join(', ') : 'Bulunmamaktadır'),
+              if (settings.bloodTestResults != null && settings.bloodTestResults!.isNotEmpty)
+                _infoRow('Son Kan Değerleri', settings.bloodTestResults!),
+              const SizedBox(height: 24),
+
+              // ── BÖLÜM 2: DÖNGÜ ÖZETİ ────────────────────────────────
+              _sectionHeader('🩸 Kadın Sağlığı & Adet Döngüsü Özet'),
+              _infoRow('Ort. Döngü Süresi', '${settings.averageCycleLength} gün'),
+              _infoRow('Ort. Adet Kanaması', '${settings.averagePeriodLength} gün'),
+              _infoRow('Son Adet Başlangıcı', settings.lastPeriodDate != null ? settings.lastPeriodDate!.toDotFormat() : 'Belirtilmemiş'),
+              _infoRow('Menopoz Durumu', _menopauseLabel(settings.menopauseStatus)),
+              if (settings.birthControlMethod != null && settings.birthControlMethod!.isNotEmpty)
+                _infoRow('Doğum Kontrolü', settings.birthControlMethod!),
+              if (settings.womenDiseases.isNotEmpty)
+                _infoRow('Jinekolojik Hastalıklar', settings.womenDiseases.join(', ')),
+              const SizedBox(height: 24),
+
+              // ── BÖLÜM 3: GÜNLÜK KAYITLAR TABLOSU ─────────────────────
+              _sectionHeader('📅 Günlük Sağlık Logları (Son 15 Kayıt)'),
+              const SizedBox(height: 8),
+              if (allLogs.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: Text(
+                      'Henüz kaydedilmiş günlük log bulunmamaktadır.',
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                    ),
+                  ),
+                )
+              else
+                _buildLogsTable(allLogs.take(15).toList()),
+              
+              const SizedBox(height: 24),
+
+              // ── BÖLÜM 4: NOTLAR ─────────────────────────────────────
+              _sectionHeader('📝 Kaydedilen Doktor/Genel Notları'),
+              const SizedBox(height: 8),
+              _buildNotesSection(allLogs),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Yardımcı Widget'lar ───────────────────────────────────────────────
+
+  Widget _sectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textPrimary,
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 140,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogsTable(List<DailyLog> logs) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFE5E5E5)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columnSpacing: 16,
+            headingRowColor: WidgetStateProperty.all(const Color(0xFFF9F9F9)),
+            headingRowHeight: 40,
+            dataRowMinHeight: 36,
+            dataRowMaxHeight: 64,
+            columns: const [
+              DataColumn(label: Text('Tarih', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(label: Text('Adet/Kanama', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(label: Text('Ruh Hali', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(label: Text('Ağrılar/Hisler', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+              DataColumn(label: Text('İlaç & Takviye', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+            ],
+            rows: logs.map((log) {
+              final activeMedNames = log.medications.where((m) => m.taken).map((m) => '${m.name} (${m.dosage})').toList();
+              final activeSupNames = log.supplements.where((s) => s.taken).map((s) => '${s.name} (${s.dosage})').toList();
+              final allTaken = [...activeMedNames, ...activeSupNames];
+
+              return DataRow(
+                cells: [
+                  DataCell(Text(log.date.toDotFormat(), style: const TextStyle(fontSize: 11))),
+                  DataCell(
+                    Text(
+                      log.flowIntensity != null ? 'Kanamalı (${log.flowIntensity})' : 'Kanama Yok',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: log.flowIntensity != null ? Colors.red.shade700 : AppColors.textSecondary,
+                        fontWeight: log.flowIntensity != null ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  DataCell(Text('${log.moodEmoji ?? ""} ${log.mood ?? "-"}', style: const TextStyle(fontSize: 11))),
+                  DataCell(
+                    SizedBox(
+                      width: 120,
+                      child: Text(
+                        log.painLocations.isNotEmpty ? log.painLocations.join(', ') : '-',
+                        style: const TextStyle(fontSize: 11),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                    ),
+                  ),
+                  DataCell(
+                    SizedBox(
+                      width: 140,
+                      child: Text(
+                        allTaken.isNotEmpty ? allTaken.join(', ') : '-',
+                        style: const TextStyle(fontSize: 11),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotesSection(List<DailyLog> logs) {
+    final logsWithNotes = logs.where((l) => (l.notes != null && l.notes!.isNotEmpty) || (l.moodNote != null && l.moodNote!.isNotEmpty)).toList();
+
+    if (logsWithNotes.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 10),
+        child: Text(
+          'Eklenmiş özel not bulunmamaktadır.',
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontStyle: FontStyle.italic),
+        ),
+      );
+    }
+
+    return Column(
+      children: logsWithNotes.take(10).map((log) {
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.scaffoldBackground.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                log.date.toDotFormat(),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: AppColors.primary),
+              ),
+              const SizedBox(height: 4),
+              if (log.notes != null && log.notes!.isNotEmpty)
+                Text('📝 Genel Not: ${log.notes}', style: const TextStyle(fontSize: 12)),
+              if (log.moodNote != null && log.moodNote!.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text('🌟 Ruh Hali Notu: ${log.moodNote}', style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
+              ]
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  String _menopauseLabel(MenopauseStatus status) {
+    switch (status) {
+      case MenopauseStatus.none:
+        return 'Menopozda değil';
+      case MenopauseStatus.pre:
+        return 'Pre-menopoz';
+      case MenopauseStatus.peri:
+        return 'Peri-menopoz';
+      case MenopauseStatus.post:
+        return 'Post-menopoz';
+    }
+  }
+
+  // ── Paylaş/Kopyala Mantığı ──────────────────────────────────────────
+
+  Future<void> _copyReportToClipboard(BuildContext context, UserSettings settings, List<DailyLog> logs) async {
+    final sb = StringBuffer();
+    sb.writeln('==================================');
+    sb.writeln('OMA KİŞİSEL SAĞLIK RAPORU');
+    sb.writeln('Rapor Tarihi: ${AppTime.now.toDotFormat()}');
+    sb.writeln('==================================\n');
+
+    sb.writeln('1. KULLANICI BİLGİLERİ');
+    sb.writeln('----------------------------------');
+    sb.writeln('İsim: ${settings.userName.isNotEmpty ? settings.userName : "Belirtilmemiş"}');
+    sb.writeln('Yaş: ${settings.age?.toString() ?? "Belirtilmemiş"}');
+    sb.writeln('Kilo/Boy: ${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm');
+    sb.writeln('Sigara: ${settings.isSmoker ? "Evet" : "Hayır"}');
+    sb.writeln('Kronik Hastalıklar: ${settings.chronicDiseases.isNotEmpty ? settings.chronicDiseases.join(", ") : "Bulunmamaktadır"}');
+    if (settings.bloodTestResults != null && settings.bloodTestResults!.isNotEmpty) {
+      sb.writeln('Kan Değerleri: ${settings.bloodTestResults}');
+    }
+    sb.writeln('');
+
+    sb.writeln('2. DÖNGÜ VE KADIN SAĞLIĞI ÖZETİ');
+    sb.writeln('----------------------------------');
+    sb.writeln('Ort. Döngü Süresi: ${settings.averageCycleLength} gün');
+    sb.writeln('Ort. Adet Süresi: ${settings.averagePeriodLength} gün');
+    sb.writeln('Son Adet Başlangıcı: ${settings.lastPeriodDate != null ? settings.lastPeriodDate!.toDotFormat() : "Belirtilmemiş"}');
+    sb.writeln('Menopoz Durumu: ${_menopauseLabel(settings.menopauseStatus)}');
+    if (settings.womenDiseases.isNotEmpty) {
+      sb.writeln('Jinekolojik Hastalıklar: ${settings.womenDiseases.join(", ")}');
+    }
+    sb.writeln('');
+
+    sb.writeln('3. SAĞLIK LOGLARI (SON 15 GÜN)');
+    sb.writeln('----------------------------------');
+    sb.writeln('Tarih | Kanama | Ruh Hali | Ağrılar | İlaçlar');
+    sb.writeln('----------------------------------');
+    for (var log in logs.take(15)) {
+      final activeMedNames = log.medications.where((m) => m.taken).map((m) => '${m.name}(${m.dosage})').toList();
+      final activeSupNames = log.supplements.where((s) => s.taken).map((s) => '${s.name}(${s.dosage})').toList();
+      final allTaken = [...activeMedNames, ...activeSupNames];
+
+      final date = log.date.toDotFormat();
+      final bleeding = log.flowIntensity != null ? 'Kanamalı(${log.flowIntensity})' : 'Kanama Yok';
+      final mood = '${log.moodEmoji ?? ""} ${log.mood ?? "-"}';
+      final pain = log.painLocations.isNotEmpty ? log.painLocations.join(', ') : '-';
+      final meds = allTaken.isNotEmpty ? allTaken.join(', ') : '-';
+
+      sb.writeln('$date | $bleeding | $mood | $pain | $meds');
+    }
+    sb.writeln('');
+
+    sb.writeln('4. KAYDEDİLEN NOTLAR');
+    sb.writeln('----------------------------------');
+    final logsWithNotes = logs.where((l) => (l.notes != null && l.notes!.isNotEmpty) || (l.moodNote != null && l.moodNote!.isNotEmpty)).toList();
+    if (logsWithNotes.isEmpty) {
+      sb.writeln('Kayıtlı not bulunamadı.');
+    } else {
+      for (var log in logsWithNotes.take(10)) {
+        sb.writeln('[${log.date.toDotFormat()}]');
+        if (log.notes != null && log.notes!.isNotEmpty) sb.writeln('- Genel: ${log.notes}');
+        if (log.moodNote != null && log.moodNote!.isNotEmpty) sb.writeln('- Ruh Hali: ${log.moodNote}');
+      }
+    }
+
+    await Clipboard.setData(ClipboardData(text: sb.toString()));
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Rapor kopyalandı! Doktorunuza WhatsApp vb. üzerinden gönderebilirsiniz.'),
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    }
+  }
+}

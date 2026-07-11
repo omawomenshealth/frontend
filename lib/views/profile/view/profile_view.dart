@@ -9,6 +9,8 @@ import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
 
+import 'doctor_report_view.dart';
+
 /// Profil sayfası — kullanıcı bilgilerini görüntüleme ve düzenleme.
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -105,6 +107,8 @@ class ProfileView extends StatelessWidget {
                       _infoRow('İlişki', s.relationshipStatus ?? '-'),
                       if (s.chronicDiseases.isNotEmpty)
                         _infoRow('Kronik', s.chronicDiseases.join(', ')),
+                      if (s.bloodTestResults != null && s.bloodTestResults!.isNotEmpty)
+                        _infoRow('Kan Değerleri', s.bloodTestResults!),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -147,6 +151,56 @@ class ProfileView extends StatelessWidget {
                         _infoRow('Takviyeler', s.dailySupplements.join(', '))
                       else
                         _infoRow('Takviyeler', 'Belirtilmemiş'),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ── 4. Raporlama ─────────────────────────
+                  _buildSectionCard(
+                    context: context,
+                    title: '📋 Doktor Raporu',
+                    icon: Icons.assignment_outlined,
+                    onEdit: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DoctorReportView(),
+                        ),
+                      );
+                    },
+                    children: [
+                      const Text(
+                        'Bugüne kadarki sağlık kayıtlarınızı doktorunuz için derlenmiş ve okunabilir bir rapor halinde görüntüleyin.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const DoctorReportView(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          icon: const Icon(Icons.description_outlined, size: 18),
+                          label: const Text('Raporu Görüntüle ve Paylaş', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -378,6 +432,7 @@ class ProfileView extends StatelessWidget {
     final nameCtrl = TextEditingController(text: s.userName);
     final smokingYearsCtrl = TextEditingController(
         text: s.smokingYears?.toString() ?? '0');
+    final bloodTestCtrl = TextEditingController(text: s.bloodTestResults ?? '');
 
     showModalBottomSheet(
       context: context,
@@ -391,6 +446,7 @@ class ProfileView extends StatelessWidget {
           vm.updateHeight(double.tryParse(heightCtrl.text));
           vm.updateAge(int.tryParse(ageCtrl.text));
           vm.updateSmokingYears(int.tryParse(smokingYearsCtrl.text) ?? 0);
+          vm.updateBloodTestResults(bloodTestCtrl.text.trim());
           await vm.saveSettings();
           // Dashboard'ı da güncelle
           if (ctx.mounted) {
@@ -404,6 +460,8 @@ class ProfileView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _sheetField('İsim', nameCtrl),
+                const SizedBox(height: 12),
+                _sheetField('Son Kan Değerleri (Kan Testi)', bloodTestCtrl, maxLines: 3),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -900,10 +958,11 @@ class ProfileView extends StatelessWidget {
   }
 
   static Widget _sheetField(String label, TextEditingController ctrl,
-      {TextInputType keyboardType = TextInputType.text}) {
+      {TextInputType keyboardType = TextInputType.text, int maxLines = 1}) {
     return TextField(
       controller: ctrl,
       keyboardType: keyboardType,
+      maxLines: maxLines,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(fontSize: 13),

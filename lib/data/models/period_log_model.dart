@@ -5,12 +5,14 @@ class MedicationEntry {
   final String name;
   final String time;          // Sabah, Öğle, Akşam
   final String stomachState;  // Aç, Tok
+  final String dosage;        // Örn: 1 Adet, 500mg, 5 Damla
   final bool taken;
 
   MedicationEntry({
     required this.name,
     required this.time,
     required this.stomachState,
+    this.dosage = '1 Adet',
     this.taken = false,
   });
 
@@ -18,12 +20,14 @@ class MedicationEntry {
     String? name,
     String? time,
     String? stomachState,
+    String? dosage,
     bool? taken,
   }) {
     return MedicationEntry(
       name: name ?? this.name,
       time: time ?? this.time,
       stomachState: stomachState ?? this.stomachState,
+      dosage: dosage ?? this.dosage,
       taken: taken ?? this.taken,
     );
   }
@@ -32,6 +36,7 @@ class MedicationEntry {
         'name': name,
         'time': time,
         'stomachState': stomachState,
+        'dosage': dosage,
         'taken': taken,
       };
 
@@ -40,6 +45,7 @@ class MedicationEntry {
       name: json['name'] as String,
       time: json['time'] as String? ?? 'Sabah',
       stomachState: json['stomachState'] as String? ?? 'Aç',
+      dosage: json['dosage'] as String? ?? '1 Adet',
       taken: json['taken'] as bool? ?? false,
     );
   }

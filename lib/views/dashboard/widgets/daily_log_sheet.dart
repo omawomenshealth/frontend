@@ -54,8 +54,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       final allMeds = storage.getCustomMedications();
       final allSups = storage.getCustomSupplements();
 
-      final medsSet = Set<String>.from(allMeds);
-      final supsSet = Set<String>.from(allSups);
+      final medsSet = {'Parol', 'Aspirin', 'Arveles', 'Majezik', 'Minoset'}..addAll(allMeds);
+      final supsSet = {'Magnezyum', 'D Vitamini', 'Omega 3', 'Demir', 'B12 Vitamini', 'C Vitamini', 'Çinko'}..addAll(allSups);
 
       // Default daily settings list items should be excluded
       medsSet.removeAll(widget.settings.dailyMedications);
@@ -124,11 +124,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Text(
-                      _tabTitles.isNotEmpty
-                          ? _tabTitles[_selectedTabIndex < _tabTitles.length ? _selectedTabIndex : 0]
-                          : 'Günlük Kayıt',
-                      style: const TextStyle(
+                    const Text(
+                      'Günlük Kayıt',
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -142,6 +140,58 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   ],
                 ),
               ),
+
+              // Yatay Kaydırılabilir Sekmeler (Tab Bar)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+                child: Row(
+                  children: _tabTitles.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final title = entry.value;
+                    final isSelected = _selectedTabIndex == idx;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedTabIndex = idx;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.background,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isSelected ? AppColors.primary : AppColors.textHint.withValues(alpha: 0.15),
+                            width: 1.5,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.primary.withValues(alpha: 0.25),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isSelected ? Colors.white : AppColors.textSecondary,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const Divider(height: 1, color: Color(0xFFEEEEEE)),
 
               // İçerik
               Expanded(
@@ -388,7 +438,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         }
                       },
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32 + MediaQuery.of(context).viewInsets.bottom),
                   ],
                 ),
               ),
@@ -641,6 +691,34 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     onChanged(newEntries);
                   },
                 ),
+                const SizedBox(width: 4),
+
+                // Miktar seçici
+                Builder(
+                  builder: (ctx) {
+                    final dosageItems = ['1 Adet', '2 Adet', '500mg', '1000mg', '5 Damla', '10 Damla'];
+                    if (!dosageItems.contains(entry.dosage)) {
+                      dosageItems.add(entry.dosage);
+                    }
+                    dosageItems.add('Özel...');
+
+                    return _miniDropdown(
+                      value: entry.dosage,
+                      items: dosageItems,
+                      onChanged: (val) {
+                        if (val == 'Özel...') {
+                          _showCustomDosageDialog(context, entry, allEntries, onChanged);
+                        } else {
+                          final newEntries = allEntries.map((e) {
+                            if (e.name == entry.name) return e.copyWith(dosage: val);
+                            return e;
+                          }).toList();
+                          onChanged(newEntries);
+                        }
+                      },
+                    );
+                  }
+                ),
 
                 // Özel Eklenenler İçin Silme Butonu
                 if (!items.contains(entry.name))
@@ -823,6 +901,56 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
+      ),
+    );
+  }
+
+  void _showCustomDosageDialog(
+    BuildContext context,
+    MedicationEntry entry,
+    List<MedicationEntry> allEntries,
+    ValueChanged<List<MedicationEntry>> onChanged,
+  ) {
+    final textCtrl = TextEditingController(text: entry.dosage);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(
+          'Özel Miktar Girin',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+        ),
+        content: TextField(
+          controller: textCtrl,
+          decoration: const InputDecoration(
+            hintText: 'Örn: 2 ölçek, 250mg, 1.5 tablet',
+            isDense: true,
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final val = textCtrl.text.trim();
+              if (val.isNotEmpty) {
+                final newEntries = allEntries.map((e) {
+                  if (e.name == entry.name) return e.copyWith(dosage: val);
+                  return e;
+                }).toList();
+                onChanged(newEntries);
+              }
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Kaydet'),
+          ),
+        ],
       ),
     );
   }
