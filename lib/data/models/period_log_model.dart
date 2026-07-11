@@ -216,19 +216,40 @@ class DailyLog {
 
   /// Aynı zamana ait iki farklı kaydın verilerini birleştirir (üst üste yazmayı önler).
   DailyLog mergeWith(DailyLog other) {
+    // İlaç ve Takviyeleri birleştir
+    List<MedicationEntry> mergeMeds(List<MedicationEntry> listA, List<MedicationEntry> listB) {
+      final Map<String, MedicationEntry> merged = {};
+      for (var item in [...listA, ...listB]) {
+        final existing = merged[item.name];
+        if (existing == null) {
+          merged[item.name] = item;
+        } else {
+          merged[item.name] = existing.copyWith(
+            taken: existing.taken || item.taken,
+            dosage: existing.dosage.isNotEmpty ? existing.dosage : item.dosage,
+            time: existing.time.isNotEmpty ? existing.time : item.time,
+            stomachState: existing.stomachState.isNotEmpty ? existing.stomachState : item.stomachState,
+          );
+        }
+      }
+      return merged.values.toList();
+    }
+
     return DailyLog(
       date: date,
-      activities: activities.isNotEmpty ? activities : other.activities,
-      nutritionTags: nutritionTags.isNotEmpty ? nutritionTags : other.nutritionTags,
-      nutritionNotes: (nutritionNotes != null && nutritionNotes!.isNotEmpty) ? nutritionNotes : other.nutritionNotes,
-      supplements: supplements.isNotEmpty ? supplements : other.supplements,
-      medications: medications.isNotEmpty ? medications : other.medications,
+      activities: (activities + other.activities).toSet().toList(),
+      nutritionTags: (nutritionTags + other.nutritionTags).toSet().toList(),
+      nutritionNotes: (nutritionNotes != null && nutritionNotes!.isNotEmpty)
+          ? nutritionNotes
+          : other.nutritionNotes,
+      supplements: mergeMeds(supplements, other.supplements),
+      medications: mergeMeds(medications, other.medications),
       mood: mood ?? other.mood,
       moodEmoji: moodEmoji ?? other.moodEmoji,
       moodNote: (moodNote != null && moodNote!.isNotEmpty) ? moodNote : other.moodNote,
       sexualActivity: sexualActivity ?? other.sexualActivity,
-      bowelActivity: bowelActivity.isNotEmpty ? bowelActivity : other.bowelActivity,
-      painLocations: painLocations.isNotEmpty ? painLocations : other.painLocations,
+      bowelActivity: (bowelActivity + other.bowelActivity).toSet().toList(),
+      painLocations: (painLocations + other.painLocations).toSet().toList(),
       flowIntensity: flowIntensity ?? other.flowIntensity,
       periodPainLevel: periodPainLevel ?? other.periodPainLevel,
       notes: (notes != null && notes!.isNotEmpty) ? notes : other.notes,

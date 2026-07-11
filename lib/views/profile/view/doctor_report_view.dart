@@ -19,7 +19,8 @@ class DoctorReportView extends StatelessWidget {
   Widget build(BuildContext context) {
     final storage = Provider.of<LocalStorageService>(context, listen: false);
     final settings = storage.loadSettings() ?? UserSettings();
-    final allLogs = storage.loadAllLogs();
+    final rawLogs = storage.loadAllLogs();
+    final allLogs = _groupLogsByDay(rawLogs);
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
@@ -174,12 +175,28 @@ class DoctorReportView extends StatelessWidget {
               // ── BÖLÜM 4: NOTLAR ─────────────────────────────────────
               _sectionHeader('📝 Kaydedilen Doktor/Genel Notları'),
               const SizedBox(height: 8),
-              _buildNotesSection(allLogs),
+              _buildNotesSection(allLogs.expand<DailyLog>((dayList) => dayList).toList()),
             ],
           ),
         ),
       ),
     );
+  }
+
+  List<List<DailyLog>> _groupLogsByDay(List<DailyLog> logs) {
+    final Map<String, List<DailyLog>> grouped = {};
+    for (final log in logs) {
+      final dayKey = log.date.toStorageKey();
+      grouped.putIfAbsent(dayKey, () => []).add(log);
+    }
+    final result = grouped.values.toList();
+    // Sıralamayı yapalım: Günler en yeni gün en başta olacak şekilde
+    result.sort((a, b) => b.first.date.compareTo(a.first.date));
+    // Her günün kendi içindeki loglarını ise en eskiden en yeniye sıralayalım
+    for (var dayList in result) {
+      dayList.sort((a, b) => a.date.compareTo(b.date));
+    }
+    return result;
   }
 
   // ── Yardımcı Widget'lar ───────────────────────────────────────────────
@@ -222,7 +239,7 @@ class DoctorReportView extends StatelessWidget {
     );
   }
 
-  Widget _buildLogsTable(List<DailyLog> logs) {
+  Widget _buildLogsTable(List<List<DailyLog>> dayGroupedLogs) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFE5E5E5)),
@@ -236,8 +253,6 @@ class DoctorReportView extends StatelessWidget {
             columnSpacing: 16,
             headingRowColor: WidgetStateProperty.all(const Color(0xFFF9F9F9)),
             headingRowHeight: 40,
-            dataRowMinHeight: 36,
-            dataRowMaxHeight: 64,
             columns: const [
               DataColumn(label: Text('Tarih', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
               DataColumn(label: Text('Adet', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
@@ -245,81 +260,123 @@ class DoctorReportView extends StatelessWidget {
               DataColumn(label: Text('İlaç & Takviye', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
               DataColumn(label: Text('Ruh Hali', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
             ],
-            rows: logs.map((log) {
+            rows: dayGroupedLogs.map((dayLogs) {
+              final dateStr = dayLogs.first.date.toDotFormat();
+
               // 1. Adet
-              final isBleeding = log.flowIntensity != null;
-              final adetPain = log.periodPainLevel != null ? ' (Ağrı: ${log.periodPainLevel}/5)' : '';
-              final adetText = isBleeding ? 'Kanamalı (${log.flowIntensity})$adetPain' : 'Kanama Yok';
+              final logsWithPeriod = dayLogs.where((l) => l.flowIntensity != null || l.periodPainLevel != null).toList();
+              final String adetText;
+              final bool isBleeding;
+              if (logsWithPeriod.isEmpty) {
+                adetText = 'Kanama Yok';
+                isBleeding = false;
+              } else {
+                isBleeding = logsWithPeriod.any((l) => l.flowIntensity != null);
+                adetText = logsWithPeriod.map((log) {
+                  final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                  final adetPain = log.periodPainLevel != null ? ' (Ağrı: ${log.periodPainLevel}/5)' : '';
+                  return '$timeStr Kanamalı (${log.flowIntensity ?? "Hafif"})$adetPain';
+                }).join('\n----------------\n');
+              }
 
               // 2. Beslenme
-              final nutritionStr = log.nutritionTags.isNotEmpty ? log.nutritionTags.join(', ') : '';
-              final bowelStr = log.bowelActivity.isNotEmpty ? 'Bağırsak: ${log.bowelActivity.join(', ')}' : '';
-              final listBeslenme = [
-                if (nutritionStr.isNotEmpty) nutritionStr,
-                if (bowelStr.isNotEmpty) bowelStr,
-              ];
-              final beslenmeText = listBeslenme.isNotEmpty ? listBeslenme.join('\n') : '-';
+              final logsWithNutrition = dayLogs.where((l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty).toList();
+              final String beslenmeText;
+              if (logsWithNutrition.isEmpty) {
+                beslenmeText = '-';
+              } else {
+                beslenmeText = logsWithNutrition.map((log) {
+                  final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                  final nutritionStr = log.nutritionTags.isNotEmpty ? log.nutritionTags.join(', ') : '';
+                  final bowelStr = log.bowelActivity.isNotEmpty ? 'Bağırsak: ${log.bowelActivity.join(', ')}' : '';
+                  final items = [if (nutritionStr.isNotEmpty) nutritionStr, if (bowelStr.isNotEmpty) bowelStr];
+                  return '$timeStr ${items.join("\n")}';
+                }).join('\n----------------\n');
+              }
 
               // 3. İlaç & Takviye
-              final activeMedNames = log.medications.where((m) => m.taken).map((m) => '${m.name} (${m.dosage})').toList();
-              final activeSupNames = log.supplements.where((s) => s.taken).map((s) => '${s.name} (${s.dosage})').toList();
-              final allTaken = [...activeMedNames, ...activeSupNames];
-              final ilacText = allTaken.isNotEmpty ? allTaken.join(', ') : '-';
+              final logsWithMeds = dayLogs.where((l) => l.medications.any((m) => m.taken) || l.supplements.any((s) => s.taken)).toList();
+              final String ilacText;
+              if (logsWithMeds.isEmpty) {
+                ilacText = '-';
+              } else {
+                ilacText = logsWithMeds.map((log) {
+                  final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                  final activeMeds = log.medications.where((m) => m.taken).map((m) => '${m.name} (${m.dosage})').toList();
+                  final activeSups = log.supplements.where((s) => s.taken).map((s) => '${s.name} (${s.dosage})').toList();
+                  final all = [...activeMeds, ...activeSups];
+                  return '$timeStr ${all.join(", ")}';
+                }).join('\n----------------\n');
+              }
 
               // 4. Ruh Hali
-              final moodStr = log.mood != null ? '${log.moodEmoji ?? ""} ${log.mood}' : '';
-              final painStr = log.painLocations.isNotEmpty ? 'Ağrı: ${log.painLocations.join(", ")}' : '';
-              final notesStr = (log.notes != null && log.notes!.isNotEmpty) ? 'Not: ${log.notes}' : '';
-              final listMood = [
-                if (moodStr.isNotEmpty) moodStr,
-                if (painStr.isNotEmpty) painStr,
-                if (notesStr.isNotEmpty) notesStr,
-              ];
-              final moodText = listMood.isNotEmpty ? listMood.join('\n') : '-';
+              final logsWithMood = dayLogs.where((l) => l.mood != null || l.painLocations.isNotEmpty || (l.notes != null && l.notes!.isNotEmpty)).toList();
+              final String moodText;
+              if (logsWithMood.isEmpty) {
+                moodText = '-';
+              } else {
+                moodText = logsWithMood.map((log) {
+                  final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                  final moodStr = log.mood != null ? '${log.moodEmoji ?? ""} ${log.mood}' : '';
+                  final painStr = log.painLocations.isNotEmpty ? 'Ağrı: ${log.painLocations.join(", ")}' : '';
+                  final notesStr = (log.notes != null && log.notes!.isNotEmpty) ? 'Not: ${log.notes}' : '';
+                  final items = [if (moodStr.isNotEmpty) moodStr, if (painStr.isNotEmpty) painStr, if (notesStr.isNotEmpty) notesStr];
+                  return '$timeStr ${items.join("\n")}';
+                }).join('\n----------------\n');
+              }
 
               return DataRow(
                 cells: [
-                  DataCell(Text(log.date.toDotFormat(), style: const TextStyle(fontSize: 11))),
+                  DataCell(Text(dateStr, style: const TextStyle(fontSize: 11))),
                   DataCell(
-                    Text(
-                      adetText,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isBleeding ? Colors.red.shade700 : AppColors.textSecondary,
-                        fontWeight: isBleeding ? FontWeight.bold : FontWeight.normal,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: SizedBox(
+                        width: 130,
+                        child: Text(
+                          adetText,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isBleeding ? Colors.red.shade700 : AppColors.textSecondary,
+                            fontWeight: isBleeding ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                   DataCell(
-                    SizedBox(
-                      width: 120,
-                      child: Text(
-                        beslenmeText,
-                        style: const TextStyle(fontSize: 11),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: SizedBox(
+                        width: 120,
+                        child: Text(
+                          beslenmeText,
+                          style: const TextStyle(fontSize: 11),
+                        ),
                       ),
                     ),
                   ),
                   DataCell(
-                    SizedBox(
-                      width: 140,
-                      child: Text(
-                        ilacText,
-                        style: const TextStyle(fontSize: 11),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: SizedBox(
+                        width: 140,
+                        child: Text(
+                          ilacText,
+                          style: const TextStyle(fontSize: 11),
+                        ),
                       ),
                     ),
                   ),
                   DataCell(
-                    SizedBox(
-                      width: 140,
-                      child: Text(
-                        moodText,
-                        style: const TextStyle(fontSize: 11),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: SizedBox(
+                        width: 150,
+                        child: Text(
+                          moodText,
+                          style: const TextStyle(fontSize: 11),
+                        ),
                       ),
                     ),
                   ),
@@ -391,7 +448,7 @@ class DoctorReportView extends StatelessWidget {
 
   // ── Paylaş/Kopyala Mantığı ──────────────────────────────────────────
 
-  Future<void> _copyReportToClipboard(BuildContext context, UserSettings settings, List<DailyLog> logs) async {
+  Future<void> _copyReportToClipboard(BuildContext context, UserSettings settings, List<List<DailyLog>> logs) async {
     final sb = StringBuffer();
     sb.writeln('==================================');
     sb.writeln('OMA KİŞİSEL SAĞLIK RAPORU');
@@ -425,27 +482,67 @@ class DoctorReportView extends StatelessWidget {
     sb.writeln('----------------------------------');
     sb.writeln('Tarih | Adet | Beslenme | İlaç & Takviye | Ruh Hali');
     sb.writeln('----------------------------------');
-    for (var log in logs.take(15)) {
-      final activeMedNames = log.medications.where((m) => m.taken).map((m) => '${m.name}(${m.dosage})').toList();
-      final activeSupNames = log.supplements.where((s) => s.taken).map((s) => '${s.name}(${s.dosage})').toList();
-      final allTaken = [...activeMedNames, ...activeSupNames];
+    for (var dayLogs in logs.take(15)) {
+      final date = dayLogs.first.date.toDotFormat();
 
-      final date = log.date.toDotFormat();
-      final adetPain = log.periodPainLevel != null ? '(Ağrı:${log.periodPainLevel}/5)' : '';
-      final bleeding = log.flowIntensity != null ? 'Kanamalı(${log.flowIntensity})$adetPain' : 'Kanama Yok';
+      // 1. Adet
+      final logsWithPeriod = dayLogs.where((l) => l.flowIntensity != null || l.periodPainLevel != null).toList();
+      final String bleeding;
+      if (logsWithPeriod.isEmpty) {
+        bleeding = 'Kanama Yok';
+      } else {
+        bleeding = logsWithPeriod.map((log) {
+          final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+          final adetPain = log.periodPainLevel != null ? '(Ağrı:${log.periodPainLevel}/5)' : '';
+          return '$timeStr Kanamalı(${log.flowIntensity ?? "Hafif"})$adetPain';
+        }).join(' // ');
+      }
 
-      final nutritionStr = log.nutritionTags.isNotEmpty ? log.nutritionTags.join(', ') : '';
-      final bowelStr = log.bowelActivity.isNotEmpty ? 'Bağırsak:${log.bowelActivity.join(', ')}' : '';
-      final listBeslenme = [if (nutritionStr.isNotEmpty) nutritionStr, if (bowelStr.isNotEmpty) bowelStr];
-      final beslenme = listBeslenme.isNotEmpty ? listBeslenme.join(' | ') : '-';
+      // 2. Beslenme
+      final logsWithNutrition = dayLogs.where((l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty).toList();
+      final String beslenme;
+      if (logsWithNutrition.isEmpty) {
+        beslenme = '-';
+      } else {
+        beslenme = logsWithNutrition.map((log) {
+          final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+          final nutritionStr = log.nutritionTags.isNotEmpty ? log.nutritionTags.join(', ') : '';
+          final bowelStr = log.bowelActivity.isNotEmpty ? 'Bağırsak:${log.bowelActivity.join(', ')}' : '';
+          final items = [if (nutritionStr.isNotEmpty) nutritionStr, if (bowelStr.isNotEmpty) bowelStr];
+          return '$timeStr ${items.join(" ")}';
+        }).join(' // ');
+      }
 
-      final meds = allTaken.isNotEmpty ? allTaken.join(', ') : '-';
+      // 3. İlaç & Takviye
+      final logsWithMeds = dayLogs.where((l) => l.medications.any((m) => m.taken) || l.supplements.any((s) => s.taken)).toList();
+      final String meds;
+      if (logsWithMeds.isEmpty) {
+        meds = '-';
+      } else {
+        meds = logsWithMeds.map((log) {
+          final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+          final activeMeds = log.medications.where((m) => m.taken).map((m) => '${m.name}(${m.dosage})').toList();
+          final activeSups = log.supplements.where((s) => s.taken).map((s) => '${s.name}(${s.dosage})').toList();
+          final all = [...activeMeds, ...activeSups];
+          return '$timeStr ${all.join(", ")}';
+        }).join(' // ');
+      }
 
-      final moodStr = log.mood != null ? '${log.moodEmoji ?? ""} ${log.mood}' : '';
-      final painStr = log.painLocations.isNotEmpty ? 'Ağrı:${log.painLocations.join(", ")}' : '';
-      final notesStr = (log.notes != null && log.notes!.isNotEmpty) ? 'Not:${log.notes}' : '';
-      final listMood = [if (moodStr.isNotEmpty) moodStr, if (painStr.isNotEmpty) painStr, if (notesStr.isNotEmpty) notesStr];
-      final moodText = listMood.isNotEmpty ? listMood.join(' | ') : '-';
+      // 4. Ruh Hali
+      final logsWithMood = dayLogs.where((l) => l.mood != null || l.painLocations.isNotEmpty || (l.notes != null && l.notes!.isNotEmpty)).toList();
+      final String moodText;
+      if (logsWithMood.isEmpty) {
+        moodText = '-';
+      } else {
+        moodText = logsWithMood.map((log) {
+          final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+          final moodStr = log.mood != null ? '${log.moodEmoji ?? ""} ${log.mood}' : '';
+          final painStr = log.painLocations.isNotEmpty ? 'Ağrı:${log.painLocations.join(", ")}' : '';
+          final notesStr = (log.notes != null && log.notes!.isNotEmpty) ? 'Not:${log.notes}' : '';
+          final items = [if (moodStr.isNotEmpty) moodStr, if (painStr.isNotEmpty) painStr, if (notesStr.isNotEmpty) notesStr];
+          return '$timeStr ${items.join(" ")}';
+        }).join(' // ');
+      }
 
       sb.writeln('$date | $bleeding | $beslenme | $meds | $moodText');
     }
@@ -453,7 +550,8 @@ class DoctorReportView extends StatelessWidget {
 
     sb.writeln('4. KAYDEDİLEN NOTLAR');
     sb.writeln('----------------------------------');
-    final logsWithNotes = logs.where((l) => (l.notes != null && l.notes!.isNotEmpty) || (l.moodNote != null && l.moodNote!.isNotEmpty)).toList();
+    final flatLogs = logs.expand<DailyLog>((dayList) => dayList).toList();
+    final logsWithNotes = flatLogs.where((l) => (l.notes != null && l.notes!.isNotEmpty) || (l.moodNote != null && l.moodNote!.isNotEmpty)).toList();
     if (logsWithNotes.isEmpty) {
       sb.writeln('Kayıtlı not bulunamadı.');
     } else {
@@ -485,7 +583,7 @@ class DoctorReportView extends StatelessWidget {
   Future<void> _generateAndDownloadPdf(
     BuildContext context,
     UserSettings settings,
-    List<DailyLog> logs,
+    List<List<DailyLog>> logs,
   ) async {
     showDialog(
       context: context,
@@ -580,7 +678,7 @@ class DoctorReportView extends StatelessWidget {
 
               pw.Text('Kaydedilen Doktor/Genel Notları', style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 8),
-              _buildPdfNotesSection(logs.take(10).toList()),
+              _buildPdfNotesSection(logs.expand<DailyLog>((dayList) => dayList).take(10).toList()),
             ];
           },
         ),
@@ -623,7 +721,7 @@ class DoctorReportView extends StatelessWidget {
     );
   }
 
-  pw.Widget _buildPdfTable(List<DailyLog> logs) {
+  pw.Widget _buildPdfTable(List<List<DailyLog>> dayGroupedLogs) {
     final headers = ['Tarih', 'Adet', 'Beslenme', 'İlaç & Takviye', 'Ruh Hali'];
     
     return pw.TableHelper.fromTextArray(
@@ -638,28 +736,70 @@ class DoctorReportView extends StatelessWidget {
         color: PdfColors.grey100,
         border: pw.Border(bottom: pw.BorderSide(color: PdfColors.grey400, width: 1)),
       ),
-      data: logs.map((log) {
-        final adetPain = log.periodPainLevel != null ? ' (Ağrı: ${log.periodPainLevel}/5)' : '';
-        final adetText = log.flowIntensity != null ? 'Kanamalı (${log.flowIntensity})$adetPain' : 'Kanama Yok';
+      data: dayGroupedLogs.map((dayLogs) {
+        final dateStr = dayLogs.first.date.toDotFormat();
 
-        final nutritionStr = log.nutritionTags.isNotEmpty ? log.nutritionTags.join(', ') : '';
-        final bowelStr = log.bowelActivity.isNotEmpty ? 'Bağırsak: ${log.bowelActivity.join(', ')}' : '';
-        final listBeslenme = [if (nutritionStr.isNotEmpty) nutritionStr, if (bowelStr.isNotEmpty) bowelStr];
-        final beslenmeText = listBeslenme.isNotEmpty ? listBeslenme.join('\n') : '-';
+        // 1. Adet
+        final logsWithPeriod = dayLogs.where((l) => l.flowIntensity != null || l.periodPainLevel != null).toList();
+        final String adetText;
+        if (logsWithPeriod.isEmpty) {
+          adetText = 'Kanama Yok';
+        } else {
+          adetText = logsWithPeriod.map((log) {
+            final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+            final adetPain = log.periodPainLevel != null ? ' (Ağrı: ${log.periodPainLevel}/5)' : '';
+            return '$timeStr Kanamalı (${log.flowIntensity ?? "Hafif"})$adetPain';
+          }).join('\n----------------\n');
+        }
 
-        final activeMedNames = log.medications.where((m) => m.taken).map((m) => '${m.name}(${m.dosage})').toList();
-        final activeSupNames = log.supplements.where((s) => s.taken).map((s) => '${s.name}(${s.dosage})').toList();
-        final allTaken = [...activeMedNames, ...activeSupNames];
-        final ilacText = allTaken.isNotEmpty ? allTaken.join(', ') : '-';
+        // 2. Beslenme
+        final logsWithNutrition = dayLogs.where((l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty).toList();
+        final String beslenmeText;
+        if (logsWithNutrition.isEmpty) {
+          beslenmeText = '-';
+        } else {
+          beslenmeText = logsWithNutrition.map((log) {
+            final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+            final nutritionStr = log.nutritionTags.isNotEmpty ? log.nutritionTags.join(', ') : '';
+            final bowelStr = log.bowelActivity.isNotEmpty ? 'Bağırsak: ${log.bowelActivity.join(', ')}' : '';
+            final items = [if (nutritionStr.isNotEmpty) nutritionStr, if (bowelStr.isNotEmpty) bowelStr];
+            return '$timeStr ${items.join("\n")}';
+          }).join('\n----------------\n');
+        }
 
-        final moodStr = log.mood != null ? '${log.moodEmoji ?? ""} ${log.mood}' : '';
-        final painStr = log.painLocations.isNotEmpty ? 'Ağrı: ${log.painLocations.join(", ")}' : '';
-        final notesStr = (log.notes != null && log.notes!.isNotEmpty) ? 'Not: ${log.notes}' : '';
-        final listMood = [if (moodStr.isNotEmpty) moodStr, if (painStr.isNotEmpty) painStr, if (notesStr.isNotEmpty) notesStr];
-        final moodText = listMood.isNotEmpty ? listMood.join('\n') : '-';
+        // 3. İlaç & Takviye
+        final logsWithMeds = dayLogs.where((l) => l.medications.any((m) => m.taken) || l.supplements.any((s) => s.taken)).toList();
+        final String ilacText;
+        if (logsWithMeds.isEmpty) {
+          ilacText = '-';
+        } else {
+          ilacText = logsWithMeds.map((log) {
+            final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+            final activeMeds = log.medications.where((m) => m.taken).map((m) => '${m.name}(${m.dosage})').toList();
+            final activeSups = log.supplements.where((s) => s.taken).map((s) => '${s.name}(${s.dosage})').toList();
+            final all = [...activeMeds, ...activeSups];
+            return '$timeStr ${all.join(", ")}';
+          }).join('\n----------------\n');
+        }
+
+        // 4. Ruh Hali
+        final logsWithMood = dayLogs.where((l) => l.mood != null || l.painLocations.isNotEmpty || (l.notes != null && l.notes!.isNotEmpty)).toList();
+        final String moodText;
+        if (logsWithMood.isEmpty) {
+          moodText = '-';
+        } else {
+          moodText = logsWithMood.map((log) {
+            final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+            final moodStr = log.mood != null ? '${log.moodEmoji ?? ""} ${log.mood}' : '';
+            final painStr = log.painLocations.isNotEmpty ? 'Ağrı: ${log.painLocations.join(", ")}' : '';
+            final notesStr = (log.notes != null && log.notes!.isNotEmpty) ? 'Not: ${log.notes}' : '';
+            final items = [if (moodStr.isNotEmpty) moodStr, if (painStr.isNotEmpty) painStr, if (notesStr.isNotEmpty) notesStr];
+            return '$timeStr ${items.join("\n")}';
+          }).join('\n----------------\n');
+        }
 
         return [
-          log.date.toDotFormat(),
+          dateStr,
           adetText,
           beslenmeText,
           ilacText,
