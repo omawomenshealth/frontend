@@ -149,20 +149,37 @@ class _CountdownCircleState extends State<CountdownCircle>
                           ),
                         )
                       else ...[
-                        Text(
-                          widget.daysRemaining == 0
-                              ? ''
-                              : '${widget.daysRemaining}',
-                          style: TextStyle(
-                            fontSize: widget.daysRemaining == 0 ? 36 : 42,
-                            fontWeight: FontWeight.bold,
-                            height: 1.1,
-                            color: Colors.black,
-                            shadows: const [
-                              Shadow(blurRadius: 8.0, color: Colors.white),
-                              Shadow(blurRadius: 16.0, color: Colors.white),
-                            ],
-                          ),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Dış çerçeve (Stroke)
+                            Text(
+                              widget.daysRemaining == 0
+                                  ? ''
+                                  : '${widget.daysRemaining}',
+                              style: TextStyle(
+                                fontSize: widget.daysRemaining == 0 ? 36 : 42,
+                                fontWeight: FontWeight.bold,
+                                height: 1.1,
+                                foreground: Paint()
+                                  ..style = PaintingStyle.stroke
+                                  ..strokeWidth = 4
+                                  ..color = const Color(0xFF89986D),
+                              ),
+                            ),
+                            // İç dolgu (Color)
+                            Text(
+                              widget.daysRemaining == 0
+                                  ? ''
+                                  : '${widget.daysRemaining}',
+                              style: TextStyle(
+                                fontSize: widget.daysRemaining == 0 ? 36 : 42,
+                                fontWeight: FontWeight.bold,
+                                height: 1.1,
+                                color: const Color(0xFFF6F0D7),
+                              ),
+                            ),
+                          ],
                         ),
                         Text(
                           widget.daysRemaining == 0 ? 'Bugün' : 'gün kaldı',
