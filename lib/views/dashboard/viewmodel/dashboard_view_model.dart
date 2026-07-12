@@ -51,6 +51,17 @@ class DashboardViewModel extends ChangeNotifier {
     return 'İyi akşamlar$nameStr! 🌙';
   }
 
+  /// Karşılama mesajı (saate göre, emojiler olmadan).
+  String get cleanGreeting {
+    final hour = AppTime.now.hour;
+    final name = _settings?.userName ?? '';
+    final nameStr = name.isNotEmpty ? ', $name' : '';
+
+    if (hour < 12) return 'Günaydın$nameStr!';
+    if (hour < 18) return 'İyi günler$nameStr!';
+    return 'İyi akşamlar$nameStr!';
+  }
+
   /// Bugünün tarih stringi.
   String get todayDateStr {
     final now = AppTime.now;

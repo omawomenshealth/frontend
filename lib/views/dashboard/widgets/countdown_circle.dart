@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/utils/period_calculator.dart';
 
 /// Regl geri sayım dairesi — CustomPainter ile animasyonlu dairesel widget.
 class CountdownCircle extends StatefulWidget {
@@ -8,6 +9,7 @@ class CountdownCircle extends StatefulWidget {
   final int? totalDays; // Döngü uzunluğu
   final String phaseName;
   final Color phaseColor;
+  final CyclePhase? phase;
 
   const CountdownCircle({
     super.key,
@@ -15,6 +17,7 @@ class CountdownCircle extends StatefulWidget {
     this.totalDays,
     required this.phaseName,
     this.phaseColor = AppColors.periodPrimary,
+    this.phase,
   });
 
   @override
@@ -25,6 +28,21 @@ class _CountdownCircleState extends State<CountdownCircle>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+
+  String get _phaseImagePath {
+    switch (widget.phase) {
+      case CyclePhase.menstrual:
+        return 'assets/images/period.png';
+      case CyclePhase.follicular:
+        return 'assets/images/folikulerfaz.png';
+      case CyclePhase.ovulation:
+        return 'assets/images/ovulasyon.png';
+      case CyclePhase.luteal:
+        return 'assets/images/lutealfaz.png';
+      default:
+        return 'assets/images/period.png';
+    }
+  }
 
   @override
   void initState() {
@@ -88,62 +106,80 @@ class _CountdownCircleState extends State<CountdownCircle>
               backgroundColor: widget.phaseColor.withValues(alpha: 0.12),
             ),
             child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.daysRemaining == null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(
-                        'Tarih Bekleniyor',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                          color: widget.phaseColor,
-                        ),
-                      ),
-                    )
-                  else ...[
-                    Text(
-                      widget.daysRemaining == 0
-                          ? '🩸'
-                          : '${widget.daysRemaining}',
-                      style: TextStyle(
-                        fontSize: widget.daysRemaining == 0 ? 36 : 42,
-                        fontWeight: FontWeight.bold,
-                        color: widget.phaseColor,
-                      ),
-                    ),
-                    Text(
-                      widget.daysRemaining == 0 ? 'Bugün' : 'gün kaldı',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: widget.phaseColor.withValues(alpha: 0.7),
-                      ),
+              child: Container(
+                width: 135,
+                height: 135,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    width: 2.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
                     ),
                   ],
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: widget.phaseColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      widget.phaseName,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: widget.phaseColor,
-                      ),
-                    ),
+                  image: DecorationImage(
+                    image: AssetImage(_phaseImagePath),
+                    fit: BoxFit.cover,
                   ),
-                ],
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (widget.daysRemaining == null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            'Tarih Bekleniyor',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              shadows: [
+                                Shadow(blurRadius: 8.0, color: Colors.white),
+                                Shadow(blurRadius: 16.0, color: Colors.white),
+                              ],
+                            ),
+                          ),
+                        )
+                      else ...[
+                        Text(
+                          widget.daysRemaining == 0
+                              ? ''
+                              : '${widget.daysRemaining}',
+                          style: TextStyle(
+                            fontSize: widget.daysRemaining == 0 ? 36 : 42,
+                            fontWeight: FontWeight.bold,
+                            height: 1.1,
+                            color: Colors.black,
+                            shadows: const [
+                              Shadow(blurRadius: 8.0, color: Colors.white),
+                              Shadow(blurRadius: 16.0, color: Colors.white),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          widget.daysRemaining == 0 ? 'Bugün' : 'gün kaldı',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black.withValues(alpha: 0.8),
+                            shadows: const [
+                              Shadow(blurRadius: 6.0, color: Colors.white),
+                              Shadow(blurRadius: 12.0, color: Colors.white),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

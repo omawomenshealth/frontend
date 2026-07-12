@@ -24,7 +24,7 @@ class FeelingCard extends StatelessWidget {
     final options = <_QuickAction>[
       if (showPeriod)
         _QuickAction(
-          imagePath: 'assets/images/1.png',
+          imagePath: 'assets/images/period.png',
           color: AppColors.periodPrimary,
           bgColor: Color(0xFFF6F0D7),
           onTap: onPeriodTap,

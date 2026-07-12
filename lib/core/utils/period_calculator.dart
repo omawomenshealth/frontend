@@ -132,18 +132,72 @@ class PeriodCalculator {
   }
 
   /// Bugünün döngü fazı.
-  CyclePhase get currentPhase {
-    final today = AppTime.now.dateOnly;
+  /// Belirli bir tarihin döngü fazını döndürür.
+  CyclePhase phaseAt(DateTime date) {
+    final targetDate = date.dateOnly;
+    if (isInPeriod(targetDate)) return CyclePhase.menstrual;
+    if (isOvulationDay(targetDate)) return CyclePhase.ovulation;
+    if (isInFertileWindow(targetDate)) return CyclePhase.ovulation;
 
-    if (isInPeriod(today)) return CyclePhase.menstrual;
-    if (isOvulationDay(today)) return CyclePhase.ovulation;
-    if (isInFertileWindow(today)) return CyclePhase.ovulation;
+    final diff = targetDate.difference(lastPeriodDate.dateOnly).inDays;
+    if (cycleLength <= 0) return CyclePhase.menstrual;
+    final dayInCycle = ((diff % cycleLength) + cycleLength) % cycleLength;
+    final daysLeft = cycleLength - dayInCycle;
 
-    // Adet sonrası & ovülasyon öncesi → foliküler
-    // Ovülasyon sonrası & adet öncesi → luteal
-    final daysLeft = daysUntilNextPeriod;
     if (daysLeft <= 14) return CyclePhase.luteal;
     return CyclePhase.follicular;
+  }
+
+  /// Bugünün döngü fazı.
+  CyclePhase get currentPhase {
+    return phaseAt(AppTime.now.dateOnly);
+  }
+
+  /// Aktif fazın bitmesine kalan gün sayısı (bugün dahil).
+  int get currentPhaseDaysRemaining {
+    final today = AppTime.now.dateOnly;
+    final phase = currentPhase;
+
+    int days = 1;
+    for (int i = 1; i <= cycleLength; i++) {
+      final next = today.add(Duration(days: i));
+      if (phaseAt(next) == phase) {
+        days++;
+      } else {
+        break;
+      }
+    }
+    return days;
+  }
+
+  /// Aktif fazın toplam gün sayısı.
+  int get currentPhaseTotalDays {
+    final today = AppTime.now.dateOnly;
+    final phase = currentPhase;
+
+    // Geriye doğru başlangıcı bul
+    DateTime start = today;
+    for (int i = 0; i < cycleLength; i++) {
+      final prev = today.subtract(Duration(days: i + 1));
+      if (phaseAt(prev) == phase) {
+        start = prev;
+      } else {
+        break;
+      }
+    }
+
+    // İleriye doğru bitişi bul
+    DateTime end = today;
+    for (int i = 0; i < cycleLength; i++) {
+      final next = today.add(Duration(days: i + 1));
+      if (phaseAt(next) == phase) {
+        end = next;
+      } else {
+        break;
+      }
+    }
+
+    return end.difference(start).inDays + 1;
   }
 
   /// Döngü fazının Türkçe adı.
@@ -157,6 +211,20 @@ class PeriodCalculator {
         return 'Ovülasyon';
       case CyclePhase.luteal:
         return 'Luteal Faz';
+    }
+  }
+
+  /// Sonraki döngü fazının Türkçe adı.
+  String get nextPhaseName {
+    switch (currentPhase) {
+      case CyclePhase.menstrual:
+        return 'Foliküler Faz';
+      case CyclePhase.follicular:
+        return 'Ovülasyon';
+      case CyclePhase.ovulation:
+        return 'Luteal Faz';
+      case CyclePhase.luteal:
+        return 'Adet Dönemi';
     }
   }
 

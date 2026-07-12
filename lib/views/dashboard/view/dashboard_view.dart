@@ -40,30 +40,80 @@ class DashboardView extends StatelessWidget {
                   children: [
                     const SizedBox(height: 8),
                     // ── Karşılama ──────────────────────────
-                    Text(
-                      vm.greeting,
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                    Row(
+                      children: [
+                        Image.asset(
+                          AppTime.now.hour < 12
+                              ? 'assets/images/morning.png'
+                              : AppTime.now.hour < 18
+                                  ? 'assets/images/afternoon.png'
+                                  : 'assets/images/night.png',
+                          width: 32,
+                          height: 32,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            vm.cleanGreeting,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const cal.CalendarView(),
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/images/calendar.png',
+                            width: 32,
+                            height: 32,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 12),
 
-                    // ── Küçük Takvim logosu + Yatay Takvim ──
+                    // ── Yatay Takvim ──
                     HorizontalCalendar(
                       selectedDate: vm.selectedDate,
                       onDateSelected: vm.selectDate,
                       periodCalculator: vm.periodCalculator,
-                      onCalendarTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const cal.CalendarView(),
-                          ),
-                        );
-                      },
                     ),
+                    if (!vm.selectedDate.isSameDay(AppTime.now)) ...[
+                      const SizedBox(height: 6),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () => vm.selectDate(AppTime.now),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'Bugün',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 16),
 
                     // ── Regl Geri Sayım (Kadın) ───────────
@@ -273,6 +323,7 @@ class DashboardView extends StatelessWidget {
               totalDays: null,
               phaseName: 'Bilgi Eksik',
               phaseColor: AppColors.periodPrimary,
+              phase: null,
             ),
           ],
         ),
@@ -329,6 +380,16 @@ class DashboardView extends StatelessWidget {
             totalDays: pc.cycleLength,
             phaseName: pc.currentPhaseName,
             phaseColor: phaseColor,
+            phase: pc.currentPhase,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '${pc.currentPhaseDaysRemaining} gün sonra ${pc.nextPhaseName}',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: phaseColor,
+            ),
           ),
         ],
       ),

@@ -86,67 +86,8 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
   Widget build(BuildContext context) {
     final today = AppTime.now.dateOnly;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // ── Küçük Takvim logosu + başlık ──────
-        Row(
-          children: [
-            GestureDetector(
-              onTap: widget.onCalendarTap,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.calendar_today_rounded,
-                  color: AppColors.primary,
-                  size: 18,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              today.toTurkishLong(),
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const Spacer(),
-            // Bugüne dön butonu
-            if (!widget.selectedDate.isSameDay(today))
-              GestureDetector(
-                onTap: () => widget.onDateSelected(today),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'Bugün',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: 6),
-
-        // ── Yatay Takvim ──────────────────────
-        SizedBox(
-          height: 60,
+    return SizedBox(
+      height: 60,
           child: ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
@@ -235,9 +176,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
               );
             },
           ),
-        ),
-      ],
-    );
+        );
   }
 
   /// Döngü durumuna göre küçük renkli nokta göstergesi
