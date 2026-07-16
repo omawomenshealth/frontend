@@ -89,7 +89,9 @@ class ProfileView extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 16),
+                  _buildSyncCard(context, vm),
+                  const SizedBox(height: 24),
 
                   // ── 1. Temel Bilgiler ─────────────────────
                   _buildSectionCard(
@@ -1001,6 +1003,176 @@ class ProfileView extends StatelessWidget {
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSyncCard(BuildContext context, ProfileViewModel vm) {
+    final isLoggedIn = vm.isLoggedIn;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isLoggedIn ? Colors.green.withValues(alpha: 0.05) : Colors.amber.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isLoggedIn ? Colors.green.withValues(alpha: 0.2) : Colors.amber.withValues(alpha: 0.2),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                isLoggedIn ? Icons.cloud_done_rounded : Icons.cloud_off_rounded,
+                color: isLoggedIn ? Colors.green : Colors.amber[800],
+              ),
+              const SizedBox(width: 8),
+              Text(
+                isLoggedIn ? 'Bulut Senkronizasyonu Aktif' : 'Çevrimdışı Çalışılıyor (Bulut Deaktif)',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: isLoggedIn ? Colors.green[800] : Colors.amber[900],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (isLoggedIn) ...[
+            Text(
+              'Hesap: ${vm.userEmail}',
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Son Eşitleme: ${vm.lastSyncDisplay}',
+              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+            if (vm.syncError != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                vm.syncError!,
+                style: const TextStyle(fontSize: 12, color: Colors.redAccent),
+              ),
+            ],
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: vm.isSyncing
+                        ? null
+                        : () async {
+                            final success = await vm.syncNow();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(success
+                                      ? 'Senkronizasyon başarıyla tamamlandı.'
+                                      : 'Senkronizasyon başarısız oldu.'),
+                                  backgroundColor: success ? Colors.green : Colors.redAccent,
+                                ),
+                              );
+                              // Diğer görünümleri yenile
+                              context.read<DashboardViewModel>().loadData();
+                              context.read<CalendarViewModel>().loadData();
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    icon: vm.isSyncing
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          )
+                        : const Icon(Icons.sync_rounded, size: 18),
+                    label: Text(vm.isSyncing ? 'Eşitleniyor...' : 'Şimdi Eşitle'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(
+                  onPressed: () => _showSignOutDialog(context, vm),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.redAccent,
+                    side: const BorderSide(color: Colors.redAccent),
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  icon: const Icon(Icons.logout_rounded, size: 18),
+                  label: const Text('Çıkış Yap'),
+                ),
+              ],
+            ),
+          ] else ...[
+            const Text(
+              'Uygulama silindiğinde veya başka bir cihaza geçtiğinizde verilerinizi kaybetmemek için Google hesabınızı bağlayabilirsiniz.',
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pushReplacementNamed('/auth');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: const Icon(Icons.login_rounded, size: 18),
+                label: const Text('Giriş Yap / Hesap Bağla', style: TextStyle(fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showSignOutDialog(BuildContext context, ProfileViewModel vm) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Çıkış Yapılsın mı?'),
+        content: const Text(
+          'Hesabınızdan çıkış yapıldığında yerel verileriniz temizlenecektir. '
+          'Eğer bulut senkronizasyonunuz tamamsa, daha sonra tekrar giriş yaparak verilerinizi kurtarabilirsiniz.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              vm.signOut(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Çıkış Yap ve Temizle'),
+          ),
+        ],
       ),
     );
   }

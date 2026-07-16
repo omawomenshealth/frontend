@@ -3,22 +3,80 @@ import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 
 /// Profil iş mantığı — kullanıcı bilgilerini görüntüleme ve güncelleme.
+import '../../../data/services/sync_service.dart';
+import 'package:intl/intl.dart';
+
+/// Profil iş mantığı — kullanıcı bilgilerini görüntüleme ve güncelleme.
 class ProfileViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
+  final SyncService _sync;
 
-  ProfileViewModel(this._storage) {
+  ProfileViewModel(this._storage, this._sync) {
     loadSettings();
   }
 
   UserSettings _settings = UserSettings();
   bool _isLoading = true;
   bool _isSaving = false;
+  bool _isSyncing = false;
+  String? _syncError;
 
   UserSettings get settings => _settings;
   bool get isLoading => _isLoading;
   bool get isSaving => _isSaving;
+  bool get isSyncing => _isSyncing;
+  String? get syncError => _syncError;
 
   bool get isFemale => _settings.gender == Gender.female;
+
+  // ── Kimlik Doğrulama & Senkronizasyon ──────────────────
+  bool get isLoggedIn => _storage.isUserLoggedIn;
+  String get userEmail => _storage.authEmail ?? '';
+  String get userNameDisplay => _storage.authName ?? '';
+  
+  String get lastSyncDisplay {
+    final timeStr = _storage.lastSyncTime;
+    if (timeStr == null) return 'Hiç senkronize edilmedi';
+    try {
+      final dt = DateTime.parse(timeStr);
+      return DateFormat('dd.MM.yyyy HH:mm').format(dt);
+    } catch (_) {
+      return 'Bilinmiyor';
+    }
+  }
+
+  /// Manuel senkronizasyonu başlat (Bulutla Birleştir)
+  Future<bool> syncNow() async {
+    if (!isLoggedIn) return false;
+    _isSyncing = true;
+    _syncError = null;
+    notifyListeners();
+
+    try {
+      final success = await _sync.mergeWithCloud();
+      if (success) {
+        // Senkronizasyondan sonra yerel ayarları ve log istatistiklerini yeniden yükle
+        loadSettings();
+      } else {
+        _syncError = 'Eşitleme başarısız oldu. İnternet bağlantınızı kontrol edin.';
+      }
+      return success;
+    } catch (e) {
+      _syncError = e.toString();
+      return false;
+    } finally {
+      _isSyncing = false;
+      notifyListeners();
+    }
+  }
+
+  /// Çıkış Yap — Tüm SharedPreferences verilerini temizler ve Auth ekranına yönlendirir.
+  Future<void> signOut(BuildContext context) async {
+    await _storage.clearAll();
+    if (context.mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil('/auth', (route) => false);
+    }
+  }
 
   /// Ayarları yükle.
   void loadSettings() {

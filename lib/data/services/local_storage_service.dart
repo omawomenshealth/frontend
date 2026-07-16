@@ -11,8 +11,28 @@ class LocalStorageService {
   static const String _logDatesKey = 'daily_log_dates';
   static const String _allMedsKey = 'all_custom_medications';
   static const String _allSupsKey = 'all_custom_supplements';
+  static const String _authTokenKey = 'auth_token';
+  static const String _authEmailKey = 'auth_email';
+  static const String _authNameKey = 'auth_name';
+  static const String _authLastSyncKey = 'auth_last_sync';
 
   SharedPreferences? _prefs;
+
+  // ── Kimlik Doğrulama & Senkronizasyon Durumu ─────────────
+  
+  String? get authToken => _p.getString(_authTokenKey);
+  Future<bool> setAuthToken(String? value) async => value != null ? _p.setString(_authTokenKey, value) : _p.remove(_authTokenKey);
+
+  String? get authEmail => _p.getString(_authEmailKey);
+  Future<bool> setAuthEmail(String? value) async => value != null ? _p.setString(_authEmailKey, value) : _p.remove(_authEmailKey);
+
+  String? get authName => _p.getString(_authNameKey);
+  Future<bool> setAuthName(String? value) async => value != null ? _p.setString(_authNameKey, value) : _p.remove(_authNameKey);
+
+  String? get lastSyncTime => _p.getString(_authLastSyncKey);
+  Future<bool> setLastSyncTime(String? value) async => value != null ? _p.setString(_authLastSyncKey, value) : _p.remove(_authLastSyncKey);
+
+  bool get isUserLoggedIn => authToken != null;
 
   /// Servisi başlat.
   Future<void> init() async {
@@ -418,6 +438,16 @@ class LocalStorageService {
       return _p.setStringList(_allSupsKey, newList);
     }
     return false;
+  }
+
+  /// Tüm özel ilaçları toplu kaydet.
+  Future<bool> saveCustomMedications(List<String> list) async {
+    return _p.setStringList(_allMedsKey, list);
+  }
+
+  /// Tüm özel takviyeleri toplu kaydet.
+  Future<bool> saveCustomSupplements(List<String> list) async {
+    return _p.setStringList(_allSupsKey, list);
   }
 }
 
