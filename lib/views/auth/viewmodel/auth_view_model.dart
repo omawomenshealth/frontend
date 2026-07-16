@@ -22,7 +22,7 @@ class AuthViewModel extends ChangeNotifier {
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
-    serverClientId: '327530541694-4khqa0mvmdv55huep74fjat3edbqdmvp.apps.googleusercontent.com',
+    serverClientId: '327530541694-ejaruugjsku3e0qfkq77cloqt15095ql.apps.googleusercontent.com',
   );
 
   /// 1. Google ile Giriş Akışı
