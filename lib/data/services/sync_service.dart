@@ -54,6 +54,7 @@ class SyncService {
       final token = _storage.authToken;
       final email = _storage.authEmail;
       final name = _storage.authName;
+      final googleId = _storage.authGoogleId;
 
       // 2. Tüm SharedPreferences verilerini temizle
       await _storage.clearAll();
@@ -62,6 +63,7 @@ class SyncService {
       await _storage.setAuthToken(token);
       await _storage.setAuthEmail(email);
       await _storage.setAuthName(name);
+      await _storage.setAuthGoogleId(googleId);
 
       // 4. Ayarları Geri Yükle
       if (cloudData['settings'] != null) {
@@ -151,7 +153,8 @@ class SyncService {
       final cloudLogsRaw = cloudData['logs'] as List? ?? [];
       final cloudLogs = cloudLogsRaw.map((l) => DailyLog.fromJson(l as Map<String, dynamic>)).toList();
 
-      // Tarih anahtarlarına göre eşle
+      // Her kayıt kendi timestamp'iyle eşleşir — aynı timestamp ise merge,
+      // farklı timestamp ise ayrı kayıt olarak korunur.
       final Map<String, DailyLog> mergedLogsMap = {};
       
       // Önce buluttakileri ekle

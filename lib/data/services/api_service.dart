@@ -50,10 +50,14 @@ class ApiService {
         final userMap = data['user'] as Map<String, dynamic>;
         final userEmail = userMap['email'] as String;
         final userName = userMap['name'] as String;
+        final userGoogleId = userMap['googleId'] as String?;
         
         await _storage.setAuthToken(token);
         await _storage.setAuthEmail(userEmail);
         await _storage.setAuthName(userName);
+        if (userGoogleId != null) {
+          await _storage.setAuthGoogleId(userGoogleId);
+        }
         
         return data;
       } else {

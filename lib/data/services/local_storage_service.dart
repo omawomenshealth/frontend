@@ -14,6 +14,7 @@ class LocalStorageService {
   static const String _authTokenKey = 'auth_token';
   static const String _authEmailKey = 'auth_email';
   static const String _authNameKey = 'auth_name';
+  static const String _authGoogleIdKey = 'auth_google_id';
   static const String _authLastSyncKey = 'auth_last_sync';
 
   SharedPreferences? _prefs;
@@ -28,6 +29,9 @@ class LocalStorageService {
 
   String? get authName => _p.getString(_authNameKey);
   Future<bool> setAuthName(String? value) async => value != null ? _p.setString(_authNameKey, value) : _p.remove(_authNameKey);
+
+  String? get authGoogleId => _p.getString(_authGoogleIdKey);
+  Future<bool> setAuthGoogleId(String? value) async => value != null ? _p.setString(_authGoogleIdKey, value) : _p.remove(_authGoogleIdKey);
 
   String? get lastSyncTime => _p.getString(_authLastSyncKey);
   Future<bool> setLastSyncTime(String? value) async => value != null ? _p.setString(_authLastSyncKey, value) : _p.remove(_authLastSyncKey);
@@ -75,7 +79,9 @@ class LocalStorageService {
   // ── Günlük Kayıtlar ───────────────────────────────────
   /// Günlük kayıt kaydet.
   /// Günlük kayıt kaydet ve istatistikleri otomatik güncelle.
+  /// Her kayıt kendi tam timestamp'iyle ayrı bir entry — günde N kayıt desteklenir.
   Future<bool> saveDailyLog(DailyLog log) async {
+    // Tam timestamp bazlı key: her farklı anın kaydı ayrıdır
     final keyStr = log.date.toIso8601String();
     final key = '$_logPrefix$keyStr';
     

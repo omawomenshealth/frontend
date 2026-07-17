@@ -236,7 +236,7 @@ class DailyLog {
     }
 
     return DailyLog(
-      date: date,
+      date: date, // Timestamp korunur — her kayıt kendi zamanıyla ayrıdır
       activities: (activities + other.activities).toSet().toList(),
       nutritionTags: (nutritionTags + other.nutritionTags).toSet().toList(),
       nutritionNotes: (nutritionNotes != null && nutritionNotes!.isNotEmpty)
