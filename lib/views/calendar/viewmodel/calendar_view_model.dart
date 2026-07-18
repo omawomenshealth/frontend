@@ -35,8 +35,7 @@ class CalendarViewModel extends ChangeNotifier {
 
   List<DailyLog> get selectedDayLogs => _logMap[_selectedDay] ?? [];
 
-  bool get isFemale => _settings?.gender == Gender.female;
-  bool get hasPeriodTracking => isFemale && _settings?.lastPeriodDate != null;
+  bool get hasPeriodTracking => _settings?.lastPeriodDate != null;
 
   Future<void> loadData() async {
     if (!_isLoading) {
@@ -95,7 +94,7 @@ class CalendarViewModel extends ChangeNotifier {
       if (_periodCalculator!.isInPeriod(normalizedDate)) {
         _periodDays.add(normalizedDate);
       }
-      if (_periodCalculator!.isOvulationDay(normalizedDate)) {
+      if (_periodCalculator!.isInEstimatedOvulationWindow(normalizedDate)) {
         _ovulationDays.add(normalizedDate);
       } else if (_periodCalculator!.isInFertileWindow(normalizedDate)) {
         _fertileDays.add(normalizedDate);
@@ -120,6 +119,7 @@ class CalendarViewModel extends ChangeNotifier {
   // ARTIK BU METOTLAR AĞIR HESAPLAMA YAPMAZ, ANINDA CEVAP VERİR
   bool hasLogForDay(DateTime day) => _logMap.containsKey(day.dateOnly);
   bool isPeriodDay(DateTime day) => _periodDays.contains(day.dateOnly);
-  bool isOvulationDay(DateTime day) => _ovulationDays.contains(day.dateOnly);
+  bool isEstimatedOvulationDay(DateTime day) =>
+      _ovulationDays.contains(day.dateOnly);
   bool isFertileDay(DateTime day) => _fertileDays.contains(day.dateOnly);
 }

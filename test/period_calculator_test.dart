@@ -1,0 +1,84 @@
+import 'package:app_proje_a/core/utils/app_time.dart';
+import 'package:app_proje_a/core/utils/cycle_rules.dart';
+import 'package:app_proje_a/core/utils/date_extensions.dart';
+import 'package:app_proje_a/core/utils/period_calculator.dart';
+import 'package:app_proje_a/data/models/user_settings_model.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() {
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    await AppTime.init();
+    await AppTime.setOffsetDays(0);
+  });
+
+  test('onboarding son adet tarihi geçmiş takvimde adet olarak görünür', () {
+    final today = AppTime.now.dateOnly;
+    final lastPeriod = today.subtract(const Duration(days: 2));
+    final calculator = PeriodCalculator(
+      lastPeriodDate: lastPeriod,
+      cycleLength: 28,
+      periodLength: 5,
+      hasBleedingLog: (_) => false,
+    );
+
+    expect(calculator.isInPeriod(lastPeriod), isTrue);
+    expect(
+      calculator.isInPeriod(lastPeriod.add(const Duration(days: 1))),
+      isTrue,
+    );
+  });
+
+  test('adet sürerken sonraki adet mevcut başlangıç değildir', () {
+    final today = AppTime.now.dateOnly;
+    final calculator = PeriodCalculator(
+      lastPeriodDate: today.subtract(const Duration(days: 2)),
+      cycleLength: 28,
+      periodLength: 5,
+    );
+
+    expect(calculator.nextPeriodDate, today.add(const Duration(days: 26)));
+    expect(calculator.daysUntilNextPeriod, 26);
+  });
+
+  test(
+    'ovülasyon adetten 12-16 gün önceki tahmini aralık olarak gösterilir',
+    () {
+      final today = AppTime.now.dateOnly;
+      final calculator = PeriodCalculator(
+        lastPeriodDate: today,
+        cycleLength: 28,
+        periodLength: 5,
+      );
+      final nextPeriod = today.add(const Duration(days: 28));
+
+      expect(
+        calculator.estimatedOvulationWindow.start,
+        nextPeriod.subtract(const Duration(days: CycleRules.maxLutealLength)),
+      );
+      expect(
+        calculator.estimatedOvulationWindow.end,
+        nextPeriod.subtract(const Duration(days: CycleRules.minLutealLength)),
+      );
+      expect(
+        calculator.isInEstimatedOvulationWindow(
+          nextPeriod.subtract(const Duration(days: 14)),
+        ),
+        isTrue,
+      );
+    },
+  );
+
+  test('eski veya buluttan gelen döngü değerleri ortak sınırlara çekilir', () {
+    final settings = UserSettings.fromJson({
+      'gender': 'male',
+      'averageCycleLength': 90,
+      'averagePeriodLength': 0,
+    });
+
+    expect(settings.averageCycleLength, CycleRules.maxCycleLength);
+    expect(settings.averagePeriodLength, CycleRules.minPeriodLength);
+    expect(settings.toJson().containsKey('gender'), isFalse);
+  });
+}

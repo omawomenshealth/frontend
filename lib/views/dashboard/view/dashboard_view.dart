@@ -46,8 +46,8 @@ class DashboardView extends StatelessWidget {
                           AppTime.now.hour < 12
                               ? 'assets/images/morning.png'
                               : AppTime.now.hour < 18
-                                  ? 'assets/images/afternoon.png'
-                                  : 'assets/images/night.png',
+                              ? 'assets/images/afternoon.png'
+                              : 'assets/images/night.png',
                           width: 32,
                           height: 32,
                         ),
@@ -136,8 +136,12 @@ class DashboardView extends StatelessWidget {
                     // ── Hızlı Erişim (4 yuvarlak) ────────
                     FeelingCard(
                       showPeriod: vm.hasPeriodTracking,
-                      onPeriodTap: () =>
-                          _showDailyLogSheet(context, vm, initialIndex: 0, isSingleTab: true),
+                      onPeriodTap: () => _showDailyLogSheet(
+                        context,
+                        vm,
+                        initialIndex: 0,
+                        isSingleTab: true,
+                      ),
                       onNutritionTap: () => _showDailyLogSheet(
                         context,
                         vm,
@@ -390,6 +394,12 @@ class DashboardView extends StatelessWidget {
               fontWeight: FontWeight.w600,
               color: phaseColor,
             ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Takvim ve ovülasyon bilgileri yaklaşık tahminlerdir.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 11, color: AppColors.textHint),
           ),
         ],
       ),
@@ -716,7 +726,7 @@ class DashboardView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                           if (log.mood != null)
+                          if (log.mood != null)
                             _summaryTile(
                               'Ruh Hali',
                               '${log.moodEmoji ?? ''} ${log.mood}',
@@ -743,19 +753,31 @@ class DashboardView extends StatelessWidget {
                           if (log.flowIntensity != null)
                             _summaryTile('Akış', log.flowIntensity!),
                           if (log.periodPainLevel != null)
-                            _summaryTile('Regl Ağrısı', '${log.periodPainLevel}/5'),
+                            _summaryTile(
+                              'Regl Ağrısı',
+                              '${log.periodPainLevel}/5',
+                            ),
                           if (log.medications.any((m) => m.taken))
                             _summaryTile(
                               'İlaçlar',
-                              log.medications.where((m) => m.taken).map((m) => '${m.name} (${m.dosage})').join(', '),
+                              log.medications
+                                  .where((m) => m.taken)
+                                  .map((m) => '${m.name} (${m.dosage})')
+                                  .join(', '),
                             ),
                           if (log.supplements.any((s) => s.taken))
                             _summaryTile(
                               'Takviyeler',
-                              log.supplements.where((s) => s.taken).map((s) => '${s.name} (${s.dosage})').join(', '),
+                              log.supplements
+                                  .where((s) => s.taken)
+                                  .map((s) => '${s.name} (${s.dosage})')
+                                  .join(', '),
                             ),
                           if (log.sexualActivity != null)
-                            _summaryTile('Cinsel Aktivite', log.sexualActivity! ? 'Evet' : 'Hayır'),
+                            _summaryTile(
+                              'Cinsel Aktivite',
+                              log.sexualActivity! ? 'Evet' : 'Hayır',
+                            ),
                           if (log.notes != null && log.notes!.isNotEmpty)
                             _summaryTile('Not', log.notes!),
                         ],
@@ -819,23 +841,15 @@ class DashboardView extends StatelessWidget {
         settings: vm.settings!,
         initialTabIndex: initialIndex,
         isSingleTab: isSingleTab,
-        onSave: (log) {
+        onSave: (log) async {
           // Adet verisi varsa döngü istatistiklerini yeniden hesapla
-          if (log.flowIntensity != null) {
-            vm.recordPeriodAndRecalculate(log).then((_) {
-              // Takvim viewmodel'ini de senkronize et
-              if (context.mounted) {
-                context.read<CalendarViewModel>().loadData();
-              }
-            });
-          } else {
-            vm.saveLog(log).then((_) {
-              // Takvimi de güncelle (non-period data için)
-              if (context.mounted) {
-                context.read<CalendarViewModel>().loadData();
-              }
-            });
+          final success = log.flowIntensity != null
+              ? await vm.recordPeriodAndRecalculate(log)
+              : await vm.saveLog(log);
+          if (success && context.mounted) {
+            await context.read<CalendarViewModel>().loadData();
           }
+          return success;
         },
       ),
     );

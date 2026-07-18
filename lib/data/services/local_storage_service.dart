@@ -3,6 +3,7 @@ import '../models/user_settings_model.dart';
 import '../models/period_log_model.dart';
 import '../../core/utils/date_extensions.dart';
 import '../../core/utils/app_time.dart';
+import '../../core/utils/cycle_rules.dart';
 
 /// SharedPreferences üzerinden veri okuma/yazma servisi.
 class LocalStorageService {
@@ -20,21 +21,31 @@ class LocalStorageService {
   SharedPreferences? _prefs;
 
   // ── Kimlik Doğrulama & Senkronizasyon Durumu ─────────────
-  
+
   String? get authToken => _p.getString(_authTokenKey);
-  Future<bool> setAuthToken(String? value) async => value != null ? _p.setString(_authTokenKey, value) : _p.remove(_authTokenKey);
+  Future<bool> setAuthToken(String? value) async => value != null
+      ? _p.setString(_authTokenKey, value)
+      : _p.remove(_authTokenKey);
 
   String? get authEmail => _p.getString(_authEmailKey);
-  Future<bool> setAuthEmail(String? value) async => value != null ? _p.setString(_authEmailKey, value) : _p.remove(_authEmailKey);
+  Future<bool> setAuthEmail(String? value) async => value != null
+      ? _p.setString(_authEmailKey, value)
+      : _p.remove(_authEmailKey);
 
   String? get authName => _p.getString(_authNameKey);
-  Future<bool> setAuthName(String? value) async => value != null ? _p.setString(_authNameKey, value) : _p.remove(_authNameKey);
+  Future<bool> setAuthName(String? value) async => value != null
+      ? _p.setString(_authNameKey, value)
+      : _p.remove(_authNameKey);
 
   String? get authGoogleId => _p.getString(_authGoogleIdKey);
-  Future<bool> setAuthGoogleId(String? value) async => value != null ? _p.setString(_authGoogleIdKey, value) : _p.remove(_authGoogleIdKey);
+  Future<bool> setAuthGoogleId(String? value) async => value != null
+      ? _p.setString(_authGoogleIdKey, value)
+      : _p.remove(_authGoogleIdKey);
 
   String? get lastSyncTime => _p.getString(_authLastSyncKey);
-  Future<bool> setLastSyncTime(String? value) async => value != null ? _p.setString(_authLastSyncKey, value) : _p.remove(_authLastSyncKey);
+  Future<bool> setLastSyncTime(String? value) async => value != null
+      ? _p.setString(_authLastSyncKey, value)
+      : _p.remove(_authLastSyncKey);
 
   bool get isUserLoggedIn => authToken != null;
 
@@ -84,7 +95,7 @@ class LocalStorageService {
     // Tam timestamp bazlı key: her farklı anın kaydı ayrıdır
     final keyStr = log.date.toIso8601String();
     final key = '$_logPrefix$keyStr';
-    
+
     DailyLog logToSave = log;
     final existingJson = _p.getString(key);
     if (existingJson != null) {
@@ -258,16 +269,20 @@ class LocalStorageService {
     final settings = loadSettings();
 
     // 1. Adım: Varsayılan değerleri yükle
-    int finalCycleLength = settings?.averageCycleLength ?? 28;
-    int finalPeriodLength = settings?.averagePeriodLength ?? 5;
+    int finalCycleLength =
+        settings?.averageCycleLength ?? CycleRules.defaultCycleLength;
+    int finalPeriodLength =
+        settings?.averagePeriodLength ?? CycleRules.defaultPeriodLength;
 
     // 2. Adım: Ortalama Döngü Süresi Hesaplama
     if (periodStarts.length >= 2) {
       final cycleLengths = <int>[];
-      final startIdx = periodStarts.length > 11 ? periodStarts.length - 11 : 0;
+      final startIdx = periodStarts.length > CycleRules.recentSampleSize + 1
+          ? periodStarts.length - CycleRules.recentSampleSize - 1
+          : 0;
       for (int i = startIdx + 1; i < periodStarts.length; i++) {
         final diff = periodStarts[i].difference(periodStarts[i - 1]).inDays;
-        if (diff >= 15 && diff <= 60) {
+        if (CycleRules.isUsableCycleLength(diff)) {
           cycleLengths.add(diff);
         }
       }
@@ -284,32 +299,44 @@ class LocalStorageService {
       // EĞER SON regl dönemi aktifse (ongoing ise), onu hesaba katma!
       // Çünkü henüz bitmedi, süresi eksik çıkıp ortalamayı düşürür.
       final allLogs = loadAllLogs();
-      final bleedingDays = allLogs
-          .where((log) => log.flowIntensity != null)
-          .map((log) => log.date.dateOnly)
-          .toSet()
-          .toList()
-        ..sort();
+      final bleedingDays =
+          allLogs
+              .where((log) => log.flowIntensity != null)
+              .map((log) => log.date.dateOnly)
+              .toSet()
+              .toList()
+            ..sort();
       final today = AppTime.now.dateOnly;
-      final isOngoing = bleedingDays.isNotEmpty && today.difference(bleedingDays.last).inDays <= 1;
+      final daysSinceLastBleeding = bleedingDays.isEmpty
+          ? null
+          : today.difference(bleedingDays.last).inDays;
+      final isOngoing =
+          daysSinceLastBleeding != null &&
+          daysSinceLastBleeding >= 0 &&
+          daysSinceLastBleeding <= 1;
 
       var recentDurations = List<int>.from(insights.periodDurations);
       if (isOngoing) {
-        if (recentDurations.length >= 2) {
+        if (recentDurations.isNotEmpty) {
           recentDurations.removeLast();
-        } else {
-          recentDurations.clear();
         }
       }
+      recentDurations = recentDurations
+          .where(CycleRules.isUsablePeriodLength)
+          .toList();
 
       // Son 10 regl süresinin ortalamasını al
-      final recentDurationsLimited = recentDurations.length > 10
-          ? recentDurations.sublist(recentDurations.length - 10)
+      final recentDurationsLimited =
+          recentDurations.length > CycleRules.recentSampleSize
+          ? recentDurations.sublist(
+              recentDurations.length - CycleRules.recentSampleSize,
+            )
           : recentDurations;
 
       if (recentDurationsLimited.isNotEmpty) {
         final totalPeriodDays = recentDurationsLimited.reduce((a, b) => a + b);
-        finalPeriodLength = (totalPeriodDays / recentDurationsLimited.length).round();
+        finalPeriodLength = (totalPeriodDays / recentDurationsLimited.length)
+            .round();
       }
     }
 
@@ -365,20 +392,27 @@ class LocalStorageService {
     final cycleLengths = <int>[];
     for (int i = 1; i < periodStarts.length; i++) {
       final diff = periodStarts[i].difference(periodStarts[i - 1]).inDays;
-      if (diff >= 10 && diff <= 90) {
+      if (CycleRules.isUsableCycleLength(diff)) {
         cycleLengths.add(diff);
       }
     }
 
     // Önceki döngü süresi (son iki başlangıç arası)
-    int? previousCycleLength;
-    if (cycleLengths.isNotEmpty) {
-      previousCycleLength = cycleLengths.last;
-    }
+    final int? previousCycleLength = periodStarts.length >= 2
+        ? periodStarts.last
+              .difference(periodStarts[periodStarts.length - 2])
+              .inDays
+        : null;
 
     // Önceki regl süresi (son grubun uzunluğu veya devam ediyorsa bir öncekinin)
     final today = AppTime.now.dateOnly;
-    final isOngoing = bleedingDays.isNotEmpty && today.difference(bleedingDays.last).inDays <= 1;
+    final daysSinceLastBleeding = bleedingDays.isEmpty
+        ? null
+        : today.difference(bleedingDays.last).inDays;
+    final isOngoing =
+        daysSinceLastBleeding != null &&
+        daysSinceLastBleeding >= 0 &&
+        daysSinceLastBleeding <= 1;
     int previousPeriodLength = periodDurations.last;
     if (isOngoing && periodDurations.length >= 2) {
       previousPeriodLength = periodDurations[periodDurations.length - 2];
@@ -387,8 +421,13 @@ class LocalStorageService {
     // Döngü değişkenliği (min-max)
     int? variationMin;
     int? variationMax;
-    if (cycleLengths.length >= 2) {
-      final sorted = List<int>.from(cycleLengths)..sort();
+    final recentCycleLengths = cycleLengths.length > CycleRules.recentSampleSize
+        ? cycleLengths.sublist(
+            cycleLengths.length - CycleRules.recentSampleSize,
+          )
+        : cycleLengths;
+    if (recentCycleLengths.length >= 2) {
+      final sorted = List<int>.from(recentCycleLengths)..sort();
       variationMin = sorted.first;
       variationMax = sorted.last;
     }
@@ -481,7 +520,8 @@ class CycleInsights {
   /// 21-35 gün arası normal kabul edilir.
   CycleStatus get cycleStatus {
     if (previousCycleLength == null) return CycleStatus.noData;
-    if (previousCycleLength! >= 21 && previousCycleLength! <= 35) {
+    if (previousCycleLength! >= CycleRules.normalCycleMin &&
+        previousCycleLength! <= CycleRules.normalCycleMax) {
       return CycleStatus.normal;
     }
     return CycleStatus.abnormal;
@@ -490,7 +530,8 @@ class CycleInsights {
   /// Önceki regl süresi durumu.
   /// 2-7 gün arası normal kabul edilir.
   CycleStatus get periodStatus {
-    if (previousPeriodLength >= 2 && previousPeriodLength <= 7) {
+    if (previousPeriodLength >= CycleRules.normalPeriodMin &&
+        previousPeriodLength <= CycleRules.normalPeriodMax) {
       return CycleStatus.normal;
     }
     return CycleStatus.abnormal;

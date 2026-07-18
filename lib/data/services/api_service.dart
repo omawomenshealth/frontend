@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:http/http.dart' as http;
 import 'local_storage_service.dart';
 
 /// Express Backend ile iletişim kuran API servis sınıfı.
 class ApiService {
   final LocalStorageService _storage;
-  
+
   static String customBaseUrl = '';
 
   ApiService(this._storage);
@@ -16,7 +16,9 @@ class ApiService {
     if (customBaseUrl.isNotEmpty) return customBaseUrl;
     if (kIsWeb) return 'http://localhost:3000';
     // Android emulator localhost'a erişmek için 10.0.2.2 kullanır
-    return Platform.isAndroid ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+    return Platform.isAndroid
+        ? 'http://10.0.2.2:3000'
+        : 'http://localhost:3000';
   }
 
   Map<String, String> _getHeaders() {
@@ -28,41 +30,45 @@ class ApiService {
   }
 
   /// Google ID Token ile sunucuya giriş yap ve JWT al.
-  Future<Map<String, dynamic>> loginWithGoogle(String idToken, {String? email, String? name}) async {
+  Future<Map<String, dynamic>> loginWithGoogle(
+    String idToken, {
+    String? email,
+    String? name,
+  }) async {
     final url = Uri.parse('$baseUrl/api/auth/google');
-    
+
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'idToken': idToken,
-          if (email != null) 'email': email,
-          if (name != null) 'name': name,
-        }),
+        body: jsonEncode({'idToken': idToken, 'email': ?email, 'name': ?name}),
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
-        
+        final data =
+            jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+
         // Token ve kullanıcı bilgilerini kaydet
         final token = data['token'] as String;
         final userMap = data['user'] as Map<String, dynamic>;
         final userEmail = userMap['email'] as String;
         final userName = userMap['name'] as String;
         final userGoogleId = userMap['googleId'] as String?;
-        
+
         await _storage.setAuthToken(token);
         await _storage.setAuthEmail(userEmail);
         await _storage.setAuthName(userName);
         if (userGoogleId != null) {
           await _storage.setAuthGoogleId(userGoogleId);
         }
-        
+
         return data;
       } else {
         final errorBody = jsonDecode(utf8.decode(response.bodyBytes));
-        throw Exception(errorBody['error'] ?? 'Giriş yapılamadı. Sunucu hata kodu: ${response.statusCode}');
+        throw Exception(
+          errorBody['error'] ??
+              'Giriş yapılamadı. Sunucu hata kodu: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Bağlantı hatası: ${e.toString()}');
@@ -75,9 +81,10 @@ class ApiService {
     required List<Map<String, dynamic>> logs,
     required List<String> customMedications,
     required List<String> customSupplements,
+    bool replaceExisting = true,
   }) async {
     final url = Uri.parse('$baseUrl/api/sync/upload');
-    
+
     try {
       final response = await http.post(
         url,
@@ -87,6 +94,7 @@ class ApiService {
           'logs': logs,
           'customMedications': customMedications,
           'customSupplements': customSupplements,
+          'replaceExisting': replaceExisting,
         }),
       );
 
@@ -96,10 +104,13 @@ class ApiService {
         return true;
       } else {
         final errorBody = jsonDecode(utf8.decode(response.bodyBytes));
-        throw Exception(errorBody['error'] ?? 'Veri yedeklenemedi. Kod: ${response.statusCode}');
+        throw Exception(
+          errorBody['error'] ??
+              'Veri yedeklenemedi. Kod: ${response.statusCode}',
+        );
       }
     } catch (e) {
-      print('Senkronizasyon yükleme hatası: $e');
+      debugPrint('Senkronizasyon yükleme hatası: $e');
       return false;
     }
   }
@@ -107,20 +118,23 @@ class ApiService {
   /// Buluttaki yedeklenmiş verileri indir (Download).
   Future<Map<String, dynamic>?> downloadSync() async {
     final url = Uri.parse('$baseUrl/api/sync/download');
-    
+
     try {
       final response = await http.get(url, headers: _getHeaders());
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
-        await _storage.setLastSyncTime(DateTime.now().toIso8601String());
+        final data =
+            jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
         return data;
       } else {
         final errorBody = jsonDecode(utf8.decode(response.bodyBytes));
-        throw Exception(errorBody['error'] ?? 'Veri indirilemedi. Kod: ${response.statusCode}');
+        throw Exception(
+          errorBody['error'] ??
+              'Veri indirilemedi. Kod: ${response.statusCode}',
+        );
       }
     } catch (e) {
-      print('Senkronizasyon indirme hatası: $e');
+      debugPrint('Senkronizasyon indirme hatası: $e');
       return null;
     }
   }

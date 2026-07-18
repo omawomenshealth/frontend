@@ -52,11 +52,17 @@ class MyApp extends StatelessWidget {
         Provider<LocalStorageService>.value(value: storage),
         Provider<ApiService>.value(value: apiService),
         Provider<SyncService>.value(value: syncService),
-        ChangeNotifierProvider(create: (_) => AuthViewModel(storage, apiService, syncService)),
-        ChangeNotifierProvider(create: (_) => OnboardingViewModel(storage)),
+        ChangeNotifierProvider(
+          create: (_) => AuthViewModel(storage, apiService, syncService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => OnboardingViewModel(storage, syncService),
+        ),
         ChangeNotifierProvider(create: (_) => DashboardViewModel(storage)),
         ChangeNotifierProvider(create: (_) => CalendarViewModel(storage)),
-        ChangeNotifierProvider(create: (_) => ProfileViewModel(storage, syncService)),
+        ChangeNotifierProvider(
+          create: (_) => ProfileViewModel(storage, syncService),
+        ),
       ],
       child: MaterialApp(
         title: 'OMA',

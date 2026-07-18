@@ -61,7 +61,6 @@ Kullanıcı profili ve döngü hesaplama verilerini tutar.
 | Alan Adı (Field) | Dart Tipi | JSON Karşılığı | Açıklama / Seçenekler |
 | :--- | :--- | :--- | :--- |
 | `userName` | `String` | `String` | Kullanıcının adı. |
-| `gender` | `Gender` | `String` (enum name) | Cinsiyet (`'female'`, `'male'`). |
 | `isOnboardingComplete`| `bool` | `bool` | Uygulama kurulum/tanıtım adımı tamamlandı mı. |
 | `isSmoker` | `bool` | `bool` | Sigara kullanıyor mu. |
 | `smokingYears` | `int?` | `int` veya `null` | Sigara kullanım yılı. |

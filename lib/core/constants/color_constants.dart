@@ -84,5 +84,4 @@ class AppColors {
   );
 
   // ── Cinsiyet Renkleri ────────────────────────────────────
-  static const Color female = Color(0xFFE84393);
 }

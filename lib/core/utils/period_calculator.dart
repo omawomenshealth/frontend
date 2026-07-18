@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/date_extensions.dart';
 import '../utils/app_time.dart';
+import '../utils/cycle_rules.dart';
 
 /// Regl döngüsü fazları.
 enum CyclePhase {
@@ -14,7 +15,7 @@ enum CyclePhase {
 /// Kullanıcının son adet tarihi ve döngü süresi ile tahmini hesaplar yapar.
 ///
 /// Optimize edilmiş versiyon: while-loop yerine modüler aritmetik kullanır.
-/// Bu sayede isInPeriod, isOvulationDay, isInFertileWindow çağrıları
+/// Bu sayede isInPeriod ve tahmini aralık sorguları
 /// O(n) yerine O(1) karmaşıklıkta çalışır.
 class PeriodCalculator {
   final DateTime lastPeriodDate;
@@ -27,8 +28,8 @@ class PeriodCalculator {
 
   PeriodCalculator({
     required this.lastPeriodDate,
-    this.cycleLength = 28,
-    this.periodLength = 5,
+    this.cycleLength = CycleRules.defaultCycleLength,
+    this.periodLength = CycleRules.defaultPeriodLength,
     this.firstPeriodDate,
     this.hasBleedingLog, // UI veya Servisten bu kontrolü paslayacağız
   });
@@ -42,93 +43,107 @@ class PeriodCalculator {
   /// Sonraki adet başlangıç tarihi.
   DateTime get nextPeriodDate {
     final today = AppTime.now.dateOnly;
+    final anchor = lastPeriodDate.dateOnly;
+    if (cycleLength <= 0) return today;
+
+    // Kullanıcının girdiği başlangıç henüz gelmediyse sıradaki tarih odur.
+    if (anchor.isAfter(today)) return anchor;
+
+    // Adet sürüyor olsa bile mevcut başlangıcı değil, gerçek bir sonraki
+    // döngünün başlangıcını döndür.
     final dayInCycle = _dayInCycle(today);
-
-    // Eğer şu an adet dönemindeyse, mevcut döngünün başlangıcını döndür
-    if (dayInCycle < periodLength) {
-      return today.subtract(Duration(days: dayInCycle));
-    }
-
-    // Değilse, bir sonraki döngünün başlangıcı
     final daysLeft = cycleLength - dayInCycle;
     return today.add(Duration(days: daysLeft));
   }
 
-  /// Tahmini ovülasyon tarihi (döngünün ortası - 14 gün önce).
-  DateTime get nextOvulationDate {
+  /// Ovülasyonun gerçekleşebileceği tahmini tarih aralığı.
+  DateTimeRange get estimatedOvulationWindow {
     final next = nextPeriodDate;
-    // Ovülasyon genelde bir sonraki adet tarihinden 14 gün önce
-    return next.subtract(const Duration(days: 14));
+    return DateTimeRange(
+      start: next.subtract(const Duration(days: CycleRules.maxLutealLength)),
+      end: next.subtract(const Duration(days: CycleRules.minLutealLength)),
+    );
   }
 
-  /// Verimli (fertile) dönem: ovülasyondan 5 gün önce - 1 gün sonra.
+  /// Tahmini verimli dönem, ovülasyon belirsizliğini de kapsar.
   DateTimeRange get fertileWindow {
-    final ovulation = nextOvulationDate;
+    final ovulation = estimatedOvulationWindow;
     return DateTimeRange(
-      start: ovulation.subtract(const Duration(days: 5)),
-      end: ovulation.add(const Duration(days: 1)),
+      start: ovulation.start.subtract(const Duration(days: 5)),
+      end: ovulation.end.add(const Duration(days: 1)),
     );
   }
 
   /// Sonraki adet tarihine kaç gün kaldı.
   int get daysUntilNextPeriod {
     final today = AppTime.now.dateOnly;
-    // Eğer şu an adet dönemindeyse 0 döndür
-    if (isInPeriod(today)) return 0;
-    final dayInCycle = _dayInCycle(today);
-    return cycleLength - dayInCycle;
+    return nextPeriodDate.difference(today).inDays;
   }
 
   /// Verilen tarih adet döneminde mi? — O(1) modüler aritmetik
   bool isInPeriod(DateTime date) {
     final today = AppTime.now.dateOnly;
     final targetDate = date.dateOnly;
+    final anchor = lastPeriodDate.dateOnly;
 
-    // 1. Durum: Sorgulanan gün ilk girilen adet başlangıç tarihinden ÖNCE ise:
-    // Tahmini matematiksel modele göre hesapla
-    if (firstPeriodDate != null && targetDate.isBefore(firstPeriodDate!)) {
-      final dayInCycle = _dayInCycle(targetDate);
-      return dayInCycle < periodLength;
-    }
-
-    // 2. Durum: Sorgulanan gün GEÇMİŞTE ise (Bugünden önce) YALNIZCA GERÇEK LOGA bak
-    if (targetDate.isBefore(today)) {
-      if (hasBleedingLog != null) {
-        return hasBleedingLog!(targetDate);
-      }
-      return false;
-    }
-
-    // 3. Durum: Sorgulanan gün BUGÜN veya GELECEKTE ise:
-    // Eğer bugün/gelecekte gerçek log girilmişse TRUE dön, yoksa TAHMİNİ modele güven
+    // Gerçek kullanıcı kaydı her zaman tahminden önceliklidir.
     if (hasBleedingLog != null && hasBleedingLog!(targetDate)) {
       return true;
     }
 
+    // Onboarding veya profilde seçilen son adet başlangıcı ayrı bir DailyLog
+    // olmasa da başlangıç ve onu izleyen tahmini günler görünmelidir.
+    final daysAfterAnchor = targetDate.difference(anchor).inDays;
+    if (daysAfterAnchor >= 0 && daysAfterAnchor < periodLength) {
+      return true;
+    }
+
+    // İlk gerçek kayıttan daha eski tarihler yalnızca tahmini modele dayanır.
+    if (firstPeriodDate != null &&
+        targetDate.isBefore(firstPeriodDate!.dateOnly)) {
+      final dayInCycle = _dayInCycle(targetDate);
+      return dayInCycle < periodLength;
+    }
+
+    // Diğer geçmiş günler için tahmin üretme; yalnızca gerçek kayıt göster.
+    if (targetDate.isBefore(today)) {
+      return false;
+    }
+
+    // Bugün ve gelecek için tahmini modele güven.
     final dayInCycle = _dayInCycle(targetDate);
     return dayInCycle < periodLength;
   }
 
-  /// Verilen tarih ovülasyon gününde mi? — O(1) modüler aritmetik
-  bool isOvulationDay(DateTime date) {
-    final dayInCycle = _dayInCycle(date);
-    final ovulationDayInCycle = cycleLength - 14;
-    return dayInCycle == ovulationDayInCycle;
+  bool _isInWrappedRange(int value, int start, int endInclusive) {
+    if (cycleLength <= 0) return false;
+    final normalizedStart = ((start % cycleLength) + cycleLength) % cycleLength;
+    final normalizedEnd =
+        ((endInclusive % cycleLength) + cycleLength) % cycleLength;
+    if (normalizedStart <= normalizedEnd) {
+      return value >= normalizedStart && value <= normalizedEnd;
+    }
+    return value >= normalizedStart || value <= normalizedEnd;
   }
 
-  /// Verilen tarih verimli dönemde mi? — O(1) modüler aritmetik
+  /// Verilen tarih tahmini ovülasyon aralığında mı?
+  bool isInEstimatedOvulationWindow(DateTime date) {
+    final dayInCycle = _dayInCycle(date);
+    return _isInWrappedRange(
+      dayInCycle,
+      cycleLength - CycleRules.maxLutealLength,
+      cycleLength - CycleRules.minLutealLength,
+    );
+  }
+
+  /// Verilen tarih tahmini verimli dönemde mi? — O(1) modüler aritmetik
   bool isInFertileWindow(DateTime date) {
     final dayInCycle = _dayInCycle(date);
-    final ovulationDayInCycle = cycleLength - 14;
-    final fertileStart = ovulationDayInCycle - 5;
-    final fertileEnd = ovulationDayInCycle + 1; // exclusive
-
-    // Verimli dönemin döngü sınırını aştığı durum (kısa döngülerde)
-    if (fertileStart < 0) {
-      return dayInCycle >= (fertileStart + cycleLength) ||
-          dayInCycle < fertileEnd;
-    }
-    return dayInCycle >= fertileStart && dayInCycle < fertileEnd;
+    return _isInWrappedRange(
+      dayInCycle,
+      cycleLength - CycleRules.maxLutealLength - 5,
+      cycleLength - CycleRules.minLutealLength + 1,
+    );
   }
 
   /// Bugünün döngü fazı.
@@ -136,15 +151,18 @@ class PeriodCalculator {
   CyclePhase phaseAt(DateTime date) {
     final targetDate = date.dateOnly;
     if (isInPeriod(targetDate)) return CyclePhase.menstrual;
-    if (isOvulationDay(targetDate)) return CyclePhase.ovulation;
-    if (isInFertileWindow(targetDate)) return CyclePhase.ovulation;
+    if (isInEstimatedOvulationWindow(targetDate)) {
+      return CyclePhase.ovulation;
+    }
 
     final diff = targetDate.difference(lastPeriodDate.dateOnly).inDays;
     if (cycleLength <= 0) return CyclePhase.menstrual;
     final dayInCycle = ((diff % cycleLength) + cycleLength) % cycleLength;
     final daysLeft = cycleLength - dayInCycle;
 
-    if (daysLeft <= 14) return CyclePhase.luteal;
+    if (daysLeft < CycleRules.minLutealLength) {
+      return CyclePhase.luteal;
+    }
     return CyclePhase.follicular;
   }
 
@@ -208,7 +226,7 @@ class PeriodCalculator {
       case CyclePhase.follicular:
         return 'Foliküler Faz';
       case CyclePhase.ovulation:
-        return 'Ovülasyon';
+        return 'Tahmini Ovülasyon Aralığı';
       case CyclePhase.luteal:
         return 'Luteal Faz';
     }
@@ -220,7 +238,7 @@ class PeriodCalculator {
       case CyclePhase.menstrual:
         return 'Foliküler Faz';
       case CyclePhase.follicular:
-        return 'Ovülasyon';
+        return 'Tahmini Ovülasyon Aralığı';
       case CyclePhase.ovulation:
         return 'Luteal Faz';
       case CyclePhase.luteal:

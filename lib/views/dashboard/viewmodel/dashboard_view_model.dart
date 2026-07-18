@@ -30,8 +30,7 @@ class DashboardViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   DateTime get selectedDate => _selectedDate;
 
-  bool get isFemale => _settings?.gender == Gender.female;
-  bool get hasPeriodTracking => isFemale;
+  bool get hasPeriodTracking => _settings != null;
 
   /// Takvimde tarih seçildiğinde çağrılır.
   void selectDate(DateTime date) {
@@ -135,10 +134,12 @@ class DashboardViewModel extends ChangeNotifier {
   }
 
   /// Günlük kaydı ekle veya güncelle.
-  Future<void> saveLog(DailyLog log) async {
-    await _storage.saveDailyLog(log);
+  Future<bool> saveLog(DailyLog log) async {
+    final success = await _storage.saveDailyLog(log);
+    if (!success) return false;
     await _syncStateAfterSave(log.date);
     notifyListeners();
+    return true;
   }
 
   /// Adet girişi yapıldığında döngü istatistiklerini yeniden hesaplar.
@@ -146,16 +147,16 @@ class DashboardViewModel extends ChangeNotifier {
   /// - Son adet başlangıç tarihi (lastPeriodDate)
   /// - Son 10 döngünün ortalaması (averageCycleLength)
   /// hesaplanır ve UserSettings güncellenir.
-  Future<void> recordPeriodAndRecalculate(DailyLog log) async {
-    await _storage.saveDailyLog(log);
-    await _syncStateAfterSave(log.date);
-    notifyListeners();
+  Future<bool> recordPeriodAndRecalculate(DailyLog log) async {
+    return saveLog(log);
   }
 
   /// Mood güncelle (en son kaydı günceller veya yenisini oluşturur).
   Future<void> updateMood(String mood, String emoji) async {
-    final log = (latestLog ?? DailyLog.empty(AppTime.now))
-        .copyWith(mood: mood, moodEmoji: emoji);
+    final log = (latestLog ?? DailyLog.empty(AppTime.now)).copyWith(
+      mood: mood,
+      moodEmoji: emoji,
+    );
     await saveLog(log);
   }
 
@@ -182,7 +183,7 @@ class DashboardViewModel extends ChangeNotifier {
   /// Günün genel tamamlanma yüzdesi.
   double get completionPercentage {
     if (_todayLogs.isEmpty) return 0;
-    
+
     // Tüm günün loglarını birleştirerek doluluk kontrolü
     bool hasMood = _todayLogs.any((l) => l.mood != null);
     bool hasActivity = _todayLogs.any((l) => l.activities.isNotEmpty);

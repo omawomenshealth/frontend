@@ -1,22 +1,24 @@
 import 'dart:convert';
 
-/// Kullanıcı cinsiyet enum'u.
-enum Gender { female, male }
+import '../../core/utils/cycle_rules.dart';
 
 /// Menopoz durumu.
 enum MenopauseStatus { none, pre, peri, post }
 
 /// Kullanıcı profil ve ayar bilgilerini tutan model.
+///
+/// Uygulama kadın sağlığı ve adet döngüsü odaklı olduğu için ayrıca bir
+/// cinsiyet alanı tutulmaz. Eski yedeklerdeki `gender`, `andropauseStatus`
+/// ve `menDiseases` alanları JSON okunurken güvenle yok sayılır.
 class UserSettings {
   final String userName;
-  final Gender gender;
   final bool isOnboardingComplete;
 
-  // ── Ortak Bilgiler ───────────────────────────────────────
+  // Ortak bilgiler
   final bool isSmoker;
   final int? smokingYears;
-  final double? weight;         // kg
-  final double? height;         // cm
+  final double? weight;
+  final double? height;
   final int? age;
   final String? relationshipStatus;
   final bool? sexuallyActive;
@@ -24,28 +26,22 @@ class UserSettings {
   final String? bloodTestResults;
   final List<String> chronicDiseases;
 
-  // ── Kadın Özel ───────────────────────────────────────────
-  final int averageCycleLength;    // Varsayılan: 28
-  final int averagePeriodLength;   // Varsayılan: 5
+  // Kadın sağlığı
+  final int averageCycleLength;
+  final int averagePeriodLength;
   final DateTime? lastPeriodDate;
   final MenopauseStatus menopauseStatus;
   final String? birthControlMethod;
   final List<String> womenDiseases;
 
-  // ── Erkek Özel ───────────────────────────────────────────
-  final bool? andropauseStatus;
-  final List<String> menDiseases;
+  // İlaç ve takviye
+  final List<String> dailyMedications;
+  final List<String> dailySupplements;
 
-  // ── İlaç & Takviye ───────────────────────────────────────
-  final List<String> dailyMedications;    // Günlük ilaçlar
-  final List<String> dailySupplements;    // Günlük takviyeler
-
-  // ── Bildirim ─────────────────────────────────────────────
   final bool notificationsEnabled;
 
   UserSettings({
     this.userName = '',
-    this.gender = Gender.female,
     this.isOnboardingComplete = false,
     this.isSmoker = false,
     this.smokingYears,
@@ -57,23 +53,19 @@ class UserSettings {
     this.wantsChildrenInYear,
     this.bloodTestResults,
     this.chronicDiseases = const [],
-    this.averageCycleLength = 28,
-    this.averagePeriodLength = 5,
+    this.averageCycleLength = CycleRules.defaultCycleLength,
+    this.averagePeriodLength = CycleRules.defaultPeriodLength,
     this.lastPeriodDate,
     this.menopauseStatus = MenopauseStatus.none,
     this.birthControlMethod,
     this.womenDiseases = const [],
-    this.andropauseStatus,
-    this.menDiseases = const [],
     this.dailyMedications = const [],
     this.dailySupplements = const [],
     this.notificationsEnabled = true,
   });
 
-  /// copyWith — immutable güncelleme.
   UserSettings copyWith({
     String? userName,
-    Gender? gender,
     bool? isOnboardingComplete,
     bool? isSmoker,
     int? smokingYears,
@@ -91,15 +83,12 @@ class UserSettings {
     MenopauseStatus? menopauseStatus,
     String? birthControlMethod,
     List<String>? womenDiseases,
-    bool? andropauseStatus,
-    List<String>? menDiseases,
     List<String>? dailyMedications,
     List<String>? dailySupplements,
     bool? notificationsEnabled,
   }) {
     return UserSettings(
       userName: userName ?? this.userName,
-      gender: gender ?? this.gender,
       isOnboardingComplete: isOnboardingComplete ?? this.isOnboardingComplete,
       isSmoker: isSmoker ?? this.isSmoker,
       smokingYears: smokingYears ?? this.smokingYears,
@@ -117,19 +106,15 @@ class UserSettings {
       menopauseStatus: menopauseStatus ?? this.menopauseStatus,
       birthControlMethod: birthControlMethod ?? this.birthControlMethod,
       womenDiseases: womenDiseases ?? this.womenDiseases,
-      andropauseStatus: andropauseStatus ?? this.andropauseStatus,
-      menDiseases: menDiseases ?? this.menDiseases,
       dailyMedications: dailyMedications ?? this.dailyMedications,
       dailySupplements: dailySupplements ?? this.dailySupplements,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     );
   }
 
-  /// JSON'a çevir.
   Map<String, dynamic> toJson() {
     return {
       'userName': userName,
-      'gender': gender.name,
       'isOnboardingComplete': isOnboardingComplete,
       'isSmoker': isSmoker,
       'smokingYears': smokingYears,
@@ -147,56 +132,60 @@ class UserSettings {
       'menopauseStatus': menopauseStatus.name,
       'birthControlMethod': birthControlMethod,
       'womenDiseases': womenDiseases,
-      'andropauseStatus': andropauseStatus,
-      'menDiseases': menDiseases,
       'dailyMedications': dailyMedications,
       'dailySupplements': dailySupplements,
       'notificationsEnabled': notificationsEnabled,
     };
   }
 
-  /// JSON'dan oluştur.
   factory UserSettings.fromJson(Map<String, dynamic> json) {
+    final rawCycleLength =
+        (json['averageCycleLength'] as num?)?.toInt() ??
+        CycleRules.defaultCycleLength;
+    final rawPeriodLength =
+        (json['averagePeriodLength'] as num?)?.toInt() ??
+        CycleRules.defaultPeriodLength;
+
     return UserSettings(
       userName: json['userName'] as String? ?? '',
-      gender: Gender.values.firstWhere(
-        (e) => e.name == json['gender'],
-        orElse: () => Gender.female,
-      ),
       isOnboardingComplete: json['isOnboardingComplete'] as bool? ?? false,
       isSmoker: json['isSmoker'] as bool? ?? false,
-      smokingYears: json['smokingYears'] as int?,
+      smokingYears: (json['smokingYears'] as num?)?.toInt(),
       weight: (json['weight'] as num?)?.toDouble(),
       height: (json['height'] as num?)?.toDouble(),
-      age: json['age'] as int?,
+      age: (json['age'] as num?)?.toInt(),
       relationshipStatus: json['relationshipStatus'] as String?,
       sexuallyActive: json['sexuallyActive'] as bool?,
       wantsChildrenInYear: json['wantsChildrenInYear'] as bool?,
       bloodTestResults: json['bloodTestResults'] as String?,
-      chronicDiseases: List<String>.from(json['chronicDiseases'] ?? []),
-      averageCycleLength: json['averageCycleLength'] as int? ?? 28,
-      averagePeriodLength: json['averagePeriodLength'] as int? ?? 5,
+      chronicDiseases: List<String>.from(
+        json['chronicDiseases'] as List? ?? const [],
+      ),
+      averageCycleLength: CycleRules.sanitizeCycleLength(rawCycleLength),
+      averagePeriodLength: CycleRules.sanitizePeriodLength(rawPeriodLength),
       lastPeriodDate: json['lastPeriodDate'] != null
-          ? DateTime.parse(json['lastPeriodDate'] as String)
+          ? DateTime.tryParse(json['lastPeriodDate'].toString())
           : null,
       menopauseStatus: MenopauseStatus.values.firstWhere(
-        (e) => e.name == json['menopauseStatus'],
+        (value) => value.name == json['menopauseStatus'],
         orElse: () => MenopauseStatus.none,
       ),
       birthControlMethod: json['birthControlMethod'] as String?,
-      womenDiseases: List<String>.from(json['womenDiseases'] ?? []),
-      andropauseStatus: json['andropauseStatus'] as bool?,
-      menDiseases: List<String>.from(json['menDiseases'] ?? []),
-      dailyMedications: List<String>.from(json['dailyMedications'] ?? []),
-      dailySupplements: List<String>.from(json['dailySupplements'] ?? []),
+      womenDiseases: List<String>.from(
+        json['womenDiseases'] as List? ?? const [],
+      ),
+      dailyMedications: List<String>.from(
+        json['dailyMedications'] as List? ?? const [],
+      ),
+      dailySupplements: List<String>.from(
+        json['dailySupplements'] as List? ?? const [],
+      ),
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
     );
   }
 
-  /// JSON string'e çevir (SharedPreferences depolama için).
   String toJsonString() => jsonEncode(toJson());
 
-  /// JSON string'den oluştur.
   factory UserSettings.fromJsonString(String jsonString) {
     return UserSettings.fromJson(
       jsonDecode(jsonString) as Map<String, dynamic>,

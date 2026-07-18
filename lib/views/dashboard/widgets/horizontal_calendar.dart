@@ -77,7 +77,9 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     if (pc == null) return _CycleStatus.none;
 
     if (pc.isInPeriod(date)) return _CycleStatus.period;
-    if (pc.isOvulationDay(date)) return _CycleStatus.ovulation;
+    if (pc.isInEstimatedOvulationWindow(date)) {
+      return _CycleStatus.ovulation;
+    }
     if (pc.isInFertileWindow(date)) return _CycleStatus.fertile;
     return _CycleStatus.none;
   }
@@ -88,95 +90,92 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
 
     return SizedBox(
       height: 60,
-          child: ListView.builder(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: _totalDays,
-            itemBuilder: (context, index) {
-              final date = today.add(Duration(days: index - _centerIndex));
-              final isSelected = date.isSameDay(widget.selectedDate);
-              final isToday = date.isSameDay(today);
-              final cycleStatus = _getCycleStatus(date);
+      child: ListView.builder(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: _totalDays,
+        itemBuilder: (context, index) {
+          final date = today.add(Duration(days: index - _centerIndex));
+          final isSelected = date.isSameDay(widget.selectedDate);
+          final isToday = date.isSameDay(today);
+          final cycleStatus = _getCycleStatus(date);
 
-              return RepaintBoundary(
-                child: GestureDetector(
-                  onTap: () => widget.onDateSelected(date),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeOutCubic,
-                    width: 56,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      gradient: isSelected
-                          ? const LinearGradient(
-                              colors: [
-                                AppColors.primary,
-                                AppColors.primaryLight,
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            )
-                          : null,
-                      color: isSelected
-                          ? null
-                          : isToday
-                          ? AppColors.primary.withValues(alpha: 0.08)
-                          : AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: isToday && !isSelected
-                          ? Border.all(
-                              color: AppColors.primary.withValues(alpha: 0.3),
-                              width: 1.5,
-                            )
-                          : null,
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _shortWeekday(date.weekday),
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            color: isSelected
-                                ? Colors.white.withValues(alpha: 0.8)
-                                : AppColors.textSecondary,
+          return RepaintBoundary(
+            child: GestureDetector(
+              onTap: () => widget.onDateSelected(date),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                width: 56,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? const LinearGradient(
+                          colors: [AppColors.primary, AppColors.primaryLight],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        )
+                      : null,
+                  color: isSelected
+                      ? null
+                      : isToday
+                      ? AppColors.primary.withValues(alpha: 0.08)
+                      : AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: isToday && !isSelected
+                      ? Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                          width: 1.5,
+                        )
+                      : null,
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${date.day}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected
-                                ? Colors.white
-                                : isToday
-                                ? AppColors.primary
-                                : AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        // ── Döngü göstergesi (nokta) ──────
-                        _buildCycleIndicator(cycleStatus, isSelected),
-                      ],
-                    ),
-                  ),
+                        ]
+                      : null,
                 ),
-              );
-            },
-          ),
-        );
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _shortWeekday(date.weekday),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white.withValues(alpha: 0.8)
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${date.day}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected
+                            ? Colors.white
+                            : isToday
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    // ── Döngü göstergesi (nokta) ──────
+                    _buildCycleIndicator(cycleStatus, isSelected),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   /// Döngü durumuna göre küçük renkli nokta göstergesi

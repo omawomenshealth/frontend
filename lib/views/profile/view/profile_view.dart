@@ -5,6 +5,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../core/utils/cycle_rules.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
@@ -70,7 +71,7 @@ class ProfileView extends StatelessWidget {
                           children: [
                             Text(
                               s.userName.isNotEmpty ? s.userName : 'Kullanıcı',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
@@ -78,7 +79,7 @@ class ProfileView extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              s.gender == Gender.female ? '👩 Kadın' : '👨 Erkek',
+                              'Kadın sağlığı takibi',
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: AppColors.textSecondary,
@@ -103,40 +104,44 @@ class ProfileView extends StatelessWidget {
                       if (s.weight != null) _infoRow('Kilo', '${s.weight} kg'),
                       if (s.height != null) _infoRow('Boy', '${s.height} cm'),
                       if (s.age != null) _infoRow('Yaş', '${s.age}'),
-                      _infoRow('Sigara', s.isSmoker
-                          ? 'Evet${s.smokingYears != null && s.smokingYears! > 0 ? " (${s.smokingYears} yıl)" : ""}'
-                          : 'Hayır'),
+                      _infoRow(
+                        'Sigara',
+                        s.isSmoker
+                            ? 'Evet${s.smokingYears != null && s.smokingYears! > 0 ? " (${s.smokingYears} yıl)" : ""}'
+                            : 'Hayır',
+                      ),
                       _infoRow('İlişki', s.relationshipStatus ?? '-'),
                       if (s.chronicDiseases.isNotEmpty)
                         _infoRow('Kronik', s.chronicDiseases.join(', ')),
-                      if (s.bloodTestResults != null && s.bloodTestResults!.isNotEmpty)
+                      if (s.bloodTestResults != null &&
+                          s.bloodTestResults!.isNotEmpty)
                         _infoRow('Kan Değerleri', s.bloodTestResults!),
                     ],
                   ),
                   const SizedBox(height: 16),
 
-                  // ── 2. Kadın Sağlığı (sadece kadın ise) ───
-                  if (vm.isFemale) ...[
-                    _buildSectionCard(
-                      context: context,
-                      title: '🩺 Kadın Sağlığı',
-                      icon: Icons.edit_outlined,
-                      onEdit: () => _showWomenHealthSheet(context, vm),
-                      children: [
-                        _infoRow('Döngü Süresi', '${s.averageCycleLength} gün'),
-                        _infoRow('Adet Süresi', '${s.averagePeriodLength} gün'),
-                        if (s.lastPeriodDate != null)
-                          _infoRow('Son Adet',
-                              '${s.lastPeriodDate!.day}.${s.lastPeriodDate!.month}.${s.lastPeriodDate!.year}'),
-                        _infoRow('Menopoz', _menopauseLabel(s.menopauseStatus)),
-                        if (s.birthControlMethod != null)
-                          _infoRow('Doğum Kontrol', s.birthControlMethod!),
-                        if (s.womenDiseases.isNotEmpty)
-                          _infoRow('Hastalıklar', s.womenDiseases.join(', ')),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                  // ── 2. Kadın Sağlığı ─────────────────────
+                  _buildSectionCard(
+                    context: context,
+                    title: '🩺 Kadın Sağlığı',
+                    icon: Icons.edit_outlined,
+                    onEdit: () => _showWomenHealthSheet(context, vm),
+                    children: [
+                      _infoRow('Döngü Süresi', '${s.averageCycleLength} gün'),
+                      _infoRow('Adet Süresi', '${s.averagePeriodLength} gün'),
+                      if (s.lastPeriodDate != null)
+                        _infoRow(
+                          'Son Adet',
+                          '${s.lastPeriodDate!.day}.${s.lastPeriodDate!.month}.${s.lastPeriodDate!.year}',
+                        ),
+                      _infoRow('Menopoz', _menopauseLabel(s.menopauseStatus)),
+                      if (s.birthControlMethod != null)
+                        _infoRow('Doğum Kontrol', s.birthControlMethod!),
+                      if (s.womenDiseases.isNotEmpty)
+                        _infoRow('Hastalıklar', s.womenDiseases.join(', ')),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
 
                   // ── 3. İlaç & Takviye ─────────────────────
                   _buildSectionCard(
@@ -194,13 +199,25 @@ class ProfileView extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 16,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          icon: const Icon(Icons.description_outlined, size: 18),
-                          label: const Text('Raporu Görüntüle ve Paylaş', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                          icon: const Icon(
+                            Icons.description_outlined,
+                            size: 18,
+                          ),
+                          label: const Text(
+                            'Raporu Görüntüle ve Paylaş',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -240,8 +257,12 @@ class ProfileView extends StatelessWidget {
                                   await AppTime.setOffsetDays(0);
                                   if (context.mounted) {
                                     vm.loadSettings();
-                                    context.read<DashboardViewModel>().loadData();
-                                    context.read<CalendarViewModel>().loadData();
+                                    context
+                                        .read<DashboardViewModel>()
+                                        .loadData();
+                                    context
+                                        .read<CalendarViewModel>()
+                                        .loadData();
                                   }
                                 },
                                 child: const Text(
@@ -338,11 +359,7 @@ class ProfileView extends StatelessWidget {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 18,
-                    color: AppColors.primary,
-                  ),
+                  child: Icon(icon, size: 18, color: AppColors.primary),
                 ),
               ),
             ],
@@ -354,16 +371,19 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget _timeTravelButton(BuildContext context, ProfileViewModel vm, String label, int daysToAdd) {
+  Widget _timeTravelButton(
+    BuildContext context,
+    ProfileViewModel vm,
+    String label,
+    int daysToAdd,
+  ) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary.withValues(alpha: 0.1),
         foregroundColor: AppColors.primary,
         elevation: 0,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       onPressed: () async {
         final newOffset = AppTime.offsetDays + daysToAdd;
@@ -374,7 +394,10 @@ class ProfileView extends StatelessWidget {
           context.read<CalendarViewModel>().loadData();
         }
       },
-      child: Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
@@ -433,7 +456,8 @@ class ProfileView extends StatelessWidget {
     final ageCtrl = TextEditingController(text: s.age?.toString() ?? '');
     final nameCtrl = TextEditingController(text: s.userName);
     final smokingYearsCtrl = TextEditingController(
-        text: s.smokingYears?.toString() ?? '0');
+      text: s.smokingYears?.toString() ?? '0',
+    );
     final bloodTestCtrl = TextEditingController(text: s.bloodTestResults ?? '');
 
     showModalBottomSheet(
@@ -464,29 +488,49 @@ class ProfileView extends StatelessWidget {
               children: [
                 _sheetField('İsim', nameCtrl),
                 const SizedBox(height: 12),
-                _sheetField('Son Kan Değerleri (Kan Testi)', bloodTestCtrl, maxLines: 3),
+                _sheetField(
+                  'Son Kan Değerleri (Kan Testi)',
+                  bloodTestCtrl,
+                  maxLines: 3,
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: _sheetField('Kilo (kg)', weightCtrl,
-                        keyboardType: TextInputType.number)),
+                    Expanded(
+                      child: _sheetField(
+                        'Kilo (kg)',
+                        weightCtrl,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
                     const SizedBox(width: 12),
-                    Expanded(child: _sheetField('Boy (cm)', heightCtrl,
-                        keyboardType: TextInputType.number)),
+                    Expanded(
+                      child: _sheetField(
+                        'Boy (cm)',
+                        heightCtrl,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
                     const SizedBox(width: 12),
                     SizedBox(
                       width: 80,
-                      child: _sheetField('Yaş', ageCtrl,
-                          keyboardType: TextInputType.number),
+                      child: _sheetField(
+                        'Yaş',
+                        ageCtrl,
+                        keyboardType: TextInputType.number,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Text('Sigara',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'Sigara',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -503,22 +547,29 @@ class ProfileView extends StatelessWidget {
                 ),
                 if (vm.settings.isSmoker) ...[
                   const SizedBox(height: 12),
-                  _sheetField('Kaç yıldır', smokingYearsCtrl,
-                      keyboardType: TextInputType.number),
+                  _sheetField(
+                    'Kaç yıldır',
+                    smokingYearsCtrl,
+                    keyboardType: TextInputType.number,
+                  ),
                 ],
                 const SizedBox(height: 16),
-                const Text('Kronik Hastalıklar',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'Kronik Hastalıklar',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: AppStrings.chronicDiseasesList.map((disease) {
-                    final isSelected =
-                        vm.settings.chronicDiseases.contains(disease);
+                    final isSelected = vm.settings.chronicDiseases.contains(
+                      disease,
+                    );
                     return FilterChip(
                       label: Text(disease),
                       selected: isSelected,
@@ -567,20 +618,25 @@ class ProfileView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Döngü süresi
-                const Text('Döngü Süresi',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'Döngü Süresi',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: Slider(
                         value: s.averageCycleLength.toDouble(),
-                        min: 20,
-                        max: 45,
-                        divisions: 25,
+                        min: CycleRules.minCycleLength.toDouble(),
+                        max: CycleRules.maxCycleLength.toDouble(),
+                        divisions:
+                            CycleRules.maxCycleLength -
+                            CycleRules.minCycleLength,
                         label: '${s.averageCycleLength} gün',
                         onChanged: (v) {
                           vm.updateAverageCycleLength(v.round());
@@ -590,7 +646,9 @@ class ProfileView extends StatelessWidget {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.periodPrimary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -608,20 +666,25 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Adet süresi
-                const Text('Adet Süresi',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'Adet Süresi',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: Slider(
                         value: s.averagePeriodLength.toDouble(),
-                        min: 2,
-                        max: 10,
-                        divisions: 8,
+                        min: CycleRules.minPeriodLength.toDouble(),
+                        max: CycleRules.maxPeriodLength.toDouble(),
+                        divisions:
+                            CycleRules.maxPeriodLength -
+                            CycleRules.minPeriodLength,
                         label: '${s.averagePeriodLength} gün',
                         onChanged: (v) {
                           vm.updateAveragePeriodLength(v.round());
@@ -631,7 +694,9 @@ class ProfileView extends StatelessWidget {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.periodPrimary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -649,11 +714,14 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Son adet tarihi
-                const Text('Son Adet Tarihi',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'Son Adet Tarihi',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () async {
@@ -672,15 +740,20 @@ class ProfileView extends StatelessWidget {
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.background,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.calendar_today,
-                            size: 20, color: AppColors.textSecondary),
+                        const Icon(
+                          Icons.calendar_today,
+                          size: 20,
+                          color: AppColors.textSecondary,
+                        ),
                         const SizedBox(width: 12),
                         Text(
                           s.lastPeriodDate != null
@@ -699,73 +772,104 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Menopoz
-                const Text('Menopoz Durumu',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'Menopoz Durumu',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _menopauseChip('Yok', MenopauseStatus.none, s, vm,
-                        setSheetState),
-                    _menopauseChip('Pre', MenopauseStatus.pre, s, vm,
-                        setSheetState),
-                    _menopauseChip('Peri', MenopauseStatus.peri, s, vm,
-                        setSheetState),
-                    _menopauseChip('Post', MenopauseStatus.post, s, vm,
-                        setSheetState),
+                    _menopauseChip(
+                      'Yok',
+                      MenopauseStatus.none,
+                      s,
+                      vm,
+                      setSheetState,
+                    ),
+                    _menopauseChip(
+                      'Pre',
+                      MenopauseStatus.pre,
+                      s,
+                      vm,
+                      setSheetState,
+                    ),
+                    _menopauseChip(
+                      'Peri',
+                      MenopauseStatus.peri,
+                      s,
+                      vm,
+                      setSheetState,
+                    ),
+                    _menopauseChip(
+                      'Post',
+                      MenopauseStatus.post,
+                      s,
+                      vm,
+                      setSheetState,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
 
                 // Doğum Kontrol
-                const Text('Doğum Kontrol',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'Doğum Kontrol',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: [
-                    AppStrings.noBirthControl,
-                    AppStrings.pill,
-                    AppStrings.iud,
-                    AppStrings.condom,
-                    AppStrings.implant,
-                    AppStrings.otherMethod,
-                  ].map((method) {
-                    final isSelected = s.birthControlMethod == method;
-                    return ChoiceChip(
-                      label: Text(method),
-                      selected: isSelected,
-                      onSelected: (_) {
-                        vm.updateBirthControlMethod(method);
-                        setSheetState(() {});
-                      },
-                      selectedColor:
-                          AppColors.periodLight.withValues(alpha: 0.2),
-                      labelStyle: TextStyle(
-                        fontSize: 12,
-                        color: isSelected
-                            ? AppColors.periodPrimary
-                            : AppColors.textPrimary,
-                      ),
-                    );
-                  }).toList(),
+                  children:
+                      [
+                        AppStrings.noBirthControl,
+                        AppStrings.pill,
+                        AppStrings.iud,
+                        AppStrings.condom,
+                        AppStrings.implant,
+                        AppStrings.otherMethod,
+                      ].map((method) {
+                        final isSelected = s.birthControlMethod == method;
+                        return ChoiceChip(
+                          label: Text(method),
+                          selected: isSelected,
+                          onSelected: (_) {
+                            vm.updateBirthControlMethod(method);
+                            setSheetState(() {});
+                          },
+                          selectedColor: AppColors.periodLight.withValues(
+                            alpha: 0.2,
+                          ),
+                          labelStyle: TextStyle(
+                            fontSize: 12,
+                            color: isSelected
+                                ? AppColors.periodPrimary
+                                : AppColors.textPrimary,
+                          ),
+                        );
+                      }).toList(),
                 ),
                 const SizedBox(height: 16),
 
                 // Kadın hastalıkları
-                const Text('Kadın Hastalıkları',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'Kadın Hastalıkları',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -779,8 +883,9 @@ class ProfileView extends StatelessWidget {
                         vm.toggleWomenDisease(disease);
                         setSheetState(() {});
                       },
-                      selectedColor:
-                          AppColors.periodPrimary.withValues(alpha: 0.15),
+                      selectedColor: AppColors.periodPrimary.withValues(
+                        alpha: 0.15,
+                      ),
                       checkmarkColor: AppColors.periodPrimary,
                       labelStyle: TextStyle(
                         fontSize: 12,
@@ -823,11 +928,14 @@ class ProfileView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // İlaçlar
-                const Text('İlaçlar',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'İlaçlar',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -835,14 +943,18 @@ class ProfileView extends StatelessWidget {
                   children: vm.settings.dailyMedications.map((med) {
                     return Chip(
                       label: Text(med, style: const TextStyle(fontSize: 12)),
-                      deleteIcon:
-                          const Icon(Icons.close, size: 16, color: AppColors.error),
+                      deleteIcon: const Icon(
+                        Icons.close,
+                        size: 16,
+                        color: AppColors.error,
+                      ),
                       onDeleted: () {
                         vm.removeMedication(med);
                         setSheetState(() {});
                       },
-                      backgroundColor:
-                          AppColors.medicationPrimary.withValues(alpha: 0.1),
+                      backgroundColor: AppColors.medicationPrimary.withValues(
+                        alpha: 0.1,
+                      ),
                     );
                   }).toList(),
                 ),
@@ -857,11 +969,14 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Takviyeler
-                const Text('Takviyeler',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
+                const Text(
+                  'Takviyeler',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -869,14 +984,16 @@ class ProfileView extends StatelessWidget {
                   children: vm.settings.dailySupplements.map((sup) {
                     return Chip(
                       label: Text(sup, style: const TextStyle(fontSize: 12)),
-                      deleteIcon:
-                          const Icon(Icons.close, size: 16, color: AppColors.error),
+                      deleteIcon: const Icon(
+                        Icons.close,
+                        size: 16,
+                        color: AppColors.error,
+                      ),
                       onDeleted: () {
                         vm.removeSupplement(sup);
                         setSheetState(() {});
                       },
-                      backgroundColor:
-                          AppColors.success.withValues(alpha: 0.1),
+                      backgroundColor: AppColors.success.withValues(alpha: 0.1),
                     );
                   }).toList(),
                 ),
@@ -935,12 +1052,15 @@ class ProfileView extends StatelessWidget {
               hintText: hint,
               hintStyle: const TextStyle(fontSize: 13),
               isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(
-                    color: AppColors.textHint.withValues(alpha: 0.3)),
+                  color: AppColors.textHint.withValues(alpha: 0.3),
+                ),
               ),
             ),
           ),
@@ -952,9 +1072,9 @@ class ProfileView extends StatelessWidget {
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           ),
           child: const Text('Ekle'),
         ),
@@ -962,8 +1082,12 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  static Widget _sheetField(String label, TextEditingController ctrl,
-      {TextInputType keyboardType = TextInputType.text, int maxLines = 1}) {
+  static Widget _sheetField(
+    String label,
+    TextEditingController ctrl, {
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
+  }) {
     return TextField(
       controller: ctrl,
       keyboardType: keyboardType,
@@ -972,15 +1096,16 @@ class ProfileView extends StatelessWidget {
         labelText: label,
         labelStyle: const TextStyle(fontSize: 13),
         isDense: true,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
 
-  static Widget _chipButton(
-      String label, bool isSelected, VoidCallback onTap) {
+  static Widget _chipButton(String label, bool isSelected, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -1014,10 +1139,14 @@ class ProfileView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isLoggedIn ? Colors.green.withValues(alpha: 0.05) : Colors.amber.withValues(alpha: 0.05),
+        color: isLoggedIn
+            ? Colors.green.withValues(alpha: 0.05)
+            : Colors.amber.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isLoggedIn ? Colors.green.withValues(alpha: 0.2) : Colors.amber.withValues(alpha: 0.2),
+          color: isLoggedIn
+              ? Colors.green.withValues(alpha: 0.2)
+              : Colors.amber.withValues(alpha: 0.2),
           width: 1.5,
         ),
       ),
@@ -1032,7 +1161,9 @@ class ProfileView extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                isLoggedIn ? 'Bulut Senkronizasyonu Aktif' : 'Çevrimdışı Çalışılıyor (Bulut Deaktif)',
+                isLoggedIn
+                    ? 'Bulut Senkronizasyonu Aktif'
+                    : 'Çevrimdışı Çalışılıyor (Bulut Deaktif)',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -1045,12 +1176,19 @@ class ProfileView extends StatelessWidget {
           if (isLoggedIn) ...[
             Text(
               'Hesap: ${vm.userEmail}',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               'Son Eşitleme: ${vm.lastSyncDisplay}',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
             ),
             if (vm.syncError != null) ...[
               const SizedBox(height: 8),
@@ -1071,10 +1209,14 @@ class ProfileView extends StatelessWidget {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(success
-                                      ? 'Senkronizasyon başarıyla tamamlandı.'
-                                      : 'Senkronizasyon başarısız oldu.'),
-                                  backgroundColor: success ? Colors.green : Colors.redAccent,
+                                  content: Text(
+                                    success
+                                        ? 'Senkronizasyon başarıyla tamamlandı.'
+                                        : 'Senkronizasyon başarısız oldu.',
+                                  ),
+                                  backgroundColor: success
+                                      ? Colors.green
+                                      : Colors.redAccent,
                                 ),
                               );
                               // Diğer görünümleri yenile
@@ -1095,10 +1237,15 @@ class ProfileView extends StatelessWidget {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
                           )
                         : const Icon(Icons.sync_rounded, size: 18),
-                    label: Text(vm.isSyncing ? 'Eşitleniyor...' : 'Şimdi Eşitle'),
+                    label: Text(
+                      vm.isSyncing ? 'Eşitleniyor...' : 'Şimdi Eşitle',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -1107,7 +1254,10 @@ class ProfileView extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.redAccent,
                     side: const BorderSide(color: Colors.redAccent),
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 16,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -1120,7 +1270,11 @@ class ProfileView extends StatelessWidget {
           ] else ...[
             const Text(
               'Uygulama silindiğinde veya başka bir cihaza geçtiğinizde verilerinizi kaybetmemek için Google hesabınızı bağlayabilirsiniz.',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 14),
             SizedBox(
@@ -1138,7 +1292,10 @@ class ProfileView extends StatelessWidget {
                   ),
                 ),
                 icon: const Icon(Icons.login_rounded, size: 18),
-                label: const Text('Giriş Yap / Hesap Bağla', style: TextStyle(fontWeight: FontWeight.w600)),
+                label: const Text(
+                  'Giriş Yap / Hesap Bağla',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
               ),
             ),
           ],
@@ -1264,8 +1421,10 @@ class _EditSheet extends StatelessWidget {
                     icon: const Icon(Icons.check_circle_outline),
                     label: const Text(
                       'Kaydet',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),

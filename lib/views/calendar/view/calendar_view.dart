@@ -181,13 +181,31 @@ class _CalendarViewState extends State<CalendarView> {
             // 🚀 Her gün çizilirken burası tetiklenir (Artık kasmayacak)
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, day, focusedDay) {
-                return _buildDayCell(context, day, vm, isSelected: false, isToday: false);
+                return _buildDayCell(
+                  context,
+                  day,
+                  vm,
+                  isSelected: false,
+                  isToday: false,
+                );
               },
               todayBuilder: (context, day, focusedDay) {
-                return _buildDayCell(context, day, vm, isSelected: false, isToday: true);
+                return _buildDayCell(
+                  context,
+                  day,
+                  vm,
+                  isSelected: false,
+                  isToday: true,
+                );
               },
               selectedBuilder: (context, day, focusedDay) {
-                return _buildDayCell(context, day, vm, isSelected: true, isToday: false);
+                return _buildDayCell(
+                  context,
+                  day,
+                  vm,
+                  isSelected: true,
+                  isToday: false,
+                );
               },
               markerBuilder: (context, day, events) {
                 return _buildMarkers(day, vm);
@@ -208,11 +226,14 @@ class _CalendarViewState extends State<CalendarView> {
     required bool isToday,
   }) {
     final isPeriod = vm.isPeriodDay(day);
-    final isOvulation = vm.isOvulationDay(day);
+    final isOvulation = vm.isEstimatedOvulationDay(day);
     final isFertile = vm.isFertileDay(day);
 
     Color? backgroundColor;
-    TextStyle textStyle = const TextStyle(color: AppColors.textPrimary, fontSize: 14);
+    TextStyle textStyle = const TextStyle(
+      color: AppColors.textPrimary,
+      fontSize: 14,
+    );
 
     if (isPeriod) {
       backgroundColor = AppColors.periodPrimary.withValues(alpha: 0.15);
@@ -252,12 +273,12 @@ class _CalendarViewState extends State<CalendarView> {
               fontSize: 14,
             )
           : isToday
-              ? const TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                )
-              : textStyle,
+          ? const TextStyle(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            )
+          : textStyle,
     );
 
     Widget cellBody;
@@ -274,8 +295,12 @@ class _CalendarViewState extends State<CalendarView> {
         child: dayNumText,
       );
     } else {
-      final decorationColor = backgroundColor ?? (isToday ? AppColors.primary.withValues(alpha: 0.15) : null);
-      final border = isToday ? Border.all(color: AppColors.primary, width: 1.5) : null;
+      final decorationColor =
+          backgroundColor ??
+          (isToday ? AppColors.primary.withValues(alpha: 0.15) : null);
+      final border = isToday
+          ? Border.all(color: AppColors.primary, width: 1.5)
+          : null;
 
       cellBody = Container(
         width: 38,
@@ -316,7 +341,11 @@ class _CalendarViewState extends State<CalendarView> {
 // Seçili Gün Detayı — kendi Selector scope'u ile
 // ══════════════════════════════════════════════════════════════
 class _DayDetailSection extends StatelessWidget {
-  void _showDailyLogSheet(BuildContext context, DateTime date, CalendarViewModel calendarVm) {
+  void _showDailyLogSheet(
+    BuildContext context,
+    DateTime date,
+    CalendarViewModel calendarVm,
+  ) {
     final dashboardVm = context.read<DashboardViewModel>();
     showModalBottomSheet(
       context: context,
@@ -327,12 +356,13 @@ class _DayDetailSection extends StatelessWidget {
         settings: calendarVm.settings ?? dashboardVm.settings!,
         initialTabIndex: 0,
         onSave: (log) async {
-          if (log.flowIntensity != null) {
-            await dashboardVm.recordPeriodAndRecalculate(log);
-          } else {
-            await dashboardVm.saveLog(log);
+          final success = log.flowIntensity != null
+              ? await dashboardVm.recordPeriodAndRecalculate(log)
+              : await dashboardVm.saveLog(log);
+          if (success) {
+            await calendarVm.loadData();
           }
-          calendarVm.loadData();
+          return success;
         },
       ),
     );
@@ -379,14 +409,21 @@ class _DayDetailSection extends StatelessWidget {
                   GestureDetector(
                     onTap: () => _showDailyLogSheet(context, selectedDay, vm),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Row(
                         children: [
-                          Icon(Icons.add_circle_outline, size: 14, color: AppColors.primary),
+                          Icon(
+                            Icons.add_circle_outline,
+                            size: 14,
+                            color: AppColors.primary,
+                          ),
                           SizedBox(width: 4),
                           Text(
                             'Kayıt Ekle',
@@ -445,7 +482,8 @@ class _DayDetailSection extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton.icon(
-                          onPressed: () => _showDailyLogSheet(context, selectedDay, vm),
+                          onPressed: () =>
+                              _showDailyLogSheet(context, selectedDay, vm),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
@@ -455,7 +493,10 @@ class _DayDetailSection extends StatelessWidget {
                             ),
                           ),
                           icon: const Icon(Icons.add_rounded, size: 18),
-                          label: const Text('Kayıt Ekle', style: TextStyle(fontWeight: FontWeight.w600)),
+                          label: const Text(
+                            'Kayıt Ekle',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
                         ),
                       ],
                     ),

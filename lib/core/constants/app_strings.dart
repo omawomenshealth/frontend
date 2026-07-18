@@ -17,8 +17,6 @@ class AppStrings {
   // ── Onboarding ───────────────────────────────────────────
   static const String letsStart = 'Haydi Başlayalım!';
   static const String tellAboutYourself = 'Bize kendinizden bahsedin';
-  static const String selectGender = 'Cinsiyetiniz';
-  static const String female = 'Kadın';
   static const String next = 'İleri';
   static const String back = 'Geri';
   static const String finish = 'Tamamla';

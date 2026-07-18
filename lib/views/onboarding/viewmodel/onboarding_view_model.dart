@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../data/services/sync_service.dart';
+import '../../../core/utils/cycle_rules.dart';
 
 /// Onboarding iş mantığı — adım adım kullanıcı bilgisi toplama.
 class OnboardingViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
+  final SyncService _sync;
 
-  OnboardingViewModel(this._storage);
+  OnboardingViewModel(this._storage, this._sync);
 
   // ── Sayfa kontrolü ────────────────────────────────────
   int _currentPage = 0;
@@ -29,17 +32,13 @@ class OnboardingViewModel extends ChangeNotifier {
   List<String> _chronicDiseases = [];
 
   // Kadın
-  int _averageCycleLength = 28;
-  int _averagePeriodLength = 5;
+  int _averageCycleLength = CycleRules.defaultCycleLength;
+  int _averagePeriodLength = CycleRules.defaultPeriodLength;
   bool _isCycleLengthUnknown = false;
   DateTime? _lastPeriodDate;
   MenopauseStatus _menopauseStatus = MenopauseStatus.none;
   String? _birthControlMethod;
   List<String> _womenDiseases = [];
-
-  // Erkek
-  bool? _andropauseStatus;
-  List<String> _menDiseases = [];
 
   // İlaç & Takviye
   List<String> _dailyMedications = [];
@@ -67,8 +66,6 @@ class OnboardingViewModel extends ChangeNotifier {
   MenopauseStatus get menopauseStatus => _menopauseStatus;
   String? get birthControlMethod => _birthControlMethod;
   List<String> get womenDiseases => _womenDiseases;
-  bool? get andropauseStatus => _andropauseStatus;
-  List<String> get menDiseases => _menDiseases;
   List<String> get dailyMedications => _dailyMedications;
   List<String> get dailySupplements => _dailySupplements;
 
@@ -138,19 +135,19 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void setAverageCycleLength(int value) {
-    _averageCycleLength = value;
+    _averageCycleLength = CycleRules.sanitizeCycleLength(value);
     notifyListeners(); // Slider label güncellenmeli
   }
 
   void setAveragePeriodLength(int value) {
-    _averagePeriodLength = value;
+    _averagePeriodLength = CycleRules.sanitizePeriodLength(value);
     notifyListeners();
   }
 
   void setIsCycleLengthUnknown(bool value) {
     _isCycleLengthUnknown = value;
     if (value) {
-      _averageCycleLength = 28; // Bilinmiyorsa varsayılan 28 olarak kalır
+      _averageCycleLength = CycleRules.defaultCycleLength;
     }
     notifyListeners(); // Conditional widget gösterir/gizler
   }
@@ -175,20 +172,6 @@ class OnboardingViewModel extends ChangeNotifier {
       _womenDiseases = List.from(_womenDiseases)..remove(disease);
     } else {
       _womenDiseases = List.from(_womenDiseases)..add(disease);
-    }
-    notifyListeners();
-  }
-
-  void setAndropauseStatus(bool? value) {
-    _andropauseStatus = value;
-    notifyListeners();
-  }
-
-  void toggleMenDisease(String disease) {
-    if (_menDiseases.contains(disease)) {
-      _menDiseases = List.from(_menDiseases)..remove(disease);
-    } else {
-      _menDiseases = List.from(_menDiseases)..add(disease);
     }
     notifyListeners();
   }
@@ -266,13 +249,17 @@ class OnboardingViewModel extends ChangeNotifier {
       menopauseStatus: _menopauseStatus,
       birthControlMethod: _birthControlMethod,
       womenDiseases: _womenDiseases,
-      andropauseStatus: _andropauseStatus,
-      menDiseases: _menDiseases,
       dailyMedications: _dailyMedications,
       dailySupplements: _dailySupplements,
     );
 
     final success = await _storage.saveSettings(settings);
+
+    // Yeni hesap için boş/eksik profil yedeği oluşturma. Bulut yedeği ancak
+    // onboarding verileri başarıyla yerelde tamamlandıktan sonra başlatılır.
+    if (success && _storage.isUserLoggedIn) {
+      await _sync.backupToCloud();
+    }
 
     _isSaving = false;
     notifyListeners();

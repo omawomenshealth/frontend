@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
@@ -18,7 +19,11 @@ class AuthView extends StatelessWidget {
             width: double.infinity,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFFA1887F), Color(0xFFD7CCC8), Color(0xFFEFEBE9)],
+                colors: [
+                  Color(0xFFA1887F),
+                  Color(0xFFD7CCC8),
+                  Color(0xFFEFEBE9),
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -77,7 +82,10 @@ class AuthView extends StatelessWidget {
                         ),
                         child: Text(
                           vm.errorMessage!,
-                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -97,17 +105,19 @@ class AuthView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Geliştirici Test Modu (Mock Login) butonu
-                    CustomButton(
-                      text: 'Geliştirici Modu (Test)',
-                      icon: Icons.bug_report_outlined,
-                      isLoading: vm.isLoading,
-                      onPressed: () => _showMockLoginDialog(context, vm),
-                      isOutlined: true,
-                      backgroundColor: Colors.white,
-                      textColor: Colors.white,
-                    ),
-                    const SizedBox(height: 24),
+                    if (kDebugMode) ...[
+                      // Sunucu ayrıca ALLOW_MOCK_AUTH ile izin vermelidir.
+                      CustomButton(
+                        text: 'Geliştirici Modu (Test)',
+                        icon: Icons.bug_report_outlined,
+                        isLoading: vm.isLoading,
+                        onPressed: () => _showMockLoginDialog(context, vm),
+                        isOutlined: true,
+                        backgroundColor: Colors.white,
+                        textColor: Colors.white,
+                      ),
+                      const SizedBox(height: 24),
+                    ],
 
                     // Giriş yapmadan devam et
                     TextButton(
@@ -155,11 +165,7 @@ class AuthView extends StatelessWidget {
         if (hasCloudData) {
           _showSyncConflictDialog(context, vm);
         } else {
-          vm.autoBackupNewUser().then((_) {
-            if (context.mounted) {
-              _navigateToNextScreen(context, vm);
-            }
-          });
+          _handleAccountWithoutCloudData(context, vm);
         }
       },
     );
@@ -222,11 +228,7 @@ class AuthView extends StatelessWidget {
                     if (hasCloudData) {
                       _showSyncConflictDialog(context, vm);
                     } else {
-                      vm.autoBackupNewUser().then((_) {
-                        if (context.mounted) {
-                          _navigateToNextScreen(context, vm);
-                        }
-                      });
+                      _handleAccountWithoutCloudData(context, vm);
                     }
                   },
                 );
@@ -239,6 +241,42 @@ class AuthView extends StatelessWidget {
             child: const Text('Giriş Yap'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _handleAccountWithoutCloudData(BuildContext context, AuthViewModel vm) {
+    if (!vm.hasCompletedOnboarding) {
+      // OnboardingViewModel, başarılı yerel kayıttan sonra bulut yedeğini alır.
+      _navigateToNextScreen(context, vm);
+      return;
+    }
+
+    vm.backupCompletedProfile().then((_) {
+      if (context.mounted) {
+        _navigateToNextScreen(context, vm);
+      }
+    });
+  }
+
+  Future<void> _resolveAndNavigate(
+    BuildContext context,
+    AuthViewModel vm,
+    SyncConflictAction action,
+  ) async {
+    final success = await vm.resolveSyncConflict(action);
+    if (!context.mounted) return;
+    if (success) {
+      _navigateToNextScreen(context, vm);
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          vm.errorMessage ??
+              'Senkronizasyon tamamlanamadı. Lütfen tekrar deneyin.',
+        ),
+        backgroundColor: AppColors.error,
       ),
     );
   }
@@ -270,7 +308,11 @@ class AuthView extends StatelessWidget {
               '• Birleştir: Cihazdaki yerel veriler ile bulut verilerini tarihlerine göre harmanlar.\n'
               '• Geri Yükle: Cihazdaki verileri siler ve buluttaki yedeği telefona yazar.\n'
               '• Üzerine Yaz: Buluttaki yedeği siler ve cihazdaki verileri buluta yükler.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.5),
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
             ),
           ],
         ),
@@ -279,8 +321,11 @@ class AuthView extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await vm.resolveSyncConflict(SyncConflictAction.restore);
-              if (context.mounted) _navigateToNextScreen(context, vm);
+              await _resolveAndNavigate(
+                context,
+                vm,
+                SyncConflictAction.restore,
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.grey[200],
@@ -292,8 +337,7 @@ class AuthView extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await vm.resolveSyncConflict(SyncConflictAction.backup);
-              if (context.mounted) _navigateToNextScreen(context, vm);
+              await _resolveAndNavigate(context, vm, SyncConflictAction.backup);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.grey[200],
@@ -305,8 +349,7 @@ class AuthView extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await vm.resolveSyncConflict(SyncConflictAction.merge);
-              if (context.mounted) _navigateToNextScreen(context, vm);
+              await _resolveAndNavigate(context, vm, SyncConflictAction.merge);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,

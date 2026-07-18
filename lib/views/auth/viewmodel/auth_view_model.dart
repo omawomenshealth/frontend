@@ -22,11 +22,15 @@ class AuthViewModel extends ChangeNotifier {
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
-    serverClientId: '327530541694-ejaruugjsku3e0qfkq77cloqt15095ql.apps.googleusercontent.com',
+    serverClientId:
+        '327530541694-ejaruugjsku3e0qfkq77cloqt15095ql.apps.googleusercontent.com',
   );
 
   /// 1. Google ile Giriş Akışı
-  Future<bool> signInWithGoogle(BuildContext context, {required Function(bool hasCloudData) onLoginSuccess}) async {
+  Future<bool> signInWithGoogle(
+    BuildContext context, {
+    required Function(bool hasCloudData) onLoginSuccess,
+  }) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -42,7 +46,8 @@ class AuthViewModel extends ChangeNotifier {
       }
 
       // Kimlik bilgilerini (ID Token) al
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
@@ -104,34 +109,53 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   /// 3. İlk girişteki senkronizasyon kararını uygular.
-  Future<void> resolveSyncConflict(SyncConflictAction action) async {
+  Future<bool> resolveSyncConflict(SyncConflictAction action) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
+      bool success;
       if (action == SyncConflictAction.merge) {
-        await _sync.mergeWithCloud();
+        success = await _sync.mergeWithCloud();
       } else if (action == SyncConflictAction.restore) {
-        await _sync.restoreFromCloud();
+        success = await _sync.restoreFromCloud();
       } else if (action == SyncConflictAction.backup) {
-        await _sync.backupToCloud();
+        success = await _sync.backupToCloud();
+      } else {
+        success = false;
       }
+      if (!success) {
+        _errorMessage =
+            'Senkronizasyon tamamlanamadı. Yerel verileriniz korundu.';
+      }
+      return success;
     } catch (e) {
-      print('Çakışma çözümleme hatası: $e');
+      _errorMessage = 'Senkronizasyon hatası: $e';
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  /// 4. Yeni kullanıcı durumunda otomatik yedekleme yapar.
-  Future<void> autoBackupNewUser() async {
+  bool get hasCompletedOnboarding => _storage.isOnboardingComplete;
+
+  /// Yerelde tamamlanmış profil varsa yeni bulut hesabına yedekler.
+  Future<bool> backupCompletedProfile() async {
+    if (!hasCompletedOnboarding) return false;
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
     try {
-      await _sync.backupToCloud();
+      final success = await _sync.backupToCloud();
+      if (!success) {
+        _errorMessage = 'Profil açıldı ancak bulut yedeği oluşturulamadı.';
+      }
+      return success;
     } catch (e) {
-      print('Yeni kullanıcı otomatik yedekleme hatası: $e');
+      _errorMessage = 'Bulut yedekleme hatası: $e';
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../core/utils/cycle_rules.dart';
 
 /// Profil iş mantığı — kullanıcı bilgilerini görüntüleme ve güncelleme.
 import '../../../data/services/sync_service.dart';
@@ -27,13 +28,11 @@ class ProfileViewModel extends ChangeNotifier {
   bool get isSyncing => _isSyncing;
   String? get syncError => _syncError;
 
-  bool get isFemale => _settings.gender == Gender.female;
-
   // ── Kimlik Doğrulama & Senkronizasyon ──────────────────
   bool get isLoggedIn => _storage.isUserLoggedIn;
   String get userEmail => _storage.authEmail ?? '';
   String get userNameDisplay => _storage.authName ?? '';
-  
+
   String get lastSyncDisplay {
     final timeStr = _storage.lastSyncTime;
     if (timeStr == null) return 'Hiç senkronize edilmedi';
@@ -58,7 +57,8 @@ class ProfileViewModel extends ChangeNotifier {
         // Senkronizasyondan sonra yerel ayarları ve log istatistiklerini yeniden yükle
         loadSettings();
       } else {
-        _syncError = 'Eşitleme başarısız oldu. İnternet bağlantınızı kontrol edin.';
+        _syncError =
+            'Eşitleme başarısız oldu. İnternet bağlantınızı kontrol edin.';
       }
       return success;
     } catch (e) {
@@ -143,12 +143,16 @@ class ProfileViewModel extends ChangeNotifier {
   // ── Kadın Sağlığı Güncellemeleri ─────────────────────
 
   void updateAverageCycleLength(int value) {
-    _settings = _settings.copyWith(averageCycleLength: value);
+    _settings = _settings.copyWith(
+      averageCycleLength: CycleRules.sanitizeCycleLength(value),
+    );
     notifyListeners();
   }
 
   void updateAveragePeriodLength(int value) {
-    _settings = _settings.copyWith(averagePeriodLength: value);
+    _settings = _settings.copyWith(
+      averagePeriodLength: CycleRules.sanitizePeriodLength(value),
+    );
     notifyListeners();
   }
 

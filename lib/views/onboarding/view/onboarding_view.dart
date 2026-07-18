@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/utils/cycle_rules.dart';
 import '../../../core/shared_widgets/custom_button.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
@@ -62,9 +63,9 @@ class _OnboardingViewState extends State<OnboardingView> {
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (i) => vm.goToPage(i),
                 children: [
-                  _GenderPage(vm: vm),
+                  _WelcomePage(vm: vm),
                   _BasicInfoPage(vm: vm),
-                  _GenderSpecificPage(vm: vm),
+                  _CycleHealthPage(vm: vm),
                   _SummaryPage(vm: vm),
                 ],
               ),
@@ -109,7 +110,11 @@ class _OnboardingViewState extends State<OnboardingView> {
   }
 
   // ── Alt Butonlar ──────────────────────────────────────
-  Widget _buildBottomButtons(OnboardingViewModel vm, int currentPage, bool isSaving) {
+  Widget _buildBottomButtons(
+    OnboardingViewModel vm,
+    int currentPage,
+    bool isSaving,
+  ) {
     final canGoBack = currentPage > 0;
     final isLastPage = currentPage == vm.totalPages - 1;
 
@@ -157,11 +162,11 @@ class _OnboardingViewState extends State<OnboardingView> {
 }
 
 // ══════════════════════════════════════════════════════════════
-// Sayfa 1: Cinsiyet/İsim — kendi state'ini yönetir, rebuild yok
+// Sayfa 1: Karşılama/İsim — kendi state'ini yönetir, rebuild yok
 // ══════════════════════════════════════════════════════════════
-class _GenderPage extends StatelessWidget {
+class _WelcomePage extends StatelessWidget {
   final OnboardingViewModel vm;
-  const _GenderPage({required this.vm});
+  const _WelcomePage({required this.vm});
 
   @override
   Widget build(BuildContext context) {
@@ -193,9 +198,15 @@ class _BasicInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Sadece UI durumu değişen alanları izle (isSmoker, relationshipStatus, vb.)
-    return Selector<OnboardingViewModel,
-        ({bool isSmoker, String relationshipStatus, bool? wantsChildren,
-          List<String> chronicDiseases})>(
+    return Selector<
+      OnboardingViewModel,
+      ({
+        bool isSmoker,
+        String relationshipStatus,
+        bool? wantsChildren,
+        List<String> chronicDiseases,
+      })
+    >(
       selector: (_, vm) => (
         isSmoker: vm.isSmoker,
         relationshipStatus: vm.relationshipStatus,
@@ -260,7 +271,8 @@ class _BasicInfoPage extends StatelessWidget {
                     width: 80,
                     child: TextField(
                       keyboardType: TextInputType.number,
-                      onChanged: (v) => vm.setSmokingYears(int.tryParse(v) ?? 0),
+                      onChanged: (v) =>
+                          vm.setSmokingYears(int.tryParse(v) ?? 0),
                       decoration: const InputDecoration(hintText: 'Yıl'),
                     ),
                   ),
@@ -282,8 +294,12 @@ class _BasicInfoPage extends StatelessWidget {
                   onSelected: (_) => vm.setRelationshipStatus(opt),
                   selectedColor: AppColors.primaryLight.withValues(alpha: 0.3),
                   labelStyle: TextStyle(
-                    color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.textPrimary,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                   ),
                 );
               }).toList(),
@@ -303,7 +319,9 @@ class _BasicInfoPage extends StatelessWidget {
             TextField(
               onChanged: vm.setBloodTestResults,
               maxLines: 3,
-              decoration: const InputDecoration(hintText: AppStrings.bloodTestHint),
+              decoration: const InputDecoration(
+                hintText: AppStrings.bloodTestHint,
+              ),
             ),
             const SizedBox(height: 24),
 
@@ -322,7 +340,9 @@ class _BasicInfoPage extends StatelessWidget {
                   checkmarkColor: AppColors.accent,
                   labelStyle: TextStyle(
                     fontSize: 13,
-                    color: isSelected ? AppColors.accent : AppColors.textPrimary,
+                    color: isSelected
+                        ? AppColors.accent
+                        : AppColors.textPrimary,
                   ),
                 );
               }).toList(),
@@ -336,11 +356,11 @@ class _BasicInfoPage extends StatelessWidget {
 }
 
 // ══════════════════════════════════════════════════════════════
-// Sayfa 3: Cinsiyete Özel Bilgiler
+// Sayfa 3: Döngü ve kadın sağlığı bilgileri
 // ══════════════════════════════════════════════════════════════
-class _GenderSpecificPage extends StatelessWidget {
+class _CycleHealthPage extends StatelessWidget {
   final OnboardingViewModel vm;
-  const _GenderSpecificPage({required this.vm});
+  const _CycleHealthPage({required this.vm});
 
   @override
   Widget build(BuildContext context) {
@@ -381,7 +401,8 @@ class _CycleLengthSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<OnboardingViewModel, ({bool unknown, int length})>(
-      selector: (_, vm) => (unknown: vm.isCycleLengthUnknown, length: vm.averageCycleLength),
+      selector: (_, vm) =>
+          (unknown: vm.isCycleLengthUnknown, length: vm.averageCycleLength),
       builder: (context, state, _) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,15 +434,19 @@ class _CycleLengthSection extends StatelessWidget {
                   Expanded(
                     child: Slider(
                       value: state.length.toDouble(),
-                      min: 20,
-                      max: 45,
-                      divisions: 25,
+                      min: CycleRules.minCycleLength.toDouble(),
+                      max: CycleRules.maxCycleLength.toDouble(),
+                      divisions:
+                          CycleRules.maxCycleLength - CycleRules.minCycleLength,
                       label: '${state.length} gün',
                       onChanged: (v) => vm.setAverageCycleLength(v.round()),
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.periodPrimary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -471,7 +496,10 @@ class _LastPeriodSection extends StatelessWidget {
                 if (picked != null) vm.setLastPeriodDate(picked);
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.background,
                   borderRadius: BorderRadius.circular(12),
@@ -523,10 +551,26 @@ class _MenopauseSection extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _chip(AppStrings.noMenopause, MenopauseStatus.none, currentStatus),
-                _chip(AppStrings.preMenopause, MenopauseStatus.pre, currentStatus),
-                _chip(AppStrings.periMenopause, MenopauseStatus.peri, currentStatus),
-                _chip(AppStrings.postMenopause, MenopauseStatus.post, currentStatus),
+                _chip(
+                  AppStrings.noMenopause,
+                  MenopauseStatus.none,
+                  currentStatus,
+                ),
+                _chip(
+                  AppStrings.preMenopause,
+                  MenopauseStatus.pre,
+                  currentStatus,
+                ),
+                _chip(
+                  AppStrings.periMenopause,
+                  MenopauseStatus.peri,
+                  currentStatus,
+                ),
+                _chip(
+                  AppStrings.postMenopause,
+                  MenopauseStatus.post,
+                  currentStatus,
+                ),
               ],
             ),
           ],
@@ -567,22 +611,25 @@ class _BirthControlSection extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: [
-                AppStrings.noBirthControl,
-                AppStrings.pill,
-                AppStrings.iud,
-                AppStrings.condom,
-                AppStrings.implant,
-                AppStrings.otherMethod,
-              ].map((method) {
-                final isSelected = selected == method;
-                return ChoiceChip(
-                  label: Text(method),
-                  selected: isSelected,
-                  onSelected: (_) => vm.setBirthControlMethod(method),
-                  selectedColor: AppColors.periodLight.withValues(alpha: 0.2),
-                );
-              }).toList(),
+              children:
+                  [
+                    AppStrings.noBirthControl,
+                    AppStrings.pill,
+                    AppStrings.iud,
+                    AppStrings.condom,
+                    AppStrings.implant,
+                    AppStrings.otherMethod,
+                  ].map((method) {
+                    final isSelected = selected == method;
+                    return ChoiceChip(
+                      label: Text(method),
+                      selected: isSelected,
+                      onSelected: (_) => vm.setBirthControlMethod(method),
+                      selectedColor: AppColors.periodLight.withValues(
+                        alpha: 0.2,
+                      ),
+                    );
+                  }).toList(),
             ),
           ],
         );
@@ -614,7 +661,9 @@ class _WomenDiseasesSection extends StatelessWidget {
                   label: Text(disease),
                   selected: isSelected,
                   onSelected: (_) => vm.toggleWomenDisease(disease),
-                  selectedColor: AppColors.periodPrimary.withValues(alpha: 0.15),
+                  selectedColor: AppColors.periodPrimary.withValues(
+                    alpha: 0.15,
+                  ),
                   checkmarkColor: AppColors.periodPrimary,
                   labelStyle: TextStyle(
                     fontSize: 13,
