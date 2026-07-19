@@ -6,6 +6,7 @@ import '../../../core/utils/cycle_rules.dart';
 import '../../../core/shared_widgets/custom_button.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
+import '../../../core/utils/date_extensions.dart';
 import '../viewmodel/onboarding_view_model.dart';
 
 /// Onboarding ekranı — adım adım kullanıcı bilgisi toplama.
@@ -41,6 +42,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   @override
   Widget build(BuildContext context) {
+    AppStrings.of(context);
     final vm = context.read<OnboardingViewModel>();
 
     return Scaffold(
@@ -177,9 +179,9 @@ class _WelcomePage extends StatelessWidget {
         const SizedBox(height: 16),
         TextField(
           onChanged: vm.setUserName,
-          decoration: const InputDecoration(
-            hintText: 'Adınız',
-            prefixIcon: Icon(Icons.person_outline),
+          decoration: InputDecoration(
+            hintText: AppStrings.yourName,
+            prefixIcon: const Icon(Icons.person_outline),
           ),
         ),
         const SizedBox(height: 32),
@@ -215,8 +217,8 @@ class _BasicInfoPage extends StatelessWidget {
       ),
       builder: (context, state, _) {
         return _PageWrapper(
-          title: 'Temel Bilgiler',
-          subtitle: 'Sağlık profilinizi oluşturalım',
+          title: AppStrings.basicInformation,
+          subtitle: AppStrings.createHealthProfile,
           scrollable: true,
           children: [
             // Kilo, Boy, Yaş — TextField'lar kendi state'lerini yönetir
@@ -226,9 +228,12 @@ class _BasicInfoPage extends StatelessWidget {
                   child: TextField(
                     keyboardType: TextInputType.number,
                     onChanged: (v) => vm.setWeight(double.tryParse(v)),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: AppStrings.weight,
-                      prefixIcon: Icon(Icons.monitor_weight_outlined, size: 20),
+                      prefixIcon: const Icon(
+                        Icons.monitor_weight_outlined,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ),
@@ -237,9 +242,9 @@ class _BasicInfoPage extends StatelessWidget {
                   child: TextField(
                     keyboardType: TextInputType.number,
                     onChanged: (v) => vm.setHeight(double.tryParse(v)),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: AppStrings.height,
-                      prefixIcon: Icon(Icons.height_rounded, size: 20),
+                      prefixIcon: const Icon(Icons.height_rounded, size: 20),
                     ),
                   ),
                 ),
@@ -249,7 +254,7 @@ class _BasicInfoPage extends StatelessWidget {
                   child: TextField(
                     keyboardType: TextInputType.number,
                     onChanged: (v) => vm.setAge(int.tryParse(v)),
-                    decoration: const InputDecoration(hintText: AppStrings.age),
+                    decoration: InputDecoration(hintText: AppStrings.age),
                   ),
                 ),
               ],
@@ -263,9 +268,9 @@ class _BasicInfoPage extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Text(
-                    'Kaç yıldır: ',
-                    style: TextStyle(color: AppColors.textSecondary),
+                  Text(
+                    '${AppStrings.smokingYears}: ',
+                    style: const TextStyle(color: AppColors.textSecondary),
                   ),
                   SizedBox(
                     width: 80,
@@ -273,7 +278,7 @@ class _BasicInfoPage extends StatelessWidget {
                       keyboardType: TextInputType.number,
                       onChanged: (v) =>
                           vm.setSmokingYears(int.tryParse(v) ?? 0),
-                      decoration: const InputDecoration(hintText: 'Yıl'),
+                      decoration: InputDecoration(hintText: AppStrings.year),
                     ),
                   ),
                 ],
@@ -287,7 +292,9 @@ class _BasicInfoPage extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: AppStrings.relationshipStatusOptions.map((opt) {
-                final isSelected = state.relationshipStatus == opt;
+                final isSelected =
+                    AppStrings.localizeStoredValue(state.relationshipStatus) ==
+                    opt;
                 return ChoiceChip(
                   label: Text(opt),
                   selected: isSelected,
@@ -319,9 +326,7 @@ class _BasicInfoPage extends StatelessWidget {
             TextField(
               onChanged: vm.setBloodTestResults,
               maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: AppStrings.bloodTestHint,
-              ),
+              decoration: InputDecoration(hintText: AppStrings.bloodTestHint),
             ),
             const SizedBox(height: 24),
 
@@ -331,7 +336,10 @@ class _BasicInfoPage extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: AppStrings.chronicDiseasesList.map((disease) {
-                final isSelected = state.chronicDiseases.contains(disease);
+                final isSelected = state.chronicDiseases.any(
+                  (value) =>
+                      AppStrings.localizeStoredValue(value) == disease,
+                );
                 return FilterChip(
                   label: Text(disease),
                   selected: isSelected,
@@ -365,8 +373,8 @@ class _CycleHealthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _PageWrapper(
-      title: 'Kadın Sağlığı',
-      subtitle: 'Döngü ve sağlık bilgileriniz',
+      title: AppStrings.womenHealth,
+      subtitle: AppStrings.cycleAndHealthInformation,
       scrollable: true,
       children: [
         // ── Bölüm 1: Döngü süresi (Switch + Slider) ──────
@@ -409,13 +417,16 @@ class _CycleLengthSection extends StatelessWidget {
           children: [
             _sectionTitle(AppStrings.menstrualCycleLength),
             SwitchListTile(
-              title: const Text(
-                'Döngü süremi bilmiyorum',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              title: Text(
+                AppStrings.doNotKnowCycleLength,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              subtitle: const Text(
-                'Uygulama zamanla hesaplasın',
-                style: TextStyle(fontSize: 12),
+              subtitle: Text(
+                AppStrings.calculateCycleOverTime,
+                style: const TextStyle(fontSize: 12),
               ),
               contentPadding: EdgeInsets.zero,
               value: state.unknown,
@@ -438,7 +449,7 @@ class _CycleLengthSection extends StatelessWidget {
                       max: CycleRules.maxCycleLength.toDouble(),
                       divisions:
                           CycleRules.maxCycleLength - CycleRules.minCycleLength,
-                      label: '${state.length} gün',
+                      label: AppStrings.dayCount(state.length),
                       onChanged: (v) => vm.setAverageCycleLength(v.round()),
                     ),
                   ),
@@ -452,7 +463,7 @@ class _CycleLengthSection extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      '${state.length} gün',
+                      AppStrings.dayCount(state.length),
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppColors.periodPrimary,
@@ -491,7 +502,9 @@ class _LastPeriodSection extends StatelessWidget {
                   initialDate: lastPeriodDate ?? now,
                   firstDate: now.subtract(const Duration(days: 90)),
                   lastDate: now,
-                  locale: const Locale('tr', 'TR'),
+                  locale: AppStrings.resolveLocale(
+                    Localizations.localeOf(context),
+                  ),
                 );
                 if (picked != null) vm.setLastPeriodDate(picked);
               },
@@ -514,8 +527,8 @@ class _LastPeriodSection extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       lastPeriodDate != null
-                          ? '${lastPeriodDate.day}.${lastPeriodDate.month}.${lastPeriodDate.year}'
-                          : 'Tarih seçin',
+                          ? lastPeriodDate.toDotFormat()
+                          : AppStrings.selectDate,
                       style: TextStyle(
                         color: lastPeriodDate != null
                             ? AppColors.textPrimary
@@ -620,7 +633,9 @@ class _BirthControlSection extends StatelessWidget {
                     AppStrings.implant,
                     AppStrings.otherMethod,
                   ].map((method) {
-                    final isSelected = selected == method;
+                    final isSelected =
+                        AppStrings.localizeStoredValue(selected ?? '') ==
+                        method;
                     return ChoiceChip(
                       label: Text(method),
                       selected: isSelected,
@@ -656,7 +671,10 @@ class _WomenDiseasesSection extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: AppStrings.womenDiseasesList.map((disease) {
-                final isSelected = diseases.contains(disease);
+                final isSelected = diseases.any(
+                  (value) =>
+                      AppStrings.localizeStoredValue(value) == disease,
+                );
                 return FilterChip(
                   label: Text(disease),
                   selected: isSelected,
@@ -692,8 +710,8 @@ class _SummaryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Summary sayfası tüm veriyi gösterir, ama sadece sayfa görünür olduğunda build olur
     return _PageWrapper(
-      title: 'Harika! 🎉',
-      subtitle: 'Profiliniz hazır. Başlayalım mı?',
+      title: AppStrings.great,
+      subtitle: AppStrings.profileReady,
       children: [
         const SizedBox(height: 16),
         Container(
@@ -711,16 +729,26 @@ class _SummaryPage extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _summaryRow('İsim', vm.userName.isEmpty ? '-' : vm.userName),
-              if (vm.weight != null) _summaryRow('Kilo', '${vm.weight} kg'),
-              if (vm.height != null) _summaryRow('Boy', '${vm.height} cm'),
-              if (vm.age != null) _summaryRow('Yaş', '${vm.age}'),
               _summaryRow(
-                'Sigara',
-                vm.isSmoker ? 'Evet (${vm.smokingYears} yıl)' : 'Hayır',
+                AppStrings.name,
+                vm.userName.isEmpty ? '-' : vm.userName,
+              ),
+              if (vm.weight != null)
+                _summaryRow(AppStrings.weight, '${vm.weight} kg'),
+              if (vm.height != null)
+                _summaryRow(AppStrings.height, '${vm.height} cm'),
+              if (vm.age != null) _summaryRow(AppStrings.age, '${vm.age}'),
+              _summaryRow(
+                AppStrings.smoking,
+                vm.isSmoker
+                    ? '${AppStrings.yes} (${AppStrings.yearsSmoking(vm.smokingYears)})'
+                    : AppStrings.no,
               ),
               if (vm.lastPeriodDate != null)
-                _summaryRow('Döngü', '${vm.averageCycleLength} gün'),
+                _summaryRow(
+                  AppStrings.menstrualCycleLength,
+                  AppStrings.dayCount(vm.averageCycleLength),
+                ),
             ],
           ),
         ),

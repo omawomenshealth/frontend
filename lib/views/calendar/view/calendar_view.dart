@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../dashboard/widgets/daily_log_sheet.dart';
@@ -32,6 +33,7 @@ class _CalendarViewState extends State<CalendarView> {
 
   @override
   Widget build(BuildContext context) {
+    AppStrings.of(context);
     return Selector<CalendarViewModel, bool>(
       selector: (_, vm) => vm.isLoading,
       builder: (context, isLoading, _) {
@@ -68,9 +70,9 @@ class _CalendarViewState extends State<CalendarView> {
                             ),
                           ),
                         ),
-                      const Text(
-                        '📅 Takvim',
-                        style: TextStyle(
+                      Text(
+                        '📅 ${AppStrings.calendar}',
+                        style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -116,7 +118,7 @@ class _CalendarViewState extends State<CalendarView> {
             ],
           ),
           child: TableCalendar(
-            locale: 'tr_TR',
+            locale: AppStrings.localeName,
             firstDay: DateTime(2024, 1, 1),
             lastDay: DateTime(2030, 12, 31),
             focusedDay: _focusedDay,
@@ -417,17 +419,17 @@ class _DayDetailSection extends StatelessWidget {
                         color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.add_circle_outline,
                             size: 14,
                             color: AppColors.primary,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
-                            'Kayıt Ekle',
-                            style: TextStyle(
+                            AppStrings.addDailyLog,
+                            style: const TextStyle(
                               fontSize: 11,
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
@@ -448,9 +450,9 @@ class _DayDetailSection extends StatelessWidget {
                         color: AppColors.periodPrimary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text(
-                        '🩸 Adet',
-                        style: TextStyle(
+                      child: Text(
+                        '🩸 ${AppStrings.period}',
+                        style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.periodPrimary,
                           fontWeight: FontWeight.w600,
@@ -473,9 +475,9 @@ class _DayDetailSection extends StatelessWidget {
                           color: AppColors.textHint.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Bu gün için kayıt yok',
-                          style: TextStyle(
+                        Text(
+                          AppStrings.noLogsForDay,
+                          style: const TextStyle(
                             color: AppColors.textHint,
                             fontSize: 14,
                           ),
@@ -493,9 +495,9 @@ class _DayDetailSection extends StatelessWidget {
                             ),
                           ),
                           icon: const Icon(Icons.add_rounded, size: 18),
-                          label: const Text(
-                            'Kayıt Ekle',
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                          label: Text(
+                            AppStrings.addDailyLog,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ),
                       ],
@@ -527,19 +529,26 @@ class _DayDetailSection extends StatelessWidget {
                             const SizedBox(height: 8),
                             if (log.mood != null)
                               _detailRow(
-                                'Ruh Hali',
-                                '${log.moodEmoji ?? ''} ${log.mood}',
+                                AppStrings.mood,
+                                '${log.moodEmoji ?? ''} ${AppStrings.localizeStoredValue(log.mood!)}',
                               ),
                             if (log.activities.isNotEmpty)
-                              _detailRow('Hareket', log.activities.join(', ')),
+                              _detailRow(
+                                AppStrings.activity,
+                                log.activities
+                                    .map(AppStrings.localizeStoredValue)
+                                    .join(', '),
+                              ),
                             if (log.nutritionTags.isNotEmpty)
                               _detailRow(
-                                'Beslenme',
-                                log.nutritionTags.join(', '),
+                                AppStrings.nutrition,
+                                log.nutritionTags
+                                    .map(AppStrings.localizeStoredValue)
+                                    .join(', '),
                               ),
                             if (log.medications.isNotEmpty)
                               _detailRow(
-                                'İlaçlar',
+                                AppStrings.medications,
                                 log.medications
                                     .map(
                                       (m) => '${m.name} ${m.taken ? "✅" : "❌"}',
@@ -548,7 +557,7 @@ class _DayDetailSection extends StatelessWidget {
                               ),
                             if (log.supplements.isNotEmpty)
                               _detailRow(
-                                'Takviyeler',
+                                AppStrings.supplements,
                                 log.supplements
                                     .map(
                                       (s) => '${s.name} ${s.taken ? "✅" : "❌"}',
@@ -557,18 +566,27 @@ class _DayDetailSection extends StatelessWidget {
                               ),
                             if (log.bowelActivity.isNotEmpty)
                               _detailRow(
-                                'Bağırsak',
-                                log.bowelActivity.join(', '),
+                                AppStrings.bowel,
+                                log.bowelActivity
+                                    .map(AppStrings.localizeStoredValue)
+                                    .join(', '),
                               ),
                             if (log.painLocations.isNotEmpty)
                               _detailRow(
-                                'Ağrılar',
-                                log.painLocations.join(', '),
+                                AppStrings.pain,
+                                log.painLocations
+                                    .map(AppStrings.localizeStoredValue)
+                                    .join(', '),
                               ),
                             if (log.flowIntensity != null)
-                              _detailRow('Akış', log.flowIntensity!),
+                              _detailRow(
+                                AppStrings.flow,
+                                AppStrings.localizeStoredValue(
+                                  log.flowIntensity!,
+                                ),
+                              ),
                             if (log.notes != null && log.notes!.isNotEmpty)
-                              _detailRow('Notlar', log.notes!),
+                              _detailRow(AppStrings.notes, log.notes!),
                             if (index != logs.length - 1)
                               Divider(
                                 color: AppColors.textHint.withValues(

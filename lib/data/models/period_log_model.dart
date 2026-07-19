@@ -1,20 +1,22 @@
 import 'dart:convert';
 
+import '../../core/constants/app_strings.dart';
+
 /// İlaç/Takviye alım kaydı.
 class MedicationEntry {
   final String name;
-  final String time;          // Sabah, Öğle, Akşam
-  final String stomachState;  // Aç, Tok
-  final String dosage;        // Örn: 1 Adet, 500mg, 5 Damla
+  final String time; // Sabah, Öğle, Akşam
+  final String stomachState; // Aç, Tok
+  final String dosage; // Örn: 1 Adet, 500mg, 5 Damla
   final bool taken;
 
   MedicationEntry({
     required this.name,
     required this.time,
     required this.stomachState,
-    this.dosage = '1 Adet',
+    String? dosage,
     this.taken = false,
-  });
+  }) : dosage = dosage ?? AppStrings.dosageOptions.first;
 
   MedicationEntry copyWith({
     String? name,
@@ -33,19 +35,20 @@ class MedicationEntry {
   }
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'time': time,
-        'stomachState': stomachState,
-        'dosage': dosage,
-        'taken': taken,
-      };
+    'name': name,
+    'time': time,
+    'stomachState': stomachState,
+    'dosage': dosage,
+    'taken': taken,
+  };
 
   factory MedicationEntry.fromJson(Map<String, dynamic> json) {
     return MedicationEntry(
       name: json['name'] as String,
-      time: json['time'] as String? ?? 'Sabah',
-      stomachState: json['stomachState'] as String? ?? 'Aç',
-      dosage: json['dosage'] as String? ?? '1 Adet',
+      time: json['time'] as String? ?? AppStrings.medicationTimes.first,
+      stomachState:
+          json['stomachState'] as String? ?? AppStrings.stomachStates.first,
+      dosage: json['dosage'] as String? ?? AppStrings.dosageOptions.first,
       taken: json['taken'] as bool? ?? false,
     );
   }
@@ -69,8 +72,8 @@ class DailyLog {
   final List<MedicationEntry> medications;
 
   // ── Ruh Hali ─────────────────────────────────────────────
-  final String? mood;       // Mutlu, Huzurlu, İyi, Normal, Kötü, vb.
-  final String? moodEmoji;  // 😊, 😌, 🙂, vb.
+  final String? mood; // Mutlu, Huzurlu, İyi, Normal, Kötü, vb.
+  final String? moodEmoji; // 😊, 😌, 🙂, vb.
   final String? moodNote;
 
   // ── Cinsel Aktivite ──────────────────────────────────────
@@ -83,8 +86,8 @@ class DailyLog {
   final List<String> painLocations; // Baş ağrısı, Bel ağrısı, vb.
 
   // ── Regl (Kadınlar için) ─────────────────────────────────
-  final String? flowIntensity;  // Yok, Lekelenme, Hafif, Orta, Yoğun
-  final int? periodPainLevel;   // 0-5
+  final String? flowIntensity; // Yok, Lekelenme, Hafif, Orta, Yoğun
+  final int? periodPainLevel; // 0-5
 
   // ── Genel Notlar ─────────────────────────────────────────
   final String? notes;
@@ -158,22 +161,22 @@ class DailyLog {
   }
 
   Map<String, dynamic> toJson() => {
-        'date': date.toIso8601String(),
-        'activities': activities,
-        'nutritionTags': nutritionTags,
-        'nutritionNotes': nutritionNotes,
-        'supplements': supplements.map((e) => e.toJson()).toList(),
-        'medications': medications.map((e) => e.toJson()).toList(),
-        'mood': mood,
-        'moodEmoji': moodEmoji,
-        'moodNote': moodNote,
-        'sexualActivity': sexualActivity,
-        'bowelActivity': bowelActivity,
-        'painLocations': painLocations,
-        'flowIntensity': flowIntensity,
-        'periodPainLevel': periodPainLevel,
-        'notes': notes,
-      };
+    'date': date.toIso8601String(),
+    'activities': activities,
+    'nutritionTags': nutritionTags,
+    'nutritionNotes': nutritionNotes,
+    'supplements': supplements.map((e) => e.toJson()).toList(),
+    'medications': medications.map((e) => e.toJson()).toList(),
+    'mood': mood,
+    'moodEmoji': moodEmoji,
+    'moodNote': moodNote,
+    'sexualActivity': sexualActivity,
+    'bowelActivity': bowelActivity,
+    'painLocations': painLocations,
+    'flowIntensity': flowIntensity,
+    'periodPainLevel': periodPainLevel,
+    'notes': notes,
+  };
 
   factory DailyLog.fromJson(Map<String, dynamic> json) {
     return DailyLog(
@@ -181,14 +184,14 @@ class DailyLog {
       activities: List<String>.from(json['activities'] ?? []),
       nutritionTags: List<String>.from(json['nutritionTags'] ?? []),
       nutritionNotes: json['nutritionNotes'] as String?,
-      supplements: (json['supplements'] as List<dynamic>?)
-              ?.map((e) =>
-                  MedicationEntry.fromJson(e as Map<String, dynamic>))
+      supplements:
+          (json['supplements'] as List<dynamic>?)
+              ?.map((e) => MedicationEntry.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      medications: (json['medications'] as List<dynamic>?)
-              ?.map((e) =>
-                  MedicationEntry.fromJson(e as Map<String, dynamic>))
+      medications:
+          (json['medications'] as List<dynamic>?)
+              ?.map((e) => MedicationEntry.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
       mood: json['mood'] as String?,
@@ -206,9 +209,7 @@ class DailyLog {
   String toJsonString() => jsonEncode(toJson());
 
   factory DailyLog.fromJsonString(String jsonString) {
-    return DailyLog.fromJson(
-      jsonDecode(jsonString) as Map<String, dynamic>,
-    );
+    return DailyLog.fromJson(jsonDecode(jsonString) as Map<String, dynamic>);
   }
 
   /// Boş günlük kayıt oluştur.
@@ -217,7 +218,10 @@ class DailyLog {
   /// Aynı zamana ait iki farklı kaydın verilerini birleştirir (üst üste yazmayı önler).
   DailyLog mergeWith(DailyLog other) {
     // İlaç ve Takviyeleri birleştir
-    List<MedicationEntry> mergeMeds(List<MedicationEntry> listA, List<MedicationEntry> listB) {
+    List<MedicationEntry> mergeMeds(
+      List<MedicationEntry> listA,
+      List<MedicationEntry> listB,
+    ) {
       final Map<String, MedicationEntry> merged = {};
       for (var item in [...listA, ...listB]) {
         final existing = merged[item.name];
@@ -228,7 +232,9 @@ class DailyLog {
             taken: existing.taken || item.taken,
             dosage: existing.dosage.isNotEmpty ? existing.dosage : item.dosage,
             time: existing.time.isNotEmpty ? existing.time : item.time,
-            stomachState: existing.stomachState.isNotEmpty ? existing.stomachState : item.stomachState,
+            stomachState: existing.stomachState.isNotEmpty
+                ? existing.stomachState
+                : item.stomachState,
           );
         }
       }
@@ -246,7 +252,9 @@ class DailyLog {
       medications: mergeMeds(medications, other.medications),
       mood: mood ?? other.mood,
       moodEmoji: moodEmoji ?? other.moodEmoji,
-      moodNote: (moodNote != null && moodNote!.isNotEmpty) ? moodNote : other.moodNote,
+      moodNote: (moodNote != null && moodNote!.isNotEmpty)
+          ? moodNote
+          : other.moodNote,
       sexualActivity: sexualActivity ?? other.sexualActivity,
       bowelActivity: (bowelActivity + other.bowelActivity).toSet().toList(),
       painLocations: (painLocations + other.painLocations).toSet().toList(),

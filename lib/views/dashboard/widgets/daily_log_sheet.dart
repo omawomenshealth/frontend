@@ -58,17 +58,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       final allMeds = storage.getCustomMedications();
       final allSups = storage.getCustomSupplements();
 
-      final medsSet = {'Parol', 'Aspirin', 'Arveles', 'Majezik', 'Minoset'}
-        ..addAll(allMeds);
-      final supsSet = {
-        'Magnezyum',
-        'D Vitamini',
-        'Omega 3',
-        'Demir',
-        'B12 Vitamini',
-        'C Vitamini',
-        'Çinko',
-      }..addAll(allSups);
+      final medsSet = AppStrings.defaultMedications.toSet()..addAll(allMeds);
+      final supsSet = AppStrings.defaultSupplements.toSet()..addAll(allSups);
 
       // Default daily settings list items should be excluded
       medsSet.removeAll(widget.settings.dailyMedications);
@@ -90,25 +81,21 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     super.dispose();
   }
 
-  List<String> get _tabTitles => const [
-    '🩸 Adet',
-    '🍽️ Beslenme',
-    '💊 İlaçlar',
-    '🌟 Ruh Hali',
+  List<String> get _tabTitles => [
+    '🩸 ${AppStrings.period}',
+    '🍽️ ${AppStrings.nutrition}',
+    '💊 ${AppStrings.medications}',
+    '🌟 ${AppStrings.mood}',
   ];
 
-  bool _isSectionVisible(String category) {
+  bool _isSectionVisible(int categoryIndex) {
     final idx = _selectedTabIndex < _tabTitles.length ? _selectedTabIndex : 0;
-    final title = _tabTitles[idx];
-    if (title.contains('Adet') && category == 'Adet') return true;
-    if (title.contains('Beslenme') && category == 'Beslenme') return true;
-    if (title.contains('İlaçlar') && category == 'İlaçlar') return true;
-    if (title.contains('Ruh Hali') && category == 'Ruh Hali') return true;
-    return false;
+    return idx == categoryIndex;
   }
 
   @override
   Widget build(BuildContext context) {
+    AppStrings.of(context);
     return DraggableScrollableSheet(
       initialChildSize: 0.9,
       minChildSize: 0.5,
@@ -137,9 +124,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    const Text(
-                      'Günlük Kayıt',
-                      style: TextStyle(
+                    Text(
+                      AppStrings.dailyLog,
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -230,14 +217,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [
                     // 0. Ruh Hali
-                    if (_isSectionVisible('Ruh Hali'))
+                    if (_isSectionVisible(3))
                       _buildSection(
                         title: '🌟 ${AppStrings.mood}',
                         child: Wrap(
                           spacing: 12,
                           runSpacing: 12,
                           children: AppStrings.moodOptions.entries.map((entry) {
-                            final isSelected = _log.mood == entry.key;
+                            final isSelected =
+                                AppStrings.localizeStoredValue(
+                                  _log.mood ?? '',
+                                ) ==
+                                entry.key;
                             return GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -295,7 +286,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       ),
 
                     // 1. Hareket Durumu
-                    if (_isSectionVisible('Ruh Hali'))
+                    if (_isSectionVisible(3))
                       _buildSection(
                         title: '🏃 ${AppStrings.activityStatus}',
                         child: _buildChipSelector(
@@ -309,7 +300,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       ),
 
                     // 2. Beslenme Durumu
-                    if (_isSectionVisible('Beslenme'))
+                    if (_isSectionVisible(1))
                       _buildSection(
                         title: '🍽️ ${AppStrings.nutritionStatus}',
                         child: _buildChipSelector(
@@ -323,7 +314,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       ),
 
                     // 3. Takviyeler
-                    if (_isSectionVisible('İlaçlar'))
+                    if (_isSectionVisible(2))
                       _buildSection(
                         title: '🌿 ${AppStrings.supplements}',
                         child: _buildMedicationList(
@@ -331,7 +322,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           entries: _log.supplements,
                           color: AppColors.success,
                           customController: _customSupController,
-                          customHint: 'Örn: D Vitamini',
+                          customHint: AppStrings.supplementExample,
                           suggestions: _previouslyAddedSups,
                           onChanged: (entries) => setState(
                             () => _log = _log.copyWith(supplements: entries),
@@ -340,7 +331,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       ),
 
                     // 4. İlaçlar
-                    if (_isSectionVisible('İlaçlar'))
+                    if (_isSectionVisible(2))
                       _buildSection(
                         title: '💊 ${AppStrings.medications}',
                         subtitle: AppStrings.medicationDisclaimer,
@@ -349,7 +340,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           entries: _log.medications,
                           color: AppColors.medicationPrimary,
                           customController: _customMedController,
-                          customHint: 'Örn: 500mg Parol',
+                          customHint: AppStrings.medicationExample,
                           suggestions: _previouslyAddedMeds,
                           onChanged: (entries) => setState(
                             () => _log = _log.copyWith(medications: entries),
@@ -358,13 +349,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       ),
 
                     // 5. Cinsel Aktivite
-                    if (_isSectionVisible('Ruh Hali'))
+                    if (_isSectionVisible(3))
                       _buildSection(
                         title: '💕 ${AppStrings.sexualActivity}',
                         child: Row(
                           children: [
                             _toggleButton(
-                              'Evet',
+                              AppStrings.yes,
                               _log.sexualActivity == true,
                               () {
                                 setState(
@@ -376,7 +367,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                             ),
                             const SizedBox(width: 8),
                             _toggleButton(
-                              'Hayır',
+                              AppStrings.no,
                               _log.sexualActivity == false,
                               () {
                                 setState(
@@ -391,7 +382,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       ),
 
                     // 6. Bağırsak Aktivitesi
-                    if (_isSectionVisible('Beslenme'))
+                    if (_isSectionVisible(1))
                       _buildSection(
                         title: '🔄 ${AppStrings.bowelActivity}',
                         child: _buildChipSelector(
@@ -405,7 +396,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       ),
 
                     // 7. Hisler & Ağrılar
-                    if (_isSectionVisible('Ruh Hali'))
+                    if (_isSectionVisible(3))
                       _buildSection(
                         title: '🩹 ${AppStrings.sensations}',
                         child: _buildChipSelector(
@@ -419,9 +410,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       ),
 
                     // 8. Regl
-                    if (_isSectionVisible('Adet')) ...[
+                    if (_isSectionVisible(0)) ...[
                       _buildSection(
-                        title: '🩸 Adet Kanaması (Akış Şiddeti)',
+                        title: AppStrings.periodBleeding,
                         child: _buildSingleChipSelector(
                           options: AppStrings.flowOptions,
                           selected: _log.flowIntensity,
@@ -434,15 +425,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ],
 
                     // 9. Notlar
-                    if (_isSectionVisible('Ruh Hali'))
+                    if (_isSectionVisible(3))
                       _buildSection(
                         title: '📝 ${AppStrings.notes}',
                         child: TextField(
                           controller: _notesController,
                           maxLines: 3,
                           onChanged: (v) => _log = _log.copyWith(notes: v),
-                          decoration: const InputDecoration(
-                            hintText: 'Bugün hakkında notlarınız...',
+                          decoration: InputDecoration(
+                            hintText: AppStrings.notesHint,
                           ),
                         ),
                       ),
@@ -467,7 +458,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                               hour: _log.date.hour,
                               minute: _log.date.minute,
                             ),
-                            helpText: 'Kayıt Saatini Seçin',
+                            helpText: AppStrings.selectLogTime,
                             builder: (context, child) {
                               return Theme(
                                 data: Theme.of(context).copyWith(
@@ -512,7 +503,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           Navigator.pop(context);
                           messenger.showSnackBar(
                             SnackBar(
-                              content: const Text(AppStrings.saved),
+                              content: Text(AppStrings.saved),
                               backgroundColor: AppColors.success,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
@@ -522,10 +513,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Kayıt tamamlanamadı. Lütfen tekrar deneyin.',
-                              ),
+                            SnackBar(
+                              content: Text(AppStrings.logSaveFailed),
                               backgroundColor: AppColors.error,
                               behavior: SnackBarBehavior.floating,
                             ),
@@ -590,12 +579,16 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       spacing: 8,
       runSpacing: 8,
       children: options.map((opt) {
-        final isSelected = selected.contains(opt);
+        final isSelected = selected.any(
+          (value) => AppStrings.localizeStoredValue(value) == opt,
+        );
         return GestureDetector(
           onTap: () {
             final newList = List<String>.from(selected);
             if (isSelected) {
-              newList.remove(opt);
+              newList.removeWhere(
+                (value) => AppStrings.localizeStoredValue(value) == opt,
+              );
             } else {
               newList.add(opt);
             }
@@ -638,7 +631,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       spacing: 8,
       runSpacing: 8,
       children: options.map((opt) {
-        final isSelected = selected == opt;
+        final isSelected =
+            AppStrings.localizeStoredValue(selected ?? '') == opt;
         return GestureDetector(
           onTap: () {
             if (isSelected) {
@@ -688,8 +682,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     for (var name in items) {
       final existing = entries.firstWhere(
         (e) => e.name == name,
-        orElse: () =>
-            MedicationEntry(name: name, time: 'Sabah', stomachState: 'Aç'),
+        orElse: () => MedicationEntry(
+          name: name,
+          time: AppStrings.medicationTimes.first,
+          stomachState: AppStrings.stomachStates.first,
+        ),
       );
       allEntries.add(existing);
     }
@@ -763,8 +760,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
                   // Zaman seçici
                   _miniDropdown(
-                    value: entry.time,
-                    items: ['Sabah', 'Öğle', 'Akşam'],
+                    value: AppStrings.localizeStoredValue(entry.time),
+                    items: AppStrings.medicationTimes,
                     onChanged: (val) {
                       final newEntries = allEntries.map((e) {
                         if (e.name == entry.name) return e.copyWith(time: val);
@@ -777,8 +774,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
                   // Aç/Tok
                   _miniDropdown(
-                    value: entry.stomachState,
-                    items: ['Aç', 'Tok'],
+                    value: AppStrings.localizeStoredValue(entry.stomachState),
+                    items: AppStrings.stomachStates,
                     onChanged: (val) {
                       final newEntries = allEntries.map((e) {
                         if (e.name == entry.name) {
@@ -794,24 +791,22 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   // Miktar seçici
                   Builder(
                     builder: (ctx) {
-                      final dosageItems = [
-                        '1 Adet',
-                        '2 Adet',
-                        '500mg',
-                        '1000mg',
-                        '5 Damla',
-                        '10 Damla',
-                      ];
-                      if (!dosageItems.contains(entry.dosage)) {
-                        dosageItems.add(entry.dosage);
+                      final dosageItems = List<String>.from(
+                        AppStrings.dosageOptions,
+                      );
+                      final localizedDosage = AppStrings.localizeStoredValue(
+                        entry.dosage,
+                      );
+                      if (!dosageItems.contains(localizedDosage)) {
+                        dosageItems.add(localizedDosage);
                       }
-                      dosageItems.add('Özel...');
+                      dosageItems.add(AppStrings.custom);
 
                       return _miniDropdown(
-                        value: entry.dosage,
+                        value: localizedDosage,
                         items: dosageItems,
                         onChanged: (val) {
-                          if (val == 'Özel...') {
+                          if (val == AppStrings.custom) {
                             _showCustomDosageDialog(
                               context,
                               entry,
@@ -860,8 +855,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Önceden Eklenenler:',
-              style: TextStyle(
+              AppStrings.previouslyAdded,
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
@@ -881,8 +876,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     newEntries.add(
                       MedicationEntry(
                         name: name,
-                        time: 'Sabah',
-                        stomachState: 'Aç',
+                        time: AppStrings.medicationTimes.first,
+                        stomachState: AppStrings.stomachStates.first,
                         taken: true,
                       ),
                     );
@@ -955,8 +950,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     newEntries.add(
                       MedicationEntry(
                         name: txt,
-                        time: 'Sabah',
-                        stomachState: 'Aç',
+                        time: AppStrings.medicationTimes.first,
+                        stomachState: AppStrings.stomachStates.first,
                         taken: true,
                       ),
                     );
@@ -976,7 +971,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   vertical: 10,
                 ),
               ),
-              child: const Text('Ekle'),
+              child: Text(AppStrings.add),
             ),
           ],
         ),
@@ -1052,9 +1047,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(
-          'Özel Miktar Girin',
-          style: TextStyle(
+        title: Text(
+          AppStrings.customDosage,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -1062,8 +1057,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ),
         content: TextField(
           controller: textCtrl,
-          decoration: const InputDecoration(
-            hintText: 'Örn: 2 ölçek, 250mg, 1.5 tablet',
+          decoration: InputDecoration(
+            hintText: AppStrings.customDosageHint,
             isDense: true,
           ),
           autofocus: true,
@@ -1071,7 +1066,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1089,7 +1084,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Kaydet'),
+            child: Text(AppStrings.save),
           ),
         ],
       ),

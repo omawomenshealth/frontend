@@ -2,9 +2,11 @@ import 'package:app_proje_a/views/dashboard/widgets/horizontal_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../data/models/period_log_model.dart';
+import '../../../data/services/api_service.dart';
 import '../viewmodel/dashboard_view_model.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../../calendar/view/calendar_view.dart' as cal;
@@ -21,6 +23,7 @@ class DashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppStrings.of(context);
     return Consumer<DashboardViewModel>(
       builder: (context, vm, _) {
         if (vm.isLoading) {
@@ -102,9 +105,9 @@ class DashboardView extends StatelessWidget {
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Text(
-                              'Bugün',
-                              style: TextStyle(
+                            child: Text(
+                              AppStrings.today,
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primary,
@@ -180,100 +183,10 @@ class DashboardView extends StatelessWidget {
               ),
             ),
           ),
-
-          // ── Günlük Kayıt Ekle FAB ──────────────────────
-          /*floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => _showDailyLogSheet(context, vm),
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            icon: const Icon(Icons.add_circle_outline),
-            label: const Text(
-              'Günlük Kayıt',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ),*/
         );
       },
     );
   }
-
-  /*   // ── İlerleme Kartı ──────────────────────────────────────
-  Widget _buildProgressCard(DashboardViewModel vm) {
-    final percent = vm.completionPercentage;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Bugünün Durumu',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  percent == 0
-                      ? 'Henüz kayıt eklenmedi'
-                      : '${(percent * 100).round()}% tamamlandı',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                // İlerleme çubuğu
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: percent,
-                    backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    valueColor: const AlwaysStoppedAnimation(Colors.white),
-                    minHeight: 6,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                '${(percent * 100).round()}%',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  } */
 
   // ── Regl Kartı ──────────────────────────────────────────
   Widget _buildPeriodCard(DashboardViewModel vm) {
@@ -287,9 +200,9 @@ class DashboardView extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text(
-                  '🩸 Döngü Takibi',
-                  style: TextStyle(
+                Text(
+                  AppStrings.cycleTracking,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -310,9 +223,9 @@ class DashboardView extends StatelessWidget {
                     ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'Bekleniyor',
-                    style: TextStyle(
+                  child: Text(
+                    AppStrings.waiting,
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppColors.periodPrimary,
@@ -322,10 +235,10 @@ class DashboardView extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            const CountdownCircle(
+            CountdownCircle(
               daysRemaining: null,
               totalDays: null,
-              phaseName: 'Bilgi Eksik',
+              phaseName: AppStrings.missingInformation,
               phaseColor: AppColors.periodPrimary,
               phase: null,
             ),
@@ -349,9 +262,9 @@ class DashboardView extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text(
-                '🩸 Döngü Takibi',
-                style: TextStyle(
+              Text(
+                AppStrings.cycleTracking,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -388,7 +301,10 @@ class DashboardView extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            '${pc.currentPhaseDaysRemaining} gün sonra ${pc.nextPhaseName}',
+            AppStrings.phaseAfterDays(
+              pc.currentPhaseDaysRemaining,
+              pc.nextPhaseName,
+            ),
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -396,10 +312,10 @@ class DashboardView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Takvim ve ovülasyon bilgileri yaklaşık tahminlerdir.',
+          Text(
+            AppStrings.phasePredictionDisclaimer,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 11, color: AppColors.textHint),
+            style: const TextStyle(fontSize: 11, color: AppColors.textHint),
           ),
         ],
       ),
@@ -408,20 +324,26 @@ class DashboardView extends StatelessWidget {
 
   // ── Size Özel Tavsiye Kartı ─────────────────────────────
   Widget _buildRecommendationCard(BuildContext context) {
-    // ID'si 6 olan PMS makalesini veya varsayılan olarak ilk makaleyi bulalım
-    final article = DummyArticles.articles.firstWhere(
-      (a) => a.id == '6',
-      orElse: () => DummyArticles.articles.first,
-    );
-
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ArticleDetailView(article: article),
-          ),
-        );
+      onTap: () async {
+        try {
+          final json = await context.read<ApiService>().fetchArticle(
+            'adet-doneminde-beslenme',
+          );
+          if (!context.mounted) return;
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  ArticleDetailView(article: Article.fromJson(json)),
+            ),
+          );
+        } on ApiException catch (error) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error.message)));
+        }
       },
       child: Container(
         width: double.infinity,
@@ -469,17 +391,17 @@ class DashboardView extends StatelessWidget {
                         color: Colors.white.withValues(alpha: 0.22),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.lightbulb_outline_rounded,
                             color: Colors.white,
                             size: 12,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
-                            'GÜNÜN TAVSİYESİ',
-                            style: TextStyle(
+                            AppStrings.recommendationOfTheDay,
+                            style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
@@ -499,7 +421,7 @@ class DashboardView extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          article.readTime,
+                          AppStrings.dayCount(5),
                           style: const TextStyle(
                             fontSize: 11,
                             color: Colors.white70,
@@ -512,7 +434,7 @@ class DashboardView extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  article.title,
+                  AppStrings.recommendationTitle,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -522,7 +444,7 @@ class DashboardView extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  article.summary,
+                  AppStrings.recommendationSummary,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -532,18 +454,18 @@ class DashboardView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Row(
+                Row(
                   children: [
                     Text(
-                      'Okumaya Başla',
-                      style: TextStyle(
+                      AppStrings.startReading,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(width: 4),
-                    Icon(
+                    const SizedBox(width: 4),
+                    const Icon(
                       Icons.arrow_forward_rounded,
                       size: 14,
                       color: Colors.white,
@@ -562,8 +484,8 @@ class DashboardView extends StatelessWidget {
   Widget _buildTimeline(BuildContext context, DashboardViewModel vm) {
     final isToday = vm.selectedDate.isToday;
     final title = isToday
-        ? '📋 Bugünün Kayıtları'
-        : '📋 ${vm.selectedDate.toDotFormat()} Tarihli Kayıtlar';
+        ? AppStrings.todaysLogs
+        : AppStrings.datedLogs(vm.selectedDate.toDotFormat());
 
     final hasLogs = vm.todayLogs.any((log) => log.hasData);
 
@@ -590,17 +512,17 @@ class DashboardView extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.add_circle_outline,
                       size: 14,
                       color: AppColors.primary,
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
-                      'Kayıt Ekle',
-                      style: TextStyle(
+                      AppStrings.addDailyLog,
+                      style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
@@ -636,10 +558,10 @@ class DashboardView extends StatelessWidget {
                   color: AppColors.textHint.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Bu tarih için henüz bir kayıt girilmemiş.',
+                Text(
+                  AppStrings.noLogForDate,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 13,
                   ),
@@ -660,9 +582,12 @@ class DashboardView extends StatelessWidget {
                     ),
                   ),
                   icon: const Icon(Icons.add_rounded, size: 16),
-                  label: const Text(
-                    'Kayıt Ekle',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  label: Text(
+                    AppStrings.addDailyLog,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -728,38 +653,54 @@ class DashboardView extends StatelessWidget {
                         children: [
                           if (log.mood != null)
                             _summaryTile(
-                              'Ruh Hali',
-                              '${log.moodEmoji ?? ''} ${log.mood}',
+                              AppStrings.mood,
+                              '${log.moodEmoji ?? ''} ${AppStrings.localizeStoredValue(log.mood!)}',
                             ),
                           if (log.moodNote != null && log.moodNote!.isNotEmpty)
-                            _summaryTile('Ruh Hali Notu', log.moodNote!),
+                            _summaryTile(AppStrings.moodNote, log.moodNote!),
                           if (log.activities.isNotEmpty)
-                            _summaryTile('Hareket', log.activities.join(', ')),
+                            _summaryTile(
+                              AppStrings.activity,
+                              log.activities
+                                  .map(AppStrings.localizeStoredValue)
+                                  .join(', '),
+                            ),
                           if (log.nutritionTags.isNotEmpty)
                             _summaryTile(
-                              'Beslenme',
-                              log.nutritionTags.join(', '),
+                              AppStrings.nutrition,
+                              log.nutritionTags
+                                  .map(AppStrings.localizeStoredValue)
+                                  .join(', '),
                             ),
                           if (log.bowelActivity.isNotEmpty)
                             _summaryTile(
-                              'Bağırsak',
-                              log.bowelActivity.join(', '),
+                              AppStrings.bowel,
+                              log.bowelActivity
+                                  .map(AppStrings.localizeStoredValue)
+                                  .join(', '),
                             ),
                           if (log.painLocations.isNotEmpty)
                             _summaryTile(
-                              'Ağrılar',
-                              log.painLocations.join(', '),
+                              AppStrings.pain,
+                              log.painLocations
+                                  .map(AppStrings.localizeStoredValue)
+                                  .join(', '),
                             ),
                           if (log.flowIntensity != null)
-                            _summaryTile('Akış', log.flowIntensity!),
+                            _summaryTile(
+                              AppStrings.flow,
+                              AppStrings.localizeStoredValue(
+                                log.flowIntensity!,
+                              ),
+                            ),
                           if (log.periodPainLevel != null)
                             _summaryTile(
-                              'Regl Ağrısı',
+                              AppStrings.periodPain,
                               '${log.periodPainLevel}/5',
                             ),
                           if (log.medications.any((m) => m.taken))
                             _summaryTile(
-                              'İlaçlar',
+                              AppStrings.medications,
                               log.medications
                                   .where((m) => m.taken)
                                   .map((m) => '${m.name} (${m.dosage})')
@@ -767,7 +708,7 @@ class DashboardView extends StatelessWidget {
                             ),
                           if (log.supplements.any((s) => s.taken))
                             _summaryTile(
-                              'Takviyeler',
+                              AppStrings.supplements,
                               log.supplements
                                   .where((s) => s.taken)
                                   .map((s) => '${s.name} (${s.dosage})')
@@ -775,11 +716,13 @@ class DashboardView extends StatelessWidget {
                             ),
                           if (log.sexualActivity != null)
                             _summaryTile(
-                              'Cinsel Aktivite',
-                              log.sexualActivity! ? 'Evet' : 'Hayır',
+                              AppStrings.sexualActivity,
+                              log.sexualActivity!
+                                  ? AppStrings.yes
+                                  : AppStrings.no,
                             ),
                           if (log.notes != null && log.notes!.isNotEmpty)
-                            _summaryTile('Not', log.notes!),
+                            _summaryTile(AppStrings.notes, log.notes!),
                         ],
                       ),
                     ),

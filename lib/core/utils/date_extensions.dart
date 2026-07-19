@@ -1,4 +1,6 @@
 import 'package:intl/intl.dart';
+
+import '../constants/app_strings.dart';
 import 'app_time.dart';
 
 /// DateTime üzerine eklenen yardımcı extension metotları.
@@ -10,17 +12,19 @@ extension DateTimeExtensions on DateTime {
 
   /// "29 Haziran 2026" formatı
   String toTurkishLong() {
-    return DateFormat('d MMMM yyyy', 'tr_TR').format(this);
+    return DateFormat('d MMMM yyyy', AppStrings.localeName).format(this);
   }
 
   /// "29 Haz" formatı
   String toTurkishShort() {
-    return DateFormat('d MMM', 'tr_TR').format(this);
+    return DateFormat('d MMM', AppStrings.localeName).format(this);
   }
 
   /// "29.06.2026" formatı
   String toDotFormat() {
-    return DateFormat('dd.MM.yyyy').format(this);
+    return DateFormat(
+      AppStrings.isTurkish ? 'dd.MM.yyyy' : 'MM/dd/yyyy',
+    ).format(this);
   }
 
   /// "2026-06-29" formatı (depolama için)
@@ -53,15 +57,6 @@ extension DateTimeExtensions on DateTime {
 
   /// Haftanın günü (Türkçe)
   String get turkishWeekday {
-    const days = [
-      'Pazartesi',
-      'Salı',
-      'Çarşamba',
-      'Perşembe',
-      'Cuma',
-      'Cumartesi',
-      'Pazar',
-    ];
-    return days[weekday - 1];
+    return AppStrings.weekdays[weekday - 1];
   }
 }

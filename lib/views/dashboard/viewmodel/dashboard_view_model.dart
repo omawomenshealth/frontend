@@ -5,6 +5,7 @@ import '../../../data/services/local_storage_service.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
+import '../../../core/constants/app_strings.dart';
 
 /// Dashboard iş mantığı.
 class DashboardViewModel extends ChangeNotifier {
@@ -41,30 +42,24 @@ class DashboardViewModel extends ChangeNotifier {
 
   /// Karşılama mesajı (saate göre).
   String get greeting {
-    final hour = AppTime.now.hour;
     final name = _settings?.userName ?? '';
-    final nameStr = name.isNotEmpty ? ', $name' : '';
-
-    if (hour < 12) return 'Günaydın$nameStr! ☀️';
-    if (hour < 18) return 'İyi günler$nameStr! 🌤️';
-    return 'İyi akşamlar$nameStr! 🌙';
+    return AppStrings.greeting(hour: AppTime.now.hour, name: name);
   }
 
   /// Karşılama mesajı (saate göre, emojiler olmadan).
   String get cleanGreeting {
-    final hour = AppTime.now.hour;
     final name = _settings?.userName ?? '';
-    final nameStr = name.isNotEmpty ? ', $name' : '';
-
-    if (hour < 12) return 'Günaydın$nameStr!';
-    if (hour < 18) return 'İyi günler$nameStr!';
-    return 'İyi akşamlar$nameStr!';
+    return AppStrings.greeting(
+      hour: AppTime.now.hour,
+      name: name,
+      emoji: false,
+    );
   }
 
   /// Bugünün tarih stringi.
   String get todayDateStr {
     final now = AppTime.now;
-    return '${now.turkishWeekday}, ${now.day}.${now.month}.${now.year}';
+    return '${now.turkishWeekday}, ${now.toDotFormat()}';
   }
 
   /// Veri yükleme.

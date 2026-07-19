@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/app_time.dart';
@@ -223,10 +224,9 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     );
   }
 
-  /// Kısa gün adı (Türkçe)
+  /// Kısa gün adı (seçili dil).
   String _shortWeekday(int weekday) {
-    const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-    return days[weekday - 1];
+    return AppStrings.shortWeekdays[weekday - 1];
   }
 }
 

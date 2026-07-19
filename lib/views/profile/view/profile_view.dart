@@ -18,6 +18,7 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppStrings.of(context);
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) {
         if (vm.isLoading) {
@@ -70,8 +71,10 @@ class ProfileView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              s.userName.isNotEmpty ? s.userName : 'Kullanıcı',
-                              style: TextStyle(
+                              s.userName.isNotEmpty
+                                  ? s.userName
+                                  : AppStrings.user,
+                              style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
@@ -79,7 +82,7 @@ class ProfileView extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Kadın sağlığı takibi',
+                              AppStrings.womenHealth,
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: AppColors.textSecondary,
@@ -97,25 +100,40 @@ class ProfileView extends StatelessWidget {
                   // ── 1. Temel Bilgiler ─────────────────────
                   _buildSectionCard(
                     context: context,
-                    title: '📋 Temel Bilgiler',
+                    title: '📋 ${AppStrings.basicInformation}',
                     icon: Icons.edit_outlined,
                     onEdit: () => _showBasicInfoSheet(context, vm),
                     children: [
-                      if (s.weight != null) _infoRow('Kilo', '${s.weight} kg'),
-                      if (s.height != null) _infoRow('Boy', '${s.height} cm'),
-                      if (s.age != null) _infoRow('Yaş', '${s.age}'),
+                      if (s.weight != null)
+                        _infoRow(AppStrings.weight, '${s.weight} kg'),
+                      if (s.height != null)
+                        _infoRow(AppStrings.height, '${s.height} cm'),
+                      if (s.age != null) _infoRow(AppStrings.age, '${s.age}'),
                       _infoRow(
-                        'Sigara',
+                        AppStrings.smoking,
                         s.isSmoker
-                            ? 'Evet${s.smokingYears != null && s.smokingYears! > 0 ? " (${s.smokingYears} yıl)" : ""}'
-                            : 'Hayır',
+                            ? '${AppStrings.yes}${s.smokingYears != null && s.smokingYears! > 0 ? " (${AppStrings.yearsSmoking(s.smokingYears!)})" : ""}'
+                            : AppStrings.no,
                       ),
-                      _infoRow('İlişki', s.relationshipStatus ?? '-'),
+                      _infoRow(
+                        AppStrings.relationshipStatus,
+                        AppStrings.localizeStoredValue(
+                          s.relationshipStatus ?? '-',
+                        ),
+                      ),
                       if (s.chronicDiseases.isNotEmpty)
-                        _infoRow('Kronik', s.chronicDiseases.join(', ')),
+                        _infoRow(
+                          AppStrings.chronicDiseases,
+                          s.chronicDiseases
+                              .map(AppStrings.localizeStoredValue)
+                              .join(', '),
+                        ),
                       if (s.bloodTestResults != null &&
                           s.bloodTestResults!.isNotEmpty)
-                        _infoRow('Kan Değerleri', s.bloodTestResults!),
+                        _infoRow(
+                          AppStrings.lastBloodValues,
+                          s.bloodTestResults!,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -123,22 +141,39 @@ class ProfileView extends StatelessWidget {
                   // ── 2. Kadın Sağlığı ─────────────────────
                   _buildSectionCard(
                     context: context,
-                    title: '🩺 Kadın Sağlığı',
+                    title: '🩺 ${AppStrings.womenHealth}',
                     icon: Icons.edit_outlined,
                     onEdit: () => _showWomenHealthSheet(context, vm),
                     children: [
-                      _infoRow('Döngü Süresi', '${s.averageCycleLength} gün'),
-                      _infoRow('Adet Süresi', '${s.averagePeriodLength} gün'),
+                      _infoRow(
+                        AppStrings.menstrualCycleLength,
+                        AppStrings.dayCount(s.averageCycleLength),
+                      ),
+                      _infoRow(
+                        AppStrings.periodLength,
+                        AppStrings.dayCount(s.averagePeriodLength),
+                      ),
                       if (s.lastPeriodDate != null)
                         _infoRow(
-                          'Son Adet',
-                          '${s.lastPeriodDate!.day}.${s.lastPeriodDate!.month}.${s.lastPeriodDate!.year}',
+                          AppStrings.lastPeriodDate,
+                          s.lastPeriodDate!.toDotFormat(),
                         ),
-                      _infoRow('Menopoz', _menopauseLabel(s.menopauseStatus)),
+                      _infoRow(
+                        AppStrings.menopauseStatus,
+                        _menopauseLabel(s.menopauseStatus),
+                      ),
                       if (s.birthControlMethod != null)
-                        _infoRow('Doğum Kontrol', s.birthControlMethod!),
+                        _infoRow(
+                          AppStrings.birthControl,
+                          AppStrings.localizeStoredValue(s.birthControlMethod!),
+                        ),
                       if (s.womenDiseases.isNotEmpty)
-                        _infoRow('Hastalıklar', s.womenDiseases.join(', ')),
+                        _infoRow(
+                          AppStrings.womenDiseases,
+                          s.womenDiseases
+                              .map(AppStrings.localizeStoredValue)
+                              .join(', '),
+                        ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -146,18 +181,30 @@ class ProfileView extends StatelessWidget {
                   // ── 3. İlaç & Takviye ─────────────────────
                   _buildSectionCard(
                     context: context,
-                    title: '💊 İlaç & Takviye',
+                    title: '💊 ${AppStrings.medicationAndSupplement}',
                     icon: Icons.edit_outlined,
                     onEdit: () => _showMedicationSheet(context, vm),
                     children: [
                       if (s.dailyMedications.isNotEmpty)
-                        _infoRow('İlaçlar', s.dailyMedications.join(', '))
+                        _infoRow(
+                          AppStrings.medications,
+                          s.dailyMedications.join(', '),
+                        )
                       else
-                        _infoRow('İlaçlar', 'Belirtilmemiş'),
+                        _infoRow(
+                          AppStrings.medications,
+                          AppStrings.notSpecified,
+                        ),
                       if (s.dailySupplements.isNotEmpty)
-                        _infoRow('Takviyeler', s.dailySupplements.join(', '))
+                        _infoRow(
+                          AppStrings.supplements,
+                          s.dailySupplements.join(', '),
+                        )
                       else
-                        _infoRow('Takviyeler', 'Belirtilmemiş'),
+                        _infoRow(
+                          AppStrings.supplements,
+                          AppStrings.notSpecified,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -165,7 +212,7 @@ class ProfileView extends StatelessWidget {
                   // ── 4. Raporlama ─────────────────────────
                   _buildSectionCard(
                     context: context,
-                    title: '📋 Doktor Raporu',
+                    title: '📋 ${AppStrings.doctorReport}',
                     icon: Icons.assignment_outlined,
                     onEdit: () {
                       Navigator.push(
@@ -176,9 +223,9 @@ class ProfileView extends StatelessWidget {
                       );
                     },
                     children: [
-                      const Text(
-                        'Bugüne kadarki sağlık kayıtlarınızı doktorunuz için derlenmiş ve okunabilir bir rapor halinde görüntüleyin.',
-                        style: TextStyle(
+                      Text(
+                        AppStrings.doctorReportDescription,
+                        style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
                           height: 1.4,
@@ -211,9 +258,9 @@ class ProfileView extends StatelessWidget {
                             Icons.description_outlined,
                             size: 18,
                           ),
-                          label: const Text(
-                            'Raporu Görüntüle ve Paylaş',
-                            style: TextStyle(
+                          label: Text(
+                            AppStrings.viewAndShareReport,
+                            style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 13,
                             ),
@@ -242,9 +289,9 @@ class ProfileView extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Text(
-                              '⏰ Zaman Yolculuğu (Test)',
-                              style: TextStyle(
+                            Text(
+                              '⏰ ${AppStrings.timeTravel}',
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
@@ -265,9 +312,9 @@ class ProfileView extends StatelessWidget {
                                         .loadData();
                                   }
                                 },
-                                child: const Text(
-                                  'Sıfırla',
-                                  style: TextStyle(
+                                child: Text(
+                                  AppStrings.reset,
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
@@ -278,7 +325,7 @@ class ProfileView extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Sanal Tarih: ${AppTime.now.toDotFormat()} (${AppTime.now.turkishWeekday})',
+                          '${AppStrings.virtualDate}: ${AppTime.now.toDotFormat()} (${AppTime.now.turkishWeekday})',
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -288,7 +335,7 @@ class ProfileView extends StatelessWidget {
                         if (AppTime.offsetDays != 0) ...[
                           const SizedBox(height: 4),
                           Text(
-                            'Aktif Sapma: +${AppTime.offsetDays} gün ileri',
+                            AppStrings.activeOffset(AppTime.offsetDays),
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.primary,
@@ -299,9 +346,24 @@ class ProfileView extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _timeTravelButton(context, vm, '+1 Gün', 1),
-                            _timeTravelButton(context, vm, '+7 Gün', 7),
-                            _timeTravelButton(context, vm, '+30 Gün', 30),
+                            _timeTravelButton(
+                              context,
+                              vm,
+                              '+${AppStrings.dayCount(1)}',
+                              1,
+                            ),
+                            _timeTravelButton(
+                              context,
+                              vm,
+                              '+${AppStrings.dayCount(7)}',
+                              7,
+                            ),
+                            _timeTravelButton(
+                              context,
+                              vm,
+                              '+${AppStrings.dayCount(30)}',
+                              30,
+                            ),
                           ],
                         ),
                       ],
@@ -435,13 +497,13 @@ class ProfileView extends StatelessWidget {
   String _menopauseLabel(MenopauseStatus status) {
     switch (status) {
       case MenopauseStatus.none:
-        return 'Menopozda değil';
+        return AppStrings.noMenopause;
       case MenopauseStatus.pre:
-        return 'Pre-menopoz';
+        return AppStrings.preMenopause;
       case MenopauseStatus.peri:
-        return 'Peri-menopoz';
+        return AppStrings.periMenopause;
       case MenopauseStatus.post:
-        return 'Post-menopoz';
+        return AppStrings.postMenopause;
     }
   }
 
@@ -465,7 +527,7 @@ class ProfileView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
-        title: '📋 Temel Bilgileri Düzenle',
+        title: '📋 ${AppStrings.basicInformationEdit}',
         onSave: () async {
           vm.updateUserName(nameCtrl.text.trim());
           vm.updateWeight(double.tryParse(weightCtrl.text));
@@ -486,10 +548,10 @@ class ProfileView extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _sheetField('İsim', nameCtrl),
+                _sheetField(AppStrings.name, nameCtrl),
                 const SizedBox(height: 12),
                 _sheetField(
-                  'Son Kan Değerleri (Kan Testi)',
+                  AppStrings.lastBloodValuesTest,
                   bloodTestCtrl,
                   maxLines: 3,
                 ),
@@ -498,7 +560,7 @@ class ProfileView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _sheetField(
-                        'Kilo (kg)',
+                        AppStrings.weight,
                         weightCtrl,
                         keyboardType: TextInputType.number,
                       ),
@@ -506,7 +568,7 @@ class ProfileView extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _sheetField(
-                        'Boy (cm)',
+                        AppStrings.height,
                         heightCtrl,
                         keyboardType: TextInputType.number,
                       ),
@@ -515,7 +577,7 @@ class ProfileView extends StatelessWidget {
                     SizedBox(
                       width: 80,
                       child: _sheetField(
-                        'Yaş',
+                        AppStrings.age,
                         ageCtrl,
                         keyboardType: TextInputType.number,
                       ),
@@ -523,9 +585,9 @@ class ProfileView extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Sigara',
-                  style: TextStyle(
+                Text(
+                  AppStrings.smoking,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -534,12 +596,12 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _chipButton('Evet', vm.settings.isSmoker, () {
+                    _chipButton(AppStrings.yes, vm.settings.isSmoker, () {
                       vm.updateIsSmoker(true);
                       setSheetState(() {});
                     }),
                     const SizedBox(width: 8),
-                    _chipButton('Hayır', !vm.settings.isSmoker, () {
+                    _chipButton(AppStrings.no, !vm.settings.isSmoker, () {
                       vm.updateIsSmoker(false);
                       setSheetState(() {});
                     }),
@@ -548,15 +610,15 @@ class ProfileView extends StatelessWidget {
                 if (vm.settings.isSmoker) ...[
                   const SizedBox(height: 12),
                   _sheetField(
-                    'Kaç yıldır',
+                    AppStrings.smokingYears,
                     smokingYearsCtrl,
                     keyboardType: TextInputType.number,
                   ),
                 ],
                 const SizedBox(height: 16),
-                const Text(
-                  'Kronik Hastalıklar',
-                  style: TextStyle(
+                Text(
+                  AppStrings.chronicDiseases,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -567,8 +629,9 @@ class ProfileView extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: AppStrings.chronicDiseasesList.map((disease) {
-                    final isSelected = vm.settings.chronicDiseases.contains(
-                      disease,
+                    final isSelected = vm.settings.chronicDiseases.any(
+                      (value) =>
+                          AppStrings.localizeStoredValue(value) == disease,
                     );
                     return FilterChip(
                       label: Text(disease),
@@ -602,7 +665,7 @@ class ProfileView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
-        title: '🩺 Kadın Sağlığı Düzenle',
+        title: '🩺 ${AppStrings.womenHealthEdit}',
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {
@@ -618,9 +681,9 @@ class ProfileView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Döngü süresi
-                const Text(
-                  'Döngü Süresi',
-                  style: TextStyle(
+                Text(
+                  AppStrings.menstrualCycleLength,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -637,7 +700,7 @@ class ProfileView extends StatelessWidget {
                         divisions:
                             CycleRules.maxCycleLength -
                             CycleRules.minCycleLength,
-                        label: '${s.averageCycleLength} gün',
+                        label: AppStrings.dayCount(s.averageCycleLength),
                         onChanged: (v) {
                           vm.updateAverageCycleLength(v.round());
                           setSheetState(() {});
@@ -654,7 +717,7 @@ class ProfileView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${s.averageCycleLength} gün',
+                        AppStrings.dayCount(s.averageCycleLength),
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           color: AppColors.periodPrimary,
@@ -666,9 +729,9 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Adet süresi
-                const Text(
-                  'Adet Süresi',
-                  style: TextStyle(
+                Text(
+                  AppStrings.periodLength,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -685,7 +748,7 @@ class ProfileView extends StatelessWidget {
                         divisions:
                             CycleRules.maxPeriodLength -
                             CycleRules.minPeriodLength,
-                        label: '${s.averagePeriodLength} gün',
+                        label: AppStrings.dayCount(s.averagePeriodLength),
                         onChanged: (v) {
                           vm.updateAveragePeriodLength(v.round());
                           setSheetState(() {});
@@ -702,7 +765,7 @@ class ProfileView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${s.averagePeriodLength} gün',
+                        AppStrings.dayCount(s.averagePeriodLength),
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           color: AppColors.periodPrimary,
@@ -714,9 +777,9 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Son adet tarihi
-                const Text(
-                  'Son Adet Tarihi',
-                  style: TextStyle(
+                Text(
+                  AppStrings.lastPeriodDate,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -731,7 +794,9 @@ class ProfileView extends StatelessWidget {
                       initialDate: s.lastPeriodDate ?? now,
                       firstDate: now.subtract(const Duration(days: 90)),
                       lastDate: now,
-                      locale: const Locale('tr', 'TR'),
+                      locale: AppStrings.resolveLocale(
+                        Localizations.localeOf(ctx2),
+                      ),
                     );
                     if (picked != null) {
                       vm.updateLastPeriodDate(picked);
@@ -757,8 +822,8 @@ class ProfileView extends StatelessWidget {
                         const SizedBox(width: 12),
                         Text(
                           s.lastPeriodDate != null
-                              ? '${s.lastPeriodDate!.day}.${s.lastPeriodDate!.month}.${s.lastPeriodDate!.year}'
-                              : 'Tarih seçin',
+                              ? s.lastPeriodDate!.toDotFormat()
+                              : AppStrings.selectDate,
                           style: TextStyle(
                             color: s.lastPeriodDate != null
                                 ? AppColors.textPrimary
@@ -772,9 +837,9 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Menopoz
-                const Text(
-                  'Menopoz Durumu',
-                  style: TextStyle(
+                Text(
+                  AppStrings.menopauseStatus,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -786,28 +851,28 @@ class ProfileView extends StatelessWidget {
                   runSpacing: 8,
                   children: [
                     _menopauseChip(
-                      'Yok',
+                      AppStrings.none,
                       MenopauseStatus.none,
                       s,
                       vm,
                       setSheetState,
                     ),
                     _menopauseChip(
-                      'Pre',
+                      AppStrings.preMenopause,
                       MenopauseStatus.pre,
                       s,
                       vm,
                       setSheetState,
                     ),
                     _menopauseChip(
-                      'Peri',
+                      AppStrings.periMenopause,
                       MenopauseStatus.peri,
                       s,
                       vm,
                       setSheetState,
                     ),
                     _menopauseChip(
-                      'Post',
+                      AppStrings.postMenopause,
                       MenopauseStatus.post,
                       s,
                       vm,
@@ -818,9 +883,9 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Doğum Kontrol
-                const Text(
-                  'Doğum Kontrol',
-                  style: TextStyle(
+                Text(
+                  AppStrings.birthControl,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -839,7 +904,11 @@ class ProfileView extends StatelessWidget {
                         AppStrings.implant,
                         AppStrings.otherMethod,
                       ].map((method) {
-                        final isSelected = s.birthControlMethod == method;
+                        final isSelected =
+                            AppStrings.localizeStoredValue(
+                              s.birthControlMethod ?? '',
+                            ) ==
+                            method;
                         return ChoiceChip(
                           label: Text(method),
                           selected: isSelected,
@@ -862,9 +931,9 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Kadın hastalıkları
-                const Text(
-                  'Kadın Hastalıkları',
-                  style: TextStyle(
+                Text(
+                  AppStrings.womenDiseases,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -875,7 +944,10 @@ class ProfileView extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: AppStrings.womenDiseasesList.map((disease) {
-                    final isSelected = s.womenDiseases.contains(disease);
+                    final isSelected = s.womenDiseases.any(
+                      (value) =>
+                          AppStrings.localizeStoredValue(value) == disease,
+                    );
                     return FilterChip(
                       label: Text(disease),
                       selected: isSelected,
@@ -913,7 +985,7 @@ class ProfileView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
-        title: '💊 İlaç & Takviye Düzenle',
+        title: '💊 ${AppStrings.medicationSupplementEdit}',
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {
@@ -928,9 +1000,9 @@ class ProfileView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // İlaçlar
-                const Text(
-                  'İlaçlar',
-                  style: TextStyle(
+                Text(
+                  AppStrings.medications,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -959,7 +1031,7 @@ class ProfileView extends StatelessWidget {
                   }).toList(),
                 ),
                 const SizedBox(height: 8),
-                _addItemRow(medCtrl, 'Yeni ilaç ekle', () {
+                _addItemRow(medCtrl, AppStrings.newMedication, () {
                   if (medCtrl.text.trim().isNotEmpty) {
                     vm.addMedication(medCtrl.text.trim());
                     medCtrl.clear();
@@ -969,9 +1041,9 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Takviyeler
-                const Text(
-                  'Takviyeler',
-                  style: TextStyle(
+                Text(
+                  AppStrings.supplements,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -998,7 +1070,7 @@ class ProfileView extends StatelessWidget {
                   }).toList(),
                 ),
                 const SizedBox(height: 8),
-                _addItemRow(supCtrl, 'Yeni takviye ekle', () {
+                _addItemRow(supCtrl, AppStrings.newSupplement, () {
                   if (supCtrl.text.trim().isNotEmpty) {
                     vm.addSupplement(supCtrl.text.trim());
                     supCtrl.clear();
@@ -1076,7 +1148,7 @@ class ProfileView extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           ),
-          child: const Text('Ekle'),
+          child: Text(AppStrings.add),
         ),
       ],
     );
@@ -1162,8 +1234,8 @@ class ProfileView extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 isLoggedIn
-                    ? 'Bulut Senkronizasyonu Aktif'
-                    : 'Çevrimdışı Çalışılıyor (Bulut Deaktif)',
+                    ? AppStrings.cloudSyncActive
+                    : AppStrings.offlineCloudDisabled,
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -1175,7 +1247,7 @@ class ProfileView extends StatelessWidget {
           const SizedBox(height: 12),
           if (isLoggedIn) ...[
             Text(
-              'Hesap: ${vm.userEmail}',
+              '${AppStrings.account}: ${vm.userEmail}',
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -1184,7 +1256,7 @@ class ProfileView extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Son Eşitleme: ${vm.lastSyncDisplay}',
+              '${AppStrings.lastSync}: ${vm.lastSyncDisplay}',
               style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
@@ -1211,8 +1283,8 @@ class ProfileView extends StatelessWidget {
                                 SnackBar(
                                   content: Text(
                                     success
-                                        ? 'Senkronizasyon başarıyla tamamlandı.'
-                                        : 'Senkronizasyon başarısız oldu.',
+                                        ? AppStrings.syncSuccessful
+                                        : AppStrings.syncFailed,
                                   ),
                                   backgroundColor: success
                                       ? Colors.green
@@ -1244,7 +1316,7 @@ class ProfileView extends StatelessWidget {
                           )
                         : const Icon(Icons.sync_rounded, size: 18),
                     label: Text(
-                      vm.isSyncing ? 'Eşitleniyor...' : 'Şimdi Eşitle',
+                      vm.isSyncing ? AppStrings.syncing : AppStrings.syncNow,
                     ),
                   ),
                 ),
@@ -1263,14 +1335,14 @@ class ProfileView extends StatelessWidget {
                     ),
                   ),
                   icon: const Icon(Icons.logout_rounded, size: 18),
-                  label: const Text('Çıkış Yap'),
+                  label: Text(AppStrings.logout),
                 ),
               ],
             ),
           ] else ...[
-            const Text(
-              'Uygulama silindiğinde veya başka bir cihaza geçtiğinizde verilerinizi kaybetmemek için Google hesabınızı bağlayabilirsiniz.',
-              style: TextStyle(
+            Text(
+              AppStrings.connectAccountDescription,
+              style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
                 height: 1.4,
@@ -1292,9 +1364,9 @@ class ProfileView extends StatelessWidget {
                   ),
                 ),
                 icon: const Icon(Icons.login_rounded, size: 18),
-                label: const Text(
-                  'Giriş Yap / Hesap Bağla',
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                label: Text(
+                  AppStrings.loginConnectAccount,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -1308,15 +1380,12 @@ class ProfileView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Çıkış Yapılsın mı?'),
-        content: const Text(
-          'Hesabınızdan çıkış yapıldığında yerel verileriniz temizlenecektir. '
-          'Eğer bulut senkronizasyonunuz tamamsa, daha sonra tekrar giriş yaparak verilerinizi kurtarabilirsiniz.',
-        ),
+        title: Text(AppStrings.logoutQuestion),
+        content: Text(AppStrings.logoutDescription),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1327,7 +1396,7 @@ class ProfileView extends StatelessWidget {
               backgroundColor: Colors.redAccent,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Çıkış Yap ve Temizle'),
+            child: Text(AppStrings.logoutAndClear),
           ),
         ],
       ),
@@ -1419,9 +1488,9 @@ class _EditSheet extends StatelessWidget {
                       ),
                     ),
                     icon: const Icon(Icons.check_circle_outline),
-                    label: const Text(
-                      'Kaydet',
-                      style: TextStyle(
+                    label: Text(
+                      AppStrings.save,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

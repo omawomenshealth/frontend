@@ -2,7 +2,19 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:http/http.dart' as http;
+import '../../core/constants/app_strings.dart';
 import 'local_storage_service.dart';
+
+class ApiException implements Exception {
+  final String message;
+  final int? statusCode;
+  final String? code;
+
+  const ApiException(this.message, {this.statusCode, this.code});
+
+  @override
+  String toString() => message;
+}
 
 /// Express Backend ile iletişim kuran API servis sınıfı.
 class ApiService {
@@ -25,8 +37,17 @@ class ApiService {
     final token = _storage.authToken;
     return {
       'Content-Type': 'application/json; charset=utf-8',
+      'Accept-Language': AppStrings.languageCode,
       if (token != null) 'Authorization': 'Bearer $token',
     };
+  }
+
+  Map<String, dynamic> _decodeObject(http.Response response) {
+    final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+    if (decoded is! Map<String, dynamic>) {
+      throw ApiException(AppStrings.invalidServerResponse);
+    }
+    return decoded;
   }
 
   /// Google ID Token ile sunucuya giriş yap ve JWT al.
@@ -40,7 +61,10 @@ class ApiService {
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': AppStrings.languageCode,
+        },
         body: jsonEncode({'idToken': idToken, 'email': ?email, 'name': ?name}),
       );
 
@@ -67,11 +91,11 @@ class ApiService {
         final errorBody = jsonDecode(utf8.decode(response.bodyBytes));
         throw Exception(
           errorBody['error'] ??
-              'Giriş yapılamadı. Sunucu hata kodu: ${response.statusCode}',
+              AppStrings.loginServerError(response.statusCode),
         );
       }
     } catch (e) {
-      throw Exception('Bağlantı hatası: ${e.toString()}');
+      throw Exception(AppStrings.connectionError(e));
     }
   }
 
@@ -105,8 +129,7 @@ class ApiService {
       } else {
         final errorBody = jsonDecode(utf8.decode(response.bodyBytes));
         throw Exception(
-          errorBody['error'] ??
-              'Veri yedeklenemedi. Kod: ${response.statusCode}',
+          errorBody['error'] ?? AppStrings.uploadError(response.statusCode),
         );
       }
     } catch (e) {
@@ -129,13 +152,104 @@ class ApiService {
       } else {
         final errorBody = jsonDecode(utf8.decode(response.bodyBytes));
         throw Exception(
-          errorBody['error'] ??
-              'Veri indirilemedi. Kod: ${response.statusCode}',
+          errorBody['error'] ?? AppStrings.downloadError(response.statusCode),
         );
       }
     } catch (e) {
       debugPrint('Senkronizasyon indirme hatası: $e');
       return null;
     }
+  }
+
+  /// Yayındaki makalelerin yalnızca kart/listeme bilgilerini getirir.
+  /// Premium içeriğin gövdesi bu uçtan hiçbir zaman dönmez.
+  Future<List<Map<String, dynamic>>> fetchArticles() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/articles'),
+      headers: _getHeaders(),
+    );
+    final data = _decodeObject(response);
+
+    if (response.statusCode != 200) {
+      throw ApiException(
+        data['error'] as String? ?? AppStrings.articlesCouldNotLoad,
+        statusCode: response.statusCode,
+        code: data['code'] as String?,
+      );
+    }
+
+    final articles = data['articles'];
+    if (articles is! List) {
+      throw ApiException(AppStrings.invalidArticleList);
+    }
+    return articles
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList(growable: false);
+  }
+
+  /// Makale gövdesini getirir. Premium erişim kontrolü sunucuda yapılır.
+  Future<Map<String, dynamic>> fetchArticle(String articleId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/articles/${Uri.encodeComponent(articleId)}'),
+      headers: _getHeaders(),
+    );
+    final data = _decodeObject(response);
+
+    if (response.statusCode != 200) {
+      throw ApiException(
+        data['error'] as String? ?? AppStrings.articleCouldNotLoad,
+        statusCode: response.statusCode,
+        code: data['code'] as String?,
+      );
+    }
+
+    final article = data['article'];
+    if (article is! Map) {
+      throw ApiException(AppStrings.invalidArticle);
+    }
+    return Map<String, dynamic>.from(article);
+  }
+
+  Future<Map<String, dynamic>> fetchPremiumStatus() async {
+    if (_storage.authToken == null) {
+      return const {'isPremium': false};
+    }
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/premium/status'),
+      headers: _getHeaders(),
+    );
+    final data = _decodeObject(response);
+    if (response.statusCode != 200) {
+      throw ApiException(
+        data['error'] as String? ?? AppStrings.premiumStatusCouldNotCheck,
+        statusCode: response.statusCode,
+      );
+    }
+    return data;
+  }
+
+  /// Google Play'in verdiği satın alma token'ını güvenli sunucuda doğrulatır.
+  Future<Map<String, dynamic>> verifyGooglePlayPurchase({
+    required String purchaseToken,
+    required String productId,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/premium/google-play/verify'),
+      headers: _getHeaders(),
+      body: jsonEncode({
+        'purchaseToken': purchaseToken,
+        'productId': productId,
+      }),
+    );
+    final data = _decodeObject(response);
+    if (response.statusCode != 200) {
+      throw ApiException(
+        data['error'] as String? ?? AppStrings.purchaseCouldNotVerify,
+        statusCode: response.statusCode,
+      );
+    }
+    return data;
   }
 }

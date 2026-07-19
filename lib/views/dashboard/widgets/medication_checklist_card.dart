@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../data/models/period_log_model.dart';
 
 /// İlaç / Takviye checklist kartı.
@@ -9,7 +10,7 @@ class MedicationChecklistCard extends StatelessWidget {
   final Color color;
   final List<MedicationEntry> items;
   final ValueChanged<int> onToggle;
-  final String emptyMessage;
+  final String? emptyMessage;
 
   const MedicationChecklistCard({
     super.key,
@@ -18,7 +19,7 @@ class MedicationChecklistCard extends StatelessWidget {
     required this.color,
     required this.items,
     required this.onToggle,
-    this.emptyMessage = 'Henüz eklenmemiş',
+    this.emptyMessage,
   });
 
   @override
@@ -55,7 +56,10 @@ class MedicationChecklistCard extends StatelessWidget {
               // Tamamlanan sayısı
               if (items.isNotEmpty)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
@@ -74,11 +78,8 @@ class MedicationChecklistCard extends StatelessWidget {
           if (items.isEmpty) ...[
             const SizedBox(height: 12),
             Text(
-              emptyMessage,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textHint,
-              ),
+              emptyMessage ?? AppStrings.emptyMedicationList,
+              style: const TextStyle(fontSize: 13, color: AppColors.textHint),
             ),
           ] else ...[
             const SizedBox(height: 12),
@@ -116,14 +117,16 @@ class MedicationChecklistCard extends StatelessWidget {
                             color: item.taken ? color : Colors.transparent,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: item.taken
-                                  ? color
-                                  : AppColors.textHint,
+                              color: item.taken ? color : AppColors.textHint,
                               width: 1.5,
                             ),
                           ),
                           child: item.taken
-                              ? const Icon(Icons.check, size: 14, color: Colors.white)
+                              ? const Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: Colors.white,
+                                )
                               : null,
                         ),
                         const SizedBox(width: 12),

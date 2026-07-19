@@ -5,6 +5,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../data/models/period_log_model.dart';
@@ -17,6 +18,7 @@ class DoctorReportView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppStrings.of(context);
     final storage = Provider.of<LocalStorageService>(context, listen: false);
     final settings = storage.loadSettings() ?? UserSettings();
     final rawLogs = storage.loadAllLogs();
@@ -25,21 +27,22 @@ class DoctorReportView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text(
-          'Doktor Raporu',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        title: Text(
+          AppStrings.doctorReport,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
         elevation: 0.5,
         actions: [
           IconButton(
-            tooltip: 'PDF Olarak İndir / Paylaş',
+            tooltip: AppStrings.downloadOrSharePdf,
             icon: const Icon(Icons.picture_as_pdf_outlined),
-            onPressed: () => _generateAndDownloadPdf(context, settings, allLogs),
+            onPressed: () =>
+                _generateAndDownloadPdf(context, settings, allLogs),
           ),
           IconButton(
-            tooltip: 'Metin Olarak Kopyala',
+            tooltip: AppStrings.copyAsText,
             icon: const Icon(Icons.share_outlined),
             onPressed: () => _copyReportToClipboard(context, settings, allLogs),
           ),
@@ -71,9 +74,9 @@ class DoctorReportView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'OMA KİŞİSEL SAĞLIK RAPORU',
-                          style: TextStyle(
+                        Text(
+                          AppStrings.personalHealthReport,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primary,
@@ -82,7 +85,7 @@ class DoctorReportView extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Rapor Tarihi: ${AppTime.now.toDotFormat()}',
+                          AppStrings.reportDateLine(AppTime.now.toDotFormat()),
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textSecondary,
@@ -90,33 +93,46 @@ class DoctorReportView extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         ElevatedButton.icon(
-                          onPressed: () => _generateAndDownloadPdf(context, settings, allLogs),
+                          onPressed: () => _generateAndDownloadPdf(
+                            context,
+                            settings,
+                            allLogs,
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                           icon: const Icon(Icons.picture_as_pdf, size: 16),
-                          label: const Text(
-                            'PDF Olarak İndir / Paylaş',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                          label: Text(
+                            AppStrings.downloadOrSharePdf,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      'Tıbbi Özet',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.medicalSummary,
+                      style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
@@ -130,52 +146,105 @@ class DoctorReportView extends StatelessWidget {
               const SizedBox(height: 16),
 
               // ── BÖLÜM 1: KİŞİSEL BİLGİLER ───────────────────────────
-              _sectionHeader('📋 Kullanıcı Temel Bilgileri'),
-              _infoRow('İsim / Nickname', settings.userName.isNotEmpty ? settings.userName : 'Belirtilmemiş'),
-              _infoRow('Yaş', settings.age?.toString() ?? 'Belirtilmemiş'),
-              _infoRow('Kilo / Boy', '${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm'),
-              _infoRow('Sigara Kullanımı', settings.isSmoker
-                  ? 'Evet${settings.smokingYears != null && settings.smokingYears! > 0 ? " (${settings.smokingYears} yıl)" : ""}'
-                  : 'Hayır'),
-              _infoRow('Kronik Hastalıklar', settings.chronicDiseases.isNotEmpty ? settings.chronicDiseases.join(', ') : 'Bulunmamaktadır'),
-              if (settings.bloodTestResults != null && settings.bloodTestResults!.isNotEmpty)
-                _infoRow('Son Kan Değerleri', settings.bloodTestResults!),
+              _sectionHeader('📋 ${AppStrings.userBasicInformation}'),
+              _infoRow(
+                AppStrings.nickname,
+                settings.userName.isNotEmpty
+                    ? settings.userName
+                    : AppStrings.notSpecified,
+              ),
+              _infoRow(
+                AppStrings.age,
+                settings.age?.toString() ?? AppStrings.notSpecified,
+              ),
+              _infoRow(
+                AppStrings.weightHeight,
+                '${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm',
+              ),
+              _infoRow(
+                AppStrings.smoking,
+                settings.isSmoker
+                    ? '${AppStrings.yes}${settings.smokingYears != null && settings.smokingYears! > 0 ? " (${AppStrings.yearsSmoking(settings.smokingYears!)})" : ""}'
+                    : AppStrings.no,
+              ),
+              _infoRow(
+                AppStrings.chronicDiseases,
+                settings.chronicDiseases.isNotEmpty
+                    ? settings.chronicDiseases
+                          .map(AppStrings.localizeStoredValue)
+                          .join(', ')
+                    : AppStrings.noConditions,
+              ),
+              if (settings.bloodTestResults != null &&
+                  settings.bloodTestResults!.isNotEmpty)
+                _infoRow(
+                  AppStrings.lastBloodValues,
+                  settings.bloodTestResults!,
+                ),
               const SizedBox(height: 24),
 
               // ── BÖLÜM 2: DÖNGÜ ÖZETİ ────────────────────────────────
-              _sectionHeader('🩸 Kadın Sağlığı & Adet Döngüsü Özet'),
-              _infoRow('Ort. Döngü Süresi', '${settings.averageCycleLength} gün'),
-              _infoRow('Ort. Adet Kanaması', '${settings.averagePeriodLength} gün'),
-              _infoRow('Son Adet Başlangıcı', settings.lastPeriodDate != null ? settings.lastPeriodDate!.toDotFormat() : 'Belirtilmemiş'),
-              _infoRow('Menopoz Durumu', _menopauseLabel(settings.menopauseStatus)),
-              if (settings.birthControlMethod != null && settings.birthControlMethod!.isNotEmpty)
-                _infoRow('Doğum Kontrolü', settings.birthControlMethod!),
+              _sectionHeader('🩸 ${AppStrings.womenHealthSummary}'),
+              _infoRow(
+                AppStrings.averageCycleLength,
+                AppStrings.dayCount(settings.averageCycleLength),
+              ),
+              _infoRow(
+                AppStrings.averagePeriodLength,
+                AppStrings.dayCount(settings.averagePeriodLength),
+              ),
+              _infoRow(
+                AppStrings.lastPeriodDate,
+                settings.lastPeriodDate != null
+                    ? settings.lastPeriodDate!.toDotFormat()
+                    : AppStrings.notSpecified,
+              ),
+              _infoRow(
+                AppStrings.menopauseStatus,
+                _menopauseLabel(settings.menopauseStatus),
+              ),
+              if (settings.birthControlMethod != null &&
+                  settings.birthControlMethod!.isNotEmpty)
+                _infoRow(
+                  AppStrings.birthControl,
+                  AppStrings.localizeStoredValue(settings.birthControlMethod!),
+                ),
               if (settings.womenDiseases.isNotEmpty)
-                _infoRow('Jinekolojik Hastalıklar', settings.womenDiseases.join(', ')),
+                _infoRow(
+                  AppStrings.gynecologicalDiseases,
+                  settings.womenDiseases
+                      .map(AppStrings.localizeStoredValue)
+                      .join(', '),
+                ),
               const SizedBox(height: 24),
 
               // ── BÖLÜM 3: GÜNLÜK KAYITLAR TABLOSU ─────────────────────
-              _sectionHeader('📅 Günlük Sağlık Logları (Son 15 Kayıt)'),
+              _sectionHeader('📅 ${AppStrings.dailyHealthLogs}'),
               const SizedBox(height: 8),
               if (allLogs.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Center(
                     child: Text(
-                      'Henüz kaydedilmiş günlük log bulunmamaktadır.',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                      AppStrings.noHealthLogs,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 )
               else
                 _buildLogsTable(allLogs.take(15).toList()),
-              
+
               const SizedBox(height: 24),
 
               // ── BÖLÜM 4: NOTLAR ─────────────────────────────────────
-              _sectionHeader('📝 Kaydedilen Doktor/Genel Notları'),
+              _sectionHeader('📝 ${AppStrings.savedDoctorNotes}'),
               const SizedBox(height: 8),
-              _buildNotesSection(allLogs.expand<DailyLog>((dayList) => dayList).toList()),
+              _buildNotesSection(
+                allLogs.expand<DailyLog>((dayList) => dayList).toList(),
+              ),
             ],
           ),
         ),
@@ -225,13 +294,20 @@ class DoctorReportView extends StatelessWidget {
             width: 140,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
             ),
           ),
         ],
@@ -253,76 +329,179 @@ class DoctorReportView extends StatelessWidget {
             columnSpacing: 16,
             headingRowColor: WidgetStateProperty.all(const Color(0xFFF9F9F9)),
             headingRowHeight: 40,
-            columns: const [
-              DataColumn(label: Text('Tarih', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Adet', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Beslenme', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('İlaç & Takviye', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-              DataColumn(label: Text('Ruh Hali', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+            columns: [
+              DataColumn(
+                label: Text(
+                  AppStrings.date,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  AppStrings.period,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  AppStrings.nutrition,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  AppStrings.medicationAndSupplement,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  AppStrings.mood,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
             ],
             rows: dayGroupedLogs.map((dayLogs) {
               final dateStr = dayLogs.first.date.toDotFormat();
 
               // 1. Adet
-              final logsWithPeriod = dayLogs.where((l) => l.flowIntensity != null || l.periodPainLevel != null).toList();
+              final logsWithPeriod = dayLogs
+                  .where(
+                    (l) => l.flowIntensity != null || l.periodPainLevel != null,
+                  )
+                  .toList();
               final String adetText;
               final bool isBleeding;
               if (logsWithPeriod.isEmpty) {
-                adetText = 'Kanama Yok';
+                adetText = AppStrings.noBleeding;
                 isBleeding = false;
               } else {
                 isBleeding = logsWithPeriod.any((l) => l.flowIntensity != null);
-                adetText = logsWithPeriod.map((log) {
-                  final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-                  final adetPain = log.periodPainLevel != null ? ' (Ağrı: ${log.periodPainLevel}/5)' : '';
-                  return '$timeStr Kanamalı (${log.flowIntensity ?? "Hafif"})$adetPain';
-                }).join('\n----------------\n');
+                adetText = logsWithPeriod
+                    .map((log) {
+                      final timeStr =
+                          '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                      final adetPain = log.periodPainLevel != null
+                          ? ' (${AppStrings.pain}: ${log.periodPainLevel}/5)'
+                          : '';
+                      return '$timeStr ${AppStrings.bleeding} (${AppStrings.localizeStoredValue(log.flowIntensity ?? AppStrings.flowOptions[1])})$adetPain';
+                    })
+                    .join('\n----------------\n');
               }
 
               // 2. Beslenme
-              final logsWithNutrition = dayLogs.where((l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty).toList();
+              final logsWithNutrition = dayLogs
+                  .where(
+                    (l) =>
+                        l.nutritionTags.isNotEmpty ||
+                        l.bowelActivity.isNotEmpty,
+                  )
+                  .toList();
               final String beslenmeText;
               if (logsWithNutrition.isEmpty) {
                 beslenmeText = '-';
               } else {
-                beslenmeText = logsWithNutrition.map((log) {
-                  final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-                  final nutritionStr = log.nutritionTags.isNotEmpty ? log.nutritionTags.join(', ') : '';
-                  final bowelStr = log.bowelActivity.isNotEmpty ? 'Bağırsak: ${log.bowelActivity.join(', ')}' : '';
-                  final items = [if (nutritionStr.isNotEmpty) nutritionStr, if (bowelStr.isNotEmpty) bowelStr];
-                  return '$timeStr ${items.join("\n")}';
-                }).join('\n----------------\n');
+                beslenmeText = logsWithNutrition
+                    .map((log) {
+                      final timeStr =
+                          '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                      final nutritionStr = log.nutritionTags.isNotEmpty
+                          ? log.nutritionTags
+                                .map(AppStrings.localizeStoredValue)
+                                .join(', ')
+                          : '';
+                      final bowelStr = log.bowelActivity.isNotEmpty
+                          ? '${AppStrings.bowel}: ${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
+                          : '';
+                      final items = [
+                        if (nutritionStr.isNotEmpty) nutritionStr,
+                        if (bowelStr.isNotEmpty) bowelStr,
+                      ];
+                      return '$timeStr ${items.join("\n")}';
+                    })
+                    .join('\n----------------\n');
               }
 
               // 3. İlaç & Takviye
-              final logsWithMeds = dayLogs.where((l) => l.medications.any((m) => m.taken) || l.supplements.any((s) => s.taken)).toList();
+              final logsWithMeds = dayLogs
+                  .where(
+                    (l) =>
+                        l.medications.any((m) => m.taken) ||
+                        l.supplements.any((s) => s.taken),
+                  )
+                  .toList();
               final String ilacText;
               if (logsWithMeds.isEmpty) {
                 ilacText = '-';
               } else {
-                ilacText = logsWithMeds.map((log) {
-                  final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-                  final activeMeds = log.medications.where((m) => m.taken).map((m) => '${m.name} (${m.dosage})').toList();
-                  final activeSups = log.supplements.where((s) => s.taken).map((s) => '${s.name} (${s.dosage})').toList();
-                  final all = [...activeMeds, ...activeSups];
-                  return '$timeStr ${all.join(", ")}';
-                }).join('\n----------------\n');
+                ilacText = logsWithMeds
+                    .map((log) {
+                      final timeStr =
+                          '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                      final activeMeds = log.medications
+                          .where((m) => m.taken)
+                          .map((m) => '${m.name} (${m.dosage})')
+                          .toList();
+                      final activeSups = log.supplements
+                          .where((s) => s.taken)
+                          .map((s) => '${s.name} (${s.dosage})')
+                          .toList();
+                      final all = [...activeMeds, ...activeSups];
+                      return '$timeStr ${all.join(", ")}';
+                    })
+                    .join('\n----------------\n');
               }
 
               // 4. Ruh Hali
-              final logsWithMood = dayLogs.where((l) => l.mood != null || l.painLocations.isNotEmpty || (l.notes != null && l.notes!.isNotEmpty)).toList();
+              final logsWithMood = dayLogs
+                  .where(
+                    (l) =>
+                        l.mood != null ||
+                        l.painLocations.isNotEmpty ||
+                        (l.notes != null && l.notes!.isNotEmpty),
+                  )
+                  .toList();
               final String moodText;
               if (logsWithMood.isEmpty) {
                 moodText = '-';
               } else {
-                moodText = logsWithMood.map((log) {
-                  final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-                  final moodStr = log.mood != null ? '${log.moodEmoji ?? ""} ${log.mood}' : '';
-                  final painStr = log.painLocations.isNotEmpty ? 'Ağrı: ${log.painLocations.join(", ")}' : '';
-                  final notesStr = (log.notes != null && log.notes!.isNotEmpty) ? 'Not: ${log.notes}' : '';
-                  final items = [if (moodStr.isNotEmpty) moodStr, if (painStr.isNotEmpty) painStr, if (notesStr.isNotEmpty) notesStr];
-                  return '$timeStr ${items.join("\n")}';
-                }).join('\n----------------\n');
+                moodText = logsWithMood
+                    .map((log) {
+                      final timeStr =
+                          '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                      final moodStr = log.mood != null
+                          ? '${log.moodEmoji ?? ""} ${AppStrings.localizeStoredValue(log.mood!)}'
+                          : '';
+                      final painStr = log.painLocations.isNotEmpty
+                          ? '${AppStrings.pain}: ${log.painLocations.map(AppStrings.localizeStoredValue).join(", ")}'
+                          : '';
+                      final notesStr =
+                          (log.notes != null && log.notes!.isNotEmpty)
+                          ? '${AppStrings.notes}: ${log.notes}'
+                          : '';
+                      final items = [
+                        if (moodStr.isNotEmpty) moodStr,
+                        if (painStr.isNotEmpty) painStr,
+                        if (notesStr.isNotEmpty) notesStr,
+                      ];
+                      return '$timeStr ${items.join("\n")}';
+                    })
+                    .join('\n----------------\n');
               }
 
               return DataRow(
@@ -337,8 +516,12 @@ class DoctorReportView extends StatelessWidget {
                           adetText,
                           style: TextStyle(
                             fontSize: 11,
-                            color: isBleeding ? Colors.red.shade700 : AppColors.textSecondary,
-                            fontWeight: isBleeding ? FontWeight.bold : FontWeight.normal,
+                            color: isBleeding
+                                ? Colors.red.shade700
+                                : AppColors.textSecondary,
+                            fontWeight: isBleeding
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                       ),
@@ -390,14 +573,24 @@ class DoctorReportView extends StatelessWidget {
   }
 
   Widget _buildNotesSection(List<DailyLog> logs) {
-    final logsWithNotes = logs.where((l) => (l.notes != null && l.notes!.isNotEmpty) || (l.moodNote != null && l.moodNote!.isNotEmpty)).toList();
+    final logsWithNotes = logs
+        .where(
+          (l) =>
+              (l.notes != null && l.notes!.isNotEmpty) ||
+              (l.moodNote != null && l.moodNote!.isNotEmpty),
+        )
+        .toList();
 
     if (logsWithNotes.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 10),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: Text(
-          'Eklenmiş özel not bulunmamaktadır.',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontStyle: FontStyle.italic),
+          AppStrings.noSavedNotes,
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 12,
+            fontStyle: FontStyle.italic,
+          ),
         ),
       );
     }
@@ -417,15 +610,28 @@ class DoctorReportView extends StatelessWidget {
             children: [
               Text(
                 log.date.toDotFormat(),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: AppColors.primary),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  color: AppColors.primary,
+                ),
               ),
               const SizedBox(height: 4),
               if (log.notes != null && log.notes!.isNotEmpty)
-                Text('📝 Genel Not: ${log.notes}', style: const TextStyle(fontSize: 12)),
+                Text(
+                  '📝 ${AppStrings.generalNote}: ${log.notes}',
+                  style: const TextStyle(fontSize: 12),
+                ),
               if (log.moodNote != null && log.moodNote!.isNotEmpty) ...[
                 const SizedBox(height: 2),
-                Text('🌟 Ruh Hali Notu: ${log.moodNote}', style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
-              ]
+                Text(
+                  '🌟 ${AppStrings.moodNote}: ${log.moodNote}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
             ],
           ),
         );
@@ -436,129 +642,224 @@ class DoctorReportView extends StatelessWidget {
   String _menopauseLabel(MenopauseStatus status) {
     switch (status) {
       case MenopauseStatus.none:
-        return 'Menopozda değil';
+        return AppStrings.noMenopause;
       case MenopauseStatus.pre:
-        return 'Pre-menopoz';
+        return AppStrings.preMenopause;
       case MenopauseStatus.peri:
-        return 'Peri-menopoz';
+        return AppStrings.periMenopause;
       case MenopauseStatus.post:
-        return 'Post-menopoz';
+        return AppStrings.postMenopause;
     }
   }
 
   // ── Paylaş/Kopyala Mantığı ──────────────────────────────────────────
 
-  Future<void> _copyReportToClipboard(BuildContext context, UserSettings settings, List<List<DailyLog>> logs) async {
+  Future<void> _copyReportToClipboard(
+    BuildContext context,
+    UserSettings settings,
+    List<List<DailyLog>> logs,
+  ) async {
     final sb = StringBuffer();
     sb.writeln('==================================');
-    sb.writeln('OMA KİŞİSEL SAĞLIK RAPORU');
-    sb.writeln('Rapor Tarihi: ${AppTime.now.toDotFormat()}');
+    sb.writeln(AppStrings.personalHealthReport);
+    sb.writeln(AppStrings.reportDateLine(AppTime.now.toDotFormat()));
     sb.writeln('==================================\n');
 
-    sb.writeln('1. KULLANICI BİLGİLERİ');
+    sb.writeln('1. ${AppStrings.userBasicInformation.toUpperCase()}');
     sb.writeln('----------------------------------');
-    sb.writeln('İsim: ${settings.userName.isNotEmpty ? settings.userName : "Belirtilmemiş"}');
-    sb.writeln('Yaş: ${settings.age?.toString() ?? "Belirtilmemiş"}');
-    sb.writeln('Kilo/Boy: ${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm');
-    sb.writeln('Sigara: ${settings.isSmoker ? "Evet" : "Hayır"}');
-    sb.writeln('Kronik Hastalıklar: ${settings.chronicDiseases.isNotEmpty ? settings.chronicDiseases.join(", ") : "Bulunmamaktadır"}');
-    if (settings.bloodTestResults != null && settings.bloodTestResults!.isNotEmpty) {
-      sb.writeln('Kan Değerleri: ${settings.bloodTestResults}');
+    sb.writeln(
+      '${AppStrings.name}: ${settings.userName.isNotEmpty ? settings.userName : AppStrings.notSpecified}',
+    );
+    sb.writeln(
+      '${AppStrings.age}: ${settings.age?.toString() ?? AppStrings.notSpecified}',
+    );
+    sb.writeln(
+      '${AppStrings.weightHeight}: ${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm',
+    );
+    sb.writeln(
+      '${AppStrings.smoking}: ${settings.isSmoker ? AppStrings.yes : AppStrings.no}',
+    );
+    sb.writeln(
+      '${AppStrings.chronicDiseases}: ${settings.chronicDiseases.isNotEmpty ? settings.chronicDiseases.map(AppStrings.localizeStoredValue).join(", ") : AppStrings.noConditions}',
+    );
+    if (settings.bloodTestResults != null &&
+        settings.bloodTestResults!.isNotEmpty) {
+      sb.writeln('${AppStrings.lastBloodValues}: ${settings.bloodTestResults}');
     }
     sb.writeln('');
 
-    sb.writeln('2. DÖNGÜ VE KADIN SAĞLIĞI ÖZETİ');
+    sb.writeln('2. ${AppStrings.womenHealthSummary.toUpperCase()}');
     sb.writeln('----------------------------------');
-    sb.writeln('Ort. Döngü Süresi: ${settings.averageCycleLength} gün');
-    sb.writeln('Ort. Adet Süresi: ${settings.averagePeriodLength} gün');
-    sb.writeln('Son Adet Başlangıcı: ${settings.lastPeriodDate != null ? settings.lastPeriodDate!.toDotFormat() : "Belirtilmemiş"}');
-    sb.writeln('Menopoz Durumu: ${_menopauseLabel(settings.menopauseStatus)}');
+    sb.writeln(
+      '${AppStrings.averageCycleLength}: ${AppStrings.dayCount(settings.averageCycleLength)}',
+    );
+    sb.writeln(
+      '${AppStrings.averagePeriodLength}: ${AppStrings.dayCount(settings.averagePeriodLength)}',
+    );
+    sb.writeln(
+      '${AppStrings.lastPeriodDate}: ${settings.lastPeriodDate != null ? settings.lastPeriodDate!.toDotFormat() : AppStrings.notSpecified}',
+    );
+    sb.writeln(
+      '${AppStrings.menopauseStatus}: ${_menopauseLabel(settings.menopauseStatus)}',
+    );
     if (settings.womenDiseases.isNotEmpty) {
-      sb.writeln('Jinekolojik Hastalıklar: ${settings.womenDiseases.join(", ")}');
+      sb.writeln(
+        '${AppStrings.gynecologicalDiseases}: ${settings.womenDiseases.map(AppStrings.localizeStoredValue).join(", ")}',
+      );
     }
     sb.writeln('');
 
-    sb.writeln('3. SAĞLIK LOGLARI (SON 15 GÜN)');
+    sb.writeln('3. ${AppStrings.dailyHealthLogs.toUpperCase()}');
     sb.writeln('----------------------------------');
-    sb.writeln('Tarih | Adet | Beslenme | İlaç & Takviye | Ruh Hali');
+    sb.writeln(
+      '${AppStrings.date} | ${AppStrings.period} | ${AppStrings.nutrition} | ${AppStrings.medicationAndSupplement} | ${AppStrings.mood}',
+    );
     sb.writeln('----------------------------------');
     for (var dayLogs in logs.take(15)) {
       final date = dayLogs.first.date.toDotFormat();
 
       // 1. Adet
-      final logsWithPeriod = dayLogs.where((l) => l.flowIntensity != null || l.periodPainLevel != null).toList();
+      final logsWithPeriod = dayLogs
+          .where((l) => l.flowIntensity != null || l.periodPainLevel != null)
+          .toList();
       final String bleeding;
       if (logsWithPeriod.isEmpty) {
-        bleeding = 'Kanama Yok';
+        bleeding = AppStrings.noBleeding;
       } else {
-        bleeding = logsWithPeriod.map((log) {
-          final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-          final adetPain = log.periodPainLevel != null ? '(Ağrı:${log.periodPainLevel}/5)' : '';
-          return '$timeStr Kanamalı(${log.flowIntensity ?? "Hafif"})$adetPain';
-        }).join(' // ');
+        bleeding = logsWithPeriod
+            .map((log) {
+              final timeStr =
+                  '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+              final adetPain = log.periodPainLevel != null
+                  ? '(${AppStrings.pain}:${log.periodPainLevel}/5)'
+                  : '';
+              return '$timeStr ${AppStrings.bleeding}(${AppStrings.localizeStoredValue(log.flowIntensity ?? AppStrings.flowOptions[1])})$adetPain';
+            })
+            .join(' // ');
       }
 
       // 2. Beslenme
-      final logsWithNutrition = dayLogs.where((l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty).toList();
+      final logsWithNutrition = dayLogs
+          .where(
+            (l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty,
+          )
+          .toList();
       final String beslenme;
       if (logsWithNutrition.isEmpty) {
         beslenme = '-';
       } else {
-        beslenme = logsWithNutrition.map((log) {
-          final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-          final nutritionStr = log.nutritionTags.isNotEmpty ? log.nutritionTags.join(', ') : '';
-          final bowelStr = log.bowelActivity.isNotEmpty ? 'Bağırsak:${log.bowelActivity.join(', ')}' : '';
-          final items = [if (nutritionStr.isNotEmpty) nutritionStr, if (bowelStr.isNotEmpty) bowelStr];
-          return '$timeStr ${items.join(" ")}';
-        }).join(' // ');
+        beslenme = logsWithNutrition
+            .map((log) {
+              final timeStr =
+                  '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+              final nutritionStr = log.nutritionTags.isNotEmpty
+                  ? log.nutritionTags
+                        .map(AppStrings.localizeStoredValue)
+                        .join(', ')
+                  : '';
+              final bowelStr = log.bowelActivity.isNotEmpty
+                  ? '${AppStrings.bowel}:${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
+                  : '';
+              final items = [
+                if (nutritionStr.isNotEmpty) nutritionStr,
+                if (bowelStr.isNotEmpty) bowelStr,
+              ];
+              return '$timeStr ${items.join(" ")}';
+            })
+            .join(' // ');
       }
 
       // 3. İlaç & Takviye
-      final logsWithMeds = dayLogs.where((l) => l.medications.any((m) => m.taken) || l.supplements.any((s) => s.taken)).toList();
+      final logsWithMeds = dayLogs
+          .where(
+            (l) =>
+                l.medications.any((m) => m.taken) ||
+                l.supplements.any((s) => s.taken),
+          )
+          .toList();
       final String meds;
       if (logsWithMeds.isEmpty) {
         meds = '-';
       } else {
-        meds = logsWithMeds.map((log) {
-          final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-          final activeMeds = log.medications.where((m) => m.taken).map((m) => '${m.name}(${m.dosage})').toList();
-          final activeSups = log.supplements.where((s) => s.taken).map((s) => '${s.name}(${s.dosage})').toList();
-          final all = [...activeMeds, ...activeSups];
-          return '$timeStr ${all.join(", ")}';
-        }).join(' // ');
+        meds = logsWithMeds
+            .map((log) {
+              final timeStr =
+                  '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+              final activeMeds = log.medications
+                  .where((m) => m.taken)
+                  .map((m) => '${m.name}(${m.dosage})')
+                  .toList();
+              final activeSups = log.supplements
+                  .where((s) => s.taken)
+                  .map((s) => '${s.name}(${s.dosage})')
+                  .toList();
+              final all = [...activeMeds, ...activeSups];
+              return '$timeStr ${all.join(", ")}';
+            })
+            .join(' // ');
       }
 
       // 4. Ruh Hali
-      final logsWithMood = dayLogs.where((l) => l.mood != null || l.painLocations.isNotEmpty || (l.notes != null && l.notes!.isNotEmpty)).toList();
+      final logsWithMood = dayLogs
+          .where(
+            (l) =>
+                l.mood != null ||
+                l.painLocations.isNotEmpty ||
+                (l.notes != null && l.notes!.isNotEmpty),
+          )
+          .toList();
       final String moodText;
       if (logsWithMood.isEmpty) {
         moodText = '-';
       } else {
-        moodText = logsWithMood.map((log) {
-          final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-          final moodStr = log.mood != null ? '${log.moodEmoji ?? ""} ${log.mood}' : '';
-          final painStr = log.painLocations.isNotEmpty ? 'Ağrı:${log.painLocations.join(", ")}' : '';
-          final notesStr = (log.notes != null && log.notes!.isNotEmpty) ? 'Not:${log.notes}' : '';
-          final items = [if (moodStr.isNotEmpty) moodStr, if (painStr.isNotEmpty) painStr, if (notesStr.isNotEmpty) notesStr];
-          return '$timeStr ${items.join(" ")}';
-        }).join(' // ');
+        moodText = logsWithMood
+            .map((log) {
+              final timeStr =
+                  '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+              final moodStr = log.mood != null
+                  ? '${log.moodEmoji ?? ""} ${AppStrings.localizeStoredValue(log.mood!)}'
+                  : '';
+              final painStr = log.painLocations.isNotEmpty
+                  ? '${AppStrings.pain}:${log.painLocations.map(AppStrings.localizeStoredValue).join(", ")}'
+                  : '';
+              final notesStr = (log.notes != null && log.notes!.isNotEmpty)
+                  ? '${AppStrings.notes}:${log.notes}'
+                  : '';
+              final items = [
+                if (moodStr.isNotEmpty) moodStr,
+                if (painStr.isNotEmpty) painStr,
+                if (notesStr.isNotEmpty) notesStr,
+              ];
+              return '$timeStr ${items.join(" ")}';
+            })
+            .join(' // ');
       }
 
       sb.writeln('$date | $bleeding | $beslenme | $meds | $moodText');
     }
     sb.writeln('');
 
-    sb.writeln('4. KAYDEDİLEN NOTLAR');
+    sb.writeln('4. ${AppStrings.savedDoctorNotes.toUpperCase()}');
     sb.writeln('----------------------------------');
     final flatLogs = logs.expand<DailyLog>((dayList) => dayList).toList();
-    final logsWithNotes = flatLogs.where((l) => (l.notes != null && l.notes!.isNotEmpty) || (l.moodNote != null && l.moodNote!.isNotEmpty)).toList();
+    final logsWithNotes = flatLogs
+        .where(
+          (l) =>
+              (l.notes != null && l.notes!.isNotEmpty) ||
+              (l.moodNote != null && l.moodNote!.isNotEmpty),
+        )
+        .toList();
     if (logsWithNotes.isEmpty) {
-      sb.writeln('Kayıtlı not bulunamadı.');
+      sb.writeln(AppStrings.noSavedNotes);
     } else {
       for (var log in logsWithNotes.take(10)) {
         sb.writeln('[${log.date.toDotFormat()}]');
-        if (log.notes != null && log.notes!.isNotEmpty) sb.writeln('- Genel: ${log.notes}');
-        if (log.moodNote != null && log.moodNote!.isNotEmpty) sb.writeln('- Ruh Hali: ${log.moodNote}');
+        if (log.notes != null && log.notes!.isNotEmpty) {
+          sb.writeln('- ${AppStrings.generalNote}: ${log.notes}');
+        }
+        if (log.moodNote != null && log.moodNote!.isNotEmpty) {
+          sb.writeln('- ${AppStrings.moodNote}: ${log.moodNote}');
+        }
       }
     }
 
@@ -567,7 +868,7 @@ class DoctorReportView extends StatelessWidget {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Rapor kopyalandı! Doktorunuza WhatsApp vb. üzerinden gönderebilirsiniz.'),
+          content: Text(AppStrings.reportCopied),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -588,14 +889,12 @@ class DoctorReportView extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (ctx) => const Center(child: CircularProgressIndicator()),
     );
 
     try {
       final pdf = pw.Document();
-      
+
       final regularFont = await PdfGoogleFonts.robotoRegular();
       final boldFont = await PdfGoogleFonts.robotoBold();
 
@@ -603,10 +902,7 @@ class DoctorReportView extends StatelessWidget {
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
           margin: const pw.EdgeInsets.all(32),
-          theme: pw.ThemeData.withFont(
-            base: regularFont,
-            bold: boldFont,
-          ),
+          theme: pw.ThemeData.withFont(base: regularFont, bold: boldFont),
           build: (pw.Context context) {
             return [
               pw.Row(
@@ -616,7 +912,7 @@ class DoctorReportView extends StatelessWidget {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
-                        'OMA KİSEL SAĞLIK RAPORU',
+                        AppStrings.personalHealthReport,
                         style: pw.TextStyle(
                           fontSize: 18,
                           fontWeight: pw.FontWeight.bold,
@@ -625,13 +921,16 @@ class DoctorReportView extends StatelessWidget {
                       ),
                       pw.SizedBox(height: 4),
                       pw.Text(
-                        'Rapor Tarihi: ${AppTime.now.toDotFormat()}',
-                        style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey),
+                        AppStrings.reportDateLine(AppTime.now.toDotFormat()),
+                        style: const pw.TextStyle(
+                          fontSize: 10,
+                          color: PdfColors.grey,
+                        ),
                       ),
                     ],
                   ),
                   pw.Text(
-                    'Tıbbi Özet',
+                    AppStrings.medicalSummary,
                     style: pw.TextStyle(
                       fontSize: 12,
                       fontWeight: pw.FontWeight.bold,
@@ -644,41 +943,118 @@ class DoctorReportView extends StatelessWidget {
               pw.Divider(thickness: 1.5, color: PdfColors.grey300),
               pw.SizedBox(height: 16),
 
-              pw.Text('Kullanıcı Temel Bilgileri', style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                AppStrings.userBasicInformation,
+                style: pw.TextStyle(
+                  fontSize: 13,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
               pw.SizedBox(height: 8),
-              _pdfInfoRow('İsim / Nickname', settings.userName.isNotEmpty ? settings.userName : 'Belirtilmemiş'),
-              _pdfInfoRow('Yaş', settings.age?.toString() ?? 'Belirtilmemiş'),
-              _pdfInfoRow('Kilo / Boy', '${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm'),
-              _pdfInfoRow('Sigara Kullanımı', settings.isSmoker ? 'Evet' : 'Hayır'),
-              _pdfInfoRow('Kronik Hastalıklar', settings.chronicDiseases.isNotEmpty ? settings.chronicDiseases.join(', ') : 'Bulunmamaktadır'),
-              if (settings.bloodTestResults != null && settings.bloodTestResults!.isNotEmpty)
-                _pdfInfoRow('Son Kan Değerleri', settings.bloodTestResults!),
+              _pdfInfoRow(
+                AppStrings.nickname,
+                settings.userName.isNotEmpty
+                    ? settings.userName
+                    : AppStrings.notSpecified,
+              ),
+              _pdfInfoRow(
+                AppStrings.age,
+                settings.age?.toString() ?? AppStrings.notSpecified,
+              ),
+              _pdfInfoRow(
+                AppStrings.weightHeight,
+                '${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm',
+              ),
+              _pdfInfoRow(
+                AppStrings.smoking,
+                settings.isSmoker ? AppStrings.yes : AppStrings.no,
+              ),
+              _pdfInfoRow(
+                AppStrings.chronicDiseases,
+                settings.chronicDiseases.isNotEmpty
+                    ? settings.chronicDiseases
+                          .map(AppStrings.localizeStoredValue)
+                          .join(', ')
+                    : AppStrings.noConditions,
+              ),
+              if (settings.bloodTestResults != null &&
+                  settings.bloodTestResults!.isNotEmpty)
+                _pdfInfoRow(
+                  AppStrings.lastBloodValues,
+                  settings.bloodTestResults!,
+                ),
               pw.SizedBox(height: 16),
 
-              pw.Text('Kadın Sağlığı & Adet Döngüsü Özet', style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                AppStrings.womenHealthSummary,
+                style: pw.TextStyle(
+                  fontSize: 13,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
               pw.SizedBox(height: 8),
-              _pdfInfoRow('Ort. Döngü Süresi', '${settings.averageCycleLength} gün'),
-              _pdfInfoRow('Ort. Adet Kanaması', '${settings.averagePeriodLength} gün'),
-              _pdfInfoRow('Son Adet Başlangıcı', settings.lastPeriodDate != null ? settings.lastPeriodDate!.toDotFormat() : 'Belirtilmemiş'),
-              _pdfInfoRow('Menopoz Durumu', _menopauseLabel(settings.menopauseStatus)),
-              if (settings.birthControlMethod != null && settings.birthControlMethod!.isNotEmpty)
-                _pdfInfoRow('Doğum Kontrolü', settings.birthControlMethod!),
+              _pdfInfoRow(
+                AppStrings.averageCycleLength,
+                AppStrings.dayCount(settings.averageCycleLength),
+              ),
+              _pdfInfoRow(
+                AppStrings.averagePeriodLength,
+                AppStrings.dayCount(settings.averagePeriodLength),
+              ),
+              _pdfInfoRow(
+                AppStrings.lastPeriodDate,
+                settings.lastPeriodDate != null
+                    ? settings.lastPeriodDate!.toDotFormat()
+                    : AppStrings.notSpecified,
+              ),
+              _pdfInfoRow(
+                AppStrings.menopauseStatus,
+                _menopauseLabel(settings.menopauseStatus),
+              ),
+              if (settings.birthControlMethod != null &&
+                  settings.birthControlMethod!.isNotEmpty)
+                _pdfInfoRow(
+                  AppStrings.birthControl,
+                  AppStrings.localizeStoredValue(settings.birthControlMethod!),
+                ),
               if (settings.womenDiseases.isNotEmpty)
-                _pdfInfoRow('Jinekolojik Hastalıklar', settings.womenDiseases.join(', ')),
+                _pdfInfoRow(
+                  AppStrings.gynecologicalDiseases,
+                  settings.womenDiseases
+                      .map(AppStrings.localizeStoredValue)
+                      .join(', '),
+                ),
               pw.SizedBox(height: 16),
 
-              pw.Text('Günlük Sağlık Logları (Son 15 Kayıt)', style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                AppStrings.dailyHealthLogs,
+                style: pw.TextStyle(
+                  fontSize: 13,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
               pw.SizedBox(height: 8),
               if (logs.isEmpty)
-                pw.Text('Henüz kaydedilmiş günlük log bulunmamaktadır.', style: const pw.TextStyle(fontSize: 10))
+                pw.Text(
+                  AppStrings.noHealthLogs,
+                  style: const pw.TextStyle(fontSize: 10),
+                )
               else
                 _buildPdfTable(logs.take(15).toList()),
 
               pw.SizedBox(height: 16),
 
-              pw.Text('Kaydedilen Doktor/Genel Notları', style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                AppStrings.savedDoctorNotes,
+                style: pw.TextStyle(
+                  fontSize: 13,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
               pw.SizedBox(height: 8),
-              _buildPdfNotesSection(logs.expand<DailyLog>((dayList) => dayList).take(10).toList()),
+              _buildPdfNotesSection(
+                logs.expand<DailyLog>((dayList) => dayList).take(10).toList(),
+              ),
             ];
           },
         ),
@@ -688,14 +1064,15 @@ class DoctorReportView extends StatelessWidget {
 
       await Printing.layoutPdf(
         onLayout: (PdfPageFormat format) async => pdf.save(),
-        name: 'oma_saglik_raporu_${settings.userName.replaceAll(' ', '_')}.pdf',
+        name:
+            '${AppStrings.reportFileName}_${settings.userName.replaceAll(' ', '_')}.pdf',
       );
     } catch (e) {
       if (context.mounted) Navigator.pop(context);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('PDF oluşturulurken hata: $e'),
+            content: Text(AppStrings.pdfCreationError(e)),
             backgroundColor: AppColors.error,
           ),
         );
@@ -711,10 +1088,16 @@ class DoctorReportView extends StatelessWidget {
         children: [
           pw.SizedBox(
             width: 140,
-            child: pw.Text(label, style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700)),
+            child: pw.Text(
+              label,
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+            ),
           ),
           pw.Expanded(
-            child: pw.Text(value, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold)),
+            child: pw.Text(
+              value,
+              style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -722,98 +1105,169 @@ class DoctorReportView extends StatelessWidget {
   }
 
   pw.Widget _buildPdfTable(List<List<DailyLog>> dayGroupedLogs) {
-    final headers = ['Tarih', 'Adet', 'Beslenme', 'İlaç & Takviye', 'Ruh Hali'];
-    
+    final headers = [
+      AppStrings.date,
+      AppStrings.period,
+      AppStrings.nutrition,
+      AppStrings.medicationAndSupplement,
+      AppStrings.mood,
+    ];
+
     return pw.TableHelper.fromTextArray(
       headers: headers,
       cellAlignment: pw.Alignment.centerLeft,
       headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
       cellStyle: const pw.TextStyle(fontSize: 8),
       rowDecoration: const pw.BoxDecoration(
-        border: pw.Border(bottom: pw.BorderSide(color: PdfColors.grey300, width: 0.5)),
+        border: pw.Border(
+          bottom: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
+        ),
       ),
       headerDecoration: const pw.BoxDecoration(
         color: PdfColors.grey100,
-        border: pw.Border(bottom: pw.BorderSide(color: PdfColors.grey400, width: 1)),
+        border: pw.Border(
+          bottom: pw.BorderSide(color: PdfColors.grey400, width: 1),
+        ),
       ),
       data: dayGroupedLogs.map((dayLogs) {
         final dateStr = dayLogs.first.date.toDotFormat();
 
         // 1. Adet
-        final logsWithPeriod = dayLogs.where((l) => l.flowIntensity != null || l.periodPainLevel != null).toList();
+        final logsWithPeriod = dayLogs
+            .where((l) => l.flowIntensity != null || l.periodPainLevel != null)
+            .toList();
         final String adetText;
         if (logsWithPeriod.isEmpty) {
-          adetText = 'Kanama Yok';
+          adetText = AppStrings.noBleeding;
         } else {
-          adetText = logsWithPeriod.map((log) {
-            final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-            final adetPain = log.periodPainLevel != null ? ' (Ağrı: ${log.periodPainLevel}/5)' : '';
-            return '$timeStr Kanamalı (${log.flowIntensity ?? "Hafif"})$adetPain';
-          }).join('\n----------------\n');
+          adetText = logsWithPeriod
+              .map((log) {
+                final timeStr =
+                    '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                final adetPain = log.periodPainLevel != null
+                    ? ' (${AppStrings.pain}: ${log.periodPainLevel}/5)'
+                    : '';
+                return '$timeStr ${AppStrings.bleeding} (${AppStrings.localizeStoredValue(log.flowIntensity ?? AppStrings.flowOptions[1])})$adetPain';
+              })
+              .join('\n----------------\n');
         }
 
         // 2. Beslenme
-        final logsWithNutrition = dayLogs.where((l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty).toList();
+        final logsWithNutrition = dayLogs
+            .where(
+              (l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty,
+            )
+            .toList();
         final String beslenmeText;
         if (logsWithNutrition.isEmpty) {
           beslenmeText = '-';
         } else {
-          beslenmeText = logsWithNutrition.map((log) {
-            final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-            final nutritionStr = log.nutritionTags.isNotEmpty ? log.nutritionTags.join(', ') : '';
-            final bowelStr = log.bowelActivity.isNotEmpty ? 'Bağırsak: ${log.bowelActivity.join(', ')}' : '';
-            final items = [if (nutritionStr.isNotEmpty) nutritionStr, if (bowelStr.isNotEmpty) bowelStr];
-            return '$timeStr ${items.join("\n")}';
-          }).join('\n----------------\n');
+          beslenmeText = logsWithNutrition
+              .map((log) {
+                final timeStr =
+                    '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                final nutritionStr = log.nutritionTags.isNotEmpty
+                    ? log.nutritionTags
+                          .map(AppStrings.localizeStoredValue)
+                          .join(', ')
+                    : '';
+                final bowelStr = log.bowelActivity.isNotEmpty
+                    ? '${AppStrings.bowel}: ${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
+                    : '';
+                final items = [
+                  if (nutritionStr.isNotEmpty) nutritionStr,
+                  if (bowelStr.isNotEmpty) bowelStr,
+                ];
+                return '$timeStr ${items.join("\n")}';
+              })
+              .join('\n----------------\n');
         }
 
         // 3. İlaç & Takviye
-        final logsWithMeds = dayLogs.where((l) => l.medications.any((m) => m.taken) || l.supplements.any((s) => s.taken)).toList();
+        final logsWithMeds = dayLogs
+            .where(
+              (l) =>
+                  l.medications.any((m) => m.taken) ||
+                  l.supplements.any((s) => s.taken),
+            )
+            .toList();
         final String ilacText;
         if (logsWithMeds.isEmpty) {
           ilacText = '-';
         } else {
-          ilacText = logsWithMeds.map((log) {
-            final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-            final activeMeds = log.medications.where((m) => m.taken).map((m) => '${m.name}(${m.dosage})').toList();
-            final activeSups = log.supplements.where((s) => s.taken).map((s) => '${s.name}(${s.dosage})').toList();
-            final all = [...activeMeds, ...activeSups];
-            return '$timeStr ${all.join(", ")}';
-          }).join('\n----------------\n');
+          ilacText = logsWithMeds
+              .map((log) {
+                final timeStr =
+                    '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                final activeMeds = log.medications
+                    .where((m) => m.taken)
+                    .map((m) => '${m.name}(${m.dosage})')
+                    .toList();
+                final activeSups = log.supplements
+                    .where((s) => s.taken)
+                    .map((s) => '${s.name}(${s.dosage})')
+                    .toList();
+                final all = [...activeMeds, ...activeSups];
+                return '$timeStr ${all.join(", ")}';
+              })
+              .join('\n----------------\n');
         }
 
         // 4. Ruh Hali
-        final logsWithMood = dayLogs.where((l) => l.mood != null || l.painLocations.isNotEmpty || (l.notes != null && l.notes!.isNotEmpty)).toList();
+        final logsWithMood = dayLogs
+            .where(
+              (l) =>
+                  l.mood != null ||
+                  l.painLocations.isNotEmpty ||
+                  (l.notes != null && l.notes!.isNotEmpty),
+            )
+            .toList();
         final String moodText;
         if (logsWithMood.isEmpty) {
           moodText = '-';
         } else {
-          moodText = logsWithMood.map((log) {
-            final timeStr = '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-            final moodStr = log.mood != null ? '${log.moodEmoji ?? ""} ${log.mood}' : '';
-            final painStr = log.painLocations.isNotEmpty ? 'Ağrı: ${log.painLocations.join(", ")}' : '';
-            final notesStr = (log.notes != null && log.notes!.isNotEmpty) ? 'Not: ${log.notes}' : '';
-            final items = [if (moodStr.isNotEmpty) moodStr, if (painStr.isNotEmpty) painStr, if (notesStr.isNotEmpty) notesStr];
-            return '$timeStr ${items.join("\n")}';
-          }).join('\n----------------\n');
+          moodText = logsWithMood
+              .map((log) {
+                final timeStr =
+                    '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
+                final moodStr = log.mood != null
+                    ? '${log.moodEmoji ?? ""} ${AppStrings.localizeStoredValue(log.mood!)}'
+                    : '';
+                final painStr = log.painLocations.isNotEmpty
+                    ? '${AppStrings.pain}: ${log.painLocations.map(AppStrings.localizeStoredValue).join(", ")}'
+                    : '';
+                final notesStr = (log.notes != null && log.notes!.isNotEmpty)
+                    ? '${AppStrings.notes}: ${log.notes}'
+                    : '';
+                final items = [
+                  if (moodStr.isNotEmpty) moodStr,
+                  if (painStr.isNotEmpty) painStr,
+                  if (notesStr.isNotEmpty) notesStr,
+                ];
+                return '$timeStr ${items.join("\n")}';
+              })
+              .join('\n----------------\n');
         }
 
-        return [
-          dateStr,
-          adetText,
-          beslenmeText,
-          ilacText,
-          moodText,
-        ];
+        return [dateStr, adetText, beslenmeText, ilacText, moodText];
       }).toList(),
     );
   }
 
   pw.Widget _buildPdfNotesSection(List<DailyLog> logs) {
-    final logsWithNotes = logs.where((l) => (l.notes != null && l.notes!.isNotEmpty) || (l.moodNote != null && l.moodNote!.isNotEmpty)).toList();
+    final logsWithNotes = logs
+        .where(
+          (l) =>
+              (l.notes != null && l.notes!.isNotEmpty) ||
+              (l.moodNote != null && l.moodNote!.isNotEmpty),
+        )
+        .toList();
 
     if (logsWithNotes.isEmpty) {
-      return pw.Text('Eklenmiş özel not bulunmamaktadır.', style: const pw.TextStyle(fontSize: 9, fontStyle: pw.FontStyle.italic));
+      return pw.Text(
+        AppStrings.noSavedNotes,
+        style: const pw.TextStyle(fontSize: 9, fontStyle: pw.FontStyle.italic),
+      );
     }
 
     return pw.Column(
@@ -832,13 +1286,25 @@ class DoctorReportView extends StatelessWidget {
             children: [
               pw.Text(
                 log.date.toDotFormat(),
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9),
+                style: pw.TextStyle(
+                  fontWeight: pw.FontWeight.bold,
+                  fontSize: 9,
+                ),
               ),
               pw.SizedBox(height: 2),
               if (log.notes != null && log.notes!.isNotEmpty)
-                pw.Text('Genel Not: ${log.notes}', style: const pw.TextStyle(fontSize: 9)),
+                pw.Text(
+                  '${AppStrings.generalNote}: ${log.notes}',
+                  style: const pw.TextStyle(fontSize: 9),
+                ),
               if (log.moodNote != null && log.moodNote!.isNotEmpty)
-                pw.Text('Ruh Hali Notu: ${log.moodNote}', style: const pw.TextStyle(fontSize: 9, fontStyle: pw.FontStyle.italic)),
+                pw.Text(
+                  '${AppStrings.moodNote}: ${log.moodNote}',
+                  style: const pw.TextStyle(
+                    fontSize: 9,
+                    fontStyle: pw.FontStyle.italic,
+                  ),
+                ),
             ],
           ),
         );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../data/services/local_storage_service.dart';
 
 /// Döngülerim istatistik kartı — rakip uygulamadaki gibi
@@ -29,11 +30,11 @@ class CycleInsightsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Başlık
-          const Row(
+          Row(
             children: [
               Text(
-                '📊 Döngülerim',
-                style: TextStyle(
+                AppStrings.myCycles,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -45,38 +46,38 @@ class CycleInsightsCard extends StatelessWidget {
 
           // 1. Önceki döngü süresi
           _buildInsightRow(
-            label: 'Önceki döngü süresi',
+            label: AppStrings.previousCycleLength,
             value: insights.previousCycleLength != null
-                ? '${insights.previousCycleLength} gün'
-                : 'Veri yok',
+                ? AppStrings.dayCount(insights.previousCycleLength!)
+                : AppStrings.noDataStatus,
             status: insights.cycleStatus,
             statusLabel: _cycleStatusLabel(insights.cycleStatus),
-            infoText: 'Normal aralık: 21-35 gün',
+            infoText: AppStrings.normalCycleRange,
           ),
 
           _divider(),
 
           // 2. Önceki regl süresi
           _buildInsightRow(
-            label: 'Önceki regl süresi',
-            value: '${insights.previousPeriodLength} gün',
+            label: AppStrings.previousPeriodLength,
+            value: AppStrings.dayCount(insights.previousPeriodLength),
             status: insights.periodStatus,
             statusLabel: _cycleStatusLabel(insights.periodStatus),
-            infoText: 'Normal aralık: 2-7 gün',
+            infoText: AppStrings.normalPeriodRange,
           ),
 
           _divider(),
 
           // 3. Döngü süresi değişkenliği
           _buildInsightRow(
-            label: 'Döngü süresi değişkenliği',
+            label: AppStrings.cycleLengthVariation,
             value:
                 insights.variationMin != null && insights.variationMax != null
-                ? '${insights.variationMin}-${insights.variationMax} gün'
-                : 'Yeterli veri yok',
+                ? '${insights.variationMin}-${insights.variationMax} ${AppStrings.daysUnit}'
+                : AppStrings.insufficientData,
             status: _regularityToCycleStatus(insights.regularity),
             statusLabel: _regularityLabel(insights.regularity),
-            infoText: '≤7 gün fark: Düzenli',
+            infoText: AppStrings.regularDifference,
           ),
 
           // Kayıt sayısı bilgisi
@@ -98,8 +99,11 @@ class CycleInsightsCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     insights.totalCyclesRecorded > 1
-                        ? '${insights.totalCyclesRecorded} döngü kaydedildi · ${insights.cycleLengths.length} döngü süresi hesaplandı'
-                        : 'Daha fazla veri girdikçe istatistikler daha doğru olacak',
+                        ? AppStrings.records(
+                            insights.totalCyclesRecorded,
+                            insights.cycleLengths.length,
+                          )
+                        : AppStrings.cycleStatisticsHint,
                     style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary.withValues(alpha: 0.8),
@@ -249,22 +253,22 @@ class CycleInsightsCard extends StatelessWidget {
   String _cycleStatusLabel(CycleStatus status) {
     switch (status) {
       case CycleStatus.normal:
-        return 'OLAĞAN';
+        return AppStrings.normal;
       case CycleStatus.abnormal:
-        return 'OLAĞAN DIŞI';
+        return AppStrings.abnormal;
       case CycleStatus.noData:
-        return 'VERİ YOK';
+        return AppStrings.noDataStatus;
     }
   }
 
   String _regularityLabel(CycleRegularity regularity) {
     switch (regularity) {
       case CycleRegularity.regular:
-        return 'DÜZENLİ';
+        return AppStrings.regular;
       case CycleRegularity.irregular:
-        return 'DÜZENSİZ';
+        return AppStrings.irregular;
       case CycleRegularity.noData:
-        return 'VERİ YOK';
+        return AppStrings.noDataStatus;
     }
   }
 

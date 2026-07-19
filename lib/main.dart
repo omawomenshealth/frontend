@@ -3,10 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'core/constants/app_strings.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/app_time.dart';
 import 'data/services/local_storage_service.dart';
 import 'data/services/api_service.dart';
+import 'data/services/premium_purchase_service.dart';
 import 'data/services/sync_service.dart';
 import 'views/auth/view/auth_view.dart';
 import 'views/auth/viewmodel/auth_view_model.dart';
@@ -23,9 +25,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Telefonun yerel sunucuya bağlanabilmesi için yerel IP adresi tanımlandı:
-  ApiService.customBaseUrl = 'http://192.168.1.2:3000';
+  ApiService.customBaseUrl = 'http://192.168.1.13:3000';
 
-  await initializeDateFormatting('tr_TR', null);
+  await Future.wait([
+    initializeDateFormatting('tr_TR', null),
+    initializeDateFormatting('en_US', null),
+  ]);
   await AppTime.init();
 
   final storage = LocalStorageService();
@@ -53,6 +58,10 @@ class MyApp extends StatelessWidget {
         Provider<ApiService>.value(value: apiService),
         Provider<SyncService>.value(value: syncService),
         ChangeNotifierProvider(
+          create: (_) =>
+              PremiumPurchaseService(storage, apiService)..initialize(),
+        ),
+        ChangeNotifierProvider(
           create: (_) => AuthViewModel(storage, apiService, syncService),
         ),
         ChangeNotifierProvider(
@@ -65,15 +74,18 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'OMA',
+        onGenerateTitle: (_) => AppStrings.appName,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         localizationsDelegates: const [
+          AppStrings.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [Locale('tr', 'TR'), Locale('en', 'US')],
+        supportedLocales: AppStrings.supportedLocales,
+        localeResolutionCallback: (locale, _) =>
+            AppStrings.resolveLocale(locale),
         initialRoute: storage.isOnboardingComplete ? '/home' : '/auth',
         routes: {
           '/auth': (context) => const AuthView(),
@@ -100,6 +112,7 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    AppStrings.of(context);
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: Container(
@@ -115,21 +128,21 @@ class _HomeShellState extends State<HomeShell> {
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (i) => setState(() => _currentIndex = i),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_rounded),
-              activeIcon: Icon(Icons.dashboard_rounded),
-              label: 'Ana Sayfa',
+              icon: const Icon(Icons.dashboard_rounded),
+              activeIcon: const Icon(Icons.dashboard_rounded),
+              label: AppStrings.home,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.article_rounded),
-              activeIcon: Icon(Icons.article_rounded),
-              label: 'Yazılar',
+              icon: const Icon(Icons.article_rounded),
+              activeIcon: const Icon(Icons.article_rounded),
+              label: AppStrings.articles,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person_rounded),
-              activeIcon: Icon(Icons.person_rounded),
-              label: 'Profil',
+              icon: const Icon(Icons.person_rounded),
+              activeIcon: const Icon(Icons.person_rounded),
+              label: AppStrings.profile,
             ),
           ],
         ),

@@ -6,6 +6,7 @@ import '../../../core/utils/cycle_rules.dart';
 /// Profil iş mantığı — kullanıcı bilgilerini görüntüleme ve güncelleme.
 import '../../../data/services/sync_service.dart';
 import 'package:intl/intl.dart';
+import '../../../core/constants/app_strings.dart';
 
 /// Profil iş mantığı — kullanıcı bilgilerini görüntüleme ve güncelleme.
 class ProfileViewModel extends ChangeNotifier {
@@ -35,12 +36,14 @@ class ProfileViewModel extends ChangeNotifier {
 
   String get lastSyncDisplay {
     final timeStr = _storage.lastSyncTime;
-    if (timeStr == null) return 'Hiç senkronize edilmedi';
+    if (timeStr == null) return AppStrings.neverSynced;
     try {
       final dt = DateTime.parse(timeStr);
-      return DateFormat('dd.MM.yyyy HH:mm').format(dt);
+      return DateFormat(
+        AppStrings.isTurkish ? 'dd.MM.yyyy HH:mm' : 'MM/dd/yyyy h:mm a',
+      ).format(dt);
     } catch (_) {
-      return 'Bilinmiyor';
+      return AppStrings.unknown;
     }
   }
 
@@ -57,8 +60,7 @@ class ProfileViewModel extends ChangeNotifier {
         // Senkronizasyondan sonra yerel ayarları ve log istatistiklerini yeniden yükle
         loadSettings();
       } else {
-        _syncError =
-            'Eşitleme başarısız oldu. İnternet bağlantınızı kontrol edin.';
+        _syncError = AppStrings.syncInternetFailed;
       }
       return success;
     } catch (e) {
@@ -173,8 +175,11 @@ class ProfileViewModel extends ChangeNotifier {
 
   void toggleWomenDisease(String disease) {
     final diseases = List<String>.from(_settings.womenDiseases);
-    if (diseases.contains(disease)) {
-      diseases.remove(disease);
+    final existingIndex = diseases.indexWhere(
+      (value) => AppStrings.localizeStoredValue(value) == disease,
+    );
+    if (existingIndex >= 0) {
+      diseases.removeAt(existingIndex);
     } else {
       diseases.add(disease);
     }
@@ -184,8 +189,11 @@ class ProfileViewModel extends ChangeNotifier {
 
   void toggleChronicDisease(String disease) {
     final diseases = List<String>.from(_settings.chronicDiseases);
-    if (diseases.contains(disease)) {
-      diseases.remove(disease);
+    final existingIndex = diseases.indexWhere(
+      (value) => AppStrings.localizeStoredValue(value) == disease,
+    );
+    if (existingIndex >= 0) {
+      diseases.removeAt(existingIndex);
     } else {
       diseases.add(disease);
     }

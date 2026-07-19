@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/app_strings.dart';
 import '../model/article_model.dart';
 
-/// Makale detay ekranı.
-/// Yazıların detaylı içeriğini modern, okunabilir ve premium bir tasarımla sunar.
+/// Yalnızca sunucu tarafından erişim izni verilmiş makale içeriğini gösterir.
 class ArticleDetailView extends StatelessWidget {
   final Article article;
 
@@ -11,21 +12,19 @@ class ArticleDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contentParagraphs = _getArticleContent(article.id);
-
+    AppStrings.of(context);
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
-          // ── Premium Hero AppBar ──────────────────────
           SliverAppBar(
             expandedHeight: 240,
             pinned: true,
             elevation: 0,
             leading: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8),
               child: CircleAvatar(
-                backgroundColor: Colors.white.withValues(alpha: 0.8),
+                backgroundColor: Colors.white.withValues(alpha: 0.84),
                 child: IconButton(
                   icon: const Icon(
                     Icons.arrow_back_ios_new_rounded,
@@ -42,7 +41,7 @@ class ArticleDetailView extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       article.cardColor,
-                      article.cardColor.withValues(alpha: 0.8),
+                      article.cardColor.withValues(alpha: 0.78),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -50,7 +49,6 @@ class ArticleDetailView extends StatelessWidget {
                 ),
                 child: Stack(
                   children: [
-                    // Arka planda dekoratif çemberler
                     Positioned(
                       right: -30,
                       top: -30,
@@ -67,32 +65,26 @@ class ArticleDetailView extends StatelessWidget {
                         backgroundColor: Colors.white.withValues(alpha: 0.08),
                       ),
                     ),
-                    // Başlık ve etiketler
                     SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.all(20.0),
+                        padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.25),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                article.topic.toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                  letterSpacing: 1.1,
+                            Row(
+                              children: [
+                                _HeroBadge(
+                                  label: article.localizedTopic.toUpperCase(),
                                 ),
-                              ),
+                                if (article.isPremium) ...[
+                                  const SizedBox(width: 8),
+                                  _HeroBadge(
+                                    label: AppStrings.premium,
+                                    icon: Icons.workspace_premium_rounded,
+                                  ),
+                                ],
+                              ],
                             ),
                             const SizedBox(height: 12),
                             Text(
@@ -120,196 +112,26 @@ class ArticleDetailView extends StatelessWidget {
               ),
             ),
           ),
-
-          // ── Makale İçeriği ───────────────────────────
           SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.scaffoldBackground,
+            child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Yazar ve Okuma Süresi
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: article.cardColor.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.menu_book_rounded,
-                          size: 18,
-                          color: article.cardColor,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Dr. OMA Sağlık Ekibi',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          Text(
-                            'Uzman Tavsiyesi',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.02),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.timer_outlined,
-                              size: 14,
-                              color: article.cardColor,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              article.readTime,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: article.cardColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildAuthorRow(),
                   const SizedBox(height: 24),
-
-                  // Özet Kutusu
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: article.cardColor.withValues(alpha: 0.15),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('💡', style: TextStyle(fontSize: 22)),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Özet Tavsiye',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                article.summary,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  height: 1.4,
-                                  color: AppColors.textSecondary,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _buildSummaryBox(),
                   const SizedBox(height: 24),
-
-                  // Ana Metin
-                  ...contentParagraphs.map((para) {
-                    if (para.startsWith('###')) {
-                      // Alt Başlık
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 20, bottom: 8),
-                        child: Text(
-                          para.replaceAll('###', '').trim(),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      );
-                    } else if (para.startsWith('•')) {
-                      // Madde imi
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10, left: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '•',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: article.cardColor,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                para.substring(1).trim(),
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  height: 1.6,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      // Normal paragraf
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Text(
-                          para,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            height: 1.6,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      );
-                    }
-                  }),
+                  if (article.contentBlocks.isEmpty)
+                    Text(
+                      AppStrings.articleNotPublished,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        height: 1.6,
+                      ),
+                    )
+                  else
+                    ...article.contentBlocks.map(_buildContentBlock),
                 ],
               ),
             ),
@@ -319,52 +141,206 @@ class ArticleDetailView extends StatelessWidget {
     );
   }
 
-  /// Makale ID'sine göre detaylı okuma metni döndürür
-  List<String> _getArticleContent(String id) {
-    switch (id) {
-      case '1':
-        return [
-          'Regl döngüsü boyunca vücudun beslenme ihtiyaçları değişkenlik gösterir. Hormon seviyelerindeki dalgalanmalar enerji seviyenizi, modunuzu ve metabolizma hızınızı doğrudan etkiler.',
-          '### Menstrüel Faz (1-5. Günler)',
-          'Bu dönemde demir kaybı yaşandığı için demir açısından zengin beslenmek kritik önem taşır. Ayrıca ağrıları hafifletmek için magnezyum alımını artırmak faydalı olacaktır.',
-          '• Kırmızı et, ıspanak, kuru baklagiller ve pekmez gibi demir zengini gıdaları tüketin.',
-          '• Demirin emilimini artırmak için yanında C vitamini içeren taze besinler tercih edin.',
-          '• Kakao oranı yüksek bitter çikolata magnezyum ihtiyacını karşılamada yardımcı olabilir.',
-          '### Foliküler Faz (6-14. Günler)',
-          'Östrojen hormonunun yükselmesiyle enerji seviyeniz artar. Hücre yenilenmesini desteklemek için sağlıklı yağlar ve protein alımına odaklanmalısınız.',
-          '• Avokado, zeytinyağı ve çiğ kuruyemişleri beslenme planınıza ekleyin.',
-          '• Lifli gıdalar östrojen metabolizmasını dengede tutmaya yardımcı olur.',
-          '### Ovülasyon Fazı (14-16. Günler)',
-          'Vücut sıcaklığı ve enerjinin en üst seviyede olduğu dönemdir. Hafif, antioksidan bakımından zengin ve temiz beslenmeye özen gösterin.',
-          '### Luteal Faz (17-28. Günler)',
-          'Progesteron hormonunun etkisiyle vücutta ödem artabilir ve tatlı krizleri baş gösterebilir. Kompleks karbonhidratlar tüketerek kan şekerini dengelemek bu dönemi rahat atlatmanızı sağlar.',
-        ];
-      case '6':
-        return [
-          'Premenstrüel Sendrom (PMS), kadınların büyük bir çoğunluğunun adet öncesi dönemde yaşadığı fiziksel ve duygusal değişimlerdir. Bu süreci doğru yöntemlerle hafifletmek mümkündür.',
-          '### Fiziksel Belirtileri Yönetmek',
-          'Vücutta oluşan ödem ve şişkinliği azaltmak için tuz tüketimini sınırlandırmak ilk adımdır. Bol su içmek, sanılanın aksine vücuttan su atılmasını kolaylaştırır.',
-          '• Günlük tuz alımınızı azaltın ve işlenmiş gıdalardan uzak durun.',
-          '• Günde en az 2-2.5 litre su içtiğinizden emin olun.',
-          '• Şişkinliği azaltmak için maydanoz, salatalık gibi besinleri tüketin.',
-          '### Duygusal Dalgalanmalarla Başa Çıkma',
-          'Kan şekerindeki dalgalanmalar anksiyete ve sinirlilik halini tetikler. Bu nedenle sık aralıklarla protein ve lif dengeli ara öğünler yapmak faydalıdır.',
-          '• Yoga, meditasyon veya hafif yürüyüşler gibi stres azaltıcı aktivitelere vakit ayırın.',
-          '• Kahve ve kafein içeren içecekler sinirliliği artırabilir, bitki çaylarına yönelin.',
-          '### Takviye Desteği',
-          'B6 vitamini ve magnezyum kombinasyonunun PMS semptomları üzerinde olumlu etkileri bilimsel olarak kanıtlanmıştır. Doktorunuza danışarak uygun takviyeleri alabilirsiniz.',
-        ];
-      default:
-        return [
-          'Sağlıklı bir yaşam sürdürmek, vücudumuzun ihtiyaçlarını anlamak ve onlara uygun yanıtlar vermekle başlar. Günlük alışkanlıklarımız, genel refahımız ve hormonal dengemiz üzerinde doğrudan bir etkiye sahiptir.',
-          '### Düzenli Takip ve Farkındalık',
-          'Vücudunuzun verdiği sinyalleri izlemek, potansiyel sağlık sorunlarını erkenden tespit etmenize yardımcı olur. Adet döngüsü, uyku kalitesi ve ruh hali değişimleri bu sinyallerin en önemlileridir.',
-          '• Her gün yeterince su içtiğinizden emin olun.',
-          '• Günlük yürüyüşler ve hafif egzersizleri bir alışkanlık haline getirin.',
-          '• Düzenli uyku saatleri hormonal sisteminizin kusursuz çalışmasını destekler.',
-          '### Adım Adım İyileşme',
-          'Büyük değişiklikler yerine her gün küçük adımlarla sağlıklı alışkanlıklar edinmek kalıcı sonuçlar doğuracaktır. Kendinize zaman tanıyın ve gelişiminizi takip edin.',
-        ];
+  Widget _buildAuthorRow() {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: article.cardColor.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.menu_book_rounded,
+            size: 18,
+            color: article.cardColor,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.healthTeam,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                AppStrings.generalInformation,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.timer_outlined, size: 14, color: article.cardColor),
+              const SizedBox(width: 4),
+              Text(
+                article.readTime,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: article.cardColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryBox() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: article.cardColor.withValues(alpha: 0.15),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('💡', style: TextStyle(fontSize: 22)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.shortSummary,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  article.summary,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: AppColors.textSecondary,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContentBlock(String block) {
+    if (block.startsWith('###')) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 20, bottom: 8),
+        child: Text(
+          block.replaceFirst('###', '').trim(),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+      );
     }
+
+    if (block.startsWith('•')) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10, left: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '•',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: article.cardColor,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                block.substring(1).trim(),
+                style: const TextStyle(
+                  fontSize: 15,
+                  height: 1.6,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Text(
+        block,
+        style: const TextStyle(
+          fontSize: 15,
+          height: 1.6,
+          color: AppColors.textSecondary,
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroBadge extends StatelessWidget {
+  final String label;
+  final IconData? icon;
+
+  const _HeroBadge({required this.label, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.25),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: Colors.white, size: 13),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

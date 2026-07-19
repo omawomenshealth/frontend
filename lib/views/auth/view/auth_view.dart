@@ -12,6 +12,7 @@ class AuthView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppStrings.of(context);
     return Consumer<AuthViewModel>(
       builder: (context, vm, _) {
         return Scaffold(
@@ -52,9 +53,9 @@ class AuthView extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // Uygulama adı
-                    const Text(
+                    Text(
                       AppStrings.appName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
@@ -94,7 +95,7 @@ class AuthView extends StatelessWidget {
 
                     // Google ile Giriş Yap butonu
                     CustomButton(
-                      text: 'Google ile Bağlan',
+                      text: AppStrings.googleConnect,
                       icon: Icons.login_rounded,
                       isLoading: vm.isLoading,
                       onPressed: () => _handleGoogleLogin(context, vm),
@@ -108,7 +109,7 @@ class AuthView extends StatelessWidget {
                     if (kDebugMode) ...[
                       // Sunucu ayrıca ALLOW_MOCK_AUTH ile izin vermelidir.
                       CustomButton(
-                        text: 'Geliştirici Modu (Test)',
+                        text: AppStrings.developerMode,
                         icon: Icons.bug_report_outlined,
                         isLoading: vm.isLoading,
                         onPressed: () => _showMockLoginDialog(context, vm),
@@ -174,35 +175,38 @@ class AuthView extends StatelessWidget {
   /// Geliştirici Modu Tıklandığında Giriş Penceresi
   void _showMockLoginDialog(BuildContext context, AuthViewModel vm) {
     final emailCtrl = TextEditingController(text: 'testuser@gmail.com');
-    final nameCtrl = TextEditingController(text: 'Test Kullanıcısı');
+    final nameCtrl = TextEditingController(text: AppStrings.testUser);
 
     showDialog(
       context: context,
       barrierDismissible: !vm.isLoading,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Geliştirici Test Girişi'),
+        title: Text(AppStrings.developerTestLogin),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Google Console ayarlarınız tamamlanmadan veya yerel emülatörde senkronizasyonu test etmek için bu modu kullanabilirsiniz.',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            Text(
+              AppStrings.developerTestDescription,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: nameCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Ad Soyad',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppStrings.fullName,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: emailCtrl,
-              decoration: const InputDecoration(
-                labelText: 'E-posta',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppStrings.email,
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -211,7 +215,7 @@ class AuthView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -238,7 +242,7 @@ class AuthView extends StatelessWidget {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Giriş Yap'),
+            child: Text(AppStrings.login),
           ),
         ],
       ),
@@ -272,10 +276,7 @@ class AuthView extends StatelessWidget {
     }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          vm.errorMessage ??
-              'Senkronizasyon tamamlanamadı. Lütfen tekrar deneyin.',
-        ),
+        content: Text(vm.errorMessage ?? AppStrings.syncCouldNotComplete),
         backgroundColor: AppColors.error,
       ),
     );
@@ -288,27 +289,25 @@ class AuthView extends StatelessWidget {
       barrierDismissible: false, // Kullanıcı mutlaka seçim yapmalı
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.cloud_done_rounded, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text('Bulut Yedeği Bulundu'),
+            const Icon(Icons.cloud_done_rounded, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Text(AppStrings.cloudBackupFound),
           ],
         ),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Giriş yaptığınız hesaba ait bulut sunucusunda yedek verileriniz bulunmaktadır. Nasıl devam etmek istersiniz?',
-              style: TextStyle(fontSize: 14, height: 1.4),
+              AppStrings.cloudBackupQuestion,
+              style: const TextStyle(fontSize: 14, height: 1.4),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
-              '• Birleştir: Cihazdaki yerel veriler ile bulut verilerini tarihlerine göre harmanlar.\n'
-              '• Geri Yükle: Cihazdaki verileri siler ve buluttaki yedeği telefona yazar.\n'
-              '• Üzerine Yaz: Buluttaki yedeği siler ve cihazdaki verileri buluta yükler.',
-              style: TextStyle(
+              AppStrings.cloudBackupOptions,
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
                 height: 1.5,
@@ -332,7 +331,7 @@ class AuthView extends StatelessWidget {
               foregroundColor: Colors.black87,
               elevation: 0,
             ),
-            child: const Text('Geri Yükle'),
+            child: Text(AppStrings.restore),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -344,7 +343,7 @@ class AuthView extends StatelessWidget {
               foregroundColor: Colors.black87,
               elevation: 0,
             ),
-            child: const Text('Üzerine Yaz'),
+            child: Text(AppStrings.overwrite),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -355,7 +354,7 @@ class AuthView extends StatelessWidget {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Birleştir'),
+            child: Text(AppStrings.merge),
           ),
         ],
       ),

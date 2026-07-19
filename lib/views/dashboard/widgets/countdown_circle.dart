@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/period_calculator.dart';
 
 /// Regl geri sayım dairesi — CustomPainter ile animasyonlu dairesel widget.
@@ -135,7 +136,7 @@ class _CountdownCircleState extends State<CountdownCircle>
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
-                            'Tarih Bekleniyor',
+                            AppStrings.dateAwaiting,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 14,
@@ -182,7 +183,9 @@ class _CountdownCircleState extends State<CountdownCircle>
                           ],
                         ),
                         Text(
-                          widget.daysRemaining == 0 ? 'Bugün' : 'gün kaldı',
+                          widget.daysRemaining == 0
+                              ? AppStrings.today
+                              : AppStrings.daysRemaining,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,

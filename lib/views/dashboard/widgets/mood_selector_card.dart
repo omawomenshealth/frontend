@@ -47,7 +47,9 @@ class MoodSelectorCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 10,
             children: AppStrings.moodOptions.entries.map((entry) {
-              final isSelected = selectedMood == entry.key;
+              final isSelected =
+                  AppStrings.localizeStoredValue(selectedMood ?? '') ==
+                  entry.key;
               return GestureDetector(
                 onTap: () => onMoodSelected(entry),
                 child: AnimatedContainer(
@@ -58,12 +60,12 @@ class MoodSelectorCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? _getMoodColor(entry.key).withValues(alpha: 0.15)
+                        ? _getMoodColor(entry.value).withValues(alpha: 0.15)
                         : AppColors.background,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected
-                          ? _getMoodColor(entry.key)
+                          ? _getMoodColor(entry.value)
                           : Colors.transparent,
                       width: 1.5,
                     ),
@@ -81,7 +83,7 @@ class MoodSelectorCard extends StatelessWidget {
                               ? FontWeight.w600
                               : FontWeight.normal,
                           color: isSelected
-                              ? _getMoodColor(entry.key)
+                              ? _getMoodColor(entry.value)
                               : AppColors.textSecondary,
                         ),
                       ),
@@ -96,26 +98,20 @@ class MoodSelectorCard extends StatelessWidget {
     );
   }
 
-  Color _getMoodColor(String mood) {
-    switch (mood) {
-      case 'Mutlu':
+  Color _getMoodColor(String emoji) {
+    switch (emoji) {
+      case '😊':
         return AppColors.moodHappy;
-      case 'Huzurlu':
+      case '😌':
         return AppColors.moodPeaceful;
-      case 'İyi':
-      case 'Enerjik':
+      case '🙂':
+      case '⚡':
         return AppColors.moodGood;
-      case 'Normal':
-        return AppColors.moodNeutral;
-      case 'Kötü':
-      case 'Üzgün':
+      case '😞':
+      case '😴':
         return AppColors.moodSad;
-      case 'Sinirli':
+      case '😡':
         return AppColors.moodAngry;
-      case 'Kaygılı':
-        return AppColors.moodAnxious;
-      case 'Yorgun':
-        return AppColors.moodSad;
       default:
         return AppColors.moodNeutral;
     }

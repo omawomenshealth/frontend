@@ -3,6 +3,7 @@ import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/sync_service.dart';
 import '../../../core/utils/cycle_rules.dart';
+import '../../../core/constants/app_strings.dart';
 
 /// Onboarding iş mantığı — adım adım kullanıcı bilgisi toplama.
 class OnboardingViewModel extends ChangeNotifier {
@@ -25,7 +26,7 @@ class OnboardingViewModel extends ChangeNotifier {
   double? _weight;
   double? _height;
   int? _age;
-  String _relationshipStatus = 'Belirtmek istemiyorum';
+  String _relationshipStatus = AppStrings.relationshipStatusOptions.last;
   bool? _sexuallyActive;
   bool? _wantsChildrenInYear;
   String? _bloodTestResults;
@@ -126,8 +127,12 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void toggleChronicDisease(String disease) {
-    if (_chronicDiseases.contains(disease)) {
-      _chronicDiseases = List.from(_chronicDiseases)..remove(disease);
+    final existingIndex = _chronicDiseases.indexWhere(
+      (value) => AppStrings.localizeStoredValue(value) == disease,
+    );
+    if (existingIndex >= 0) {
+      _chronicDiseases = List.from(_chronicDiseases)
+        ..removeAt(existingIndex);
     } else {
       _chronicDiseases = List.from(_chronicDiseases)..add(disease);
     }
@@ -168,8 +173,11 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void toggleWomenDisease(String disease) {
-    if (_womenDiseases.contains(disease)) {
-      _womenDiseases = List.from(_womenDiseases)..remove(disease);
+    final existingIndex = _womenDiseases.indexWhere(
+      (value) => AppStrings.localizeStoredValue(value) == disease,
+    );
+    if (existingIndex >= 0) {
+      _womenDiseases = List.from(_womenDiseases)..removeAt(existingIndex);
     } else {
       _womenDiseases = List.from(_womenDiseases)..add(disease);
     }

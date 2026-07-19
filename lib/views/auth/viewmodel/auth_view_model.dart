@@ -3,6 +3,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/sync_service.dart';
+import '../../../core/constants/app_strings.dart';
 
 enum SyncConflictAction { merge, restore, backup }
 
@@ -51,7 +52,7 @@ class AuthViewModel extends ChangeNotifier {
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
-        throw Exception('Google Kimlik Doğrulama Tokenı alınamadı.');
+        throw Exception(AppStrings.googleTokenMissing);
       }
 
       // Backend API'ye gönder
@@ -126,12 +127,11 @@ class AuthViewModel extends ChangeNotifier {
         success = false;
       }
       if (!success) {
-        _errorMessage =
-            'Senkronizasyon tamamlanamadı. Yerel verileriniz korundu.';
+        _errorMessage = AppStrings.syncProtectedError;
       }
       return success;
     } catch (e) {
-      _errorMessage = 'Senkronizasyon hatası: $e';
+      _errorMessage = AppStrings.syncError(e);
       return false;
     } finally {
       _isLoading = false;
@@ -150,11 +150,11 @@ class AuthViewModel extends ChangeNotifier {
     try {
       final success = await _sync.backupToCloud();
       if (!success) {
-        _errorMessage = 'Profil açıldı ancak bulut yedeği oluşturulamadı.';
+        _errorMessage = AppStrings.profileBackupFailed;
       }
       return success;
     } catch (e) {
-      _errorMessage = 'Bulut yedekleme hatası: $e';
+      _errorMessage = AppStrings.cloudBackupError(e);
       return false;
     } finally {
       _isLoading = false;

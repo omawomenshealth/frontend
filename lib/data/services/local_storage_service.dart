@@ -4,6 +4,7 @@ import '../models/period_log_model.dart';
 import '../../core/utils/date_extensions.dart';
 import '../../core/utils/app_time.dart';
 import '../../core/utils/cycle_rules.dart';
+import '../../core/constants/app_strings.dart';
 
 /// SharedPreferences üzerinden veri okuma/yazma servisi.
 class LocalStorageService {
@@ -56,9 +57,7 @@ class LocalStorageService {
 
   SharedPreferences get _p {
     if (_prefs == null) {
-      throw StateError(
-        'LocalStorageService henüz başlatılmadı. init() çağrın.',
-      );
+      throw StateError(AppStrings.localStorageNotInitialized);
     }
     return _prefs!;
   }

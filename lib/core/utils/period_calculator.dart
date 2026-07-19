@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../constants/app_strings.dart';
 import '../utils/date_extensions.dart';
 import '../utils/app_time.dart';
 import '../utils/cycle_rules.dart';
@@ -218,31 +220,31 @@ class PeriodCalculator {
     return end.difference(start).inDays + 1;
   }
 
-  /// Döngü fazının Türkçe adı.
+  /// Döngü fazının seçili dildeki adı.
   String get currentPhaseName {
     switch (currentPhase) {
       case CyclePhase.menstrual:
-        return 'Adet Dönemi';
+        return AppStrings.menstrualPhase;
       case CyclePhase.follicular:
-        return 'Foliküler Faz';
+        return AppStrings.follicularPhase;
       case CyclePhase.ovulation:
-        return 'Tahmini Ovülasyon Aralığı';
+        return AppStrings.estimatedOvulationWindow;
       case CyclePhase.luteal:
-        return 'Luteal Faz';
+        return AppStrings.lutealPhase;
     }
   }
 
-  /// Sonraki döngü fazının Türkçe adı.
+  /// Sonraki döngü fazının seçili dildeki adı.
   String get nextPhaseName {
     switch (currentPhase) {
       case CyclePhase.menstrual:
-        return 'Foliküler Faz';
+        return AppStrings.follicularPhase;
       case CyclePhase.follicular:
-        return 'Tahmini Ovülasyon Aralığı';
+        return AppStrings.estimatedOvulationWindow;
       case CyclePhase.ovulation:
-        return 'Luteal Faz';
+        return AppStrings.lutealPhase;
       case CyclePhase.luteal:
-        return 'Adet Dönemi';
+        return AppStrings.menstrualPhase;
     }
   }
 
