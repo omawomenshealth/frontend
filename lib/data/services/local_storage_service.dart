@@ -1,6 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import '../models/user_settings_model.dart';
 import '../models/period_log_model.dart';
+import '../models/medication_reminder_model.dart';
 import '../../core/utils/date_extensions.dart';
 import '../../core/utils/app_time.dart';
 import '../../core/utils/cycle_rules.dart';
@@ -18,6 +20,9 @@ class LocalStorageService {
   static const String _authNameKey = 'auth_name';
   static const String _authGoogleIdKey = 'auth_google_id';
   static const String _authLastSyncKey = 'auth_last_sync';
+  static const String _medicationReminderPlansKey =
+      'medication_reminder_plans_v1';
+  static const String _medicationDoseRecordsKey = 'medication_dose_records_v1';
 
   SharedPreferences? _prefs;
 
@@ -492,6 +497,149 @@ class LocalStorageService {
   /// Tüm özel takviyeleri toplu kaydet.
   Future<bool> saveCustomSupplements(List<String> list) async {
     return _p.setStringList(_allSupsKey, list);
+  }
+
+  // ── İlaç & Takviye Hatırlatıcıları ─────────────────────
+
+  List<MedicationReminderPlan> loadMedicationReminderPlans() {
+    final raw = _p.getString(_medicationReminderPlansKey);
+    if (raw == null) return [];
+    try {
+      final decoded = jsonDecode(raw) as List<dynamic>;
+      final plans = decoded
+          .map(
+            (item) => MedicationReminderPlan.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList();
+      plans.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      return plans;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<bool> saveMedicationReminderPlans(List<MedicationReminderPlan> plans) {
+    return _p.setString(
+      _medicationReminderPlansKey,
+      jsonEncode(plans.map((plan) => plan.toJson()).toList()),
+    );
+  }
+
+  Future<bool> upsertMedicationReminderPlan(MedicationReminderPlan plan) async {
+    final plans = loadMedicationReminderPlans();
+    final index = plans.indexWhere((item) => item.id == plan.id);
+    if (index == -1) {
+      plans.add(plan);
+    } else {
+      plans[index] = plan;
+    }
+    return saveMedicationReminderPlans(plans);
+  }
+
+  Future<bool> deleteMedicationReminderPlan(String id) async {
+    final plans = loadMedicationReminderPlans()
+      ..removeWhere((plan) => plan.id == id);
+    return saveMedicationReminderPlans(plans);
+  }
+
+  List<MedicationDoseRecord> loadMedicationDoseRecords() {
+    final raw = _p.getString(_medicationDoseRecordsKey);
+    if (raw == null) return [];
+    try {
+      final decoded = jsonDecode(raw) as List<dynamic>;
+      final records = decoded
+          .map(
+            (item) => MedicationDoseRecord.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList();
+      records.sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+      return records;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<bool> saveMedicationDoseRecords(List<MedicationDoseRecord> records) {
+    return _p.setString(
+      _medicationDoseRecordsKey,
+      jsonEncode(records.map((record) => record.toJson()).toList()),
+    );
+  }
+
+  /// Geçmiş dozları kalıcılaştırır ve gelecekteki en yakın 50 dozu planlarla
+  /// yeniden eşitler. Böylece plan sonradan düzenlense veya silinse bile geçmiş
+  /// alındı/atlandı/cevaplanmadı kayıtları kaybolmaz.
+  Future<bool> refreshMedicationDoseRecords({
+    required Iterable<MedicationReminderPlan> plans,
+    required Set<String> notificationScheduledDoseIds,
+    DateTime? now,
+  }) async {
+    final currentTime = now ?? DateTime.now();
+    final enabledPlans = plans.where((plan) => plan.enabled).toList();
+    final records = loadMedicationDoseRecords();
+    final byId = {for (final record in records) record.id: record};
+
+    for (final plan in enabledPlans) {
+      final historical = MedicationScheduleCalculator.between(
+        plans: [plan],
+        from: plan.createdAt,
+        through: currentTime,
+      );
+      for (final dose in historical) {
+        byId.putIfAbsent(
+          dose.id,
+          () => MedicationDoseRecord.fromPlannedDose(
+            dose,
+            notificationScheduled: false,
+          ),
+        );
+      }
+    }
+
+    byId.removeWhere(
+      (_, record) =>
+          !record.scheduledAt.isBefore(currentTime) && record.status == null,
+    );
+
+    final upcoming = MedicationScheduleCalculator.upcoming(
+      plans: enabledPlans,
+      from: currentTime,
+      limit: 50,
+    );
+    for (final dose in upcoming) {
+      final wasScheduled = notificationScheduledDoseIds.contains(dose.id);
+      byId.putIfAbsent(
+        dose.id,
+        () => MedicationDoseRecord.fromPlannedDose(
+          dose,
+          notificationScheduled: wasScheduled,
+          notificationScheduledAt: wasScheduled ? currentTime : null,
+        ),
+      );
+    }
+
+    final updated = byId.values.toList()
+      ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+    return saveMedicationDoseRecords(updated);
+  }
+
+  Future<bool> recordMedicationDoseResponse({
+    required String recordId,
+    required MedicationDoseResponseStatus status,
+    DateTime? respondedAt,
+  }) async {
+    final records = loadMedicationDoseRecords();
+    final index = records.indexWhere((record) => record.id == recordId);
+    if (index == -1) return false;
+    records[index] = records[index].copyWith(
+      status: status,
+      respondedAt: respondedAt ?? DateTime.now(),
+    );
+    return saveMedicationDoseRecords(records);
   }
 }
 

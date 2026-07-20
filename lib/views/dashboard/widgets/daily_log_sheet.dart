@@ -8,6 +8,8 @@ import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../data/models/medication_reminder_model.dart';
+import 'medication_reminder_section.dart';
 
 /// Günlük kayıt BottomSheet — tüm modüllerin detaylı giriş ekranı.
 class DailyLogSheet extends StatefulWidget {
@@ -38,6 +40,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   final _customMedController = TextEditingController();
   final _customSupController = TextEditingController();
   late int _selectedTabIndex;
+  late Set<DailyLogObservedSection> _visitedSections;
   List<String> _previouslyAddedMeds = [];
   List<String> _previouslyAddedSups = [];
   bool _isSaving = false;
@@ -49,6 +52,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _notesController.text = _log.notes ?? '';
     _moodNoteController.text = _log.moodNote ?? '';
     _selectedTabIndex = widget.initialTabIndex;
+    _visitedSections = {
+      ..._log.observedSections,
+      _observedSectionForIndex(_selectedTabIndex),
+    };
     _loadPreviouslyAddedItems();
   }
 
@@ -91,6 +98,19 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   bool _isSectionVisible(int categoryIndex) {
     final idx = _selectedTabIndex < _tabTitles.length ? _selectedTabIndex : 0;
     return idx == categoryIndex;
+  }
+
+  DailyLogObservedSection get _activeObservedSection {
+    return _observedSectionForIndex(_selectedTabIndex);
+  }
+
+  DailyLogObservedSection _observedSectionForIndex(int index) {
+    return switch (index) {
+      0 => DailyLogObservedSection.period,
+      1 => DailyLogObservedSection.nutrition,
+      2 => DailyLogObservedSection.medication,
+      _ => DailyLogObservedSection.wellbeing,
+    };
   }
 
   @override
@@ -159,6 +179,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         onTap: () {
                           setState(() {
                             _selectedTabIndex = idx;
+                            _visitedSections.add(_observedSectionForIndex(idx));
                           });
                         },
                         child: Container(
@@ -299,6 +320,85 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         ),
                       ),
 
+                    if (_isSectionVisible(3))
+                      _buildSection(
+                        title: '🌙 ${AppStrings.dailyFactors}',
+                        subtitle: AppStrings.dailyFactorsHint,
+                        child: Column(
+                          children: [
+                            _buildOptionalSliderMetric(
+                              icon: Icons.bedtime_outlined,
+                              title: AppStrings.sleepDuration,
+                              value: _log.sleepDurationMinutes,
+                              minimum: 30,
+                              maximum: 960,
+                              step: 30,
+                              initialValue: 480,
+                              color: AppColors.primary,
+                              valueText: AppStrings.hoursMinutes,
+                              onChanged: (value) => setState(() {
+                                _log = value == null
+                                    ? _log.copyWith(clearSleepDuration: true)
+                                    : _log.copyWith(
+                                        sleepDurationMinutes: value,
+                                      );
+                              }),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildOptionalSliderMetric(
+                              icon: Icons.hotel_class_outlined,
+                              title: AppStrings.sleepQuality,
+                              value: _log.sleepQuality,
+                              minimum: 1,
+                              maximum: 5,
+                              step: 1,
+                              initialValue: 3,
+                              color: AppColors.primary,
+                              valueText: AppStrings.levelOutOfFive,
+                              onChanged: (value) => setState(() {
+                                _log = value == null
+                                    ? _log.copyWith(clearSleepQuality: true)
+                                    : _log.copyWith(sleepQuality: value);
+                              }),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildOptionalSliderMetric(
+                              icon: Icons.psychology_alt_outlined,
+                              title: AppStrings.stressLevel,
+                              value: _log.stressLevel,
+                              minimum: 1,
+                              maximum: 5,
+                              step: 1,
+                              initialValue: 3,
+                              color: AppColors.accent,
+                              valueText: AppStrings.levelOutOfFive,
+                              onChanged: (value) => setState(() {
+                                _log = value == null
+                                    ? _log.copyWith(clearStressLevel: true)
+                                    : _log.copyWith(stressLevel: value);
+                              }),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildOptionalSliderMetric(
+                              icon: Icons.bolt_outlined,
+                              title: AppStrings.energyLevel,
+                              value: _log.energyLevel,
+                              minimum: 1,
+                              maximum: 5,
+                              step: 1,
+                              initialValue: 3,
+                              color: AppColors.warning,
+                              valueText: AppStrings.levelOutOfFive,
+                              onChanged: (value) => setState(() {
+                                _log = value == null
+                                    ? _log.copyWith(clearEnergyLevel: true)
+                                    : _log.copyWith(energyLevel: value);
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+
                     // 2. Beslenme Durumu
                     if (_isSectionVisible(1))
                       _buildSection(
@@ -313,20 +413,78 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         ),
                       ),
 
+                    if (_isSectionVisible(1))
+                      _buildSection(
+                        title: '💧 ${AppStrings.dailyFactors}',
+                        subtitle: AppStrings.dailyFactorsHint,
+                        child: Column(
+                          children: [
+                            _buildOptionalCounterMetric(
+                              icon: Icons.water_drop_outlined,
+                              title: AppStrings.waterIntake,
+                              value: _log.waterIntakeMl,
+                              minimum: 0,
+                              maximum: 6000,
+                              step: 250,
+                              initialValue: 0,
+                              color: AppColors.info,
+                              valueText: AppStrings.milliliters,
+                              onChanged: (value) => setState(() {
+                                _log = value == null
+                                    ? _log.copyWith(clearWaterIntake: true)
+                                    : _log.copyWith(waterIntakeMl: value);
+                              }),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildOptionalCounterMetric(
+                              icon: Icons.coffee_outlined,
+                              title: AppStrings.caffeineIntake,
+                              subtitle: AppStrings.caffeineServingHint,
+                              value: _log.caffeineServings,
+                              minimum: 0,
+                              maximum: 12,
+                              step: 1,
+                              initialValue: 0,
+                              color: AppColors.warning,
+                              valueText: AppStrings.servingCount,
+                              onChanged: (value) => setState(() {
+                                _log = value == null
+                                    ? _log.copyWith(clearCaffeineServings: true)
+                                    : _log.copyWith(caffeineServings: value);
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+
                     // 3. Takviyeler
                     if (_isSectionVisible(2))
                       _buildSection(
                         title: '🌿 ${AppStrings.supplements}',
-                        child: _buildMedicationList(
-                          items: widget.settings.dailySupplements,
-                          entries: _log.supplements,
-                          color: AppColors.success,
-                          customController: _customSupController,
-                          customHint: AppStrings.supplementExample,
-                          suggestions: _previouslyAddedSups,
-                          onChanged: (entries) => setState(
-                            () => _log = _log.copyWith(supplements: entries),
-                          ),
+                        child: Column(
+                          children: [
+                            _buildMedicationList(
+                              items: widget.settings.dailySupplements,
+                              entries: _log.supplements,
+                              color: AppColors.success,
+                              customController: _customSupController,
+                              customHint: AppStrings.supplementExample,
+                              suggestions: _previouslyAddedSups,
+                              onChanged: (entries) => setState(
+                                () =>
+                                    _log = _log.copyWith(supplements: entries),
+                              ),
+                            ),
+                            MedicationReminderSection(
+                              itemType: MedicationPlanItemType.supplement,
+                              availableItems: {
+                                ...widget.settings.dailySupplements,
+                                ..._log.supplements.map((entry) => entry.name),
+                                ..._previouslyAddedSups,
+                              }.toList(),
+                              color: AppColors.success,
+                            ),
+                          ],
                         ),
                       ),
 
@@ -335,16 +493,30 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       _buildSection(
                         title: '💊 ${AppStrings.medications}',
                         subtitle: AppStrings.medicationDisclaimer,
-                        child: _buildMedicationList(
-                          items: widget.settings.dailyMedications,
-                          entries: _log.medications,
-                          color: AppColors.medicationPrimary,
-                          customController: _customMedController,
-                          customHint: AppStrings.medicationExample,
-                          suggestions: _previouslyAddedMeds,
-                          onChanged: (entries) => setState(
-                            () => _log = _log.copyWith(medications: entries),
-                          ),
+                        child: Column(
+                          children: [
+                            _buildMedicationList(
+                              items: widget.settings.dailyMedications,
+                              entries: _log.medications,
+                              color: AppColors.medicationPrimary,
+                              customController: _customMedController,
+                              customHint: AppStrings.medicationExample,
+                              suggestions: _previouslyAddedMeds,
+                              onChanged: (entries) => setState(
+                                () =>
+                                    _log = _log.copyWith(medications: entries),
+                              ),
+                            ),
+                            MedicationReminderSection(
+                              itemType: MedicationPlanItemType.medication,
+                              availableItems: {
+                                ...widget.settings.dailyMedications,
+                                ..._log.medications.map((entry) => entry.name),
+                                ..._previouslyAddedMeds,
+                              }.toList(),
+                              color: AppColors.medicationPrimary,
+                            ),
+                          ],
                         ),
                       ),
 
@@ -422,6 +594,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           color: AppColors.periodPrimary,
                         ),
                       ),
+                      _buildSection(
+                        title: '💧 ${AppStrings.vaginalDischarge}',
+                        subtitle: AppStrings.dischargeTrackingHint,
+                        child: _buildVaginalDischargeInput(),
+                      ),
                     ],
 
                     // 9. Notlar
@@ -490,7 +667,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         var success = false;
                         try {
                           success = await widget.onSave(
-                            _log.copyWith(date: finalDate),
+                            _log.copyWith(
+                              date: finalDate,
+                              observedSections: {
+                                ..._log.observedSections,
+                                ..._visitedSections,
+                                _activeObservedSection,
+                              },
+                            ),
                           );
                         } catch (_) {
                           success = false;
@@ -566,6 +750,459 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           child,
         ],
       ),
+    );
+  }
+
+  Widget _buildOptionalSliderMetric({
+    required IconData icon,
+    required String title,
+    required int? value,
+    required int minimum,
+    required int maximum,
+    required int step,
+    required int initialValue,
+    required Color color,
+    required String Function(int) valueText,
+    required ValueChanged<int?> onChanged,
+  }) {
+    if (value == null) {
+      return _buildMetricAddRow(
+        icon: icon,
+        title: title,
+        color: color,
+        onAdd: () => onChanged(initialValue),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 6, 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20, color: color),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              Text(
+                valueText(value),
+                style: TextStyle(fontWeight: FontWeight.w700, color: color),
+              ),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                tooltip: AppStrings.delete,
+                onPressed: () => onChanged(null),
+                icon: const Icon(Icons.close, size: 18),
+              ),
+            ],
+          ),
+          Slider(
+            value: value.toDouble(),
+            min: minimum.toDouble(),
+            max: maximum.toDouble(),
+            divisions: (maximum - minimum) ~/ step,
+            activeColor: color,
+            label: valueText(value),
+            onChanged: (next) {
+              final stepped =
+                  ((next - minimum) / step).round() * step + minimum;
+              onChanged(stepped.clamp(minimum, maximum).toInt());
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOptionalCounterMetric({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required int? value,
+    required int minimum,
+    required int maximum,
+    required int step,
+    required int initialValue,
+    required Color color,
+    required String Function(int) valueText,
+    required ValueChanged<int?> onChanged,
+  }) {
+    if (value == null) {
+      return _buildMetricAddRow(
+        icon: icon,
+        title: title,
+        subtitle: subtitle,
+        color: color,
+        onAdd: () => onChanged(initialValue),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                if (subtitle != null)
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            onPressed: value <= minimum
+                ? null
+                : () =>
+                      onChanged((value - step).clamp(minimum, maximum).toInt()),
+            icon: const Icon(Icons.remove_circle_outline),
+          ),
+          SizedBox(
+            width: 72,
+            child: Text(
+              valueText(value),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.w700, color: color),
+            ),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            onPressed: value >= maximum
+                ? null
+                : () =>
+                      onChanged((value + step).clamp(minimum, maximum).toInt()),
+            icon: const Icon(Icons.add_circle_outline),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            tooltip: AppStrings.delete,
+            onPressed: () => onChanged(null),
+            icon: const Icon(Icons.close, size: 18),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetricAddRow({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required Color color,
+    required VoidCallback onAdd,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (subtitle != null)
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          TextButton.icon(
+            onPressed: onAdd,
+            icon: const Icon(Icons.add, size: 18),
+            label: Text(AppStrings.add),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVaginalDischargeInput() {
+    final present = _log.vaginalDischargePresent;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                AppStrings.dischargePresent,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+            if (present != null)
+              IconButton(
+                tooltip: AppStrings.delete,
+                onPressed: () => setState(() {
+                  _log = _log.copyWith(
+                    clearVaginalDischargePresent: true,
+                    clearVaginalDischargeColor: true,
+                    clearVaginalDischargeConsistency: true,
+                    clearVaginalDischargeAmount: true,
+                    vaginalDischargeSymptoms: const {},
+                  );
+                }),
+                icon: const Icon(Icons.close, size: 18),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _toggleButton(
+              AppStrings.yes,
+              present == true,
+              () => setState(
+                () => _log = _log.copyWith(vaginalDischargePresent: true),
+              ),
+            ),
+            const SizedBox(width: 8),
+            _toggleButton(
+              AppStrings.no,
+              present == false,
+              () => setState(() {
+                _log = _log.copyWith(
+                  vaginalDischargePresent: false,
+                  clearVaginalDischargeColor: true,
+                  clearVaginalDischargeConsistency: true,
+                  clearVaginalDischargeAmount: true,
+                  vaginalDischargeSymptoms: const {},
+                );
+              }),
+            ),
+          ],
+        ),
+        if (present == true) ...[
+          const SizedBox(height: 18),
+          Text(
+            AppStrings.dischargeColor,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          _buildDischargeColorSelector(),
+          const SizedBox(height: 18),
+          Text(
+            AppStrings.dischargeConsistency,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          _buildSingleChipSelector(
+            options: AppStrings.dischargeConsistencyOptions,
+            selected: _log.vaginalDischargeConsistency == null
+                ? null
+                : AppStrings.dischargeConsistencyOptions[_log
+                      .vaginalDischargeConsistency!
+                      .index],
+            onChanged: (value) => setState(() {
+              _log = value == null
+                  ? _log.copyWith(clearVaginalDischargeConsistency: true)
+                  : _log.copyWith(
+                      vaginalDischargeConsistency:
+                          VaginalDischargeConsistency.values[AppStrings
+                              .dischargeConsistencyOptions
+                              .indexOf(value)],
+                    );
+            }),
+            color: AppColors.primary,
+          ),
+          const SizedBox(height: 18),
+          Text(
+            AppStrings.dischargeAmount,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          _buildSingleChipSelector(
+            options: AppStrings.dischargeAmountOptions,
+            selected: _log.vaginalDischargeAmount == null
+                ? null
+                : AppStrings.dischargeAmountOptions[_log
+                      .vaginalDischargeAmount!
+                      .index],
+            onChanged: (value) => setState(() {
+              _log = value == null
+                  ? _log.copyWith(clearVaginalDischargeAmount: true)
+                  : _log.copyWith(
+                      vaginalDischargeAmount:
+                          VaginalDischargeAmount.values[AppStrings
+                              .dischargeAmountOptions
+                              .indexOf(value)],
+                    );
+            }),
+            color: AppColors.secondaryDark,
+          ),
+          const SizedBox(height: 18),
+          Text(
+            AppStrings.dischargeSymptoms,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          _buildChipSelector(
+            options: AppStrings.dischargeSymptomOptions,
+            selected: _log.vaginalDischargeSymptoms
+                .map(
+                  (symptom) =>
+                      AppStrings.dischargeSymptomOptions[symptom.index],
+                )
+                .toList(),
+            onChanged: (values) => setState(() {
+              _log = _log.copyWith(
+                vaginalDischargeSymptoms: values
+                    .map(
+                      (value) =>
+                          VaginalDischargeSymptom.values[AppStrings
+                              .dischargeSymptomOptions
+                              .indexOf(value)],
+                    )
+                    .toSet(),
+              );
+            }),
+            color: AppColors.accent,
+          ),
+        ],
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: AppColors.info.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            AppStrings.dischargeMedicalDisclaimer,
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDischargeColorSelector() {
+    const swatches = <Color>[
+      Color(0xFFE7F7FC),
+      Colors.white,
+      Color(0xFFFFF2CC),
+      Color(0xFFFFD54F),
+      Color(0xFF66BB6A),
+      Color(0xFF9E9E9E),
+      Color(0xFF8D6E63),
+      Color(0xFFF48FB1),
+      Color(0xFFE57373),
+      Color(0xFFB39DDB),
+    ];
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: VaginalDischargeColor.values.map((colorValue) {
+        final isSelected = _log.vaginalDischargeColor == colorValue;
+        final swatch = swatches[colorValue.index];
+        return InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => setState(() {
+            _log = isSelected
+                ? _log.copyWith(clearVaginalDischargeColor: true)
+                : _log.copyWith(vaginalDischargeColor: colorValue);
+          }),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.primary.withValues(alpha: 0.09)
+                  : AppColors.background,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? AppColors.primary : Colors.transparent,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    color: swatch,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.textHint),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  AppStrings.dischargeColorOptions[colorValue.index],
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 

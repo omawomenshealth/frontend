@@ -11,6 +11,57 @@ enum _TextKey {
   appName,
   appSlogan,
   home,
+  insights,
+  insightsSubtitle,
+  insightsPrivacyNote,
+  insightsEmptyTitle,
+  insightsEmptyDescription,
+  insightsDisclaimer,
+  insightDataBuildingTitle,
+  insightDataBuildingBody,
+  insightRecordingSummaryTitle,
+  insightRecordingSummaryBody,
+  insightCycleLengthTitle,
+  insightCycleLengthBody,
+  insightCycleVariationTitle,
+  insightCycleVariationBody,
+  insightPeriodDurationTitle,
+  insightPeriodDurationBody,
+  insightFrequentMoodTitle,
+  insightFrequentMoodBody,
+  insightRecurringSymptomTitle,
+  insightRecurringSymptomBody,
+  insightFrequentActivityTitle,
+  insightFrequentActivityBody,
+  insightFrequentNutritionTitle,
+  insightFrequentNutritionBody,
+  insightFrequentBowelTitle,
+  insightFrequentBowelBody,
+  insightSymptomMoodTitle,
+  insightSymptomMoodBody,
+  insightSymptomBleedingTitle,
+  insightSymptomBleedingBody,
+  insightAssociationTitle,
+  insightAssociationSameDayBody,
+  insightAssociationNextDayBody,
+  insightMedicationSkipAssociationTitle,
+  insightMedicationSkipAssociationBody,
+  insightMedicationAdherenceTitle,
+  insightMedicationAdherenceBody,
+  insightFertileDischargeTitle,
+  insightFertileDischargeBody,
+  insightMenstrualDischargeTitle,
+  insightMenstrualDischargeBody,
+  insightDischargeHealthTitle,
+  insightDischargeHealthBody,
+  insightConfidenceEmerging,
+  insightConfidenceModerate,
+  insightConfidenceStrong,
+  insightAssociationEvidence,
+  insightEvidenceDays,
+  insightEvidenceCycles,
+  insightEvidenceEntries,
+  insightEvidenceRecords,
   articles,
   profile,
   welcome,
@@ -114,6 +165,26 @@ enum _TextKey {
   activityStatus,
   nutrition,
   nutritionStatus,
+  dailyFactors,
+  dailyFactorsHint,
+  sleep,
+  sleepDuration,
+  sleepQuality,
+  stressLevel,
+  energyLevel,
+  waterIntake,
+  caffeineIntake,
+  caffeineServingHint,
+  hoursMinutes,
+  milliliters,
+  servingCount,
+  levelOutOfFive,
+  insightFeatureShortSleep,
+  insightFeaturePoorSleep,
+  insightFeatureHighStress,
+  insightFeatureLowEnergy,
+  insightFeatureHighCaffeine,
+  insightFeatureBelowTypicalWater,
   supplements,
   medications,
   medicationDisclaimer,
@@ -125,6 +196,14 @@ enum _TextKey {
   flowIntensity,
   periodBleeding,
   periodPain,
+  vaginalDischarge,
+  dischargePresent,
+  dischargeColor,
+  dischargeConsistency,
+  dischargeAmount,
+  dischargeSymptoms,
+  dischargeTrackingHint,
+  dischargeMedicalDisclaimer,
   notesHint,
   selectLogTime,
   logSaveFailed,
@@ -286,6 +365,47 @@ enum _TextKey {
   noActivePremium,
   premiumActivated,
   purchaseVerificationFailed,
+  createReminder,
+  editReminder,
+  reminderPlans,
+  noReminderPlans,
+  reminderItem,
+  reminderDose,
+  notificationTime,
+  repeatPeriod,
+  everyDay,
+  selectedDays,
+  startDate,
+  endDate,
+  noEndDate,
+  reminderEnabled,
+  notificationPermissionDenied,
+  reminderSaved,
+  reminderDeleted,
+  reminderDeleteQuestion,
+  phoneNotificationUnsupported,
+  reminderScheduleFailed,
+  reminderNotificationTitle,
+  reminderNotificationBody,
+  notificationScheduled,
+  notificationNotScheduled,
+  reminderChannelName,
+  reminderChannelDescription,
+  todaysPlannedDoses,
+  doseTaken,
+  doseSkipped,
+  doseUpcoming,
+  doseUnanswered,
+  selectAtLeastOneDay,
+  endDateValidation,
+  reminderItemRequired,
+  active,
+  inactive,
+  reminderSummaryDaily,
+  reminderSummaryDays,
+  reminderDateRange,
+  reminderDeliveryNote,
+  responseSaved,
   emptyMedicationList,
   reportFileName,
 }
@@ -302,6 +422,10 @@ enum _ListKey {
   bowelActivityOptions,
   painLocations,
   flowOptions,
+  dischargeColors,
+  dischargeConsistencies,
+  dischargeAmounts,
+  dischargeSymptoms,
   dosageOptions,
   shortWeekdays,
   weekdays,
@@ -315,6 +439,83 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.appName: 'OMA',
   _TextKey.appSlogan: 'Sağlığınızı günlük takip edin',
   _TextKey.home: 'Ana Sayfa',
+  _TextKey.insights: 'İçgörüler',
+  _TextKey.insightsSubtitle:
+      'Günlük kayıtlarından hesaplanan kişisel örüntüler',
+  _TextKey.insightsPrivacyNote:
+      'Bu özetler cihazındaki kayıtlarla, sabit kurallar ve istatistiklerle oluşturulur. LLM kullanılmaz.',
+  _TextKey.insightsEmptyTitle: 'Henüz içgörü oluşturulamıyor',
+  _TextKey.insightsEmptyDescription:
+      'Ana Sayfa’dan günlük kayıt ekledikçe kişisel özetlerin burada görünecek.',
+  _TextKey.insightsDisclaimer:
+      'İçgörüler yalnızca kayıtlarındaki örüntüleri gösterir; tıbbi tanı veya neden-sonuç ilişkisi değildir.',
+  _TextKey.insightDataBuildingTitle: 'Örüntün oluşmaya başladı',
+  _TextKey.insightDataBuildingBody:
+      'Kayıt bulunan gün: {count}. En az 3 kayıtlı gün olduğunda tekrarlayan seçimleri karşılaştırmaya başlayacağız.',
+  _TextKey.insightRecordingSummaryTitle: 'Kayıt görünümün',
+  _TextKey.insightRecordingSummaryBody:
+      '{spanDays} günlük zaman aralığında {loggedDays} farklı gün için sağlık kaydı oluşturdun.',
+  _TextKey.insightCycleLengthTitle: 'Son döngü uzunluğun',
+  _TextKey.insightCycleLengthBody:
+      'Kaydettiğin son iki regl başlangıcı arasında {length} gün var.',
+  _TextKey.insightCycleVariationTitle: 'Döngü aralığın',
+  _TextKey.insightCycleVariationBody:
+      'Hesaplanabilen son {count} döngün {min}–{max} gün arasında değişti.',
+  _TextKey.insightPeriodDurationTitle: 'Son tamamlanan kanama kaydın',
+  _TextKey.insightPeriodDurationBody:
+      'Ardışık kanama kayıtların {duration} gün sürdü.',
+  _TextKey.insightFrequentMoodTitle: 'En sık kaydettiğin his',
+  _TextKey.insightFrequentMoodBody:
+      '{label}, ruh hâli girdiğin {total} günün {count} tanesinde yer aldı.',
+  _TextKey.insightRecurringSymptomTitle: 'Tekrarlayan belirti kaydın',
+  _TextKey.insightRecurringSymptomBody:
+      '{label}, kayıt bulunan {total} günün {count} tanesinde işaretlendi.',
+  _TextKey.insightFrequentActivityTitle: 'En sık kaydettiğin hareket',
+  _TextKey.insightFrequentActivityBody:
+      '{label}, {total} kayıtlı günün {count} tanesinde yer aldı.',
+  _TextKey.insightFrequentNutritionTitle: 'Beslenme kayıtlarında öne çıkan',
+  _TextKey.insightFrequentNutritionBody:
+      '{label} etiketi {total} kayıtlı günün {count} tanesinde yer aldı.',
+  _TextKey.insightFrequentBowelTitle: 'Bağırsak kayıtlarında öne çıkan',
+  _TextKey.insightFrequentBowelBody:
+      '{label}, {total} kayıtlı günün {count} tanesinde işaretlendi.',
+  _TextKey.insightSymptomMoodTitle: 'Aynı gün kaydedilenler',
+  _TextKey.insightSymptomMoodBody:
+      '{primary} ile {secondary} aynı günde {count} kez kaydedildi. Bu yalnızca bir eşleşmedir.',
+  _TextKey.insightSymptomBleedingTitle: 'Kanama günlerindeki belirti',
+  _TextKey.insightSymptomBleedingBody:
+      '{label}, kanama kaydı olan {total} günün {count} tanesinde de işaretlendi.',
+  _TextKey.insightAssociationTitle: 'Kayıtlarında öne çıkan bağlantı',
+  _TextKey.insightAssociationSameDayBody:
+      '{primary} kaydedilen {withTotal} günün {withEvent} tanesinde aynı gün {secondary} de kaydedildi (%{withPercent}). {primary} kaydedilmeyen {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; neden-sonuç değildir.',
+  _TextKey.insightAssociationNextDayBody:
+      '{primary} kaydedilen {withTotal} günün {withEvent} tanesini izleyen gün {secondary} kaydedildi (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; neden-sonuç değildir.',
+  _TextKey.insightMedicationSkipAssociationTitle:
+      'Doz yanıtından sonra görülen örüntü',
+  _TextKey.insightMedicationSkipAssociationBody:
+      '{primary} “atlandı” olarak yanıtlanan {withTotal} günün {withEvent} tanesini izleyen gün {secondary} kaydedildi (%{withPercent}). “Alındı” yanıtı bulunan {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; ilacın etkisi veya neden-sonuç değildir.',
+  _TextKey.insightMedicationAdherenceTitle: 'Planlanan doz yanıtların',
+  _TextKey.insightMedicationAdherenceBody:
+      'Zamanı geçmiş {total} planlı dozun {taken} tanesini “alındı” olarak yanıtladın. Yanıtsız dozlar alındı sayılmaz.',
+  _TextKey.insightFertileDischargeTitle:
+      'Akıntı kaydı ve tahmini verimli dönem',
+  _TextKey.insightFertileDischargeBody:
+      'Son kaydındaki {color}, {consistency} görünüm tahmini verimli pencereyle örtüşüyor. Bu, doğurganlığın artabileceği bir dönemle uyumlu olabilir; ovülasyonu doğrulamaz ve gebelikten korunma yöntemi değildir.',
+  _TextKey.insightMenstrualDischargeTitle: 'Akıntı kaydı ve adet dönemi',
+  _TextKey.insightMenstrualDischargeBody:
+      'Son {color} akıntı kaydın adet veya kanama günüyle örtüşüyor. Bu kart yalnızca zamanlama bağlamı verir ve rengin nedenini belirlemez. Adet dışında kanlı görünüm tekrarlarsa sağlık profesyoneline danış.',
+  _TextKey.insightDischargeHealthTitle: 'Akıntı değişikliğini değerlendirin',
+  _TextKey.insightDischargeHealthBody:
+      'Son kaydında renk, kıvam, koku veya eşlik eden bulgulardan değerlendirilmesi gereken bir değişiklik işaretlendi. Bu, enfeksiyon dahil farklı nedenlerle görülebilir; uygulama nedenini belirleyemez veya tanı koyamaz. Değişiklik yeniyse, sürerse ya da kötüleşirse sağlık profesyoneline başvur.',
+  _TextKey.insightConfidenceEmerging: 'Oluşan bağlantı',
+  _TextKey.insightConfidenceModerate: 'Orta güven',
+  _TextKey.insightConfidenceStrong: 'Daha güçlü kanıt',
+  _TextKey.insightAssociationEvidence:
+      '{confidence} • {count} karşılaştırılabilir gün',
+  _TextKey.insightEvidenceDays: 'Kayıtlı gün: {count}',
+  _TextKey.insightEvidenceCycles: 'Hesaplanan döngü: {count}',
+  _TextKey.insightEvidenceEntries: 'İşaretleme girişi: {count}',
+  _TextKey.insightEvidenceRecords: 'Kayıt: {count}',
   _TextKey.articles: 'Yazılar',
   _TextKey.profile: 'Profil',
   _TextKey.welcome: 'Hoş Geldiniz',
@@ -420,6 +621,28 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.activityStatus: 'Hareket Durumu',
   _TextKey.nutrition: 'Beslenme',
   _TextKey.nutritionStatus: 'Beslenme Durumu',
+  _TextKey.dailyFactors: 'Günlük Etkenler',
+  _TextKey.dailyFactorsHint:
+      'İsteğe bağlıdır. Düzenli kayıtlar, kişisel bağlantıları karşılaştırmayı sağlar.',
+  _TextKey.sleep: 'Uyku',
+  _TextKey.sleepDuration: 'Uyku Süresi',
+  _TextKey.sleepQuality: 'Uyku Kalitesi',
+  _TextKey.stressLevel: 'Stres Düzeyi',
+  _TextKey.energyLevel: 'Enerji Düzeyi',
+  _TextKey.waterIntake: 'Su Tüketimi',
+  _TextKey.caffeineIntake: 'Kafeinli İçecek',
+  _TextKey.caffeineServingHint: 'Bardak/fincan sayısı',
+  _TextKey.hoursMinutes: '{hours} sa {minutes} dk',
+  _TextKey.milliliters: '{value} ml',
+  _TextKey.servingCount: '{count} porsiyon',
+  _TextKey.levelOutOfFive: '{value}/5',
+  _TextKey.insightFeatureShortSleep: 'kişisel ortancanın altında uyku süresi',
+  _TextKey.insightFeaturePoorSleep: 'düşük uyku kalitesi',
+  _TextKey.insightFeatureHighStress: 'yüksek stres',
+  _TextKey.insightFeatureLowEnergy: 'düşük enerji',
+  _TextKey.insightFeatureHighCaffeine: '2 veya daha fazla kafeinli içecek',
+  _TextKey.insightFeatureBelowTypicalWater:
+      'kişisel ortancanın altında su tüketimi',
   _TextKey.supplements: 'Takviyeler',
   _TextKey.medications: 'İlaçlar',
   _TextKey.medicationDisclaimer:
@@ -432,6 +655,16 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.flowIntensity: 'Akış Yoğunluğu',
   _TextKey.periodBleeding: '🩸 Adet Kanaması (Akış Şiddeti)',
   _TextKey.periodPain: 'Regl Ağrısı',
+  _TextKey.vaginalDischarge: 'Vajinal Akıntı / Servikal Mukus',
+  _TextKey.dischargePresent: 'Bugün akıntı veya mukus gözlemledin mi?',
+  _TextKey.dischargeColor: 'Renk',
+  _TextKey.dischargeConsistency: 'Görünüm / Kıvam',
+  _TextKey.dischargeAmount: 'Miktar',
+  _TextKey.dischargeSymptoms: 'Eşlik Eden Bulgular',
+  _TextKey.dischargeTrackingHint:
+      'Renk tek başına yorumlanmaz. Kıvam, koku ve eşlik eden bulguları da kaydet.',
+  _TextKey.dischargeMedicalDisclaimer:
+      'Bu takip tanı veya kesin ovülasyon sonucu vermez. Olağandışı ya da süren değişikliklerde sağlık profesyoneline danış.',
   _TextKey.notesHint: 'Bugün hakkında notlarınız...',
   _TextKey.selectLogTime: 'Kayıt Saatini Seçin',
   _TextKey.logSaveFailed: 'Kayıt tamamlanamadı. Lütfen tekrar deneyin.',
@@ -622,6 +855,54 @@ const Map<_TextKey, String> _turkishTexts = {
       'Satın alma doğrulandı ancak aktif premium erişim bulunamadı.',
   _TextKey.premiumActivated: 'Premium üyeliğiniz aktif edildi.',
   _TextKey.purchaseVerificationFailed: 'Satın alma doğrulanamadı: {error}',
+  _TextKey.createReminder: 'Hatırlatıcı oluştur',
+  _TextKey.editReminder: 'Hatırlatıcıyı düzenle',
+  _TextKey.reminderPlans: 'Hatırlatıcı planları',
+  _TextKey.noReminderPlans: 'Henüz hatırlatıcı planı yok.',
+  _TextKey.reminderItem: 'İlaç veya takviye',
+  _TextKey.reminderDose: 'Doz',
+  _TextKey.notificationTime: 'Bildirim saati',
+  _TextKey.repeatPeriod: 'Tekrarlama periyodu',
+  _TextKey.everyDay: 'Her gün',
+  _TextKey.selectedDays: 'Seçili günler',
+  _TextKey.startDate: 'Başlangıç tarihi',
+  _TextKey.endDate: 'Bitiş tarihi',
+  _TextKey.noEndDate: 'Bitiş tarihi yok',
+  _TextKey.reminderEnabled: 'Hatırlatıcı açık',
+  _TextKey.notificationPermissionDenied:
+      'Plan kaydedildi ancak bildirim izni verilmedi. Telefon ayarlarından OMA bildirimlerini açabilirsin.',
+  _TextKey.reminderSaved: 'Hatırlatıcı planı kaydedildi.',
+  _TextKey.reminderDeleted: 'Hatırlatıcı planı silindi.',
+  _TextKey.reminderDeleteQuestion:
+      '{name} hatırlatıcı planını silmek istiyor musun?',
+  _TextKey.phoneNotificationUnsupported:
+      'Plan kaydedildi. Zamanlanmış bildirimler Android ve iPhone uygulamasında çalışır.',
+  _TextKey.reminderScheduleFailed:
+      'Plan kaydedildi ancak bildirimler zamanlanamadı: {error}',
+  _TextKey.reminderNotificationTitle: '{name} zamanı',
+  _TextKey.reminderNotificationBody:
+      '{dose} dozunu alma zamanı. Yanıtını OMA’da kaydedebilirsin.',
+  _TextKey.notificationScheduled: 'Bildirim cihazda planlandı',
+  _TextKey.notificationNotScheduled: 'Bildirim cihazda planlanmadı',
+  _TextKey.reminderChannelName: 'İlaç ve takviye hatırlatıcıları',
+  _TextKey.reminderChannelDescription:
+      'Planlanan ilaç ve takviye dozları için bildirimler',
+  _TextKey.todaysPlannedDoses: 'Bugünün planlanan dozları',
+  _TextKey.doseTaken: 'Alındı',
+  _TextKey.doseSkipped: 'Atlandı',
+  _TextKey.doseUpcoming: 'Bekliyor',
+  _TextKey.doseUnanswered: 'Cevaplanmadı',
+  _TextKey.selectAtLeastOneDay: 'En az bir gün seç.',
+  _TextKey.endDateValidation: 'Bitiş tarihi başlangıç tarihinden önce olamaz.',
+  _TextKey.reminderItemRequired: 'İlaç veya takviye adını gir.',
+  _TextKey.active: 'Aktif',
+  _TextKey.inactive: 'Kapalı',
+  _TextKey.reminderSummaryDaily: 'Her gün • {time}',
+  _TextKey.reminderSummaryDays: '{days} • {time}',
+  _TextKey.reminderDateRange: '{start} – {end}',
+  _TextKey.reminderDeliveryNote:
+      'OMA bildirimi cihazda planlar. Telefon sistemi bildirimin ekranda gösterildiğini doğrulamadığı için “alındı” yalnızca sen yanıt verdiğinde kaydedilir. İzin ve pil ayarları bildirim saatini etkileyebilir.',
+  _TextKey.responseSaved: 'Doz yanıtı kaydedildi.',
   _TextKey.emptyMedicationList: 'Henüz eklenmemiş',
   _TextKey.reportFileName: 'oma_saglik_raporu',
 };
@@ -631,6 +912,82 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.appName: 'OMA',
   _TextKey.appSlogan: 'Track your health every day',
   _TextKey.home: 'Home',
+  _TextKey.insights: 'Insights',
+  _TextKey.insightsSubtitle: 'Personal patterns calculated from your logs',
+  _TextKey.insightsPrivacyNote:
+      'These summaries are created on your device using fixed rules and statistics. No LLM is used.',
+  _TextKey.insightsEmptyTitle: 'No insights yet',
+  _TextKey.insightsEmptyDescription:
+      'Add daily logs from Home and your personal summaries will appear here.',
+  _TextKey.insightsDisclaimer:
+      'Insights show patterns in your records only; they are not a medical diagnosis or evidence of cause and effect.',
+  _TextKey.insightDataBuildingTitle: 'Your pattern is taking shape',
+  _TextKey.insightDataBuildingBody:
+      'Days with logs: {count}. Repeated choices will be compared after at least 3 logged days.',
+  _TextKey.insightRecordingSummaryTitle: 'Your logging overview',
+  _TextKey.insightRecordingSummaryBody:
+      'You created health logs for {loggedDays} different days across a {spanDays}-day span.',
+  _TextKey.insightCycleLengthTitle: 'Your latest cycle length',
+  _TextKey.insightCycleLengthBody:
+      'There are {length} days between your two latest recorded period starts.',
+  _TextKey.insightCycleVariationTitle: 'Your cycle range',
+  _TextKey.insightCycleVariationBody:
+      'Your latest {count} calculable cycles ranged from {min} to {max} days.',
+  _TextKey.insightPeriodDurationTitle: 'Latest completed bleeding record',
+  _TextKey.insightPeriodDurationBody:
+      'Your consecutive bleeding records lasted {duration} days.',
+  _TextKey.insightFrequentMoodTitle: 'Your most logged feeling',
+  _TextKey.insightFrequentMoodBody:
+      '{label} appeared on {count} of the {total} days when you logged a mood.',
+  _TextKey.insightRecurringSymptomTitle: 'Your recurring symptom log',
+  _TextKey.insightRecurringSymptomBody:
+      '{label} was marked on {count} of your {total} logged days.',
+  _TextKey.insightFrequentActivityTitle: 'Your most logged activity',
+  _TextKey.insightFrequentActivityBody:
+      '{label} appeared on {count} of your {total} logged days.',
+  _TextKey.insightFrequentNutritionTitle: 'Most common nutrition log',
+  _TextKey.insightFrequentNutritionBody:
+      'The {label} tag appeared on {count} of your {total} logged days.',
+  _TextKey.insightFrequentBowelTitle: 'Most common bowel log',
+  _TextKey.insightFrequentBowelBody:
+      '{label} was marked on {count} of your {total} logged days.',
+  _TextKey.insightSymptomMoodTitle: 'Logged on the same day',
+  _TextKey.insightSymptomMoodBody:
+      '{primary} and {secondary} were logged on the same day {count} times. This is an association only.',
+  _TextKey.insightSymptomBleedingTitle: 'Symptom on bleeding days',
+  _TextKey.insightSymptomBleedingBody:
+      '{label} was also marked on {count} of the {total} days with a bleeding record.',
+  _TextKey.insightAssociationTitle: 'A connection in your logs',
+  _TextKey.insightAssociationSameDayBody:
+      'On {withEvent} of {withTotal} days with {primary}, {secondary} was also logged that day ({withPercent}%). On {withoutTotal} comparable days without {primary}, the rate was {withoutPercent}%. This is an association, not cause and effect.',
+  _TextKey.insightAssociationNextDayBody:
+      '{secondary} was logged the next day after {withEvent} of {withTotal} days with {primary} ({withPercent}%). On the other {withoutTotal} comparable days, the rate was {withoutPercent}%. This is an association, not cause and effect.',
+  _TextKey.insightMedicationSkipAssociationTitle:
+      'Pattern after a dose response',
+  _TextKey.insightMedicationSkipAssociationBody:
+      '{secondary} was logged the next day after {withEvent} of {withTotal} days when {primary} was marked “skipped” ({withPercent}%). On {withoutTotal} comparable days marked “taken”, the rate was {withoutPercent}%. This is an association, not a medication effect or cause and effect.',
+  _TextKey.insightMedicationAdherenceTitle: 'Your planned dose responses',
+  _TextKey.insightMedicationAdherenceBody:
+      'You marked {taken} of {total} past planned doses as “taken”. Unanswered doses are not counted as taken.',
+  _TextKey.insightFertileDischargeTitle:
+      'Discharge entry and estimated fertile window',
+  _TextKey.insightFertileDischargeBody:
+      'The {color}, {consistency} appearance in your latest entry overlaps with the estimated fertile window. This may be compatible with a time of increased fertility; it does not confirm ovulation and is not a contraceptive method.',
+  _TextKey.insightMenstrualDischargeTitle:
+      'Discharge entry and menstrual phase',
+  _TextKey.insightMenstrualDischargeBody:
+      'Your latest {color} discharge entry overlaps with a period or bleeding day. This card only provides timing context and cannot determine the cause of the color. Consult a healthcare professional if blood-tinged discharge recurs outside your period.',
+  _TextKey.insightDischargeHealthTitle: 'Review this discharge change',
+  _TextKey.insightDischargeHealthBody:
+      'Your latest entry includes a color, consistency, odor, or accompanying finding worth reviewing. This can have different causes, including infection; the app cannot identify the cause or diagnose it. Contact a healthcare professional if the change is new, persists, or worsens.',
+  _TextKey.insightConfidenceEmerging: 'Emerging connection',
+  _TextKey.insightConfidenceModerate: 'Moderate confidence',
+  _TextKey.insightConfidenceStrong: 'Stronger evidence',
+  _TextKey.insightAssociationEvidence: '{confidence} • {count} comparable days',
+  _TextKey.insightEvidenceDays: 'Logged days: {count}',
+  _TextKey.insightEvidenceCycles: 'Calculated cycles: {count}',
+  _TextKey.insightEvidenceEntries: 'Check entries: {count}',
+  _TextKey.insightEvidenceRecords: 'Records: {count}',
   _TextKey.articles: 'Articles',
   _TextKey.profile: 'Profile',
   _TextKey.welcome: 'Welcome',
@@ -737,6 +1094,29 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.activityStatus: 'Activity',
   _TextKey.nutrition: 'Nutrition',
   _TextKey.nutritionStatus: 'Nutrition',
+  _TextKey.dailyFactors: 'Daily Factors',
+  _TextKey.dailyFactorsHint:
+      'Optional. Consistent entries let the app compare personal connections.',
+  _TextKey.sleep: 'Sleep',
+  _TextKey.sleepDuration: 'Sleep Duration',
+  _TextKey.sleepQuality: 'Sleep Quality',
+  _TextKey.stressLevel: 'Stress Level',
+  _TextKey.energyLevel: 'Energy Level',
+  _TextKey.waterIntake: 'Water Intake',
+  _TextKey.caffeineIntake: 'Caffeinated Drinks',
+  _TextKey.caffeineServingHint: 'Number of cups/servings',
+  _TextKey.hoursMinutes: '{hours} h {minutes} min',
+  _TextKey.milliliters: '{value} ml',
+  _TextKey.servingCount: '{count} servings',
+  _TextKey.levelOutOfFive: '{value}/5',
+  _TextKey.insightFeatureShortSleep:
+      'sleep duration below your personal median',
+  _TextKey.insightFeaturePoorSleep: 'low sleep quality',
+  _TextKey.insightFeatureHighStress: 'high stress',
+  _TextKey.insightFeatureLowEnergy: 'low energy',
+  _TextKey.insightFeatureHighCaffeine: '2 or more caffeinated drinks',
+  _TextKey.insightFeatureBelowTypicalWater:
+      'water intake below your personal median',
   _TextKey.supplements: 'Supplements',
   _TextKey.medications: 'Medications',
   _TextKey.medicationDisclaimer:
@@ -749,6 +1129,16 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.flowIntensity: 'Flow Intensity',
   _TextKey.periodBleeding: '🩸 Period Bleeding (Flow Intensity)',
   _TextKey.periodPain: 'Period Pain',
+  _TextKey.vaginalDischarge: 'Vaginal Discharge / Cervical Mucus',
+  _TextKey.dischargePresent: 'Did you notice discharge or mucus today?',
+  _TextKey.dischargeColor: 'Color',
+  _TextKey.dischargeConsistency: 'Appearance / Consistency',
+  _TextKey.dischargeAmount: 'Amount',
+  _TextKey.dischargeSymptoms: 'Accompanying Findings',
+  _TextKey.dischargeTrackingHint:
+      'Color is not interpreted alone. Also record consistency, odor, and accompanying findings.',
+  _TextKey.dischargeMedicalDisclaimer:
+      'This tracking does not diagnose a condition or confirm ovulation. Contact a healthcare professional for unusual or persistent changes.',
   _TextKey.notesHint: 'Your notes about today...',
   _TextKey.selectLogTime: 'Select Log Time',
   _TextKey.logSaveFailed: 'The log could not be saved. Please try again.',
@@ -935,6 +1325,54 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.premiumActivated: 'Your Premium membership is now active.',
   _TextKey.purchaseVerificationFailed:
       'The purchase could not be verified: {error}',
+  _TextKey.createReminder: 'Create reminder',
+  _TextKey.editReminder: 'Edit reminder',
+  _TextKey.reminderPlans: 'Reminder plans',
+  _TextKey.noReminderPlans: 'No reminder plan yet.',
+  _TextKey.reminderItem: 'Medication or supplement',
+  _TextKey.reminderDose: 'Dose',
+  _TextKey.notificationTime: 'Notification time',
+  _TextKey.repeatPeriod: 'Repeat period',
+  _TextKey.everyDay: 'Every day',
+  _TextKey.selectedDays: 'Selected days',
+  _TextKey.startDate: 'Start date',
+  _TextKey.endDate: 'End date',
+  _TextKey.noEndDate: 'No end date',
+  _TextKey.reminderEnabled: 'Reminder enabled',
+  _TextKey.notificationPermissionDenied:
+      'The plan was saved, but notification permission was not granted. You can enable OMA notifications in your phone settings.',
+  _TextKey.reminderSaved: 'Reminder plan saved.',
+  _TextKey.reminderDeleted: 'Reminder plan deleted.',
+  _TextKey.reminderDeleteQuestion:
+      'Do you want to delete the reminder plan for {name}?',
+  _TextKey.phoneNotificationUnsupported:
+      'The plan was saved. Scheduled notifications work in the Android and iPhone apps.',
+  _TextKey.reminderScheduleFailed:
+      'The plan was saved, but notifications could not be scheduled: {error}',
+  _TextKey.reminderNotificationTitle: 'Time for {name}',
+  _TextKey.reminderNotificationBody:
+      'It is time to take {dose}. You can record your response in OMA.',
+  _TextKey.notificationScheduled: 'Notification scheduled on device',
+  _TextKey.notificationNotScheduled: 'Notification not scheduled on device',
+  _TextKey.reminderChannelName: 'Medication and supplement reminders',
+  _TextKey.reminderChannelDescription:
+      'Notifications for planned medication and supplement doses',
+  _TextKey.todaysPlannedDoses: 'Today’s planned doses',
+  _TextKey.doseTaken: 'Taken',
+  _TextKey.doseSkipped: 'Skipped',
+  _TextKey.doseUpcoming: 'Upcoming',
+  _TextKey.doseUnanswered: 'Unanswered',
+  _TextKey.selectAtLeastOneDay: 'Select at least one day.',
+  _TextKey.endDateValidation: 'The end date cannot be before the start date.',
+  _TextKey.reminderItemRequired: 'Enter a medication or supplement name.',
+  _TextKey.active: 'Active',
+  _TextKey.inactive: 'Off',
+  _TextKey.reminderSummaryDaily: 'Every day • {time}',
+  _TextKey.reminderSummaryDays: '{days} • {time}',
+  _TextKey.reminderDateRange: '{start} – {end}',
+  _TextKey.reminderDeliveryNote:
+      'OMA schedules the notification on your device. Because the phone cannot confirm that it was displayed, “taken” is recorded only when you respond. Permission and battery settings may affect delivery time.',
+  _TextKey.responseSaved: 'Dose response saved.',
   _TextKey.emptyMedicationList: 'Nothing added yet',
   _TextKey.reportFileName: 'oma_health_report',
 };
@@ -1024,6 +1462,36 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Mide ağrısı',
   ],
   _ListKey.flowOptions: ['Lekelenme', 'Hafif', 'Orta', 'Yoğun'],
+  _ListKey.dischargeColors: [
+    'Şeffaf',
+    'Beyaz',
+    'Krem',
+    'Sarı',
+    'Yeşil',
+    'Gri',
+    'Kahverengi',
+    'Pembe',
+    'Kırmızı / kanlı',
+    'Diğer',
+  ],
+  _ListKey.dischargeConsistencies: [
+    'Sulu',
+    'Kaygan',
+    'Uzayan / yumurta akı gibi',
+    'Kremsi',
+    'Yapışkan',
+    'Yoğun / pütürlü',
+    'Köpüklü',
+    'Diğer',
+  ],
+  _ListKey.dischargeAmounts: ['Az', 'Orta', 'Fazla'],
+  _ListKey.dischargeSymptoms: [
+    'Olağandışı koku',
+    'Kaşıntı',
+    'Yanma',
+    'İdrar yaparken ağrı',
+    'Pelvik / alt karın ağrısı',
+  ],
   _ListKey.dosageOptions: [
     '1 Adet',
     '2 Adet',
@@ -1153,6 +1621,36 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Stomach pain',
   ],
   _ListKey.flowOptions: ['Spotting', 'Light', 'Medium', 'Heavy'],
+  _ListKey.dischargeColors: [
+    'Clear',
+    'White',
+    'Cream',
+    'Yellow',
+    'Green',
+    'Gray',
+    'Brown',
+    'Pink',
+    'Red / blood-tinged',
+    'Other',
+  ],
+  _ListKey.dischargeConsistencies: [
+    'Watery',
+    'Slippery',
+    'Stretchy / egg-white-like',
+    'Creamy',
+    'Sticky',
+    'Thick / clumpy',
+    'Frothy',
+    'Other',
+  ],
+  _ListKey.dischargeAmounts: ['Light', 'Moderate', 'Heavy'],
+  _ListKey.dischargeSymptoms: [
+    'Unusual odor',
+    'Itching',
+    'Burning',
+    'Painful urination',
+    'Pelvic / lower abdominal pain',
+  ],
   _ListKey.dosageOptions: [
     '1 Tablet',
     '2 Tablets',
@@ -1204,6 +1702,16 @@ const Map<_ListKey, List<String>> _englishLists = {
 /// [_listCatalogs] ve [supportedLocales] içine dili kaydedin.
 class AppStrings {
   AppStrings._();
+
+  static const insightFeatureShortSleepToken = 'metric:short_sleep';
+  static const insightFeaturePoorSleepToken = 'metric:poor_sleep';
+  static const insightFeatureHighStressToken = 'metric:high_stress';
+  static const insightFeatureLowEnergyToken = 'metric:low_energy';
+  static const insightFeatureHighCaffeineToken = 'metric:high_caffeine';
+  static const insightFeatureBelowTypicalWaterToken =
+      'metric:below_typical_water';
+  static const dischargeColorFeaturePrefix = 'dischargeColor:';
+  static const dischargeConsistencyFeaturePrefix = 'dischargeConsistency:';
 
   static const delegate = _AppStringsDelegate();
 
@@ -1283,18 +1791,55 @@ class AppStrings {
     return result;
   }
 
-  /// Eski kayıtlardaki Türkçe/İngilizce seçenekleri etkin dile çevirir.
+  /// Herhangi bir desteklenen dilde saklanmış seçeneği etkin dile çevirir.
   static String localizeStoredValue(String value) {
     for (final key in _ListKey.values) {
-      final turkish = _turkishLists[key]!;
-      final english = _englishLists[key]!;
-      final trIndex = turkish.indexOf(value);
-      if (trIndex >= 0 && trIndex < _list(key).length) {
-        return _list(key)[trIndex];
+      for (final catalog in _listCatalogs.values) {
+        final index = catalog[key]!.indexOf(value);
+        if (index >= 0 && index < _list(key).length) {
+          return _list(key)[index];
+        }
       }
-      final enIndex = english.indexOf(value);
-      if (enIndex >= 0 && enIndex < _list(key).length) {
-        return _list(key)[enIndex];
+    }
+    return value;
+  }
+
+  /// Analiz motorunun dile bağlı olmayan metrik kimliklerini kullanıcı diline
+  /// çevirir; normal kayıt seçenekleri için mevcut liste çevirisine geri döner.
+  static String localizeInsightFeature(String value) {
+    if (value.startsWith(dischargeColorFeaturePrefix)) {
+      return dischargeColorLabelByName(
+        value.substring(dischargeColorFeaturePrefix.length),
+      );
+    }
+    if (value.startsWith(dischargeConsistencyFeaturePrefix)) {
+      return dischargeConsistencyLabelByName(
+        value.substring(dischargeConsistencyFeaturePrefix.length),
+      );
+    }
+    return switch (value) {
+      insightFeatureShortSleepToken => _text(_TextKey.insightFeatureShortSleep),
+      insightFeaturePoorSleepToken => _text(_TextKey.insightFeaturePoorSleep),
+      insightFeatureHighStressToken => _text(_TextKey.insightFeatureHighStress),
+      insightFeatureLowEnergyToken => _text(_TextKey.insightFeatureLowEnergy),
+      insightFeatureHighCaffeineToken => _text(
+        _TextKey.insightFeatureHighCaffeine,
+      ),
+      insightFeatureBelowTypicalWaterToken => _text(
+        _TextKey.insightFeatureBelowTypicalWater,
+      ),
+      _ => localizeStoredValue(value),
+    };
+  }
+
+  /// Herhangi bir desteklenen dilde saklanmış eşdeğer seçenekleri tek bir sabit
+  /// değerde toplar. Analiz motoru böylece arayüz dilinden bağımsız çalışır.
+  static String canonicalizeStoredValue(String value) {
+    for (final key in _ListKey.values) {
+      final canonical = _turkishLists[key]!;
+      for (final catalog in _listCatalogs.values) {
+        final index = catalog[key]!.indexOf(value);
+        if (index >= 0) return canonical[index];
       }
     }
     return value;
@@ -1303,6 +1848,215 @@ class AppStrings {
   static String get appName => _text(_TextKey.appName);
   static String get appSlogan => _text(_TextKey.appSlogan);
   static String get home => _text(_TextKey.home);
+  static String get insights => _text(_TextKey.insights);
+  static String get insightsSubtitle => _text(_TextKey.insightsSubtitle);
+  static String get insightsPrivacyNote => _text(_TextKey.insightsPrivacyNote);
+  static String get insightsEmptyTitle => _text(_TextKey.insightsEmptyTitle);
+  static String get insightsEmptyDescription =>
+      _text(_TextKey.insightsEmptyDescription);
+  static String get insightsDisclaimer => _text(_TextKey.insightsDisclaimer);
+  static String get insightDataBuildingTitle =>
+      _text(_TextKey.insightDataBuildingTitle);
+  static String insightDataBuildingBody(int count) =>
+      _format(_TextKey.insightDataBuildingBody, {'count': count});
+  static String get insightRecordingSummaryTitle =>
+      _text(_TextKey.insightRecordingSummaryTitle);
+  static String insightRecordingSummaryBody({
+    required int loggedDays,
+    required int spanDays,
+  }) => _format(_TextKey.insightRecordingSummaryBody, {
+    'loggedDays': loggedDays,
+    'spanDays': spanDays,
+  });
+  static String get insightCycleLengthTitle =>
+      _text(_TextKey.insightCycleLengthTitle);
+  static String insightCycleLengthBody(int length) =>
+      _format(_TextKey.insightCycleLengthBody, {'length': length});
+  static String get insightCycleVariationTitle =>
+      _text(_TextKey.insightCycleVariationTitle);
+  static String insightCycleVariationBody({
+    required int count,
+    required int min,
+    required int max,
+  }) => _format(_TextKey.insightCycleVariationBody, {
+    'count': count,
+    'min': min,
+    'max': max,
+  });
+  static String get insightPeriodDurationTitle =>
+      _text(_TextKey.insightPeriodDurationTitle);
+  static String insightPeriodDurationBody(int duration) =>
+      _format(_TextKey.insightPeriodDurationBody, {'duration': duration});
+  static String get insightFrequentMoodTitle =>
+      _text(_TextKey.insightFrequentMoodTitle);
+  static String insightFrequentMoodBody({
+    required String label,
+    required int count,
+    required int total,
+  }) => _format(_TextKey.insightFrequentMoodBody, {
+    'label': label,
+    'count': count,
+    'total': total,
+  });
+  static String get insightRecurringSymptomTitle =>
+      _text(_TextKey.insightRecurringSymptomTitle);
+  static String insightRecurringSymptomBody({
+    required String label,
+    required int count,
+    required int total,
+  }) => _format(_TextKey.insightRecurringSymptomBody, {
+    'label': label,
+    'count': count,
+    'total': total,
+  });
+  static String get insightFrequentActivityTitle =>
+      _text(_TextKey.insightFrequentActivityTitle);
+  static String insightFrequentActivityBody({
+    required String label,
+    required int count,
+    required int total,
+  }) => _format(_TextKey.insightFrequentActivityBody, {
+    'label': label,
+    'count': count,
+    'total': total,
+  });
+  static String get insightFrequentNutritionTitle =>
+      _text(_TextKey.insightFrequentNutritionTitle);
+  static String insightFrequentNutritionBody({
+    required String label,
+    required int count,
+    required int total,
+  }) => _format(_TextKey.insightFrequentNutritionBody, {
+    'label': label,
+    'count': count,
+    'total': total,
+  });
+  static String get insightFrequentBowelTitle =>
+      _text(_TextKey.insightFrequentBowelTitle);
+  static String insightFrequentBowelBody({
+    required String label,
+    required int count,
+    required int total,
+  }) => _format(_TextKey.insightFrequentBowelBody, {
+    'label': label,
+    'count': count,
+    'total': total,
+  });
+  static String get insightSymptomMoodTitle =>
+      _text(_TextKey.insightSymptomMoodTitle);
+  static String insightSymptomMoodBody({
+    required String primary,
+    required String secondary,
+    required int count,
+  }) => _format(_TextKey.insightSymptomMoodBody, {
+    'primary': primary,
+    'secondary': secondary,
+    'count': count,
+  });
+  static String get insightSymptomBleedingTitle =>
+      _text(_TextKey.insightSymptomBleedingTitle);
+  static String insightSymptomBleedingBody({
+    required String label,
+    required int count,
+    required int total,
+  }) => _format(_TextKey.insightSymptomBleedingBody, {
+    'label': label,
+    'count': count,
+    'total': total,
+  });
+  static String get insightAssociationTitle =>
+      _text(_TextKey.insightAssociationTitle);
+  static String insightAssociationBody({
+    required String primary,
+    required String secondary,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+    required int lagDays,
+  }) => _format(
+    lagDays == 0
+        ? _TextKey.insightAssociationSameDayBody
+        : _TextKey.insightAssociationNextDayBody,
+    {
+      'primary': primary,
+      'secondary': secondary,
+      'withEvent': withEvent,
+      'withTotal': withTotal,
+      'withoutTotal': withoutTotal,
+      'withPercent': withPercent,
+      'withoutPercent': withoutPercent,
+    },
+  );
+  static String get insightMedicationSkipAssociationTitle =>
+      _text(_TextKey.insightMedicationSkipAssociationTitle);
+  static String insightMedicationSkipAssociationBody({
+    required String primary,
+    required String secondary,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightMedicationSkipAssociationBody, {
+    'primary': primary,
+    'secondary': secondary,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightMedicationAdherenceTitle =>
+      _text(_TextKey.insightMedicationAdherenceTitle);
+  static String insightMedicationAdherenceBody({
+    required int taken,
+    required int total,
+  }) => _format(_TextKey.insightMedicationAdherenceBody, {
+    'taken': taken,
+    'total': total,
+  });
+  static String get insightFertileDischargeTitle =>
+      _text(_TextKey.insightFertileDischargeTitle);
+  static String insightFertileDischargeBody({
+    required String color,
+    required String consistency,
+  }) => _format(_TextKey.insightFertileDischargeBody, {
+    'color': color,
+    'consistency': consistency,
+  });
+  static String get insightMenstrualDischargeTitle =>
+      _text(_TextKey.insightMenstrualDischargeTitle);
+  static String insightMenstrualDischargeBody(String color) =>
+      _format(_TextKey.insightMenstrualDischargeBody, {'color': color});
+  static String get insightDischargeHealthTitle =>
+      _text(_TextKey.insightDischargeHealthTitle);
+  static String get insightDischargeHealthBody =>
+      _text(_TextKey.insightDischargeHealthBody);
+  static String insightConfidenceLabel(String confidenceName) {
+    return switch (confidenceName) {
+      'strong' => _text(_TextKey.insightConfidenceStrong),
+      'moderate' => _text(_TextKey.insightConfidenceModerate),
+      _ => _text(_TextKey.insightConfidenceEmerging),
+    };
+  }
+
+  static String insightAssociationEvidence({
+    required String confidence,
+    required int count,
+  }) => _format(_TextKey.insightAssociationEvidence, {
+    'confidence': confidence,
+    'count': count,
+  });
+  static String insightEvidenceDays(int count) =>
+      _format(_TextKey.insightEvidenceDays, {'count': count});
+  static String insightEvidenceCycles(int count) =>
+      _format(_TextKey.insightEvidenceCycles, {'count': count});
+  static String insightEvidenceEntries(int count) =>
+      _format(_TextKey.insightEvidenceEntries, {'count': count});
+  static String insightEvidenceRecords(int count) =>
+      _format(_TextKey.insightEvidenceRecords, {'count': count});
   static String get articles => _text(_TextKey.articles);
   static String get profile => _text(_TextKey.profile);
   static String get welcome => _text(_TextKey.welcome);
@@ -1378,6 +2132,18 @@ class AppStrings {
   static String get condom => _text(_TextKey.condom);
   static String get implant => _text(_TextKey.implant);
   static String get otherMethod => _text(_TextKey.otherMethod);
+
+  static bool birthControlMayAffectCycleSignals(String? value) {
+    if (value == null || value.isEmpty) return false;
+    final allowed = {
+      _turkishTexts[_TextKey.noBirthControl],
+      _englishTexts[_TextKey.noBirthControl],
+      _turkishTexts[_TextKey.condom],
+      _englishTexts[_TextKey.condom],
+    };
+    return !allowed.contains(value);
+  }
+
   static String get womenDiseases => _text(_TextKey.womenDiseases);
   static String get lastPeriodDate => _text(_TextKey.lastPeriodDate);
   static String get selectDate => _text(_TextKey.selectDate);
@@ -1414,6 +2180,26 @@ class AppStrings {
   static String get activityStatus => _text(_TextKey.activityStatus);
   static String get nutrition => _text(_TextKey.nutrition);
   static String get nutritionStatus => _text(_TextKey.nutritionStatus);
+  static String get dailyFactors => _text(_TextKey.dailyFactors);
+  static String get dailyFactorsHint => _text(_TextKey.dailyFactorsHint);
+  static String get sleep => _text(_TextKey.sleep);
+  static String get sleepDuration => _text(_TextKey.sleepDuration);
+  static String get sleepQuality => _text(_TextKey.sleepQuality);
+  static String get stressLevel => _text(_TextKey.stressLevel);
+  static String get energyLevel => _text(_TextKey.energyLevel);
+  static String get waterIntake => _text(_TextKey.waterIntake);
+  static String get caffeineIntake => _text(_TextKey.caffeineIntake);
+  static String get caffeineServingHint => _text(_TextKey.caffeineServingHint);
+  static String hoursMinutes(int minutes) => _format(_TextKey.hoursMinutes, {
+    'hours': minutes ~/ 60,
+    'minutes': minutes % 60,
+  });
+  static String milliliters(int value) =>
+      _format(_TextKey.milliliters, {'value': value});
+  static String servingCount(int count) =>
+      _format(_TextKey.servingCount, {'count': count});
+  static String levelOutOfFive(int value) =>
+      _format(_TextKey.levelOutOfFive, {'value': value});
   static String get supplements => _text(_TextKey.supplements);
   static String get medications => _text(_TextKey.medications);
   static String get medicationDisclaimer =>
@@ -1426,6 +2212,17 @@ class AppStrings {
   static String get flowIntensity => _text(_TextKey.flowIntensity);
   static String get periodBleeding => _text(_TextKey.periodBleeding);
   static String get periodPain => _text(_TextKey.periodPain);
+  static String get vaginalDischarge => _text(_TextKey.vaginalDischarge);
+  static String get dischargePresent => _text(_TextKey.dischargePresent);
+  static String get dischargeColor => _text(_TextKey.dischargeColor);
+  static String get dischargeConsistency =>
+      _text(_TextKey.dischargeConsistency);
+  static String get dischargeAmount => _text(_TextKey.dischargeAmount);
+  static String get dischargeSymptoms => _text(_TextKey.dischargeSymptoms);
+  static String get dischargeTrackingHint =>
+      _text(_TextKey.dischargeTrackingHint);
+  static String get dischargeMedicalDisclaimer =>
+      _text(_TextKey.dischargeMedicalDisclaimer);
   static String get notesHint => _text(_TextKey.notesHint);
   static String get selectLogTime => _text(_TextKey.selectLogTime);
   static String get logSaveFailed => _text(_TextKey.logSaveFailed);
@@ -1629,6 +2426,61 @@ class AppStrings {
   static String get premiumActivated => _text(_TextKey.premiumActivated);
   static String purchaseVerificationFailed(Object error) =>
       _format(_TextKey.purchaseVerificationFailed, {'error': error});
+  static String get createReminder => _text(_TextKey.createReminder);
+  static String get editReminder => _text(_TextKey.editReminder);
+  static String get reminderPlans => _text(_TextKey.reminderPlans);
+  static String get noReminderPlans => _text(_TextKey.noReminderPlans);
+  static String get reminderItem => _text(_TextKey.reminderItem);
+  static String get reminderDose => _text(_TextKey.reminderDose);
+  static String get notificationTime => _text(_TextKey.notificationTime);
+  static String get repeatPeriod => _text(_TextKey.repeatPeriod);
+  static String get everyDay => _text(_TextKey.everyDay);
+  static String get selectedDays => _text(_TextKey.selectedDays);
+  static String get startDate => _text(_TextKey.startDate);
+  static String get endDate => _text(_TextKey.endDate);
+  static String get noEndDate => _text(_TextKey.noEndDate);
+  static String get reminderEnabled => _text(_TextKey.reminderEnabled);
+  static String get notificationPermissionDenied =>
+      _text(_TextKey.notificationPermissionDenied);
+  static String get reminderSaved => _text(_TextKey.reminderSaved);
+  static String get reminderDeleted => _text(_TextKey.reminderDeleted);
+  static String reminderDeleteQuestion(String name) =>
+      _format(_TextKey.reminderDeleteQuestion, {'name': name});
+  static String get phoneNotificationUnsupported =>
+      _text(_TextKey.phoneNotificationUnsupported);
+  static String reminderScheduleFailed(Object error) =>
+      _format(_TextKey.reminderScheduleFailed, {'error': error});
+  static String reminderNotificationTitle(String name) =>
+      _format(_TextKey.reminderNotificationTitle, {'name': name});
+  static String reminderNotificationBody(String dose) =>
+      _format(_TextKey.reminderNotificationBody, {'dose': dose});
+  static String get notificationScheduled =>
+      _text(_TextKey.notificationScheduled);
+  static String get notificationNotScheduled =>
+      _text(_TextKey.notificationNotScheduled);
+  static String get reminderChannelName => _text(_TextKey.reminderChannelName);
+  static String get reminderChannelDescription =>
+      _text(_TextKey.reminderChannelDescription);
+  static String get todaysPlannedDoses => _text(_TextKey.todaysPlannedDoses);
+  static String get doseTaken => _text(_TextKey.doseTaken);
+  static String get doseSkipped => _text(_TextKey.doseSkipped);
+  static String get doseUpcoming => _text(_TextKey.doseUpcoming);
+  static String get doseUnanswered => _text(_TextKey.doseUnanswered);
+  static String get selectAtLeastOneDay => _text(_TextKey.selectAtLeastOneDay);
+  static String get endDateValidation => _text(_TextKey.endDateValidation);
+  static String get reminderItemRequired =>
+      _text(_TextKey.reminderItemRequired);
+  static String get active => _text(_TextKey.active);
+  static String get inactive => _text(_TextKey.inactive);
+  static String reminderSummaryDaily(String time) =>
+      _format(_TextKey.reminderSummaryDaily, {'time': time});
+  static String reminderSummaryDays(String days, String time) =>
+      _format(_TextKey.reminderSummaryDays, {'days': days, 'time': time});
+  static String reminderDateRange(String start, String end) =>
+      _format(_TextKey.reminderDateRange, {'start': start, 'end': end});
+  static String get reminderDeliveryNote =>
+      _text(_TextKey.reminderDeliveryNote);
+  static String get responseSaved => _text(_TextKey.responseSaved);
   static String get emptyMedicationList => _text(_TextKey.emptyMedicationList);
   static String get reportFileName => _text(_TextKey.reportFileName);
 
@@ -1646,7 +2498,48 @@ class AppStrings {
       _list(_ListKey.bowelActivityOptions);
   static List<String> get painLocations => _list(_ListKey.painLocations);
   static List<String> get flowOptions => _list(_ListKey.flowOptions);
+  static List<String> get dischargeColorOptions =>
+      _list(_ListKey.dischargeColors);
+  static List<String> get dischargeConsistencyOptions =>
+      _list(_ListKey.dischargeConsistencies);
+  static List<String> get dischargeAmountOptions =>
+      _list(_ListKey.dischargeAmounts);
+  static List<String> get dischargeSymptomOptions =>
+      _list(_ListKey.dischargeSymptoms);
   static List<String> get dosageOptions => _list(_ListKey.dosageOptions);
+
+  static String dischargeColorLabelByName(String name) {
+    final index = switch (name) {
+      'clear' => 0,
+      'white' => 1,
+      'cream' => 2,
+      'yellow' => 3,
+      'green' => 4,
+      'gray' => 5,
+      'brown' => 6,
+      'pink' => 7,
+      'red' => 8,
+      'other' => 9,
+      _ => -1,
+    };
+    return index < 0 ? name : dischargeColorOptions[index];
+  }
+
+  static String dischargeConsistencyLabelByName(String name) {
+    final index = switch (name) {
+      'watery' => 0,
+      'slippery' => 1,
+      'stretchyEggWhite' => 2,
+      'creamy' => 3,
+      'sticky' => 4,
+      'thickClumpy' => 5,
+      'frothy' => 6,
+      'other' => 7,
+      _ => -1,
+    };
+    return index < 0 ? name : dischargeConsistencyOptions[index];
+  }
+
   static List<String> get shortWeekdays => _list(_ListKey.shortWeekdays);
   static List<String> get weekdays => _list(_ListKey.weekdays);
   static List<String> get articleTopics => _list(_ListKey.articleTopics);

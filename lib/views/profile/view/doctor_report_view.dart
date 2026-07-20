@@ -8,6 +8,7 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../core/utils/daily_log_formatters.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
@@ -268,6 +269,41 @@ class DoctorReportView extends StatelessWidget {
     return result;
   }
 
+  String _nutritionMetricsText(DailyLog log) {
+    return [
+      if (log.waterIntakeMl != null)
+        '${AppStrings.waterIntake}: ${AppStrings.milliliters(log.waterIntakeMl!)}',
+      if (log.caffeineServings != null)
+        '${AppStrings.caffeineIntake}: ${AppStrings.servingCount(log.caffeineServings!)}',
+    ].join(', ');
+  }
+
+  String _wellbeingMetricsText(DailyLog log) {
+    return [
+      if (log.sleepDurationMinutes != null)
+        '${AppStrings.sleepDuration}: ${AppStrings.hoursMinutes(log.sleepDurationMinutes!)}',
+      if (log.sleepQuality != null)
+        '${AppStrings.sleepQuality}: ${AppStrings.levelOutOfFive(log.sleepQuality!)}',
+      if (log.stressLevel != null)
+        '${AppStrings.stressLevel}: ${AppStrings.levelOutOfFive(log.stressLevel!)}',
+      if (log.energyLevel != null)
+        '${AppStrings.energyLevel}: ${AppStrings.levelOutOfFive(log.energyLevel!)}',
+    ].join(', ');
+  }
+
+  String _periodAndDischargeText(DailyLog log) {
+    return [
+      if (log.flowIntensity != null)
+        '${AppStrings.bleeding} '
+            '(${AppStrings.localizeStoredValue(log.flowIntensity!)})',
+      if (log.periodPainLevel != null)
+        '${AppStrings.periodPain}: ${log.periodPainLevel}/5',
+      if (log.vaginalDischargePresent != null)
+        '${AppStrings.vaginalDischarge}: '
+            '${DailyLogFormatters.vaginalDischarge(log)}',
+    ].join(' • ');
+  }
+
   // ── Yardımcı Widget'lar ───────────────────────────────────────────────
 
   Widget _sectionHeader(String title) {
@@ -382,7 +418,10 @@ class DoctorReportView extends StatelessWidget {
               // 1. Adet
               final logsWithPeriod = dayLogs
                   .where(
-                    (l) => l.flowIntensity != null || l.periodPainLevel != null,
+                    (l) =>
+                        l.flowIntensity != null ||
+                        l.periodPainLevel != null ||
+                        l.vaginalDischargePresent != null,
                   )
                   .toList();
               final String adetText;
@@ -396,10 +435,7 @@ class DoctorReportView extends StatelessWidget {
                     .map((log) {
                       final timeStr =
                           '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-                      final adetPain = log.periodPainLevel != null
-                          ? ' (${AppStrings.pain}: ${log.periodPainLevel}/5)'
-                          : '';
-                      return '$timeStr ${AppStrings.bleeding} (${AppStrings.localizeStoredValue(log.flowIntensity ?? AppStrings.flowOptions[1])})$adetPain';
+                      return '$timeStr ${_periodAndDischargeText(log)}';
                     })
                     .join('\n----------------\n');
               }
@@ -409,7 +445,9 @@ class DoctorReportView extends StatelessWidget {
                   .where(
                     (l) =>
                         l.nutritionTags.isNotEmpty ||
-                        l.bowelActivity.isNotEmpty,
+                        l.bowelActivity.isNotEmpty ||
+                        l.waterIntakeMl != null ||
+                        l.caffeineServings != null,
                   )
                   .toList();
               final String beslenmeText;
@@ -428,9 +466,11 @@ class DoctorReportView extends StatelessWidget {
                       final bowelStr = log.bowelActivity.isNotEmpty
                           ? '${AppStrings.bowel}: ${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
                           : '';
+                      final metricsStr = _nutritionMetricsText(log);
                       final items = [
                         if (nutritionStr.isNotEmpty) nutritionStr,
                         if (bowelStr.isNotEmpty) bowelStr,
+                        if (metricsStr.isNotEmpty) metricsStr,
                       ];
                       return '$timeStr ${items.join("\n")}';
                     })
@@ -473,6 +513,10 @@ class DoctorReportView extends StatelessWidget {
                     (l) =>
                         l.mood != null ||
                         l.painLocations.isNotEmpty ||
+                        l.sleepDurationMinutes != null ||
+                        l.sleepQuality != null ||
+                        l.stressLevel != null ||
+                        l.energyLevel != null ||
                         (l.notes != null && l.notes!.isNotEmpty),
                   )
                   .toList();
@@ -494,9 +538,11 @@ class DoctorReportView extends StatelessWidget {
                           (log.notes != null && log.notes!.isNotEmpty)
                           ? '${AppStrings.notes}: ${log.notes}'
                           : '';
+                      final metricsStr = _wellbeingMetricsText(log);
                       final items = [
                         if (moodStr.isNotEmpty) moodStr,
                         if (painStr.isNotEmpty) painStr,
+                        if (metricsStr.isNotEmpty) metricsStr,
                         if (notesStr.isNotEmpty) notesStr,
                       ];
                       return '$timeStr ${items.join("\n")}';
@@ -720,7 +766,12 @@ class DoctorReportView extends StatelessWidget {
 
       // 1. Adet
       final logsWithPeriod = dayLogs
-          .where((l) => l.flowIntensity != null || l.periodPainLevel != null)
+          .where(
+            (l) =>
+                l.flowIntensity != null ||
+                l.periodPainLevel != null ||
+                l.vaginalDischargePresent != null,
+          )
           .toList();
       final String bleeding;
       if (logsWithPeriod.isEmpty) {
@@ -730,10 +781,7 @@ class DoctorReportView extends StatelessWidget {
             .map((log) {
               final timeStr =
                   '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-              final adetPain = log.periodPainLevel != null
-                  ? '(${AppStrings.pain}:${log.periodPainLevel}/5)'
-                  : '';
-              return '$timeStr ${AppStrings.bleeding}(${AppStrings.localizeStoredValue(log.flowIntensity ?? AppStrings.flowOptions[1])})$adetPain';
+              return '$timeStr ${_periodAndDischargeText(log)}';
             })
             .join(' // ');
       }
@@ -741,7 +789,11 @@ class DoctorReportView extends StatelessWidget {
       // 2. Beslenme
       final logsWithNutrition = dayLogs
           .where(
-            (l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty,
+            (l) =>
+                l.nutritionTags.isNotEmpty ||
+                l.bowelActivity.isNotEmpty ||
+                l.waterIntakeMl != null ||
+                l.caffeineServings != null,
           )
           .toList();
       final String beslenme;
@@ -760,9 +812,11 @@ class DoctorReportView extends StatelessWidget {
               final bowelStr = log.bowelActivity.isNotEmpty
                   ? '${AppStrings.bowel}:${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
                   : '';
+              final metricsStr = _nutritionMetricsText(log);
               final items = [
                 if (nutritionStr.isNotEmpty) nutritionStr,
                 if (bowelStr.isNotEmpty) bowelStr,
+                if (metricsStr.isNotEmpty) metricsStr,
               ];
               return '$timeStr ${items.join(" ")}';
             })
@@ -805,6 +859,10 @@ class DoctorReportView extends StatelessWidget {
             (l) =>
                 l.mood != null ||
                 l.painLocations.isNotEmpty ||
+                l.sleepDurationMinutes != null ||
+                l.sleepQuality != null ||
+                l.stressLevel != null ||
+                l.energyLevel != null ||
                 (l.notes != null && l.notes!.isNotEmpty),
           )
           .toList();
@@ -825,9 +883,11 @@ class DoctorReportView extends StatelessWidget {
               final notesStr = (log.notes != null && log.notes!.isNotEmpty)
                   ? '${AppStrings.notes}:${log.notes}'
                   : '';
+              final metricsStr = _wellbeingMetricsText(log);
               final items = [
                 if (moodStr.isNotEmpty) moodStr,
                 if (painStr.isNotEmpty) painStr,
+                if (metricsStr.isNotEmpty) metricsStr,
                 if (notesStr.isNotEmpty) notesStr,
               ];
               return '$timeStr ${items.join(" ")}';
@@ -1134,7 +1194,12 @@ class DoctorReportView extends StatelessWidget {
 
         // 1. Adet
         final logsWithPeriod = dayLogs
-            .where((l) => l.flowIntensity != null || l.periodPainLevel != null)
+            .where(
+              (l) =>
+                  l.flowIntensity != null ||
+                  l.periodPainLevel != null ||
+                  l.vaginalDischargePresent != null,
+            )
             .toList();
         final String adetText;
         if (logsWithPeriod.isEmpty) {
@@ -1144,10 +1209,7 @@ class DoctorReportView extends StatelessWidget {
               .map((log) {
                 final timeStr =
                     '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-                final adetPain = log.periodPainLevel != null
-                    ? ' (${AppStrings.pain}: ${log.periodPainLevel}/5)'
-                    : '';
-                return '$timeStr ${AppStrings.bleeding} (${AppStrings.localizeStoredValue(log.flowIntensity ?? AppStrings.flowOptions[1])})$adetPain';
+                return '$timeStr ${_periodAndDischargeText(log)}';
               })
               .join('\n----------------\n');
         }
@@ -1155,7 +1217,11 @@ class DoctorReportView extends StatelessWidget {
         // 2. Beslenme
         final logsWithNutrition = dayLogs
             .where(
-              (l) => l.nutritionTags.isNotEmpty || l.bowelActivity.isNotEmpty,
+              (l) =>
+                  l.nutritionTags.isNotEmpty ||
+                  l.bowelActivity.isNotEmpty ||
+                  l.waterIntakeMl != null ||
+                  l.caffeineServings != null,
             )
             .toList();
         final String beslenmeText;
@@ -1174,9 +1240,11 @@ class DoctorReportView extends StatelessWidget {
                 final bowelStr = log.bowelActivity.isNotEmpty
                     ? '${AppStrings.bowel}: ${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
                     : '';
+                final metricsStr = _nutritionMetricsText(log);
                 final items = [
                   if (nutritionStr.isNotEmpty) nutritionStr,
                   if (bowelStr.isNotEmpty) bowelStr,
+                  if (metricsStr.isNotEmpty) metricsStr,
                 ];
                 return '$timeStr ${items.join("\n")}';
               })
@@ -1219,6 +1287,10 @@ class DoctorReportView extends StatelessWidget {
               (l) =>
                   l.mood != null ||
                   l.painLocations.isNotEmpty ||
+                  l.sleepDurationMinutes != null ||
+                  l.sleepQuality != null ||
+                  l.stressLevel != null ||
+                  l.energyLevel != null ||
                   (l.notes != null && l.notes!.isNotEmpty),
             )
             .toList();
@@ -1239,9 +1311,11 @@ class DoctorReportView extends StatelessWidget {
                 final notesStr = (log.notes != null && log.notes!.isNotEmpty)
                     ? '${AppStrings.notes}: ${log.notes}'
                     : '';
+                final metricsStr = _wellbeingMetricsText(log);
                 final items = [
                   if (moodStr.isNotEmpty) moodStr,
                   if (painStr.isNotEmpty) painStr,
+                  if (metricsStr.isNotEmpty) metricsStr,
                   if (notesStr.isNotEmpty) notesStr,
                 ];
                 return '$timeStr ${items.join("\n")}';

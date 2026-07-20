@@ -19,6 +19,47 @@ void main() {
     expect(AppStrings.dayCount(1), '1 day');
     expect(AppStrings.dayCount(3), '3 days');
     expect(AppStrings.localizeStoredValue('Yoğun'), 'Heavy');
+    expect(
+      AppStrings.insightCycleLengthBody(29),
+      'There are 29 days between your two latest recorded period starts.',
+    );
+    expect(
+      AppStrings.insightSymptomMoodBody(
+        primary: 'Headache',
+        secondary: 'Tired',
+        count: 3,
+      ),
+      'Headache and Tired were logged on the same day 3 times. '
+      'This is an association only.',
+    );
+    expect(AppStrings.insightEvidenceDays(4), 'Logged days: 4');
+    expect(
+      AppStrings.insightAssociationBody(
+        primary: 'Salty',
+        secondary: 'Bloating',
+        withEvent: 8,
+        withTotal: 10,
+        withoutTotal: 10,
+        withPercent: 80,
+        withoutPercent: 10,
+        lagDays: 0,
+      ),
+      contains('This is an association, not cause and effect.'),
+    );
+  });
+
+  test('İçgörü şablonları Türkçe parametrelerle biçimlenir', () async {
+    await AppStrings.delegate.load(const Locale('tr', 'TR'));
+
+    expect(
+      AppStrings.insightRecordingSummaryBody(loggedDays: 8, spanDays: 14),
+      '14 günlük zaman aralığında 8 farklı gün için sağlık kaydı oluşturdun.',
+    );
+    expect(
+      AppStrings.insightFrequentMoodBody(label: 'Yorgun', count: 5, total: 8),
+      'Yorgun, ruh hâli girdiğin 8 günün 5 tanesinde yer aldı.',
+    );
+    expect(AppStrings.insightEvidenceCycles(3), 'Hesaplanan döngü: 3');
   });
 
   test('Desteklenmeyen dil İngilizceye düşer', () {

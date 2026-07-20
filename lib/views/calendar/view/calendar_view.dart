@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../core/utils/daily_log_formatters.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../dashboard/widgets/daily_log_sheet.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
@@ -532,6 +533,28 @@ class _DayDetailSection extends StatelessWidget {
                                 AppStrings.mood,
                                 '${log.moodEmoji ?? ''} ${AppStrings.localizeStoredValue(log.mood!)}',
                               ),
+                            if (log.sleepDurationMinutes != null)
+                              _detailRow(
+                                AppStrings.sleepDuration,
+                                AppStrings.hoursMinutes(
+                                  log.sleepDurationMinutes!,
+                                ),
+                              ),
+                            if (log.sleepQuality != null)
+                              _detailRow(
+                                AppStrings.sleepQuality,
+                                AppStrings.levelOutOfFive(log.sleepQuality!),
+                              ),
+                            if (log.stressLevel != null)
+                              _detailRow(
+                                AppStrings.stressLevel,
+                                AppStrings.levelOutOfFive(log.stressLevel!),
+                              ),
+                            if (log.energyLevel != null)
+                              _detailRow(
+                                AppStrings.energyLevel,
+                                AppStrings.levelOutOfFive(log.energyLevel!),
+                              ),
                             if (log.activities.isNotEmpty)
                               _detailRow(
                                 AppStrings.activity,
@@ -545,6 +568,16 @@ class _DayDetailSection extends StatelessWidget {
                                 log.nutritionTags
                                     .map(AppStrings.localizeStoredValue)
                                     .join(', '),
+                              ),
+                            if (log.waterIntakeMl != null)
+                              _detailRow(
+                                AppStrings.waterIntake,
+                                AppStrings.milliliters(log.waterIntakeMl!),
+                              ),
+                            if (log.caffeineServings != null)
+                              _detailRow(
+                                AppStrings.caffeineIntake,
+                                AppStrings.servingCount(log.caffeineServings!),
                               ),
                             if (log.medications.isNotEmpty)
                               _detailRow(
@@ -584,6 +617,11 @@ class _DayDetailSection extends StatelessWidget {
                                 AppStrings.localizeStoredValue(
                                   log.flowIntensity!,
                                 ),
+                              ),
+                            if (log.vaginalDischargePresent != null)
+                              _detailRow(
+                                AppStrings.vaginalDischarge,
+                                DailyLogFormatters.vaginalDischarge(log),
                               ),
                             if (log.notes != null && log.notes!.isNotEmpty)
                               _detailRow(AppStrings.notes, log.notes!),

@@ -5,6 +5,7 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
+import '../../../core/utils/daily_log_formatters.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/services/api_service.dart';
 import '../viewmodel/dashboard_view_model.dart';
@@ -658,6 +659,28 @@ class DashboardView extends StatelessWidget {
                             ),
                           if (log.moodNote != null && log.moodNote!.isNotEmpty)
                             _summaryTile(AppStrings.moodNote, log.moodNote!),
+                          if (log.sleepDurationMinutes != null)
+                            _summaryTile(
+                              AppStrings.sleepDuration,
+                              AppStrings.hoursMinutes(
+                                log.sleepDurationMinutes!,
+                              ),
+                            ),
+                          if (log.sleepQuality != null)
+                            _summaryTile(
+                              AppStrings.sleepQuality,
+                              AppStrings.levelOutOfFive(log.sleepQuality!),
+                            ),
+                          if (log.stressLevel != null)
+                            _summaryTile(
+                              AppStrings.stressLevel,
+                              AppStrings.levelOutOfFive(log.stressLevel!),
+                            ),
+                          if (log.energyLevel != null)
+                            _summaryTile(
+                              AppStrings.energyLevel,
+                              AppStrings.levelOutOfFive(log.energyLevel!),
+                            ),
                           if (log.activities.isNotEmpty)
                             _summaryTile(
                               AppStrings.activity,
@@ -671,6 +694,16 @@ class DashboardView extends StatelessWidget {
                               log.nutritionTags
                                   .map(AppStrings.localizeStoredValue)
                                   .join(', '),
+                            ),
+                          if (log.waterIntakeMl != null)
+                            _summaryTile(
+                              AppStrings.waterIntake,
+                              AppStrings.milliliters(log.waterIntakeMl!),
+                            ),
+                          if (log.caffeineServings != null)
+                            _summaryTile(
+                              AppStrings.caffeineIntake,
+                              AppStrings.servingCount(log.caffeineServings!),
                             ),
                           if (log.bowelActivity.isNotEmpty)
                             _summaryTile(
@@ -697,6 +730,11 @@ class DashboardView extends StatelessWidget {
                             _summaryTile(
                               AppStrings.periodPain,
                               '${log.periodPainLevel}/5',
+                            ),
+                          if (log.vaginalDischargePresent != null)
+                            _summaryTile(
+                              AppStrings.vaginalDischarge,
+                              DailyLogFormatters.vaginalDischarge(log),
                             ),
                           if (log.medications.any((m) => m.taken))
                             _summaryTile(
