@@ -81,4 +81,28 @@ void main() {
     expect(settings.averagePeriodLength, CycleRules.minPeriodLength);
     expect(settings.toJson().containsKey('gender'), isFalse);
   });
+
+  test('dongu halkasi fazlari 28 gunluk donguye orantili hesaplanir', () {
+    final calculator = PeriodCalculator(
+      lastPeriodDate: AppTime.now.dateOnly,
+      cycleLength: 28,
+      periodLength: 5,
+    );
+
+    expect(calculator.phaseDayCounts, [5, 7, 5, 11]);
+    expect(
+      calculator.phaseDayCounts.fold<int>(0, (sum, value) => sum + value),
+      28,
+    );
+  });
+
+  test('folikuler parca daha uzun dongulerde orantili olarak buyur', () {
+    final calculator = PeriodCalculator(
+      lastPeriodDate: AppTime.now.dateOnly,
+      cycleLength: 35,
+      periodLength: 7,
+    );
+
+    expect(calculator.phaseDayCounts, [7, 12, 5, 11]);
+  });
 }

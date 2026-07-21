@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/constants/app_strings.dart';
+import 'core/constants/color_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/app_time.dart';
 import 'data/services/local_storage_service.dart';
@@ -153,39 +154,47 @@ class _HomeShellState extends State<HomeShell> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
             ),
           ],
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _selectPage,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.dashboard_rounded),
-              activeIcon: const Icon(Icons.dashboard_rounded),
-              label: AppStrings.home,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.insights_outlined),
-              activeIcon: const Icon(Icons.insights_rounded),
-              label: AppStrings.insights,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.article_rounded),
-              activeIcon: const Icon(Icons.article_rounded),
-              label: AppStrings.articles,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.person_rounded),
-              activeIcon: const Icon(Icons.person_rounded),
-              label: AppStrings.profile,
-            ),
-          ],
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _selectPage,
+            iconSize: 20,
+            selectedFontSize: 11,
+            unselectedFontSize: 11,
+            items: [
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.dashboard_rounded),
+                activeIcon: const Icon(Icons.dashboard_rounded),
+                label: AppStrings.home,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.insights_outlined),
+                activeIcon: const Icon(Icons.insights_rounded),
+                label: AppStrings.insights,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.article_rounded),
+                activeIcon: const Icon(Icons.article_rounded),
+                label: AppStrings.articles,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.person_rounded),
+                activeIcon: const Icon(Icons.person_rounded),
+                label: AppStrings.profile,
+              ),
+            ],
+          ),
         ),
       ),
     );

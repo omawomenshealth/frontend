@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/shared_widgets/oma_design_widgets.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/daily_log_formatters.dart';
@@ -41,52 +42,14 @@ class DashboardView extends StatelessWidget {
               onRefresh: vm.loadData,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 112),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 8),
                     // ── Karşılama ──────────────────────────
-                    Row(
-                      children: [
-                        Image.asset(
-                          AppTime.now.hour < 12
-                              ? 'assets/images/morning.png'
-                              : AppTime.now.hour < 18
-                              ? 'assets/images/afternoon.png'
-                              : 'assets/images/night.png',
-                          width: 32,
-                          height: 32,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            vm.cleanGreeting,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const cal.CalendarView(),
-                              ),
-                            );
-                          },
-                          child: Image.asset(
-                            'assets/images/calendar.png',
-                            width: 32,
-                            height: 32,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                    _buildHomeHeader(context, vm),
+                    const SizedBox(height: 18),
 
                     // ── Yatay Takvim ──
                     HorizontalCalendar(
@@ -197,32 +160,79 @@ class DashboardView extends StatelessWidget {
     );
   }
 
+  Widget _buildHomeHeader(BuildContext context, DashboardViewModel vm) {
+    return Row(
+      children: [
+        Expanded(
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 7,
+            runSpacing: 3,
+            children: [
+              Text(
+                vm.todayDateStr.toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.4,
+                ),
+              ),
+              Container(
+                width: 3,
+                height: 3,
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              Text(
+                vm.cleanGreeting,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          tooltip: AppStrings.calendar,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const cal.CalendarView()),
+            );
+          },
+          style: IconButton.styleFrom(
+            foregroundColor: AppColors.primaryDark,
+            backgroundColor: AppColors.surface,
+            side: const BorderSide(color: AppColors.outline),
+          ),
+          icon: const Icon(Icons.calendar_month_outlined, size: 19),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPersonalInsightsPreview(DashboardViewModel vm) {
     return Column(
       key: const ValueKey('dashboard_personal_insights'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                AppStrings.personalInsightsPreviewTitle,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+        OmaSectionHeader(
+          title: AppStrings.personalInsightsPreviewTitle,
+          eyebrow: AppStrings.insights,
+          action: onOpenInsights == null
+              ? null
+              : TextButton(
+                  key: const ValueKey('dashboard_view_all_insights'),
+                  onPressed: onOpenInsights,
+                  child: Text(AppStrings.viewAllInsights),
                 ),
-              ),
-            ),
-            if (onOpenInsights != null)
-              TextButton(
-                key: const ValueKey('dashboard_view_all_insights'),
-                onPressed: onOpenInsights,
-                child: Text(AppStrings.viewAllInsights),
-              ),
-          ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 14),
         for (var index = 0; index < vm.personalInsights.length; index++) ...[
           PersonalInsightCard(insight: vm.personalInsights[index]),
           if (index != vm.personalInsights.length - 1)
@@ -235,134 +245,49 @@ class DashboardView extends StatelessWidget {
   // ── Regl Kartı ──────────────────────────────────────────
   Widget _buildPeriodCard(DashboardViewModel vm) {
     final pc = vm.periodCalculator;
+    final phaseColor = pc == null
+        ? AppColors.periodPrimary
+        : [
+            AppColors.periodPrimary,
+            AppColors.fertile,
+            AppColors.ovulation,
+            AppColors.luteal,
+          ][pc.currentPhaseIndex];
 
-    if (pc == null) {
-      return Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(color: Colors.transparent),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text(
-                  AppStrings.cycleTracking,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(
-                      255,
-                      58,
-                      0,
-                      0,
-                    ).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    AppStrings.waiting,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.periodPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            CountdownCircle(
-              daysRemaining: null,
-              totalDays: null,
-              phaseName: AppStrings.missingInformation,
-              phaseColor: AppColors.periodPrimary,
-              phase: null,
-            ),
-          ],
+    return Column(
+      children: [
+        Text(
+          AppStrings.cycleTracking.toUpperCase(),
+          style: const TextStyle(
+            color: AppColors.primary,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 2.8,
+          ),
         ),
-      );
-    }
-
-    final phaseColors = [
-      AppColors.periodPrimary,
-      AppColors.fertile,
-      AppColors.ovulation,
-      AppColors.luteal,
-    ];
-    final phaseColor = phaseColors[pc.currentPhaseIndex];
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(color: Colors.transparent),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                AppStrings.cycleTracking,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: phaseColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  pc.currentPhaseName,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: phaseColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          CountdownCircle(
-            daysRemaining: pc.daysUntilNextPeriod,
-            totalDays: pc.cycleLength,
-            phaseName: pc.currentPhaseName,
-            phaseColor: phaseColor,
-            phase: pc.currentPhase,
-          ),
-          const SizedBox(height: 12),
+        const SizedBox(height: 6),
+        CountdownCircle(
+          daysRemaining: pc?.daysUntilNextPeriod,
+          totalDays: pc?.cycleLength,
+          phaseDayCounts: pc?.phaseDayCounts,
+          phaseName: pc?.currentPhaseName ?? AppStrings.missingInformation,
+          phaseColor: phaseColor,
+          phase: pc?.currentPhase,
+        ),
+        if (pc != null)
           Text(
             AppStrings.phaseAfterDays(
               pc.currentPhaseDaysRemaining,
               pc.nextPhaseName,
             ),
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
               color: phaseColor,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            AppStrings.phasePredictionDisclaimer,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 11, color: AppColors.textHint),
-          ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -394,18 +319,15 @@ class DashboardView extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              const Color(0xFF9CAB84),
-              const Color(0xFF9CAB84).withValues(alpha: 0.8),
-            ],
+            colors: [const Color(0xFFF2F0E7), const Color(0xFFE4ECD8)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF9CAB84).withValues(alpha: 0.25),
-              blurRadius: 15,
+              color: const Color(0xFF74835A).withValues(alpha: 0.12),
+              blurRadius: 20,
               offset: const Offset(0, 6),
             ),
           ],
@@ -418,7 +340,7 @@ class DashboardView extends StatelessWidget {
               child: Icon(
                 Icons.auto_awesome_rounded,
                 size: 90,
-                color: Colors.white.withValues(alpha: 0.12),
+                color: AppColors.primary.withValues(alpha: 0.12),
               ),
             ),
             Column(
@@ -432,14 +354,14 @@ class DashboardView extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.22),
+                        color: AppColors.primary.withValues(alpha: 0.13),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
                           const Icon(
                             Icons.lightbulb_outline_rounded,
-                            color: Colors.white,
+                            color: AppColors.primary,
                             size: 12,
                           ),
                           const SizedBox(width: 4),
@@ -448,7 +370,7 @@ class DashboardView extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                              color: AppColors.primaryDark,
                               letterSpacing: 1.0,
                             ),
                           ),
@@ -460,7 +382,7 @@ class DashboardView extends StatelessWidget {
                       children: [
                         const Icon(
                           Icons.timer_outlined,
-                          color: Colors.white70,
+                          color: AppColors.textSecondary,
                           size: 12,
                         ),
                         const SizedBox(width: 4),
@@ -468,7 +390,7 @@ class DashboardView extends StatelessWidget {
                           AppStrings.dayCount(5),
                           style: const TextStyle(
                             fontSize: 11,
-                            color: Colors.white70,
+                            color: AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -482,7 +404,7 @@ class DashboardView extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     height: 1.3,
                   ),
                 ),
@@ -493,7 +415,7 @@ class DashboardView extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: AppColors.textSecondary,
                     height: 1.4,
                   ),
                 ),
@@ -505,14 +427,14 @@ class DashboardView extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.primaryDark,
                       ),
                     ),
                     const SizedBox(width: 4),
                     const Icon(
                       Icons.arrow_forward_rounded,
                       size: 14,
-                      color: Colors.white,
+                      color: AppColors.primaryDark,
                     ),
                   ],
                 ),

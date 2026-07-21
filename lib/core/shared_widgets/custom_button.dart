@@ -44,9 +44,10 @@ class _CustomButtonState extends State<CustomButton>
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.96,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -72,21 +73,29 @@ class _CustomButtonState extends State<CustomButton>
           height: widget.height,
           decoration: widget.isOutlined
               ? BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(99),
                   border: Border.all(
                     color: widget.backgroundColor ?? AppColors.primary,
-                    width: 1.5,
+                    width: 1.2,
                   ),
                 )
               : BoxDecoration(
-                  gradient: widget.gradient ?? AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(14),
+                  gradient:
+                      widget.gradient ??
+                      (widget.backgroundColor == null
+                          ? AppColors.primaryGradient
+                          : null),
+                  color: widget.gradient == null
+                      ? widget.backgroundColor
+                      : null,
+                  borderRadius: BorderRadius.circular(99),
                   boxShadow: [
                     BoxShadow(
                       color: (widget.backgroundColor ?? AppColors.primary)
-                          .withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                          .withValues(alpha: 0.16),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),

@@ -4,6 +4,7 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/cycle_rules.dart';
 import '../../../core/shared_widgets/custom_button.dart';
+import '../../../core/shared_widgets/oma_design_widgets.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
@@ -46,6 +47,7 @@ class _OnboardingViewState extends State<OnboardingView> {
     final vm = context.read<OnboardingViewModel>();
 
     return Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
       body: SafeArea(
         child: Column(
           children: [
@@ -89,24 +91,49 @@ class _OnboardingViewState extends State<OnboardingView> {
   // ── İlerleme Çubuğu ──────────────────────────────────
   Widget _buildProgressBar(int currentPage, int totalPages) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-      child: Row(
-        children: List.generate(totalPages, (i) {
-          final isActive = i <= currentPage;
-          return Expanded(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: 4,
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              decoration: BoxDecoration(
-                color: isActive
-                    ? AppColors.primary
-                    : AppColors.primary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(2),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Text(
+                'OMA',
+                style: TextStyle(
+                  color: AppColors.primaryDark,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2.4,
+                ),
               ),
-            ),
-          );
-        }),
+              const Spacer(),
+              Text(
+                '${currentPage + 1} / $totalPages',
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: List.generate(totalPages, (i) {
+              final isActive = i <= currentPage;
+              return Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: 5,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    color: isActive ? AppColors.primary : AppColors.outline,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }
@@ -337,8 +364,7 @@ class _BasicInfoPage extends StatelessWidget {
               runSpacing: 8,
               children: AppStrings.chronicDiseasesList.map((disease) {
                 final isSelected = state.chronicDiseases.any(
-                  (value) =>
-                      AppStrings.localizeStoredValue(value) == disease,
+                  (value) => AppStrings.localizeStoredValue(value) == disease,
                 );
                 return FilterChip(
                   label: Text(disease),
@@ -672,8 +698,7 @@ class _WomenDiseasesSection extends StatelessWidget {
               runSpacing: 8,
               children: AppStrings.womenDiseasesList.map((disease) {
                 final isSelected = diseases.any(
-                  (value) =>
-                      AppStrings.localizeStoredValue(value) == disease,
+                  (value) => AppStrings.localizeStoredValue(value) == disease,
                 );
                 return FilterChip(
                   label: Text(disease),
@@ -804,14 +829,7 @@ class _PageWrapper extends StatelessWidget {
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
+        Text(title, style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: 4),
         Text(
           subtitle,
@@ -822,16 +840,22 @@ class _PageWrapper extends StatelessWidget {
       ],
     );
 
+    final card = OmaSoftCard(
+      padding: const EdgeInsets.all(24),
+      color: AppColors.surface,
+      child: content,
+    );
+
     if (scrollable) {
       return SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-        child: content,
+        child: card,
       );
     }
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-      child: content,
+      child: Align(alignment: Alignment.topCenter, child: card),
     );
   }
 }

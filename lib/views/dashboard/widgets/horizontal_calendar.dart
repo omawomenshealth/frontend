@@ -45,7 +45,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     final diff = widget.selectedDate.dateOnly.difference(today).inDays;
     final targetIndex = _centerIndex + diff;
     // Her item ~64px genişlikte
-    const itemWidth = 64.0;
+    const itemWidth = 56.0;
     final screenWidth = MediaQuery.of(context).size.width;
     final offset =
         (targetIndex * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
@@ -90,7 +90,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     final today = AppTime.now.dateOnly;
 
     return SizedBox(
-      height: 60,
+      height: 52,
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
@@ -108,36 +108,19 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.easeOutCubic,
-                width: 56,
+                width: 48,
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? const LinearGradient(
-                          colors: [AppColors.primary, AppColors.primaryLight],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        )
-                      : null,
                   color: isSelected
-                      ? null
+                      ? AppColors.primaryLight
                       : isToday
-                      ? AppColors.primary.withValues(alpha: 0.08)
-                      : AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: isToday && !isSelected
-                      ? Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                          width: 1.5,
-                        )
-                      : null,
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
+                      ? AppColors.surface
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(200),
+                  border: isSelected
+                      ? Border.all(color: AppColors.primary)
+                      : isToday
+                      ? Border.all(color: AppColors.outline)
                       : null,
                 ),
                 child: Column(
@@ -149,7 +132,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
                         fontSize: 10,
                         fontWeight: FontWeight.w500,
                         color: isSelected
-                            ? Colors.white.withValues(alpha: 0.8)
+                            ? AppColors.primary
                             : AppColors.textSecondary,
                       ),
                     ),
@@ -157,10 +140,10 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
                     Text(
                       '${date.day}',
                       style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
                         color: isSelected
-                            ? Colors.white
+                            ? AppColors.primaryDark
                             : isToday
                             ? AppColors.primary
                             : AppColors.textPrimary,

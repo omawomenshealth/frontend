@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/shared_widgets/oma_design_widgets.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/premium_purchase_service.dart';
 import '../model/article_model.dart';
@@ -141,59 +142,42 @@ class _ArticlesViewState extends State<ArticlesView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '📖 ${AppStrings.articles}',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                  if (isPremium)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFD54F).withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.workspace_premium_rounded,
-                            size: 16,
-                            color: Color(0xFFD49B00),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            AppStrings.premium,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF9A7000),
-                              fontSize: 12,
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 18),
+              child: OmaPageHeader(
+                title: AppStrings.articles,
+                subtitle: AppStrings.expertArticlesSubtitle,
+                icon: Icons.menu_book_outlined,
+                trailing: isPremium
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.insightGoldSurface,
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.workspace_premium_outlined,
+                              size: 15,
+                              color: AppColors.insightGold,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-              child: Text(
-                AppStrings.expertArticlesSubtitle,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
+                            const SizedBox(width: 4),
+                            Text(
+                              AppStrings.premium,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.insightGold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : null,
               ),
             ),
             if (_articles.isNotEmpty) _buildTopicFilters(),
@@ -363,18 +347,18 @@ class _ArticlesViewState extends State<ArticlesView> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              article.cardColor,
-              article.cardColor.withValues(alpha: 0.72),
+              Color.lerp(article.cardColor, Colors.white, 0.72)!,
+              Color.lerp(article.cardColor, Colors.white, 0.86)!,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: article.cardColor.withValues(alpha: 0.28),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: article.cardColor.withValues(alpha: 0.14),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -397,7 +381,7 @@ class _ArticlesViewState extends State<ArticlesView> {
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -410,7 +394,7 @@ class _ArticlesViewState extends State<ArticlesView> {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     height: 1.3,
                   ),
                 ),
@@ -421,7 +405,7 @@ class _ArticlesViewState extends State<ArticlesView> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.white.withValues(alpha: 0.86),
+                    color: AppColors.textSecondary,
                     height: 1.3,
                   ),
                 ),
@@ -467,19 +451,19 @@ class _ArticlesViewState extends State<ArticlesView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.24),
-        borderRadius: BorderRadius.circular(8),
+        color: AppColors.primary.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(99),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white, size: 12),
+          Icon(icon, color: AppColors.primaryDark, size: 12),
           const SizedBox(width: 3),
           Text(
             label,
             style: const TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: AppColors.primaryDark,
               letterSpacing: 0.4,
             ),
           ),

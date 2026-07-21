@@ -1,13 +1,16 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import '../../../core/constants/color_constants.dart';
+
 import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/period_calculator.dart';
 
-/// Regl geri sayım dairesi — CustomPainter ile animasyonlu dairesel widget.
+/// Figma'daki dort fazli dongu halkasinin responsive Flutter karsiligi.
 class CountdownCircle extends StatefulWidget {
   final int? daysRemaining;
-  final int? totalDays; // Döngü uzunluğu
+  final int? totalDays;
+  final List<int>? phaseDayCounts;
   final String phaseName;
   final Color phaseColor;
   final CyclePhase? phase;
@@ -16,6 +19,7 @@ class CountdownCircle extends StatefulWidget {
     super.key,
     this.daysRemaining,
     this.totalDays,
+    this.phaseDayCounts,
     required this.phaseName,
     this.phaseColor = AppColors.periodPrimary,
     this.phase,
@@ -27,22 +31,16 @@ class CountdownCircle extends StatefulWidget {
 
 class _CountdownCircleState extends State<CountdownCircle>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late final AnimationController _controller;
   late Animation<double> _animation;
 
-  String get _phaseImagePath {
-    switch (widget.phase) {
-      case CyclePhase.menstrual:
-        return 'assets/images/period.png';
-      case CyclePhase.follicular:
-        return 'assets/images/folikulerfaz.png';
-      case CyclePhase.ovulation:
-        return 'assets/images/ovulasyon.png';
-      case CyclePhase.luteal:
-        return 'assets/images/lutealfaz.png';
-      default:
-        return 'assets/images/period.png';
+  double get _targetProgress {
+    if (widget.daysRemaining == null ||
+        widget.totalDays == null ||
+        widget.totalDays! <= 0) {
+      return 0;
     }
+    return (1 - (widget.daysRemaining! / widget.totalDays!)).clamp(0.0, 1.0);
   }
 
   @override
@@ -50,36 +48,21 @@ class _CountdownCircleState extends State<CountdownCircle>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 900),
     );
-
-    final progress =
-        (widget.daysRemaining != null &&
-            widget.totalDays != null &&
-            widget.totalDays! > 0)
-        ? 1.0 - (widget.daysRemaining! / widget.totalDays!)
-        : 0.0;
-    _animation = Tween<double>(
-      begin: 0,
-      end: progress,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
     _controller.forward();
   }
 
   @override
-  void didUpdateWidget(CountdownCircle oldWidget) {
+  void didUpdateWidget(covariant CountdownCircle oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.daysRemaining != widget.daysRemaining) {
-      final progress =
-          (widget.daysRemaining != null &&
-              widget.totalDays != null &&
-              widget.totalDays! > 0)
-          ? 1.0 - (widget.daysRemaining! / widget.totalDays!)
-          : 0.0;
-      _animation = Tween<double>(begin: _animation.value, end: progress)
-          .animate(
-            CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-          );
+    if (oldWidget.daysRemaining != widget.daysRemaining ||
+        oldWidget.totalDays != widget.totalDays ||
+        oldWidget.phase != widget.phase) {
       _controller
         ..reset()
         ..forward();
@@ -94,182 +77,227 @@ class _CountdownCircleState extends State<CountdownCircle>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return SizedBox(
-          width: 180,
-          height: 180,
-          child: CustomPaint(
-            painter: _CirclePainter(
-              progress: _animation.value,
-              color: widget.phaseColor,
-              backgroundColor: widget.phaseColor.withValues(alpha: 0.12),
-            ),
-            child: Center(
-              child: Container(
-                width: 135,
-                height: 135,
-                decoration: BoxDecoration(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final available = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 340.0;
+        final size = available.clamp(270.0, 340.0).toDouble();
+
+        return AnimatedBuilder(
+          animation: _animation,
+          builder: (context, _) {
+            return SizedBox.square(
+              dimension: size,
+              child: DecoratedBox(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.4),
-                    width: 2.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                  image: DecorationImage(
-                    image: AssetImage(_phaseImagePath),
-                    fit: BoxFit.cover,
+                  gradient: RadialGradient(
+                    colors: [Color(0x128AA878), Color(0x008AA878)],
+                    stops: [0, 0.72],
                   ),
                 ),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (widget.daysRemaining == null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            AppStrings.dateAwaiting,
+                child: CustomPaint(
+                  painter: _CycleRingPainter(
+                    activePhase: widget.phase,
+                    indicatorColor: widget.phaseColor,
+                    progress: _targetProgress * _animation.value,
+                    phaseDayCounts: widget.phaseDayCounts,
+                  ),
+                  child: Center(
+                    child: SizedBox(
+                      width: size * 0.43,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.daysRemaining == null
+                                ? AppStrings.waiting
+                                : widget.daysRemaining == 0
+                                ? AppStrings.today
+                                : '${widget.daysRemaining} ${AppStrings.daysRemaining}',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              shadows: [
-                                Shadow(blurRadius: 8.0, color: Colors.white),
-                                Shadow(blurRadius: 16.0, color: Colors.white),
-                              ],
+                              color: AppColors.primary,
+                              fontSize: 15,
+                              height: 1.25,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                        )
-                      else ...[
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Dış çerçeve (Stroke)
-                            Text(
-                              widget.daysRemaining == 0
-                                  ? ''
-                                  : '${widget.daysRemaining}',
-                              style: TextStyle(
-                                fontSize: widget.daysRemaining == 0 ? 36 : 42,
-                                fontWeight: FontWeight.bold,
-                                height: 1.1,
-                                foreground: Paint()
-                                  ..style = PaintingStyle.stroke
-                                  ..strokeWidth = 4
-                                  ..color = const Color(0xFF89986D),
-                              ),
+                          const SizedBox(height: 7),
+                          Text(
+                            widget.phaseName,
+                            textAlign: TextAlign.center,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: widget.phaseColor,
+                              fontSize: size < 300 ? 22 : 27,
+                              height: 1.08,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.6,
                             ),
-                            // İç dolgu (Color)
-                            Text(
-                              widget.daysRemaining == 0
-                                  ? ''
-                                  : '${widget.daysRemaining}',
-                              style: TextStyle(
-                                fontSize: widget.daysRemaining == 0 ? 36 : 42,
-                                fontWeight: FontWeight.bold,
-                                height: 1.1,
-                                color: const Color(0xFFF6F0D7),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          widget.daysRemaining == 0
-                              ? AppStrings.today
-                              : AppStrings.daysRemaining,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black.withValues(alpha: 0.8),
-                            shadows: const [
-                              Shadow(blurRadius: 6.0, color: Colors.white),
-                              Shadow(blurRadius: 12.0, color: Colors.white),
-                            ],
                           ),
-                        ),
-                      ],
-                    ],
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.daysRemaining == null
+                                ? AppStrings.cycleStatisticsHint
+                                : AppStrings.phasePredictionDisclaimer,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 11,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
   }
 }
 
-class _CirclePainter extends CustomPainter {
+class _CycleRingPainter extends CustomPainter {
+  final CyclePhase? activePhase;
+  final Color indicatorColor;
   final double progress;
-  final Color color;
-  final Color backgroundColor;
+  final List<int>? phaseDayCounts;
 
-  _CirclePainter({
+  const _CycleRingPainter({
+    required this.activePhase,
+    required this.indicatorColor,
     required this.progress,
-    required this.color,
-    required this.backgroundColor,
+    required this.phaseDayCounts,
   });
+
+  static const _colors = <Color>[
+    AppColors.periodPrimary,
+    AppColors.fertile,
+    AppColors.ovulation,
+    AppColors.luteal,
+  ];
+
+  static const _defaultDayCounts = <int>[5, 7, 5, 11];
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) / 2 - 8;
-
-    // Arka plan halkası
-    final bgPaint = Paint()
-      ..color = backgroundColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(center, radius, bgPaint);
-
-    // İlerleme halkası
-    final progressPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round;
-
-    final sweepAngle = 2 * math.pi * progress;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      sweepAngle,
-      false,
-      progressPaint,
+    final center = size.center(Offset.zero);
+    final strokeWidth = size.width * 0.09;
+    final radius = size.width / 2 - strokeWidth * 0.95;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    const gap = 0.035;
+    var angle = -math.pi / 2;
+    final usableCounts =
+        phaseDayCounts != null &&
+            phaseDayCounts!.length == CyclePhase.values.length &&
+            phaseDayCounts!.fold<int>(0, (sum, value) => sum + value) > 0
+        ? phaseDayCounts!
+        : _defaultDayCounts;
+    final totalPhaseDays = usableCounts.fold<int>(
+      0,
+      (sum, value) => sum + value,
     );
 
-    // Uç noktadaki parlak nokta
-    if (progress > 0.01) {
-      final endAngle = -math.pi / 2 + sweepAngle;
-      final dotX = center.dx + radius * math.cos(endAngle);
-      final dotY = center.dy + radius * math.sin(endAngle);
+    final shadowPaint = Paint()
+      ..color = const Color(0xFF6A9E78).withValues(alpha: 0.09)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth + 15
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16);
+    canvas.drawCircle(center, radius, shadowPaint);
 
-      final dotPaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(Offset(dotX, dotY), 5, dotPaint);
-
-      final dotBorderPaint = Paint()
-        ..color = color
+    for (var index = 0; index < usableCounts.length; index++) {
+      final fraction = usableCounts[index] / totalPhaseDays;
+      final sweep = math.pi * 2 * fraction;
+      final isActive = activePhase == null || activePhase!.index == index;
+      final paint = Paint()
+        ..color = _colors[index].withValues(alpha: isActive ? 0.96 : 0.52)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2;
-      canvas.drawCircle(Offset(dotX, dotY), 5, dotBorderPaint);
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.butt;
+      canvas.drawArc(rect, angle + gap / 2, sweep - gap, false, paint);
+      angle += sweep;
+    }
+
+    final guidePaint = Paint()
+      ..color = AppColors.primary.withValues(alpha: 0.2)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    canvas.drawCircle(center, radius + strokeWidth / 2 + 9, guidePaint);
+    canvas.drawCircle(center, radius - strokeWidth / 2 - 9, guidePaint);
+
+    for (var index = 0; index < totalPhaseDays; index++) {
+      final tickAngle = -math.pi / 2 + (math.pi * 2 * index / totalPhaseDays);
+      final isMajor = index % 7 == 0;
+      final startRadius = radius + strokeWidth / 2 + 6;
+      final endRadius = startRadius + (isMajor ? 6 : 3);
+      final tickPaint = Paint()
+        ..color = AppColors.primary.withValues(alpha: isMajor ? 0.7 : 0.35)
+        ..strokeWidth = isMajor ? 1.5 : 0.8
+        ..strokeCap = StrokeCap.round;
+      canvas.drawLine(
+        Offset(
+          center.dx + startRadius * math.cos(tickAngle),
+          center.dy + startRadius * math.sin(tickAngle),
+        ),
+        Offset(
+          center.dx + endRadius * math.cos(tickAngle),
+          center.dy + endRadius * math.sin(tickAngle),
+        ),
+        tickPaint,
+      );
+    }
+
+    if (activePhase != null) {
+      final indicatorAngle = -math.pi / 2 + (math.pi * 2 * progress);
+      final point = Offset(
+        center.dx + radius * math.cos(indicatorAngle),
+        center.dy + radius * math.sin(indicatorAngle),
+      );
+      canvas.drawCircle(
+        point,
+        12,
+        Paint()
+          ..color = indicatorColor.withValues(alpha: 0.14)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+      );
+      canvas.drawCircle(point, 7, Paint()..color = AppColors.background);
+      canvas.drawCircle(
+        point,
+        7,
+        Paint()
+          ..color = indicatorColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.2,
+      );
+      canvas.drawCircle(point, 2.5, Paint()..color = indicatorColor);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _CirclePainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.color != color;
+  bool shouldRepaint(covariant _CycleRingPainter oldDelegate) {
+    return oldDelegate.activePhase != activePhase ||
+        oldDelegate.indicatorColor != indicatorColor ||
+        oldDelegate.progress != progress ||
+        !_sameCounts(oldDelegate.phaseDayCounts, phaseDayCounts);
+  }
+
+  bool _sameCounts(List<int>? first, List<int>? second) {
+    if (identical(first, second)) return true;
+    if (first == null || second == null || first.length != second.length) {
+      return false;
+    }
+    for (var index = 0; index < first.length; index++) {
+      if (first[index] != second[index]) return false;
+    }
+    return true;
   }
 }

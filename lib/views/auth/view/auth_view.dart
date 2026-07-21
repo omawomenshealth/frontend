@@ -21,9 +21,9 @@ class AuthView extends StatelessWidget {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFFA1887F),
-                  Color(0xFFD7CCC8),
-                  Color(0xFFEFEBE9),
+                  Color(0xFFFFFEF8),
+                  Color(0xFFFAFAEE),
+                  Color(0xFFE8EFDF),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -38,16 +38,40 @@ class AuthView extends StatelessWidget {
 
                     // Logo / İkon
                     Container(
-                      width: 100,
-                      height: 100,
+                      width: 124,
+                      height: 124,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: AppColors.surface,
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.16),
+                            blurRadius: 28,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
-                      child: const Icon(
-                        Icons.favorite_rounded,
-                        size: 50,
-                        color: Colors.white,
+                      child: const Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Icon(
+                            Icons.donut_large_rounded,
+                            size: 76,
+                            color: AppColors.primary,
+                          ),
+                          Text(
+                            'OMA',
+                            style: TextStyle(
+                              color: AppColors.primaryDark,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -56,7 +80,7 @@ class AuthView extends StatelessWidget {
                     Text(
                       AppStrings.appName,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1,
@@ -66,7 +90,7 @@ class AuthView extends StatelessWidget {
                     Text(
                       AppStrings.appSlogan,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.85),
+                        color: AppColors.textSecondary,
                         fontSize: 16,
                       ),
                     ),
@@ -78,13 +102,13 @@ class AuthView extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.redAccent.withValues(alpha: 0.2),
+                          color: AppColors.accentLight,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           vm.errorMessage!,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.error,
                             fontSize: 13,
                           ),
                           textAlign: TextAlign.center,
@@ -100,9 +124,9 @@ class AuthView extends StatelessWidget {
                       isLoading: vm.isLoading,
                       onPressed: () => _handleGoogleLogin(context, vm),
                       gradient: const LinearGradient(
-                        colors: [Colors.white, Color(0xFFF0EEFF)],
+                        colors: [AppColors.surface, AppColors.primaryLight],
                       ),
-                      textColor: AppColors.primary,
+                      textColor: AppColors.primaryDark,
                     ),
                     const SizedBox(height: 16),
 
@@ -114,8 +138,8 @@ class AuthView extends StatelessWidget {
                         isLoading: vm.isLoading,
                         onPressed: () => _showMockLoginDialog(context, vm),
                         isOutlined: true,
-                        backgroundColor: Colors.white,
-                        textColor: Colors.white,
+                        backgroundColor: AppColors.primary,
+                        textColor: AppColors.primary,
                       ),
                       const SizedBox(height: 24),
                     ],
@@ -128,11 +152,11 @@ class AuthView extends StatelessWidget {
                       child: Text(
                         AppStrings.continueWithoutLogin,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: AppColors.primaryDark,
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           decoration: TextDecoration.underline,
-                          decorationColor: Colors.white.withValues(alpha: 0.5),
+                          decorationColor: AppColors.primary,
                         ),
                       ),
                     ),

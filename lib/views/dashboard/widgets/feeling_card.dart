@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
+import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 
-/// Dashboard'da 4 eşit yuvarlak parçaya bölünmüş hızlı erişim kartı.
-/// Regl girişi, Yeme-İçme, İlaç Takibi, Nasıl Hissediyorsun.
+/// Ana ekrandaki tekrar kullanilabilir hizli kayit aksiyonlari.
 class FeelingCard extends StatelessWidget {
   final VoidCallback onPeriodTap;
   final VoidCallback onNutritionTap;
@@ -21,133 +22,97 @@ class FeelingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final options = <_QuickAction>[
+    final actions = <_QuickAction>[
       if (showPeriod)
         _QuickAction(
-          imagePath: 'assets/images/period.png',
-          color: AppColors.periodPrimary,
-          bgColor: Color(0xFFF6F0D7),
+          label: AppStrings.period,
+          icon: Icons.water_drop_outlined,
           onTap: onPeriodTap,
         ),
       _QuickAction(
-        imagePath: 'assets/images/2.png',
-        color: AppColors.warning,
-        bgColor: Color(0xFFF6F0D7),
+        label: AppStrings.nutrition,
+        icon: Icons.local_dining_outlined,
         onTap: onNutritionTap,
       ),
       _QuickAction(
-        imagePath: 'assets/images/3.png',
-        color: AppColors.medicationPrimary,
-        bgColor: Color(0xFFF6F0D7),
+        label: AppStrings.medications,
+        icon: Icons.medication_outlined,
         onTap: onMedicationTap,
       ),
       _QuickAction(
-        imagePath: 'assets/images/4.png',
-        color: AppColors.moodHappy,
-        bgColor: Color(0xFFF6F0D7),
+        label: AppStrings.mood,
+        icon: Icons.mood_outlined,
         onTap: onMoodTap,
       ),
     ];
 
     return Row(
-      children: options.map((option) {
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: _QuickActionCircle(option: option),
-          ),
-        );
-      }).toList(),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var index = 0; index < actions.length; index++) ...[
+          Expanded(child: _QuickActionButton(action: actions[index])),
+          if (index != actions.length - 1) const SizedBox(width: 12),
+        ],
+      ],
     );
   }
 }
 
-/// Tek bir yuvarlak aksiyon düğmesi
-class _QuickActionCircle extends StatefulWidget {
-  final _QuickAction option;
+class _QuickActionButton extends StatefulWidget {
+  final _QuickAction action;
 
-  const _QuickActionCircle({required this.option});
+  const _QuickActionButton({required this.action});
 
   @override
-  State<_QuickActionCircle> createState() => _QuickActionCircleState();
+  State<_QuickActionButton> createState() => _QuickActionButtonState();
 }
 
-class _QuickActionCircleState extends State<_QuickActionCircle>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _scaleAnimation;
-  bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 150),
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.92,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class _QuickActionButtonState extends State<_QuickActionButton> {
+  var _pressed = false;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.option.onTap,
-      onTapDown: (_) {
-        setState(() => _isPressed = true);
-        _controller.forward();
-      },
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        _controller.reverse();
-      },
-      onTapCancel: () {
-        setState(() => _isPressed = false);
-        _controller.reverse();
-      },
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: AspectRatio(
-          aspectRatio: 1,
-          child: Container(
-            decoration: BoxDecoration(
-              color: widget.option.bgColor,
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF9CAB84), width: 3.5),
-              boxShadow: [
-                // 1. Ana, derin alt gölge (koyu ve derin)
-                BoxShadow(
-                  color: Colors.black.withValues(
-                    alpha: _isPressed ? 0.3 : 0.2,
-                  ), // Daha koyu
-                  blurRadius: _isPressed ? 15 : 10, // Daha geniş yayılım
-                  offset: _isPressed
-                      ? const Offset(0, 5)
-                      : const Offset(0, 8), // Daha derin offset
+    return Semantics(
+      button: true,
+      label: widget.action.label,
+      child: GestureDetector(
+        onTap: widget.action.onTap,
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapUp: (_) => setState(() => _pressed = false),
+        onTapCancel: () => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: _pressed ? 0.94 : 1,
+          duration: const Duration(milliseconds: 130),
+          child: Column(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 130),
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: _pressed ? AppColors.primaryLight : AppColors.surface,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.primaryDark, width: 1),
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ClipOval(
-                  child: Image.asset(
-                    widget.option.imagePath,
-                    width: 42,
-                    height: 42,
-                    fit: BoxFit.cover,
-                  ),
+                child: Icon(
+                  widget.action.icon,
+                  color: AppColors.primaryDark,
+                  size: 20,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                widget.action.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -155,17 +120,14 @@ class _QuickActionCircleState extends State<_QuickActionCircle>
   }
 }
 
-/// Hızlı aksiyon veri modeli
 class _QuickAction {
-  final String imagePath;
-  final Color color;
-  final Color bgColor;
+  final String label;
+  final IconData icon;
   final VoidCallback onTap;
 
   const _QuickAction({
-    required this.imagePath,
-    required this.color,
-    required this.bgColor,
+    required this.label,
+    required this.icon,
     required this.onTap,
   });
 }

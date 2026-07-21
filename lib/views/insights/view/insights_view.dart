@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/shared_widgets/oma_design_widgets.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../viewmodel/insights_view_model.dart';
 
@@ -64,45 +65,10 @@ class InsightsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(
-                Icons.auto_awesome_rounded,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppStrings.insights,
-                    style: const TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    AppStrings.insightsSubtitle,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        OmaPageHeader(
+          title: AppStrings.insights,
+          subtitle: AppStrings.insightsSubtitle,
+          icon: Icons.auto_awesome_outlined,
         ),
         const SizedBox(height: 18),
         Container(
@@ -110,7 +76,7 @@ class InsightsView extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: AppColors.surface.withValues(alpha: 0.75),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: AppColors.primary.withValues(alpha: 0.16),
             ),
@@ -223,15 +189,22 @@ class PersonalInsightCard extends StatelessWidget {
       child: Container(
         key: ValueKey('personal_insight_${insight.id}'),
         width: double.infinity,
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
+          gradient: LinearGradient(
+            colors: [
+              Color.lerp(presentation.color, Colors.white, 0.83)!,
+              Color.lerp(presentation.color, Colors.white, 0.93)!,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.035),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: presentation.color.withValues(alpha: 0.12),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -239,11 +212,11 @@ class PersonalInsightCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: presentation.color.withValues(alpha: 0.13),
-                borderRadius: BorderRadius.circular(13),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
                 presentation.icon,

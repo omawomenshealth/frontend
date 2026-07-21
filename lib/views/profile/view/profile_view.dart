@@ -100,7 +100,7 @@ class ProfileView extends StatelessWidget {
                   // ── 1. Temel Bilgiler ─────────────────────
                   _buildSectionCard(
                     context: context,
-                    title: '📋 ${AppStrings.basicInformation}',
+                    title: AppStrings.basicInformation,
                     icon: Icons.edit_outlined,
                     onEdit: () => _showBasicInfoSheet(context, vm),
                     children: [
@@ -141,7 +141,7 @@ class ProfileView extends StatelessWidget {
                   // ── 2. Kadın Sağlığı ─────────────────────
                   _buildSectionCard(
                     context: context,
-                    title: '🩺 ${AppStrings.womenHealth}',
+                    title: AppStrings.womenHealth,
                     icon: Icons.edit_outlined,
                     onEdit: () => _showWomenHealthSheet(context, vm),
                     children: [
@@ -181,7 +181,7 @@ class ProfileView extends StatelessWidget {
                   // ── 3. İlaç & Takviye ─────────────────────
                   _buildSectionCard(
                     context: context,
-                    title: '💊 ${AppStrings.medicationAndSupplement}',
+                    title: AppStrings.medicationAndSupplement,
                     icon: Icons.edit_outlined,
                     onEdit: () => _showMedicationSheet(context, vm),
                     children: [
@@ -212,7 +212,7 @@ class ProfileView extends StatelessWidget {
                   // ── 4. Raporlama ─────────────────────────
                   _buildSectionCard(
                     context: context,
-                    title: '📋 ${AppStrings.doctorReport}',
+                    title: AppStrings.doctorReport,
                     icon: Icons.assignment_outlined,
                     onEdit: () {
                       Navigator.push(
@@ -390,12 +390,13 @@ class ProfileView extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.outline),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -419,7 +420,7 @@ class ProfileView extends StatelessWidget {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(icon, size: 18, color: AppColors.primary),
                 ),
@@ -527,7 +528,7 @@ class ProfileView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
-        title: '📋 ${AppStrings.basicInformationEdit}',
+        title: AppStrings.basicInformationEdit,
         onSave: () async {
           vm.updateUserName(nameCtrl.text.trim());
           vm.updateWeight(double.tryParse(weightCtrl.text));
@@ -665,7 +666,7 @@ class ProfileView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
-        title: '🩺 ${AppStrings.womenHealthEdit}',
+        title: AppStrings.womenHealthEdit,
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {
@@ -985,7 +986,7 @@ class ProfileView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
-        title: '💊 ${AppStrings.medicationSupplementEdit}',
+        title: AppStrings.medicationSupplementEdit,
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {

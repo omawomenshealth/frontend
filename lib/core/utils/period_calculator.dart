@@ -250,4 +250,40 @@ class PeriodCalculator {
 
   /// Döngü fazına göre renk indeksi (0-3).
   int get currentPhaseIndex => currentPhase.index;
+
+  /// Tahmini bir dongudeki her fazin kac gun surdugunu dondurur.
+  ///
+  /// Sira [CyclePhase.values] ile aynidir: menstrual, follicular,
+  /// ovulation ve luteal. Arayuzdeki dongu halkasi bu degerleri kullanarak
+  /// her parcayi kullanicinin gercek dongu uzunluguna orantilar.
+  List<int> get phaseDayCounts {
+    if (cycleLength <= 0) {
+      return List<int>.unmodifiable(
+        List<int>.filled(CyclePhase.values.length, 0),
+      );
+    }
+
+    final counts = List<int>.filled(CyclePhase.values.length, 0);
+    final effectivePeriodLength = periodLength.clamp(0, cycleLength);
+
+    for (var dayInCycle = 0; dayInCycle < cycleLength; dayInCycle++) {
+      late final CyclePhase phase;
+      if (dayInCycle < effectivePeriodLength) {
+        phase = CyclePhase.menstrual;
+      } else if (_isInWrappedRange(
+        dayInCycle,
+        cycleLength - CycleRules.maxLutealLength,
+        cycleLength - CycleRules.minLutealLength,
+      )) {
+        phase = CyclePhase.ovulation;
+      } else if (cycleLength - dayInCycle < CycleRules.minLutealLength) {
+        phase = CyclePhase.luteal;
+      } else {
+        phase = CyclePhase.follicular;
+      }
+      counts[phase.index]++;
+    }
+
+    return List<int>.unmodifiable(counts);
+  }
 }
