@@ -3,6 +3,7 @@ import 'package:app_proje_a/core/utils/personal_association_engine.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/personal_insight_model.dart';
+import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -189,6 +190,108 @@ void main() {
     expect(delayed.withEventCount, 12);
     expect(delayed.withTotal, 12);
     expect(delayed.withoutEventCount, 0);
+  });
+
+  test(
+    'ruh halini döngü fazındaki diğer ruh hali günleriyle karşılaştırır',
+    () {
+      final start = DateTime(2026, 1, 1);
+      final logs = List.generate(84, (day) {
+        final dayInCycle = day % 28;
+        final isFollicular = dayInCycle >= 5 && dayInCycle <= 11;
+        return DailyLog(
+          date: start.add(Duration(days: day)),
+          mood: isFollicular ? 'Mutlu' : 'Yorgun',
+          observedSections: const {DailyLogObservedSection.wellbeing},
+        );
+      });
+
+      final insights = engine.generate(
+        logs: logs,
+        settings: UserSettings(
+          lastPeriodDate: start,
+          averageCycleLength: 28,
+          averagePeriodLength: 5,
+        ),
+      );
+      final association = insights.firstWhere(
+        (insight) =>
+            insight.kind == PersonalInsightKind.moodCyclePhaseAssociation &&
+            insight.primaryLabel == 'Mutlu' &&
+            insight.secondaryLabel == 'cyclePhase:follicular',
+      );
+
+      expect(association.withEventCount, 21);
+      expect(association.withTotal, 21);
+      expect(association.withoutEventCount, 0);
+      expect(association.withoutTotal, 63);
+      expect(association.confidence, PersonalInsightConfidence.strong);
+    },
+  );
+
+  test(
+    'enerji düzeyini döngü fazındaki diğer enerji günleriyle karşılaştırır',
+    () {
+      final start = DateTime(2026, 1, 1);
+      final logs = List.generate(84, (day) {
+        final dayInCycle = day % 28;
+        final isLuteal = dayInCycle >= 17;
+        return DailyLog(
+          date: start.add(Duration(days: day)),
+          energyLevel: isLuteal ? 2 : 4,
+          observedSections: const {DailyLogObservedSection.wellbeing},
+        );
+      });
+
+      final insights = engine.generate(
+        logs: logs,
+        settings: UserSettings(
+          lastPeriodDate: start,
+          averageCycleLength: 28,
+          averagePeriodLength: 5,
+        ),
+      );
+      final association = insights.firstWhere(
+        (insight) =>
+            insight.kind == PersonalInsightKind.energyCyclePhaseAssociation &&
+            insight.primaryLabel == AppStrings.insightFeatureLowEnergyToken &&
+            insight.secondaryLabel == 'cyclePhase:luteal',
+      );
+
+      expect(association.withEventCount, 33);
+      expect(association.withTotal, 33);
+      expect(association.withoutEventCount, 0);
+      expect(association.withoutTotal, 51);
+      expect(association.confidence, PersonalInsightConfidence.strong);
+    },
+  );
+
+  test('döngü sinyali uygun değilse faz-ruh hali bağlantısını bastırır', () {
+    final start = DateTime(2026, 1, 1);
+    final logs = List.generate(56, (day) {
+      return DailyLog(
+        date: start.add(Duration(days: day)),
+        mood: day % 28 >= 5 && day % 28 <= 11 ? 'Mutlu' : 'Yorgun',
+        energyLevel: day % 28 >= 17 ? 2 : 4,
+      );
+    });
+
+    final insights = engine.generate(
+      logs: logs,
+      settings: UserSettings(
+        lastPeriodDate: start,
+        menopauseStatus: MenopauseStatus.peri,
+      ),
+    );
+
+    expect(
+      insights.where(
+        (insight) =>
+            insight.kind == PersonalInsightKind.moodCyclePhaseAssociation ||
+            insight.kind == PersonalInsightKind.energyCyclePhaseAssociation,
+      ),
+      isEmpty,
+    );
   });
 
   test('daha seyrek görülen ters yönlü bağlantıyı da bulur', () {

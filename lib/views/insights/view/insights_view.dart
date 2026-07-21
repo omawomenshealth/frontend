@@ -42,7 +42,7 @@ class InsightsView extends StatelessWidget {
                       sliver: SliverList.separated(
                         itemCount: vm.insights.length,
                         itemBuilder: (context, index) =>
-                            _InsightCard(insight: vm.insights[index]),
+                            PersonalInsightCard(insight: vm.insights[index]),
                         separatorBuilder: (_, _) => const SizedBox(height: 12),
                       ),
                     ),
@@ -210,10 +210,10 @@ class InsightsView extends StatelessWidget {
   }
 }
 
-class _InsightCard extends StatelessWidget {
+class PersonalInsightCard extends StatelessWidget {
   final PersonalInsight insight;
 
-  const _InsightCard({required this.insight});
+  const PersonalInsightCard({super.key, required this.insight});
 
   @override
   Widget build(BuildContext context) {
@@ -437,6 +437,38 @@ class _InsightPresentation {
         );
         icon = Icons.bubble_chart_rounded;
         color = AppColors.periodPrimary;
+      case PersonalInsightKind.moodCyclePhaseAssociation:
+        title = AppStrings.insightMoodCyclePhaseTitle;
+        body = AppStrings.insightMoodCyclePhaseBody(
+          mood: primary,
+          phase: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.donut_large_rounded;
+        color = AppColors.luteal;
+      case PersonalInsightKind.energyCyclePhaseAssociation:
+        title = AppStrings.insightEnergyCyclePhaseTitle;
+        body = AppStrings.insightEnergyCyclePhaseBody(
+          energy: primary,
+          phase: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.bolt_rounded;
+        color = AppColors.warning;
       case PersonalInsightKind.structuredAssociation:
         title = AppStrings.insightAssociationTitle;
         body = AppStrings.insightAssociationBody(

@@ -3,7 +3,9 @@ import 'dart:math' as math;
 import '../../data/models/medication_reminder_model.dart';
 import '../../data/models/period_log_model.dart';
 import '../../data/models/personal_insight_model.dart';
+import '../../data/models/user_settings_model.dart';
 import '../constants/app_strings.dart';
+import 'cycle_rules.dart';
 import 'date_extensions.dart';
 
 /// Kişinin kendi kayıtlarında karşılaştırmalı ve gecikmeli bağlantılar arar.
@@ -25,6 +27,7 @@ class PersonalAssociationEngine {
   List<PersonalInsight> generate({
     required List<DailyLog> logs,
     List<MedicationDoseRecord> doseRecords = const [],
+    UserSettings? settings,
   }) {
     final days = _buildDays(logs);
     if (days.length < _minimumComparableDays) return const [];
@@ -32,6 +35,8 @@ class PersonalAssociationEngine {
     final candidates = <_AssociationCandidate>[];
     _addDailyLogCandidates(candidates, days);
     _addMetricCandidates(candidates, days);
+    _addMoodCyclePhaseCandidates(candidates, days, settings);
+    _addEnergyCyclePhaseCandidates(candidates, days, settings);
     _addMedicationCandidates(candidates, days, doseRecords);
     if (candidates.isEmpty) return const [];
 
@@ -56,6 +61,120 @@ class PersonalAssociationEngine {
         .take(_maximumResults)
         .map((candidate) => candidate.toInsight())
         .toList(growable: false);
+  }
+
+  void _addMoodCyclePhaseCandidates(
+    List<_AssociationCandidate> candidates,
+    Map<DateTime, _ObservedDay> days,
+    UserSettings? settings,
+  ) {
+    final cycle = _buildCyclePhaseContext(days, settings);
+    if (cycle == null) return;
+
+    final moodLabels = days.values
+        .map((day) => day.mood)
+        .whereType<String>()
+        .toSet();
+    for (final phase in _ObservedCyclePhase.values) {
+      for (final mood in moodLabels) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.moodCyclePhaseAssociation,
+          primaryLabel: mood,
+          secondaryLabel: '${AppStrings.cyclePhaseFeaturePrefix}${phase.name}',
+          lagDays: 0,
+          exposureObserved: (day) =>
+              day.mood != null && cycle.phaseAt(day) != null,
+          exposurePresent: (day) => cycle.phaseAt(day) == phase,
+          outcomeObserved: (day) => day.mood != null,
+          outcomePresent: (day) => day.mood == mood,
+        );
+      }
+    }
+  }
+
+  void _addEnergyCyclePhaseCandidates(
+    List<_AssociationCandidate> candidates,
+    Map<DateTime, _ObservedDay> days,
+    UserSettings? settings,
+  ) {
+    final cycle = _buildCyclePhaseContext(days, settings);
+    if (cycle == null) return;
+
+    void testEnergyPattern({
+      required _ObservedCyclePhase phase,
+      required String energyLabel,
+      required bool Function(int value) matches,
+    }) {
+      _testCandidate(
+        candidates: candidates,
+        days: days,
+        kind: PersonalInsightKind.energyCyclePhaseAssociation,
+        primaryLabel: energyLabel,
+        secondaryLabel: '${AppStrings.cyclePhaseFeaturePrefix}${phase.name}',
+        lagDays: 0,
+        exposureObserved: (day) =>
+            day.energyLevel != null && cycle.phaseAt(day) != null,
+        exposurePresent: (day) => cycle.phaseAt(day) == phase,
+        outcomeObserved: (day) => day.energyLevel != null,
+        outcomePresent: (day) => matches(day.energyLevel!),
+      );
+    }
+
+    for (final phase in _ObservedCyclePhase.values) {
+      testEnergyPattern(
+        phase: phase,
+        energyLabel: AppStrings.insightFeatureLowEnergyToken,
+        matches: (value) => value <= 2,
+      );
+      testEnergyPattern(
+        phase: phase,
+        energyLabel: AppStrings.insightFeatureHighEnergyToken,
+        matches: (value) => value >= 4,
+      );
+    }
+  }
+
+  _CyclePhaseContext? _buildCyclePhaseContext(
+    Map<DateTime, _ObservedDay> days,
+    UserSettings? settings,
+  ) {
+    if (settings?.menopauseStatus == MenopauseStatus.peri ||
+        settings?.menopauseStatus == MenopauseStatus.post ||
+        AppStrings.birthControlMayAffectCycleSignals(
+          settings?.birthControlMethod,
+        )) {
+      return null;
+    }
+
+    final dates = days.keys.toList()..sort();
+    final periodStarts = <DateTime>[];
+    DateTime? previousBleedingDay;
+    for (final date in dates) {
+      if (!days[date]!.hasBleeding) continue;
+      if (previousBleedingDay == null ||
+          date.difference(previousBleedingDay).inDays > 1) {
+        periodStarts.add(date);
+      }
+      previousBleedingDay = date;
+    }
+
+    final anchors = <DateTime>{
+      if (settings?.lastPeriodDate != null) settings!.lastPeriodDate!.dateOnly,
+      ...periodStarts,
+    }.toList()..sort();
+    if (anchors.isEmpty) return null;
+
+    return _CyclePhaseContext(
+      anchors: anchors,
+      fallbackCycleLength: CycleRules.sanitizeCycleLength(
+        settings?.averageCycleLength ?? CycleRules.defaultCycleLength,
+      ),
+      periodLength: CycleRules.sanitizePeriodLength(
+        settings?.averagePeriodLength ?? CycleRules.defaultPeriodLength,
+      ),
+    );
   }
 
   void _addMetricCandidates(
@@ -486,6 +605,7 @@ class PersonalAssociationEngine {
       int? energyLevel;
       int? waterIntakeMl;
       int? caffeineServings;
+      var hasBleeding = false;
       var nutritionObserved = false;
       var wellbeingObserved = false;
 
@@ -501,6 +621,7 @@ class PersonalAssociationEngine {
         energyLevel = log.energyLevel ?? energyLevel;
         waterIntakeMl = log.waterIntakeMl ?? waterIntakeMl;
         caffeineServings = log.caffeineServings ?? caffeineServings;
+        hasBleeding = hasBleeding || log.flowIntensity != null;
 
         nutritionObserved =
             nutritionObserved ||
@@ -539,6 +660,7 @@ class PersonalAssociationEngine {
           energyLevel: energyLevel,
           waterIntakeMl: waterIntakeMl,
           caffeineServings: caffeineServings,
+          hasBleeding: hasBleeding,
           nutritionObserved: nutritionObserved,
           wellbeingObserved: wellbeingObserved,
         ),
@@ -614,6 +736,60 @@ class PersonalAssociationEngine {
   }
 }
 
+enum _ObservedCyclePhase { menstrual, follicular, ovulation, luteal }
+
+class _CyclePhaseContext {
+  final List<DateTime> anchors;
+  final int fallbackCycleLength;
+  final int periodLength;
+
+  const _CyclePhaseContext({
+    required this.anchors,
+    required this.fallbackCycleLength,
+    required this.periodLength,
+  });
+
+  _ObservedCyclePhase? phaseAt(_ObservedDay day) {
+    if (day.hasBleeding) return _ObservedCyclePhase.menstrual;
+
+    var anchorIndex = -1;
+    for (var index = anchors.length - 1; index >= 0; index--) {
+      if (!anchors[index].isAfter(day.date)) {
+        anchorIndex = index;
+        break;
+      }
+    }
+    if (anchorIndex < 0) return null;
+
+    final anchor = anchors[anchorIndex];
+    var cycleLength = fallbackCycleLength;
+    if (anchorIndex + 1 < anchors.length) {
+      final observedLength = anchors[anchorIndex + 1].difference(anchor).inDays;
+      if (CycleRules.isUsableCycleLength(observedLength)) {
+        cycleLength = observedLength;
+      }
+    }
+
+    final elapsedDays = day.date.difference(anchor).inDays;
+    final dayInCycle = elapsedDays % cycleLength;
+    if (dayInCycle < periodLength) {
+      return _ObservedCyclePhase.menstrual;
+    }
+
+    final ovulationStart = cycleLength - CycleRules.maxLutealLength;
+    final ovulationEnd = cycleLength - CycleRules.minLutealLength;
+    if (dayInCycle >= ovulationStart && dayInCycle <= ovulationEnd) {
+      return _ObservedCyclePhase.ovulation;
+    }
+
+    final daysLeft = cycleLength - dayInCycle;
+    if (daysLeft < CycleRules.minLutealLength) {
+      return _ObservedCyclePhase.luteal;
+    }
+    return _ObservedCyclePhase.follicular;
+  }
+}
+
 class _ObservedDay {
   final DateTime date;
   final Set<String> nutrition;
@@ -627,6 +803,7 @@ class _ObservedDay {
   final int? energyLevel;
   final int? waterIntakeMl;
   final int? caffeineServings;
+  final bool hasBleeding;
   final bool nutritionObserved;
   final bool wellbeingObserved;
 
@@ -643,6 +820,7 @@ class _ObservedDay {
     required this.energyLevel,
     required this.waterIntakeMl,
     required this.caffeineServings,
+    required this.hasBleeding,
     required this.nutritionObserved,
     required this.wellbeingObserved,
   });

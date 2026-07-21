@@ -1,3 +1,4 @@
+import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/utils/personal_insight_engine.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
@@ -52,6 +53,68 @@ void main() {
     expect(symptom, isNotNull);
     expect(symptom!.primaryLabel, 'Baş ağrısı');
     expect(symptom.value, 2);
+  });
+
+  test('ruh hali ve döngü fazı bağlantısını ana insight listesine ekler', () {
+    final start = DateTime(2026, 1, 1);
+    final logs = List.generate(84, (day) {
+      final dayInCycle = day % 28;
+      return DailyLog(
+        date: start.add(Duration(days: day)),
+        mood: dayInCycle >= 5 && dayInCycle <= 11 ? 'Mutlu' : 'Yorgun',
+      );
+    });
+
+    final insights = engine.generate(
+      logs,
+      now: DateTime(2026, 3, 26),
+      settings: UserSettings(
+        lastPeriodDate: start,
+        averageCycleLength: 28,
+        averagePeriodLength: 5,
+      ),
+    );
+    final phaseMood = insights.firstWhere(
+      (insight) =>
+          insight.kind == PersonalInsightKind.moodCyclePhaseAssociation &&
+          insight.primaryLabel == 'Mutlu' &&
+          insight.secondaryLabel == 'cyclePhase:follicular',
+    );
+
+    expect(phaseMood.withEventCount, 21);
+    expect(phaseMood.withTotal, 21);
+    expect(phaseMood.withoutTotal, 63);
+  });
+
+  test('enerji ve döngü fazı bağlantısını ana insight listesine ekler', () {
+    final start = DateTime(2026, 1, 1);
+    final logs = List.generate(84, (day) {
+      final dayInCycle = day % 28;
+      return DailyLog(
+        date: start.add(Duration(days: day)),
+        energyLevel: dayInCycle >= 17 ? 2 : 4,
+      );
+    });
+
+    final insights = engine.generate(
+      logs,
+      now: DateTime(2026, 3, 26),
+      settings: UserSettings(
+        lastPeriodDate: start,
+        averageCycleLength: 28,
+        averagePeriodLength: 5,
+      ),
+    );
+    final phaseEnergy = insights.firstWhere(
+      (insight) =>
+          insight.kind == PersonalInsightKind.energyCyclePhaseAssociation &&
+          insight.primaryLabel == AppStrings.insightFeatureLowEnergyToken &&
+          insight.secondaryLabel == 'cyclePhase:luteal',
+    );
+
+    expect(phaseEnergy.withEventCount, 33);
+    expect(phaseEnergy.withTotal, 33);
+    expect(phaseEnergy.withoutTotal, 51);
   });
 
   test('döngü uzunluğu, aralığı ve tamamlanan kanama süresini hesaplar', () {

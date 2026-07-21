@@ -13,6 +13,8 @@ enum PersonalInsightKind {
   frequentBowel,
   symptomMoodCooccurrence,
   symptomBleedingCooccurrence,
+  moodCyclePhaseAssociation,
+  energyCyclePhaseAssociation,
   structuredAssociation,
   medicationAdherence,
   medicationSkipSymptomAssociation,

@@ -17,6 +17,8 @@ enum _TextKey {
   insightsEmptyTitle,
   insightsEmptyDescription,
   insightsDisclaimer,
+  personalInsightsPreviewTitle,
+  viewAllInsights,
   insightDataBuildingTitle,
   insightDataBuildingBody,
   insightRecordingSummaryTitle,
@@ -41,6 +43,10 @@ enum _TextKey {
   insightSymptomMoodBody,
   insightSymptomBleedingTitle,
   insightSymptomBleedingBody,
+  insightMoodCyclePhaseTitle,
+  insightMoodCyclePhaseBody,
+  insightEnergyCyclePhaseTitle,
+  insightEnergyCyclePhaseBody,
   insightAssociationTitle,
   insightAssociationSameDayBody,
   insightAssociationNextDayBody,
@@ -183,6 +189,7 @@ enum _TextKey {
   insightFeaturePoorSleep,
   insightFeatureHighStress,
   insightFeatureLowEnergy,
+  insightFeatureHighEnergy,
   insightFeatureHighCaffeine,
   insightFeatureBelowTypicalWater,
   supplements,
@@ -449,6 +456,8 @@ const Map<_TextKey, String> _turkishTexts = {
       'Ana Sayfa’dan günlük kayıt ekledikçe kişisel özetlerin burada görünecek.',
   _TextKey.insightsDisclaimer:
       'İçgörüler yalnızca kayıtlarındaki örüntüleri gösterir; tıbbi tanı veya neden-sonuç ilişkisi değildir.',
+  _TextKey.personalInsightsPreviewTitle: 'Sana özel içgörüler',
+  _TextKey.viewAllInsights: 'Tümünü gör',
   _TextKey.insightDataBuildingTitle: 'Örüntün oluşmaya başladı',
   _TextKey.insightDataBuildingBody:
       'Kayıt bulunan gün: {count}. En az 3 kayıtlı gün olduğunda tekrarlayan seçimleri karşılaştırmaya başlayacağız.',
@@ -485,6 +494,13 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightSymptomBleedingTitle: 'Kanama günlerindeki belirti',
   _TextKey.insightSymptomBleedingBody:
       '{label}, kanama kaydı olan {total} günün {count} tanesinde de işaretlendi.',
+  _TextKey.insightMoodCyclePhaseTitle: 'Döngü fazında öne çıkan ruh hâli',
+  _TextKey.insightMoodCyclePhaseBody:
+      '{mood}, “{phase}” günlerinde ruh hâli girdiğin {withTotal} günün {withEvent} tanesinde kaydedildi (%{withPercent}). Diğer fazlarda ruh hâli girdiğin {withoutTotal} günde bu oran %{withoutPercent}. Bu bir ilişkidir; döngü fazının ruh hâline neden olduğunu göstermez.',
+  _TextKey.insightEnergyCyclePhaseTitle:
+      'Döngü fazında öne çıkan enerji düzeyi',
+  _TextKey.insightEnergyCyclePhaseBody:
+      '{energy}, “{phase}” günlerinde enerji düzeyi girdiğin {withTotal} günün {withEvent} tanesinde görüldü (%{withPercent}). Diğer fazlarda enerji düzeyi girdiğin {withoutTotal} günde bu oran %{withoutPercent}. Bu bir ilişkidir; döngü fazının enerji düzeyine neden olduğunu göstermez.',
   _TextKey.insightAssociationTitle: 'Kayıtlarında öne çıkan bağlantı',
   _TextKey.insightAssociationSameDayBody:
       '{primary} kaydedilen {withTotal} günün {withEvent} tanesinde aynı gün {secondary} de kaydedildi (%{withPercent}). {primary} kaydedilmeyen {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; neden-sonuç değildir.',
@@ -640,6 +656,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightFeaturePoorSleep: 'düşük uyku kalitesi',
   _TextKey.insightFeatureHighStress: 'yüksek stres',
   _TextKey.insightFeatureLowEnergy: 'düşük enerji',
+  _TextKey.insightFeatureHighEnergy: 'yüksek enerji',
   _TextKey.insightFeatureHighCaffeine: '2 veya daha fazla kafeinli içecek',
   _TextKey.insightFeatureBelowTypicalWater:
       'kişisel ortancanın altında su tüketimi',
@@ -921,6 +938,8 @@ const Map<_TextKey, String> _englishTexts = {
       'Add daily logs from Home and your personal summaries will appear here.',
   _TextKey.insightsDisclaimer:
       'Insights show patterns in your records only; they are not a medical diagnosis or evidence of cause and effect.',
+  _TextKey.personalInsightsPreviewTitle: 'Your personal insights',
+  _TextKey.viewAllInsights: 'View all',
   _TextKey.insightDataBuildingTitle: 'Your pattern is taking shape',
   _TextKey.insightDataBuildingBody:
       'Days with logs: {count}. Repeated choices will be compared after at least 3 logged days.',
@@ -957,6 +976,12 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightSymptomBleedingTitle: 'Symptom on bleeding days',
   _TextKey.insightSymptomBleedingBody:
       '{label} was also marked on {count} of the {total} days with a bleeding record.',
+  _TextKey.insightMoodCyclePhaseTitle: 'Mood pattern by cycle phase',
+  _TextKey.insightMoodCyclePhaseBody:
+      '{mood} was logged on {withEvent} of {withTotal} mood-logged days during {phase} ({withPercent}%). On {withoutTotal} mood-logged days in other phases, the rate was {withoutPercent}%. This is an association; it does not show that the cycle phase caused the mood.',
+  _TextKey.insightEnergyCyclePhaseTitle: 'Energy pattern by cycle phase',
+  _TextKey.insightEnergyCyclePhaseBody:
+      '{energy} appeared on {withEvent} of {withTotal} energy-logged days during {phase} ({withPercent}%). On {withoutTotal} energy-logged days in other phases, the rate was {withoutPercent}%. This is an association; it does not show that the cycle phase caused the energy level.',
   _TextKey.insightAssociationTitle: 'A connection in your logs',
   _TextKey.insightAssociationSameDayBody:
       'On {withEvent} of {withTotal} days with {primary}, {secondary} was also logged that day ({withPercent}%). On {withoutTotal} comparable days without {primary}, the rate was {withoutPercent}%. This is an association, not cause and effect.',
@@ -1114,6 +1139,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightFeaturePoorSleep: 'low sleep quality',
   _TextKey.insightFeatureHighStress: 'high stress',
   _TextKey.insightFeatureLowEnergy: 'low energy',
+  _TextKey.insightFeatureHighEnergy: 'high energy',
   _TextKey.insightFeatureHighCaffeine: '2 or more caffeinated drinks',
   _TextKey.insightFeatureBelowTypicalWater:
       'water intake below your personal median',
@@ -1707,11 +1733,13 @@ class AppStrings {
   static const insightFeaturePoorSleepToken = 'metric:poor_sleep';
   static const insightFeatureHighStressToken = 'metric:high_stress';
   static const insightFeatureLowEnergyToken = 'metric:low_energy';
+  static const insightFeatureHighEnergyToken = 'metric:high_energy';
   static const insightFeatureHighCaffeineToken = 'metric:high_caffeine';
   static const insightFeatureBelowTypicalWaterToken =
       'metric:below_typical_water';
   static const dischargeColorFeaturePrefix = 'dischargeColor:';
   static const dischargeConsistencyFeaturePrefix = 'dischargeConsistency:';
+  static const cyclePhaseFeaturePrefix = 'cyclePhase:';
 
   static const delegate = _AppStringsDelegate();
 
@@ -1817,11 +1845,21 @@ class AppStrings {
         value.substring(dischargeConsistencyFeaturePrefix.length),
       );
     }
+    if (value.startsWith(cyclePhaseFeaturePrefix)) {
+      return switch (value.substring(cyclePhaseFeaturePrefix.length)) {
+        'menstrual' => menstrualPhase,
+        'follicular' => follicularPhase,
+        'ovulation' => estimatedOvulationWindow,
+        'luteal' => lutealPhase,
+        final name => name,
+      };
+    }
     return switch (value) {
       insightFeatureShortSleepToken => _text(_TextKey.insightFeatureShortSleep),
       insightFeaturePoorSleepToken => _text(_TextKey.insightFeaturePoorSleep),
       insightFeatureHighStressToken => _text(_TextKey.insightFeatureHighStress),
       insightFeatureLowEnergyToken => _text(_TextKey.insightFeatureLowEnergy),
+      insightFeatureHighEnergyToken => _text(_TextKey.insightFeatureHighEnergy),
       insightFeatureHighCaffeineToken => _text(
         _TextKey.insightFeatureHighCaffeine,
       ),
@@ -1855,6 +1893,9 @@ class AppStrings {
   static String get insightsEmptyDescription =>
       _text(_TextKey.insightsEmptyDescription);
   static String get insightsDisclaimer => _text(_TextKey.insightsDisclaimer);
+  static String get personalInsightsPreviewTitle =>
+      _text(_TextKey.personalInsightsPreviewTitle);
+  static String get viewAllInsights => _text(_TextKey.viewAllInsights);
   static String get insightDataBuildingTitle =>
       _text(_TextKey.insightDataBuildingTitle);
   static String insightDataBuildingBody(int count) =>
@@ -1963,6 +2004,44 @@ class AppStrings {
     'label': label,
     'count': count,
     'total': total,
+  });
+  static String get insightMoodCyclePhaseTitle =>
+      _text(_TextKey.insightMoodCyclePhaseTitle);
+  static String insightMoodCyclePhaseBody({
+    required String mood,
+    required String phase,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightMoodCyclePhaseBody, {
+    'mood': mood,
+    'phase': phase,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightEnergyCyclePhaseTitle =>
+      _text(_TextKey.insightEnergyCyclePhaseTitle);
+  static String insightEnergyCyclePhaseBody({
+    required String energy,
+    required String phase,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightEnergyCyclePhaseBody, {
+    'energy': energy,
+    'phase': phase,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
   });
   static String get insightAssociationTitle =>
       _text(_TextKey.insightAssociationTitle);

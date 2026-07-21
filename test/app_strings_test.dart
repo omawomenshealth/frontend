@@ -34,6 +34,10 @@ void main() {
     );
     expect(AppStrings.insightEvidenceDays(4), 'Logged days: 4');
     expect(
+      AppStrings.localizeInsightFeature('cyclePhase:follicular'),
+      'Follicular Phase',
+    );
+    expect(
       AppStrings.insightAssociationBody(
         primary: 'Salty',
         secondary: 'Bloating',
@@ -60,6 +64,36 @@ void main() {
       'Yorgun, ruh hâli girdiğin 8 günün 5 tanesinde yer aldı.',
     );
     expect(AppStrings.insightEvidenceCycles(3), 'Hesaplanan döngü: 3');
+    expect(
+      AppStrings.insightMoodCyclePhaseBody(
+        mood: 'Mutlu',
+        phase: 'Foliküler Faz',
+        withEvent: 12,
+        withTotal: 20,
+        withoutTotal: 40,
+        withPercent: 60,
+        withoutPercent: 20,
+      ),
+      'Mutlu, “Foliküler Faz” günlerinde ruh hâli girdiğin 20 günün 12 '
+      'tanesinde kaydedildi (%60). Diğer fazlarda ruh hâli girdiğin 40 günde '
+      'bu oran %20. Bu bir ilişkidir; döngü fazının ruh hâline neden olduğunu '
+      'göstermez.',
+    );
+    expect(
+      AppStrings.insightEnergyCyclePhaseBody(
+        energy: 'düşük enerji',
+        phase: 'Luteal Faz',
+        withEvent: 15,
+        withTotal: 20,
+        withoutTotal: 40,
+        withPercent: 75,
+        withoutPercent: 25,
+      ),
+      'düşük enerji, “Luteal Faz” günlerinde enerji düzeyi girdiğin 20 günün '
+      '15 tanesinde görüldü (%75). Diğer fazlarda enerji düzeyi girdiğin 40 '
+      'günde bu oran %25. Bu bir ilişkidir; döngü fazının enerji düzeyine neden '
+      'olduğunu göstermez.',
+    );
   });
 
   test('Desteklenmeyen dil İngilizceye düşer', () {

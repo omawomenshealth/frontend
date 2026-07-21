@@ -74,4 +74,46 @@ void main() {
 
     expect(find.byIcon(Icons.account_tree_outlined), findsWidgets);
   });
+
+  testWidgets('seçilen insightlar ana sayfada gösterilir ve tümü açılır', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService();
+    await storage.init();
+    await storage.saveSettings(
+      UserSettings(isOnboardingComplete: true, userName: 'Test'),
+    );
+    for (var day = 0; day < 3; day++) {
+      await storage.saveDailyLog(
+        DailyLog(
+          date: DateTime(2026, 1, 1).add(Duration(days: day)),
+          painLocations: const ['Baş ağrısı'],
+          observedSections: const {DailyLogObservedSection.wellbeing},
+        ),
+      );
+    }
+
+    await tester.pumpWidget(MyApp(storage: storage));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('dashboard_personal_insights')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('personal_insight_recurring_symptom')),
+      findsOneWidget,
+    );
+
+    final viewAllButton = find.byKey(
+      const ValueKey('dashboard_view_all_insights'),
+    );
+    await tester.ensureVisible(viewAllButton);
+    await tester.pumpAndSettle();
+    await tester.tap(viewAllButton);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(InsightsView), findsOneWidget);
+  });
 }

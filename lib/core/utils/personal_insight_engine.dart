@@ -124,6 +124,7 @@ class PersonalInsightEngine {
       const PersonalAssociationEngine().generate(
         logs: logs,
         doseRecords: doseRecords,
+        settings: settings,
       ),
     );
 

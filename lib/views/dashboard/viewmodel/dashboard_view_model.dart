@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/models/period_log_model.dart';
+import '../../../data/models/personal_insight_model.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../core/utils/personal_insight_engine.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
@@ -10,6 +12,9 @@ import '../../../core/constants/app_strings.dart';
 /// Dashboard iş mantığı.
 class DashboardViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
+  final PersonalInsightEngine _insightEngine = const PersonalInsightEngine();
+
+  static const int _previewInsightLimit = 2;
 
   DashboardViewModel(this._storage) {
     loadData();
@@ -19,6 +24,7 @@ class DashboardViewModel extends ChangeNotifier {
   List<DailyLog> _todayLogs = [];
   PeriodCalculator? _periodCalculator;
   CycleInsights? _cycleInsights;
+  List<PersonalInsight> _personalInsights = const [];
   bool _isLoading = true;
   DateTime _selectedDate = AppTime.now;
   Set<DateTime> _bleedingDays = {};
@@ -28,6 +34,7 @@ class DashboardViewModel extends ChangeNotifier {
   DailyLog? get latestLog => _todayLogs.isNotEmpty ? _todayLogs.first : null;
   PeriodCalculator? get periodCalculator => _periodCalculator;
   CycleInsights? get cycleInsights => _cycleInsights;
+  List<PersonalInsight> get personalInsights => _personalInsights;
   bool get isLoading => _isLoading;
   DateTime get selectedDate => _selectedDate;
 
@@ -73,6 +80,7 @@ class DashboardViewModel extends ChangeNotifier {
     _todayLogs = _storage.loadLogsForDate(_selectedDate);
 
     final allLogs = _storage.loadAllLogs();
+    _refreshPersonalInsights(allLogs);
     _bleedingDays = allLogs
         .where((log) => log.flowIntensity != null)
         .map((log) => log.date.dateOnly)
@@ -105,6 +113,7 @@ class DashboardViewModel extends ChangeNotifier {
     _settings = _storage.loadSettings();
 
     final allLogs = _storage.loadAllLogs();
+    _refreshPersonalInsights(allLogs);
     _bleedingDays = allLogs
         .where((log) => log.flowIntensity != null)
         .map((log) => log.date.dateOnly)
@@ -126,6 +135,31 @@ class DashboardViewModel extends ChangeNotifier {
       _periodCalculator = null;
       _cycleInsights = null;
     }
+  }
+
+  void _refreshPersonalInsights(List<DailyLog> allLogs) {
+    final generated = _insightEngine.generate(
+      allLogs,
+      doseRecords: _storage.loadMedicationDoseRecords(),
+      settings: _settings,
+    );
+    _personalInsights = generated
+        .where(
+          (insight) => switch (insight.kind) {
+            PersonalInsightKind.dataBuilding ||
+            PersonalInsightKind.recurringSymptom ||
+            PersonalInsightKind.structuredAssociation ||
+            PersonalInsightKind.moodCyclePhaseAssociation ||
+            PersonalInsightKind.energyCyclePhaseAssociation ||
+            PersonalInsightKind.medicationAdherence ||
+            PersonalInsightKind.medicationSkipSymptomAssociation ||
+            PersonalInsightKind.fertileDischargeSignal ||
+            PersonalInsightKind.dischargeHealthNotice => true,
+            _ => false,
+          },
+        )
+        .take(_previewInsightLimit)
+        .toList(growable: false);
   }
 
   /// Günlük kaydı ekle veya güncelle.

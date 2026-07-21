@@ -131,18 +131,26 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 0;
 
-  final _pages = const [
-    DashboardView(),
-    InsightsView(),
-    ArticlesView(),
-    ProfileView(),
-  ];
+  void _selectPage(int index) {
+    if (index == 1) {
+      context.read<InsightsViewModel>().loadData();
+    }
+    setState(() => _currentIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _pages),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          DashboardView(onOpenInsights: () => _selectPage(1)),
+          const InsightsView(),
+          const ArticlesView(),
+          const ProfileView(),
+        ],
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
@@ -155,12 +163,7 @@ class _HomeShellState extends State<HomeShell> {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (i) {
-            if (i == 1) {
-              context.read<InsightsViewModel>().loadData();
-            }
-            setState(() => _currentIndex = i);
-          },
+          onTap: _selectPage,
           items: [
             BottomNavigationBarItem(
               icon: const Icon(Icons.dashboard_rounded),

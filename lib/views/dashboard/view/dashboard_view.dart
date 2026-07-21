@@ -17,10 +17,13 @@ import '../widgets/feeling_card.dart';
 import '../widgets/cycle_insights_card.dart';
 import '../../articles/model/article_model.dart';
 import '../../articles/view/article_detail_view.dart';
+import '../../insights/view/insights_view.dart';
 
 /// Dashboard ana ekranı.
 class DashboardView extends StatelessWidget {
-  const DashboardView({super.key});
+  final VoidCallback? onOpenInsights;
+
+  const DashboardView({super.key, this.onOpenInsights});
 
   @override
   Widget build(BuildContext context) {
@@ -167,6 +170,11 @@ class DashboardView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
+                    if (vm.personalInsights.isNotEmpty) ...[
+                      _buildPersonalInsightsPreview(vm),
+                      const SizedBox(height: 16),
+                    ],
+
                     // ── Size Özel Tavsiye / Makale Kartı ──
                     _buildRecommendationCard(context),
                     const SizedBox(height: 16),
@@ -186,6 +194,41 @@ class DashboardView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildPersonalInsightsPreview(DashboardViewModel vm) {
+    return Column(
+      key: const ValueKey('dashboard_personal_insights'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                AppStrings.personalInsightsPreviewTitle,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+            if (onOpenInsights != null)
+              TextButton(
+                key: const ValueKey('dashboard_view_all_insights'),
+                onPressed: onOpenInsights,
+                child: Text(AppStrings.viewAllInsights),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        for (var index = 0; index < vm.personalInsights.length; index++) ...[
+          PersonalInsightCard(insight: vm.personalInsights[index]),
+          if (index != vm.personalInsights.length - 1)
+            const SizedBox(height: 12),
+        ],
+      ],
     );
   }
 
