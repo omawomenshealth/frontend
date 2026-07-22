@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/image_constants.dart';
 import '../../../core/shared_widgets/custom_button.dart';
 import '../viewmodel/auth_view_model.dart';
 
@@ -54,24 +55,13 @@ class AuthView extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Icon(
-                            Icons.donut_large_rounded,
-                            size: 76,
-                            color: AppColors.primary,
-                          ),
-                          Text(
-                            'OMA',
-                            style: TextStyle(
-                              color: AppColors.primaryDark,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Image.asset(
+                          ImageConstants.logo,
+                          fit: BoxFit.contain,
+                          semanticLabel: AppStrings.appName,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
