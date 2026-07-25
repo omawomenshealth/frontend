@@ -43,7 +43,9 @@ class CalendarViewModel extends ChangeNotifier {
       notifyListeners();
     }
 
-    _settings = _storage.loadSettings();
+    // Tamamlanan son regl süresi, yeni kayıt olmasa da takvim açıldığında
+    // ortalamaya ve sonraki tahminlere yansısın.
+    _settings = await _storage.refreshCycleStatistics();
     final logs = _storage.loadAllLogs();
 
     _logMap = {};

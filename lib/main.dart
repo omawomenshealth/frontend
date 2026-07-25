@@ -49,6 +49,9 @@ void main() async {
     initialOffsetDays: storage.virtualDaysOffset,
     persistOffset: storage.setVirtualDaysOffset,
   );
+  // Son kanama kaydından sonra gün değişmiş olabilir. Sağlayıcılar ve ekranlar
+  // oluşturulmadan önce tamamlanan dönemi ortalamaya dahil et.
+  await storage.refreshCycleStatistics();
   final notificationService = NotificationService();
   final reminderPlans = storage.loadMedicationReminderPlans();
   var scheduledDoseIds = <String>{};
@@ -141,8 +144,30 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> {
+class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+
+    // Uygulama birkaç gün arka planda kaldıysa devam eden dönem bu sırada
+    // tamamlanmış olabilir. Ana ekran ve takvim tahminlerini birlikte yenile.
+    context.read<DashboardViewModel>().loadData();
+    context.read<CalendarViewModel>().loadData();
+  }
 
   void _selectPage(int index) {
     if (index == 1) {

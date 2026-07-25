@@ -76,7 +76,9 @@ class DashboardViewModel extends ChangeNotifier {
       notifyListeners();
     }
 
-    _settings = _storage.loadSettings();
+    // Süreye bağlı istatistikler yalnızca yeni kayıt geldiğinde değil,
+    // dönem bittikten sonra ekran tekrar açıldığında da güncellenmelidir.
+    _settings = await _storage.refreshCycleStatistics();
     _todayLogs = _storage.loadLogsForDate(_selectedDate);
 
     final allLogs = _storage.loadAllLogs();

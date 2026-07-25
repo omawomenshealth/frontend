@@ -165,7 +165,7 @@ class LocalStorageService {
       }
 
       // SİHİRLİ DOKUNUŞ: Veri her değiştiğinde istatistikleri arka planda sessizce güncelle
-      await _syncCalculatedStatsToSettings();
+      await refreshCycleStatistics();
     }
     return success;
   }
@@ -187,25 +187,42 @@ class LocalStorageService {
       await _p.setStringList(_logDatesKey, dates.toList());
 
       // SİHİRLİ DOKUNUŞ: Veri silindiğinde de istatistikleri güncelle
-      await _syncCalculatedStatsToSettings();
+      await refreshCycleStatistics();
     }
     return allSuccess;
   }
 
-  /// Arka planda hesaplama yapıp ayarları güncelleyen private yardımcı metot
-  Future<void> _syncCalculatedStatsToSettings() async {
-    final stats = calculateCycleStats();
+  /// Kayıtların ve bugünün tarihinin gerektirdiği döngü istatistiklerini
+  /// ayarlara yansıtır ve kullanılacak güncel ayarları döndürür.
+  ///
+  /// Son adet dönemi devam ederken eksik süre ortalamaya katılmaz. Dönem
+  /// bittikten sonra yeni bir günlük kayıt yapılmasa bile bu metot tekrar
+  /// çağrıldığında tamamlanan süre ortalamaya dahil edilir.
+  Future<UserSettings?> refreshCycleStatistics() async {
     final settings = loadSettings();
+    if (settings == null) return null;
 
-    if (stats != null && settings != null) {
-      final updatedSettings = settings.copyWith(
-        averageCycleLength: stats.averageCycleLength,
-        averagePeriodLength: stats.averagePeriodLength,
-        lastPeriodDate: stats
-            .lastPeriodDate, // Eğer modelinizde varsa son adet tarihini de eşitleyin
-      );
-      await saveSettings(updatedSettings);
+    final stats = calculateCycleStats();
+    if (stats == null) return settings;
+
+    final lastPeriodDateIsCurrent =
+        settings.lastPeriodDate?.dateOnly == stats.lastPeriodDate.dateOnly;
+    final valuesAreCurrent =
+        settings.averageCycleLength == stats.averageCycleLength &&
+        settings.averagePeriodLength == stats.averagePeriodLength &&
+        lastPeriodDateIsCurrent;
+    if (valuesAreCurrent) return settings;
+
+    final updatedSettings = settings.copyWith(
+      averageCycleLength: stats.averageCycleLength,
+      averagePeriodLength: stats.averagePeriodLength,
+      lastPeriodDate: stats.lastPeriodDate,
+    );
+    final saved = await saveSettings(updatedSettings);
+    if (saved) {
+      return updatedSettings;
     }
+    return settings;
   }
 
   /// Belirli bir günün tüm kayıtlarını oku.

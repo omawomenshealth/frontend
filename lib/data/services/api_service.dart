@@ -28,9 +28,9 @@ class ApiService {
   String get baseUrl {
     if (customBaseUrl.isNotEmpty) return customBaseUrl;
     if (kIsWeb) return 'http://localhost:3000';
-    // Android emulator localhost'a erişmek için 10.0.2.2 kullanır
+    // Gerçek cihaz için Wi-Fi IP, emülatör için 10.0.2.2 kullanılır
     return Platform.isAndroid
-        ? 'http://10.0.2.2:3000'
+        ? 'http://192.168.1.18:3000'
         : 'http://localhost:3000';
   }
 

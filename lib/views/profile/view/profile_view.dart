@@ -6,6 +6,7 @@ import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/cycle_rules.dart';
+import '../../../data/services/local_storage_service.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
@@ -302,15 +303,8 @@ class ProfileView extends StatelessWidget {
                               GestureDetector(
                                 onTap: () async {
                                   await AppTime.setOffsetDays(0);
-                                  if (context.mounted) {
-                                    vm.loadSettings();
-                                    context
-                                        .read<DashboardViewModel>()
-                                        .loadData();
-                                    context
-                                        .read<CalendarViewModel>()
-                                        .loadData();
-                                  }
+                                  if (!context.mounted) return;
+                                  await _refreshDateDependentData(context, vm);
                                 },
                                 child: Text(
                                   AppStrings.reset,
@@ -451,17 +445,28 @@ class ProfileView extends StatelessWidget {
       onPressed: () async {
         final newOffset = AppTime.offsetDays + daysToAdd;
         await AppTime.setOffsetDays(newOffset);
-        if (context.mounted) {
-          vm.loadSettings();
-          context.read<DashboardViewModel>().loadData();
-          context.read<CalendarViewModel>().loadData();
-        }
+        if (!context.mounted) return;
+        await _refreshDateDependentData(context, vm);
       },
       child: Text(
         label,
         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
       ),
     );
+  }
+
+  Future<void> _refreshDateDependentData(
+    BuildContext context,
+    ProfileViewModel profileViewModel,
+  ) async {
+    await context.read<LocalStorageService>().refreshCycleStatistics();
+    if (!context.mounted) return;
+
+    profileViewModel.loadSettings();
+    await Future.wait([
+      context.read<DashboardViewModel>().loadData(),
+      context.read<CalendarViewModel>().loadData(),
+    ]);
   }
 
   Widget _infoRow(String label, String value) {
