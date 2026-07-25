@@ -336,6 +336,34 @@ enum _TextKey {
   syncing,
   syncNow,
   logout,
+  privacyCenter,
+  privacyNotice,
+  healthCloudConsent,
+  consentActive,
+  consentInactive,
+  grantConsent,
+  withdrawConsent,
+  withdrawConsentWarning,
+  cloudDataDeletedLocalRemains,
+  exportMyData,
+  exportReady,
+  privacyActionFailed,
+  consentExplanation,
+  continueOffline,
+  deleteAccountAndData,
+  deleteLocalData,
+  deletionWarningTitle,
+  deletionWarningCloud,
+  deletionWarningLocal,
+  continueDeletion,
+  finalDeletionTitle,
+  finalDeletionDescription,
+  confirmationEmailHint,
+  confirmationEmailMismatch,
+  deletingData,
+  deletionCouldNotStart,
+  deletionFailed,
+  deletionSuccessful,
   connectAccountDescription,
   loginConnectAccount,
   logoutQuestion,
@@ -394,6 +422,8 @@ enum _TextKey {
   reminderScheduleFailed,
   reminderNotificationTitle,
   reminderNotificationBody,
+  privateReminderNotificationTitle,
+  privateReminderNotificationBody,
   notificationScheduled,
   notificationNotScheduled,
   reminderChannelName,
@@ -825,6 +855,43 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.syncing: 'Eşitleniyor...',
   _TextKey.syncNow: 'Şimdi Eşitle',
   _TextKey.logout: 'Çıkış Yap',
+  _TextKey.privacyCenter: 'Gizlilik Merkezi',
+  _TextKey.privacyNotice: 'Gizlilik Bildirimi',
+  _TextKey.healthCloudConsent: 'Sağlık Verisi Bulut Rızası',
+  _TextKey.consentActive: 'Açık rıza aktif',
+  _TextKey.consentInactive: 'Açık rıza verilmemiş veya güncel değil',
+  _TextKey.grantConsent: 'Açık Rıza Ver',
+  _TextKey.withdrawConsent: 'Rızamı Geri Çek',
+  _TextKey.withdrawConsentWarning:
+      'Rızanızı geri çekerseniz buluttaki sağlık kayıtlarınız silinir. Hesabınız ve satın alma kaydınız açık, bu cihazdaki yerel verileriniz ise cihazınızda kalır.',
+  _TextKey.cloudDataDeletedLocalRemains:
+      'Bulut sağlık verileri silindi. Bu cihazdaki yerel kayıtlar korunuyor.',
+  _TextKey.exportMyData: 'Verilerimi JSON Olarak Dışa Aktar',
+  _TextKey.exportReady: 'JSON dışa aktarma dosyası hazırlandı.',
+  _TextKey.privacyActionFailed:
+      'Gizlilik işlemi tamamlanamadı. Lütfen yeniden deneyin.',
+  _TextKey.consentExplanation:
+      'Döngü, belirti, ilaç ve takviye kayıtlarınız sağlık verisidir. Bulut eşitlemesi için bu veriler şifrelenerek sunucuda işlenir. Rıza isteğe bağlıdır ve istediğiniz zaman geri çekilebilir.',
+  _TextKey.continueOffline: 'Bulut Eşitlemeden Devam Et',
+  _TextKey.deleteAccountAndData: 'Hesabımı ve Verilerimi Sil',
+  _TextKey.deleteLocalData: 'Bu Cihazdaki Verilerimi Sil',
+  _TextKey.deletionWarningTitle: 'Veriler Kalıcı Olarak Silinecek',
+  _TextKey.deletionWarningCloud:
+      'Profiliniz, sağlık kayıtlarınız, ilaç ve takviye listeleriniz, bulut yedeğiniz ve hesap bağlantınız kalıcı olarak silinir. Bu işlem geri alınamaz. Google Play aboneliğiniz otomatik iptal olmaz; aboneliği ayrıca Play Store üzerinden yönetmelisiniz.',
+  _TextKey.deletionWarningLocal:
+      'Bu cihazdaki profiliniz ve sağlık kayıtlarınız kalıcı olarak silinir. Bu işlem geri alınamaz.',
+  _TextKey.continueDeletion: 'Devam Et',
+  _TextKey.finalDeletionTitle: 'Son Onay',
+  _TextKey.finalDeletionDescription:
+      'Yanlışlıkla silmeyi önlemek için aşağıya hesabınızın e-posta adresini eksiksiz yazın.',
+  _TextKey.confirmationEmailHint: 'Hesap e-posta adresi',
+  _TextKey.confirmationEmailMismatch: 'E-posta adresi hesapla eşleşmiyor.',
+  _TextKey.deletingData: 'Veriler siliniyor...',
+  _TextKey.deletionCouldNotStart: 'Güvenli silme işlemi başlatılamadı.',
+  _TextKey.deletionFailed:
+      'Hesap ve veriler silinemedi. Lütfen yeniden deneyin.',
+  _TextKey.deletionSuccessful:
+      'Hesabınız ve verileriniz kalıcı olarak silindi.',
   _TextKey.connectAccountDescription:
       'Uygulama silindiğinde veya başka bir cihaza geçtiğinizde verilerinizi kaybetmemek için Google hesabınızı bağlayabilirsiniz.',
   _TextKey.loginConnectAccount: 'Giriş Yap / Hesap Bağla',
@@ -899,6 +966,9 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.reminderNotificationTitle: '{name} zamanı',
   _TextKey.reminderNotificationBody:
       '{dose} dozunu alma zamanı. Yanıtını OMA’da kaydedebilirsin.',
+  _TextKey.privateReminderNotificationTitle: 'OMA hatırlatıcısı',
+  _TextKey.privateReminderNotificationBody:
+      'Planladığın bir sağlık hatırlatıcısının zamanı geldi.',
   _TextKey.notificationScheduled: 'Bildirim cihazda planlandı',
   _TextKey.notificationNotScheduled: 'Bildirim cihazda planlanmadı',
   _TextKey.reminderChannelName: 'İlaç ve takviye hatırlatıcıları',
@@ -1305,6 +1375,45 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.syncing: 'Syncing...',
   _TextKey.syncNow: 'Sync Now',
   _TextKey.logout: 'Sign Out',
+  _TextKey.privacyCenter: 'Privacy Center',
+  _TextKey.privacyNotice: 'Privacy Notice',
+  _TextKey.healthCloudConsent: 'Health Data Cloud Consent',
+  _TextKey.consentActive: 'Explicit consent is active',
+  _TextKey.consentInactive: 'Consent is missing or out of date',
+  _TextKey.grantConsent: 'Give Explicit Consent',
+  _TextKey.withdrawConsent: 'Withdraw My Consent',
+  _TextKey.withdrawConsentWarning:
+      'Withdrawing consent deletes your cloud health records. Your account and purchase record remain active, and local data stays on this device.',
+  _TextKey.cloudDataDeletedLocalRemains:
+      'Cloud health data was deleted. Local records remain on this device.',
+  _TextKey.exportMyData: 'Export My Data as JSON',
+  _TextKey.exportReady: 'The JSON export file is ready.',
+  _TextKey.privacyActionFailed:
+      'The privacy action could not be completed. Please try again.',
+  _TextKey.consentExplanation:
+      'Cycle, symptom, medication, and supplement records are health data. Cloud sync processes them on the server in encrypted form. Consent is optional and can be withdrawn at any time.',
+  _TextKey.continueOffline: 'Continue Without Cloud Sync',
+  _TextKey.deleteAccountAndData: 'Delete My Account and Data',
+  _TextKey.deleteLocalData: 'Delete Data on This Device',
+  _TextKey.deletionWarningTitle: 'Your Data Will Be Permanently Deleted',
+  _TextKey.deletionWarningCloud:
+      'Your profile, health records, medication and supplement lists, cloud backup, and account link will be permanently deleted. This cannot be undone. Your Google Play subscription is not cancelled automatically; manage it separately in the Play Store.',
+  _TextKey.deletionWarningLocal:
+      'Your profile and health records on this device will be permanently deleted. This cannot be undone.',
+  _TextKey.continueDeletion: 'Continue',
+  _TextKey.finalDeletionTitle: 'Final Confirmation',
+  _TextKey.finalDeletionDescription:
+      'To prevent accidental deletion, enter the complete email address for your account below.',
+  _TextKey.confirmationEmailHint: 'Account email address',
+  _TextKey.confirmationEmailMismatch:
+      'The email address does not match the account.',
+  _TextKey.deletingData: 'Deleting data...',
+  _TextKey.deletionCouldNotStart:
+      'The secure deletion process could not be started.',
+  _TextKey.deletionFailed:
+      'The account and data could not be deleted. Please try again.',
+  _TextKey.deletionSuccessful:
+      'Your account and data have been permanently deleted.',
   _TextKey.connectAccountDescription:
       'Connect your Google account so you do not lose your data if the app is removed or you move to another device.',
   _TextKey.loginConnectAccount: 'Sign In / Connect Account',
@@ -1378,6 +1487,9 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.reminderNotificationTitle: 'Time for {name}',
   _TextKey.reminderNotificationBody:
       'It is time to take {dose}. You can record your response in OMA.',
+  _TextKey.privateReminderNotificationTitle: 'OMA reminder',
+  _TextKey.privateReminderNotificationBody:
+      'It is time for one of your scheduled health reminders.',
   _TextKey.notificationScheduled: 'Notification scheduled on device',
   _TextKey.notificationNotScheduled: 'Notification not scheduled on device',
   _TextKey.reminderChannelName: 'Medication and supplement reminders',
@@ -2450,6 +2562,44 @@ class AppStrings {
   static String get syncing => _text(_TextKey.syncing);
   static String get syncNow => _text(_TextKey.syncNow);
   static String get logout => _text(_TextKey.logout);
+  static String get privacyCenter => _text(_TextKey.privacyCenter);
+  static String get privacyNotice => _text(_TextKey.privacyNotice);
+  static String get healthCloudConsent => _text(_TextKey.healthCloudConsent);
+  static String get consentActive => _text(_TextKey.consentActive);
+  static String get consentInactive => _text(_TextKey.consentInactive);
+  static String get grantConsent => _text(_TextKey.grantConsent);
+  static String get withdrawConsent => _text(_TextKey.withdrawConsent);
+  static String get withdrawConsentWarning =>
+      _text(_TextKey.withdrawConsentWarning);
+  static String get cloudDataDeletedLocalRemains =>
+      _text(_TextKey.cloudDataDeletedLocalRemains);
+  static String get exportMyData => _text(_TextKey.exportMyData);
+  static String get exportReady => _text(_TextKey.exportReady);
+  static String get privacyActionFailed => _text(_TextKey.privacyActionFailed);
+  static String get consentExplanation => _text(_TextKey.consentExplanation);
+  static String get continueOffline => _text(_TextKey.continueOffline);
+  static String get deleteAccountAndData =>
+      _text(_TextKey.deleteAccountAndData);
+  static String get deleteLocalData => _text(_TextKey.deleteLocalData);
+  static String get deletionWarningTitle =>
+      _text(_TextKey.deletionWarningTitle);
+  static String get deletionWarningCloud =>
+      _text(_TextKey.deletionWarningCloud);
+  static String get deletionWarningLocal =>
+      _text(_TextKey.deletionWarningLocal);
+  static String get continueDeletion => _text(_TextKey.continueDeletion);
+  static String get finalDeletionTitle => _text(_TextKey.finalDeletionTitle);
+  static String get finalDeletionDescription =>
+      _text(_TextKey.finalDeletionDescription);
+  static String get confirmationEmailHint =>
+      _text(_TextKey.confirmationEmailHint);
+  static String get confirmationEmailMismatch =>
+      _text(_TextKey.confirmationEmailMismatch);
+  static String get deletingData => _text(_TextKey.deletingData);
+  static String get deletionCouldNotStart =>
+      _text(_TextKey.deletionCouldNotStart);
+  static String get deletionFailed => _text(_TextKey.deletionFailed);
+  static String get deletionSuccessful => _text(_TextKey.deletionSuccessful);
   static String get connectAccountDescription =>
       _text(_TextKey.connectAccountDescription);
   static String get loginConnectAccount => _text(_TextKey.loginConnectAccount);
@@ -2533,6 +2683,10 @@ class AppStrings {
       _format(_TextKey.reminderNotificationTitle, {'name': name});
   static String reminderNotificationBody(String dose) =>
       _format(_TextKey.reminderNotificationBody, {'dose': dose});
+  static String get privateReminderNotificationTitle =>
+      _text(_TextKey.privateReminderNotificationTitle);
+  static String get privateReminderNotificationBody =>
+      _text(_TextKey.privateReminderNotificationBody);
   static String get notificationScheduled =>
       _text(_TextKey.notificationScheduled);
   static String get notificationNotScheduled =>

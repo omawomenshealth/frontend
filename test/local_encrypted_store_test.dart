@@ -1,0 +1,139 @@
+import 'package:app_proje_a/data/models/period_log_model.dart';
+import 'package:app_proje_a/data/models/user_settings_model.dart';
+import 'package:app_proje_a/data/services/local_encrypted_store.dart';
+import 'package:app_proje_a/data/services/local_storage_service.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+const _encryptedEntryPrefix = 'oma_encrypted_entry_v2_';
+
+Iterable<String> _encryptedKeys(SharedPreferences preferences) =>
+    preferences.getKeys().where((key) => key.startsWith(_encryptedEntryPrefix));
+
+void main() {
+  test(
+    'eski plaintext verileri ilk açılışta şifreler ve yeniden okuyabilir',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'auth_token': 'legacy-jwt',
+        'all_custom_medications': <String>['Legacy ilaç'],
+        'virtual_days_offset': 17,
+      });
+      final keyStore = MemoryLocalKeyStore();
+      final first = LocalStorageService(keyStore: keyStore);
+
+      await first.init();
+
+      expect(first.authToken, 'legacy-jwt');
+      expect(first.getCustomMedications(), ['Legacy ilaç']);
+      expect(first.virtualDaysOffset, 17);
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.get('auth_token'), isNull);
+      expect(preferences.get('all_custom_medications'), isNull);
+      expect(preferences.get('virtual_days_offset'), isNull);
+      expect(_encryptedKeys(preferences), hasLength(3));
+      for (final key in _encryptedKeys(preferences)) {
+        expect(key, isNot(contains('auth')));
+        expect(key, isNot(contains('medication')));
+        final raw = preferences.getString(key)!;
+        expect(raw, startsWith('oma:v2:'));
+        expect(raw, isNot(contains('legacy-jwt')));
+        expect(raw, isNot(contains('Legacy ilaç')));
+      }
+
+      final restarted = LocalStorageService(keyStore: keyStore);
+      await restarted.init();
+      expect(restarted.authToken, 'legacy-jwt');
+      expect(restarted.getCustomMedications(), ['Legacy ilaç']);
+    },
+  );
+
+  test(
+    'sağlık, günlük ve oturum değerleri ile kayıt adları gizli tutulur',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+      await storage.init();
+
+      await storage.setAuthToken('header.secret.signature');
+      await storage.setAuthEmail('private@example.com');
+      await storage.saveSettings(
+        UserSettings(
+          userName: 'Gizli kullanıcı',
+          bloodTestResults: 'Gizli kan',
+        ),
+      );
+      await storage.saveDailyLog(
+        DailyLog(date: DateTime(2026, 7, 24, 12), notes: 'Gizli günlük notu'),
+      );
+
+      final preferences = await SharedPreferences.getInstance();
+      final encryptedKeys = _encryptedKeys(preferences).toList();
+      expect(encryptedKeys, isNotEmpty);
+      expect(preferences.getKeys(), isNot(contains('auth_token')));
+      expect(preferences.getKeys(), isNot(contains('auth_email')));
+      expect(preferences.getKeys(), isNot(contains('user_settings')));
+      expect(preferences.getKeys(), isNot(contains('daily_log_dates')));
+      expect(encryptedKeys.join(), isNot(contains('2026-07-24')));
+      for (final key in encryptedKeys) {
+        final raw = preferences.get(key);
+        expect(raw, isA<String>(), reason: key);
+        expect(raw as String, startsWith('oma:v2:'), reason: key);
+        expect(raw, isNot(contains('Gizli')), reason: key);
+        expect(raw, isNot(contains('private@example.com')), reason: key);
+        expect(raw, isNot(contains('header.secret.signature')), reason: key);
+        expect(raw, isNot(contains('2026-07-24')), reason: key);
+      }
+    },
+  );
+
+  test('ciphertext değiştirilirse doğrulama başarısız olur', () async {
+    SharedPreferences.setMockInitialValues({});
+    final keyStore = MemoryLocalKeyStore();
+    final storage = LocalStorageService(keyStore: keyStore);
+    await storage.init();
+    await storage.setAuthToken('untampered-token');
+
+    final preferences = await SharedPreferences.getInstance();
+    final physicalKey = _encryptedKeys(preferences).single;
+    final raw = preferences.getString(physicalKey)!;
+    final replacement = raw.endsWith('A') ? 'B' : 'A';
+    await preferences.setString(
+      physicalKey,
+      '${raw.substring(0, raw.length - 1)}$replacement',
+    );
+
+    final restarted = LocalStorageService(keyStore: keyStore);
+    await expectLater(restarted.init(), throwsStateError);
+  });
+
+  test('şifreli veri varken cihaz anahtarı kayıpsa veri açılmaz', () async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await storage.init();
+    await storage.setAuthToken('device-bound-token');
+
+    final restarted = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await expectLater(restarted.init(), throwsStateError);
+  });
+
+  test('silme ciphertext ile cihaz anahtarını birlikte kaldırır', () async {
+    SharedPreferences.setMockInitialValues({});
+    final keyStore = MemoryLocalKeyStore();
+    final storage = LocalStorageService(keyStore: keyStore);
+    await storage.init();
+    await storage.setAuthToken('delete-me');
+    await storage.saveSettings(UserSettings(userName: 'Silinecek'));
+
+    expect(await storage.clearAll(), isTrue);
+    final preferences = await SharedPreferences.getInstance();
+    expect(_encryptedKeys(preferences), isEmpty);
+    expect(await keyStore.read(), isNull);
+
+    // Aynı servis ileride yeni bir oturum yazarsa yeni cihaz anahtarı üretir.
+    expect(await storage.setAuthToken('new-session'), isTrue);
+    expect(await keyStore.read(), isNotNull);
+    expect(_encryptedKeys(preferences), hasLength(1));
+    expect(storage.authToken, 'new-session');
+  });
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -23,22 +24,31 @@ import 'views/insights/viewmodel/insights_view_model.dart';
 import 'views/calendar/viewmodel/calendar_view_model.dart';
 import 'views/articles/view/articles_view.dart';
 import 'views/profile/view/profile_view.dart';
+import 'views/profile/view/privacy_center_view.dart';
 import 'views/profile/viewmodel/profile_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Telefonun yerel sunucuya bağlanabilmesi için yerel IP adresi tanımlandı:
-  ApiService.customBaseUrl = 'http://192.168.1.13:3000';
+  const configuredApiUrl = String.fromEnvironment('OMA_API_BASE_URL');
+  if (kReleaseMode && !configuredApiUrl.startsWith('https://')) {
+    throw StateError(
+      'Release builds require an HTTPS OMA_API_BASE_URL dart-define.',
+    );
+  }
+  ApiService.customBaseUrl = configuredApiUrl;
 
   await Future.wait([
     initializeDateFormatting('tr_TR', null),
     initializeDateFormatting('en_US', null),
   ]);
-  await AppTime.init();
 
   final storage = LocalStorageService();
   await storage.init();
+  await AppTime.init(
+    initialOffsetDays: storage.virtualDaysOffset,
+    persistOffset: storage.setVirtualDaysOffset,
+  );
   final notificationService = NotificationService();
   final reminderPlans = storage.loadMedicationReminderPlans();
   var scheduledDoseIds = <String>{};
@@ -94,7 +104,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => InsightsViewModel(storage)),
         ChangeNotifierProvider(create: (_) => CalendarViewModel(storage)),
         ChangeNotifierProvider(
-          create: (_) => ProfileViewModel(storage, syncService),
+          create: (_) =>
+              ProfileViewModel(storage, syncService, apiService, reminders),
         ),
       ],
       child: MaterialApp(
@@ -115,6 +126,7 @@ class MyApp extends StatelessWidget {
           '/auth': (context) => const AuthView(),
           '/onboarding': (context) => const OnboardingView(),
           '/home': (context) => const HomeShell(),
+          '/privacy': (context) => const PrivacyCenterView(),
         },
       ),
     );

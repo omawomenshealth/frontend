@@ -2,10 +2,39 @@
 
 ## Sunucu bağlantısı
 
-Yerel sunucu adresi geliştirme sırasında `lib/main.dart` içindeki
-`ApiService.customBaseUrl` üzerinden ayarlanır. Telefonda bilgisayarın yerel IP
-adresi, Android emülatörde varsayılan `http://10.0.2.2:3000` kullanılabilir.
-Üretimde bu değer HTTPS kullanan gerçek API adresi olmalıdır.
+Yerel sunucu adresi geliştirme sırasında `OMA_API_BASE_URL` dart-define değeriyle
+ayarlanır. Değer verilmezse Android emülatörde varsayılan
+`http://10.0.2.2:3000`, diğer geliştirme hedeflerinde localhost kullanılır.
+
+```powershell
+flutter run --dart-define=OMA_API_BASE_URL=http://192.168.1.13:3000
+```
+
+Release derlemelerinde HTTPS zorunludur; boş veya HTTP adresle uygulama güvenli
+biçimde açılışı reddeder:
+
+```powershell
+flutter build appbundle --release --dart-define=OMA_API_BASE_URL=https://api.example.com
+```
+
+## Telefonda veri şifreleme
+
+Sağlık kayıtları, günlükler, ayarlar, ilaç/hatırlatıcı verileri ve oturum bilgileri
+telefonda AES-256-GCM ile şifreli tutulur. Rastgele üretilen 32 baytlık yerel veri
+anahtarı Android Keystore veya iOS Keychain içinde saklanır; SharedPreferences
+içine yalnızca doğrulamalı şifreli zarflar yazılır. Günlük tarihlerini ele
+vermemesi için fiziksel kayıt adları da HMAC-SHA256 ile anonimleştirilir.
+
+Eski test kurulumunda düz metin veri varsa uygulamanın ilk açılışında otomatik ve
+tekrar çalıştırılabilir biçimde şifrelenir. Şifreli veri değiştirildiğinde veya
+cihaz anahtarı kaybolduğunda uygulama veriyi düz metin kabul etmez ve açmayı
+reddeder. Profilde çıkış ya da hesap silme tamamlandığında yerel şifreli kayıtlar
+ile cihaz anahtarı birlikte kaldırılır.
+
+Android 6.0 (API 23) altı artık desteklenmez. Android yedeği kapalıdır; iOS
+anahtarı da yalnızca bu cihaza bağlıdır. Telefon değiştiğinde yerel şifreli dosya
+taşınmaz; kullanıcı giriş yaptıktan sonra veriler sunucudan yeniden senkronize
+edilir.
 
 ## Makaleler
 

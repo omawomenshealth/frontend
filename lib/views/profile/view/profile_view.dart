@@ -1372,9 +1372,209 @@ class ProfileView extends StatelessWidget {
               ),
             ),
           ],
+          const SizedBox(height: 16),
+          const Divider(height: 1),
+          const SizedBox(height: 16),
+          if (isLoggedIn) ...[
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).pushNamed('/privacy'),
+                icon: const Icon(Icons.privacy_tip_outlined, size: 19),
+                label: Text(AppStrings.privacyCenter),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: vm.isDeletingAccount
+                  ? null
+                  : () => _showDeletionWarning(context, vm),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red.shade800,
+                side: BorderSide(color: Colors.red.shade300),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              icon: vm.isDeletingAccount
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.delete_forever_rounded, size: 19),
+              label: Text(
+                vm.isDeletingAccount
+                    ? AppStrings.deletingData
+                    : isLoggedIn
+                    ? AppStrings.deleteAccountAndData
+                    : AppStrings.deleteLocalData,
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _showDeletionWarning(
+    BuildContext context,
+    ProfileViewModel vm,
+  ) async {
+    final shouldContinue = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(
+          Icons.warning_amber_rounded,
+          color: Colors.redAccent,
+          size: 36,
+        ),
+        title: Text(AppStrings.deletionWarningTitle),
+        content: Text(
+          vm.isLoggedIn
+              ? AppStrings.deletionWarningCloud
+              : AppStrings.deletionWarningLocal,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(AppStrings.continueDeletion),
+          ),
+        ],
+      ),
+    );
+    if (shouldContinue == true && context.mounted) {
+      await _showFinalDeletionDialog(context, vm);
+    }
+  }
+
+  Future<void> _showFinalDeletionDialog(
+    BuildContext context,
+    ProfileViewModel vm,
+  ) async {
+    final emailController = TextEditingController();
+    var isSubmitting = false;
+    String? errorMessage;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) {
+          final emailMatches =
+              !vm.isLoggedIn ||
+              emailController.text.trim().toLowerCase() ==
+                  vm.userEmail.trim().toLowerCase();
+          return AlertDialog(
+            title: Text(AppStrings.finalDeletionTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  vm.isLoggedIn
+                      ? AppStrings.finalDeletionDescription
+                      : AppStrings.deletionWarningLocal,
+                ),
+                if (vm.isLoggedIn) ...[
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: emailController,
+                    enabled: !isSubmitting,
+                    keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
+                    decoration: InputDecoration(
+                      labelText: AppStrings.confirmationEmailHint,
+                      border: const OutlineInputBorder(),
+                    ),
+                    onChanged: (_) => setDialogState(() {
+                      errorMessage = null;
+                    }),
+                  ),
+                ],
+                if (errorMessage != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    errorMessage!,
+                    style: const TextStyle(color: Colors.redAccent),
+                  ),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: isSubmitting
+                    ? null
+                    : () => Navigator.pop(dialogContext),
+                child: Text(AppStrings.cancel),
+              ),
+              ElevatedButton.icon(
+                onPressed: isSubmitting || !emailMatches
+                    ? null
+                    : () async {
+                        setDialogState(() {
+                          isSubmitting = true;
+                          errorMessage = null;
+                        });
+                        final success = vm.isLoggedIn
+                            ? await vm.deleteAccountAndData(
+                                emailController.text.trim(),
+                              )
+                            : await vm.deleteLocalData();
+                        if (!dialogContext.mounted) return;
+                        if (!success) {
+                          setDialogState(() {
+                            isSubmitting = false;
+                            errorMessage =
+                                vm.syncError ?? AppStrings.deletionFailed;
+                          });
+                          return;
+                        }
+                        Navigator.pop(dialogContext);
+                        if (context.mounted) {
+                          vm.navigateAfterDeletion(context);
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                ),
+                icon: isSubmitting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.delete_forever_rounded),
+                label: Text(
+                  isSubmitting
+                      ? AppStrings.deletingData
+                      : vm.isLoggedIn
+                      ? AppStrings.deleteAccountAndData
+                      : AppStrings.deleteLocalData,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+    emailController.dispose();
   }
 
   void _showSignOutDialog(BuildContext context, ProfileViewModel vm) {

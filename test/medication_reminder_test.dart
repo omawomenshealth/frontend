@@ -2,6 +2,7 @@ import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/constants/color_constants.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
+import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/views/dashboard/widgets/medication_reminder_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -88,7 +89,7 @@ void main() {
 
   test('planlanan doz ve yanıtı yerel depoda kalıcı tutulur', () async {
     SharedPreferences.setMockInitialValues({});
-    final storage = LocalStorageService();
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
     await storage.init();
     final reminderPlan = plan();
 
@@ -142,7 +143,7 @@ void main() {
 
   testWidgets('ilaç bölümünden hatırlatıcı formu açılır', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    final storage = LocalStorageService();
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
     await storage.init();
     await initializeDateFormatting('tr_TR', null);
     await AppStrings.delegate.load(const Locale('tr', 'TR'));

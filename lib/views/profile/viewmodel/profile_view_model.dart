@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../data/services/api_service.dart';
+import '../../../data/services/notification_service.dart';
 import '../../../core/utils/cycle_rules.dart';
 
 /// Profil iş mantığı — kullanıcı bilgilerini görüntüleme ve güncelleme.
@@ -12,8 +14,10 @@ import '../../../core/constants/app_strings.dart';
 class ProfileViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
   final SyncService _sync;
+  final ApiService _api;
+  final NotificationService _notifications;
 
-  ProfileViewModel(this._storage, this._sync) {
+  ProfileViewModel(this._storage, this._sync, this._api, this._notifications) {
     loadSettings();
   }
 
@@ -21,12 +25,14 @@ class ProfileViewModel extends ChangeNotifier {
   bool _isLoading = true;
   bool _isSaving = false;
   bool _isSyncing = false;
+  bool _isDeletingAccount = false;
   String? _syncError;
 
   UserSettings get settings => _settings;
   bool get isLoading => _isLoading;
   bool get isSaving => _isSaving;
   bool get isSyncing => _isSyncing;
+  bool get isDeletingAccount => _isDeletingAccount;
   String? get syncError => _syncError;
 
   // ── Kimlik Doğrulama & Senkronizasyon ──────────────────
@@ -72,12 +78,62 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
-  /// Çıkış Yap — Tüm SharedPreferences verilerini temizler ve Auth ekranına yönlendirir.
+  /// Çıkış Yap — Şifreli yerel veriler ile cihaz anahtarını temizler.
   Future<void> signOut(BuildContext context) async {
+    await _api.logout();
+    await _notifications.cancelAll();
     await _storage.clearAll();
     if (context.mounted) {
       Navigator.of(context).pushNamedAndRemoveUntil('/auth', (route) => false);
     }
+  }
+
+  /// Kısa ömürlü sunucu doğrulamasını alır, bulut hesabını siler ve ancak
+  /// sunucu onayından sonra cihazdaki kopyayı temizler.
+  Future<bool> deleteAccountAndData(String confirmationEmail) async {
+    if (!isLoggedIn || _isDeletingAccount) return false;
+    _isDeletingAccount = true;
+    _syncError = null;
+    notifyListeners();
+
+    try {
+      final deletionToken = await _api.createAccountDeletionChallenge(
+        confirmationEmail,
+      );
+      await _api.deleteAccount(deletionToken);
+      await _notifications.cancelAll();
+      final cleared = await _storage.clearAll();
+      return cleared || await _storage.clearAll();
+    } on ApiException catch (error) {
+      _syncError = error.message;
+      return false;
+    } catch (_) {
+      _syncError = AppStrings.deletionFailed;
+      return false;
+    } finally {
+      _isDeletingAccount = false;
+      notifyListeners();
+    }
+  }
+
+  /// Hesap bağlanmamışsa yalnızca bu cihazdaki verileri siler.
+  Future<bool> deleteLocalData() async {
+    if (_isDeletingAccount) return false;
+    _isDeletingAccount = true;
+    _syncError = null;
+    notifyListeners();
+    try {
+      await _notifications.cancelAll();
+      final cleared = await _storage.clearAll();
+      return cleared || await _storage.clearAll();
+    } finally {
+      _isDeletingAccount = false;
+      notifyListeners();
+    }
+  }
+
+  void navigateAfterDeletion(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil('/auth', (route) => false);
   }
 
   /// Ayarları yükle.

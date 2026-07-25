@@ -7,8 +7,10 @@ import '../../core/utils/date_extensions.dart';
 import '../../core/utils/app_time.dart';
 import '../../core/utils/cycle_rules.dart';
 import '../../core/constants/app_strings.dart';
+import 'local_encrypted_store.dart';
 
-/// SharedPreferences üzerinden veri okuma/yazma servisi.
+/// Sağlık ve oturum verilerini AES-256-GCM şifreli SharedPreferences zarfları
+/// üzerinden okuyan/yazan servis. Yerel anahtar Keystore/Keychain'de tutulur.
 class LocalStorageService {
   static const String _settingsKey = 'user_settings';
   static const String _logPrefix = 'daily_log_';
@@ -16,15 +18,21 @@ class LocalStorageService {
   static const String _allMedsKey = 'all_custom_medications';
   static const String _allSupsKey = 'all_custom_supplements';
   static const String _authTokenKey = 'auth_token';
+  static const String _authRefreshTokenKey = 'auth_refresh_token';
   static const String _authEmailKey = 'auth_email';
   static const String _authNameKey = 'auth_name';
   static const String _authGoogleIdKey = 'auth_google_id';
   static const String _authLastSyncKey = 'auth_last_sync';
+  static const String _virtualDaysOffsetKey = 'virtual_days_offset';
   static const String _medicationReminderPlansKey =
       'medication_reminder_plans_v1';
   static const String _medicationDoseRecordsKey = 'medication_dose_records_v1';
 
-  SharedPreferences? _prefs;
+  final LocalKeyStore _keyStore;
+  LocalEncryptedStore? _encryptedStore;
+
+  LocalStorageService({LocalKeyStore? keyStore})
+    : _keyStore = keyStore ?? FlutterSecureLocalKeyStore();
 
   // ── Kimlik Doğrulama & Senkronizasyon Durumu ─────────────
 
@@ -32,6 +40,11 @@ class LocalStorageService {
   Future<bool> setAuthToken(String? value) async => value != null
       ? _p.setString(_authTokenKey, value)
       : _p.remove(_authTokenKey);
+
+  String? get authRefreshToken => _p.getString(_authRefreshTokenKey);
+  Future<bool> setAuthRefreshToken(String? value) async => value != null
+      ? _p.setString(_authRefreshTokenKey, value)
+      : _p.remove(_authRefreshTokenKey);
 
   String? get authEmail => _p.getString(_authEmailKey);
   Future<bool> setAuthEmail(String? value) async => value != null
@@ -53,19 +66,46 @@ class LocalStorageService {
       ? _p.setString(_authLastSyncKey, value)
       : _p.remove(_authLastSyncKey);
 
+  int get virtualDaysOffset =>
+      int.tryParse(_p.getString(_virtualDaysOffsetKey) ?? '') ?? 0;
+  Future<bool> setVirtualDaysOffset(int value) =>
+      _p.setString(_virtualDaysOffsetKey, value.toString());
+
   bool get isUserLoggedIn => authToken != null;
 
   /// Servisi başlat.
   Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
+    final preferences = await SharedPreferences.getInstance();
+    _encryptedStore = LocalEncryptedStore(
+      preferences,
+      _keyStore,
+      _isProtectedKey,
+    );
+    await _encryptedStore!.init();
   }
 
-  SharedPreferences get _p {
-    if (_prefs == null) {
+  LocalEncryptedStore get _p {
+    if (_encryptedStore == null) {
       throw StateError(AppStrings.localStorageNotInitialized);
     }
-    return _prefs!;
+    return _encryptedStore!;
   }
+
+  bool _isProtectedKey(String key) =>
+      key == _settingsKey ||
+      key == _logDatesKey ||
+      key == _allMedsKey ||
+      key == _allSupsKey ||
+      key == _authTokenKey ||
+      key == _authRefreshTokenKey ||
+      key == _authEmailKey ||
+      key == _authNameKey ||
+      key == _authGoogleIdKey ||
+      key == _authLastSyncKey ||
+      key == _virtualDaysOffsetKey ||
+      key == _medicationReminderPlansKey ||
+      key == _medicationDoseRecordsKey ||
+      key.startsWith(_logPrefix);
 
   // ── Kullanıcı Ayarları ─────────────────────────────────
 
@@ -452,7 +492,7 @@ class LocalStorageService {
     return (_p.getStringList(_logDatesKey) ?? []).toSet();
   }
 
-  /// Tüm verileri sil (test/sıfırlama için).
+  /// Tüm korumalı verileri ve Keystore/Keychain yerel anahtarını sil.
   Future<bool> clearAll() async {
     return _p.clear();
   }

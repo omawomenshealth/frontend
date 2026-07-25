@@ -131,6 +131,7 @@ class NotificationService {
           importance: Importance.high,
           priority: Priority.high,
           category: AndroidNotificationCategory.reminder,
+          visibility: NotificationVisibility.secret,
         ),
         iOS: const DarwinNotificationDetails(
           threadIdentifier: 'oma_medication_reminders',
@@ -138,8 +139,8 @@ class NotificationService {
       );
       await _plugin.zonedSchedule(
         id: _notificationId(dose.id),
-        title: AppStrings.reminderNotificationTitle(dose.plan.itemName),
-        body: AppStrings.reminderNotificationBody(dose.plan.dosage),
+        title: AppStrings.privateReminderNotificationTitle,
+        body: AppStrings.privateReminderNotificationBody,
         scheduledDate: timezone.TZDateTime.from(
           dose.scheduledAt,
           timezone.local,

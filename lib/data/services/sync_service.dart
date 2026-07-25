@@ -5,7 +5,7 @@ import '../models/period_log_model.dart';
 import 'local_storage_service.dart';
 import 'api_service.dart';
 
-/// Yerel SharedPreferences verileri ile PostgreSQL bulut veritabanı
+/// Yerel şifreli kasa verileri ile PostgreSQL bulut veritabanı
 /// arasındaki senkronizasyonu yöneten servis.
 class SyncService {
   final LocalStorageService _storage;
@@ -90,6 +90,7 @@ class SyncService {
         customMedications: cloudMedications,
         customSupplements: cloudSupplements,
         authToken: localSnapshot.authToken,
+        authRefreshToken: localSnapshot.authRefreshToken,
         authEmail: localSnapshot.authEmail,
         authName: localSnapshot.authName,
         authGoogleId: localSnapshot.authGoogleId,
@@ -117,6 +118,7 @@ class SyncService {
       customMedications: _storage.getCustomMedications(),
       customSupplements: _storage.getCustomSupplements(),
       authToken: _storage.authToken,
+      authRefreshToken: _storage.authRefreshToken,
       authEmail: _storage.authEmail,
       authName: _storage.authName,
       authGoogleId: _storage.authGoogleId,
@@ -131,6 +133,7 @@ class SyncService {
       customMedications: snapshot.customMedications,
       customSupplements: snapshot.customSupplements,
       authToken: snapshot.authToken,
+      authRefreshToken: snapshot.authRefreshToken,
       authEmail: snapshot.authEmail,
       authName: snapshot.authName,
       authGoogleId: snapshot.authGoogleId,
@@ -144,6 +147,7 @@ class SyncService {
     required List<String> customMedications,
     required List<String> customSupplements,
     required String? authToken,
+    required String? authRefreshToken,
     required String? authEmail,
     required String? authName,
     required String? authGoogleId,
@@ -161,6 +165,12 @@ class SyncService {
       requireSuccess(
         await _storage.setAuthToken(authToken),
         'Oturum anahtarı yazma',
+      );
+    }
+    if (authRefreshToken != null) {
+      requireSuccess(
+        await _storage.setAuthRefreshToken(authRefreshToken),
+        'Oturum yenileme anahtarı yazma',
       );
     }
     if (authEmail != null) {
@@ -336,6 +346,7 @@ class _LocalSnapshot {
   final List<String> customMedications;
   final List<String> customSupplements;
   final String? authToken;
+  final String? authRefreshToken;
   final String? authEmail;
   final String? authName;
   final String? authGoogleId;
@@ -347,6 +358,7 @@ class _LocalSnapshot {
     required this.customMedications,
     required this.customSupplements,
     required this.authToken,
+    required this.authRefreshToken,
     required this.authEmail,
     required this.authName,
     required this.authGoogleId,

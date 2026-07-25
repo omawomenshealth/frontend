@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
@@ -123,9 +121,7 @@ class PremiumPurchaseService extends ChangeNotifier {
       final accountId = _storage.authGoogleId;
       final purchaseParam = PurchaseParam(
         productDetails: _product!,
-        applicationUserName: accountId == null
-            ? null
-            : sha256.convert(utf8.encode(accountId)).toString(),
+        applicationUserName: accountId,
       );
       final launched = await _store.buyNonConsumable(
         purchaseParam: purchaseParam,

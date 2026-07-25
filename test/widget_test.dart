@@ -4,13 +4,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
+import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/main.dart';
 import 'package:app_proje_a/views/insights/view/insights_view.dart';
 
 void main() {
   testWidgets('App builds successfully', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
-    final storage = LocalStorageService();
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
     await storage.init();
     await tester.pumpWidget(MyApp(storage: storage));
     // Uygulama başarıyla oluşturuldu mu kontrol et
@@ -21,7 +22,7 @@ void main() {
     WidgetTester tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final storage = LocalStorageService();
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
     await storage.init();
     await storage.saveSettings(
       UserSettings(isOnboardingComplete: true, userName: 'Test'),
@@ -48,7 +49,7 @@ void main() {
     WidgetTester tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final storage = LocalStorageService();
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
     await storage.init();
     await storage.saveSettings(
       UserSettings(isOnboardingComplete: true, userName: 'Test'),
@@ -79,7 +80,7 @@ void main() {
     WidgetTester tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final storage = LocalStorageService();
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
     await storage.init();
     await storage.saveSettings(
       UserSettings(isOnboardingComplete: true, userName: 'Test'),

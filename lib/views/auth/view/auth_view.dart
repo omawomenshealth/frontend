@@ -177,11 +177,7 @@ class AuthView extends StatelessWidget {
       context,
       onLoginSuccess: (hasCloudData) {
         if (!context.mounted) return;
-        if (hasCloudData) {
-          _showSyncConflictDialog(context, vm);
-        } else {
-          _handleAccountWithoutCloudData(context, vm);
-        }
+        _continueAfterPrivacyChoice(context, vm, hasCloudData);
       },
     );
   }
@@ -243,11 +239,7 @@ class AuthView extends StatelessWidget {
                   name: name,
                   onLoginSuccess: (hasCloudData) {
                     if (!context.mounted) return;
-                    if (hasCloudData) {
-                      _showSyncConflictDialog(context, vm);
-                    } else {
-                      _handleAccountWithoutCloudData(context, vm);
-                    }
+                    _continueAfterPrivacyChoice(context, vm, hasCloudData);
                   },
                 );
               }
@@ -261,6 +253,48 @@ class AuthView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _continueAfterPrivacyChoice(
+    BuildContext context,
+    AuthViewModel vm,
+    bool hasCloudData,
+  ) async {
+    if (vm.privacyConsentRequired) {
+      final accepted = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          icon: const Icon(Icons.health_and_safety_outlined),
+          title: Text(AppStrings.healthCloudConsent),
+          content: Text(AppStrings.consentExplanation),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(AppStrings.continueOffline),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(AppStrings.grantConsent),
+            ),
+          ],
+        ),
+      );
+      if (!context.mounted) return;
+      if (accepted == true) {
+        final granted = await vm.grantPrivacyConsent();
+        if (!granted || !context.mounted) return;
+      } else {
+        _navigateToNextScreen(context, vm);
+        return;
+      }
+    }
+
+    if (hasCloudData) {
+      _showSyncConflictDialog(context, vm);
+    } else {
+      _handleAccountWithoutCloudData(context, vm);
+    }
   }
 
   void _handleAccountWithoutCloudData(BuildContext context, AuthViewModel vm) {

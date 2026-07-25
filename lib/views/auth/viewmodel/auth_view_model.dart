@@ -15,11 +15,14 @@ class AuthViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   String? _errorMessage;
+  bool _privacyConsentRequired = false;
+  String _privacyNoticeVersion = '2026-07-24';
 
   AuthViewModel(this._storage, this._api, this._sync);
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get privacyConsentRequired => _privacyConsentRequired;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
@@ -66,6 +69,7 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
 
       final bool hasCloudData = response['hasCloudData'] as bool? ?? false;
+      _readPrivacyState(response);
       onLoginSuccess(hasCloudData);
       return true;
     } catch (e) {
@@ -99,6 +103,7 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
 
       final bool hasCloudData = response['hasCloudData'] as bool? ?? false;
+      _readPrivacyState(response);
       onLoginSuccess(hasCloudData);
       return true;
     } catch (e) {
@@ -106,6 +111,36 @@ class AuthViewModel extends ChangeNotifier {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
       notifyListeners();
       return false;
+    }
+  }
+
+  void _readPrivacyState(Map<String, dynamic> response) {
+    final privacy = response['privacy'];
+    if (privacy is Map<String, dynamic>) {
+      _privacyConsentRequired = privacy['granted'] != true;
+      _privacyNoticeVersion =
+          privacy['noticeVersion'] as String? ?? _privacyNoticeVersion;
+    } else {
+      _privacyConsentRequired = true;
+    }
+  }
+
+  Future<bool> grantPrivacyConsent() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      await _api.grantPrivacyConsent(_privacyNoticeVersion);
+      _privacyConsentRequired = false;
+      return true;
+    } catch (error) {
+      _errorMessage = error is ApiException
+          ? error.message
+          : AppStrings.privacyActionFailed;
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
