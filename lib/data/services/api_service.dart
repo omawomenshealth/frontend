@@ -30,7 +30,7 @@ class ApiService {
     if (kIsWeb) return 'http://localhost:3000';
     // Gerçek cihaz için Wi-Fi IP, emülatör için 10.0.2.2 kullanılır
     return Platform.isAndroid
-        ? 'http://192.168.1.18:3000'
+        ? 'http://192.168.1.16:3000'
         : 'http://localhost:3000';
   }
 

@@ -90,10 +90,11 @@ class ArticleDetailView extends StatelessWidget {
                             Text(
                               article.title,
                               style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                                fontFamily: 'CormorantGaramond',
+                                fontSize: 32,
+                                fontWeight: FontWeight.w600,
                                 color: Colors.white,
-                                height: 1.25,
+                                height: 1.02,
                                 shadows: [
                                   Shadow(
                                     offset: Offset(0, 2),
@@ -190,7 +191,7 @@ class ArticleDetailView extends StatelessWidget {
               Icon(Icons.timer_outlined, size: 14, color: article.cardColor),
               const SizedBox(width: 4),
               Text(
-                article.readTime,
+                AppStrings.readTimeMinutes(article.readTimeMinutes),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -218,7 +219,19 @@ class ArticleDetailView extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('💡', style: TextStyle(fontSize: 22)),
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: article.cardColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.lightbulb_outline_rounded,
+              color: article.cardColor,
+              size: 20,
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -227,8 +240,9 @@ class ArticleDetailView extends StatelessWidget {
                 Text(
                   AppStrings.shortSummary,
                   style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: 'CormorantGaramond',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -257,8 +271,9 @@ class ArticleDetailView extends StatelessWidget {
         child: Text(
           block.replaceFirst('###', '').trim(),
           style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontFamily: 'CormorantGaramond',
+            fontSize: 23,
+            fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),

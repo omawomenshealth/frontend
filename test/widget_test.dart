@@ -18,7 +18,7 @@ void main() {
     expect(find.byType(MyApp), findsOneWidget);
   });
 
-  testWidgets('İçgörüler sekmesi Ana Sayfa ile Yazılar arasındadır', (
+  testWidgets('Keşfet ve İçgörüler kaynak tasarımdaki sıradadır', (
     WidgetTester tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -35,14 +35,19 @@ void main() {
       find.byType(BottomNavigationBar),
     );
     expect(navigation.items, hasLength(4));
-    expect((navigation.items[0].icon as Icon).icon, Icons.dashboard_rounded);
-    expect((navigation.items[1].icon as Icon).icon, Icons.insights_outlined);
-    expect((navigation.items[2].icon as Icon).icon, Icons.article_rounded);
+    expect((navigation.items[0].icon as Icon).icon, Icons.home_outlined);
+    expect((navigation.items[1].icon as Icon).icon, Icons.explore_outlined);
+    expect(
+      (navigation.items[2].icon as Icon).icon,
+      Icons.auto_awesome_outlined,
+    );
 
-    await tester.tap(find.byIcon(Icons.insights_outlined));
+    navigation.onTap!(2);
     await tester.pump();
 
     expect(find.byType(InsightsView), findsOneWidget);
+    expect(find.byType(BottomNavigationBar), findsNothing);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
   });
 
   testWidgets('karşılaştırmalı bağlantı insight kartında gösterilir', (
@@ -70,10 +75,14 @@ void main() {
 
     await tester.pumpWidget(MyApp(storage: storage));
     await tester.pump();
-    await tester.tap(find.byIcon(Icons.insights_outlined));
+    final navigation = tester.widget<BottomNavigationBar>(
+      find.byType(BottomNavigationBar),
+    );
+    navigation.onTap!(2);
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.account_tree_outlined), findsWidgets);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_forward_rounded), findsWidgets);
   });
 
   testWidgets('seçilen insightlar ana sayfada gösterilir ve tümü açılır', (

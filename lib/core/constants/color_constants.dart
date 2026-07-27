@@ -17,17 +17,17 @@ class AppColors {
   static const Color accentLight = Color(0xFFF7E5E7);
 
   // Yuzeyler
-  static const Color background = Color(0xFFFAFAEE);
-  static const Color surface = Color(0xFFFFFEF8);
-  static const Color surfaceMuted = Color(0xFFFAFAF8);
-  static const Color cardBackground = Color(0xFFFFFEF8);
-  static const Color scaffoldBackground = Color(0xFFFAFAEE);
-  static const Color outline = Color(0xFFE2E3D5);
+  static const Color background = Color(0xFFF7F2EC);
+  static const Color surface = Color(0xFFFFFDFC);
+  static const Color surfaceMuted = Color(0xFFFAF7F3);
+  static const Color cardBackground = Color(0xFFFFFDFC);
+  static const Color scaffoldBackground = Color(0xFFF7F2EC);
+  static const Color outline = Color(0xFFE7DED5);
 
   // Metinler
   static const Color textPrimary = Color(0xFF1A1C1A);
-  static const Color textSecondary = Color(0xFF5A6A60);
-  static const Color textHint = Color(0xFF8A9898);
+  static const Color textSecondary = Color(0xFF746D68);
+  static const Color textHint = Color(0xFF9A918B);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
   // Ic goru kartlari
@@ -59,6 +59,7 @@ class AppColors {
   static const Color ovulation = Color(0xFF8A72B0);
   static const Color fertile = Color(0xFF6A9E78);
   static const Color luteal = Color(0xFFFED276);
+  static const Color lutealDark = Color(0xFF9A762B);
 
   // Durumlar
   static const Color success = Color(0xFF6A9E78);
@@ -85,7 +86,7 @@ class AppColors {
   );
 
   static const LinearGradient backgroundGradient = LinearGradient(
-    colors: [Color(0xFFFFFEF8), Color(0xFFFAFAEE)],
+    colors: [Color(0xFFFFFDFC), Color(0xFFF7F2EC)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );

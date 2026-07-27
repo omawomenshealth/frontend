@@ -131,8 +131,7 @@ class OnboardingViewModel extends ChangeNotifier {
       (value) => AppStrings.localizeStoredValue(value) == disease,
     );
     if (existingIndex >= 0) {
-      _chronicDiseases = List.from(_chronicDiseases)
-        ..removeAt(existingIndex);
+      _chronicDiseases = List.from(_chronicDiseases)..removeAt(existingIndex);
     } else {
       _chronicDiseases = List.from(_chronicDiseases)..add(disease);
     }

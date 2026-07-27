@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:provider/provider.dart';
@@ -136,7 +138,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// Ana kabuk — Ana Sayfa, İçgörüler, Yazılar ve Profil arasında geçiş.
+/// Ana kabuk — Ana Sayfa, Keşfet, İçgörüler ve Profil arasında geçiş.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -170,7 +172,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   }
 
   void _selectPage(int index) {
-    if (index == 1) {
+    if (index == 2) {
       context.read<InsightsViewModel>().loadData();
     }
     setState(() => _currentIndex = index);
@@ -179,61 +181,229 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
+    final phaseIndex = context
+        .watch<DashboardViewModel>()
+        .periodCalculator
+        ?.currentPhaseIndex;
+    final activeColor = switch (phaseIndex) {
+      0 => AppColors.periodPrimary,
+      2 => AppColors.ovulation,
+      3 => AppColors.lutealDark,
+      _ => AppColors.primary,
+    };
+
     return Scaffold(
+      extendBody: true,
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          DashboardView(onOpenInsights: () => _selectPage(1)),
-          const InsightsView(),
+          DashboardView(onOpenInsights: () => _selectPage(2)),
           const ArticlesView(),
+          InsightsView(onClose: () => _selectPage(0)),
           const ProfileView(),
         ],
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
+      bottomNavigationBar: _currentIndex == 2
+          ? null
+          : SafeArea(
+              top: false,
+              minimum: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 70,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.96),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF3C322C,
+                            ).withValues(alpha: 0.13),
+                            blurRadius: 28,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: BottomNavigationBar(
+                        currentIndex: _currentIndex,
+                        onTap: _selectPage,
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        type: BottomNavigationBarType.fixed,
+                        selectedItemColor: activeColor,
+                        unselectedItemColor: AppColors.textSecondary,
+                        iconSize: 20,
+                        selectedFontSize: 10.5,
+                        unselectedFontSize: 10.5,
+                        selectedLabelStyle: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                        ),
+                        unselectedLabelStyle: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                        ),
+                        items: [
+                          BottomNavigationBarItem(
+                            icon: const Icon(Icons.home_outlined),
+                            activeIcon: const Icon(Icons.home_rounded),
+                            label: AppStrings.home,
+                          ),
+                          BottomNavigationBarItem(
+                            icon: const Icon(Icons.explore_outlined),
+                            activeIcon: const Icon(Icons.explore_rounded),
+                            label: AppStrings.explore,
+                          ),
+                          BottomNavigationBarItem(
+                            icon: const Icon(Icons.auto_awesome_outlined),
+                            activeIcon: const Icon(Icons.auto_awesome_rounded),
+                            label: AppStrings.insights,
+                          ),
+                          BottomNavigationBarItem(
+                            icon: const Icon(Icons.circle_outlined),
+                            activeIcon: const Icon(Icons.circle),
+                            label: AppStrings.profile,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 9),
+                  Semantics(
+                    button: true,
+                    label: AppStrings.appName,
+                    child: InkWell(
+                      onTap: () => _showOmaSheet(context, activeColor),
+                      customBorder: const CircleBorder(),
+                      child: Container(
+                        width: 66,
+                        height: 66,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.96),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(
+                                0xFF3C322C,
+                              ).withValues(alpha: 0.13),
+                              blurRadius: 28,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: CustomPaint(
+                            size: const Size.square(35),
+                            painter: _SunburstPainter(color: activeColor),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-          child: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: _selectPage,
-            iconSize: 20,
-            selectedFontSize: 11,
-            unselectedFontSize: 11,
-            items: [
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.dashboard_rounded),
-                activeIcon: const Icon(Icons.dashboard_rounded),
-                label: AppStrings.home,
+    );
+  }
+
+  void _showOmaSheet(BuildContext context, Color accent) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 4, 24, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CustomPaint(
+                    size: const Size.square(34),
+                    painter: _SunburstPainter(color: accent),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    AppStrings.appName,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontFamily: 'CormorantGaramond',
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.insights_outlined),
-                activeIcon: const Icon(Icons.insights_rounded),
-                label: AppStrings.insights,
+              const SizedBox(height: 18),
+              Text(
+                AppStrings.omaTalkPrompt,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  height: 1.45,
+                ),
               ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.article_rounded),
-                activeIcon: const Icon(Icons.article_rounded),
-                label: AppStrings.articles,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.person_rounded),
-                activeIcon: const Icon(Icons.person_rounded),
-                label: AppStrings.profile,
+              const SizedBox(height: 18),
+              Wrap(
+                spacing: 9,
+                runSpacing: 9,
+                children: [
+                  for (final label in [
+                    AppStrings.energyLevel,
+                    AppStrings.sleep,
+                    AppStrings.mood,
+                    AppStrings.nutrition,
+                  ])
+                    ActionChip(
+                      label: Text(label),
+                      onPressed: () => Navigator.pop(context),
+                      side: BorderSide(color: accent.withValues(alpha: 0.3)),
+                      backgroundColor: Color.lerp(accent, Colors.white, 0.9),
+                    ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+class _SunburstPainter extends CustomPainter {
+  final Color color;
+
+  const _SunburstPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final outer = size.shortestSide / 2;
+    final inner = outer * 0.42;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+
+    for (var index = 0; index < 24; index++) {
+      final angle = index * math.pi * 2 / 24;
+      canvas.drawLine(
+        Offset(
+          center.dx + inner * math.cos(angle),
+          center.dy + inner * math.sin(angle),
+        ),
+        Offset(
+          center.dx + outer * math.cos(angle),
+          center.dy + outer * math.sin(angle),
+        ),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SunburstPainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }

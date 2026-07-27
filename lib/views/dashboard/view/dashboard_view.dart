@@ -1,26 +1,24 @@
-import 'package:app_proje_a/views/dashboard/widgets/horizontal_calendar.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/color_constants.dart';
+
 import '../../../core/constants/app_strings.dart';
-import '../../../core/shared_widgets/oma_design_widgets.dart';
-import '../../../core/utils/date_extensions.dart';
+import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/app_time.dart';
-import '../../../core/utils/daily_log_formatters.dart';
+import '../../../core/utils/date_extensions.dart';
+import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/period_log_model.dart';
-import '../../../data/services/api_service.dart';
-import '../viewmodel/dashboard_view_model.dart';
-import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../../calendar/view/calendar_view.dart' as cal;
-import '../widgets/countdown_circle.dart';
+import '../../calendar/viewmodel/calendar_view_model.dart';
+import '../../insights/view/insights_view.dart';
+import '../viewmodel/dashboard_view_model.dart';
 import '../widgets/daily_log_sheet.dart';
 import '../widgets/feeling_card.dart';
-import '../widgets/cycle_insights_card.dart';
-import '../../articles/model/article_model.dart';
-import '../../articles/view/article_detail_view.dart';
-import '../../insights/view/insights_view.dart';
+import '../widgets/horizontal_calendar.dart';
+import '../widgets/phase_hero_card.dart';
 
-/// Dashboard ana ekranı.
+/// Oma's daily home screen, adapted from the exported mobile design while
+/// retaining the existing Flutter data and logging flows.
 class DashboardView extends StatelessWidget {
   final VoidCallback? onOpenInsights;
 
@@ -32,78 +30,79 @@ class DashboardView extends StatelessWidget {
     return Consumer<DashboardViewModel>(
       builder: (context, vm, _) {
         if (vm.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Scaffold(
+            backgroundColor: AppColors.scaffoldBackground,
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
 
+        final calculator = vm.periodCalculator;
+        final phase =
+            calculator?.phaseAt(vm.selectedDate) ?? CyclePhase.follicular;
+        final accent = _phaseColor(phase);
+        final cycleDay = _cycleDay(calculator, vm.selectedDate);
+        final periodCount = phase == CyclePhase.menstrual
+            ? cycleDay
+            : _daysToPeriod(calculator, cycleDay);
+
         return Scaffold(
-          backgroundColor: AppColors.scaffoldBackground,
+          backgroundColor: Color.lerp(
+            AppColors.scaffoldBackground,
+            accent,
+            0.035,
+          ),
           body: SafeArea(
+            bottom: false,
             child: RefreshIndicator(
+              color: accent,
               onRefresh: vm.loadData,
               child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 14, 20, 112),
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 132),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 8),
-                    // ── Karşılama ──────────────────────────
-                    _buildHomeHeader(context, vm),
-                    const SizedBox(height: 18),
-
-                    // ── Yatay Takvim ──
+                    _HomeHeader(
+                      vm: vm,
+                      accent: accent,
+                      onCalendarTap: () => _openCalendar(context),
+                    ),
+                    const SizedBox(height: 22),
                     HorizontalCalendar(
                       selectedDate: vm.selectedDate,
                       onDateSelected: vm.selectDate,
-                      periodCalculator: vm.periodCalculator,
+                      periodCalculator: calculator,
                     ),
                     if (!vm.selectedDate.isSameDay(AppTime.now)) ...[
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 9),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: GestureDetector(
-                          onTap: () => vm.selectDate(AppTime.now),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              AppStrings.today,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
+                        child: TextButton.icon(
+                          onPressed: () => vm.selectDate(AppTime.now),
+                          style: TextButton.styleFrom(
+                            foregroundColor: accent,
+                            visualDensity: VisualDensity.compact,
                           ),
+                          icon: const Icon(Icons.today_outlined, size: 15),
+                          label: Text(AppStrings.today),
                         ),
                       ),
                     ],
+                    const SizedBox(height: 20),
+                    PhaseHeroCard(
+                      phase: phase,
+                      cycleDay: cycleDay,
+                      periodCount: periodCount,
+                      onOpenInsights: () => _openInsights(context),
+                    ),
+                    const SizedBox(height: 30),
+                    _SectionTitle(
+                      title: AppStrings.quickLogTitle,
+                      caption: AppStrings.quickLogCaption,
+                    ),
                     const SizedBox(height: 16),
-
-                    // ── Regl Geri Sayım (Kadın) ───────────
-                    if (vm.hasPeriodTracking) ...[
-                      GestureDetector(
-                        onTap: () {
-                          // Takvim sayfasına git
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const cal.CalendarView(),
-                            ),
-                          );
-                        },
-                        child: _buildPeriodCard(vm),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // ── Hızlı Erişim (4 yuvarlak) ────────
                     FeelingCard(
                       showPeriod: vm.hasPeriodTracking,
                       onPeriodTap: () => _showDailyLogSheet(
@@ -131,25 +130,17 @@ class DashboardView extends StatelessWidget {
                         isSingleTab: true,
                       ),
                     ),
-                    const SizedBox(height: 16),
-
-                    if (vm.personalInsights.isNotEmpty) ...[
-                      _buildPersonalInsightsPreview(vm),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // ── Size Özel Tavsiye / Makale Kartı ──
-                    _buildRecommendationCard(context),
-                    const SizedBox(height: 16),
-
-                    // ── Döngülerim İstatistik Kartı ───────
-                    if (vm.hasPeriodTracking && vm.cycleInsights != null) ...[
-                      CycleInsightsCard(insights: vm.cycleInsights!),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // ── Günlük Kayıtlar (Timeline) ──────────
-                    _buildTimeline(context, vm),
+                    const SizedBox(height: 38),
+                    if (vm.personalInsights.isNotEmpty)
+                      _PersonalInsightsPreview(
+                        vm: vm,
+                        accent: accent,
+                        onViewAll: () => _openInsights(context),
+                      )
+                    else
+                      _InsightPlaceholder(accent: accent),
+                    const SizedBox(height: 28),
+                    _Journey(accent: accent),
                   ],
                 ),
               ),
@@ -160,616 +151,52 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildHomeHeader(BuildContext context, DashboardViewModel vm) {
-    return Row(
-      children: [
-        Expanded(
-          child: Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 7,
-            runSpacing: 3,
-            children: [
-              Text(
-                vm.todayDateStr.toUpperCase(),
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.4,
-                ),
-              ),
-              Container(
-                width: 3,
-                height: 3,
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              Text(
-                vm.cleanGreeting,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-        IconButton(
-          tooltip: AppStrings.calendar,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const cal.CalendarView()),
-            );
-          },
-          style: IconButton.styleFrom(
-            foregroundColor: AppColors.primaryDark,
-            backgroundColor: AppColors.surface,
-            side: const BorderSide(color: AppColors.outline),
-          ),
-          icon: const Icon(Icons.calendar_month_outlined, size: 19),
-        ),
-      ],
+  void _openCalendar(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const cal.CalendarView()),
     );
   }
 
-  Widget _buildPersonalInsightsPreview(DashboardViewModel vm) {
-    return Column(
-      key: const ValueKey('dashboard_personal_insights'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OmaSectionHeader(
-          title: AppStrings.personalInsightsPreviewTitle,
-          eyebrow: AppStrings.insights,
-          action: onOpenInsights == null
-              ? null
-              : TextButton(
-                  key: const ValueKey('dashboard_view_all_insights'),
-                  onPressed: onOpenInsights,
-                  child: Text(AppStrings.viewAllInsights),
-                ),
-        ),
-        const SizedBox(height: 14),
-        for (var index = 0; index < vm.personalInsights.length; index++) ...[
-          PersonalInsightCard(insight: vm.personalInsights[index]),
-          if (index != vm.personalInsights.length - 1)
-            const SizedBox(height: 12),
-        ],
-      ],
+  void _openInsights(BuildContext context) {
+    if (onOpenInsights != null) {
+      onOpenInsights!();
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const InsightsView()),
     );
   }
 
-  // ── Regl Kartı ──────────────────────────────────────────
-  Widget _buildPeriodCard(DashboardViewModel vm) {
-    final pc = vm.periodCalculator;
-    final phaseColor = pc == null
-        ? AppColors.periodPrimary
-        : [
-            AppColors.periodPrimary,
-            AppColors.fertile,
-            AppColors.ovulation,
-            AppColors.luteal,
-          ][pc.currentPhaseIndex];
+  int _cycleDay(PeriodCalculator? calculator, DateTime date) {
+    if (calculator == null || calculator.cycleLength <= 0) return 1;
+    final difference = date.dateOnly
+        .difference(calculator.lastPeriodDate.dateOnly)
+        .inDays;
+    final normalized =
+        ((difference % calculator.cycleLength) + calculator.cycleLength) %
+        calculator.cycleLength;
+    return normalized + 1;
+  }
 
-    return Column(
-      children: [
-        Text(
-          AppStrings.cycleTracking.toUpperCase(),
-          style: const TextStyle(
-            color: AppColors.primary,
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 2.8,
-          ),
-        ),
-        const SizedBox(height: 6),
-        CountdownCircle(
-          daysRemaining: pc?.daysUntilNextPeriod,
-          totalDays: pc?.cycleLength,
-          phaseDayCounts: pc?.phaseDayCounts,
-          phaseName: pc?.currentPhaseName ?? AppStrings.missingInformation,
-          phaseColor: phaseColor,
-          phase: pc?.currentPhase,
-        ),
-        if (pc != null)
-          Text(
-            AppStrings.phaseAfterDays(
-              pc.currentPhaseDaysRemaining,
-              pc.nextPhaseName,
-            ),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: phaseColor,
-            ),
-          ),
-      ],
+  int _daysToPeriod(PeriodCalculator? calculator, int cycleDay) {
+    if (calculator == null || calculator.cycleLength <= 0) return 0;
+    return (calculator.cycleLength - cycleDay + 1).clamp(
+      0,
+      calculator.cycleLength,
     );
   }
 
-  // ── Size Özel Tavsiye Kartı ─────────────────────────────
-  Widget _buildRecommendationCard(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        try {
-          final json = await context.read<ApiService>().fetchArticle(
-            'adet-doneminde-beslenme',
-          );
-          if (!context.mounted) return;
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) =>
-                  ArticleDetailView(article: Article.fromJson(json)),
-            ),
-          );
-        } on ApiException catch (error) {
-          if (!context.mounted) return;
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(error.message)));
-        }
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [const Color(0xFFF2F0E7), const Color(0xFFE4ECD8)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF74835A).withValues(alpha: 0.12),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              right: -15,
-              bottom: -15,
-              child: Icon(
-                Icons.auto_awesome_rounded,
-                size: 90,
-                color: AppColors.primary.withValues(alpha: 0.12),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.13),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.lightbulb_outline_rounded,
-                            color: AppColors.primary,
-                            size: 12,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            AppStrings.recommendationOfTheDay,
-                            style: const TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primaryDark,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.timer_outlined,
-                          color: AppColors.textSecondary,
-                          size: 12,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          AppStrings.dayCount(5),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  AppStrings.recommendationTitle,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  AppStrings.recommendationSummary,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Text(
-                      AppStrings.startReading,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryDark,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(
-                      Icons.arrow_forward_rounded,
-                      size: 14,
-                      color: AppColors.primaryDark,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+  Color _phaseColor(CyclePhase phase) {
+    return switch (phase) {
+      CyclePhase.menstrual => AppColors.periodPrimary,
+      CyclePhase.follicular => AppColors.primary,
+      CyclePhase.ovulation => AppColors.ovulation,
+      CyclePhase.luteal => AppColors.lutealDark,
+    };
   }
 
-  // ── Günlük Kayıtlar (Timeline) ─────────────────────────
-  Widget _buildTimeline(BuildContext context, DashboardViewModel vm) {
-    final isToday = vm.selectedDate.isToday;
-    final title = isToday
-        ? AppStrings.todaysLogs
-        : AppStrings.datedLogs(vm.selectedDate.toDotFormat());
-
-    final hasLogs = vm.todayLogs.any((log) => log.hasData);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const Spacer(),
-            // "+ Ekle" Butonu
-            GestureDetector(
-              onTap: () => _showDailyLogSheet(context, vm),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.add_circle_outline,
-                      size: 14,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      AppStrings.addDailyLog,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        if (!hasLogs)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.event_note_outlined,
-                  size: 40,
-                  color: AppColors.textHint.withValues(alpha: 0.5),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  AppStrings.noLogForDate,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: () => _showDailyLogSheet(context, vm),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  icon: const Icon(Icons.add_rounded, size: 16),
-                  label: Text(
-                    AppStrings.addDailyLog,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-        else
-          ...vm.todayLogs.where((log) => log.hasData).map((log) {
-            final timeStr =
-                '${log.date.hour.toString().padLeft(2, '0')}:${log.date.minute.toString().padLeft(2, '0')}';
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Saat
-                  SizedBox(
-                    width: 50,
-                    child: Text(
-                      timeStr,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                  // Çizgi ve Nokta
-                  Column(
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      Container(
-                        width: 2,
-                        height: 50, // İhtiyaca göre uzar (basit bir çizgi)
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 12),
-                  // İçerik Kartı
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (log.mood != null)
-                            _summaryTile(
-                              AppStrings.mood,
-                              '${log.moodEmoji ?? ''} ${AppStrings.localizeStoredValue(log.mood!)}',
-                            ),
-                          if (log.moodNote != null && log.moodNote!.isNotEmpty)
-                            _summaryTile(AppStrings.moodNote, log.moodNote!),
-                          if (log.sleepDurationMinutes != null)
-                            _summaryTile(
-                              AppStrings.sleepDuration,
-                              AppStrings.hoursMinutes(
-                                log.sleepDurationMinutes!,
-                              ),
-                            ),
-                          if (log.sleepQuality != null)
-                            _summaryTile(
-                              AppStrings.sleepQuality,
-                              AppStrings.levelOutOfFive(log.sleepQuality!),
-                            ),
-                          if (log.stressLevel != null)
-                            _summaryTile(
-                              AppStrings.stressLevel,
-                              AppStrings.levelOutOfFive(log.stressLevel!),
-                            ),
-                          if (log.energyLevel != null)
-                            _summaryTile(
-                              AppStrings.energyLevel,
-                              AppStrings.levelOutOfFive(log.energyLevel!),
-                            ),
-                          if (log.activities.isNotEmpty)
-                            _summaryTile(
-                              AppStrings.activity,
-                              log.activities
-                                  .map(AppStrings.localizeStoredValue)
-                                  .join(', '),
-                            ),
-                          if (log.nutritionTags.isNotEmpty)
-                            _summaryTile(
-                              AppStrings.nutrition,
-                              log.nutritionTags
-                                  .map(AppStrings.localizeStoredValue)
-                                  .join(', '),
-                            ),
-                          if (log.waterIntakeMl != null)
-                            _summaryTile(
-                              AppStrings.waterIntake,
-                              AppStrings.milliliters(log.waterIntakeMl!),
-                            ),
-                          if (log.caffeineServings != null)
-                            _summaryTile(
-                              AppStrings.caffeineIntake,
-                              AppStrings.servingCount(log.caffeineServings!),
-                            ),
-                          if (log.bowelActivity.isNotEmpty)
-                            _summaryTile(
-                              AppStrings.bowel,
-                              log.bowelActivity
-                                  .map(AppStrings.localizeStoredValue)
-                                  .join(', '),
-                            ),
-                          if (log.painLocations.isNotEmpty)
-                            _summaryTile(
-                              AppStrings.pain,
-                              log.painLocations
-                                  .map(AppStrings.localizeStoredValue)
-                                  .join(', '),
-                            ),
-                          if (log.flowIntensity != null)
-                            _summaryTile(
-                              AppStrings.flow,
-                              AppStrings.localizeStoredValue(
-                                log.flowIntensity!,
-                              ),
-                            ),
-                          if (log.periodPainLevel != null)
-                            _summaryTile(
-                              AppStrings.periodPain,
-                              '${log.periodPainLevel}/5',
-                            ),
-                          if (log.vaginalDischargePresent != null)
-                            _summaryTile(
-                              AppStrings.vaginalDischarge,
-                              DailyLogFormatters.vaginalDischarge(log),
-                            ),
-                          if (log.medications.any((m) => m.taken))
-                            _summaryTile(
-                              AppStrings.medications,
-                              log.medications
-                                  .where((m) => m.taken)
-                                  .map((m) => '${m.name} (${m.dosage})')
-                                  .join(', '),
-                            ),
-                          if (log.supplements.any((s) => s.taken))
-                            _summaryTile(
-                              AppStrings.supplements,
-                              log.supplements
-                                  .where((s) => s.taken)
-                                  .map((s) => '${s.name} (${s.dosage})')
-                                  .join(', '),
-                            ),
-                          if (log.sexualActivity != null)
-                            _summaryTile(
-                              AppStrings.sexualActivity,
-                              log.sexualActivity!
-                                  ? AppStrings.yes
-                                  : AppStrings.no,
-                            ),
-                          if (log.notes != null && log.notes!.isNotEmpty)
-                            _summaryTile(AppStrings.notes, log.notes!),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-      ],
-    );
-  }
-
-  Widget _summaryTile(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Günlük Kayıt Sheet ──────────────────────────────────
   void _showDailyLogSheet(
     BuildContext context,
     DashboardViewModel vm, {
@@ -783,12 +210,11 @@ class DashboardView extends StatelessWidget {
       builder: (context) => DailyLogSheet(
         initialLog: DailyLog.empty(
           vm.selectedDate.isToday ? AppTime.now : vm.selectedDate,
-        ), // Her seferinde yeni bir kayıt açılır (bugün ise güncel saatle)
+        ),
         settings: vm.settings!,
         initialTabIndex: initialIndex,
         isSingleTab: isSingleTab,
         onSave: (log) async {
-          // Adet verisi varsa döngü istatistiklerini yeniden hesapla
           final success = log.flowIntensity != null
               ? await vm.recordPeriodAndRecalculate(log)
               : await vm.saveLog(log);
@@ -798,6 +224,337 @@ class DashboardView extends StatelessWidget {
           return success;
         },
       ),
+    );
+  }
+}
+
+class _HomeHeader extends StatelessWidget {
+  final DashboardViewModel vm;
+  final Color accent;
+  final VoidCallback onCalendarTap;
+
+  const _HomeHeader({
+    required this.vm,
+    required this.accent,
+    required this.onCalendarTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+    final now = AppTime.now;
+    final greeting = switch (now.hour) {
+      < 12 => '${AppStrings.goodMorning},',
+      < 18 => '${AppStrings.goodAfternoon},',
+      _ => '${AppStrings.goodEvening},',
+    };
+    final storedName = vm.settings?.userName.trim() ?? '';
+    final name = storedName.isEmpty
+        ? AppStrings.greetingNameFallback
+        : storedName;
+    final month = DateFormat.MMMM(locale.toString()).format(vm.selectedDate);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                greeting,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontFamily: 'CormorantGaramond',
+                  fontSize: 34,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w500,
+                  height: 1.02,
+                  letterSpacing: -0.9,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 9),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                '${vm.selectedDate.day}',
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontFamily: 'CormorantGaramond',
+                  fontSize: 26,
+                  fontWeight: FontWeight.w600,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                month,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 19),
+        Semantics(
+          button: true,
+          label: AppStrings.calendar,
+          child: IconButton(
+            onPressed: onCalendarTap,
+            style: IconButton.styleFrom(
+              fixedSize: const Size(46, 46),
+              foregroundColor: accent,
+              backgroundColor: const Color(0xFFF4EDE5),
+              side: BorderSide(color: accent.withValues(alpha: 0.34)),
+            ),
+            icon: const Icon(Icons.calendar_month_outlined, size: 20),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  final String caption;
+
+  const _SectionTitle({required this.title, required this.caption});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: AppColors.textPrimary,
+              fontFamily: 'CormorantGaramond',
+              fontSize: 25,
+              fontWeight: FontWeight.w500,
+              letterSpacing: -0.4,
+            ),
+          ),
+        ),
+        Text(
+          caption,
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 10.5,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PersonalInsightsPreview extends StatelessWidget {
+  final DashboardViewModel vm;
+  final Color accent;
+  final VoidCallback onViewAll;
+
+  const _PersonalInsightsPreview({
+    required this.vm,
+    required this.accent,
+    required this.onViewAll,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      key: const ValueKey('dashboard_personal_insights'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppStrings.omaConnectsYourData,
+          style: TextStyle(
+            color: accent,
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.8,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Expanded(
+              child: Text(
+                AppStrings.myDailyInsights,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontFamily: 'CormorantGaramond',
+                  fontSize: 29,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0.7,
+                ),
+              ),
+            ),
+            TextButton(
+              key: const ValueKey('dashboard_view_all_insights'),
+              onPressed: onViewAll,
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.textSecondary,
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                visualDensity: VisualDensity.compact,
+              ),
+              child: Text(AppStrings.viewAllChevron),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 224,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            physics: const BouncingScrollPhysics(),
+            itemCount: vm.personalInsights.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (context, index) => SizedBox(
+              width: 300,
+              child: PersonalInsightCard(insight: vm.personalInsights[index]),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InsightPlaceholder extends StatelessWidget {
+  final Color accent;
+
+  const _InsightPlaceholder({required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: Color.lerp(accent, Colors.white, 0.86),
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.auto_awesome_outlined, color: accent),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Text(
+              AppStrings.insightLearning,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+                height: 1.45,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Journey extends StatelessWidget {
+  final Color accent;
+
+  const _Journey({required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    final labels = AppStrings.journeyLabels;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SizedBox(
+          height: 58,
+          child: Stack(
+            children: [
+              Positioned(
+                left: 13,
+                right: 13,
+                top: 13,
+                child: Container(height: 1, color: AppColors.outline),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (var index = 0; index < labels.length; index++)
+                    SizedBox(
+                      width: constraints.maxWidth / labels.length,
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 27,
+                            height: 27,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: index <= 2 ? accent : AppColors.outline,
+                              ),
+                            ),
+                            child: Text(
+                              '${index + 1}',
+                              style: TextStyle(
+                                color: index <= 2
+                                    ? accent
+                                    : AppColors.textSecondary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              labels[index],
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.65,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

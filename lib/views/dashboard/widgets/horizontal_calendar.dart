@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/color_constants.dart';
+
 import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/color_constants.dart';
+import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/period_calculator.dart';
-import '../../../core/utils/app_time.dart';
 
-/// Yatay kaydırılabilir günlük takvim şeridi.
-/// Sol başta küçük bir takvim ikonu, ardından yatay scroll ile günler gösterilir.
-/// Adet ve ovülasyon günleri renkli göstergelerle işaretlenir.
+/// The seven-day card used by the home design.
+///
+/// Weeks can still be swiped in both directions and every day remains
+/// selectable, so the visual adaptation does not remove the existing logging
+/// workflow.
 class HorizontalCalendar extends StatefulWidget {
   final DateTime selectedDate;
   final ValueChanged<DateTime> onDateSelected;
   final PeriodCalculator? periodCalculator;
-  final VoidCallback? onCalendarTap;
 
   const HorizontalCalendar({
     super.key,
     required this.selectedDate,
     required this.onDateSelected,
     this.periodCalculator,
-    this.onCalendarTap,
   });
 
   @override
@@ -27,191 +28,180 @@ class HorizontalCalendar extends StatefulWidget {
 }
 
 class _HorizontalCalendarState extends State<HorizontalCalendar> {
-  late final ScrollController _scrollController;
-  static const int _totalDays = 365; // ±6 ay
-  static const int _centerIndex = 182; // bugünün indeksi
+  static const _centerPage = 5200;
+  late final PageController _pageController;
+  late DateTime _anchorMonday;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToSelected();
-    });
-  }
-
-  void _scrollToSelected() {
-    final today = AppTime.now.dateOnly;
-    final diff = widget.selectedDate.dateOnly.difference(today).inDays;
-    final targetIndex = _centerIndex + diff;
-    // Her item ~64px genişlikte
-    const itemWidth = 56.0;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final offset =
-        (targetIndex * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        offset.clamp(0.0, _scrollController.position.maxScrollExtent),
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeOutCubic,
-      );
-    }
+    _anchorMonday = _mondayOf(widget.selectedDate);
+    _pageController = PageController(initialPage: _centerPage);
   }
 
   @override
-  void didUpdateWidget(HorizontalCalendar oldWidget) {
+  void didUpdateWidget(covariant HorizontalCalendar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!oldWidget.selectedDate.isSameDay(widget.selectedDate)) {
-      _scrollToSelected();
+    if (oldWidget.selectedDate.isSameDay(widget.selectedDate)) return;
+
+    final visibleMonday = _mondayForPage(
+      _pageController.hasClients
+          ? (_pageController.page?.round() ?? _centerPage)
+          : _centerPage,
+    );
+    final selectedMonday = _mondayOf(widget.selectedDate);
+    if (!visibleMonday.isSameDay(selectedMonday)) {
+      _anchorMonday = selectedMonday;
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(_centerPage);
+      }
     }
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
-  /// Belirli bir tarih için döngü durumunu döndürür.
-  _CycleStatus _getCycleStatus(DateTime date) {
-    final pc = widget.periodCalculator;
-    if (pc == null) return _CycleStatus.none;
+  DateTime _mondayOf(DateTime date) {
+    final normalized = date.dateOnly;
+    return normalized.subtract(Duration(days: normalized.weekday - 1));
+  }
 
-    if (pc.isInPeriod(date)) return _CycleStatus.period;
-    if (pc.isInEstimatedOvulationWindow(date)) {
-      return _CycleStatus.ovulation;
-    }
-    if (pc.isInFertileWindow(date)) return _CycleStatus.fertile;
-    return _CycleStatus.none;
+  DateTime _mondayForPage(int page) {
+    return _anchorMonday.add(Duration(days: (page - _centerPage) * 7));
   }
 
   @override
   Widget build(BuildContext context) {
-    final today = AppTime.now.dateOnly;
-
-    return SizedBox(
-      height: 52,
-      child: ListView.builder(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        itemCount: _totalDays,
-        itemBuilder: (context, index) {
-          final date = today.add(Duration(days: index - _centerIndex));
-          final isSelected = date.isSameDay(widget.selectedDate);
-          final isToday = date.isSameDay(today);
-          final cycleStatus = _getCycleStatus(date);
-
-          return RepaintBoundary(
-            child: GestureDetector(
-              onTap: () => widget.onDateSelected(date),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOutCubic,
-                width: 48,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primaryLight
-                      : isToday
-                      ? AppColors.surface
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(200),
-                  border: isSelected
-                      ? Border.all(color: AppColors.primary)
-                      : isToday
-                      ? Border.all(color: AppColors.outline)
-                      : null,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _shortWeekday(date.weekday),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${date.day}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: isSelected
-                            ? AppColors.primaryDark
-                            : isToday
-                            ? AppColors.primary
-                            : AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    // ── Döngü göstergesi (nokta) ──────
-                    _buildCycleIndicator(cycleStatus, isSelected),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  /// Döngü durumuna göre küçük renkli nokta göstergesi
-  Widget _buildCycleIndicator(_CycleStatus status, bool isSelected) {
-    if (status == _CycleStatus.none) {
-      return const SizedBox(height: 6);
-    }
-
-    Color dotColor;
-    double dotSize;
-
-    switch (status) {
-      case _CycleStatus.period:
-        dotColor = isSelected ? Colors.white : AppColors.periodPrimary;
-        dotSize = 6;
-        break;
-      case _CycleStatus.ovulation:
-        dotColor = isSelected ? Colors.white : AppColors.ovulation;
-        dotSize = 6;
-        break;
-      case _CycleStatus.fertile:
-        dotColor = isSelected
-            ? Colors.white.withValues(alpha: 0.7)
-            : AppColors.fertile;
-        dotSize = 5;
-        break;
-      case _CycleStatus.none:
-        return const SizedBox(height: 6);
-    }
-
     return Container(
-      width: dotSize,
-      height: dotSize,
+      height: 94,
       decoration: BoxDecoration(
-        color: dotColor,
-        shape: BoxShape.circle,
+        color: Colors.white.withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: dotColor.withValues(alpha: 0.4),
-            blurRadius: 3,
-            offset: const Offset(0, 1),
+            color: const Color(0xFF3C2C24).withValues(alpha: 0.07),
+            blurRadius: 26,
+            offset: const Offset(0, 9),
           ),
         ],
       ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: PageView.builder(
+          controller: _pageController,
+          physics: const BouncingScrollPhysics(),
+          itemBuilder: (context, page) {
+            final monday = _mondayForPage(page);
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+              child: Row(
+                children: [
+                  for (var index = 0; index < 7; index++)
+                    Expanded(
+                      child: _DayButton(
+                        date: monday.add(Duration(days: index)),
+                        selectedDate: widget.selectedDate,
+                        periodCalculator: widget.periodCalculator,
+                        onTap: widget.onDateSelected,
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
-  }
-
-  /// Kısa gün adı (seçili dil).
-  String _shortWeekday(int weekday) {
-    return AppStrings.shortWeekdays[weekday - 1];
   }
 }
 
-/// Döngü durumu enum
-enum _CycleStatus { none, period, ovulation, fertile }
+class _DayButton extends StatelessWidget {
+  final DateTime date;
+  final DateTime selectedDate;
+  final PeriodCalculator? periodCalculator;
+  final ValueChanged<DateTime> onTap;
+
+  const _DayButton({
+    required this.date,
+    required this.selectedDate,
+    required this.periodCalculator,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = date.isSameDay(selectedDate);
+    final today = date.isSameDay(AppTime.now);
+    final phase = periodCalculator?.phaseAt(date);
+    final phaseColor = _phaseColor(phase);
+    final isPredictedPeriod =
+        periodCalculator != null && periodCalculator!.isInPeriod(date);
+
+    return Semantics(
+      selected: selected,
+      button: true,
+      label: '${AppStrings.shortWeekdays[date.weekday - 1]} ${date.day}',
+      child: InkResponse(
+        onTap: () => onTap(date),
+        radius: 26,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              AppStrings.shortWeekdays[date.weekday - 1].toUpperCase(),
+              maxLines: 1,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.05,
+              ),
+            ),
+            const SizedBox(height: 7),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: selected ? phaseColor : Colors.transparent,
+                shape: BoxShape.circle,
+                border: today && !selected
+                    ? Border.all(
+                        color: phaseColor.withValues(alpha: 0.45),
+                        width: 1.2,
+                      )
+                    : null,
+              ),
+              child: Text(
+                '${date.day}',
+                style: TextStyle(
+                  color: selected
+                      ? Colors.white
+                      : isPredictedPeriod
+                      ? AppColors.periodPrimary
+                      : AppColors.textPrimary,
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _phaseColor(CyclePhase? phase) {
+    return switch (phase) {
+      CyclePhase.menstrual => AppColors.periodPrimary,
+      CyclePhase.follicular => AppColors.primary,
+      CyclePhase.ovulation => AppColors.ovulation,
+      CyclePhase.luteal => AppColors.lutealDark,
+      null => AppColors.primary,
+    };
+  }
+}

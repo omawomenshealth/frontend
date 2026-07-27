@@ -82,6 +82,19 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/oma-profile-characters.png
+
+  fonts:
+    - family: Karla
+      fonts:
+        - asset: assets/fonts/Karla-Variable.ttf
+        - asset: assets/fonts/Karla-Italic-Variable.ttf
+          style: italic
+    - family: CormorantGaramond
+      fonts:
+        - asset: assets/fonts/CormorantGaramond-Variable.ttf
+        - asset: assets/fonts/CormorantGaramond-Italic-Variable.ttf
+          style: italic
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

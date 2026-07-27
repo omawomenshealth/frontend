@@ -69,6 +69,102 @@ enum _TextKey {
   insightEvidenceEntries,
   insightEvidenceRecords,
   articles,
+  explore,
+  exploreSearchHint,
+  savedStories,
+  exploreSavedEmpty,
+  exploreSearchEmpty,
+  clearFilters,
+  viewAllUpper,
+  explorePhaseDays,
+  exploreMenstrualName,
+  exploreFollicularName,
+  exploreOvulationName,
+  exploreLutealName,
+  exploreMenstrualDescription,
+  exploreFollicularDescription,
+  exploreOvulationDescription,
+  exploreLutealDescription,
+  exploreMovement,
+  exploreRituals,
+  exploreNourish,
+  exploreReads,
+  exploreEnergy,
+  exploreSleep,
+  exploreIntimacy,
+  exploreFocus,
+  readTimeMinutes,
+  insightStoryHeader,
+  insightExplanationLabel,
+  previousInsight,
+  nextInsight,
+  insightStoryDone,
+  quickLogTitle,
+  quickLogCaption,
+  greetingNameFallback,
+  omaConnectsYourData,
+  myDailyInsights,
+  viewAllChevron,
+  insightLearning,
+  journeyTrack,
+  journeyConnect,
+  journeyUnderstand,
+  journeyAct,
+  journeyImprove,
+  omaTalkPrompt,
+  phaseMenstrualHeadline,
+  phaseMenstrualBody,
+  phaseMenstrualFertility,
+  phaseFollicularHeadline,
+  phaseFollicularBody,
+  phaseFollicularFertility,
+  phaseOvulationHeadline,
+  phaseOvulationBody,
+  phaseOvulationFertility,
+  phaseLutealHeadline,
+  phaseLutealBody,
+  phaseLutealFertility,
+  readBodyChanges,
+  periodDayCount,
+  daysToPeriodCount,
+  profileCurrentMode,
+  profileCycleTrack,
+  profileSymptomPatterns,
+  profileSupportTitle,
+  profileSupportDescription,
+  profilePremiumTitle,
+  gotIt,
+  completeCycleDetails,
+  cycleDayLabel,
+  profileCharactersSemantics,
+  profilePremiumDescription,
+  modeTrackCycle,
+  modeTrackCycleSubtitle,
+  modeGetPregnant,
+  modeGetPregnantSubtitle,
+  modePregnancy,
+  modePregnancySubtitle,
+  waitingForData,
+  editCycleSettings,
+  review,
+  newLabel,
+  variable,
+  patternsForming,
+  patternsFormingDescription,
+  medicationRoutine,
+  moodPattern,
+  energyPattern,
+  recurringPattern,
+  patternEvidence,
+  ageYears,
+  personalDetails,
+  completeProfile,
+  medicationsAndReminders,
+  noPlanAdded,
+  savedPlans,
+  privacyAndData,
+  helpAndSupport,
+  helpAndSupportSubtitle,
   profile,
   welcome,
   login,
@@ -563,6 +659,113 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightEvidenceEntries: 'İşaretleme girişi: {count}',
   _TextKey.insightEvidenceRecords: 'Kayıt: {count}',
   _TextKey.articles: 'Yazılar',
+  _TextKey.explore: 'Keşfet',
+  _TextKey.exploreSearchHint: 'Yazı ve ritüellerde ara...',
+  _TextKey.savedStories: 'Kaydedilenler',
+  _TextKey.exploreSavedEmpty: 'Henüz kaydedilmiş bir yazı yok.',
+  _TextKey.exploreSearchEmpty: 'Aramana uygun bir yazı bulunamadı.',
+  _TextKey.clearFilters: 'Filtreleri temizle',
+  _TextKey.viewAllUpper: 'TÜMÜNÜ GÖR',
+  _TextKey.explorePhaseDays: '{phase} günlerin',
+  _TextKey.exploreMenstrualName: 'menstrüel',
+  _TextKey.exploreFollicularName: 'foliküler',
+  _TextKey.exploreOvulationName: 'ovülasyon',
+  _TextKey.exploreLutealName: 'luteal',
+  _TextKey.exploreMenstrualDescription:
+      'Gebelik olasılığının çok düşük olduğu günler',
+  _TextKey.exploreFollicularDescription:
+      'Enerjinin ve merakının yükseldiği günler',
+  _TextKey.exploreOvulationDescription:
+      'Gebelik olasılığının yüksek olduğu günler',
+  _TextKey.exploreLutealDescription: 'Daha yumuşak bir ritme döndüğün günler',
+  _TextKey.exploreMovement: 'Hareket',
+  _TextKey.exploreRituals: 'Ritüeller',
+  _TextKey.exploreNourish: 'Beslen',
+  _TextKey.exploreReads: 'Okumalar',
+  _TextKey.exploreEnergy: 'Enerji',
+  _TextKey.exploreSleep: 'Uyku',
+  _TextKey.exploreIntimacy: 'Yakınlık',
+  _TextKey.exploreFocus: 'Odak',
+  _TextKey.readTimeMinutes: '{count} dk',
+  _TextKey.insightStoryHeader: 'OMA İÇGÖRÜSÜ · BUGÜN',
+  _TextKey.insightExplanationLabel: 'OMA’NIN AÇIKLAMASI',
+  _TextKey.previousInsight: 'Önceki içgörü',
+  _TextKey.nextInsight: 'Sonraki içgörü',
+  _TextKey.insightStoryDone: 'Bitti',
+  _TextKey.quickLogTitle: 'Hızlı kayıt',
+  _TextKey.quickLogCaption: 'Bugün ne değişti?',
+  _TextKey.greetingNameFallback: 'Sen',
+  _TextKey.omaConnectsYourData: 'OMA VERİLERİNİ BİRBİRİNE BAĞLAR',
+  _TextKey.myDailyInsights: 'Günlük İçgörülerim',
+  _TextKey.viewAllChevron: 'Tümünü gör ›',
+  _TextKey.insightLearning:
+      'OMA, kayıtlarından kişisel içgörüler oluşturmak için seni tanıyor.',
+  _TextKey.journeyTrack: 'KAYDET',
+  _TextKey.journeyConnect: 'BAĞLA',
+  _TextKey.journeyUnderstand: 'ANLA',
+  _TextKey.journeyAct: 'UYGULA',
+  _TextKey.journeyImprove: 'GELİŞTİR',
+  _TextKey.omaTalkPrompt:
+      'Bugünkü kayıtlarından konuşmak istediğin konuyu seç.',
+  _TextKey.phaseMenstrualHeadline: 'Dinlen ve\nserbest bırak',
+  _TextKey.phaseMenstrualBody:
+      'Bedenin arınıyor ve yeniden başlıyor. Yavaş sabahlar, sıcaklık ve nazik hareket bugün sana iyi gelebilir.',
+  _TextKey.phaseMenstrualFertility: 'Gebelik olasılığı çok düşük',
+  _TextKey.phaseFollicularHeadline: 'Yeni enerji,\ntaze fikirler',
+  _TextKey.phaseFollicularBody:
+      'Östrojen yükseliyor. Kendini meraklı, sosyal ve yeni başlangıçlara açık hissedebilirsin.',
+  _TextKey.phaseFollicularFertility: 'Düşük, yükselen gebelik olasılığı',
+  _TextKey.phaseOvulationHeadline: 'En canlı\nhissettiğin günler',
+  _TextKey.phaseOvulationBody:
+      'İletişim ve bağ kurmak daha doğal gelebilir. Özgüven ve sıcaklık bu günlerde sıkça yükselir.',
+  _TextKey.phaseOvulationFertility: 'Gebelik olasılığı yüksek',
+  _TextKey.phaseLutealHeadline: 'İçe dönüş\nzamanı',
+  _TextKey.phaseLutealBody:
+      'Progesteron yükselip sonra yumuşar. Konfor, sakin odak ve daha nazik planlar iyi gelebilir.',
+  _TextKey.phaseLutealFertility: 'Gebelik olasılığı düşük',
+  _TextKey.readBodyChanges: 'Bedeninde neler olduğunu oku',
+  _TextKey.periodDayCount: 'adet günü',
+  _TextKey.daysToPeriodCount: 'adete kalan gün',
+  _TextKey.profileCurrentMode: 'Şu anki modun',
+  _TextKey.profileCycleTrack: 'Döngü takibim',
+  _TextKey.profileSymptomPatterns: 'Semptom örüntülerin',
+  _TextKey.profileSupportTitle: 'OMA desteği',
+  _TextKey.profileSupportDescription:
+      'Profil, döngü ve ilaç ayarlarını bu sayfadaki ilgili satırlardan düzenleyebilirsin. Sağlık kayıtlarının özeti için Doktor Raporu bölümünü kullan.',
+  _TextKey.profilePremiumTitle: 'OMA Premium',
+  _TextKey.gotIt: 'Anladım',
+  _TextKey.completeCycleDetails: 'Döngü bilgilerini tamamla',
+  _TextKey.cycleDayLabel: 'Döngü günü',
+  _TextKey.profileCharactersSemantics: 'OMA profil karakterleri',
+  _TextKey.profilePremiumDescription: 'Döngüne özel tüm içgörüleri aç',
+  _TextKey.modeTrackCycle: 'Döngüyü takip et',
+  _TextKey.modeTrackCycleSubtitle: 'Döngü ve semptom takibi',
+  _TextKey.modeGetPregnant: 'Hamile kal',
+  _TextKey.modeGetPregnantSubtitle: 'Doğurganlık odağı',
+  _TextKey.modePregnancy: 'Hamilelik',
+  _TextKey.modePregnancySubtitle: 'Gebelik yolculuğu',
+  _TextKey.waitingForData: 'Veri bekleniyor',
+  _TextKey.editCycleSettings: 'Döngü ayarlarını düzenle',
+  _TextKey.review: 'Takip et',
+  _TextKey.newLabel: 'Yeni',
+  _TextKey.variable: 'Değişken',
+  _TextKey.patternsForming: 'Örüntülerin oluşuyor',
+  _TextKey.patternsFormingDescription:
+      'Günlük kayıtların arttıkça kişisel eğilimlerin burada görünür.',
+  _TextKey.medicationRoutine: 'İlaç düzeni',
+  _TextKey.moodPattern: 'Ruh hali eğilimi',
+  _TextKey.energyPattern: 'Enerji eğilimi',
+  _TextKey.recurringPattern: 'Tekrarlayan eğilim',
+  _TextKey.patternEvidence: '{count} kaydındaki gerçek verine dayanıyor',
+  _TextKey.ageYears: '{count} yaş',
+  _TextKey.personalDetails: 'Kişisel bilgiler',
+  _TextKey.completeProfile: 'Profilini tamamla',
+  _TextKey.medicationsAndReminders: 'İlaçlar ve hatırlatıcılar',
+  _TextKey.noPlanAdded: 'Henüz plan eklenmedi',
+  _TextKey.savedPlans: '{count} kayıtlı plan',
+  _TextKey.privacyAndData: 'Gizlilik ve veriler',
+  _TextKey.helpAndSupport: 'Yardım ve destek',
+  _TextKey.helpAndSupportSubtitle: 'OMA kullanımı hakkında yardım',
   _TextKey.profile: 'Profil',
   _TextKey.welcome: 'Hoş Geldiniz',
   _TextKey.login: 'Giriş Yap',
@@ -1084,6 +1287,110 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightEvidenceEntries: 'Check entries: {count}',
   _TextKey.insightEvidenceRecords: 'Records: {count}',
   _TextKey.articles: 'Articles',
+  _TextKey.explore: 'Explore',
+  _TextKey.exploreSearchHint: 'Search for stories, rituals...',
+  _TextKey.savedStories: 'Saved',
+  _TextKey.exploreSavedEmpty: 'You have not saved any stories yet.',
+  _TextKey.exploreSearchEmpty: 'No stories match your search.',
+  _TextKey.clearFilters: 'Clear filters',
+  _TextKey.viewAllUpper: 'VIEW ALL',
+  _TextKey.explorePhaseDays: 'Your {phase} days',
+  _TextKey.exploreMenstrualName: 'menstrual',
+  _TextKey.exploreFollicularName: 'follicular',
+  _TextKey.exploreOvulationName: 'ovulation',
+  _TextKey.exploreLutealName: 'luteal',
+  _TextKey.exploreMenstrualDescription: 'Very low chance of pregnancy',
+  _TextKey.exploreFollicularDescription: 'Low, rising chance of pregnancy',
+  _TextKey.exploreOvulationDescription: 'High chance of pregnancy',
+  _TextKey.exploreLutealDescription: 'Low chance of pregnancy',
+  _TextKey.exploreMovement: 'Movement',
+  _TextKey.exploreRituals: 'Rituals',
+  _TextKey.exploreNourish: 'Nourish',
+  _TextKey.exploreReads: 'Reads',
+  _TextKey.exploreEnergy: 'Energy',
+  _TextKey.exploreSleep: 'Sleep',
+  _TextKey.exploreIntimacy: 'Intimacy',
+  _TextKey.exploreFocus: 'Focus',
+  _TextKey.readTimeMinutes: '{count} mins',
+  _TextKey.insightStoryHeader: 'OMA INSIGHT · TODAY',
+  _TextKey.insightExplanationLabel: 'OMA’S EXPLANATION',
+  _TextKey.previousInsight: 'Previous insight',
+  _TextKey.nextInsight: 'Next insight',
+  _TextKey.insightStoryDone: 'Done',
+  _TextKey.quickLogTitle: 'Quick log',
+  _TextKey.quickLogCaption: 'What changed today?',
+  _TextKey.greetingNameFallback: 'You',
+  _TextKey.omaConnectsYourData: 'OMA CONNECTS YOUR DATA',
+  _TextKey.myDailyInsights: 'My Daily Insights',
+  _TextKey.viewAllChevron: 'View all ›',
+  _TextKey.insightLearning:
+      'OMA is learning from your logs to build personal insights.',
+  _TextKey.journeyTrack: 'TRACK',
+  _TextKey.journeyConnect: 'CONNECT',
+  _TextKey.journeyUnderstand: 'UNDERSTAND',
+  _TextKey.journeyAct: 'ACT',
+  _TextKey.journeyImprove: 'IMPROVE',
+  _TextKey.omaTalkPrompt:
+      'Choose what you would like to talk about from today’s logs.',
+  _TextKey.phaseMenstrualHeadline: 'Rest and\nlet go',
+  _TextKey.phaseMenstrualBody:
+      'Your body is shedding and beginning again. Slow mornings, warmth and gentle movement feel supportive today.',
+  _TextKey.phaseMenstrualFertility: 'Very low chance of pregnancy',
+  _TextKey.phaseFollicularHeadline: 'New energy,\nfresh ideas',
+  _TextKey.phaseFollicularBody:
+      'Estrogen is rising. You may feel curious, social and open to starting things. A good week to plan and move.',
+  _TextKey.phaseFollicularFertility: 'Low, rising chance of pregnancy',
+  _TextKey.phaseOvulationHeadline: 'Your most\nvibrant days',
+  _TextKey.phaseOvulationBody:
+      'Communication and connection feel more natural. Confidence and warmth often peak around now.',
+  _TextKey.phaseOvulationFertility: 'High chance of pregnancy',
+  _TextKey.phaseLutealHeadline: 'Turning\ninward',
+  _TextKey.phaseLutealBody:
+      'Progesterone rises, then softens. Comfort, quieter focus and gentler plans often feel right in these days.',
+  _TextKey.phaseLutealFertility: 'Low chance of pregnancy',
+  _TextKey.readBodyChanges: 'Read what your body is doing',
+  _TextKey.periodDayCount: 'days of period',
+  _TextKey.daysToPeriodCount: 'days to period',
+  _TextKey.profileCurrentMode: 'Your mode',
+  _TextKey.profileCycleTrack: 'My cycle track',
+  _TextKey.profileSymptomPatterns: 'Symptom patterns',
+  _TextKey.profileSupportTitle: 'OMA support',
+  _TextKey.profileSupportDescription:
+      'Edit profile, cycle and medication settings from the matching rows on this page. Use Doctor Report for a summary of your health records.',
+  _TextKey.profilePremiumTitle: 'OMA Premium',
+  _TextKey.gotIt: 'Got it',
+  _TextKey.completeCycleDetails: 'Complete your cycle details',
+  _TextKey.cycleDayLabel: 'Cycle day',
+  _TextKey.profileCharactersSemantics: 'OMA profile characters',
+  _TextKey.profilePremiumDescription: 'Unlock every insight for your cycle',
+  _TextKey.modeTrackCycle: 'Track cycle',
+  _TextKey.modeTrackCycleSubtitle: 'Cycle and symptom tracking',
+  _TextKey.modeGetPregnant: 'Get pregnant',
+  _TextKey.modeGetPregnantSubtitle: 'Fertility focus',
+  _TextKey.modePregnancy: 'Pregnancy',
+  _TextKey.modePregnancySubtitle: 'Pregnancy journey',
+  _TextKey.waitingForData: 'Waiting for data',
+  _TextKey.editCycleSettings: 'Edit cycle settings',
+  _TextKey.review: 'Review',
+  _TextKey.newLabel: 'New',
+  _TextKey.variable: 'Variable',
+  _TextKey.patternsForming: 'Your patterns are forming',
+  _TextKey.patternsFormingDescription:
+      'Your personal trends will appear as you add daily logs.',
+  _TextKey.medicationRoutine: 'Medication routine',
+  _TextKey.moodPattern: 'Mood pattern',
+  _TextKey.energyPattern: 'Energy pattern',
+  _TextKey.recurringPattern: 'Recurring pattern',
+  _TextKey.patternEvidence: 'Based on {count} of your real records',
+  _TextKey.ageYears: '{count} years',
+  _TextKey.personalDetails: 'Personal details',
+  _TextKey.completeProfile: 'Complete your profile',
+  _TextKey.medicationsAndReminders: 'Medication & reminders',
+  _TextKey.noPlanAdded: 'No plan added yet',
+  _TextKey.savedPlans: '{count} saved plans',
+  _TextKey.privacyAndData: 'Privacy & data',
+  _TextKey.helpAndSupport: 'Help & support',
+  _TextKey.helpAndSupportSubtitle: 'Help with using OMA',
   _TextKey.profile: 'Profile',
   _TextKey.welcome: 'Welcome',
   _TextKey.login: 'Sign In',
@@ -2249,6 +2556,144 @@ class AppStrings {
   static String insightEvidenceRecords(int count) =>
       _format(_TextKey.insightEvidenceRecords, {'count': count});
   static String get articles => _text(_TextKey.articles);
+  static String get explore => _text(_TextKey.explore);
+  static String get exploreSearchHint => _text(_TextKey.exploreSearchHint);
+  static String get savedStories => _text(_TextKey.savedStories);
+  static String get exploreSavedEmpty => _text(_TextKey.exploreSavedEmpty);
+  static String get exploreSearchEmpty => _text(_TextKey.exploreSearchEmpty);
+  static String get clearFilters => _text(_TextKey.clearFilters);
+  static String get viewAllUpper => _text(_TextKey.viewAllUpper);
+  static String explorePhaseDays(String phase) =>
+      _format(_TextKey.explorePhaseDays, {'phase': phase});
+  static String get exploreMenstrualName =>
+      _text(_TextKey.exploreMenstrualName);
+  static String get exploreFollicularName =>
+      _text(_TextKey.exploreFollicularName);
+  static String get exploreOvulationName =>
+      _text(_TextKey.exploreOvulationName);
+  static String get exploreLutealName => _text(_TextKey.exploreLutealName);
+  static String get exploreMenstrualDescription =>
+      _text(_TextKey.exploreMenstrualDescription);
+  static String get exploreFollicularDescription =>
+      _text(_TextKey.exploreFollicularDescription);
+  static String get exploreOvulationDescription =>
+      _text(_TextKey.exploreOvulationDescription);
+  static String get exploreLutealDescription =>
+      _text(_TextKey.exploreLutealDescription);
+  static String localizeExploreSection(String value) {
+    return switch (value.trim().toLowerCase()) {
+      'movement' => _text(_TextKey.exploreMovement),
+      'rituals' => _text(_TextKey.exploreRituals),
+      'nourish' => _text(_TextKey.exploreNourish),
+      'reads' => _text(_TextKey.exploreReads),
+      _ => localizeArticleTopic(value),
+    };
+  }
+
+  static String get exploreEnergy => _text(_TextKey.exploreEnergy);
+  static String get exploreSleep => _text(_TextKey.exploreSleep);
+  static String get exploreIntimacy => _text(_TextKey.exploreIntimacy);
+  static String get exploreFocus => _text(_TextKey.exploreFocus);
+  static String get exploreNourish => _text(_TextKey.exploreNourish);
+  static String readTimeMinutes(int count) =>
+      _format(_TextKey.readTimeMinutes, {'count': count});
+  static String get insightStoryHeader => _text(_TextKey.insightStoryHeader);
+  static String get insightExplanationLabel =>
+      _text(_TextKey.insightExplanationLabel);
+  static String get previousInsight => _text(_TextKey.previousInsight);
+  static String get nextInsight => _text(_TextKey.nextInsight);
+  static String get insightStoryDone => _text(_TextKey.insightStoryDone);
+  static String get quickLogTitle => _text(_TextKey.quickLogTitle);
+  static String get quickLogCaption => _text(_TextKey.quickLogCaption);
+  static String get greetingNameFallback =>
+      _text(_TextKey.greetingNameFallback);
+  static String get omaConnectsYourData => _text(_TextKey.omaConnectsYourData);
+  static String get myDailyInsights => _text(_TextKey.myDailyInsights);
+  static String get viewAllChevron => _text(_TextKey.viewAllChevron);
+  static String get insightLearning => _text(_TextKey.insightLearning);
+  static List<String> get journeyLabels => [
+    _text(_TextKey.journeyTrack),
+    _text(_TextKey.journeyConnect),
+    _text(_TextKey.journeyUnderstand),
+    _text(_TextKey.journeyAct),
+    _text(_TextKey.journeyImprove),
+  ];
+  static String get omaTalkPrompt => _text(_TextKey.omaTalkPrompt);
+  static String get phaseMenstrualHeadline =>
+      _text(_TextKey.phaseMenstrualHeadline);
+  static String get phaseMenstrualBody => _text(_TextKey.phaseMenstrualBody);
+  static String get phaseMenstrualFertility =>
+      _text(_TextKey.phaseMenstrualFertility);
+  static String get phaseFollicularHeadline =>
+      _text(_TextKey.phaseFollicularHeadline);
+  static String get phaseFollicularBody => _text(_TextKey.phaseFollicularBody);
+  static String get phaseFollicularFertility =>
+      _text(_TextKey.phaseFollicularFertility);
+  static String get phaseOvulationHeadline =>
+      _text(_TextKey.phaseOvulationHeadline);
+  static String get phaseOvulationBody => _text(_TextKey.phaseOvulationBody);
+  static String get phaseOvulationFertility =>
+      _text(_TextKey.phaseOvulationFertility);
+  static String get phaseLutealHeadline => _text(_TextKey.phaseLutealHeadline);
+  static String get phaseLutealBody => _text(_TextKey.phaseLutealBody);
+  static String get phaseLutealFertility =>
+      _text(_TextKey.phaseLutealFertility);
+  static String get readBodyChanges => _text(_TextKey.readBodyChanges);
+  static String get periodDayLabel => _text(_TextKey.periodDayCount);
+  static String get daysToPeriodLabel => _text(_TextKey.daysToPeriodCount);
+  static String get dayUnit => _text(_TextKey.day);
+  static String get profileCurrentMode => _text(_TextKey.profileCurrentMode);
+  static String get profileCycleTrack => _text(_TextKey.profileCycleTrack);
+  static String get profileSymptomPatterns =>
+      _text(_TextKey.profileSymptomPatterns);
+  static String get profileSupportTitle => _text(_TextKey.profileSupportTitle);
+  static String get profileSupportDescription =>
+      _text(_TextKey.profileSupportDescription);
+  static String get profilePremiumTitle => _text(_TextKey.profilePremiumTitle);
+  static String get gotIt => _text(_TextKey.gotIt);
+  static String get completeCycleDetails =>
+      _text(_TextKey.completeCycleDetails);
+  static String get cycleDayLabel => _text(_TextKey.cycleDayLabel);
+  static String get profileCharactersSemantics =>
+      _text(_TextKey.profileCharactersSemantics);
+  static String get profilePremiumDescription =>
+      _text(_TextKey.profilePremiumDescription);
+  static String get modeTrackCycle => _text(_TextKey.modeTrackCycle);
+  static String get modeTrackCycleSubtitle =>
+      _text(_TextKey.modeTrackCycleSubtitle);
+  static String get modeGetPregnant => _text(_TextKey.modeGetPregnant);
+  static String get modeGetPregnantSubtitle =>
+      _text(_TextKey.modeGetPregnantSubtitle);
+  static String get modePregnancy => _text(_TextKey.modePregnancy);
+  static String get modePregnancySubtitle =>
+      _text(_TextKey.modePregnancySubtitle);
+  static String get waitingForData => _text(_TextKey.waitingForData);
+  static String get editCycleSettings => _text(_TextKey.editCycleSettings);
+  static String get review => _text(_TextKey.review);
+  static String get newLabel => _text(_TextKey.newLabel);
+  static String get variable => _text(_TextKey.variable);
+  static String get patternsForming => _text(_TextKey.patternsForming);
+  static String get patternsFormingDescription =>
+      _text(_TextKey.patternsFormingDescription);
+  static String get medicationRoutine => _text(_TextKey.medicationRoutine);
+  static String get moodPattern => _text(_TextKey.moodPattern);
+  static String get energyPattern => _text(_TextKey.energyPattern);
+  static String get recurringPattern => _text(_TextKey.recurringPattern);
+  static String patternEvidence(int count) =>
+      _format(_TextKey.patternEvidence, {'count': count});
+  static String ageYears(int count) =>
+      _format(_TextKey.ageYears, {'count': count});
+  static String get personalDetails => _text(_TextKey.personalDetails);
+  static String get completeProfile => _text(_TextKey.completeProfile);
+  static String get medicationsAndReminders =>
+      _text(_TextKey.medicationsAndReminders);
+  static String get noPlanAdded => _text(_TextKey.noPlanAdded);
+  static String savedPlans(int count) =>
+      _format(_TextKey.savedPlans, {'count': count});
+  static String get privacyAndData => _text(_TextKey.privacyAndData);
+  static String get helpAndSupport => _text(_TextKey.helpAndSupport);
+  static String get helpAndSupportSubtitle =>
+      _text(_TextKey.helpAndSupportSubtitle);
   static String get profile => _text(_TextKey.profile);
   static String get welcome => _text(_TextKey.welcome);
   static String get login => _text(_TextKey.login);

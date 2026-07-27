@@ -6,16 +6,21 @@ import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/cycle_rules.dart';
+import '../../../core/utils/period_calculator.dart';
+import '../../../data/models/personal_insight_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
+import '../../articles/widgets/premium_paywall.dart';
 
 import 'doctor_report_view.dart';
 
+part 'profile_redesign.dart';
+
 /// Profil sayfası — kullanıcı bilgilerini görüntüleme ve düzenleme.
-class ProfileView extends StatelessWidget {
-  const ProfileView({super.key});
+class _ProfileMechanics extends StatelessWidget {
+  const _ProfileMechanics();
 
   @override
   Widget build(BuildContext context) {
@@ -1215,18 +1220,18 @@ class ProfileView extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: isLoggedIn
-            ? Colors.green.withValues(alpha: 0.05)
-            : Colors.amber.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isLoggedIn
-              ? Colors.green.withValues(alpha: 0.2)
-              : Colors.amber.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.outline),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF574C44).withValues(alpha: 0.055),
+            blurRadius: 22,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1235,17 +1240,20 @@ class ProfileView extends StatelessWidget {
             children: [
               Icon(
                 isLoggedIn ? Icons.cloud_done_rounded : Icons.cloud_off_rounded,
-                color: isLoggedIn ? Colors.green : Colors.amber[800],
+                color: isLoggedIn ? AppColors.success : AppColors.warning,
               ),
               const SizedBox(width: 8),
-              Text(
-                isLoggedIn
-                    ? AppStrings.cloudSyncActive
-                    : AppStrings.offlineCloudDisabled,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: isLoggedIn ? Colors.green[800] : Colors.amber[900],
+              Expanded(
+                child: Text(
+                  isLoggedIn
+                      ? AppStrings.cloudSyncActive
+                      : AppStrings.offlineCloudDisabled,
+                  style: const TextStyle(
+                    fontFamily: 'Karla',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
             ],
@@ -1654,15 +1662,19 @@ class _EditSheet extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                    Expanded(
+                      child: Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: 'CormorantGaramond',
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
-                    const Spacer(),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close),

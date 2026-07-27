@@ -27,11 +27,12 @@ class AppTheme {
       colorScheme: scheme,
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.scaffoldBackground,
-      fontFamily: 'Roboto',
+      fontFamily: 'Karla',
       splashFactory: InkSparkle.splashFactory,
       textTheme: const TextTheme(
         headlineLarge: TextStyle(
           color: AppColors.textPrimary,
+          fontFamily: 'CormorantGaramond',
           fontSize: 30,
           height: 1.12,
           fontWeight: FontWeight.w700,
@@ -39,6 +40,7 @@ class AppTheme {
         ),
         headlineMedium: TextStyle(
           color: AppColors.textPrimary,
+          fontFamily: 'CormorantGaramond',
           fontSize: 24,
           height: 1.2,
           fontWeight: FontWeight.w700,
@@ -46,6 +48,7 @@ class AppTheme {
         ),
         titleLarge: TextStyle(
           color: AppColors.textPrimary,
+          fontFamily: 'CormorantGaramond',
           fontSize: 20,
           height: 1.25,
           fontWeight: FontWeight.w700,
@@ -84,6 +87,7 @@ class AppTheme {
         centerTitle: false,
         titleTextStyle: TextStyle(
           color: AppColors.textPrimary,
+          fontFamily: 'CormorantGaramond',
           fontSize: 20,
           fontWeight: FontWeight.w700,
         ),

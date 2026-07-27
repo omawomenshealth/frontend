@@ -1,14 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/shared_widgets/oma_design_widgets.dart';
+import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/personal_insight_model.dart';
+import '../../dashboard/viewmodel/dashboard_view_model.dart';
 import '../viewmodel/insights_view_model.dart';
 
-class InsightsView extends StatelessWidget {
-  const InsightsView({super.key});
+part 'insights_story_view.dart';
+
+class InsightsListView extends StatelessWidget {
+  const InsightsListView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -231,6 +237,8 @@ class PersonalInsightCard extends StatelessWidget {
                 children: [
                   Text(
                     presentation.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -240,6 +248,8 @@ class PersonalInsightCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     presentation.body,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 13,
                       height: 1.45,
@@ -248,6 +258,7 @@ class PersonalInsightCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 9,
                       vertical: 5,
@@ -257,7 +268,6 @@ class PersonalInsightCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(9),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.fact_check_outlined,
@@ -265,12 +275,16 @@ class PersonalInsightCard extends StatelessWidget {
                           color: presentation.color,
                         ),
                         const SizedBox(width: 5),
-                        Text(
-                          presentation.evidence,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: presentation.color,
+                        Expanded(
+                          child: Text(
+                            presentation.evidence,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: presentation.color,
+                            ),
                           ),
                         ),
                       ],
