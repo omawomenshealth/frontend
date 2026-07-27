@@ -247,6 +247,20 @@ enum _TextKey {
   todaysSummary,
   dailyLog,
   addDailyLog,
+  logPeriodQuestion,
+  logPeriodHint,
+  logNutritionQuestion,
+  logNutritionHint,
+  logMedicationQuestion,
+  logMedicationHint,
+  logMoodQuestion,
+  logMoodHint,
+  logAnythingElse,
+  logHydration,
+  savePeriod,
+  saveNutrition,
+  saveMedication,
+  saveMoment,
   todaysStatus,
   noLogAdded,
   completed,
@@ -855,6 +869,23 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.todaysSummary: 'Bugünün Özeti',
   _TextKey.dailyLog: 'Günlük Kayıt',
   _TextKey.addDailyLog: 'Günlük Kayıt Ekle',
+  _TextKey.logPeriodQuestion: 'Bugün akışın nasıl?',
+  _TextKey.logPeriodHint:
+      'Yoğunluğu kaydetmen, OMA’nın sonraki döngünü daha doğru tahmin etmesine yardımcı olur.',
+  _TextKey.logNutritionQuestion: 'Bugün nasıl beslendin?',
+  _TextKey.logNutritionHint:
+      'Kısa bir kayıt yeterli; OMA zamanla beslenmeni enerji ve ruh halinle ilişkilendirir.',
+  _TextKey.logMedicationQuestion: 'Bugünkü rutinin nasıl?',
+  _TextKey.logMedicationHint:
+      'İlaç ve takviyelerini işaretle, dozlarını ve hatırlatmalarını tek yerde düzenle.',
+  _TextKey.logMoodQuestion: 'Şu anda nasıl hissediyorsun?',
+  _TextKey.logMoodHint: 'Fazla düşünmene gerek yok; şu ana en yakın olanı seç.',
+  _TextKey.logAnythingElse: 'Başka ne fark ediyorsun?',
+  _TextKey.logHydration: 'Hidrasyon',
+  _TextKey.savePeriod: 'Adet kaydını kaydet',
+  _TextKey.saveNutrition: 'Beslenmeyi kaydet',
+  _TextKey.saveMedication: 'Rutini kaydet',
+  _TextKey.saveMoment: 'Bu anı kaydet',
   _TextKey.todaysStatus: 'Bugünün Durumu',
   _TextKey.noLogAdded: 'Henüz kayıt eklenmedi',
   _TextKey.completed: 'tamamlandı',
@@ -1488,6 +1519,24 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.todaysSummary: 'Today’s Summary',
   _TextKey.dailyLog: 'Daily Log',
   _TextKey.addDailyLog: 'Add Daily Log',
+  _TextKey.logPeriodQuestion: 'How is your flow today?',
+  _TextKey.logPeriodHint:
+      'Logging the intensity helps OMA predict your next cycle more precisely.',
+  _TextKey.logNutritionQuestion: 'How did you nourish today?',
+  _TextKey.logNutritionHint:
+      'A quick note is enough; OMA connects nutrition to energy and mood over time.',
+  _TextKey.logMedicationQuestion: 'How is today’s routine?',
+  _TextKey.logMedicationHint:
+      'Check your medications and supplements, then manage doses and reminders in one place.',
+  _TextKey.logMoodQuestion: 'How do you feel right now?',
+  _TextKey.logMoodHint:
+      'No need to overthink it; choose what feels closest right now.',
+  _TextKey.logAnythingElse: 'Anything else you’re noticing?',
+  _TextKey.logHydration: 'Hydration',
+  _TextKey.savePeriod: 'Save period',
+  _TextKey.saveNutrition: 'Save nutrition',
+  _TextKey.saveMedication: 'Save routine',
+  _TextKey.saveMoment: 'Save this moment',
   _TextKey.todaysStatus: 'Today’s Status',
   _TextKey.noLogAdded: 'No log added yet',
   _TextKey.completed: 'completed',
@@ -2813,6 +2862,22 @@ class AppStrings {
   static String get todaysSummary => _text(_TextKey.todaysSummary);
   static String get dailyLog => _text(_TextKey.dailyLog);
   static String get addDailyLog => _text(_TextKey.addDailyLog);
+  static String get logPeriodQuestion => _text(_TextKey.logPeriodQuestion);
+  static String get logPeriodHint => _text(_TextKey.logPeriodHint);
+  static String get logNutritionQuestion =>
+      _text(_TextKey.logNutritionQuestion);
+  static String get logNutritionHint => _text(_TextKey.logNutritionHint);
+  static String get logMedicationQuestion =>
+      _text(_TextKey.logMedicationQuestion);
+  static String get logMedicationHint => _text(_TextKey.logMedicationHint);
+  static String get logMoodQuestion => _text(_TextKey.logMoodQuestion);
+  static String get logMoodHint => _text(_TextKey.logMoodHint);
+  static String get logAnythingElse => _text(_TextKey.logAnythingElse);
+  static String get logHydration => _text(_TextKey.logHydration);
+  static String get savePeriod => _text(_TextKey.savePeriod);
+  static String get saveNutrition => _text(_TextKey.saveNutrition);
+  static String get saveMedication => _text(_TextKey.saveMedication);
+  static String get saveMoment => _text(_TextKey.saveMoment);
   static String get todaysStatus => _text(_TextKey.todaysStatus);
   static String get noLogAdded => _text(_TextKey.noLogAdded);
   static String get completed => _text(_TextKey.completed);

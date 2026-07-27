@@ -226,7 +226,9 @@ class DailyLog {
     List<String>? bowelActivity,
     List<String>? painLocations,
     String? flowIntensity,
+    bool clearFlowIntensity = false,
     int? periodPainLevel,
+    bool clearPeriodPainLevel = false,
     bool? vaginalDischargePresent,
     bool clearVaginalDischargePresent = false,
     VaginalDischargeColor? vaginalDischargeColor,
@@ -266,8 +268,12 @@ class DailyLog {
       sexualActivity: sexualActivity ?? this.sexualActivity,
       bowelActivity: bowelActivity ?? this.bowelActivity,
       painLocations: painLocations ?? this.painLocations,
-      flowIntensity: flowIntensity ?? this.flowIntensity,
-      periodPainLevel: periodPainLevel ?? this.periodPainLevel,
+      flowIntensity: clearFlowIntensity
+          ? null
+          : flowIntensity ?? this.flowIntensity,
+      periodPainLevel: clearPeriodPainLevel
+          ? null
+          : periodPainLevel ?? this.periodPainLevel,
       vaginalDischargePresent: clearVaginalDischargePresent
           ? null
           : vaginalDischargePresent ?? this.vaginalDischargePresent,
