@@ -613,6 +613,7 @@ class PersonalAssociationEngine {
         nutrition.addAll(log.nutritionTags.map(_canonical));
         activities.addAll(log.activities.map(_canonical));
         symptoms.addAll(log.painLocations.map(_canonical));
+        symptoms.addAll(log.symptoms.map(_canonical));
         bowel.addAll(log.bowelActivity.map(_canonical));
         if (log.mood != null) mood = _canonical(log.mood!);
         sleepDurationMinutes = log.sleepDurationMinutes ?? sleepDurationMinutes;
@@ -627,6 +628,9 @@ class PersonalAssociationEngine {
             nutritionObserved ||
             log.observedSections.contains(DailyLogObservedSection.nutrition) ||
             log.nutritionTags.isNotEmpty ||
+            log.mealTypes.isNotEmpty ||
+            log.nutritionQuality != null ||
+            log.cravings.isNotEmpty ||
             log.bowelActivity.isNotEmpty ||
             log.waterIntakeMl != null ||
             log.caffeineServings != null ||
@@ -641,6 +645,7 @@ class PersonalAssociationEngine {
             log.energyLevel != null ||
             log.activities.isNotEmpty ||
             log.painLocations.isNotEmpty ||
+            log.symptoms.isNotEmpty ||
             log.sexualActivity != null ||
             (log.notes?.isNotEmpty ?? false);
       }

@@ -771,6 +771,7 @@ Future<void> _showDailyLogEditor(
       initialLog: DailyLog.empty(date),
       settings: settings,
       initialTabIndex: 0,
+      isSingleTab: true,
       onSave: (log) async {
         final success = log.flowIntensity != null
             ? await dashboardVm.recordPeriodAndRecalculate(log)
@@ -984,6 +985,18 @@ class _DailyLogDetails extends StatelessWidget {
                 .trim(),
     );
     add(
+      AppStrings.moodWhoWith,
+      value.moodCompanions.isEmpty
+          ? null
+          : value.moodCompanions.map(AppStrings.localizeStoredValue).join(', '),
+    );
+    add(
+      AppStrings.moodWhere,
+      value.moodPlaces.isEmpty
+          ? null
+          : value.moodPlaces.map(AppStrings.localizeStoredValue).join(', '),
+    );
+    add(
       AppStrings.sleepDuration,
       value.sleepDurationMinutes == null
           ? null
@@ -1018,6 +1031,24 @@ class _DailyLogDetails extends StatelessWidget {
       value.nutritionTags.isEmpty
           ? null
           : value.nutritionTags.map(AppStrings.localizeStoredValue).join(', '),
+    );
+    add(
+      AppStrings.mealsToday,
+      value.mealTypes.isEmpty
+          ? null
+          : value.mealTypes.map(AppStrings.localizeStoredValue).join(', '),
+    );
+    add(
+      AppStrings.mealsFeel,
+      value.nutritionQuality == null
+          ? null
+          : AppStrings.localizeStoredValue(value.nutritionQuality!),
+    );
+    add(
+      AppStrings.cravingsQuestion,
+      value.cravings.isEmpty
+          ? null
+          : value.cravings.map(AppStrings.localizeStoredValue).join(', '),
     );
     add(
       AppStrings.waterIntake,
@@ -1066,10 +1097,30 @@ class _DailyLogDetails extends StatelessWidget {
           : value.painLocations.map(AppStrings.localizeStoredValue).join(', '),
     );
     add(
+      AppStrings.symptom,
+      value.symptoms.isEmpty
+          ? null
+          : value.symptoms.map(AppStrings.localizeStoredValue).join(', '),
+    );
+    add(
+      AppStrings.symptomStrength,
+      value.symptomSeverity == null
+          ? null
+          : AppStrings.symptomSeverityOptions[value.symptomSeverity! - 1],
+    );
+    add(
       AppStrings.flow,
       value.flowIntensity == null
           ? null
           : AppStrings.localizeStoredValue(value.flowIntensity!),
+    );
+    add(
+      AppStrings.periodStartedToday,
+      value.periodStartedToday == null
+          ? null
+          : value.periodStartedToday!
+          ? AppStrings.yes
+          : AppStrings.no,
     );
     add(
       AppStrings.vaginalDischarge,

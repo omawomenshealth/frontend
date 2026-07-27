@@ -218,7 +218,14 @@ class DashboardViewModel extends ChangeNotifier {
     // Tüm günün loglarını birleştirerek doluluk kontrolü
     bool hasMood = _todayLogs.any((l) => l.mood != null);
     bool hasActivity = _todayLogs.any((l) => l.activities.isNotEmpty);
-    bool hasNutrition = _todayLogs.any((l) => l.nutritionTags.isNotEmpty);
+    bool hasNutrition = _todayLogs.any(
+      (l) =>
+          l.nutritionTags.isNotEmpty ||
+          l.mealTypes.isNotEmpty ||
+          l.nutritionQuality != null ||
+          l.cravings.isNotEmpty ||
+          l.waterIntakeMl != null,
+    );
     bool hasBowel = _todayLogs.any((l) => l.bowelActivity.isNotEmpty);
 
     int filled = 0;

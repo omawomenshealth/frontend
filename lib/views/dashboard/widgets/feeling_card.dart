@@ -7,7 +7,7 @@ import '../../../core/constants/color_constants.dart';
 class FeelingCard extends StatelessWidget {
   final VoidCallback onPeriodTap;
   final VoidCallback onNutritionTap;
-  final VoidCallback onMedicationTap;
+  final VoidCallback onSymptomTap;
   final VoidCallback onMoodTap;
   final bool showPeriod;
 
@@ -15,7 +15,7 @@ class FeelingCard extends StatelessWidget {
     super.key,
     required this.onPeriodTap,
     required this.onNutritionTap,
-    required this.onMedicationTap,
+    required this.onSymptomTap,
     required this.onMoodTap,
     this.showPeriod = true,
   });
@@ -32,18 +32,11 @@ class FeelingCard extends StatelessWidget {
           onTap: onPeriodTap,
         ),
       _QuickAction(
-        label: AppStrings.nutrition,
-        icon: Icons.bolt_outlined,
-        foreground: AppColors.primaryDark,
-        background: const Color(0xFFE6EEE0),
-        onTap: onNutritionTap,
-      ),
-      _QuickAction(
-        label: AppStrings.medications,
+        label: AppStrings.symptom,
         icon: Icons.add_rounded,
         foreground: AppColors.periodFlow,
         background: const Color(0xFFF4E4DE),
-        onTap: onMedicationTap,
+        onTap: onSymptomTap,
       ),
       _QuickAction(
         label: AppStrings.mood,
@@ -51,6 +44,13 @@ class FeelingCard extends StatelessWidget {
         foreground: AppColors.secondaryDark,
         background: AppColors.secondaryLight,
         onTap: onMoodTap,
+      ),
+      _QuickAction(
+        label: AppStrings.nutrition,
+        icon: Icons.bolt_outlined,
+        foreground: AppColors.primaryDark,
+        background: const Color(0xFFE6EEE0),
+        onTap: onNutritionTap,
       ),
     ];
 

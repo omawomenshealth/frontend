@@ -114,19 +114,19 @@ class DashboardView extends StatelessWidget {
                       onNutritionTap: () => _showDailyLogSheet(
                         context,
                         vm,
-                        initialIndex: vm.hasPeriodTracking ? 1 : 0,
+                        initialIndex: 1,
                         isSingleTab: true,
                       ),
-                      onMedicationTap: () => _showDailyLogSheet(
+                      onSymptomTap: () => _showDailyLogSheet(
                         context,
                         vm,
-                        initialIndex: vm.hasPeriodTracking ? 2 : 1,
+                        initialIndex: 2,
                         isSingleTab: true,
                       ),
                       onMoodTap: () => _showDailyLogSheet(
                         context,
                         vm,
-                        initialIndex: vm.hasPeriodTracking ? 3 : 2,
+                        initialIndex: 3,
                         isSingleTab: true,
                       ),
                     ),

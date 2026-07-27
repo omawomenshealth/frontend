@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
-import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/user_settings_model.dart';
-import '../../../data/services/local_storage_service.dart';
-import 'medication_reminder_section.dart';
 
 class DailyLogSheet extends StatefulWidget {
   final DailyLog initialLog;
@@ -33,1982 +29,1095 @@ class DailyLogSheet extends StatefulWidget {
 
 class _DailyLogSheetState extends State<DailyLogSheet> {
   late DailyLog _log;
-  late int _selectedTabIndex;
-  late Set<DailyLogObservedSection> _visitedSections;
+  late int _logType;
+  var _isSaving = false;
 
-  final _notesController = TextEditingController();
-  final _moodNoteController = TextEditingController();
-  final _nutritionNotesController = TextEditingController();
-  final _customMedController = TextEditingController();
-  final _customSupController = TextEditingController();
+  late int _flowIndex;
+  late bool _periodStartedToday;
+  late Set<String> _periodSymptoms;
 
-  List<String> _previouslyAddedMeds = [];
-  List<String> _previouslyAddedSups = [];
-  bool _isSaving = false;
+  late int _waterGlasses;
+  late Set<String> _meals;
+  late int _nutritionQualityIndex;
+  late Set<String> _cravings;
+
+  final _symptomSearchController = TextEditingController();
+  late Set<String> _symptoms;
+  late int _symptomSeverityIndex;
+
+  late int _moodIndex;
+  var _moodStep = 1;
+  late Set<String> _moodCompanions;
+  late Set<String> _moodPlaces;
 
   @override
   void initState() {
     super.initState();
     _log = widget.initialLog;
-    _selectedTabIndex = widget.initialTabIndex.clamp(0, 3);
-    _visitedSections = {
-      ..._log.observedSections,
-      _observedSectionForIndex(_selectedTabIndex),
-    };
-    _notesController.text = _log.notes ?? '';
-    _moodNoteController.text = _log.moodNote ?? '';
-    _nutritionNotesController.text = _log.nutritionNotes ?? '';
-    _loadPreviouslyAddedItems();
+    _logType = widget.initialTabIndex.clamp(0, 3);
+
+    _flowIndex = _localizedIndex(
+      AppStrings.flowOptions,
+      _log.flowIntensity,
+      fallback: 2,
+    );
+    _periodStartedToday = _log.periodStartedToday ?? true;
+    _periodSymptoms = _localizedSet(
+      _log.symptoms,
+      AppStrings.periodSymptomOptions,
+    );
+
+    _waterGlasses = _log.waterIntakeMl == null
+        ? 4
+        : (_log.waterIntakeMl! / 250).round().clamp(0, 12);
+    _meals = _localizedSet(_log.mealTypes, AppStrings.nutritionMealOptions);
+    if (_meals.isEmpty) {
+      _meals = {
+        AppStrings.nutritionMealOptions[0],
+        AppStrings.nutritionMealOptions[1],
+      };
+    }
+    _nutritionQualityIndex = _localizedIndex(
+      AppStrings.nutritionQualityOptions,
+      _log.nutritionQuality,
+      fallback: 1,
+    );
+    _cravings = _localizedSet(
+      _log.cravings,
+      AppStrings.nutritionCravingOptions,
+    );
+
+    _symptoms = _localizedSet(_log.symptoms, _allSymptomOptions);
+    _symptomSeverityIndex = (_log.symptomSeverity ?? 2) - 1;
+
+    _moodIndex = _localizedIndex(
+      AppStrings.moodCheckInOptions,
+      _log.mood,
+      fallback: 1,
+    );
+    _moodCompanions = _localizedSet(
+      _log.moodCompanions,
+      AppStrings.moodCompanionOptions,
+    );
+    _moodPlaces = _localizedSet(_log.moodPlaces, AppStrings.moodPlaceOptions);
   }
 
   @override
   void dispose() {
-    _notesController.dispose();
-    _moodNoteController.dispose();
-    _nutritionNotesController.dispose();
-    _customMedController.dispose();
-    _customSupController.dispose();
+    _symptomSearchController.dispose();
     super.dispose();
   }
 
-  List<_LogTabItem> get _tabs => [
-    _LogTabItem(
-      label: AppStrings.period,
-      icon: Icons.water_drop_outlined,
-      color: AppColors.periodPrimary,
-    ),
-    _LogTabItem(
-      label: AppStrings.nutrition,
-      icon: Icons.local_dining_outlined,
-      color: AppColors.primary,
-    ),
-    _LogTabItem(
-      label: AppStrings.medications,
-      icon: Icons.medication_outlined,
-      color: AppColors.medicationPrimary,
-    ),
-    _LogTabItem(
-      label: AppStrings.mood,
-      icon: Icons.sentiment_satisfied_alt_outlined,
-      color: AppColors.secondary,
-    ),
+  List<String> get _allSymptomOptions => [
+    ...AppStrings.symptomOverallOptions,
+    ...AppStrings.symptomBodyOptions,
+    ...AppStrings.symptomSkinHairOptions,
+    ...AppStrings.symptomEnergyOptions,
+    ...AppStrings.symptomSleepOptions,
+    ...AppStrings.symptomDigestionOptions,
   ];
 
-  Color get _activeColor => _tabs[_selectedTabIndex].color;
+  int _localizedIndex(
+    List<String> options,
+    String? value, {
+    required int fallback,
+  }) {
+    if (value == null) return fallback;
+    final localized = AppStrings.localizeStoredValue(value);
+    final index = options.indexOf(localized);
+    return index < 0 ? fallback : index;
+  }
 
-  String get _pageTitle => switch (_selectedTabIndex) {
-    0 => AppStrings.logPeriodQuestion,
-    1 => AppStrings.logNutritionQuestion,
-    2 => AppStrings.logMedicationQuestion,
-    _ => AppStrings.logMoodQuestion,
-  };
-
-  String get _pageSubtitle => switch (_selectedTabIndex) {
-    0 => AppStrings.logPeriodHint,
-    1 => AppStrings.logNutritionHint,
-    2 => AppStrings.logMedicationHint,
-    _ => AppStrings.logMoodHint,
-  };
-
-  String get _saveLabel => switch (_selectedTabIndex) {
-    0 => AppStrings.savePeriod,
-    1 => AppStrings.saveNutrition,
-    2 => AppStrings.saveMedication,
-    _ => AppStrings.saveMoment,
-  };
-
-  DailyLogObservedSection get _activeObservedSection =>
-      _observedSectionForIndex(_selectedTabIndex);
-
-  DailyLogObservedSection _observedSectionForIndex(int index) {
-    return switch (index) {
-      0 => DailyLogObservedSection.period,
-      1 => DailyLogObservedSection.nutrition,
-      2 => DailyLogObservedSection.medication,
-      _ => DailyLogObservedSection.wellbeing,
-    };
+  Set<String> _localizedSet(List<String> values, List<String> options) {
+    final result = <String>{};
+    for (final value in values) {
+      final localized = AppStrings.localizeStoredValue(value);
+      if (options.contains(localized)) result.add(localized);
+    }
+    return result;
   }
 
   int get _cycleDay {
     final lastPeriod = widget.settings.lastPeriodDate;
-    if (lastPeriod == null) return 0;
     final length = widget.settings.averageCycleLength;
-    if (length <= 0) return 0;
+    if (lastPeriod == null || length <= 0) return 0;
     final difference = _log.date.dateOnly
         .difference(lastPeriod.dateOnly)
         .inDays;
     return ((difference % length) + length) % length + 1;
   }
 
-  void _loadPreviouslyAddedItems() {
-    try {
-      final storage = Provider.of<LocalStorageService>(context, listen: false);
-      final medications = AppStrings.defaultMedications.toSet()
-        ..addAll(storage.getCustomMedications())
-        ..removeAll(widget.settings.dailyMedications);
-      final supplements = AppStrings.defaultSupplements.toSet()
-        ..addAll(storage.getCustomSupplements())
-        ..removeAll(widget.settings.dailySupplements);
+  Color get _tone => switch (_logType) {
+    0 => AppColors.periodPrimary,
+    1 => AppColors.secondary,
+    2 => AppColors.secondary,
+    _ => AppColors.primary,
+  };
 
-      _previouslyAddedMeds = medications.toList();
-      _previouslyAddedSups = supplements.toList();
-    } catch (_) {}
+  bool get _isMoodContext => _logType == 3 && _moodStep == 2;
+
+  String get _actionLabel {
+    if (_logType == 3 && _moodStep == 1) return AppStrings.continueAction;
+    return switch (_logType) {
+      0 => AppStrings.savePeriod,
+      1 => AppStrings.saveNutrition,
+      2 => AppStrings.save,
+      _ => AppStrings.saveMoment,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
-
     return DraggableScrollableSheet(
-      initialChildSize: 0.96,
-      minChildSize: 0.62,
+      initialChildSize: 0.98,
+      minChildSize: 0.72,
       maxChildSize: 0.98,
       builder: (context, scrollController) {
-        return AnimatedPadding(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOut,
-          padding: EdgeInsets.only(bottom: keyboardInset),
-          child: Container(
-            decoration: const BoxDecoration(
-              color: AppColors.scaffoldBackground,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              children: [
-                const _SheetHandle(),
-                _buildHeader(),
-                if (!widget.isSingleTab) _buildTabBar(),
-                Expanded(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 220),
-                    child: ListView(
-                      key: ValueKey(_selectedTabIndex),
-                      controller: scrollController,
-                      padding: const EdgeInsets.fromLTRB(24, 18, 24, 28),
-                      children: [_buildActiveContent()],
-                    ),
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.scaffoldBackground,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              const _SheetHandle(),
+              _buildTopBar(),
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  child: ListView(
+                    key: ValueKey('$_logType-$_moodStep'),
+                    controller: scrollController,
+                    padding: const EdgeInsets.fromLTRB(18, 4, 18, 24),
+                    children: [_buildContent()],
                   ),
                 ),
-                _buildSaveArea(),
-              ],
-            ),
+              ),
+              _buildBottomAction(),
+            ],
           ),
         );
       },
     );
   }
 
-  Widget _buildHeader() {
-    final cycleMeta = _cycleDay > 0
+  Widget _buildTopBar() {
+    final meta = _cycleDay > 0
         ? '${AppStrings.today.toUpperCase()} · '
               '${AppStrings.cycleDayLabel.toUpperCase()} $_cycleDay'
         : AppStrings.today.toUpperCase();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 16, 16),
-      child: Column(
+      padding: const EdgeInsets.fromLTRB(14, 5, 14, 8),
+      child: Row(
         children: [
-          Row(
-            children: [
-              const SizedBox(width: 42),
-              Expanded(
-                child: Text(
-                  cycleMeta,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.4,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.outline),
-                ),
-                child: IconButton(
-                  tooltip: AppStrings.close,
-                  padding: EdgeInsets.zero,
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close_rounded, size: 19),
-                ),
-              ),
-            ],
+          SizedBox(
+            width: 40,
+            height: 40,
+            child: _isMoodContext
+                ? IconButton(
+                    tooltip: AppStrings.back,
+                    onPressed: () => setState(() => _moodStep = 1),
+                    icon: const Icon(Icons.chevron_left_rounded, size: 24),
+                  )
+                : null,
           ),
-          const SizedBox(height: 10),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
+          Expanded(
             child: Text(
-              _pageTitle,
-              key: ValueKey(_pageTitle),
+              meta,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontFamily: 'CormorantGaramond',
-                fontSize: 35,
-                height: 1.02,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
-          const SizedBox(height: 9),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
-            child: Text(
-              _pageSubtitle,
-              key: ValueKey(_pageSubtitle),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 13,
-                height: 1.45,
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
                 color: AppColors.textSecondary,
               ),
             ),
           ),
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.outline),
+            ),
+            child: IconButton(
+              tooltip: AppStrings.close,
+              padding: EdgeInsets.zero,
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.close_rounded, size: 18),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTabBar() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-      child: Row(
-        children: _tabs.asMap().entries.map((entry) {
-          final index = entry.key;
-          final tab = entry.value;
-          final selected = index == _selectedTabIndex;
-
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Material(
-              color: selected ? tab.color : AppColors.surface,
-              borderRadius: BorderRadius.circular(28),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(28),
-                onTap: () {
-                  setState(() {
-                    _selectedTabIndex = index;
-                    _visitedSections.add(_observedSectionForIndex(index));
-                  });
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 9,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(
-                      color: selected ? tab.color : AppColors.outline,
-                    ),
-                    boxShadow: selected
-                        ? [
-                            BoxShadow(
-                              color: tab.color.withValues(alpha: 0.2),
-                              blurRadius: 12,
-                              offset: const Offset(0, 5),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        tab.icon,
-                        size: 17,
-                        color: selected ? Colors.white : tab.color,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        tab.label,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: selected
-                              ? Colors.white
-                              : AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildActiveContent() {
-    return switch (_selectedTabIndex) {
-      0 => _buildPeriodContent(),
-      1 => _buildNutritionContent(),
-      2 => _buildMedicationContent(),
-      _ => _buildWellbeingContent(),
+  Widget _buildContent() {
+    return switch (_logType) {
+      0 => _buildPeriodPage(),
+      1 => _buildNutritionPage(),
+      2 => _buildSymptomPage(),
+      _ => _moodStep == 1 ? _buildMoodPage() : _buildMoodContextPage(),
     };
   }
 
-  Widget _buildPeriodContent() {
+  Widget _buildIntro({
+    required String title,
+    required String subtitle,
+    bool centered = false,
+  }) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: centered
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
-        _buildFlowHero(),
-        const SizedBox(height: 24),
-        _buildSection(
-          title: AppStrings.periodBleeding,
-          child: _StepSelector(
-            labels: AppStrings.flowOptions,
-            selectedIndex: _flowIndex,
-            color: AppColors.periodPrimary,
-            onChanged: (index) => setState(() {
-              _log = _log.copyWith(
-                flowIntensity: AppStrings.flowOptions[index],
-              );
-            }),
+        Text(
+          title,
+          textAlign: centered ? TextAlign.center : TextAlign.left,
+          style: const TextStyle(
+            fontFamily: 'CormorantGaramond',
+            fontSize: 29,
+            height: 1.04,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
           ),
         ),
-        _buildSection(
-          title: AppStrings.periodPain,
-          child: _buildOptionalSliderMetric(
-            icon: Icons.bolt_outlined,
-            title: AppStrings.periodPain,
-            value: _log.periodPainLevel,
-            minimum: 0,
-            maximum: 5,
-            step: 1,
-            initialValue: 2,
-            color: AppColors.periodPrimary,
-            valueText: AppStrings.levelOutOfFive,
-            onChanged: (value) => setState(() {
-              _log = value == null
-                  ? _log.copyWith(clearPeriodPainLevel: true)
-                  : _log.copyWith(periodPainLevel: value);
-            }),
+        const SizedBox(height: 10),
+        Text(
+          subtitle,
+          textAlign: centered ? TextAlign.center : TextAlign.left,
+          style: const TextStyle(
+            fontSize: 12,
+            height: 1.45,
+            color: AppColors.textSecondary,
           ),
-        ),
-        _buildSection(
-          title: AppStrings.logAnythingElse,
-          child: _buildChipSelector(
-            options: AppStrings.painLocations,
-            selected: _log.painLocations,
-            onChanged: (values) =>
-                setState(() => _log = _log.copyWith(painLocations: values)),
-            color: AppColors.periodPrimary,
-          ),
-        ),
-        _buildSection(
-          title: AppStrings.vaginalDischarge,
-          subtitle: AppStrings.dischargeTrackingHint,
-          child: _buildVaginalDischargeInput(),
         ),
       ],
     );
   }
 
-  int get _flowIndex {
-    final selected = AppStrings.localizeStoredValue(_log.flowIntensity ?? '');
-    return AppStrings.flowOptions.indexOf(selected);
-  }
-
-  Widget _buildFlowHero() {
-    final index = _flowIndex;
-    final selected = index >= 0;
-    final tones = [
+  Widget _buildPeriodPage() {
+    final flowTones = [
       const Color(0xFFE8BAC0),
       const Color(0xFFD9959E),
-      AppColors.periodPrimary,
+      const Color(0xFFD97179),
       const Color(0xFF9E3F4D),
     ];
-    final tone = selected ? tones[index] : AppColors.outline;
-    final label = selected ? AppStrings.flowOptions[index] : AppStrings.noData;
+    final tone = flowTones[_flowIndex];
 
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(
-            width: 220,
-            height: 220,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 210,
-                  height: 210,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: tone.withValues(alpha: 0.32)),
-                  ),
+    return Column(
+      children: [
+        _buildIntro(
+          title: AppStrings.logPeriodQuestion,
+          subtitle: AppStrings.logPeriodHint,
+          centered: true,
+        ),
+        const SizedBox(height: 22),
+        SizedBox(
+          width: 196,
+          height: 196,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 192,
+                height: 192,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: tone.withValues(alpha: 0.28)),
                 ),
-                Container(
-                  width: 184,
-                  height: 184,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: tone.withValues(alpha: 0.48)),
-                  ),
+              ),
+              Container(
+                width: 172,
+                height: 172,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: tone.withValues(alpha: 0.45)),
                 ),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? tone
-                        : AppColors.surface.withValues(alpha: 0.75),
-                    shape: BoxShape.circle,
-                    border: selected
-                        ? null
-                        : Border.all(color: AppColors.outline),
-                    boxShadow: selected
-                        ? [
-                            BoxShadow(
-                              color: tone.withValues(alpha: 0.22),
-                              blurRadius: 24,
-                              offset: const Offset(0, 9),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(
-                        selected ? index + 1 : 1,
-                        (_) => Icon(
-                          Icons.water_drop_rounded,
-                          size: 29,
-                          color: selected ? Colors.white : AppColors.textHint,
-                        ),
-                      ),
+              ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 144,
+                height: 144,
+                decoration: BoxDecoration(color: tone, shape: BoxShape.circle),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _flowIndex + 1,
+                    (_) => const Icon(
+                      Icons.water_drop_rounded,
+                      color: Colors.white,
+                      size: 25,
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'CormorantGaramond',
-              fontSize: 30,
-              fontWeight: FontWeight.w700,
-              color: selected ? AppColors.insightRose : AppColors.textSecondary,
-            ),
-          ),
-          if (selected)
-            TextButton(
-              onPressed: () => setState(
-                () => _log = _log.copyWith(clearFlowIntensity: true),
               ),
-              child: Text(AppStrings.delete),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNutritionContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildHydrationCard(),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          AppStrings.flowOptions[_flowIndex],
+          style: const TextStyle(
+            fontFamily: 'CormorantGaramond',
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: AppColors.insightRose,
+          ),
+        ),
+        const SizedBox(height: 20),
+        _StepSelector(
+          labels: AppStrings.flowOptions,
+          selectedIndex: _flowIndex,
+          color: AppColors.periodPrimary,
+          onChanged: (index) => setState(() => _flowIndex = index),
+        ),
         const SizedBox(height: 24),
-        _buildSection(
-          title: AppStrings.nutritionStatus,
-          child: _buildChipSelector(
-            options: AppStrings.nutritionTags,
-            selected: _log.nutritionTags,
-            onChanged: (values) =>
-                setState(() => _log = _log.copyWith(nutritionTags: values)),
-            color: AppColors.primary,
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 10, 12),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.78),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: AppColors.outline),
           ),
-        ),
-        _buildSection(
-          title: AppStrings.caffeineIntake,
-          subtitle: AppStrings.caffeineServingHint,
-          child: _buildOptionalCounterMetric(
-            icon: Icons.coffee_outlined,
-            title: AppStrings.caffeineIntake,
-            value: _log.caffeineServings,
-            minimum: 0,
-            maximum: 12,
-            step: 1,
-            initialValue: 0,
-            color: AppColors.warning,
-            valueText: AppStrings.servingCount,
-            onChanged: (value) => setState(() {
-              _log = value == null
-                  ? _log.copyWith(clearCaffeineServings: true)
-                  : _log.copyWith(caffeineServings: value);
-            }),
-          ),
-        ),
-        _buildSection(
-          title: AppStrings.bowelActivity,
-          child: _buildChipSelector(
-            options: AppStrings.bowelActivityOptions,
-            selected: _log.bowelActivity,
-            onChanged: (values) =>
-                setState(() => _log = _log.copyWith(bowelActivity: values)),
-            color: AppColors.info,
-          ),
-        ),
-        _buildSection(
-          title: AppStrings.notes,
-          child: TextField(
-            controller: _nutritionNotesController,
-            maxLines: 3,
-            onChanged: (value) => _log = _log.copyWith(nutritionNotes: value),
-            decoration: _fieldDecoration(AppStrings.notesHint),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHydrationCard() {
-    final milliliters = _log.waterIntakeMl ?? 0;
-    final glasses = (milliliters / 250).round();
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.outline),
-      ),
-      child: Column(
-        children: [
-          Row(
+          child: Row(
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      AppStrings.logHydration.toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.5,
-                        color: AppColors.primaryDark,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      AppStrings.milliliters(milliliters),
+                      AppStrings.periodStartedToday,
                       style: const TextStyle(
                         fontFamily: 'CormorantGaramond',
-                        fontSize: 29,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      AppStrings.periodStartedHint,
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        height: 1.35,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
                 ),
               ),
-              _RoundActionButton(
-                icon: Icons.remove_rounded,
-                enabled: milliliters > 0,
-                color: AppColors.primary,
-                filled: false,
-                onTap: () => setState(() {
-                  final next = (milliliters - 250).clamp(0, 6000);
-                  _log = _log.copyWith(waterIntakeMl: next);
-                }),
-              ),
-              const SizedBox(width: 8),
-              _RoundActionButton(
-                icon: Icons.add_rounded,
-                enabled: milliliters < 6000,
-                color: AppColors.primary,
-                filled: true,
-                onTap: () => setState(() {
-                  final next = (milliliters + 250).clamp(0, 6000);
-                  _log = _log.copyWith(waterIntakeMl: next);
-                }),
-              ),
-              if (_log.waterIntakeMl != null) ...[
-                const SizedBox(width: 4),
-                IconButton(
-                  tooltip: AppStrings.delete,
-                  onPressed: () => setState(
-                    () => _log = _log.copyWith(clearWaterIntake: true),
-                  ),
-                  icon: const Icon(Icons.close_rounded, size: 18),
-                ),
-              ],
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: List.generate(8, (index) {
-              final filled = index < glasses;
-              return Expanded(
-                child: Container(
-                  height: 45,
-                  margin: EdgeInsets.only(right: index == 7 ? 0 : 5),
-                  decoration: BoxDecoration(
-                    color: filled ? AppColors.primaryLight : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: filled ? AppColors.primary : AppColors.outline,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.local_drink_outlined,
-                    size: 17,
-                    color: filled ? AppColors.primary : AppColors.textHint,
-                  ),
-                ),
-              );
-            }),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMedicationContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSection(
-          title: AppStrings.medications,
-          subtitle: AppStrings.medicationDisclaimer,
-          child: Column(
-            children: [
-              _buildMedicationList(
-                items: widget.settings.dailyMedications,
-                entries: _log.medications,
-                color: AppColors.medicationPrimary,
-                customController: _customMedController,
-                customHint: AppStrings.medicationExample,
-                suggestions: _previouslyAddedMeds,
-                onChanged: (entries) =>
-                    setState(() => _log = _log.copyWith(medications: entries)),
-              ),
-              const SizedBox(height: 16),
-              MedicationReminderSection(
-                itemType: MedicationPlanItemType.medication,
-                availableItems: {
-                  ...widget.settings.dailyMedications,
-                  ..._log.medications.map((entry) => entry.name),
-                  ..._previouslyAddedMeds,
-                }.toList(),
-                color: AppColors.medicationPrimary,
+              Switch(
+                value: _periodStartedToday,
+                activeTrackColor: AppColors.periodPrimary,
+                onChanged: (value) =>
+                    setState(() => _periodStartedToday = value),
               ),
             ],
           ),
         ),
-        _buildSection(
-          title: AppStrings.supplements,
-          child: Column(
-            children: [
-              _buildMedicationList(
-                items: widget.settings.dailySupplements,
-                entries: _log.supplements,
-                color: AppColors.success,
-                customController: _customSupController,
-                customHint: AppStrings.supplementExample,
-                suggestions: _previouslyAddedSups,
-                onChanged: (entries) =>
-                    setState(() => _log = _log.copyWith(supplements: entries)),
-              ),
-              const SizedBox(height: 16),
-              MedicationReminderSection(
-                itemType: MedicationPlanItemType.supplement,
-                availableItems: {
-                  ...widget.settings.dailySupplements,
-                  ..._log.supplements.map((entry) => entry.name),
-                  ..._previouslyAddedSups,
-                }.toList(),
-                color: AppColors.success,
-              ),
-            ],
+        const SizedBox(height: 25),
+        _SectionTitle(AppStrings.logAnythingElse),
+        const SizedBox(height: 11),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: _buildSimpleChoices(
+            options: AppStrings.periodSymptomOptions,
+            selected: _periodSymptoms,
+            color: AppColors.periodPrimary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildWellbeingContent() {
+  Widget _buildNutritionPage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildMoodHero(),
-        const SizedBox(height: 24),
-        _buildSection(
-          title: AppStrings.mood,
-          child: _StepSelector(
-            labels: AppStrings.moodOptions.keys.toList(),
-            selectedIndex: _moodIndex,
-            color: _activeMoodColor,
-            onChanged: (index) {
-              final entry = AppStrings.moodOptions.entries.elementAt(index);
-              setState(() {
-                _log = _log.copyWith(mood: entry.key, moodEmoji: entry.value);
-              });
-            },
-          ),
+        _buildIntro(
+          title: AppStrings.logNutritionQuestion,
+          subtitle: AppStrings.logNutritionHint,
         ),
-        _buildSection(
-          title: AppStrings.activityStatus,
-          child: _buildChipSelector(
-            options: AppStrings.activityOptions,
-            selected: _log.activities,
-            onChanged: (values) =>
-                setState(() => _log = _log.copyWith(activities: values)),
-            color: AppColors.secondary,
-          ),
-        ),
-        _buildSection(
-          title: AppStrings.dailyFactors,
-          subtitle: AppStrings.dailyFactorsHint,
-          child: Column(
-            children: [
-              _buildOptionalSliderMetric(
-                icon: Icons.bedtime_outlined,
-                title: AppStrings.sleepDuration,
-                value: _log.sleepDurationMinutes,
-                minimum: 30,
-                maximum: 960,
-                step: 30,
-                initialValue: 480,
-                color: AppColors.primary,
-                valueText: AppStrings.hoursMinutes,
-                onChanged: (value) => setState(() {
-                  _log = value == null
-                      ? _log.copyWith(clearSleepDuration: true)
-                      : _log.copyWith(sleepDurationMinutes: value);
-                }),
-              ),
-              const SizedBox(height: 10),
-              _buildOptionalSliderMetric(
-                icon: Icons.hotel_class_outlined,
-                title: AppStrings.sleepQuality,
-                value: _log.sleepQuality,
-                minimum: 1,
-                maximum: 5,
-                step: 1,
-                initialValue: 3,
-                color: AppColors.primary,
-                valueText: AppStrings.levelOutOfFive,
-                onChanged: (value) => setState(() {
-                  _log = value == null
-                      ? _log.copyWith(clearSleepQuality: true)
-                      : _log.copyWith(sleepQuality: value);
-                }),
-              ),
-              const SizedBox(height: 10),
-              _buildOptionalSliderMetric(
-                icon: Icons.psychology_alt_outlined,
-                title: AppStrings.stressLevel,
-                value: _log.stressLevel,
-                minimum: 1,
-                maximum: 5,
-                step: 1,
-                initialValue: 3,
-                color: AppColors.accent,
-                valueText: AppStrings.levelOutOfFive,
-                onChanged: (value) => setState(() {
-                  _log = value == null
-                      ? _log.copyWith(clearStressLevel: true)
-                      : _log.copyWith(stressLevel: value);
-                }),
-              ),
-              const SizedBox(height: 10),
-              _buildOptionalSliderMetric(
-                icon: Icons.bolt_outlined,
-                title: AppStrings.energyLevel,
-                value: _log.energyLevel,
-                minimum: 1,
-                maximum: 5,
-                step: 1,
-                initialValue: 3,
-                color: AppColors.warning,
-                valueText: AppStrings.levelOutOfFive,
-                onChanged: (value) => setState(() {
-                  _log = value == null
-                      ? _log.copyWith(clearEnergyLevel: true)
-                      : _log.copyWith(energyLevel: value);
-                }),
-              ),
-            ],
-          ),
-        ),
-        _buildSection(
-          title: AppStrings.sexualActivity,
-          child: Row(
-            children: [
-              _toggleButton(
-                AppStrings.yes,
-                _log.sexualActivity == true,
-                () =>
-                    setState(() => _log = _log.copyWith(sexualActivity: true)),
-              ),
-              const SizedBox(width: 8),
-              _toggleButton(
-                AppStrings.no,
-                _log.sexualActivity == false,
-                () =>
-                    setState(() => _log = _log.copyWith(sexualActivity: false)),
-              ),
-            ],
-          ),
-        ),
-        _buildSection(
-          title: AppStrings.sensations,
-          child: _buildChipSelector(
-            options: AppStrings.painLocations,
-            selected: _log.painLocations,
-            onChanged: (values) =>
-                setState(() => _log = _log.copyWith(painLocations: values)),
-            color: AppColors.accent,
-          ),
-        ),
-        _buildSection(
-          title: AppStrings.moodNote,
-          child: TextField(
-            controller: _moodNoteController,
-            maxLines: 3,
-            onChanged: (value) => _log = _log.copyWith(moodNote: value),
-            decoration: _fieldDecoration(AppStrings.notesHint),
-          ),
-        ),
-        _buildSection(
-          title: AppStrings.notes,
-          child: TextField(
-            controller: _notesController,
-            maxLines: 3,
-            onChanged: (value) => _log = _log.copyWith(notes: value),
-            decoration: _fieldDecoration(AppStrings.notesHint),
-          ),
-        ),
-      ],
-    );
-  }
-
-  int get _moodIndex {
-    final selected = AppStrings.localizeStoredValue(_log.mood ?? '');
-    return AppStrings.moodOptions.keys.toList().indexOf(selected);
-  }
-
-  List<Color> get _moodColors => const [
-    AppColors.moodAngry,
-    AppColors.moodGood,
-    AppColors.moodSad,
-    AppColors.moodHappy,
-    AppColors.moodPeaceful,
-    AppColors.moodNeutral,
-    AppColors.warning,
-  ];
-
-  Color get _activeMoodColor =>
-      _moodIndex < 0 ? AppColors.secondary : _moodColors[_moodIndex];
-
-  Widget _buildMoodHero() {
-    final index = _moodIndex;
-    final selected = index >= 0;
-    final entry = selected
-        ? AppStrings.moodOptions.entries.elementAt(index)
-        : null;
-    final tone = selected ? _moodColors[index] : AppColors.outline;
-
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(
-            width: 230,
-            height: 230,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Transform.translate(
-                  offset: const Offset(-7, -5),
-                  child: Container(
-                    width: 218,
-                    height: 218,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: tone.withValues(alpha: 0.45),
-                        width: 1.4,
-                      ),
-                    ),
-                  ),
-                ),
-                Transform.translate(
-                  offset: const Offset(9, 5),
-                  child: Container(
-                    width: 218,
-                    height: 218,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: tone.withValues(alpha: 0.55),
-                        width: 1.4,
-                      ),
-                    ),
-                  ),
-                ),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  width: 166,
-                  height: 166,
-                  decoration: BoxDecoration(
-                    color: selected ? tone : AppColors.surface,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: tone.withValues(alpha: 0.18),
-                        blurRadius: 26,
-                        offset: const Offset(0, 9),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      entry?.value ?? '—',
-                      style: TextStyle(
-                        fontSize: selected ? 60 : 42,
-                        color: AppColors.textHint,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            entry?.key ?? AppStrings.noData,
-            style: TextStyle(
-              fontFamily: 'CormorantGaramond',
-              fontSize: 30,
-              fontWeight: FontWeight.w700,
-              color: selected ? AppColors.primaryDark : AppColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSection({
-    required String title,
-    required Widget child,
-    String? subtitle,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontFamily: 'CormorantGaramond',
-              fontSize: 21,
-              height: 1.1,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          if (subtitle != null) ...[
-            const SizedBox(height: 5),
-            Text(
-              subtitle,
-              style: const TextStyle(
-                fontSize: 12,
-                height: 1.4,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-          const SizedBox(height: 13),
-          child,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChipSelector({
-    required List<String> options,
-    required List<String> selected,
-    required ValueChanged<List<String>> onChanged,
-    required Color color,
-  }) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 9,
-      children: options.map((option) {
-        final active = selected.any(
-          (value) => AppStrings.localizeStoredValue(value) == option,
-        );
-        return _ChoiceChip(
-          label: option,
-          active: active,
-          color: color,
-          onTap: () {
-            final next = List<String>.from(selected);
-            if (active) {
-              next.removeWhere(
-                (value) => AppStrings.localizeStoredValue(value) == option,
-              );
-            } else {
-              next.add(option);
-            }
-            onChanged(next);
-          },
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildSingleChipSelector({
-    required List<String> options,
-    required String? selected,
-    required ValueChanged<String?> onChanged,
-    required Color color,
-  }) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 9,
-      children: options.map((option) {
-        final active = AppStrings.localizeStoredValue(selected ?? '') == option;
-        return _ChoiceChip(
-          label: option,
-          active: active,
-          color: color,
-          onTap: () => onChanged(active ? null : option),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildOptionalSliderMetric({
-    required IconData icon,
-    required String title,
-    required int? value,
-    required int minimum,
-    required int maximum,
-    required int step,
-    required int initialValue,
-    required Color color,
-    required String Function(int) valueText,
-    required ValueChanged<int?> onChanged,
-  }) {
-    if (value == null) {
-      return _buildMetricAddRow(
-        icon: icon,
-        title: title,
-        color: color,
-        onAdd: () => onChanged(initialValue),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.22)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, size: 19, color: color),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              Text(
-                valueText(value),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: color,
-                ),
-              ),
-              IconButton(
-                tooltip: AppStrings.delete,
-                visualDensity: VisualDensity.compact,
-                onPressed: () => onChanged(null),
-                icon: const Icon(Icons.close_rounded, size: 17),
-              ),
-            ],
-          ),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: color,
-              inactiveTrackColor: color.withValues(alpha: 0.14),
-              thumbColor: color,
-              overlayColor: color.withValues(alpha: 0.1),
-              trackHeight: 7,
-            ),
-            child: Slider(
-              value: value.toDouble(),
-              min: minimum.toDouble(),
-              max: maximum.toDouble(),
-              divisions: (maximum - minimum) ~/ step,
-              onChanged: (next) {
-                final stepped =
-                    ((next - minimum) / step).round() * step + minimum;
-                onChanged(stepped.clamp(minimum, maximum));
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOptionalCounterMetric({
-    required IconData icon,
-    required String title,
-    required int? value,
-    required int minimum,
-    required int maximum,
-    required int step,
-    required int initialValue,
-    required Color color,
-    required String Function(int) valueText,
-    required ValueChanged<int?> onChanged,
-  }) {
-    if (value == null) {
-      return _buildMetricAddRow(
-        icon: icon,
-        title: title,
-        color: color,
-        onAdd: () => onChanged(initialValue),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.22)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 20, color: color),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              valueText(value),
-              style: const TextStyle(
-                fontFamily: 'CormorantGaramond',
-                fontSize: 21,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          _RoundActionButton(
-            icon: Icons.remove_rounded,
-            enabled: value > minimum,
-            color: color,
-            filled: false,
-            onTap: () => onChanged((value - step).clamp(minimum, maximum)),
-          ),
-          const SizedBox(width: 7),
-          _RoundActionButton(
-            icon: Icons.add_rounded,
-            enabled: value < maximum,
-            color: color,
-            filled: true,
-            onTap: () => onChanged((value + step).clamp(minimum, maximum)),
-          ),
-          IconButton(
-            tooltip: AppStrings.delete,
-            visualDensity: VisualDensity.compact,
-            onPressed: () => onChanged(null),
-            icon: const Icon(Icons.close_rounded, size: 17),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMetricAddRow({
-    required IconData icon,
-    required String title,
-    required Color color,
-    required VoidCallback onAdd,
-  }) {
-    return Material(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(20),
-      child: InkWell(
-        onTap: onAdd,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+        const SizedBox(height: 22),
+        Container(
+          padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.outline),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(25),
           ),
-          child: Row(
+          child: Column(
             children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, size: 20, color: color),
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppStrings.logHydration.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.6,
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          AppStrings.hydrationGlasses(_waterGlasses, 8),
+                          style: const TextStyle(
+                            fontFamily: 'CormorantGaramond',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-              Icon(Icons.add_rounded, color: color),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _toggleButton(String label, bool selected, VoidCallback onTap) {
-    return _ChoiceChip(
-      label: label,
-      active: selected,
-      color: _activeColor,
-      onTap: onTap,
-    );
-  }
-
-  Widget _buildVaginalDischargeInput() {
-    final present = _log.vaginalDischargePresent;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.outline),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  AppStrings.dischargePresent,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    height: 1.35,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                  _RoundButton(
+                    icon: Icons.remove_rounded,
+                    color: AppColors.secondary,
+                    filled: false,
+                    enabled: _waterGlasses > 0,
+                    onTap: () =>
+                        setState(() => _waterGlasses = _waterGlasses - 1),
                   ),
-                ),
+                  const SizedBox(width: 9),
+                  _RoundButton(
+                    icon: Icons.add_rounded,
+                    color: AppColors.secondary,
+                    filled: true,
+                    enabled: _waterGlasses < 12,
+                    onTap: () =>
+                        setState(() => _waterGlasses = _waterGlasses + 1),
+                  ),
+                ],
               ),
-              if (present != null)
-                IconButton(
-                  tooltip: AppStrings.delete,
-                  onPressed: _clearDischarge,
-                  icon: const Icon(Icons.close_rounded, size: 18),
-                ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              _toggleButton(
-                AppStrings.yes,
-                present == true,
-                () => setState(
-                  () => _log = _log.copyWith(vaginalDischargePresent: true),
-                ),
-              ),
-              const SizedBox(width: 8),
-              _toggleButton(
-                AppStrings.no,
-                present == false,
-                () => setState(() {
-                  _log = _log.copyWith(
-                    vaginalDischargePresent: false,
-                    clearVaginalDischargeColor: true,
-                    clearVaginalDischargeConsistency: true,
-                    clearVaginalDischargeAmount: true,
-                    vaginalDischargeSymptoms: const {},
+              const SizedBox(height: 18),
+              Row(
+                children: List.generate(8, (index) {
+                  final filled = index < _waterGlasses;
+                  return Expanded(
+                    child: Container(
+                      height: 41,
+                      margin: EdgeInsets.only(right: index == 7 ? 0 : 6),
+                      decoration: BoxDecoration(
+                        color: filled
+                            ? AppColors.secondaryLight
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(9),
+                        border: Border.all(
+                          color: filled
+                              ? AppColors.secondary
+                              : AppColors.outline,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.local_drink_outlined,
+                        size: 16,
+                        color: filled
+                            ? AppColors.secondary
+                            : AppColors.textHint,
+                      ),
+                    ),
                   );
                 }),
               ),
             ],
           ),
-          if (present == true) ...[
-            const SizedBox(height: 22),
-            _smallSectionLabel(AppStrings.dischargeColor),
-            const SizedBox(height: 9),
-            _buildDischargeColorSelector(),
-            const SizedBox(height: 20),
-            _smallSectionLabel(AppStrings.dischargeConsistency),
-            const SizedBox(height: 9),
-            _buildSingleChipSelector(
-              options: AppStrings.dischargeConsistencyOptions,
-              selected: _log.vaginalDischargeConsistency == null
-                  ? null
-                  : AppStrings.dischargeConsistencyOptions[_log
-                        .vaginalDischargeConsistency!
-                        .index],
-              onChanged: (value) => setState(() {
-                _log = value == null
-                    ? _log.copyWith(clearVaginalDischargeConsistency: true)
-                    : _log.copyWith(
-                        vaginalDischargeConsistency:
-                            VaginalDischargeConsistency.values[AppStrings
-                                .dischargeConsistencyOptions
-                                .indexOf(value)],
-                      );
-              }),
-              color: AppColors.primary,
-            ),
-            const SizedBox(height: 20),
-            _smallSectionLabel(AppStrings.dischargeAmount),
-            const SizedBox(height: 9),
-            _buildSingleChipSelector(
-              options: AppStrings.dischargeAmountOptions,
-              selected: _log.vaginalDischargeAmount == null
-                  ? null
-                  : AppStrings.dischargeAmountOptions[_log
-                        .vaginalDischargeAmount!
-                        .index],
-              onChanged: (value) => setState(() {
-                _log = value == null
-                    ? _log.copyWith(clearVaginalDischargeAmount: true)
-                    : _log.copyWith(
-                        vaginalDischargeAmount:
-                            VaginalDischargeAmount.values[AppStrings
-                                .dischargeAmountOptions
-                                .indexOf(value)],
-                      );
-              }),
-              color: AppColors.secondary,
-            ),
-            const SizedBox(height: 20),
-            _smallSectionLabel(AppStrings.dischargeSymptoms),
-            const SizedBox(height: 9),
-            _buildChipSelector(
-              options: AppStrings.dischargeSymptomOptions,
-              selected: _log.vaginalDischargeSymptoms
-                  .map(
-                    (symptom) =>
-                        AppStrings.dischargeSymptomOptions[symptom.index],
-                  )
-                  .toList(),
-              onChanged: (values) => setState(() {
-                _log = _log.copyWith(
-                  vaginalDischargeSymptoms: values
-                      .map(
-                        (value) =>
-                            VaginalDischargeSymptom.values[AppStrings
-                                .dischargeSymptomOptions
-                                .indexOf(value)],
-                      )
-                      .toSet(),
-                );
-              }),
-              color: AppColors.accent,
-            ),
-          ],
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.info.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Text(
-              AppStrings.dischargeMedicalDisclaimer,
-              style: const TextStyle(
-                fontSize: 11,
-                height: 1.4,
-                color: AppColors.textSecondary,
+        ),
+        const SizedBox(height: 25),
+        _SectionTitle(AppStrings.mealsToday),
+        const SizedBox(height: 11),
+        _buildSimpleChoices(
+          options: AppStrings.nutritionMealOptions,
+          selected: _meals,
+          color: AppColors.secondary,
+        ),
+        const SizedBox(height: 24),
+        _SectionTitle(AppStrings.mealsFeel),
+        const SizedBox(height: 11),
+        Row(
+          children: AppStrings.nutritionQualityOptions.asMap().entries.map((
+            entry,
+          ) {
+            final selected = entry.key == _nutritionQualityIndex;
+            final activeColor = entry.key == 1
+                ? AppColors.primary
+                : AppColors.secondary;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right:
+                      entry.key == AppStrings.nutritionQualityOptions.length - 1
+                      ? 0
+                      : 8,
+                ),
+                child: _PillChoice(
+                  label: entry.value,
+                  selected: selected,
+                  color: activeColor,
+                  onTap: () =>
+                      setState(() => _nutritionQualityIndex = entry.key),
+                ),
               ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 25),
+        _SectionTitle(AppStrings.cravingsQuestion),
+        const SizedBox(height: 11),
+        _buildSimpleChoices(
+          options: AppStrings.nutritionCravingOptions,
+          selected: _cravings,
+          color: AppColors.secondary,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSymptomPage() {
+    final groups = _symptomGroups;
+    final query = _symptomSearchController.text.trim().toLowerCase();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildIntro(
+          title: AppStrings.symptomQuestion,
+          subtitle: AppStrings.symptomHint,
+        ),
+        const SizedBox(height: 18),
+        TextField(
+          controller: _symptomSearchController,
+          onChanged: (_) => setState(() {}),
+          decoration: InputDecoration(
+            hintText: AppStrings.searchSymptoms,
+            prefixIcon: const Icon(Icons.search_rounded, size: 19),
+            filled: true,
+            fillColor: AppColors.surface,
+            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(24),
+              borderSide: const BorderSide(color: AppColors.outline),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(24),
+              borderSide: const BorderSide(color: AppColors.outline),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _smallSectionLabel(String value) {
-    return Text(
-      value,
-      style: const TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w800,
-        color: AppColors.textPrimary,
-      ),
-    );
-  }
-
-  void _clearDischarge() {
-    setState(() {
-      _log = _log.copyWith(
-        clearVaginalDischargePresent: true,
-        clearVaginalDischargeColor: true,
-        clearVaginalDischargeConsistency: true,
-        clearVaginalDischargeAmount: true,
-        vaginalDischargeSymptoms: const {},
-      );
-    });
-  }
-
-  Widget _buildDischargeColorSelector() {
-    const swatches = <Color>[
-      Color(0xFFE7F7FC),
-      Colors.white,
-      Color(0xFFFFF2CC),
-      Color(0xFFFFD54F),
-      Color(0xFF66BB6A),
-      Color(0xFF9E9E9E),
-      Color(0xFF8D6E63),
-      Color(0xFFF48FB1),
-      Color(0xFFE57373),
-      Color(0xFFB39DDB),
-    ];
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: VaginalDischargeColor.values.map((value) {
-        final selected = _log.vaginalDischargeColor == value;
-        return InkWell(
-          borderRadius: BorderRadius.circular(22),
-          onTap: () => setState(() {
-            _log = selected
-                ? _log.copyWith(clearVaginalDischargeColor: true)
-                : _log.copyWith(vaginalDischargeColor: value);
-          }),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+        ),
+        if (_symptoms.isNotEmpty) ...[
+          const SizedBox(height: 18),
+          Container(
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: selected ? AppColors.primaryLight : AppColors.surfaceMuted,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: selected ? AppColors.primary : AppColors.outline,
-              ),
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 16,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    color: swatches[value.index],
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.textHint),
+                Text(
+                  AppStrings.symptomStrength.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.4,
+                    color: AppColors.primaryDark,
                   ),
                 ),
-                const SizedBox(width: 7),
-                Text(
-                  AppStrings.dischargeColorOptions[value.index],
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
+                const SizedBox(height: 10),
+                Row(
+                  children: AppStrings.symptomSeverityOptions
+                      .asMap()
+                      .entries
+                      .map((entry) {
+                        return Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              right: entry.key == 2 ? 0 : 7,
+                            ),
+                            child: _PillChoice(
+                              label: entry.value,
+                              selected: entry.key == _symptomSeverityIndex,
+                              color: AppColors.primary,
+                              onTap: () => setState(
+                                () => _symptomSeverityIndex = entry.key,
+                              ),
+                            ),
+                          ),
+                        );
+                      })
+                      .toList(),
                 ),
               ],
             ),
           ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildMedicationList({
-    required List<String> items,
-    required List<MedicationEntry> entries,
-    required Color color,
-    required TextEditingController customController,
-    required String customHint,
-    required List<String> suggestions,
-    required ValueChanged<List<MedicationEntry>> onChanged,
-  }) {
-    final allEntries = <MedicationEntry>[];
-    for (final name in items) {
-      allEntries.add(
-        entries.firstWhere(
-          (entry) => entry.name == name,
-          orElse: () => MedicationEntry(
-            name: name,
-            time: AppStrings.medicationTimes.first,
-            stomachState: AppStrings.stomachStates.first,
-          ),
-        ),
-      );
-    }
-    for (final entry in entries) {
-      if (!items.contains(entry.name)) allEntries.add(entry);
-    }
-    final suggestedItems = suggestions
-        .where((name) => !allEntries.any((entry) => entry.name == name))
-        .toList();
-
-    return Column(
-      children: [
-        for (final entry in allEntries)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: entry.taken
-                      ? color.withValues(alpha: 0.45)
-                      : AppColors.outline,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      InkWell(
-                        borderRadius: BorderRadius.circular(9),
-                        onTap: () {
-                          onChanged(
-                            allEntries
-                                .map(
-                                  (item) => item.name == entry.name
-                                      ? item.copyWith(taken: !item.taken)
-                                      : item,
-                                )
-                                .toList(),
-                          );
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            color: entry.taken ? color : Colors.transparent,
-                            borderRadius: BorderRadius.circular(9),
-                            border: Border.all(
-                              color: entry.taken ? color : AppColors.outline,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: entry.taken
-                              ? const Icon(
-                                  Icons.check_rounded,
-                                  color: Colors.white,
-                                  size: 18,
-                                )
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(width: 11),
-                      Expanded(
-                        child: Text(
-                          entry.name,
-                          style: const TextStyle(
-                            fontFamily: 'CormorantGaramond',
-                            fontSize: 19,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                      if (!items.contains(entry.name))
-                        IconButton(
-                          tooltip: AppStrings.delete,
-                          onPressed: () => onChanged(
-                            allEntries
-                                .where((item) => item.name != entry.name)
-                                .toList(),
-                          ),
-                          icon: const Icon(
-                            Icons.close_rounded,
-                            size: 18,
-                            color: AppColors.error,
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Wrap(
-                      spacing: 7,
-                      runSpacing: 7,
-                      children: [
-                        _miniDropdown(
-                          value: AppStrings.localizeStoredValue(entry.time),
-                          items: AppStrings.medicationTimes,
-                          color: color,
-                          onChanged: (value) => onChanged(
-                            allEntries
-                                .map(
-                                  (item) => item.name == entry.name
-                                      ? item.copyWith(time: value)
-                                      : item,
-                                )
-                                .toList(),
-                          ),
-                        ),
-                        _miniDropdown(
-                          value: AppStrings.localizeStoredValue(
-                            entry.stomachState,
-                          ),
-                          items: AppStrings.stomachStates,
-                          color: color,
-                          onChanged: (value) => onChanged(
-                            allEntries
-                                .map(
-                                  (item) => item.name == entry.name
-                                      ? item.copyWith(stomachState: value)
-                                      : item,
-                                )
-                                .toList(),
-                          ),
-                        ),
-                        Builder(
-                          builder: (context) {
-                            final dosages = [...AppStrings.dosageOptions];
-                            final current = AppStrings.localizeStoredValue(
-                              entry.dosage,
-                            );
-                            if (!dosages.contains(current)) {
-                              dosages.add(current);
-                            }
-                            dosages.add(AppStrings.custom);
-                            return _miniDropdown(
-                              value: current,
-                              items: dosages,
-                              color: color,
-                              onChanged: (value) {
-                                if (value == AppStrings.custom) {
-                                  _showCustomDosageDialog(
-                                    entry,
-                                    allEntries,
-                                    onChanged,
-                                    color,
-                                  );
-                                } else {
-                                  onChanged(
-                                    allEntries
-                                        .map(
-                                          (item) => item.name == entry.name
-                                              ? item.copyWith(dosage: value)
-                                              : item,
-                                        )
-                                        .toList(),
-                                  );
-                                }
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        if (suggestedItems.isNotEmpty) ...[
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              AppStrings.previouslyAdded,
+        ],
+        for (final group in groups)
+          if (query.isEmpty ||
+              group.items.any(
+                (item) => item.label.toLowerCase().contains(query),
+              )) ...[
+            const SizedBox(height: 20),
+            Text(
+              group.title,
               style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.6,
                 color: AppColors.textSecondary,
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Wrap(
-              spacing: 7,
-              runSpacing: 7,
-              children: suggestedItems
-                  .map(
-                    (name) => _ChoiceChip(
-                      label: name,
-                      active: false,
-                      color: color,
-                      leading: Icons.add_rounded,
-                      onTap: () {
-                        onChanged([
-                          ...allEntries,
-                          MedicationEntry(
-                            name: name,
-                            time: AppStrings.medicationTimes.first,
-                            stomachState: AppStrings.stomachStates.first,
-                            taken: true,
-                          ),
-                        ]);
-                      },
+            const SizedBox(height: 9),
+            GridView.count(
+              shrinkWrap: true,
+              primary: false,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 3.75,
+              children: [
+                for (final item in group.items)
+                  if (query.isEmpty || item.label.toLowerCase().contains(query))
+                    _SymptomTile(
+                      item: item,
+                      selected: _symptoms.contains(item.label),
+                      onTap: () => _toggleSymptom(item.label),
                     ),
-                  )
-                  .toList(),
+              ],
             ),
+          ],
+      ],
+    );
+  }
+
+  List<_SymptomGroup> get _symptomGroups {
+    List<_SymptomItem> items(
+      List<String> labels,
+      List<IconData> icons,
+      List<Color> colors,
+    ) {
+      return [
+        for (var index = 0; index < labels.length; index++)
+          _SymptomItem(
+            label: labels[index],
+            icon: icons[index],
+            color: colors[index],
           ),
-          const SizedBox(height: 14),
-        ],
-        Container(
-          padding: const EdgeInsets.fromLTRB(13, 5, 6, 5),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppColors.outline),
-          ),
-          child: Row(
+      ];
+    }
+
+    return [
+      _SymptomGroup(
+        title: AppStrings.symptomOverall,
+        items: items(
+          AppStrings.symptomOverallOptions,
+          [Icons.thumb_up_alt_outlined],
+          [const Color(0xFFB8A6C9)],
+        ),
+      ),
+      _SymptomGroup(
+        title: AppStrings.symptomBody,
+        items: items(
+          AppStrings.symptomBodyOptions,
+          [
+            Icons.radio_button_checked_rounded,
+            Icons.psychology_outlined,
+            Icons.local_fire_department_outlined,
+            Icons.air_rounded,
+            Icons.auto_awesome_outlined,
+            Icons.waves_rounded,
+          ],
+          [
+            const Color(0xFFC0606E),
+            const Color(0xFF8A72B0),
+            const Color(0xFFD4835C),
+            const Color(0xFF89986D),
+            const Color(0xFFC48AA8),
+            const Color(0xFF8FA88A),
+          ],
+        ),
+      ),
+      _SymptomGroup(
+        title: AppStrings.symptomSkinHair,
+        items: items(
+          AppStrings.symptomSkinHairOptions,
+          [
+            Icons.water_drop_outlined,
+            Icons.cloud_outlined,
+            Icons.water_drop_outlined,
+            Icons.content_cut_rounded,
+          ],
+          [
+            const Color(0xFFC0606E),
+            const Color(0xFFB8A6C9),
+            const Color(0xFF89986D),
+            const Color(0xFFA87960),
+          ],
+        ),
+      ),
+      _SymptomGroup(
+        title: AppStrings.symptomEnergy,
+        items: items(
+          AppStrings.symptomEnergyOptions,
+          [
+            Icons.battery_2_bar_rounded,
+            Icons.bolt_rounded,
+            Icons.center_focus_strong_outlined,
+            Icons.cloud_outlined,
+          ],
+          [
+            const Color(0xFFC0606E),
+            const Color(0xFFD4A15C),
+            const Color(0xFF89986D),
+            const Color(0xFF8A72B0),
+          ],
+        ),
+      ),
+      _SymptomGroup(
+        title: AppStrings.symptomSleep,
+        items: items(
+          AppStrings.symptomSleepOptions,
+          [Icons.dark_mode_outlined],
+          [const Color(0xFF8A72B0)],
+        ),
+      ),
+      _SymptomGroup(
+        title: AppStrings.symptomDigestion,
+        items: items(
+          AppStrings.symptomDigestionOptions,
+          [
+            Icons.cookie_outlined,
+            Icons.restaurant_outlined,
+            Icons.waves_rounded,
+            Icons.local_fire_department_outlined,
+          ],
+          [
+            const Color(0xFFD4A15C),
+            const Color(0xFFA87960),
+            const Color(0xFF89986D),
+            const Color(0xFFC0606E),
+          ],
+        ),
+      ),
+    ];
+  }
+
+  void _toggleSymptom(String label) {
+    setState(() {
+      if (_symptoms.contains(label)) {
+        _symptoms.remove(label);
+      } else {
+        _symptoms.add(label);
+      }
+    });
+  }
+
+  Widget _buildMoodPage() {
+    final tone = _moodColors[_moodIndex];
+    return Column(
+      children: [
+        _buildIntro(
+          title: AppStrings.logMoodQuestion,
+          subtitle: AppStrings.logMoodHint,
+          centered: true,
+        ),
+        const SizedBox(height: 28),
+        SizedBox(
+          width: 236,
+          height: 236,
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              Expanded(
-                child: TextField(
-                  controller: customController,
-                  decoration: InputDecoration(
-                    hintText: customHint,
-                    hintStyle: const TextStyle(fontSize: 13),
-                    border: InputBorder.none,
-                    isDense: true,
+              Transform.translate(
+                offset: const Offset(-7, -5),
+                child: Container(
+                  width: 218,
+                  height: 218,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: tone.withValues(alpha: 0.48)),
                   ),
                 ),
               ),
-              FilledButton(
-                onPressed: () {
-                  final name = customController.text.trim();
-                  if (name.isEmpty ||
-                      allEntries.any((entry) => entry.name == name)) {
-                    return;
-                  }
-                  onChanged([
-                    ...allEntries,
-                    MedicationEntry(
-                      name: name,
-                      time: AppStrings.medicationTimes.first,
-                      stomachState: AppStrings.stomachStates.first,
-                      taken: true,
-                    ),
-                  ]);
-                  customController.clear();
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: color,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+              Transform.translate(
+                offset: const Offset(9, 5),
+                child: Container(
+                  width: 218,
+                  height: 218,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: tone.withValues(alpha: 0.6)),
                   ),
-                  shape: const StadiumBorder(),
                 ),
-                child: Text(AppStrings.add),
+              ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 164,
+                height: 164,
+                decoration: BoxDecoration(color: tone, shape: BoxShape.circle),
+                child: Center(
+                  child: Text(
+                    AppStrings.moodCheckInEmojis[_moodIndex],
+                    style: const TextStyle(fontSize: 58),
+                  ),
+                ),
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          AppStrings.moodCheckInOptions[_moodIndex],
+          style: const TextStyle(
+            fontFamily: 'CormorantGaramond',
+            fontSize: 29,
+            fontWeight: FontWeight.w700,
+            color: AppColors.primaryDark,
+          ),
+        ),
+        const SizedBox(height: 28),
+        _StepSelector(
+          labels: AppStrings.moodCheckInOptions,
+          selectedIndex: _moodIndex,
+          color: tone,
+          onChanged: (index) => setState(() => _moodIndex = index),
+        ),
+      ],
+    );
+  }
+
+  List<Color> get _moodColors => const [
+    Color(0xFFB7A5C9),
+    Color(0xFFE1A6A8),
+    Color(0xFFC8BFAE),
+    Color(0xFFA8B892),
+    Color(0xFF8FA982),
+  ];
+
+  Widget _buildMoodContextPage() {
+    final mood = AppStrings.moodCheckInOptions[_moodIndex].toLowerCase();
+    return Column(
+      children: [
+        _buildIntro(
+          title: AppStrings.moodBehindQuestion(mood),
+          subtitle: AppStrings.moodContextHint,
+          centered: true,
+        ),
+        const SizedBox(height: 22),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.72),
+            borderRadius: BorderRadius.circular(23),
+            border: Border.all(color: AppColors.primaryLight),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.omaNote,
+                style: const TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.5,
+                  color: AppColors.primaryDark,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                AppStrings.moodGentleTitle,
+                style: const TextStyle(
+                  fontFamily: 'CormorantGaramond',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                AppStrings.moodGentleBody,
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  height: 1.45,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: _SectionTitle(AppStrings.moodWhoWith),
+        ),
+        const SizedBox(height: 11),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: _buildContextChoices(
+            options: AppStrings.moodCompanionOptions,
+            selected: _moodCompanions,
+            companion: true,
+          ),
+        ),
+        const SizedBox(height: 24),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: _SectionTitle(AppStrings.moodWhere),
+        ),
+        const SizedBox(height: 11),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: _buildContextChoices(
+            options: AppStrings.moodPlaceOptions,
+            selected: _moodPlaces,
+            companion: false,
           ),
         ),
       ],
     );
   }
 
-  Widget _miniDropdown({
-    required String value,
-    required List<String> items,
-    required Color color,
-    required ValueChanged<String> onChanged,
+  Widget _buildContextChoices({
+    required List<String> options,
+    required Set<String> selected,
+    required bool companion,
   }) {
-    return Container(
-      padding: const EdgeInsets.only(left: 10, right: 5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: DropdownButton<String>(
-        value: value,
-        items: items
-            .map(
-              (item) => DropdownMenuItem(
-                value: item,
-                child: Text(item, style: const TextStyle(fontSize: 12)),
-              ),
-            )
-            .toList(),
-        onChanged: (next) {
-          if (next != null) onChanged(next);
-        },
-        underline: const SizedBox.shrink(),
-        borderRadius: BorderRadius.circular(18),
-        icon: Icon(Icons.expand_more_rounded, size: 18, color: color),
-        isDense: true,
-      ),
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        _RoundButton(
+          icon: Icons.add_rounded,
+          color: AppColors.primary,
+          filled: false,
+          enabled: true,
+          onTap: () => _addCustomContext(companion),
+        ),
+        for (final option in options)
+          _PillChoice(
+            label: option,
+            selected: selected.contains(option),
+            color: AppColors.primary,
+            onTap: () => _toggleChoice(selected, option),
+          ),
+        for (final option in selected.where(
+          (value) => !options.contains(value),
+        ))
+          _PillChoice(
+            label: option,
+            selected: true,
+            color: AppColors.primary,
+            onTap: () => _toggleChoice(selected, option),
+          ),
+      ],
     );
   }
 
-  void _showCustomDosageDialog(
-    MedicationEntry entry,
-    List<MedicationEntry> allEntries,
-    ValueChanged<List<MedicationEntry>> onChanged,
-    Color color,
-  ) {
-    final controller = TextEditingController(text: entry.dosage);
-    showDialog<void>(
+  Future<void> _addCustomContext(bool companion) async {
+    final controller = TextEditingController();
+    final value = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Text(
-          AppStrings.customDosage,
+          companion ? AppStrings.moodWhoWith : AppStrings.moodWhere,
           style: const TextStyle(
             fontFamily: 'CormorantGaramond',
             fontSize: 24,
             fontWeight: FontWeight.w700,
           ),
         ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: _fieldDecoration(AppStrings.customDosageHint),
-        ),
+        content: TextField(controller: controller, autofocus: true),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(AppStrings.cancel),
           ),
           FilledButton(
-            onPressed: () {
-              final dosage = controller.text.trim();
-              if (dosage.isNotEmpty) {
-                onChanged(
-                  allEntries
-                      .map(
-                        (item) => item.name == entry.name
-                            ? item.copyWith(dosage: dosage)
-                            : item,
-                      )
-                      .toList(),
-                );
-              }
-              Navigator.pop(dialogContext);
-            },
-            style: FilledButton.styleFrom(backgroundColor: color),
-            child: Text(AppStrings.save),
+            onPressed: () =>
+                Navigator.pop(dialogContext, controller.text.trim()),
+            child: Text(AppStrings.add),
           ),
         ],
       ),
-    ).whenComplete(controller.dispose);
+    );
+    controller.dispose();
+    if (!mounted || value == null || value.isEmpty) return;
+    setState(() {
+      (companion ? _moodCompanions : _moodPlaces).add(value);
+    });
   }
 
-  InputDecoration _fieldDecoration(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      filled: true,
-      fillColor: AppColors.surface,
-      contentPadding: const EdgeInsets.all(15),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: AppColors.outline),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: AppColors.outline),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(color: _activeColor, width: 1.5),
-      ),
+  Widget _buildSimpleChoices({
+    required List<String> options,
+    required Set<String> selected,
+    required Color color,
+  }) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final option in options)
+          _PillChoice(
+            label: option,
+            selected: selected.contains(option),
+            color: color,
+            onTap: () => _toggleChoice(selected, option),
+          ),
+      ],
     );
   }
 
-  Widget _buildSaveArea() {
+  void _toggleChoice(Set<String> values, String value) {
+    setState(() {
+      if (values.contains(value)) {
+        values.remove(value);
+      } else {
+        values.add(value);
+      }
+    });
+  }
+
+  Widget _buildBottomAction() {
     return SafeArea(
       top: false,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 10, 24, 14),
-        decoration: BoxDecoration(
-          color: AppColors.scaffoldBackground.withValues(alpha: 0.96),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.textPrimary.withValues(alpha: 0.07),
-              blurRadius: 20,
-              offset: const Offset(0, -7),
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 9),
+        color: AppColors.scaffoldBackground.withValues(alpha: 0.97),
         child: SizedBox(
           width: double.infinity,
-          height: 58,
+          height: 57,
           child: FilledButton(
-            onPressed: _isSaving ? null : _saveLog,
+            onPressed: _isSaving ? null : _handleAction,
             style: FilledButton.styleFrom(
-              backgroundColor: _activeColor,
-              disabledBackgroundColor: _activeColor.withValues(alpha: 0.62),
+              backgroundColor: _tone,
               foregroundColor: Colors.white,
+              disabledBackgroundColor: _tone.withValues(alpha: 0.6),
               shape: const StadiumBorder(),
-              elevation: 0,
-              shadowColor: _activeColor.withValues(alpha: 0.45),
             ),
             child: _isSaving
                 ? const SizedBox(
-                    width: 23,
-                    height: 23,
+                    width: 22,
+                    height: 22,
                     child: CircularProgressIndicator(
                       color: Colors.white,
-                      strokeWidth: 2.4,
+                      strokeWidth: 2.3,
                     ),
                   )
                 : Text(
-                    _saveLabel,
+                    _actionLabel,
                     style: const TextStyle(
                       fontFamily: 'CormorantGaramond',
-                      fontSize: 21,
+                      fontSize: 20,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -2018,27 +1127,79 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     );
   }
 
+  Future<void> _handleAction() async {
+    if (_logType == 3 && _moodStep == 1) {
+      setState(() => _moodStep = 2);
+      return;
+    }
+    await _saveLog();
+  }
+
+  DailyLog _preparedLog(DateTime finalDate) {
+    final observed = <DailyLogObservedSection>{
+      ..._log.observedSections,
+      switch (_logType) {
+        0 => DailyLogObservedSection.period,
+        1 => DailyLogObservedSection.nutrition,
+        2 => DailyLogObservedSection.symptom,
+        _ => DailyLogObservedSection.wellbeing,
+      },
+    };
+
+    return switch (_logType) {
+      0 => _log.copyWith(
+        date: finalDate,
+        flowIntensity: AppStrings.flowOptions[_flowIndex],
+        periodStartedToday: _periodStartedToday,
+        symptoms: _periodSymptoms.toList(),
+        painLocations: _matchingPainLocations(_periodSymptoms),
+        observedSections: observed,
+      ),
+      1 => _log.copyWith(
+        date: finalDate,
+        waterIntakeMl: _waterGlasses * 250,
+        mealTypes: _meals.toList(),
+        nutritionQuality:
+            AppStrings.nutritionQualityOptions[_nutritionQualityIndex],
+        cravings: _cravings.toList(),
+        observedSections: observed,
+      ),
+      2 => _log.copyWith(
+        date: finalDate,
+        symptoms: _symptoms.toList(),
+        symptomSeverity: _symptomSeverityIndex + 1,
+        painLocations: _matchingPainLocations(_symptoms),
+        observedSections: observed,
+      ),
+      _ => _log.copyWith(
+        date: finalDate,
+        mood: AppStrings.moodCheckInOptions[_moodIndex],
+        moodEmoji: AppStrings.moodCheckInEmojis[_moodIndex],
+        moodCompanions: _moodCompanions.toList(),
+        moodPlaces: _moodPlaces.toList(),
+        observedSections: observed,
+      ),
+    };
+  }
+
+  List<String> _matchingPainLocations(Set<String> selected) {
+    final painOptions = AppStrings.painLocations;
+    return selected.where((value) {
+      final canonical = AppStrings.canonicalizeStoredValue(value);
+      return painOptions.any(
+        (pain) => AppStrings.canonicalizeStoredValue(pain) == canonical,
+      );
+    }).toList();
+  }
+
   Future<void> _saveLog() async {
-    if (_isSaving) return;
     final today = AppTime.now.dateOnly;
     var finalDate = _log.date;
-
     if (_log.date.dateOnly.isBefore(today)) {
       final pickedTime = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay(hour: _log.date.hour, minute: _log.date.minute),
+        initialTime: TimeOfDay.fromDateTime(_log.date),
         helpText: AppStrings.selectLogTime,
-        builder: (context, child) => Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: AppColors.surface,
-              onSurface: AppColors.textPrimary,
-            ),
-          ),
-          child: child!,
-        ),
       );
       if (pickedTime == null) return;
       finalDate = DateTime(
@@ -2053,16 +1214,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     setState(() => _isSaving = true);
     var success = false;
     try {
-      success = await widget.onSave(
-        _log.copyWith(
-          date: finalDate,
-          observedSections: {
-            ..._log.observedSections,
-            ..._visitedSections,
-            _activeObservedSection,
-          },
-        ),
-      );
+      success = await widget.onSave(_preparedLog(finalDate));
     } catch (_) {
       success = false;
     }
@@ -2077,9 +1229,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           content: Text(AppStrings.saved),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
         ),
       );
     } else {
@@ -2094,18 +1243,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 }
 
-class _LogTabItem {
-  final String label;
-  final IconData icon;
-  final Color color;
-
-  const _LogTabItem({
-    required this.label,
-    required this.icon,
-    required this.color,
-  });
-}
-
 class _SheetHandle extends StatelessWidget {
   const _SheetHandle();
 
@@ -2114,7 +1251,7 @@ class _SheetHandle extends StatelessWidget {
     return Container(
       width: 42,
       height: 4,
-      margin: const EdgeInsets.only(top: 10),
+      margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
         color: AppColors.outline,
         borderRadius: BorderRadius.circular(2),
@@ -2123,52 +1260,61 @@ class _SheetHandle extends StatelessWidget {
   }
 }
 
-class _ChoiceChip extends StatelessWidget {
+class _SectionTitle extends StatelessWidget {
+  final String text;
+
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontFamily: 'CormorantGaramond',
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      ),
+    );
+  }
+}
+
+class _PillChoice extends StatelessWidget {
   final String label;
-  final bool active;
+  final bool selected;
   final Color color;
   final VoidCallback onTap;
-  final IconData? leading;
 
-  const _ChoiceChip({
+  const _PillChoice({
     required this.label,
-    required this.active,
+    required this.selected,
     required this.color,
     required this.onTap,
-    this.leading,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: active ? color : AppColors.surface,
+      color: selected ? color : AppColors.surface,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
+          duration: const Duration(milliseconds: 160),
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: active ? color : AppColors.outline),
+            border: Border.all(color: selected ? color : AppColors.outline),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (leading != null) ...[
-                Icon(leading, size: 15, color: active ? Colors.white : color),
-                const SizedBox(width: 5),
-              ],
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                  color: active ? Colors.white : AppColors.textPrimary,
-                ),
-              ),
-            ],
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              color: selected ? Colors.white : AppColors.textPrimary,
+            ),
           ),
         ),
       ),
@@ -2176,18 +1322,18 @@ class _ChoiceChip extends StatelessWidget {
   }
 }
 
-class _RoundActionButton extends StatelessWidget {
+class _RoundButton extends StatelessWidget {
   final IconData icon;
-  final bool enabled;
   final Color color;
   final bool filled;
+  final bool enabled;
   final VoidCallback onTap;
 
-  const _RoundActionButton({
+  const _RoundButton({
     required this.icon,
-    required this.enabled,
     required this.color,
     required this.filled,
+    required this.enabled,
     required this.onTap,
   });
 
@@ -2208,7 +1354,7 @@ class _RoundActionButton extends StatelessWidget {
             height: 40,
             child: Icon(
               icon,
-              size: 19,
+              size: 18,
               color: filled ? Colors.white : AppColors.textPrimary,
             ),
           ),
@@ -2233,52 +1379,44 @@ class _StepSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final safeIndex = selectedIndex < 0 ? 0 : selectedIndex;
     return Column(
       children: [
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: labels.asMap().entries.map((entry) {
-            final active = entry.key == selectedIndex;
             return Expanded(
-              child: InkWell(
+              child: GestureDetector(
                 onTap: () => onChanged(entry.key),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Text(
-                    entry.value,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11,
-                      height: 1.15,
-                      fontWeight: active ? FontWeight.w800 : FontWeight.w500,
-                      color: active
-                          ? AppColors.textPrimary
-                          : AppColors.textSecondary,
-                    ),
+                child: Text(
+                  entry.value,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 9.5,
+                    fontWeight: entry.key == selectedIndex
+                        ? FontWeight.w800
+                        : FontWeight.w500,
+                    color: entry.key == selectedIndex
+                        ? AppColors.textPrimary
+                        : AppColors.textSecondary,
                   ),
                 ),
               ),
             );
           }).toList(),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: color,
-            inactiveTrackColor: color.withValues(alpha: 0.16),
-            thumbColor: selectedIndex < 0 ? AppColors.surface : color,
+            inactiveTrackColor: color.withValues(alpha: 0.18),
+            thumbColor: color,
             overlayColor: color.withValues(alpha: 0.1),
-            trackHeight: 10,
-            thumbShape: const RoundSliderThumbShape(
-              enabledThumbRadius: 11,
-              elevation: 3,
-            ),
+            trackHeight: 7,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
           ),
           child: Slider(
-            value: safeIndex.toDouble(),
+            value: selectedIndex.toDouble(),
             min: 0,
             max: (labels.length - 1).toDouble(),
             divisions: labels.length - 1,
@@ -2286,6 +1424,109 @@ class _StepSelector extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SymptomGroup {
+  final String title;
+  final List<_SymptomItem> items;
+
+  const _SymptomGroup({required this.title, required this.items});
+}
+
+class _SymptomItem {
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  const _SymptomItem({
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+}
+
+class _SymptomTile extends StatelessWidget {
+  final _SymptomItem item;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _SymptomTile({
+    required this.item,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Color.lerp(item.color, Colors.white, 0.84),
+      borderRadius: BorderRadius.circular(24),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              padding: const EdgeInsets.fromLTRB(5, 4, 8, 4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: selected ? item.color : AppColors.outline,
+                  width: selected ? 1.8 : 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: item.color,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(item.icon, color: Colors.white, size: 15),
+                  ),
+                  const SizedBox(width: 7),
+                  Expanded(
+                    child: Text(
+                      item.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (selected)
+              Positioned(
+                right: -2,
+                top: -3,
+                child: Container(
+                  width: 18,
+                  height: 18,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryDark,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    color: Colors.white,
+                    size: 12,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

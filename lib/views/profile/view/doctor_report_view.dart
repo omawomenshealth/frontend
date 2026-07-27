@@ -271,6 +271,15 @@ class DoctorReportView extends StatelessWidget {
 
   String _nutritionMetricsText(DailyLog log) {
     return [
+      if (log.mealTypes.isNotEmpty)
+        '${AppStrings.mealsToday}: '
+            '${log.mealTypes.map(AppStrings.localizeStoredValue).join(', ')}',
+      if (log.nutritionQuality != null)
+        '${AppStrings.mealsFeel}: '
+            '${AppStrings.localizeStoredValue(log.nutritionQuality!)}',
+      if (log.cravings.isNotEmpty)
+        '${AppStrings.cravingsQuestion}: '
+            '${log.cravings.map(AppStrings.localizeStoredValue).join(', ')}',
       if (log.waterIntakeMl != null)
         '${AppStrings.waterIntake}: ${AppStrings.milliliters(log.waterIntakeMl!)}',
       if (log.caffeineServings != null)
@@ -280,6 +289,12 @@ class DoctorReportView extends StatelessWidget {
 
   String _wellbeingMetricsText(DailyLog log) {
     return [
+      if (log.moodCompanions.isNotEmpty)
+        '${AppStrings.moodWhoWith}: '
+            '${log.moodCompanions.map(AppStrings.localizeStoredValue).join(', ')}',
+      if (log.moodPlaces.isNotEmpty)
+        '${AppStrings.moodWhere}: '
+            '${log.moodPlaces.map(AppStrings.localizeStoredValue).join(', ')}',
       if (log.sleepDurationMinutes != null)
         '${AppStrings.sleepDuration}: ${AppStrings.hoursMinutes(log.sleepDurationMinutes!)}',
       if (log.sleepQuality != null)
@@ -289,6 +304,16 @@ class DoctorReportView extends StatelessWidget {
       if (log.energyLevel != null)
         '${AppStrings.energyLevel}: ${AppStrings.levelOutOfFive(log.energyLevel!)}',
     ].join(', ');
+  }
+
+  String _symptomsText(DailyLog log) {
+    final values = {...log.painLocations, ...log.symptoms};
+    if (values.isEmpty) return '';
+    final severity = log.symptomSeverity == null
+        ? ''
+        : ' (${AppStrings.symptomStrength}: ${log.symptomSeverity}/3)';
+    return '${AppStrings.symptom}: '
+        '${values.map(AppStrings.localizeStoredValue).join(', ')}$severity';
   }
 
   String _periodAndDischargeText(DailyLog log) {
@@ -445,6 +470,9 @@ class DoctorReportView extends StatelessWidget {
                   .where(
                     (l) =>
                         l.nutritionTags.isNotEmpty ||
+                        l.mealTypes.isNotEmpty ||
+                        l.nutritionQuality != null ||
+                        l.cravings.isNotEmpty ||
                         l.bowelActivity.isNotEmpty ||
                         l.waterIntakeMl != null ||
                         l.caffeineServings != null,
@@ -513,6 +541,9 @@ class DoctorReportView extends StatelessWidget {
                     (l) =>
                         l.mood != null ||
                         l.painLocations.isNotEmpty ||
+                        l.symptoms.isNotEmpty ||
+                        l.moodCompanions.isNotEmpty ||
+                        l.moodPlaces.isNotEmpty ||
                         l.sleepDurationMinutes != null ||
                         l.sleepQuality != null ||
                         l.stressLevel != null ||
@@ -531,9 +562,7 @@ class DoctorReportView extends StatelessWidget {
                       final moodStr = log.mood != null
                           ? '${log.moodEmoji ?? ""} ${AppStrings.localizeStoredValue(log.mood!)}'
                           : '';
-                      final painStr = log.painLocations.isNotEmpty
-                          ? '${AppStrings.pain}: ${log.painLocations.map(AppStrings.localizeStoredValue).join(", ")}'
-                          : '';
+                      final painStr = _symptomsText(log);
                       final notesStr =
                           (log.notes != null && log.notes!.isNotEmpty)
                           ? '${AppStrings.notes}: ${log.notes}'
@@ -791,6 +820,9 @@ class DoctorReportView extends StatelessWidget {
           .where(
             (l) =>
                 l.nutritionTags.isNotEmpty ||
+                l.mealTypes.isNotEmpty ||
+                l.nutritionQuality != null ||
+                l.cravings.isNotEmpty ||
                 l.bowelActivity.isNotEmpty ||
                 l.waterIntakeMl != null ||
                 l.caffeineServings != null,
@@ -859,6 +891,9 @@ class DoctorReportView extends StatelessWidget {
             (l) =>
                 l.mood != null ||
                 l.painLocations.isNotEmpty ||
+                l.symptoms.isNotEmpty ||
+                l.moodCompanions.isNotEmpty ||
+                l.moodPlaces.isNotEmpty ||
                 l.sleepDurationMinutes != null ||
                 l.sleepQuality != null ||
                 l.stressLevel != null ||
@@ -877,9 +912,7 @@ class DoctorReportView extends StatelessWidget {
               final moodStr = log.mood != null
                   ? '${log.moodEmoji ?? ""} ${AppStrings.localizeStoredValue(log.mood!)}'
                   : '';
-              final painStr = log.painLocations.isNotEmpty
-                  ? '${AppStrings.pain}:${log.painLocations.map(AppStrings.localizeStoredValue).join(", ")}'
-                  : '';
+              final painStr = _symptomsText(log);
               final notesStr = (log.notes != null && log.notes!.isNotEmpty)
                   ? '${AppStrings.notes}:${log.notes}'
                   : '';
@@ -1219,6 +1252,9 @@ class DoctorReportView extends StatelessWidget {
             .where(
               (l) =>
                   l.nutritionTags.isNotEmpty ||
+                  l.mealTypes.isNotEmpty ||
+                  l.nutritionQuality != null ||
+                  l.cravings.isNotEmpty ||
                   l.bowelActivity.isNotEmpty ||
                   l.waterIntakeMl != null ||
                   l.caffeineServings != null,
@@ -1287,6 +1323,9 @@ class DoctorReportView extends StatelessWidget {
               (l) =>
                   l.mood != null ||
                   l.painLocations.isNotEmpty ||
+                  l.symptoms.isNotEmpty ||
+                  l.moodCompanions.isNotEmpty ||
+                  l.moodPlaces.isNotEmpty ||
                   l.sleepDurationMinutes != null ||
                   l.sleepQuality != null ||
                   l.stressLevel != null ||
@@ -1305,9 +1344,7 @@ class DoctorReportView extends StatelessWidget {
                 final moodStr = log.mood != null
                     ? '${log.moodEmoji ?? ""} ${AppStrings.localizeStoredValue(log.mood!)}'
                     : '';
-                final painStr = log.painLocations.isNotEmpty
-                    ? '${AppStrings.pain}: ${log.painLocations.map(AppStrings.localizeStoredValue).join(", ")}'
-                    : '';
+                final painStr = _symptomsText(log);
                 final notesStr = (log.notes != null && log.notes!.isNotEmpty)
                     ? '${AppStrings.notes}: ${log.notes}'
                     : '';

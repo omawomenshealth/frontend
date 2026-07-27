@@ -546,6 +546,7 @@ class PersonalInsightEngine {
           for (final log in dayLogs) {
             if (log.mood != null) mood = log.mood;
             symptoms.addAll(log.painLocations);
+            symptoms.addAll(log.symptoms);
             activities.addAll(log.activities);
             nutritionTags.addAll(log.nutritionTags);
             bowelActivity.addAll(log.bowelActivity);

@@ -4,7 +4,13 @@ import '../../core/constants/app_strings.dart';
 
 /// Kullanıcının günlük kayıt sırasında gerçekten gözden geçirip kaydettiği
 /// bölümler. Boş bırakılan alan ile "yok" yanıtını ayırmak için kullanılır.
-enum DailyLogObservedSection { period, nutrition, medication, wellbeing }
+enum DailyLogObservedSection {
+  period,
+  nutrition,
+  medication,
+  symptom,
+  wellbeing,
+}
 
 enum VaginalDischargeColor {
   clear,
@@ -94,7 +100,7 @@ class MedicationEntry {
 
 /// Günlük kayıt modeli — tüm wellness modüllerini birleşik tutar.
 class DailyLog {
-  static const int schemaVersion = 3;
+  static const int schemaVersion = 4;
 
   final DateTime date;
 
@@ -103,6 +109,9 @@ class DailyLog {
 
   // ── Beslenme ─────────────────────────────────────────────
   final List<String> nutritionTags; // Tuzlu, Paketli, vb.
+  final List<String> mealTypes;
+  final String? nutritionQuality;
+  final List<String> cravings;
   final String? nutritionNotes;
   final int? waterIntakeMl;
   final int? caffeineServings;
@@ -117,6 +126,8 @@ class DailyLog {
   final String? mood; // Mutlu, Huzurlu, İyi, Normal, Kötü, vb.
   final String? moodEmoji; // 😊, 😌, 🙂, vb.
   final String? moodNote;
+  final List<String> moodCompanions;
+  final List<String> moodPlaces;
   final int? sleepDurationMinutes;
   final int? sleepQuality;
   final int? stressLevel;
@@ -130,10 +141,13 @@ class DailyLog {
 
   // ── Hisler & Ağrılar ────────────────────────────────────
   final List<String> painLocations; // Baş ağrısı, Bel ağrısı, vb.
+  final List<String> symptoms;
+  final int? symptomSeverity;
 
   // ── Regl (Kadınlar için) ─────────────────────────────────
   final String? flowIntensity; // Yok, Lekelenme, Hafif, Orta, Yoğun
   final int? periodPainLevel; // 0-5
+  final bool? periodStartedToday;
 
   // ── Vajinal Akıntı / Servikal Mukus ─────────────────────
   final bool? vaginalDischargePresent;
@@ -152,6 +166,9 @@ class DailyLog {
     required this.date,
     this.activities = const [],
     this.nutritionTags = const [],
+    this.mealTypes = const [],
+    this.nutritionQuality,
+    this.cravings = const [],
     this.nutritionNotes,
     this.waterIntakeMl,
     this.caffeineServings,
@@ -160,6 +177,8 @@ class DailyLog {
     this.mood,
     this.moodEmoji,
     this.moodNote,
+    this.moodCompanions = const [],
+    this.moodPlaces = const [],
     this.sleepDurationMinutes,
     this.sleepQuality,
     this.stressLevel,
@@ -167,8 +186,11 @@ class DailyLog {
     this.sexualActivity,
     this.bowelActivity = const [],
     this.painLocations = const [],
+    this.symptoms = const [],
+    this.symptomSeverity,
     this.flowIntensity,
     this.periodPainLevel,
+    this.periodStartedToday,
     this.vaginalDischargePresent,
     this.vaginalDischargeColor,
     this.vaginalDischargeConsistency,
@@ -183,6 +205,10 @@ class DailyLog {
        assert(sleepQuality == null || sleepQuality >= 1 && sleepQuality <= 5),
        assert(stressLevel == null || stressLevel >= 1 && stressLevel <= 5),
        assert(energyLevel == null || energyLevel >= 1 && energyLevel <= 5),
+       assert(
+         symptomSeverity == null ||
+             symptomSeverity >= 1 && symptomSeverity <= 3,
+       ),
        assert(
          waterIntakeMl == null || waterIntakeMl >= 0 && waterIntakeMl <= 10000,
        ),
@@ -204,6 +230,9 @@ class DailyLog {
     DateTime? date,
     List<String>? activities,
     List<String>? nutritionTags,
+    List<String>? mealTypes,
+    String? nutritionQuality,
+    List<String>? cravings,
     String? nutritionNotes,
     int? waterIntakeMl,
     bool clearWaterIntake = false,
@@ -214,6 +243,8 @@ class DailyLog {
     String? mood,
     String? moodEmoji,
     String? moodNote,
+    List<String>? moodCompanions,
+    List<String>? moodPlaces,
     int? sleepDurationMinutes,
     bool clearSleepDuration = false,
     int? sleepQuality,
@@ -225,10 +256,13 @@ class DailyLog {
     bool? sexualActivity,
     List<String>? bowelActivity,
     List<String>? painLocations,
+    List<String>? symptoms,
+    int? symptomSeverity,
     String? flowIntensity,
     bool clearFlowIntensity = false,
     int? periodPainLevel,
     bool clearPeriodPainLevel = false,
+    bool? periodStartedToday,
     bool? vaginalDischargePresent,
     bool clearVaginalDischargePresent = false,
     VaginalDischargeColor? vaginalDischargeColor,
@@ -245,6 +279,9 @@ class DailyLog {
       date: date ?? this.date,
       activities: activities ?? this.activities,
       nutritionTags: nutritionTags ?? this.nutritionTags,
+      mealTypes: mealTypes ?? this.mealTypes,
+      nutritionQuality: nutritionQuality ?? this.nutritionQuality,
+      cravings: cravings ?? this.cravings,
       nutritionNotes: nutritionNotes ?? this.nutritionNotes,
       waterIntakeMl: clearWaterIntake
           ? null
@@ -257,6 +294,8 @@ class DailyLog {
       mood: mood ?? this.mood,
       moodEmoji: moodEmoji ?? this.moodEmoji,
       moodNote: moodNote ?? this.moodNote,
+      moodCompanions: moodCompanions ?? this.moodCompanions,
+      moodPlaces: moodPlaces ?? this.moodPlaces,
       sleepDurationMinutes: clearSleepDuration
           ? null
           : sleepDurationMinutes ?? this.sleepDurationMinutes,
@@ -268,12 +307,15 @@ class DailyLog {
       sexualActivity: sexualActivity ?? this.sexualActivity,
       bowelActivity: bowelActivity ?? this.bowelActivity,
       painLocations: painLocations ?? this.painLocations,
+      symptoms: symptoms ?? this.symptoms,
+      symptomSeverity: symptomSeverity ?? this.symptomSeverity,
       flowIntensity: clearFlowIntensity
           ? null
           : flowIntensity ?? this.flowIntensity,
       periodPainLevel: clearPeriodPainLevel
           ? null
           : periodPainLevel ?? this.periodPainLevel,
+      periodStartedToday: periodStartedToday ?? this.periodStartedToday,
       vaginalDischargePresent: clearVaginalDischargePresent
           ? null
           : vaginalDischargePresent ?? this.vaginalDischargePresent,
@@ -297,6 +339,9 @@ class DailyLog {
   bool get hasData {
     return activities.isNotEmpty ||
         nutritionTags.isNotEmpty ||
+        mealTypes.isNotEmpty ||
+        nutritionQuality != null ||
+        cravings.isNotEmpty ||
         (nutritionNotes?.isNotEmpty ?? false) ||
         waterIntakeMl != null ||
         caffeineServings != null ||
@@ -304,6 +349,8 @@ class DailyLog {
         medications.isNotEmpty ||
         mood != null ||
         (moodNote?.isNotEmpty ?? false) ||
+        moodCompanions.isNotEmpty ||
+        moodPlaces.isNotEmpty ||
         sleepDurationMinutes != null ||
         sleepQuality != null ||
         stressLevel != null ||
@@ -311,8 +358,11 @@ class DailyLog {
         sexualActivity != null ||
         bowelActivity.isNotEmpty ||
         painLocations.isNotEmpty ||
+        symptoms.isNotEmpty ||
+        symptomSeverity != null ||
         flowIntensity != null ||
         periodPainLevel != null ||
+        periodStartedToday != null ||
         vaginalDischargePresent != null ||
         vaginalDischargeColor != null ||
         vaginalDischargeConsistency != null ||
@@ -327,6 +377,9 @@ class DailyLog {
     'date': date.toIso8601String(),
     'activities': activities,
     'nutritionTags': nutritionTags,
+    'mealTypes': mealTypes,
+    'nutritionQuality': nutritionQuality,
+    'cravings': cravings,
     'nutritionNotes': nutritionNotes,
     'waterIntakeMl': waterIntakeMl,
     'caffeineServings': caffeineServings,
@@ -335,6 +388,8 @@ class DailyLog {
     'mood': mood,
     'moodEmoji': moodEmoji,
     'moodNote': moodNote,
+    'moodCompanions': moodCompanions,
+    'moodPlaces': moodPlaces,
     'sleepDurationMinutes': sleepDurationMinutes,
     'sleepQuality': sleepQuality,
     'stressLevel': stressLevel,
@@ -342,8 +397,11 @@ class DailyLog {
     'sexualActivity': sexualActivity,
     'bowelActivity': bowelActivity,
     'painLocations': painLocations,
+    'symptoms': symptoms,
+    'symptomSeverity': symptomSeverity,
     'flowIntensity': flowIntensity,
     'periodPainLevel': periodPainLevel,
+    'periodStartedToday': periodStartedToday,
     'vaginalDischargePresent': vaginalDischargePresent,
     'vaginalDischargeColor': vaginalDischargeColor?.name,
     'vaginalDischargeConsistency': vaginalDischargeConsistency?.name,
@@ -362,6 +420,9 @@ class DailyLog {
       date: DateTime.parse(json['date'] as String),
       activities: List<String>.from(json['activities'] ?? []),
       nutritionTags: List<String>.from(json['nutritionTags'] ?? []),
+      mealTypes: List<String>.from(json['mealTypes'] ?? []),
+      nutritionQuality: json['nutritionQuality'] as String?,
+      cravings: List<String>.from(json['cravings'] ?? []),
       nutritionNotes: json['nutritionNotes'] as String?,
       waterIntakeMl: _readOptionalInt(
         json,
@@ -388,6 +449,8 @@ class DailyLog {
       mood: json['mood'] as String?,
       moodEmoji: json['moodEmoji'] as String?,
       moodNote: json['moodNote'] as String?,
+      moodCompanions: List<String>.from(json['moodCompanions'] ?? []),
+      moodPlaces: List<String>.from(json['moodPlaces'] ?? []),
       sleepDurationMinutes: _readOptionalInt(
         json,
         'sleepDurationMinutes',
@@ -415,8 +478,16 @@ class DailyLog {
       sexualActivity: json['sexualActivity'] as bool?,
       bowelActivity: List<String>.from(json['bowelActivity'] ?? []),
       painLocations: List<String>.from(json['painLocations'] ?? []),
+      symptoms: List<String>.from(json['symptoms'] ?? []),
+      symptomSeverity: _readOptionalInt(
+        json,
+        'symptomSeverity',
+        minimum: 1,
+        maximum: 3,
+      ),
       flowIntensity: json['flowIntensity'] as String?,
       periodPainLevel: json['periodPainLevel'] as int?,
+      periodStartedToday: json['periodStartedToday'] as bool?,
       vaginalDischargePresent: json['vaginalDischargePresent'] as bool?,
       vaginalDischargeColor: _readOptionalEnum(
         json,
@@ -527,6 +598,9 @@ class DailyLog {
       date: date, // Timestamp korunur — her kayıt kendi zamanıyla ayrıdır
       activities: (activities + other.activities).toSet().toList(),
       nutritionTags: (nutritionTags + other.nutritionTags).toSet().toList(),
+      mealTypes: (mealTypes + other.mealTypes).toSet().toList(),
+      nutritionQuality: nutritionQuality ?? other.nutritionQuality,
+      cravings: (cravings + other.cravings).toSet().toList(),
       nutritionNotes: (nutritionNotes != null && nutritionNotes!.isNotEmpty)
           ? nutritionNotes
           : other.nutritionNotes,
@@ -539,6 +613,8 @@ class DailyLog {
       moodNote: (moodNote != null && moodNote!.isNotEmpty)
           ? moodNote
           : other.moodNote,
+      moodCompanions: (moodCompanions + other.moodCompanions).toSet().toList(),
+      moodPlaces: (moodPlaces + other.moodPlaces).toSet().toList(),
       sleepDurationMinutes: sleepDurationMinutes ?? other.sleepDurationMinutes,
       sleepQuality: sleepQuality ?? other.sleepQuality,
       stressLevel: stressLevel ?? other.stressLevel,
@@ -546,8 +622,11 @@ class DailyLog {
       sexualActivity: sexualActivity ?? other.sexualActivity,
       bowelActivity: (bowelActivity + other.bowelActivity).toSet().toList(),
       painLocations: (painLocations + other.painLocations).toSet().toList(),
+      symptoms: (symptoms + other.symptoms).toSet().toList(),
+      symptomSeverity: symptomSeverity ?? other.symptomSeverity,
       flowIntensity: flowIntensity ?? other.flowIntensity,
       periodPainLevel: periodPainLevel ?? other.periodPainLevel,
+      periodStartedToday: periodStartedToday ?? other.periodStartedToday,
       vaginalDischargePresent: mergedDischargePresent,
       vaginalDischargeColor: mergeDischargeDetails
           ? vaginalDischargeColor ??

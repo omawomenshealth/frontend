@@ -291,27 +291,30 @@ class LocalStorageService {
   /// Döndürülen liste eskiden yeniye doğru sıralıdır.
   List<DateTime> getPeriodStartDates() {
     final allLogs = loadAllLogs();
-
-    // flowIntensity != null olan kayıtları filtrele ve tarihe göre sırala
+    final bleedingLogs = allLogs
+        .where((log) => log.flowIntensity != null)
+        .toList();
     final bleedingDays =
-        allLogs
-            .where((log) => log.flowIntensity != null)
-            .map((log) => log.date.dateOnly)
-            .toSet() // Aynı günde birden fazla kayıt varsa tekil tut
-            .toList()
-          ..sort();
+        bleedingLogs.map((log) => log.date.dateOnly).toSet().toList()..sort();
 
     if (bleedingDays.isEmpty) return [];
 
-    // Ardışık kanama günlerini grupla
-    // 1 günden fazla arayla olan kayıtlar yeni döngü başlangıcı sayılır
-    final periodStarts = <DateTime>[bleedingDays.first];
+    final periodStarts = <DateTime>[];
+    for (var index = 0; index < bleedingDays.length; index++) {
+      final day = bleedingDays[index];
+      final dayLogs = bleedingLogs.where((log) => log.date.dateOnly == day);
+      final explicitlyStarted = dayLogs.any(
+        (log) => log.periodStartedToday == true,
+      );
+      final explicitlyNotStarted = dayLogs.every(
+        (log) => log.periodStartedToday == false,
+      );
+      final beginsNewBleedingGroup =
+          index == 0 || day.difference(bleedingDays[index - 1]).inDays > 1;
 
-    for (int i = 1; i < bleedingDays.length; i++) {
-      final diff = bleedingDays[i].difference(bleedingDays[i - 1]).inDays;
-      if (diff > 1) {
-        // Yeni bir döngü başlangıcı
-        periodStarts.add(bleedingDays[i]);
+      if (explicitlyStarted ||
+          beginsNewBleedingGroup && !explicitlyNotStarted) {
+        periodStarts.add(day);
       }
     }
 

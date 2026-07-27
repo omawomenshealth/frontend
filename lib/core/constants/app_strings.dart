@@ -261,6 +261,31 @@ enum _TextKey {
   saveNutrition,
   saveMedication,
   saveMoment,
+  continueAction,
+  periodStartedToday,
+  periodStartedHint,
+  mealsToday,
+  mealsFeel,
+  cravingsQuestion,
+  hydrationGlasses,
+  symptomQuestion,
+  symptom,
+  symptomHint,
+  searchSymptoms,
+  symptomStrength,
+  symptomOverall,
+  symptomBody,
+  symptomSkinHair,
+  symptomEnergy,
+  symptomSleep,
+  symptomDigestion,
+  moodBehindQuestion,
+  moodContextHint,
+  omaNote,
+  moodGentleTitle,
+  moodGentleBody,
+  moodWhoWith,
+  moodWhere,
   todaysStatus,
   noLogAdded,
   completed,
@@ -573,6 +598,20 @@ enum _ListKey {
   medicationTimes,
   stomachStates,
   moodOptions,
+  moodCheckInOptions,
+  moodCompanionOptions,
+  moodPlaceOptions,
+  nutritionMealOptions,
+  nutritionQualityOptions,
+  nutritionCravingOptions,
+  periodSymptomOptions,
+  symptomSeverityOptions,
+  symptomOverallOptions,
+  symptomBodyOptions,
+  symptomSkinHairOptions,
+  symptomEnergyOptions,
+  symptomSleepOptions,
+  symptomDigestionOptions,
   bowelActivityOptions,
   painLocations,
   flowOptions,
@@ -886,6 +925,35 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.saveNutrition: 'Beslenmeyi kaydet',
   _TextKey.saveMedication: 'Rutini kaydet',
   _TextKey.saveMoment: 'Bu anı kaydet',
+  _TextKey.continueAction: 'Devam Et',
+  _TextKey.periodStartedToday: 'Adetin bugün mü başladı?',
+  _TextKey.periodStartedHint:
+      'OMA’nın döngünün başlangıcını doğru belirlemesine yardımcı olur.',
+  _TextKey.mealsToday: 'Bugünkü öğünler',
+  _TextKey.mealsFeel: 'Sana nasıl hissettirdiler?',
+  _TextKey.cravingsQuestion: 'Canın özellikle ne çekti?',
+  _TextKey.hydrationGlasses: '{count} / {goal} bardak',
+  _TextKey.symptomQuestion: 'Bedeninde ne hissediyorsun?',
+  _TextKey.symptom: 'Belirti',
+  _TextKey.symptomHint:
+      'Hafif bile olsa fark ettiğin her şeyi seç; OMA zamanla bunları döngü fazınla ilişkilendirir.',
+  _TextKey.searchSymptoms: 'Belirtilerde ara',
+  _TextKey.symptomStrength: 'Genel olarak ne kadar güçlü?',
+  _TextKey.symptomOverall: 'GENEL',
+  _TextKey.symptomBody: 'BEDEN',
+  _TextKey.symptomSkinHair: 'CİLT VE SAÇ',
+  _TextKey.symptomEnergy: 'ENERJİ',
+  _TextKey.symptomSleep: 'UYKU',
+  _TextKey.symptomDigestion: 'SİNDİRİM',
+  _TextKey.moodBehindQuestion: '{mood} hissetmenin ardında ne var?',
+  _TextKey.moodContextHint:
+      'Biraz bağlam, OMA’nın örüntülerini anlamasına yardımcı olur. Uyanların tümünü seç.',
+  _TextKey.omaNote: 'OMA NOTU',
+  _TextKey.moodGentleTitle: 'Bugün kendine nazik davran.',
+  _TextKey.moodGentleBody:
+      'Döngünün bu noktasında daha hassas hissedebilirsin. Daha sakin bir tempo destekleyici olabilir.',
+  _TextKey.moodWhoWith: 'Kiminlesin?',
+  _TextKey.moodWhere: 'Neredesin?',
   _TextKey.todaysStatus: 'Bugünün Durumu',
   _TextKey.noLogAdded: 'Henüz kayıt eklenmedi',
   _TextKey.completed: 'tamamlandı',
@@ -1537,6 +1605,34 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.saveNutrition: 'Save nutrition',
   _TextKey.saveMedication: 'Save routine',
   _TextKey.saveMoment: 'Save this moment',
+  _TextKey.continueAction: 'Continue',
+  _TextKey.periodStartedToday: 'Period started today?',
+  _TextKey.periodStartedHint: 'Helps OMA anchor the start of your cycle.',
+  _TextKey.mealsToday: 'Meals today',
+  _TextKey.mealsFeel: 'How did they feel?',
+  _TextKey.cravingsQuestion: 'Any cravings?',
+  _TextKey.hydrationGlasses: '{count} / {goal} glasses',
+  _TextKey.symptomQuestion: 'What are you feeling in your body?',
+  _TextKey.symptom: 'Symptom',
+  _TextKey.symptomHint:
+      'Pick anything you notice, even faintly. OMA connects it to your phase over time.',
+  _TextKey.searchSymptoms: 'Search symptoms',
+  _TextKey.symptomStrength: 'How strong overall?',
+  _TextKey.symptomOverall: 'OVERALL',
+  _TextKey.symptomBody: 'BODY',
+  _TextKey.symptomSkinHair: 'SKIN & HAIR',
+  _TextKey.symptomEnergy: 'ENERGY',
+  _TextKey.symptomSleep: 'SLEEP',
+  _TextKey.symptomDigestion: 'DIGESTION',
+  _TextKey.moodBehindQuestion: 'What’s behind feeling {mood}?',
+  _TextKey.moodContextHint:
+      'A little context helps OMA understand your patterns. Choose all that apply.',
+  _TextKey.omaNote: 'OMA NOTE',
+  _TextKey.moodGentleTitle: 'Be gentle with yourself today.',
+  _TextKey.moodGentleBody:
+      'You often feel more sensitive around this point in your cycle. A quieter pace may feel supportive.',
+  _TextKey.moodWhoWith: 'Who are you with?',
+  _TextKey.moodWhere: 'Where are you?',
   _TextKey.todaysStatus: 'Today’s Status',
   _TextKey.noLogAdded: 'No log added yet',
   _TextKey.completed: 'completed',
@@ -1956,6 +2052,69 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Yorgun',
     'Enerjik',
   ],
+  _ListKey.moodCheckInOptions: ['Düşük', 'Hassas', 'Nötr', 'İyi', 'Harika'],
+  _ListKey.moodCompanionOptions: [
+    'Yalnızım',
+    'Partnerim',
+    'Arkadaşlarım',
+    'Ailem',
+    'İş arkadaşlarım',
+  ],
+  _ListKey.moodPlaceOptions: [
+    'Ev',
+    'İş',
+    'Dışarıda',
+    'Yoldayım',
+    'Sosyal ortam',
+  ],
+  _ListKey.nutritionMealOptions: [
+    'Kahvaltı',
+    'Öğle yemeği',
+    'Akşam yemeği',
+    'Atıştırmalık',
+  ],
+  _ListKey.nutritionQualityOptions: ['Hafif', 'Dengeli', 'Ağır'],
+  _ListKey.nutritionCravingOptions: [
+    'Tatlı',
+    'Tuzlu',
+    'Çikolata',
+    'Karbonhidrat',
+    'Acı',
+    'Kafein',
+    'Hiçbiri',
+  ],
+  _ListKey.periodSymptomOptions: [
+    'Kramplar',
+    'Bel ağrısı',
+    'Baş ağrısı',
+    'Şişkinlik',
+    'Yorgunluk',
+    'Pıhtı',
+  ],
+  _ListKey.symptomSeverityOptions: ['Hafif', 'Orta', 'Güçlü'],
+  _ListKey.symptomOverallOptions: ['Her şey yolunda'],
+  _ListKey.symptomBodyOptions: [
+    'Kramplar',
+    'Baş ağrısı',
+    'Bel ağrısı',
+    'Şişkinlik',
+    'Göğüs hassasiyeti',
+    'Mide bulantısı',
+  ],
+  _ListKey.symptomSkinHairOptions: [
+    'Akne',
+    'Kuru cilt',
+    'Yağlı saç',
+    'Saç dökülmesi',
+  ],
+  _ListKey.symptomEnergyOptions: [
+    'Yorgunluk',
+    'Huzursuzluk',
+    'Odaklanmış',
+    'Zihin bulanıklığı',
+  ],
+  _ListKey.symptomSleepOptions: ['Uykusuzluk'],
+  _ListKey.symptomDigestionOptions: ['Aşerme', 'Kabızlık', 'İshal', 'Reflü'],
   _ListKey.bowelActivityOptions: [
     'Normal',
     'Kabızlık',
@@ -2114,6 +2273,64 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Calm',
     'Tired',
     'Energetic',
+  ],
+  _ListKey.moodCheckInOptions: ['Low', 'Sensitive', 'Neutral', 'Good', 'Great'],
+  _ListKey.moodCompanionOptions: [
+    'By myself',
+    'Partner',
+    'Friends',
+    'Family',
+    'Co-workers',
+  ],
+  _ListKey.moodPlaceOptions: [
+    'Home',
+    'Work',
+    'Outside',
+    'In transit',
+    'Social',
+  ],
+  _ListKey.nutritionMealOptions: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
+  _ListKey.nutritionQualityOptions: ['Light', 'Balanced', 'Heavy'],
+  _ListKey.nutritionCravingOptions: [
+    'Sweet',
+    'Salty',
+    'Chocolate',
+    'Carbs',
+    'Spicy',
+    'Caffeine',
+    'Nothing',
+  ],
+  _ListKey.periodSymptomOptions: [
+    'Cramps',
+    'Back pain',
+    'Headache',
+    'Bloating',
+    'Fatigue',
+    'Clots',
+  ],
+  _ListKey.symptomSeverityOptions: ['Mild', 'Moderate', 'Strong'],
+  _ListKey.symptomOverallOptions: ['Everything is fine'],
+  _ListKey.symptomBodyOptions: [
+    'Cramps',
+    'Headache',
+    'Back pain',
+    'Bloating',
+    'Breast tenderness',
+    'Nausea',
+  ],
+  _ListKey.symptomSkinHairOptions: [
+    'Acne',
+    'Dry skin',
+    'Oily hair',
+    'Hair loss',
+  ],
+  _ListKey.symptomEnergyOptions: ['Fatigue', 'Restless', 'Focused', 'Foggy'],
+  _ListKey.symptomSleepOptions: ['Insomnia'],
+  _ListKey.symptomDigestionOptions: [
+    'Cravings',
+    'Constipation',
+    'Diarrhea',
+    'Reflux',
   ],
   _ListKey.bowelActivityOptions: [
     'Normal',
@@ -2878,6 +3095,33 @@ class AppStrings {
   static String get saveNutrition => _text(_TextKey.saveNutrition);
   static String get saveMedication => _text(_TextKey.saveMedication);
   static String get saveMoment => _text(_TextKey.saveMoment);
+  static String get continueAction => _text(_TextKey.continueAction);
+  static String get periodStartedToday => _text(_TextKey.periodStartedToday);
+  static String get periodStartedHint => _text(_TextKey.periodStartedHint);
+  static String get mealsToday => _text(_TextKey.mealsToday);
+  static String get mealsFeel => _text(_TextKey.mealsFeel);
+  static String get cravingsQuestion => _text(_TextKey.cravingsQuestion);
+  static String hydrationGlasses(int count, int goal) =>
+      _format(_TextKey.hydrationGlasses, {'count': count, 'goal': goal});
+  static String get symptomQuestion => _text(_TextKey.symptomQuestion);
+  static String get symptom => _text(_TextKey.symptom);
+  static String get symptomHint => _text(_TextKey.symptomHint);
+  static String get searchSymptoms => _text(_TextKey.searchSymptoms);
+  static String get symptomStrength => _text(_TextKey.symptomStrength);
+  static String get symptomOverall => _text(_TextKey.symptomOverall);
+  static String get symptomBody => _text(_TextKey.symptomBody);
+  static String get symptomSkinHair => _text(_TextKey.symptomSkinHair);
+  static String get symptomEnergy => _text(_TextKey.symptomEnergy);
+  static String get symptomSleep => _text(_TextKey.symptomSleep);
+  static String get symptomDigestion => _text(_TextKey.symptomDigestion);
+  static String moodBehindQuestion(String mood) =>
+      _format(_TextKey.moodBehindQuestion, {'mood': mood});
+  static String get moodContextHint => _text(_TextKey.moodContextHint);
+  static String get omaNote => _text(_TextKey.omaNote);
+  static String get moodGentleTitle => _text(_TextKey.moodGentleTitle);
+  static String get moodGentleBody => _text(_TextKey.moodGentleBody);
+  static String get moodWhoWith => _text(_TextKey.moodWhoWith);
+  static String get moodWhere => _text(_TextKey.moodWhere);
   static String get todaysStatus => _text(_TextKey.todaysStatus);
   static String get noLogAdded => _text(_TextKey.noLogAdded);
   static String get completed => _text(_TextKey.completed);
@@ -3268,6 +3512,34 @@ class AppStrings {
   static List<String> get medicationTimes => _list(_ListKey.medicationTimes);
   static List<String> get stomachStates => _list(_ListKey.stomachStates);
   static List<String> get moodLabels => _list(_ListKey.moodOptions);
+  static List<String> get moodCheckInOptions =>
+      _list(_ListKey.moodCheckInOptions);
+  static const List<String> moodCheckInEmojis = ['😔', '🥺', '😐', '🙂', '🥰'];
+  static List<String> get moodCompanionOptions =>
+      _list(_ListKey.moodCompanionOptions);
+  static List<String> get moodPlaceOptions => _list(_ListKey.moodPlaceOptions);
+  static List<String> get nutritionMealOptions =>
+      _list(_ListKey.nutritionMealOptions);
+  static List<String> get nutritionQualityOptions =>
+      _list(_ListKey.nutritionQualityOptions);
+  static List<String> get nutritionCravingOptions =>
+      _list(_ListKey.nutritionCravingOptions);
+  static List<String> get periodSymptomOptions =>
+      _list(_ListKey.periodSymptomOptions);
+  static List<String> get symptomSeverityOptions =>
+      _list(_ListKey.symptomSeverityOptions);
+  static List<String> get symptomOverallOptions =>
+      _list(_ListKey.symptomOverallOptions);
+  static List<String> get symptomBodyOptions =>
+      _list(_ListKey.symptomBodyOptions);
+  static List<String> get symptomSkinHairOptions =>
+      _list(_ListKey.symptomSkinHairOptions);
+  static List<String> get symptomEnergyOptions =>
+      _list(_ListKey.symptomEnergyOptions);
+  static List<String> get symptomSleepOptions =>
+      _list(_ListKey.symptomSleepOptions);
+  static List<String> get symptomDigestionOptions =>
+      _list(_ListKey.symptomDigestionOptions);
   static List<String> get bowelActivityOptions =>
       _list(_ListKey.bowelActivityOptions);
   static List<String> get painLocations => _list(_ListKey.painLocations);
