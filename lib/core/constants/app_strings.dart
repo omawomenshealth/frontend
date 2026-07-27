@@ -340,6 +340,13 @@ enum _TextKey {
   records,
   cycleStatisticsHint,
   calendar,
+  close,
+  month,
+  editPeriodDates,
+  calendarLegend,
+  recordedPeriod,
+  predictedPeriod,
+  fertileDays,
   noLogsForDay,
   viewDetails,
   period,
@@ -950,6 +957,13 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.cycleStatisticsHint:
       'Daha fazla veri girdikçe istatistikler daha doğru olacak',
   _TextKey.calendar: 'Takvim',
+  _TextKey.close: 'Kapat',
+  _TextKey.month: 'Ay',
+  _TextKey.editPeriodDates: 'Adet tarihlerini düzenle',
+  _TextKey.calendarLegend: 'Takvim açıklaması',
+  _TextKey.recordedPeriod: 'Kayıtlı adet',
+  _TextKey.predictedPeriod: 'Tahmini adet',
+  _TextKey.fertileDays: 'Doğurgan günler',
   _TextKey.noLogsForDay: 'Bu gün için kayıt yok',
   _TextKey.viewDetails: 'Detayları Gör',
   _TextKey.period: 'Adet',
@@ -1577,6 +1591,13 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.cycleStatisticsHint:
       'Your statistics will become more accurate as you add more data',
   _TextKey.calendar: 'Calendar',
+  _TextKey.close: 'Close',
+  _TextKey.month: 'Month',
+  _TextKey.editPeriodDates: 'Edit period dates',
+  _TextKey.calendarLegend: 'Calendar key',
+  _TextKey.recordedPeriod: 'Recorded period',
+  _TextKey.predictedPeriod: 'Predicted period',
+  _TextKey.fertileDays: 'Fertile days',
   _TextKey.noLogsForDay: 'No logs for this day',
   _TextKey.viewDetails: 'View Details',
   _TextKey.period: 'Period',
@@ -2896,6 +2917,16 @@ class AppStrings {
       _format(_TextKey.records, {'cycles': cycles, 'calculated': calculated});
   static String get cycleStatisticsHint => _text(_TextKey.cycleStatisticsHint);
   static String get calendar => _text(_TextKey.calendar);
+  static String get close => _text(_TextKey.close);
+  static String get month => _text(_TextKey.month);
+  static String get editPeriodDates => _text(_TextKey.editPeriodDates);
+  static String get calendarLegend => _text(_TextKey.calendarLegend);
+  static String get recordedPeriod => _text(_TextKey.recordedPeriod);
+  static String get predictedPeriod => _text(_TextKey.predictedPeriod);
+  static String get fertileDays => _text(_TextKey.fertileDays);
+  static List<String> get calendarWeekdayInitials => isTurkish
+      ? const ['P', 'S', 'Ç', 'P', 'C', 'C', 'P']
+      : const ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   static String get noLogsForDay => _text(_TextKey.noLogsForDay);
   static String get viewDetails => _text(_TextKey.viewDetails);
   static String get period => _text(_TextKey.period);

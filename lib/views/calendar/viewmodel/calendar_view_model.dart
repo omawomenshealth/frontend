@@ -24,6 +24,7 @@ class CalendarViewModel extends ChangeNotifier {
   // PERFORMANS İÇİN ÖNBELLEK (CACHE) SETLERİ
   // Hesaplanan günleri burada tutarak O(1) hızında sorgulayacağız.
   Set<DateTime> _periodDays = {};
+  Set<DateTime> _loggedPeriodDays = {};
   Set<DateTime> _ovulationDays = {};
   Set<DateTime> _fertileDays = {};
 
@@ -65,6 +66,10 @@ class CalendarViewModel extends ChangeNotifier {
   /// Build fonksiyonu çalışırken işlemciyi yormayı engeller.
   void _precomputeCalendarDays() {
     _periodDays = {};
+    _loggedPeriodDays = {
+      for (final entry in _logMap.entries)
+        if (entry.value.any((log) => log.flowIntensity != null)) entry.key,
+    };
     _ovulationDays = {};
     _fertileDays = {};
 
@@ -121,6 +126,10 @@ class CalendarViewModel extends ChangeNotifier {
   // ARTIK BU METOTLAR AĞIR HESAPLAMA YAPMAZ, ANINDA CEVAP VERİR
   bool hasLogForDay(DateTime day) => _logMap.containsKey(day.dateOnly);
   bool isPeriodDay(DateTime day) => _periodDays.contains(day.dateOnly);
+  bool isLoggedPeriodDay(DateTime day) =>
+      _loggedPeriodDays.contains(day.dateOnly);
+  bool isPredictedPeriodDay(DateTime day) =>
+      isPeriodDay(day) && !isLoggedPeriodDay(day);
   bool isEstimatedOvulationDay(DateTime day) =>
       _ovulationDays.contains(day.dateOnly);
   bool isFertileDay(DateTime day) => _fertileDays.contains(day.dateOnly);
