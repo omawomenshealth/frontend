@@ -16,6 +16,7 @@ enum PersonalInsightKind {
   moodCyclePhaseAssociation,
   energyCyclePhaseAssociation,
   structuredAssociation,
+  foodSensitivityAssociation,
   medicationAdherence,
   medicationSkipSymptomAssociation,
   fertileDischargeSignal,

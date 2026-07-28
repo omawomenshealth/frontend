@@ -57,58 +57,118 @@ enum SexualActivityType {
 /// İlaç/Takviye alım kaydı.
 class MedicationEntry {
   final String name;
-  final String time; // Sabah, Öğle, Akşam
+  final Set<String> times; // Sabah, Öğle ve Akşam birlikte seçilebilir.
   final String stomachState; // Aç, Tok
-  final String dosage; // Örn: 1 Adet, 500mg, 5 Damla
-  final bool taken;
+  final int doseCount;
+  final int takenDoseCount;
 
   MedicationEntry({
     required this.name,
-    required this.time,
+    String? time,
+    Set<String>? times,
     required this.stomachState,
     String? dosage,
-    this.taken = false,
-  }) : dosage = dosage ?? AppStrings.dosageOptions.first;
+    int? doseCount,
+    bool taken = false,
+    int? takenDoseCount,
+  }) : times = Set.unmodifiable(
+         times != null && times.isNotEmpty
+             ? times
+             : {time ?? AppStrings.medicationTimes.first},
+       ),
+       doseCount = _normalizeDoseCount(
+         doseCount ?? _doseCountFromLegacy(dosage),
+       ),
+       takenDoseCount = _normalizeTakenDoseCount(
+         takenDoseCount,
+         taken,
+         doseCount ?? _doseCountFromLegacy(dosage),
+       );
+
+  String get time => times.join(', ');
+  String get dosage => AppStrings.dosageCount(doseCount);
+  bool get taken => takenDoseCount >= doseCount;
 
   MedicationEntry copyWith({
     String? name,
     String? time,
+    Set<String>? times,
     String? stomachState,
     String? dosage,
+    int? doseCount,
     bool? taken,
+    int? takenDoseCount,
   }) {
+    final nextDoseCount = _normalizeDoseCount(
+      doseCount ??
+          (dosage == null ? this.doseCount : _doseCountFromLegacy(dosage)),
+    );
+    final nextTakenDoseCount = taken != null
+        ? (taken ? nextDoseCount : 0)
+        : (takenDoseCount ?? this.takenDoseCount).clamp(0, nextDoseCount);
     return MedicationEntry(
       name: name ?? this.name,
-      time: time ?? this.time,
+      times: times ?? (time == null ? this.times : {time}),
       stomachState: stomachState ?? this.stomachState,
-      dosage: dosage ?? this.dosage,
-      taken: taken ?? this.taken,
+      doseCount: nextDoseCount,
+      takenDoseCount: nextTakenDoseCount,
     );
   }
 
   Map<String, dynamic> toJson() => {
     'name': name,
     'time': time,
+    'times': times.toList(),
     'stomachState': stomachState,
     'dosage': dosage,
     'taken': taken,
+    'doseCount': doseCount,
+    'takenDoseCount': takenDoseCount,
   };
 
   factory MedicationEntry.fromJson(Map<String, dynamic> json) {
     return MedicationEntry(
       name: json['name'] as String,
       time: json['time'] as String? ?? AppStrings.medicationTimes.first,
+      times: (json['times'] as List<dynamic>?)?.whereType<String>().toSet(),
       stomachState:
           json['stomachState'] as String? ?? AppStrings.stomachStates.first,
       dosage: json['dosage'] as String? ?? AppStrings.dosageOptions.first,
+      doseCount: (json['doseCount'] as num?)?.toInt(),
       taken: json['taken'] as bool? ?? false,
+      takenDoseCount: (json['takenDoseCount'] as num?)?.toInt(),
+    );
+  }
+
+  static int _doseCountFromLegacy(String? value) {
+    if (value == null) return 1;
+    final lower = value.toLowerCase();
+    if (!lower.contains('adet') &&
+        !lower.contains('tablet') &&
+        !lower.contains('count')) {
+      return 1;
+    }
+    return int.tryParse(RegExp(r'\d+').firstMatch(value)?.group(0) ?? '') ?? 1;
+  }
+
+  static int _normalizeDoseCount(int value) => value.clamp(1, 12);
+
+  static int _normalizeTakenDoseCount(
+    int? value,
+    bool legacyTaken,
+    int rawDoseCount,
+  ) {
+    final normalizedDoseCount = _normalizeDoseCount(rawDoseCount);
+    return (value ?? (legacyTaken ? normalizedDoseCount : 0)).clamp(
+      0,
+      normalizedDoseCount,
     );
   }
 }
 
 /// Günlük kayıt modeli — tüm wellness modüllerini birleşik tutar.
 class DailyLog {
-  static const int schemaVersion = 6;
+  static const int schemaVersion = 8;
 
   final DateTime date;
   final bool hasExplicitTime;
@@ -119,6 +179,10 @@ class DailyLog {
   // ── Beslenme ─────────────────────────────────────────────
   final List<String> nutritionTags; // Tuzlu, Paketli, vb.
   final List<String> mealTypes;
+  final Map<String, String> mealQualities;
+  final Map<String, List<String>> mealFoodGroups;
+  final List<String> postMealFeelings;
+  // Eski yedeklerle uyumluluk için tutulur. Yeni kayıtlar mealQualities kullanır.
   final String? nutritionQuality;
   final List<String> cravings;
   final String? nutritionNotes;
@@ -141,6 +205,8 @@ class DailyLog {
   final int? sleepQuality;
   final int? stressLevel;
   final int? energyLevel;
+  final bool? dreamRemembered;
+  final String? dreamNote;
 
   // ── Cinsel Aktivite ──────────────────────────────────────
   final bool? sexualActivity;
@@ -179,6 +245,9 @@ class DailyLog {
     this.activities = const [],
     this.nutritionTags = const [],
     this.mealTypes = const [],
+    Map<String, String> mealQualities = const {},
+    Map<String, List<String>> mealFoodGroups = const {},
+    this.postMealFeelings = const [],
     this.nutritionQuality,
     this.cravings = const [],
     this.nutritionNotes,
@@ -195,6 +264,8 @@ class DailyLog {
     this.sleepQuality,
     this.stressLevel,
     this.energyLevel,
+    this.dreamRemembered,
+    this.dreamNote,
     this.sexualActivity,
     Set<SexualActivityType> sexualActivityTypes = const {},
     this.bowelActivity = const [],
@@ -255,6 +326,11 @@ class DailyLog {
                  vaginalDischargeAmount == null &&
                  vaginalDischargeSymptoms.isEmpty,
        ),
+       mealQualities = Map.unmodifiable(mealQualities),
+       mealFoodGroups = Map<String, List<String>>.unmodifiable({
+         for (final entry in mealFoodGroups.entries)
+           entry.key: List<String>.unmodifiable(entry.value),
+       }),
        sexualActivityTypes = Set.unmodifiable(sexualActivityTypes),
        symptomSeverities = Map.unmodifiable(symptomSeverities),
        vaginalDischargeSymptoms = Set.unmodifiable(vaginalDischargeSymptoms),
@@ -266,6 +342,9 @@ class DailyLog {
     List<String>? activities,
     List<String>? nutritionTags,
     List<String>? mealTypes,
+    Map<String, String>? mealQualities,
+    Map<String, List<String>>? mealFoodGroups,
+    List<String>? postMealFeelings,
     String? nutritionQuality,
     bool clearNutritionQuality = false,
     List<String>? cravings,
@@ -289,6 +368,10 @@ class DailyLog {
     bool clearStressLevel = false,
     int? energyLevel,
     bool clearEnergyLevel = false,
+    bool? dreamRemembered,
+    bool clearDreamRemembered = false,
+    String? dreamNote,
+    bool clearDreamNote = false,
     bool? sexualActivity,
     bool clearSexualActivity = false,
     Set<SexualActivityType>? sexualActivityTypes,
@@ -321,6 +404,9 @@ class DailyLog {
       activities: activities ?? this.activities,
       nutritionTags: nutritionTags ?? this.nutritionTags,
       mealTypes: mealTypes ?? this.mealTypes,
+      mealQualities: mealQualities ?? this.mealQualities,
+      mealFoodGroups: mealFoodGroups ?? this.mealFoodGroups,
+      postMealFeelings: postMealFeelings ?? this.postMealFeelings,
       nutritionQuality: clearNutritionQuality
           ? null
           : nutritionQuality ?? this.nutritionQuality,
@@ -347,6 +433,10 @@ class DailyLog {
           : sleepQuality ?? this.sleepQuality,
       stressLevel: clearStressLevel ? null : stressLevel ?? this.stressLevel,
       energyLevel: clearEnergyLevel ? null : energyLevel ?? this.energyLevel,
+      dreamRemembered: clearDreamRemembered
+          ? null
+          : dreamRemembered ?? this.dreamRemembered,
+      dreamNote: clearDreamNote ? null : dreamNote ?? this.dreamNote,
       sexualActivity: clearSexualActivity
           ? null
           : sexualActivity ?? this.sexualActivity,
@@ -389,6 +479,9 @@ class DailyLog {
     return activities.isNotEmpty ||
         nutritionTags.isNotEmpty ||
         mealTypes.isNotEmpty ||
+        mealQualities.isNotEmpty ||
+        mealFoodGroups.isNotEmpty ||
+        postMealFeelings.isNotEmpty ||
         nutritionQuality != null ||
         cravings.isNotEmpty ||
         (nutritionNotes?.isNotEmpty ?? false) ||
@@ -404,6 +497,8 @@ class DailyLog {
         sleepQuality != null ||
         stressLevel != null ||
         energyLevel != null ||
+        dreamRemembered != null ||
+        (dreamNote?.isNotEmpty ?? false) ||
         sexualActivity != null ||
         sexualActivityTypes.isNotEmpty ||
         bowelActivity.isNotEmpty ||
@@ -430,6 +525,9 @@ class DailyLog {
     'activities': activities,
     'nutritionTags': nutritionTags,
     'mealTypes': mealTypes,
+    'mealQualities': mealQualities,
+    'mealFoodGroups': mealFoodGroups,
+    'postMealFeelings': postMealFeelings,
     'nutritionQuality': nutritionQuality,
     'cravings': cravings,
     'nutritionNotes': nutritionNotes,
@@ -446,6 +544,8 @@ class DailyLog {
     'sleepQuality': sleepQuality,
     'stressLevel': stressLevel,
     'energyLevel': energyLevel,
+    'dreamRemembered': dreamRemembered,
+    'dreamNote': dreamNote,
     'sexualActivity': sexualActivity,
     'sexualActivityTypes': sexualActivityTypes
         .map((type) => type.name)
@@ -478,6 +578,9 @@ class DailyLog {
       activities: List<String>.from(json['activities'] ?? []),
       nutritionTags: List<String>.from(json['nutritionTags'] ?? []),
       mealTypes: List<String>.from(json['mealTypes'] ?? []),
+      mealQualities: _readStringMap(json, 'mealQualities'),
+      mealFoodGroups: _readStringListMap(json, 'mealFoodGroups'),
+      postMealFeelings: List<String>.from(json['postMealFeelings'] ?? []),
       nutritionQuality: json['nutritionQuality'] as String?,
       cravings: List<String>.from(json['cravings'] ?? []),
       nutritionNotes: json['nutritionNotes'] as String?,
@@ -532,6 +635,8 @@ class DailyLog {
         minimum: 1,
         maximum: 5,
       ),
+      dreamRemembered: json['dreamRemembered'] as bool?,
+      dreamNote: json['dreamNote'] as String?,
       sexualActivity: json['sexualActivity'] as bool?,
       sexualActivityTypes: _readSexualActivityTypes(json),
       bowelActivity: List<String>.from(json['bowelActivity'] ?? []),
@@ -606,6 +711,72 @@ class DailyLog {
       result[key] = value.toInt();
     }
     return result;
+  }
+
+  static Map<String, String> _readStringMap(
+    Map<String, dynamic> json,
+    String field,
+  ) {
+    final raw = json[field];
+    if (raw == null) return const {};
+    if (raw is! Map) {
+      throw FormatException('$field bir nesne olmalıdır.');
+    }
+    final result = <String, String>{};
+    for (final entry in raw.entries) {
+      final key = entry.key;
+      final value = entry.value;
+      if (key is! String ||
+          key.trim().isEmpty ||
+          key.length > 120 ||
+          value is! String ||
+          value.trim().isEmpty ||
+          value.length > 120) {
+        throw FormatException('$field geçersiz bir değer içeriyor.');
+      }
+      result[key] = value;
+    }
+    return result;
+  }
+
+  static Map<String, List<String>> _readStringListMap(
+    Map<String, dynamic> json,
+    String field,
+  ) {
+    final raw = json[field];
+    if (raw == null) return const {};
+    if (raw is! Map) {
+      throw FormatException('$field bir nesne olmalıdır.');
+    }
+    final result = <String, List<String>>{};
+    for (final entry in raw.entries) {
+      final key = entry.key;
+      final value = entry.value;
+      if (key is! String ||
+          key.trim().isEmpty ||
+          key.length > 120 ||
+          value is! List ||
+          value.length > 50 ||
+          value.any(
+            (item) =>
+                item is! String || item.trim().isEmpty || item.length > 120,
+          )) {
+        throw FormatException('$field geçersiz bir değer içeriyor.');
+      }
+      result[key] = List<String>.from(value);
+    }
+    return result;
+  }
+
+  static Map<String, List<String>> _mergeStringListMaps(
+    Map<String, List<String>> first,
+    Map<String, List<String>> second,
+  ) {
+    final keys = {...first.keys, ...second.keys};
+    return {
+      for (final key in keys)
+        key: <String>{...?first[key], ...?second[key]}.toList(),
+    };
   }
 
   static Set<SexualActivityType> _readSexualActivityTypes(
@@ -696,9 +867,13 @@ class DailyLog {
           merged[item.name] = item;
         } else {
           merged[item.name] = existing.copyWith(
-            taken: existing.taken,
-            dosage: existing.dosage.isNotEmpty ? existing.dosage : item.dosage,
-            time: existing.time.isNotEmpty ? existing.time : item.time,
+            times: {...item.times, ...existing.times},
+            doseCount: existing.doseCount >= item.doseCount
+                ? existing.doseCount
+                : item.doseCount,
+            takenDoseCount: existing.takenDoseCount >= item.takenDoseCount
+                ? existing.takenDoseCount
+                : item.takenDoseCount,
             stomachState: existing.stomachState.isNotEmpty
                 ? existing.stomachState
                 : item.stomachState,
@@ -731,6 +906,14 @@ class DailyLog {
       activities: (activities + other.activities).toSet().toList(),
       nutritionTags: (nutritionTags + other.nutritionTags).toSet().toList(),
       mealTypes: (mealTypes + other.mealTypes).toSet().toList(),
+      mealQualities: {...other.mealQualities, ...mealQualities},
+      mealFoodGroups: _mergeStringListMaps(
+        other.mealFoodGroups,
+        mealFoodGroups,
+      ),
+      postMealFeelings: (postMealFeelings + other.postMealFeelings)
+          .toSet()
+          .toList(),
       nutritionQuality: nutritionQuality ?? other.nutritionQuality,
       cravings: (cravings + other.cravings).toSet().toList(),
       nutritionNotes: (nutritionNotes != null && nutritionNotes!.isNotEmpty)
@@ -751,6 +934,8 @@ class DailyLog {
       sleepQuality: sleepQuality ?? other.sleepQuality,
       stressLevel: stressLevel ?? other.stressLevel,
       energyLevel: energyLevel ?? other.energyLevel,
+      dreamRemembered: dreamRemembered ?? other.dreamRemembered,
+      dreamNote: (dreamNote?.isNotEmpty ?? false) ? dreamNote : other.dreamNote,
       sexualActivity: mergedSexualActivity,
       sexualActivityTypes: mergedSexualActivityTypes,
       bowelActivity: (bowelActivity + other.bowelActivity).toSet().toList(),

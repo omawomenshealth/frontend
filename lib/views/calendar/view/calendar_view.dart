@@ -12,6 +12,7 @@ import '../../../core/utils/date_extensions.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
 import '../../dashboard/widgets/daily_log_sheet.dart';
+import '../../profile/viewmodel/profile_view_model.dart';
 import '../viewmodel/calendar_view_model.dart';
 
 final _firstCalendarMonth = DateTime(2024, 1);
@@ -789,6 +790,11 @@ Future<void> _showDailyLogEditor(
       settings: settings,
       initialTabIndex: initialIndex,
       isSingleTab: true,
+      onSettingsChanged: () async {
+        context.read<ProfileViewModel>().loadSettings();
+        await dashboardVm.loadData();
+        await calendarVm.loadData();
+      },
       onSave: (log) async {
         final success = log.flowIntensity != null
             ? await dashboardVm.recordPeriodAndRecalculate(log)
@@ -1121,6 +1127,12 @@ class _DailyLogDetails extends StatelessWidget {
           : AppStrings.levelOutOfFive(value.energyLevel!),
     );
     add(
+      AppStrings.dreamQuestion,
+      value.dreamRemembered == null && (value.dreamNote?.isEmpty ?? true)
+          ? null
+          : DailyLogFormatters.dream(value),
+    );
+    add(
       AppStrings.activity,
       value.activities.isEmpty
           ? null
@@ -1140,9 +1152,23 @@ class _DailyLogDetails extends StatelessWidget {
     );
     add(
       AppStrings.mealsFeel,
-      value.nutritionQuality == null
+      value.mealQualities.isEmpty && value.nutritionQuality == null
           ? null
-          : AppStrings.localizeStoredValue(value.nutritionQuality!),
+          : DailyLogFormatters.mealQualities(value),
+    );
+    add(
+      AppStrings.whatDidYouEat,
+      value.mealFoodGroups.isEmpty
+          ? null
+          : DailyLogFormatters.mealFoodGroups(value),
+    );
+    add(
+      AppStrings.howFeltAfterEating,
+      value.postMealFeelings.isEmpty
+          ? null
+          : value.postMealFeelings
+                .map(AppStrings.localizeStoredValue)
+                .join(', '),
     );
     add(
       AppStrings.cravingsQuestion,
@@ -1173,7 +1199,7 @@ class _DailyLogDetails extends StatelessWidget {
                       '${AppStrings.localizeStoredValue(item.time)} · '
                       '${AppStrings.localizeStoredValue(item.dosage)} · '
                       '${AppStrings.localizeStoredValue(item.stomachState)} · '
-                      '${item.taken ? AppStrings.doseTaken : AppStrings.no}',
+                      '${item.takenDoseCount}/${item.doseCount}',
                 )
                 .join(', '),
     );
@@ -1188,7 +1214,7 @@ class _DailyLogDetails extends StatelessWidget {
                       '${AppStrings.localizeStoredValue(item.time)} · '
                       '${AppStrings.localizeStoredValue(item.dosage)} · '
                       '${AppStrings.localizeStoredValue(item.stomachState)} · '
-                      '${item.taken ? AppStrings.doseTaken : AppStrings.no}',
+                      '${item.takenDoseCount}/${item.doseCount}',
                 )
                 .join(', '),
     );

@@ -34,13 +34,17 @@ saklar ve aynı şifreli nesne buluta yüklenir:
 
 - kayıt zamanı: `date`; kullanıcı saat eklememişse `hasExplicitTime: false`
 - hareket: `activities`
-- beslenme: `nutritionTags`, `mealTypes`, `nutritionQuality`, `cravings`,
+- beslenme: `nutritionTags`, `mealTypes`, öğün bazında `mealQualities` ve
+  `mealFoodGroups`, `postMealFeelings`, `nutritionQuality`, `cravings`,
   `nutritionNotes`, `waterIntakeMl`, `caffeineServings`
-- ilaç ve takviye: `medications`, `supplements`; her girişte ad, zaman,
-  aç/tok durumu, doz ve alındı bilgisi
+- ilaç ve takviye: `medications`, `supplements`; her girişte ad, birden fazla
+  zaman seçimi (`times`), aç/tok durumu, toplam adet (`doseCount`) ve
+  işaretlenen adet (`takenDoseCount`) bilgisi. Eski `time`, `dosage` ve `taken`
+  alanları geriye dönük uyumluluk için birlikte yazılır
 - ruh hâli ve iyi oluş: `mood`, `moodEmoji`, `moodNote`, `moodCompanions`,
   `moodPlaces`, `sleepDurationMinutes`, `sleepQuality`, `stressLevel`,
-  `energyLevel`
+  `energyLevel`, rüya hatırlama durumu ve isteğe bağlı rüya notu
+  (`dreamRemembered`, `dreamNote`)
 - diğer sağlık kayıtları: `sexualActivity`, `bowelActivity`,
   `sexualActivityTypes`, `painLocations`, `symptoms`, `symptomSeverity` ve
   belirti bazında 1-3 şiddet değerlerini tutan `symptomSeverities`

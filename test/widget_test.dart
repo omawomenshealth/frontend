@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app_proje_a/core/constants/app_strings.dart';
+import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
@@ -49,6 +51,44 @@ void main() {
     expect(find.byType(BottomNavigationBar), findsNothing);
     expect(find.byIcon(Icons.close_rounded), findsOneWidget);
   });
+
+  testWidgets(
+    'planlanan dozlar ana ekranda, eski yolculuk şeridi olmadan görünür',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+      await storage.init();
+      await storage.saveSettings(
+        UserSettings(isOnboardingComplete: true, userName: 'Test'),
+      );
+      final now = DateTime.now();
+      await storage.saveMedicationDoseRecords([
+        MedicationDoseRecord(
+          id: 'today-dose',
+          planId: 'plan-1',
+          itemType: MedicationPlanItemType.medication,
+          itemName: 'Test ilacı',
+          dosage: '3 Adet',
+          scheduledAt: DateTime(now.year, now.month, now.day, 23, 55),
+          notificationScheduled: true,
+          notificationScheduledAt: now,
+          status: null,
+          respondedAt: null,
+        ),
+      ]);
+
+      await tester.pumpWidget(MyApp(storage: storage));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('dashboard_planned_doses')),
+        findsOneWidget,
+      );
+      for (final label in AppStrings.journeyLabels) {
+        expect(find.text(label), findsNothing);
+      }
+    },
+  );
 
   testWidgets('geri tuşu önce ana sayfaya döner', (tester) async {
     SharedPreferences.setMockInitialValues({});

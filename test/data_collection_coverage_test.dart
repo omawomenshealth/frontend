@@ -9,6 +9,11 @@ void main() {
       activities: const ['Yürüyüş'],
       nutritionTags: const ['Ev yemeği'],
       mealTypes: const ['Kahvaltı'],
+      mealQualities: const {'Kahvaltı': 'Dengeli'},
+      mealFoodGroups: const {
+        'Kahvaltı': ['Gluten', 'Yumurta'],
+      },
+      postMealFeelings: const ['Enerjik', 'Şişkin'],
       nutritionQuality: 'Dengeli',
       cravings: const ['Tatlı'],
       nutritionNotes: 'Not',
@@ -17,10 +22,10 @@ void main() {
       supplements: [
         MedicationEntry(
           name: 'Demir',
-          time: 'Sabah',
+          times: const {'Sabah', 'Akşam'},
           stomachState: 'Tok',
-          dosage: '1 adet',
-          taken: true,
+          doseCount: 3,
+          takenDoseCount: 2,
         ),
       ],
       medications: [
@@ -28,8 +33,8 @@ void main() {
           name: 'İlaç',
           time: 'Akşam',
           stomachState: 'Aç',
-          dosage: '500 mg',
-          taken: false,
+          doseCount: 2,
+          takenDoseCount: 0,
         ),
       ],
       mood: 'İyi',
@@ -41,6 +46,8 @@ void main() {
       sleepQuality: 4,
       stressLevel: 2,
       energyLevel: 4,
+      dreamRemembered: true,
+      dreamNote: 'Deniz kenarında yürüyordum.',
       sexualActivity: true,
       sexualActivityTypes: const {
         SexualActivityType.partnered,

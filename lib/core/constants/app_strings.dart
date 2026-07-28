@@ -50,6 +50,8 @@ enum _TextKey {
   insightAssociationTitle,
   insightAssociationSameDayBody,
   insightAssociationNextDayBody,
+  insightFoodSensitivityTitle,
+  insightFoodSensitivityBody,
   insightMedicationSkipAssociationTitle,
   insightMedicationSkipAssociationBody,
   insightMedicationAdherenceTitle,
@@ -236,6 +238,7 @@ enum _TextKey {
   implant,
   otherMethod,
   womenDiseases,
+  commonWomenDiseases,
   lastPeriodDate,
   selectDate,
   great,
@@ -271,6 +274,8 @@ enum _TextKey {
   periodStartedHint,
   mealsToday,
   mealsFeel,
+  whatDidYouEat,
+  howFeltAfterEating,
   cravingsQuestion,
   hydrationGlasses,
   symptomQuestion,
@@ -284,6 +289,9 @@ enum _TextKey {
   symptomEnergy,
   symptomSleep,
   symptomDigestion,
+  dreamQuestion,
+  dreamNoteQuestion,
+  dreamNoteHint,
   moodBehindQuestion,
   moodContextHint,
   omaNote,
@@ -361,6 +369,9 @@ enum _TextKey {
   timeNotAdded,
   logSaveFailed,
   futureLogNotAllowed,
+  savePeriodBeforeSymptomsTitle,
+  savePeriodBeforeSymptomsBody,
+  saveAndContinue,
   supplementExample,
   medicationExample,
   previouslyAdded,
@@ -560,6 +571,8 @@ enum _TextKey {
   noReminderPlans,
   reminderItem,
   reminderDose,
+  doseUnit,
+  doseCountLabel,
   notificationTime,
   repeatPeriod,
   everyDay,
@@ -617,6 +630,8 @@ enum _ListKey {
   nutritionMealOptions,
   nutritionQualityOptions,
   nutritionCravingOptions,
+  nutritionFoodGroups,
+  postMealFeelings,
   periodSymptomOptions,
   symptomSeverityOptions,
   symptomOverallOptions,
@@ -706,6 +721,9 @@ const Map<_TextKey, String> _turkishTexts = {
       '{primary} kaydedilen {withTotal} günün {withEvent} tanesinde aynı gün {secondary} de kaydedildi (%{withPercent}). {primary} kaydedilmeyen {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; neden-sonuç değildir.',
   _TextKey.insightAssociationNextDayBody:
       '{primary} kaydedilen {withTotal} günün {withEvent} tanesini izleyen gün {secondary} kaydedildi (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; neden-sonuç değildir.',
+  _TextKey.insightFoodSensitivityTitle: 'Besin ve sindirim örüntüsü',
+  _TextKey.insightFoodSensitivityBody:
+      '{primary} içeren öğünlerden sonraki {withTotal} kaydın {withEvent} tanesinde {secondary} işaretlendi (%{withPercent}). {primary} olmayan {withoutTotal} karşılaştırılabilir kayıtta bu oran %{withoutPercent}. Bu örüntü bir hassasiyet olasılığını düşündürebilir; tanı değildir. Tekrarlarsa bir sağlık profesyoneliyle görüş.',
   _TextKey.insightMedicationSkipAssociationTitle:
       'Doz yanıtından sonra görülen örüntü',
   _TextKey.insightMedicationSkipAssociationBody:
@@ -911,6 +929,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.implant: 'İmplant',
   _TextKey.otherMethod: 'Diğer',
   _TextKey.womenDiseases: 'Kadın Hastalıkları',
+  _TextKey.commonWomenDiseases: 'Sık görülen kadın hastalıkları',
   _TextKey.lastPeriodDate: 'Son adet başlangıç tarihi',
   _TextKey.selectDate: 'Tarih seçin',
   _TextKey.great: 'Harika! 🎉',
@@ -951,6 +970,8 @@ const Map<_TextKey, String> _turkishTexts = {
       'OMA’nın döngünün başlangıcını doğru belirlemesine yardımcı olur.',
   _TextKey.mealsToday: 'Bugünkü öğünler',
   _TextKey.mealsFeel: 'Nasıl beslendin?',
+  _TextKey.whatDidYouEat: 'Ne yedin?',
+  _TextKey.howFeltAfterEating: 'Yedikten sonra nasıl hissettin?',
   _TextKey.cravingsQuestion: 'Canın özellikle ne çekti?',
   _TextKey.hydrationGlasses: '{count} / {goal} bardak',
   _TextKey.symptomQuestion: 'Bedeninde ne hissediyorsun?',
@@ -965,6 +986,9 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.symptomEnergy: 'ENERJİ',
   _TextKey.symptomSleep: 'UYKU',
   _TextKey.symptomDigestion: 'SİNDİRİM',
+  _TextKey.dreamQuestion: 'Rüya gördün mü?',
+  _TextKey.dreamNoteQuestion: 'Rüyanı not etmek ister misin?',
+  _TextKey.dreamNoteHint: 'Hatırladığın kadarıyla rüyanı yazabilirsin',
   _TextKey.moodBehindQuestion: '{mood} hissetmenin ardında ne var?',
   _TextKey.moodContextHint:
       'Biraz bağlam, OMA’nın örüntülerini anlamasına yardımcı olur. Uyanların tümünü seç.',
@@ -1052,6 +1076,10 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.timeNotAdded: 'Saat eklenmedi',
   _TextKey.logSaveFailed: 'Kayıt tamamlanamadı. Lütfen tekrar deneyin.',
   _TextKey.futureLogNotAllowed: 'Gelecek tarihlere günlük kayıt eklenemez.',
+  _TextKey.savePeriodBeforeSymptomsTitle: 'Önce adet kaydını kaydedelim',
+  _TextKey.savePeriodBeforeSymptomsBody:
+      'Belirti bölümüne geçmeden önce bu adet kaydı kaydedilecek.',
+  _TextKey.saveAndContinue: 'Kaydet ve devam et',
   _TextKey.supplementExample: 'Örn: D Vitamini',
   _TextKey.medicationExample: 'Örn: 500 mg Parol',
   _TextKey.previouslyAdded: 'Önceden Eklenenler:',
@@ -1289,6 +1317,8 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.noReminderPlans: 'Henüz hatırlatıcı planı yok.',
   _TextKey.reminderItem: 'İlaç veya takviye',
   _TextKey.reminderDose: 'Doz',
+  _TextKey.doseUnit: 'Adet',
+  _TextKey.doseCountLabel: '{count} Adet',
   _TextKey.notificationTime: 'Bildirim saati',
   _TextKey.repeatPeriod: 'Tekrarlama periyodu',
   _TextKey.everyDay: 'Her gün',
@@ -1401,6 +1431,9 @@ const Map<_TextKey, String> _englishTexts = {
       'On {withEvent} of {withTotal} days with {primary}, {secondary} was also logged that day ({withPercent}%). On {withoutTotal} comparable days without {primary}, the rate was {withoutPercent}%. This is an association, not cause and effect.',
   _TextKey.insightAssociationNextDayBody:
       '{secondary} was logged the next day after {withEvent} of {withTotal} days with {primary} ({withPercent}%). On the other {withoutTotal} comparable days, the rate was {withoutPercent}%. This is an association, not cause and effect.',
+  _TextKey.insightFoodSensitivityTitle: 'Food and digestion pattern',
+  _TextKey.insightFoodSensitivityBody:
+      '{secondary} was logged after {withEvent} of {withTotal} meals containing {primary} ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable logs without {primary}. This pattern may suggest a possible sensitivity, but it is not a diagnosis. Consult a healthcare professional if it repeats.',
   _TextKey.insightMedicationSkipAssociationTitle:
       'Pattern after a dose response',
   _TextKey.insightMedicationSkipAssociationBody:
@@ -1604,6 +1637,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.implant: 'Implant',
   _TextKey.otherMethod: 'Other',
   _TextKey.womenDiseases: 'Gynecological Conditions',
+  _TextKey.commonWomenDiseases: 'Common gynecological conditions',
   _TextKey.lastPeriodDate: 'First day of your last period',
   _TextKey.selectDate: 'Select a date',
   _TextKey.great: 'Great! 🎉',
@@ -1644,6 +1678,8 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.periodStartedHint: 'Helps OMA anchor the start of your cycle.',
   _TextKey.mealsToday: 'Meals today',
   _TextKey.mealsFeel: 'How did you eat?',
+  _TextKey.whatDidYouEat: 'What did you eat?',
+  _TextKey.howFeltAfterEating: 'How did you feel after eating?',
   _TextKey.cravingsQuestion: 'Any cravings?',
   _TextKey.hydrationGlasses: '{count} / {goal} glasses',
   _TextKey.symptomQuestion: 'What are you feeling in your body?',
@@ -1658,6 +1694,9 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.symptomEnergy: 'ENERGY',
   _TextKey.symptomSleep: 'SLEEP',
   _TextKey.symptomDigestion: 'DIGESTION',
+  _TextKey.dreamQuestion: 'Did you dream?',
+  _TextKey.dreamNoteQuestion: 'Would you like to note your dream?',
+  _TextKey.dreamNoteHint: 'Write down as much of your dream as you remember',
   _TextKey.moodBehindQuestion: 'What’s behind feeling {mood}?',
   _TextKey.moodContextHint:
       'A little context helps OMA understand your patterns. Choose all that apply.',
@@ -1746,6 +1785,10 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.timeNotAdded: 'Time not added',
   _TextKey.logSaveFailed: 'The log could not be saved. Please try again.',
   _TextKey.futureLogNotAllowed: 'Daily logs cannot be added for future dates.',
+  _TextKey.savePeriodBeforeSymptomsTitle: 'Save your period log first',
+  _TextKey.savePeriodBeforeSymptomsBody:
+      'This period log will be saved before opening symptoms.',
+  _TextKey.saveAndContinue: 'Save and continue',
   _TextKey.supplementExample: 'Example: Vitamin D',
   _TextKey.medicationExample: 'Example: Paracetamol 500 mg',
   _TextKey.previouslyAdded: 'Previously Added:',
@@ -1981,6 +2024,8 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.noReminderPlans: 'No reminder plan yet.',
   _TextKey.reminderItem: 'Medication or supplement',
   _TextKey.reminderDose: 'Dose',
+  _TextKey.doseUnit: 'Count',
+  _TextKey.doseCountLabel: '{count} count',
   _TextKey.notificationTime: 'Notification time',
   _TextKey.repeatPeriod: 'Repeat period',
   _TextKey.everyDay: 'Every day',
@@ -2060,11 +2105,16 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Dismenore (Ağrılı Adet)',
     'PCOS (Polikistik Over Sendromu)',
     'Endometriozis',
+    'Adenomyozis',
     'Miyom',
     'Over Kisti',
     'Düzensiz Adet',
     'Amenore (Adet Kesilmesi)',
     'PMS (Premenstrüel Sendrom)',
+    'Pelvik İnflamatuar Hastalık',
+    'HPV',
+    'Tekrarlayan Vajinal Enfeksiyon',
+    'Vulvodini',
     'Vajinismus',
     'Diğer',
   ],
@@ -2122,7 +2172,7 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Akşam yemeği',
     'Atıştırmalık',
   ],
-  _ListKey.nutritionQualityOptions: ['Hafif', 'Dengeli', 'Ağır'],
+  _ListKey.nutritionQualityOptions: ['Hafif', 'Orta', 'Ağır'],
   _ListKey.nutritionCravingOptions: [
     'Tatlı',
     'Tuzlu',
@@ -2131,6 +2181,31 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Acı',
     'Kafein',
     'Hiçbiri',
+  ],
+  _ListKey.nutritionFoodGroups: [
+    'Gluten',
+    'Süt ürünleri',
+    'Yumurta',
+    'Kuruyemiş',
+    'Baklagiller',
+    'Kırmızı et',
+    'Tavuk',
+    'Balık',
+    'Sebze',
+    'Meyve',
+    'İşlenmiş gıda',
+    'Acı / baharatlı',
+  ],
+  _ListKey.postMealFeelings: [
+    'Rahat',
+    'Enerjik',
+    'Tok',
+    'Şişkin',
+    'Yorgun',
+    'Mide bulantısı',
+    'Gaz',
+    'Reflü',
+    'Açlık devam etti',
   ],
   _ListKey.periodSymptomOptions: [
     'Kramplar',
@@ -2153,17 +2228,46 @@ const Map<_ListKey, List<String>> _turkishLists = {
   _ListKey.symptomSkinHairOptions: [
     'Akne',
     'Kuru cilt',
+    'Yağlı cilt',
+    'Hassas cilt',
+    'Ciltte kızarıklık',
+    'Kaşıntılı cilt',
     'Yağlı saç',
+    'Kuru saç',
     'Saç dökülmesi',
+    'Kırılgan tırnaklar',
   ],
   _ListKey.symptomEnergyOptions: [
+    'Enerjik',
+    'Dinç',
+    'Motivasyonlu',
     'Yorgunluk',
     'Huzursuzluk',
     'Odaklanmış',
+    'Sakin ve dengeli',
     'Zihin bulanıklığı',
   ],
-  _ListKey.symptomSleepOptions: ['Uykusuzluk'],
-  _ListKey.symptomDigestionOptions: ['Aşerme', 'Kabızlık', 'İshal', 'Reflü'],
+  _ListKey.symptomSleepOptions: [
+    'İyi uyudum',
+    'Derin uyku',
+    'Dinlenmiş uyandım',
+    'Uykuya dalmakta zorlandım',
+    'Sık uyandım',
+    'Erken uyandım',
+    'Canlı rüyalar',
+    'Kâbus',
+  ],
+  _ListKey.symptomDigestionOptions: [
+    'Midem iyi',
+    'Bağırsaklarım iyi',
+    'Düzenli sindirim',
+    'Aşerme',
+    'Kabızlık',
+    'İshal',
+    'Şişkinlik',
+    'Gaz',
+    'Reflü',
+  ],
   _ListKey.bowelActivityOptions: [
     'Normal',
     'Kabızlık',
@@ -2219,10 +2323,10 @@ const Map<_ListKey, List<String>> _turkishLists = {
   _ListKey.dosageOptions: [
     '1 Adet',
     '2 Adet',
-    '500 mg',
-    '1000 mg',
-    '5 Damla',
-    '10 Damla',
+    '3 Adet',
+    '4 Adet',
+    '5 Adet',
+    '6 Adet',
   ],
   _ListKey.shortWeekdays: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
   _ListKey.weekdays: [
@@ -2290,11 +2394,16 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Dysmenorrhea (Painful Periods)',
     'PCOS (Polycystic Ovary Syndrome)',
     'Endometriosis',
+    'Adenomyosis',
     'Fibroids',
     'Ovarian Cyst',
     'Irregular Periods',
     'Amenorrhea',
     'PMS (Premenstrual Syndrome)',
+    'Pelvic Inflammatory Disease',
+    'HPV',
+    'Recurrent Vaginal Infection',
+    'Vulvodynia',
     'Vaginismus',
     'Other',
   ],
@@ -2347,7 +2456,7 @@ const Map<_ListKey, List<String>> _englishLists = {
     'No activity',
   ],
   _ListKey.nutritionMealOptions: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
-  _ListKey.nutritionQualityOptions: ['Light', 'Balanced', 'Heavy'],
+  _ListKey.nutritionQualityOptions: ['Light', 'Medium', 'Heavy'],
   _ListKey.nutritionCravingOptions: [
     'Sweet',
     'Salty',
@@ -2356,6 +2465,31 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Spicy',
     'Caffeine',
     'Nothing',
+  ],
+  _ListKey.nutritionFoodGroups: [
+    'Gluten',
+    'Dairy',
+    'Eggs',
+    'Nuts',
+    'Legumes',
+    'Red meat',
+    'Poultry',
+    'Fish',
+    'Vegetables',
+    'Fruit',
+    'Processed food',
+    'Spicy food',
+  ],
+  _ListKey.postMealFeelings: [
+    'Comfortable',
+    'Energetic',
+    'Full',
+    'Bloated',
+    'Tired',
+    'Nauseous',
+    'Gassy',
+    'Reflux',
+    'Still hungry',
   ],
   _ListKey.periodSymptomOptions: [
     'Cramps',
@@ -2378,15 +2512,44 @@ const Map<_ListKey, List<String>> _englishLists = {
   _ListKey.symptomSkinHairOptions: [
     'Acne',
     'Dry skin',
+    'Oily skin',
+    'Sensitive skin',
+    'Skin redness',
+    'Itchy skin',
     'Oily hair',
+    'Dry hair',
     'Hair loss',
+    'Brittle nails',
   ],
-  _ListKey.symptomEnergyOptions: ['Fatigue', 'Restless', 'Focused', 'Foggy'],
-  _ListKey.symptomSleepOptions: ['Insomnia'],
+  _ListKey.symptomEnergyOptions: [
+    'Energetic',
+    'Refreshed',
+    'Motivated',
+    'Fatigue',
+    'Restless',
+    'Focused',
+    'Calm and balanced',
+    'Foggy',
+  ],
+  _ListKey.symptomSleepOptions: [
+    'Slept well',
+    'Deep sleep',
+    'Woke refreshed',
+    'Trouble falling asleep',
+    'Woke often',
+    'Woke early',
+    'Vivid dreams',
+    'Nightmare',
+  ],
   _ListKey.symptomDigestionOptions: [
+    'Stomach feels good',
+    'Bowels feel good',
+    'Regular digestion',
     'Cravings',
     'Constipation',
     'Diarrhea',
+    'Bloating',
+    'Gas',
     'Reflux',
   ],
   _ListKey.bowelActivityOptions: [
@@ -2442,12 +2605,12 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Pelvic / lower abdominal pain',
   ],
   _ListKey.dosageOptions: [
-    '1 Tablet',
-    '2 Tablets',
-    '500 mg',
-    '1000 mg',
-    '5 Drops',
-    '10 Drops',
+    '1 count',
+    '2 count',
+    '3 count',
+    '4 count',
+    '5 count',
+    '6 count',
   ],
   _ListKey.shortWeekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   _ListKey.weekdays: [
@@ -2585,6 +2748,9 @@ class AppStrings {
 
   /// Herhangi bir desteklenen dilde saklanmış seçeneği etkin dile çevirir.
   static String localizeStoredValue(String value) {
+    if (value == 'Dengeli' || value == 'Balanced') {
+      return nutritionQualityOptions[1];
+    }
     for (final key in _ListKey.values) {
       for (final catalog in _listCatalogs.values) {
         final index = catalog[key]!.indexOf(value);
@@ -2637,6 +2803,9 @@ class AppStrings {
   /// Herhangi bir desteklenen dilde saklanmış eşdeğer seçenekleri tek bir sabit
   /// değerde toplar. Analiz motoru böylece arayüz dilinden bağımsız çalışır.
   static String canonicalizeStoredValue(String value) {
+    if (value == 'Dengeli' || value == 'Balanced') {
+      return _turkishLists[_ListKey.nutritionQualityOptions]![1];
+    }
     for (final key in _ListKey.values) {
       final canonical = _turkishLists[key]!;
       for (final catalog in _listCatalogs.values) {
@@ -2832,6 +3001,25 @@ class AppStrings {
       'withoutPercent': withoutPercent,
     },
   );
+  static String get insightFoodSensitivityTitle =>
+      _text(_TextKey.insightFoodSensitivityTitle);
+  static String insightFoodSensitivityBody({
+    required String primary,
+    required String secondary,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightFoodSensitivityBody, {
+    'primary': primary,
+    'secondary': secondary,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
   static String get insightMedicationSkipAssociationTitle =>
       _text(_TextKey.insightMedicationSkipAssociationTitle);
   static String insightMedicationSkipAssociationBody({
@@ -3126,6 +3314,7 @@ class AppStrings {
   }
 
   static String get womenDiseases => _text(_TextKey.womenDiseases);
+  static String get commonWomenDiseases => _text(_TextKey.commonWomenDiseases);
   static String get lastPeriodDate => _text(_TextKey.lastPeriodDate);
   static String get selectDate => _text(_TextKey.selectDate);
   static String get great => _text(_TextKey.great);
@@ -3166,6 +3355,8 @@ class AppStrings {
   static String get periodStartedHint => _text(_TextKey.periodStartedHint);
   static String get mealsToday => _text(_TextKey.mealsToday);
   static String get mealsFeel => _text(_TextKey.mealsFeel);
+  static String get whatDidYouEat => _text(_TextKey.whatDidYouEat);
+  static String get howFeltAfterEating => _text(_TextKey.howFeltAfterEating);
   static String get cravingsQuestion => _text(_TextKey.cravingsQuestion);
   static String hydrationGlasses(int count, int goal) =>
       _format(_TextKey.hydrationGlasses, {'count': count, 'goal': goal});
@@ -3180,6 +3371,9 @@ class AppStrings {
   static String get symptomEnergy => _text(_TextKey.symptomEnergy);
   static String get symptomSleep => _text(_TextKey.symptomSleep);
   static String get symptomDigestion => _text(_TextKey.symptomDigestion);
+  static String get dreamQuestion => _text(_TextKey.dreamQuestion);
+  static String get dreamNoteQuestion => _text(_TextKey.dreamNoteQuestion);
+  static String get dreamNoteHint => _text(_TextKey.dreamNoteHint);
   static String moodBehindQuestion(String mood) =>
       _format(_TextKey.moodBehindQuestion, {'mood': mood});
   static String get moodContextHint => _text(_TextKey.moodContextHint);
@@ -3266,6 +3460,11 @@ class AppStrings {
   static String get timeNotAdded => _text(_TextKey.timeNotAdded);
   static String get logSaveFailed => _text(_TextKey.logSaveFailed);
   static String get futureLogNotAllowed => _text(_TextKey.futureLogNotAllowed);
+  static String get savePeriodBeforeSymptomsTitle =>
+      _text(_TextKey.savePeriodBeforeSymptomsTitle);
+  static String get savePeriodBeforeSymptomsBody =>
+      _text(_TextKey.savePeriodBeforeSymptomsBody);
+  static String get saveAndContinue => _text(_TextKey.saveAndContinue);
   static String get supplementExample => _text(_TextKey.supplementExample);
   static String get medicationExample => _text(_TextKey.medicationExample);
   static String get previouslyAdded => _text(_TextKey.previouslyAdded);
@@ -3520,6 +3719,9 @@ class AppStrings {
   static String get noReminderPlans => _text(_TextKey.noReminderPlans);
   static String get reminderItem => _text(_TextKey.reminderItem);
   static String get reminderDose => _text(_TextKey.reminderDose);
+  static String get doseUnit => _text(_TextKey.doseUnit);
+  static String dosageCount(int count) =>
+      _format(_TextKey.doseCountLabel, {'count': count});
   static String get notificationTime => _text(_TextKey.notificationTime);
   static String get repeatPeriod => _text(_TextKey.repeatPeriod);
   static String get everyDay => _text(_TextKey.everyDay);
@@ -3600,6 +3802,10 @@ class AppStrings {
       _list(_ListKey.nutritionQualityOptions);
   static List<String> get nutritionCravingOptions =>
       _list(_ListKey.nutritionCravingOptions);
+  static List<String> get nutritionFoodGroupOptions =>
+      _list(_ListKey.nutritionFoodGroups);
+  static List<String> get postMealFeelingOptions =>
+      _list(_ListKey.postMealFeelings);
   static List<String> get periodSymptomOptions =>
       _list(_ListKey.periodSymptomOptions);
   static List<String> get symptomSeverityOptions =>

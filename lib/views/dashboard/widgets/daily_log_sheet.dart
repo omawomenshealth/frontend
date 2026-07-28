@@ -9,12 +9,14 @@ import '../../../data/models/period_log_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../data/services/notification_service.dart';
 import 'medication_reminder_section.dart';
 
 class DailyLogSheet extends StatefulWidget {
   final DailyLog initialLog;
   final UserSettings settings;
   final Future<bool> Function(DailyLog) onSave;
+  final Future<void> Function()? onSettingsChanged;
   final int initialTabIndex;
   final bool isSingleTab;
 
@@ -23,6 +25,7 @@ class DailyLogSheet extends StatefulWidget {
     required this.initialLog,
     required this.settings,
     required this.onSave,
+    this.onSettingsChanged,
     this.initialTabIndex = 0,
     this.isSingleTab = false,
   });
@@ -41,7 +44,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   late int _waterGlasses;
   late Set<String> _meals;
-  int? _nutritionQualityIndex;
+  late Map<String, int> _mealQualityIndices;
+  late Map<String, Set<String>> _mealFoodGroups;
+  late Set<String> _postMealFeelings;
   late Set<String> _cravings;
 
   final _symptomSearchController = TextEditingController();
@@ -54,6 +59,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   late VaginalDischargeConsistency? _vaginalDischargeConsistency;
   late VaginalDischargeAmount? _vaginalDischargeAmount;
   late Set<VaginalDischargeSymptom> _vaginalDischargeSymptoms;
+  late bool? _dreamRemembered;
+  final _dreamNoteController = TextEditingController();
 
   late List<MedicationEntry> _medications;
   late List<MedicationEntry> _supplements;
@@ -85,13 +92,34 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ? 0
         : (_log.waterIntakeMl! / 250).round().clamp(0, 12);
     _meals = _localizedSet(_log.mealTypes, AppStrings.nutritionMealOptions);
-    _nutritionQualityIndex = _log.nutritionQuality == null
-        ? null
-        : _localizedIndex(
-            AppStrings.nutritionQualityOptions,
-            _log.nutritionQuality,
-            fallback: 1,
-          );
+    _mealQualityIndices = {
+      for (final entry in _log.mealQualities.entries)
+        AppStrings.localizeStoredValue(entry.key): _localizedIndex(
+          AppStrings.nutritionQualityOptions,
+          entry.value,
+          fallback: 1,
+        ),
+    };
+    if (_mealQualityIndices.isEmpty && _log.nutritionQuality != null) {
+      final legacyIndex = _localizedIndex(
+        AppStrings.nutritionQualityOptions,
+        _log.nutritionQuality,
+        fallback: 1,
+      );
+      for (final meal in _meals.where(_supportsMealQuality)) {
+        _mealQualityIndices[meal] = legacyIndex;
+      }
+    }
+    _mealFoodGroups = {
+      for (final entry in _log.mealFoodGroups.entries)
+        AppStrings.localizeStoredValue(entry.key): entry.value
+            .map(AppStrings.localizeStoredValue)
+            .toSet(),
+    };
+    _postMealFeelings = _localizedSet(
+      _log.postMealFeelings,
+      AppStrings.postMealFeelingOptions,
+    );
     _cravings = _localizedSet(
       _log.cravings,
       AppStrings.nutritionCravingOptions,
@@ -118,6 +146,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _vaginalDischargeConsistency = _log.vaginalDischargeConsistency;
     _vaginalDischargeAmount = _log.vaginalDischargeAmount;
     _vaginalDischargeSymptoms = {..._log.vaginalDischargeSymptoms};
+    _dreamRemembered = _log.dreamRemembered;
+    _dreamNoteController.text = _log.dreamNote ?? '';
 
     _medications = _initialMedicationEntries(
       _log.medications,
@@ -143,6 +173,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   @override
   void dispose() {
     _symptomSearchController.dispose();
+    _dreamNoteController.dispose();
     super.dispose();
   }
 
@@ -182,9 +213,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final entries = <String, MedicationEntry>{};
     for (final entry in saved) {
       entries[entry.name] = entry.copyWith(
-        time: AppStrings.localizeStoredValue(entry.time),
+        times: entry.times.map(AppStrings.localizeStoredValue).toSet(),
         stomachState: AppStrings.localizeStoredValue(entry.stomachState),
-        dosage: AppStrings.localizeStoredValue(entry.dosage),
       );
     }
     for (final rawName in configuredNames) {
@@ -196,7 +226,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           name: name,
           time: AppStrings.medicationTimes.first,
           stomachState: AppStrings.stomachStates.first,
-          dosage: AppStrings.dosageOptions.first,
+          doseCount: 1,
         ),
       );
     }
@@ -443,7 +473,21 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           onChanged: (index) => setState(() => _flowIndex = index),
         ),
         const SizedBox(height: 25),
-        _SectionTitle(AppStrings.logAnythingElse),
+        Row(
+          children: [
+            Expanded(child: _SectionTitle(AppStrings.logAnythingElse)),
+            IconButton.filled(
+              key: const ValueKey('period_open_symptoms'),
+              tooltip: AppStrings.symptom,
+              onPressed: _promptSavePeriodAndOpenSymptoms,
+              style: IconButton.styleFrom(
+                backgroundColor: AppColors.periodPrimary,
+                foregroundColor: Colors.white,
+              ),
+              icon: const Icon(Icons.add_rounded),
+            ),
+          ],
+        ),
         const SizedBox(height: 11),
         Align(
           alignment: Alignment.centerLeft,
@@ -558,30 +602,31 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 25),
         _SectionTitle(AppStrings.mealsToday),
         const SizedBox(height: 11),
-        _buildSimpleChoices(
-          options: AppStrings.nutritionMealOptions,
-          selected: _meals,
-          color: AppColors.secondary,
-        ),
-        const SizedBox(height: 24),
-        _SectionTitle(AppStrings.mealsFeel),
-        const SizedBox(height: 11),
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: AppStrings.nutritionQualityOptions.asMap().entries.map((
-            entry,
-          ) {
-            return _PillChoice(
-              label: entry.value,
-              selected: entry.key == _nutritionQualityIndex,
-              color: AppColors.secondary,
-              onTap: () => setState(
-                () => _nutritionQualityIndex =
-                    _nutritionQualityIndex == entry.key ? null : entry.key,
+          children: [
+            for (final meal in AppStrings.nutritionMealOptions)
+              _PillChoice(
+                label: meal,
+                selected: _meals.contains(meal),
+                color: AppColors.secondary,
+                onTap: () => _toggleMeal(meal),
               ),
-            );
-          }).toList(),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _SectionTitle(AppStrings.mealsFeel),
+        for (final meal in AppStrings.nutritionMealOptions.where(
+          _meals.contains,
+        )) ...[const SizedBox(height: 11), _buildMealDetails(meal)],
+        const SizedBox(height: 25),
+        _SectionTitle(AppStrings.howFeltAfterEating),
+        const SizedBox(height: 11),
+        _buildSimpleChoices(
+          options: AppStrings.postMealFeelingOptions,
+          selected: _postMealFeelings,
+          color: AppColors.secondary,
         ),
         const SizedBox(height: 25),
         _SectionTitle(AppStrings.cravingsQuestion),
@@ -672,9 +717,71 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               },
             ),
           ],
+        const SizedBox(height: 22),
+        _buildDreamCard(),
         const SizedBox(height: 26),
         _buildBodyTrackingCard(),
       ],
+    );
+  }
+
+  Widget _buildDreamCard() {
+    return Container(
+      key: const ValueKey('dream_card'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.outline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(AppStrings.dreamQuestion),
+          const SizedBox(height: 11),
+          _buildTrackingChoices(
+            options: [AppStrings.yes, AppStrings.no],
+            icons: const [Icons.nightlight_round, Icons.bedtime_outlined],
+            selectedIndices: {
+              if (_dreamRemembered == true) 0,
+              if (_dreamRemembered == false) 1,
+            },
+            color: AppColors.secondaryDark,
+            keyPrefix: 'dream',
+            onSelected: (index) => setState(() {
+              _dreamRemembered = index == 0;
+              if (_dreamRemembered != true) _dreamNoteController.clear();
+            }),
+          ),
+          if (_dreamRemembered == true) ...[
+            const SizedBox(height: 16),
+            Text(
+              AppStrings.dreamNoteQuestion,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _dreamNoteController,
+              minLines: 2,
+              maxLines: 4,
+              maxLength: 1000,
+              decoration: InputDecoration(
+                hintText: AppStrings.dreamNoteHint,
+                filled: true,
+                fillColor: AppColors.scaffoldBackground,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: AppColors.outline),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -848,6 +955,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     required List<IconData> icons,
     required Set<int> selectedIndices,
     required Color color,
+    String? keyPrefix,
     required ValueChanged<int> onSelected,
   }) {
     return LayoutBuilder(
@@ -862,6 +970,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               SizedBox(
                 width: width,
                 child: _TrackingChoiceTile(
+                  key: keyPrefix == null
+                      ? null
+                      : ValueKey('${keyPrefix}_choice_$index'),
                   label: options[index],
                   icon: icons[index],
                   selected: selectedIndices.contains(index),
@@ -942,8 +1053,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         for (var index = 0; index < labels.length; index++)
           _SymptomItem(
             label: labels[index],
-            icon: icons[index],
-            color: colors[index],
+            icon: icons[index % icons.length],
+            color: colors[index % colors.length],
           ),
       ];
     }
@@ -1194,6 +1305,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               entries: _medications,
               icon: Icons.medication_outlined,
               groupKey: 'medication',
+              itemType: MedicationPlanItemType.medication,
             ),
           if (_medications.isNotEmpty && _supplements.isNotEmpty)
             const SizedBox(height: 20),
@@ -1203,6 +1315,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               entries: _supplements,
               icon: Icons.spa_outlined,
               groupKey: 'supplement',
+              itemType: MedicationPlanItemType.supplement,
             ),
           const SizedBox(height: 14),
           Text(
@@ -1334,6 +1447,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ),
       );
     }
+    await widget.onSettingsChanged?.call();
     if (!mounted) return;
     setState(() {
       entries.add(
@@ -1341,7 +1455,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           name: name,
           time: AppStrings.medicationTimes.first,
           stomachState: AppStrings.stomachStates.first,
-          dosage: AppStrings.dosageOptions.first,
+          doseCount: 1,
         ),
       );
       _medicationSectionExpanded = true;
@@ -1409,6 +1523,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     required List<MedicationEntry> entries,
     required IconData icon,
     required String groupKey,
+    required MedicationPlanItemType itemType,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1428,6 +1543,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             entry: entries[index],
             icon: icon,
             entryKey: '$groupKey:${entries[index].name.toLowerCase()}',
+            itemType: itemType,
             onChanged: (updated) => setState(() => entries[index] = updated),
           ),
           if (index != entries.length - 1) const SizedBox(height: 7),
@@ -1440,6 +1556,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     required MedicationEntry entry,
     required IconData icon,
     required String entryKey,
+    required MedicationPlanItemType itemType,
     required ValueChanged<MedicationEntry> onChanged,
   }) {
     final expanded = _expandedMedicationEntry == entryKey;
@@ -1527,52 +1644,141 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   ),
                 ),
               ),
-              Transform.scale(
-                scale: 0.78,
-                child: Switch.adaptive(
-                  value: entry.taken,
-                  activeTrackColor: _tone,
-                  onChanged: (value) => onChanged(entry.copyWith(taken: value)),
+              IconButton(
+                key: ValueKey('medication_reminder_$entryKey'),
+                tooltip: AppStrings.createReminder,
+                visualDensity: VisualDensity.compact,
+                onPressed: () =>
+                    _openItemReminder(entry: entry, itemType: itemType),
+                icon: Icon(Icons.add_alarm_rounded, size: 19, color: _tone),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                decoration: BoxDecoration(
+                  color: _tone.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${entry.takenDoseCount}/${entry.doseCount}',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: _tone,
+                  ),
                 ),
               ),
-              const SizedBox(width: 2),
+              const SizedBox(width: 7),
             ],
           ),
           if (expanded) ...[
             Divider(height: 1, color: _tone.withValues(alpha: 0.14)),
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 9),
-              child: Row(
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 11),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: _buildMedicationDropdown(
-                      label: AppStrings.medicationTime,
-                      value: entry.time,
-                      options: AppStrings.medicationTimes,
-                      onChanged: (value) =>
-                          onChanged(entry.copyWith(time: value)),
+                  Text(
+                    AppStrings.medicationTime.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                      color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: _buildMedicationDropdown(
-                      label: AppStrings.medicationDose,
-                      value: entry.dosage,
-                      options: AppStrings.dosageOptions,
-                      onChanged: (value) =>
-                          onChanged(entry.copyWith(dosage: value)),
+                  const SizedBox(height: 7),
+                  Wrap(
+                    spacing: 7,
+                    runSpacing: 7,
+                    children: [
+                      for (final time in AppStrings.medicationTimes)
+                        _PillChoice(
+                          key: ValueKey(
+                            'medication_time_${entryKey}_${time.toLowerCase()}',
+                          ),
+                          label: time,
+                          selected: entry.times.contains(time),
+                          color: _tone,
+                          onTap: () {
+                            final times = {...entry.times};
+                            if (!times.remove(time)) times.add(time);
+                            if (times.isEmpty) times.add(time);
+                            onChanged(entry.copyWith(times: times));
+                          },
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppStrings.medicationDose,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      _RoundButton(
+                        key: ValueKey('dose_decrement_$entryKey'),
+                        icon: Icons.remove_rounded,
+                        color: _tone,
+                        filled: false,
+                        enabled: entry.doseCount > 1,
+                        onTap: () => onChanged(
+                          entry.copyWith(doseCount: entry.doseCount - 1),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          AppStrings.dosageCount(entry.doseCount),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: _tone,
+                          ),
+                        ),
+                      ),
+                      _RoundButton(
+                        key: ValueKey('dose_increment_$entryKey'),
+                        icon: Icons.add_rounded,
+                        color: _tone,
+                        filled: true,
+                        enabled: entry.doseCount < 12,
+                        onTap: () => onChanged(
+                          entry.copyWith(doseCount: entry.doseCount + 1),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  _buildDoseCircles(entry, onChanged),
+                  const SizedBox(height: 12),
+                  Text(
+                    AppStrings.medicationStomachState.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                      color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: _buildMedicationDropdown(
-                      label: AppStrings.medicationStomachState,
-                      value: entry.stomachState,
-                      options: AppStrings.stomachStates,
-                      onChanged: (value) =>
-                          onChanged(entry.copyWith(stomachState: value)),
-                    ),
+                  const SizedBox(height: 7),
+                  Wrap(
+                    spacing: 7,
+                    children: [
+                      for (final state in AppStrings.stomachStates)
+                        _PillChoice(
+                          label: state,
+                          selected: entry.stomachState == state,
+                          color: _tone,
+                          onTap: () =>
+                              onChanged(entry.copyWith(stomachState: state)),
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -1583,65 +1789,86 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     );
   }
 
-  Widget _buildMedicationDropdown({
-    required String label,
-    required String value,
-    required List<String> options,
-    required ValueChanged<String> onChanged,
-  }) {
-    final available = <String>[...options];
-    if (!available.contains(value)) available.add(value);
-    return Container(
-      padding: const EdgeInsets.fromLTRB(7, 5, 5, 4),
-      decoration: BoxDecoration(
-        color: AppColors.scaffoldBackground,
-        borderRadius: BorderRadius.circular(11),
-        border: Border.all(color: AppColors.outline),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 8,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 1),
-          DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: value,
-              isExpanded: true,
-              isDense: true,
-              borderRadius: BorderRadius.circular(14),
-              style: const TextStyle(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-              items: [
-                for (final option in available)
-                  DropdownMenuItem(
-                    value: option,
-                    child: Text(
-                      option,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+  Widget _buildDoseCircles(
+    MedicationEntry entry,
+    ValueChanged<MedicationEntry> onChanged,
+  ) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (var index = 0; index < entry.doseCount; index++)
+          Tooltip(
+            message: AppStrings.dosageCount(index + 1),
+            child: InkWell(
+              key: ValueKey('dose_circle_${entry.name}_$index'),
+              customBorder: const CircleBorder(),
+              onTap: () {
+                final next = index < entry.takenDoseCount ? index : index + 1;
+                onChanged(entry.copyWith(takenDoseCount: next));
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                width: 29,
+                height: 29,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: index < entry.takenDoseCount
+                      ? _tone
+                      : _tone.withValues(alpha: 0.08),
+                  border: Border.all(
+                    color: _tone.withValues(
+                      alpha: index < entry.takenDoseCount ? 1 : 0.42,
                     ),
                   ),
-              ],
-              onChanged: (selected) {
-                if (selected != null) onChanged(selected);
-              },
+                ),
+                child: index < entry.takenDoseCount
+                    ? const Icon(
+                        Icons.check_rounded,
+                        size: 17,
+                        color: Colors.white,
+                      )
+                    : null,
+              ),
             ),
           ),
-        ],
+      ],
+    );
+  }
+
+  Future<void> _openItemReminder({
+    required MedicationEntry entry,
+    required MedicationPlanItemType itemType,
+  }) async {
+    final baseTheme = Theme.of(context);
+    final plan = await showModalBottomSheet<MedicationReminderPlan>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppColors.surface,
+      builder: (_) => Theme(
+        data: baseTheme.copyWith(
+          colorScheme: baseTheme.colorScheme.copyWith(primary: _tone),
+        ),
+        child: MedicationReminderFormSheet(
+          itemType: itemType,
+          availableItems: [entry.name],
+          initialItemName: entry.name,
+          initialDosage: entry.dosage,
+        ),
       ),
     );
+    if (plan == null || !mounted) return;
+
+    final message = await saveMedicationReminderPlan(
+      storage: context.read<LocalStorageService>(),
+      notifications: context.read<NotificationService>(),
+      plan: plan,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildMoodPage() {
@@ -1818,13 +2045,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       spacing: 8,
       runSpacing: 8,
       children: [
-        _RoundButton(
-          icon: Icons.add_rounded,
-          color: AppColors.primary,
-          filled: false,
-          enabled: true,
-          onTap: () => _addCustomContext(companion),
-        ),
         for (final option in options)
           _PillChoice(
             label: option,
@@ -1841,6 +2061,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             color: AppColors.primary,
             onTap: () => _toggleChoice(selected, option),
           ),
+        _RoundButton(
+          key: ValueKey(companion ? 'mood_companion_add' : 'mood_place_add'),
+          icon: Icons.add_rounded,
+          color: AppColors.primary,
+          filled: false,
+          enabled: true,
+          onTap: () => _addCustomContext(companion),
+        ),
       ],
     );
   }
@@ -1913,6 +2141,157 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     });
   }
 
+  bool _supportsMealQuality(String meal) =>
+      AppStrings.nutritionMealOptions.take(3).contains(meal);
+
+  void _toggleMeal(String meal) {
+    setState(() {
+      if (_meals.remove(meal)) {
+        _mealQualityIndices.remove(meal);
+        _mealFoodGroups.remove(meal);
+      } else {
+        _meals.add(meal);
+      }
+    });
+  }
+
+  String? get _legacyNutritionQuality {
+    final selectedValues = _mealQualityIndices.entries
+        .where((entry) => _meals.contains(entry.key))
+        .map((entry) => entry.value)
+        .toSet();
+    if (selectedValues.length != 1) return null;
+    return AppStrings.nutritionQualityOptions[selectedValues.single];
+  }
+
+  Widget _buildMealDetails(String meal) {
+    final mealIndex = AppStrings.nutritionMealOptions.indexOf(meal);
+    final selectedFoods = _mealFoodGroups.putIfAbsent(meal, () => <String>{});
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 11, 12, 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.outline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            meal,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          if (_supportsMealQuality(meal)) ...[
+            const SizedBox(height: 9),
+            Row(
+              children: [
+                for (final quality
+                    in AppStrings.nutritionQualityOptions.asMap().entries) ...[
+                  if (quality.key > 0) const SizedBox(width: 5),
+                  Expanded(
+                    child: _PillChoice(
+                      key: ValueKey('meal_quality_${mealIndex}_${quality.key}'),
+                      label: quality.value,
+                      selected: _mealQualityIndices[meal] == quality.key,
+                      color: AppColors.secondary,
+                      onTap: () => setState(() {
+                        if (_mealQualityIndices[meal] == quality.key) {
+                          _mealQualityIndices.remove(meal);
+                        } else {
+                          _mealQualityIndices[meal] = quality.key;
+                        }
+                      }),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 11),
+            child: Divider(height: 1, color: AppColors.outline),
+          ),
+          Text(
+            AppStrings.whatDidYouEat.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            children: [
+              for (final food
+                  in AppStrings.nutritionFoodGroupOptions.asMap().entries)
+                _PillChoice(
+                  key: ValueKey('meal_food_${mealIndex}_${food.key}'),
+                  label: food.value,
+                  selected: selectedFoods.contains(food.value),
+                  color: AppColors.secondary,
+                  onTap: () => _toggleChoice(selectedFoods, food.value),
+                ),
+              for (final food in selectedFoods.where(
+                (value) =>
+                    !AppStrings.nutritionFoodGroupOptions.contains(value),
+              ))
+                _PillChoice(
+                  label: food,
+                  selected: true,
+                  color: AppColors.secondary,
+                  onTap: () => _toggleChoice(selectedFoods, food),
+                ),
+              _RoundButton(
+                key: ValueKey('meal_food_add_$mealIndex'),
+                icon: Icons.add_rounded,
+                color: AppColors.secondary,
+                filled: false,
+                enabled: true,
+                onTap: () => _addCustomFoodGroup(meal),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _addCustomFoodGroup(String meal) async {
+    var customValue = '';
+    final value = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(AppStrings.whatDidYouEat),
+        content: TextField(
+          autofocus: true,
+          maxLength: 120,
+          onChanged: (text) => customValue = text,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, customValue.trim()),
+            child: Text(AppStrings.add),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || value == null || value.isEmpty) return;
+    setState(() {
+      _mealFoodGroups.putIfAbsent(meal, () => <String>{}).add(value);
+    });
+  }
+
   Widget _buildBottomAction() {
     return SafeArea(
       top: false,
@@ -1961,6 +2340,30 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     await _saveLog();
   }
 
+  Future<void> _promptSavePeriodAndOpenSymptoms() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(AppStrings.savePeriodBeforeSymptomsTitle),
+        content: Text(AppStrings.savePeriodBeforeSymptomsBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(AppStrings.saveAndContinue),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final saved = await _saveLog(closeSheet: false);
+    if (!saved || !mounted) return;
+    setState(() => _logType = 2);
+  }
+
   DailyLog _preparedLog(DateTime finalDate, {required bool hasExplicitTime}) {
     final observed = <DailyLogObservedSection>{
       ..._log.observedSections,
@@ -1998,10 +2401,19 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         hasExplicitTime: hasExplicitTime,
         waterIntakeMl: _waterGlasses * 250,
         mealTypes: _meals.toList(),
-        nutritionQuality: _nutritionQualityIndex == null
-            ? null
-            : AppStrings.nutritionQualityOptions[_nutritionQualityIndex!],
-        clearNutritionQuality: _nutritionQualityIndex == null,
+        mealQualities: {
+          for (final entry in _mealQualityIndices.entries)
+            if (_meals.contains(entry.key))
+              entry.key: AppStrings.nutritionQualityOptions[entry.value],
+        },
+        mealFoodGroups: {
+          for (final entry in _mealFoodGroups.entries)
+            if (_meals.contains(entry.key) && entry.value.isNotEmpty)
+              entry.key: entry.value.toList(),
+        },
+        postMealFeelings: _postMealFeelings.toList(),
+        nutritionQuality: _legacyNutritionQuality,
+        clearNutritionQuality: _legacyNutritionQuality == null,
         cravings: _cravings.toList(),
         medications: _medications,
         supplements: _supplements,
@@ -2028,6 +2440,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         vaginalDischargeSymptoms: _vaginalDischargePresent == true
             ? _vaginalDischargeSymptoms
             : const {},
+        dreamRemembered: _dreamRemembered,
+        clearDreamRemembered: _dreamRemembered == null,
+        dreamNote: _dreamNoteController.text.trim().isEmpty
+            ? null
+            : _dreamNoteController.text.trim(),
+        clearDreamNote:
+            _dreamRemembered != true ||
+            _dreamNoteController.text.trim().isEmpty,
         observedSections: observed,
       ),
       _ => _log.copyWith(
@@ -2052,7 +2472,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     }).toList();
   }
 
-  Future<void> _saveLog() async {
+  Future<bool> _saveLog({bool closeSheet = true}) async {
     final today = AppTime.now.dateOnly;
     if (_log.date.dateOnly.isAfter(today)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -2062,21 +2482,21 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      return;
+      return false;
     }
     var finalDate = _log.date;
     var hasExplicitTime = _log.hasExplicitTime;
     if (_log.date.dateOnly.isBefore(today)) {
       final choice = await _choosePastLogTime();
-      if (choice == null) return;
+      if (choice == null) return false;
       if (choice == _PastLogTimeChoice.withTime) {
-        if (!mounted) return;
+        if (!mounted) return false;
         final pickedTime = await showTimePicker(
           context: context,
           initialTime: TimeOfDay.fromDateTime(_log.date),
           helpText: AppStrings.selectLogTime,
         );
-        if (pickedTime == null) return;
+        if (pickedTime == null) return false;
         finalDate = DateTime(
           _log.date.year,
           _log.date.month,
@@ -2094,20 +2514,23 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     }
 
     setState(() => _isSaving = true);
+    final preparedLog = _preparedLog(
+      finalDate,
+      hasExplicitTime: hasExplicitTime,
+    );
     var success = false;
     try {
-      success = await widget.onSave(
-        _preparedLog(finalDate, hasExplicitTime: hasExplicitTime),
-      );
+      success = await widget.onSave(preparedLog);
     } catch (_) {
       success = false;
     }
-    if (!mounted) return;
+    if (!mounted) return false;
     setState(() => _isSaving = false);
 
     if (success) {
+      _log = preparedLog;
       final messenger = ScaffoldMessenger.of(context);
-      Navigator.pop(context);
+      if (closeSheet) Navigator.pop(context);
       messenger.showSnackBar(
         SnackBar(
           content: Text(AppStrings.saved),
@@ -2115,6 +2538,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+      return true;
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -2123,6 +2547,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+      return false;
     }
   }
 
@@ -2204,6 +2629,7 @@ class _PillChoice extends StatelessWidget {
   final VoidCallback onTap;
 
   const _PillChoice({
+    super.key,
     required this.label,
     required this.selected,
     required this.color,
@@ -2383,6 +2809,7 @@ class _SymptomTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const tone = AppColors.secondaryDark;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -2390,11 +2817,13 @@ class _SymptomTile extends StatelessWidget {
           duration: const Duration(milliseconds: 160),
           height: 44,
           decoration: BoxDecoration(
-            color: Color.lerp(item.color, Colors.white, selected ? 0.78 : 0.88),
-            borderRadius: BorderRadius.circular(22),
+            color: selected
+                ? tone.withValues(alpha: 0.13)
+                : AppColors.scaffoldBackground,
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: selected ? item.color : AppColors.outline,
-              width: selected ? 1.6 : 1,
+              color: selected ? tone : AppColors.outline,
+              width: selected ? 1.5 : 1,
             ),
           ),
           clipBehavior: Clip.antiAlias,
@@ -2410,10 +2839,16 @@ class _SymptomTile extends StatelessWidget {
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: item.color,
+                        color: selected
+                            ? tone.withValues(alpha: 0.15)
+                            : Colors.transparent,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(item.icon, color: Colors.white, size: 15),
+                      child: Icon(
+                        item.icon,
+                        color: selected ? tone : AppColors.textHint,
+                        size: 16,
+                      ),
                     ),
                     const SizedBox(width: 7),
                     Expanded(
@@ -2429,11 +2864,7 @@ class _SymptomTile extends StatelessWidget {
                       ),
                     ),
                     if (selected)
-                      Icon(
-                        Icons.check_circle_rounded,
-                        color: item.color,
-                        size: 17,
-                      ),
+                      Icon(Icons.check_circle_rounded, color: tone, size: 17),
                   ],
                 ),
               ),
@@ -2449,15 +2880,15 @@ class _SymptomTile extends StatelessWidget {
               child: SliderTheme(
                 data: SliderTheme.of(context).copyWith(
                   trackHeight: 3,
-                  activeTrackColor: item.color,
-                  inactiveTrackColor: item.color.withValues(alpha: 0.18),
-                  thumbColor: item.color,
+                  activeTrackColor: tone,
+                  inactiveTrackColor: tone.withValues(alpha: 0.18),
+                  thumbColor: tone,
                   overlayShape: SliderComponentShape.noOverlay,
                   thumbShape: const RoundSliderThumbShape(
                     enabledThumbRadius: 5.5,
                   ),
                   activeTickMarkColor: Colors.white,
-                  inactiveTickMarkColor: item.color.withValues(alpha: 0.42),
+                  inactiveTickMarkColor: tone.withValues(alpha: 0.42),
                 ),
                 child: Slider(
                   key: ValueKey('symptom_severity_${item.label}'),
@@ -2484,6 +2915,7 @@ class _TrackingChoiceTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const _TrackingChoiceTile({
+    super.key,
     required this.label,
     required this.icon,
     required this.selected,

@@ -173,5 +173,12 @@ void main() {
     expect(find.text('Tekrarlama periyodu'), findsOneWidget);
     expect(find.text('Başlangıç tarihi'), findsOneWidget);
     expect(find.text('Bitiş tarihi'), findsOneWidget);
+    expect(find.text(AppStrings.dosageCount(1)), findsOneWidget);
+    expect(find.text(AppStrings.customDosage), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('reminder_dose_increment')));
+    await tester.tap(find.byKey(const ValueKey('reminder_dose_increment')));
+    await tester.pump();
+    expect(find.text(AppStrings.dosageCount(3)), findsOneWidget);
   });
 }

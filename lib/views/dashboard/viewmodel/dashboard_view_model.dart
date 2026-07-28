@@ -88,6 +88,9 @@ class DashboardViewModel extends ChangeNotifier {
       DailyLogObservedSection.nutrition =>
         log.waterIntakeMl != null ||
             log.mealTypes.isNotEmpty ||
+            log.mealQualities.isNotEmpty ||
+            log.mealFoodGroups.isNotEmpty ||
+            log.postMealFeelings.isNotEmpty ||
             log.nutritionQuality != null ||
             log.cravings.isNotEmpty ||
             log.nutritionTags.isNotEmpty,
@@ -98,6 +101,8 @@ class DashboardViewModel extends ChangeNotifier {
             log.sexualActivityTypes.isNotEmpty ||
             log.vaginalDischargePresent != null ||
             log.vaginalDischargeSymptoms.isNotEmpty ||
+            log.dreamRemembered != null ||
+            (log.dreamNote?.isNotEmpty ?? false) ||
             (log.symptoms.isNotEmpty && log.flowIntensity == null),
       DailyLogObservedSection.wellbeing =>
         log.mood != null ||
@@ -217,6 +222,7 @@ class DashboardViewModel extends ChangeNotifier {
             PersonalInsightKind.symptomMoodCooccurrence ||
             PersonalInsightKind.symptomBleedingCooccurrence ||
             PersonalInsightKind.structuredAssociation ||
+            PersonalInsightKind.foodSensitivityAssociation ||
             PersonalInsightKind.moodCyclePhaseAssociation ||
             PersonalInsightKind.energyCyclePhaseAssociation ||
             PersonalInsightKind.medicationAdherence ||
@@ -288,6 +294,9 @@ class DashboardViewModel extends ChangeNotifier {
       (l) =>
           l.nutritionTags.isNotEmpty ||
           l.mealTypes.isNotEmpty ||
+          l.mealQualities.isNotEmpty ||
+          l.mealFoodGroups.isNotEmpty ||
+          l.postMealFeelings.isNotEmpty ||
           l.nutritionQuality != null ||
           l.cravings.isNotEmpty ||
           l.waterIntakeMl != null,

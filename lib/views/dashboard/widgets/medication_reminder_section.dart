@@ -8,6 +8,245 @@ import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/notification_service.dart';
 
+Future<String> saveMedicationReminderPlan({
+  required LocalStorageService storage,
+  required NotificationService notifications,
+  required MedicationReminderPlan plan,
+  bool requestPermission = true,
+}) async {
+  try {
+    await storage.refreshMedicationDoseRecords(
+      plans: storage.loadMedicationReminderPlans(),
+      notificationScheduledDoseIds: const {},
+    );
+    await storage.upsertMedicationReminderPlan(plan);
+
+    var permissionGranted = true;
+    if (requestPermission && plan.enabled && notifications.isSupported) {
+      permissionGranted = await notifications.requestPermissions();
+    }
+    final result = await notifications.rescheduleMedicationReminders(
+      plans: storage.loadMedicationReminderPlans(),
+    );
+    await storage.refreshMedicationDoseRecords(
+      plans: storage.loadMedicationReminderPlans(),
+      notificationScheduledDoseIds: result.scheduledDoses
+          .map((dose) => dose.id)
+          .toSet(),
+    );
+    if (!result.supported) {
+      return AppStrings.phoneNotificationUnsupported;
+    }
+    if (!permissionGranted) {
+      return AppStrings.notificationPermissionDenied;
+    }
+    return AppStrings.reminderSaved;
+  } catch (error) {
+    await storage.refreshMedicationDoseRecords(
+      plans: storage.loadMedicationReminderPlans(),
+      notificationScheduledDoseIds: const {},
+    );
+    return AppStrings.reminderScheduleFailed(error);
+  }
+}
+
+class TodaysMedicationDosesCard extends StatefulWidget {
+  final Color color;
+
+  const TodaysMedicationDosesCard({super.key, required this.color});
+
+  @override
+  State<TodaysMedicationDosesCard> createState() =>
+      _TodaysMedicationDosesCardState();
+}
+
+class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
+  LocalStorageService get _storage => context.read<LocalStorageService>();
+
+  List<MedicationDoseRecord> _doses = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _reload();
+  }
+
+  void _reload() {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day);
+    final end = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+    _doses =
+        _storage
+            .loadMedicationDoseRecords()
+            .where(
+              (dose) =>
+                  !dose.scheduledAt.isBefore(start) &&
+                  !dose.scheduledAt.isAfter(end),
+            )
+            .toList()
+          ..sort(
+            (left, right) => left.scheduledAt.compareTo(right.scheduledAt),
+          );
+  }
+
+  Future<void> _record(
+    MedicationDoseRecord dose,
+    MedicationDoseResponseStatus status,
+  ) async {
+    await _storage.recordMedicationDoseResponse(
+      recordId: dose.id,
+      status: status,
+    );
+    if (!mounted) return;
+    setState(_reload);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    AppStrings.of(context);
+    _reload();
+    if (_doses.isEmpty) return const SizedBox.shrink();
+
+    final now = DateTime.now();
+    return Padding(
+      padding: const EdgeInsets.only(top: 24),
+      child: Container(
+        key: const ValueKey('dashboard_planned_doses'),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: widget.color.withValues(alpha: 0.20)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppStrings.todaysPlannedDoses,
+              style: const TextStyle(
+                fontFamily: 'CormorantGaramond',
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 10),
+            for (final dose in _doses) _buildDose(dose, now),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDose(MedicationDoseRecord dose, DateTime now) {
+    final statusLabel = switch (dose.status) {
+      MedicationDoseResponseStatus.taken => AppStrings.doseTaken,
+      MedicationDoseResponseStatus.skipped => AppStrings.doseSkipped,
+      null =>
+        dose.scheduledAt.isBefore(now)
+            ? AppStrings.doseUnanswered
+            : AppStrings.doseUpcoming,
+    };
+    final statusColor = switch (dose.status) {
+      MedicationDoseResponseStatus.taken => AppColors.success,
+      MedicationDoseResponseStatus.skipped => AppColors.error,
+      null =>
+        dose.scheduledAt.isBefore(now) ? AppColors.warning : AppColors.info,
+    };
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 9),
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: AppColors.scaffoldBackground,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                DateFormat.Hm(AppStrings.localeName).format(dose.scheduledAt),
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${dose.itemName} • ${dose.dosage}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(
+                dose.notificationScheduled
+                    ? Icons.notifications_active_outlined
+                    : Icons.notifications_off_outlined,
+                size: 17,
+                color: dose.notificationScheduled
+                    ? widget.color
+                    : AppColors.textHint,
+              ),
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  statusLabel,
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () =>
+                      _record(dose, MedicationDoseResponseStatus.taken),
+                  icon: const Icon(Icons.check_rounded, size: 17),
+                  label: Text(AppStrings.doseTaken),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.success,
+                    side: const BorderSide(color: AppColors.success),
+                    backgroundColor:
+                        dose.status == MedicationDoseResponseStatus.taken
+                        ? AppColors.success.withValues(alpha: 0.12)
+                        : null,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () =>
+                      _record(dose, MedicationDoseResponseStatus.skipped),
+                  icon: const Icon(Icons.close_rounded, size: 17),
+                  label: Text(AppStrings.doseSkipped),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                    side: const BorderSide(color: AppColors.error),
+                    backgroundColor:
+                        dose.status == MedicationDoseResponseStatus.skipped
+                        ? AppColors.error.withValues(alpha: 0.10)
+                        : null,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class MedicationReminderSection extends StatefulWidget {
   final MedicationPlanItemType itemType;
   final List<String> availableItems;
@@ -27,7 +266,6 @@ class MedicationReminderSection extends StatefulWidget {
 
 class _MedicationReminderSectionState extends State<MedicationReminderSection> {
   List<MedicationReminderPlan> _plans = [];
-  List<MedicationDoseRecord> _doseRecords = [];
   bool _busy = false;
 
   LocalStorageService get _storage => context.read<LocalStorageService>();
@@ -43,26 +281,12 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
     if (!mounted) return;
     setState(() {
       _plans = _storage.loadMedicationReminderPlans();
-      _doseRecords = _storage.loadMedicationDoseRecords();
     });
   }
 
   List<MedicationReminderPlan> get _sectionPlans => _plans
       .where((plan) => plan.itemType == widget.itemType)
       .toList(growable: false);
-
-  List<MedicationDoseRecord> _todaysDoses(DateTime now) {
-    final start = DateTime(now.year, now.month, now.day);
-    final end = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
-    return _doseRecords
-        .where(
-          (record) =>
-              record.itemType == widget.itemType &&
-              !record.scheduledAt.isBefore(start) &&
-              !record.scheduledAt.isAfter(end),
-        )
-        .toList(growable: false);
-  }
 
   Future<void> _openForm([MedicationReminderPlan? existing]) async {
     final baseTheme = Theme.of(context);
@@ -92,43 +316,13 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
     if (_busy) return;
     setState(() => _busy = true);
 
-    String message;
-    try {
-      await _storage.refreshMedicationDoseRecords(
-        plans: _storage.loadMedicationReminderPlans(),
-        notificationScheduledDoseIds: const {},
-      );
-      await _storage.upsertMedicationReminderPlan(plan);
-
-      var permissionGranted = true;
-      if (requestPermission && plan.enabled && _notifications.isSupported) {
-        permissionGranted = await _notifications.requestPermissions();
-      }
-      final result = await _notifications.rescheduleMedicationReminders(
-        plans: _storage.loadMedicationReminderPlans(),
-      );
-      await _storage.refreshMedicationDoseRecords(
-        plans: _storage.loadMedicationReminderPlans(),
-        notificationScheduledDoseIds: result.scheduledDoses
-            .map((dose) => dose.id)
-            .toSet(),
-      );
-      _reload();
-      if (!result.supported) {
-        message = AppStrings.phoneNotificationUnsupported;
-      } else if (!permissionGranted) {
-        message = AppStrings.notificationPermissionDenied;
-      } else {
-        message = AppStrings.reminderSaved;
-      }
-    } catch (error) {
-      await _storage.refreshMedicationDoseRecords(
-        plans: _storage.loadMedicationReminderPlans(),
-        notificationScheduledDoseIds: const {},
-      );
-      _reload();
-      message = AppStrings.reminderScheduleFailed(error);
-    }
+    final message = await saveMedicationReminderPlan(
+      storage: _storage,
+      notifications: _notifications,
+      plan: plan,
+      requestPermission: requestPermission,
+    );
+    _reload();
 
     if (!mounted) return;
     setState(() => _busy = false);
@@ -189,26 +383,9 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
     ).showSnackBar(SnackBar(content: Text(AppStrings.reminderDeleted)));
   }
 
-  Future<void> _recordResponse(
-    MedicationDoseRecord dose,
-    MedicationDoseResponseStatus status,
-  ) async {
-    await _storage.recordMedicationDoseResponse(
-      recordId: dose.id,
-      status: status,
-    );
-    _reload();
-    if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.responseSaved)));
-  }
-
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    final now = DateTime.now();
-    final todaysDoses = _todaysDoses(now);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -253,19 +430,6 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
           )
         else
           ..._sectionPlans.map(_buildPlanCard),
-        if (todaysDoses.isNotEmpty) ...[
-          const SizedBox(height: 14),
-          Text(
-            AppStrings.todaysPlannedDoses,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ...todaysDoses.map((dose) => _buildDoseCard(dose, now)),
-        ],
         const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(10),
@@ -377,111 +541,6 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
     );
   }
 
-  Widget _buildDoseCard(MedicationDoseRecord dose, DateTime now) {
-    final statusLabel = switch (dose.status) {
-      MedicationDoseResponseStatus.taken => AppStrings.doseTaken,
-      MedicationDoseResponseStatus.skipped => AppStrings.doseSkipped,
-      null =>
-        dose.scheduledAt.isBefore(now)
-            ? AppStrings.doseUnanswered
-            : AppStrings.doseUpcoming,
-    };
-    final statusColor = switch (dose.status) {
-      MedicationDoseResponseStatus.taken => AppColors.success,
-      MedicationDoseResponseStatus.skipped => AppColors.error,
-      null =>
-        dose.scheduledAt.isBefore(now) ? AppColors.warning : AppColors.info,
-    };
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                DateFormat.Hm(AppStrings.localeName).format(dose.scheduledAt),
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(width: 8),
-              Expanded(child: Text('${dose.itemName} • ${dose.dosage}')),
-              Tooltip(
-                message: dose.notificationScheduled
-                    ? AppStrings.notificationScheduled
-                    : AppStrings.notificationNotScheduled,
-                child: Icon(
-                  dose.notificationScheduled
-                      ? Icons.notifications_active_outlined
-                      : Icons.notifications_off_outlined,
-                  size: 17,
-                  color: dose.notificationScheduled
-                      ? widget.color
-                      : AppColors.textHint,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.20),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  statusLabel,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 7),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () =>
-                      _recordResponse(dose, MedicationDoseResponseStatus.taken),
-                  icon: const Icon(Icons.check_rounded, size: 17),
-                  label: Text(AppStrings.doseTaken),
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor:
-                        dose.status == MedicationDoseResponseStatus.taken
-                        ? AppColors.success.withValues(alpha: 0.18)
-                        : null,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _recordResponse(
-                    dose,
-                    MedicationDoseResponseStatus.skipped,
-                  ),
-                  icon: const Icon(Icons.close_rounded, size: 17),
-                  label: Text(AppStrings.doseSkipped),
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor:
-                        dose.status == MedicationDoseResponseStatus.skipped
-                        ? AppColors.error.withValues(alpha: 0.15)
-                        : null,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   String _formatDate(DateTime date) =>
       DateFormat.yMd(AppStrings.localeName).format(date);
 
@@ -494,12 +553,16 @@ class MedicationReminderFormSheet extends StatefulWidget {
   final MedicationPlanItemType itemType;
   final List<String> availableItems;
   final MedicationReminderPlan? existing;
+  final String? initialItemName;
+  final String? initialDosage;
 
   const MedicationReminderFormSheet({
     super.key,
     required this.itemType,
     required this.availableItems,
     this.existing,
+    this.initialItemName,
+    this.initialDosage,
   });
 
   @override
@@ -511,12 +574,10 @@ class _MedicationReminderFormSheetState
     extends State<MedicationReminderFormSheet> {
   final _formKey = GlobalKey<FormState>();
   final _customItemController = TextEditingController();
-  final _customDoseController = TextEditingController();
 
   late List<String> _itemOptions;
-  late List<String> _doseOptions;
   late String _selectedItem;
-  late String _selectedDose;
+  late int _doseCount;
   late TimeOfDay _time;
   late MedicationPlanFrequency _frequency;
   late Set<int> _weekdays;
@@ -535,16 +596,23 @@ class _MedicationReminderFormSheetState
     if (existing != null && !_itemOptions.contains(existing.itemName)) {
       _itemOptions.add(existing.itemName);
     }
+    final initialItemName = widget.initialItemName?.trim();
+    if (existing == null &&
+        initialItemName != null &&
+        initialItemName.isNotEmpty &&
+        !_itemOptions.contains(initialItemName)) {
+      _itemOptions.add(initialItemName);
+    }
     _itemOptions.sort();
     _itemOptions.add(AppStrings.custom);
-    _selectedItem = existing?.itemName ?? _itemOptions.first;
+    _selectedItem =
+        existing?.itemName ??
+        (initialItemName?.isNotEmpty ?? false
+            ? initialItemName!
+            : _itemOptions.first);
 
-    _doseOptions = List<String>.from(AppStrings.dosageOptions);
-    if (existing != null && !_doseOptions.contains(existing.dosage)) {
-      _doseOptions.add(existing.dosage);
-    }
-    _doseOptions.add(AppStrings.custom);
-    _selectedDose = existing?.dosage ?? AppStrings.dosageOptions.first;
+    final initialDosage = widget.initialDosage?.trim();
+    _doseCount = _doseCountFromText(existing?.dosage ?? initialDosage);
 
     _time = existing == null
         ? const TimeOfDay(hour: 9, minute: 0)
@@ -563,7 +631,6 @@ class _MedicationReminderFormSheetState
   @override
   void dispose() {
     _customItemController.dispose();
-    _customDoseController.dispose();
     super.dispose();
   }
 
@@ -632,34 +699,40 @@ class _MedicationReminderFormSheetState
                 ),
               ],
               const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedDose,
+              InputDecorator(
                 decoration: InputDecoration(
                   labelText: AppStrings.reminderDose,
                   prefixIcon: const Icon(Icons.straighten_rounded),
                 ),
-                items: _doseOptions
-                    .map(
-                      (dose) =>
-                          DropdownMenuItem(value: dose, child: Text(dose)),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => _selectedDose = value!),
-              ),
-              if (_selectedDose == AppStrings.custom) ...[
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: _customDoseController,
-                  maxLength: 200,
-                  decoration: InputDecoration(
-                    labelText: AppStrings.customDosage,
-                    hintText: AppStrings.customDosageHint,
-                  ),
-                  validator: (value) => value == null || value.trim().isEmpty
-                      ? AppStrings.customDosageHint
-                      : null,
+                child: Row(
+                  children: [
+                    IconButton.outlined(
+                      key: const ValueKey('reminder_dose_decrement'),
+                      onPressed: _doseCount > 1
+                          ? () => setState(() => _doseCount--)
+                          : null,
+                      icon: const Icon(Icons.remove_rounded),
+                    ),
+                    Expanded(
+                      child: Text(
+                        AppStrings.dosageCount(_doseCount),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    IconButton.filled(
+                      key: const ValueKey('reminder_dose_increment'),
+                      onPressed: _doseCount < 12
+                          ? () => setState(() => _doseCount++)
+                          : null,
+                      icon: const Icon(Icons.add_rounded),
+                    ),
+                  ],
                 ),
-              ],
+              ),
               const SizedBox(height: 12),
               _pickerTile(
                 icon: Icons.schedule_rounded,
@@ -815,14 +888,11 @@ class _MedicationReminderFormSheetState
     final itemName = _selectedItem == AppStrings.custom
         ? _customItemController.text.trim()
         : _selectedItem;
-    final dosage = _selectedDose == AppStrings.custom
-        ? _customDoseController.text.trim()
-        : _selectedDose;
     final plan = MedicationReminderPlan(
       id: existing?.id ?? 'plan_${now.microsecondsSinceEpoch}',
       itemType: widget.itemType,
       itemName: itemName,
-      dosage: dosage,
+      dosage: AppStrings.dosageCount(_doseCount),
       time: ReminderClockTime(hour: _time.hour, minute: _time.minute),
       frequency: _frequency,
       weekdays: _frequency == MedicationPlanFrequency.everyDay
@@ -847,4 +917,10 @@ class _MedicationReminderFormSheetState
 
   String _formatDate(DateTime date) =>
       DateFormat.yMd(AppStrings.localeName).format(date);
+
+  int _doseCountFromText(String? value) {
+    if (value == null) return 1;
+    final match = RegExp(r'\d+').firstMatch(value);
+    return (int.tryParse(match?.group(0) ?? '') ?? 1).clamp(1, 12);
+  }
 }

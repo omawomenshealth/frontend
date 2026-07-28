@@ -943,7 +943,7 @@ class _ProfileMechanics extends StatelessWidget {
 
                 // Kadın hastalıkları
                 Text(
-                  AppStrings.womenDiseases,
+                  AppStrings.commonWomenDiseases,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

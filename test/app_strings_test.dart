@@ -19,6 +19,7 @@ void main() {
     expect(AppStrings.dayCount(1), '1 day');
     expect(AppStrings.dayCount(3), '3 days');
     expect(AppStrings.localizeStoredValue('Yoğun'), 'Heavy');
+    expect(AppStrings.localizeStoredValue('Dengeli'), 'Medium');
     expect(
       AppStrings.insightCycleLengthBody(29),
       'There are 29 days between your two latest recorded period starts.',
@@ -55,6 +56,7 @@ void main() {
   test('İçgörü şablonları Türkçe parametrelerle biçimlenir', () async {
     await AppStrings.delegate.load(const Locale('tr', 'TR'));
 
+    expect(AppStrings.localizeStoredValue('Balanced'), 'Orta');
     expect(
       AppStrings.insightRecordingSummaryBody(loggedDays: 8, spanDays: 14),
       '14 günlük zaman aralığında 8 farklı gün için sağlık kaydı oluşturdun.',
@@ -64,6 +66,14 @@ void main() {
       'Yorgun, ruh hâli girdiğin 8 günün 5 tanesinde yer aldı.',
     );
     expect(AppStrings.insightEvidenceCycles(3), 'Hesaplanan döngü: 3');
+    expect(
+      AppStrings.dosageOptions.every((dose) => dose.endsWith('Adet')),
+      isTrue,
+    );
+    expect(AppStrings.womenDiseasesList, contains('Adenomyozis'));
+    expect(AppStrings.symptomSkinHairOptions, contains('Yağlı cilt'));
+    expect(AppStrings.symptomEnergyOptions, contains('Enerjik'));
+    expect(AppStrings.symptomDigestionOptions, contains('Midem iyi'));
     expect(
       AppStrings.insightMoodCyclePhaseBody(
         mood: 'Mutlu',

@@ -274,9 +274,15 @@ class DoctorReportView extends StatelessWidget {
       if (log.mealTypes.isNotEmpty)
         '${AppStrings.mealsToday}: '
             '${log.mealTypes.map(AppStrings.localizeStoredValue).join(', ')}',
-      if (log.nutritionQuality != null)
+      if (log.mealQualities.isNotEmpty || log.nutritionQuality != null)
         '${AppStrings.mealsFeel}: '
-            '${AppStrings.localizeStoredValue(log.nutritionQuality!)}',
+            '${DailyLogFormatters.mealQualities(log)}',
+      if (log.mealFoodGroups.isNotEmpty)
+        '${AppStrings.whatDidYouEat}: '
+            '${DailyLogFormatters.mealFoodGroups(log)}',
+      if (log.postMealFeelings.isNotEmpty)
+        '${AppStrings.howFeltAfterEating}: '
+            '${log.postMealFeelings.map(AppStrings.localizeStoredValue).join(', ')}',
       if (log.cravings.isNotEmpty)
         '${AppStrings.cravingsQuestion}: '
             '${log.cravings.map(AppStrings.localizeStoredValue).join(', ')}',
@@ -299,6 +305,8 @@ class DoctorReportView extends StatelessWidget {
         '${AppStrings.sleepDuration}: ${AppStrings.hoursMinutes(log.sleepDurationMinutes!)}',
       if (log.sleepQuality != null)
         '${AppStrings.sleepQuality}: ${AppStrings.levelOutOfFive(log.sleepQuality!)}',
+      if (log.dreamRemembered != null || (log.dreamNote?.isNotEmpty ?? false))
+        '${AppStrings.dreamQuestion}: ${DailyLogFormatters.dream(log)}',
       if (log.stressLevel != null)
         '${AppStrings.stressLevel}: ${AppStrings.levelOutOfFive(log.stressLevel!)}',
       if (log.energyLevel != null)
@@ -472,6 +480,9 @@ class DoctorReportView extends StatelessWidget {
                     (l) =>
                         l.nutritionTags.isNotEmpty ||
                         l.mealTypes.isNotEmpty ||
+                        l.mealQualities.isNotEmpty ||
+                        l.mealFoodGroups.isNotEmpty ||
+                        l.postMealFeelings.isNotEmpty ||
                         l.nutritionQuality != null ||
                         l.cravings.isNotEmpty ||
                         l.bowelActivity.isNotEmpty ||
@@ -509,9 +520,7 @@ class DoctorReportView extends StatelessWidget {
               // 3. İlaç & Takviye
               final logsWithMeds = dayLogs
                   .where(
-                    (l) =>
-                        l.medications.any((m) => m.taken) ||
-                        l.supplements.any((s) => s.taken),
+                    (l) => l.medications.isNotEmpty || l.supplements.isNotEmpty,
                   )
                   .toList();
               final String ilacText;
@@ -523,12 +532,16 @@ class DoctorReportView extends StatelessWidget {
                       final timeStr =
                           '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
                       final activeMeds = log.medications
-                          .where((m) => m.taken)
-                          .map((m) => '${m.name} (${m.dosage})')
+                          .map(
+                            (m) =>
+                                '${m.name} (${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
+                          )
                           .toList();
                       final activeSups = log.supplements
-                          .where((s) => s.taken)
-                          .map((s) => '${s.name} (${s.dosage})')
+                          .map(
+                            (s) =>
+                                '${s.name} (${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
+                          )
                           .toList();
                       final all = [...activeMeds, ...activeSups];
                       return '$timeStr ${all.join(", ")}';
@@ -545,6 +558,8 @@ class DoctorReportView extends StatelessWidget {
                         l.symptoms.isNotEmpty ||
                         l.moodCompanions.isNotEmpty ||
                         l.moodPlaces.isNotEmpty ||
+                        l.dreamRemembered != null ||
+                        (l.dreamNote?.isNotEmpty ?? false) ||
                         l.sleepDurationMinutes != null ||
                         l.sleepQuality != null ||
                         l.stressLevel != null ||
@@ -822,6 +837,9 @@ class DoctorReportView extends StatelessWidget {
             (l) =>
                 l.nutritionTags.isNotEmpty ||
                 l.mealTypes.isNotEmpty ||
+                l.mealQualities.isNotEmpty ||
+                l.mealFoodGroups.isNotEmpty ||
+                l.postMealFeelings.isNotEmpty ||
                 l.nutritionQuality != null ||
                 l.cravings.isNotEmpty ||
                 l.bowelActivity.isNotEmpty ||
@@ -858,11 +876,7 @@ class DoctorReportView extends StatelessWidget {
 
       // 3. İlaç & Takviye
       final logsWithMeds = dayLogs
-          .where(
-            (l) =>
-                l.medications.any((m) => m.taken) ||
-                l.supplements.any((s) => s.taken),
-          )
+          .where((l) => l.medications.isNotEmpty || l.supplements.isNotEmpty)
           .toList();
       final String meds;
       if (logsWithMeds.isEmpty) {
@@ -873,12 +887,16 @@ class DoctorReportView extends StatelessWidget {
               final timeStr =
                   '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
               final activeMeds = log.medications
-                  .where((m) => m.taken)
-                  .map((m) => '${m.name}(${m.dosage})')
+                  .map(
+                    (m) =>
+                        '${m.name}(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
+                  )
                   .toList();
               final activeSups = log.supplements
-                  .where((s) => s.taken)
-                  .map((s) => '${s.name}(${s.dosage})')
+                  .map(
+                    (s) =>
+                        '${s.name}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
+                  )
                   .toList();
               final all = [...activeMeds, ...activeSups];
               return '$timeStr ${all.join(", ")}';
@@ -895,6 +913,8 @@ class DoctorReportView extends StatelessWidget {
                 l.symptoms.isNotEmpty ||
                 l.moodCompanions.isNotEmpty ||
                 l.moodPlaces.isNotEmpty ||
+                l.dreamRemembered != null ||
+                (l.dreamNote?.isNotEmpty ?? false) ||
                 l.sleepDurationMinutes != null ||
                 l.sleepQuality != null ||
                 l.stressLevel != null ||
@@ -1254,6 +1274,9 @@ class DoctorReportView extends StatelessWidget {
               (l) =>
                   l.nutritionTags.isNotEmpty ||
                   l.mealTypes.isNotEmpty ||
+                  l.mealQualities.isNotEmpty ||
+                  l.mealFoodGroups.isNotEmpty ||
+                  l.postMealFeelings.isNotEmpty ||
                   l.nutritionQuality != null ||
                   l.cravings.isNotEmpty ||
                   l.bowelActivity.isNotEmpty ||
@@ -1290,11 +1313,7 @@ class DoctorReportView extends StatelessWidget {
 
         // 3. İlaç & Takviye
         final logsWithMeds = dayLogs
-            .where(
-              (l) =>
-                  l.medications.any((m) => m.taken) ||
-                  l.supplements.any((s) => s.taken),
-            )
+            .where((l) => l.medications.isNotEmpty || l.supplements.isNotEmpty)
             .toList();
         final String ilacText;
         if (logsWithMeds.isEmpty) {
@@ -1305,12 +1324,16 @@ class DoctorReportView extends StatelessWidget {
                 final timeStr =
                     '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
                 final activeMeds = log.medications
-                    .where((m) => m.taken)
-                    .map((m) => '${m.name}(${m.dosage})')
+                    .map(
+                      (m) =>
+                          '${m.name}(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
+                    )
                     .toList();
                 final activeSups = log.supplements
-                    .where((s) => s.taken)
-                    .map((s) => '${s.name}(${s.dosage})')
+                    .map(
+                      (s) =>
+                          '${s.name}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
+                    )
                     .toList();
                 final all = [...activeMeds, ...activeSups];
                 return '$timeStr ${all.join(", ")}';
@@ -1327,6 +1350,8 @@ class DoctorReportView extends StatelessWidget {
                   l.symptoms.isNotEmpty ||
                   l.moodCompanions.isNotEmpty ||
                   l.moodPlaces.isNotEmpty ||
+                  l.dreamRemembered != null ||
+                  (l.dreamNote?.isNotEmpty ?? false) ||
                   l.sleepDurationMinutes != null ||
                   l.sleepQuality != null ||
                   l.stressLevel != null ||

@@ -11,10 +11,12 @@ import '../../../data/models/period_log_model.dart';
 import '../../calendar/view/calendar_view.dart' as cal;
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../../insights/view/insights_view.dart';
+import '../../profile/viewmodel/profile_view_model.dart';
 import '../viewmodel/dashboard_view_model.dart';
 import '../widgets/daily_log_sheet.dart';
 import '../widgets/feeling_card.dart';
 import '../widgets/horizontal_calendar.dart';
+import '../widgets/medication_reminder_section.dart';
 import '../widgets/phase_hero_card.dart';
 
 /// Oma's daily home screen, adapted from the exported mobile design while
@@ -130,6 +132,7 @@ class DashboardView extends StatelessWidget {
                         isSingleTab: true,
                       ),
                     ),
+                    TodaysMedicationDosesCard(color: accent),
                     const SizedBox(height: 38),
                     if (vm.personalInsights.isNotEmpty)
                       _PersonalInsightsPreview(
@@ -139,8 +142,6 @@ class DashboardView extends StatelessWidget {
                       )
                     else
                       _InsightPlaceholder(accent: accent),
-                    const SizedBox(height: 28),
-                    _Journey(accent: accent),
                   ],
                 ),
               ),
@@ -224,6 +225,10 @@ class DashboardView extends StatelessWidget {
         settings: vm.settings!,
         initialTabIndex: initialIndex,
         isSingleTab: isSingleTab,
+        onSettingsChanged: () async {
+          context.read<ProfileViewModel>().loadSettings();
+          await vm.loadData();
+        },
         onSave: (log) async {
           final success = log.flowIntensity != null
               ? await vm.recordPeriodAndRecalculate(log)
@@ -488,83 +493,6 @@ class _InsightPlaceholder extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Journey extends StatelessWidget {
-  final Color accent;
-
-  const _Journey({required this.accent});
-
-  @override
-  Widget build(BuildContext context) {
-    final labels = AppStrings.journeyLabels;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SizedBox(
-          height: 58,
-          child: Stack(
-            children: [
-              Positioned(
-                left: 13,
-                right: 13,
-                top: 13,
-                child: Container(height: 1, color: AppColors.outline),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  for (var index = 0; index < labels.length; index++)
-                    SizedBox(
-                      width: constraints.maxWidth / labels.length,
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 27,
-                            height: 27,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: index <= 2 ? accent : AppColors.outline,
-                              ),
-                            ),
-                            child: Text(
-                              '${index + 1}',
-                              style: TextStyle(
-                                color: index <= 2
-                                    ? accent
-                                    : AppColors.textSecondary,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              labels[index],
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.65,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

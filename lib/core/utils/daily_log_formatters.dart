@@ -4,6 +4,39 @@ import '../constants/app_strings.dart';
 class DailyLogFormatters {
   DailyLogFormatters._();
 
+  static String mealQualities(DailyLog log) {
+    if (log.mealQualities.isNotEmpty) {
+      return log.mealQualities.entries
+          .map(
+            (entry) =>
+                '${AppStrings.localizeStoredValue(entry.key)}: '
+                '${AppStrings.localizeStoredValue(entry.value)}',
+          )
+          .join(', ');
+    }
+    if (log.nutritionQuality != null) {
+      return AppStrings.localizeStoredValue(log.nutritionQuality!);
+    }
+    return AppStrings.notSpecified;
+  }
+
+  static String mealFoodGroups(DailyLog log) {
+    return log.mealFoodGroups.entries
+        .map(
+          (entry) =>
+              '${AppStrings.localizeStoredValue(entry.key)}: '
+              '${entry.value.map(AppStrings.localizeStoredValue).join(", ")}',
+        )
+        .join(' • ');
+  }
+
+  static String dream(DailyLog log) {
+    if (log.dreamRemembered == false) return AppStrings.no;
+    if (log.dreamRemembered != true) return AppStrings.notSpecified;
+    final note = log.dreamNote?.trim();
+    return note == null || note.isEmpty ? AppStrings.yes : note;
+  }
+
   static String sexualActivity(DailyLog log) {
     if (log.sexualActivityTypes.isNotEmpty) {
       return log.sexualActivityTypes

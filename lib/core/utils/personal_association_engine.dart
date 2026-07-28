@@ -352,6 +352,23 @@ class PersonalAssociationEngine {
         (day) => day.mood == null ? const <String>{} : {day.mood!},
       ),
     );
+    final gluten = _canonical(AppStrings.nutritionFoodGroupOptions.first);
+    final bloating = _canonical(AppStrings.postMealFeelingOptions[3]);
+    if (days.values.any((day) => day.foodGroups.contains(gluten)) &&
+        days.values.any((day) => day.postMealFeelings.contains(bloating))) {
+      _testCandidate(
+        candidates: candidates,
+        days: days,
+        kind: PersonalInsightKind.foodSensitivityAssociation,
+        primaryLabel: gluten,
+        secondaryLabel: bloating,
+        lagDays: 0,
+        exposureObserved: (day) => day.nutritionObserved,
+        exposurePresent: (day) => day.foodGroups.contains(gluten),
+        outcomeObserved: (day) => day.nutritionObserved,
+        outcomePresent: (day) => day.postMealFeelings.contains(bloating),
+      );
+    }
 
     for (final exposure in nutritionLabels) {
       for (final outcome in symptomLabels) {
@@ -595,6 +612,8 @@ class PersonalAssociationEngine {
     return grouped.map((date, dayLogs) {
       dayLogs.sort((left, right) => left.date.compareTo(right.date));
       final nutrition = <String>{};
+      final foodGroups = <String>{};
+      final postMealFeelings = <String>{};
       final activities = <String>{};
       final symptoms = <String>{};
       final bowel = <String>{};
@@ -611,6 +630,11 @@ class PersonalAssociationEngine {
 
       for (final log in dayLogs) {
         nutrition.addAll(log.nutritionTags.map(_canonical));
+        foodGroups.addAll(
+          log.mealFoodGroups.values.expand((items) => items).map(_canonical),
+        );
+        postMealFeelings.addAll(log.postMealFeelings.map(_canonical));
+        nutrition.addAll(foodGroups);
         activities.addAll(log.activities.map(_canonical));
         symptoms.addAll(log.painLocations.map(_canonical));
         symptoms.addAll(log.symptoms.map(_canonical));
@@ -629,6 +653,9 @@ class PersonalAssociationEngine {
             log.observedSections.contains(DailyLogObservedSection.nutrition) ||
             log.nutritionTags.isNotEmpty ||
             log.mealTypes.isNotEmpty ||
+            log.mealQualities.isNotEmpty ||
+            log.mealFoodGroups.isNotEmpty ||
+            log.postMealFeelings.isNotEmpty ||
             log.nutritionQuality != null ||
             log.cravings.isNotEmpty ||
             log.bowelActivity.isNotEmpty ||
@@ -656,6 +683,8 @@ class PersonalAssociationEngine {
         _ObservedDay(
           date: date,
           nutrition: nutrition,
+          foodGroups: foodGroups,
+          postMealFeelings: postMealFeelings,
           activities: activities,
           symptoms: symptoms,
           bowel: bowel,
@@ -799,6 +828,8 @@ class _CyclePhaseContext {
 class _ObservedDay {
   final DateTime date;
   final Set<String> nutrition;
+  final Set<String> foodGroups;
+  final Set<String> postMealFeelings;
   final Set<String> activities;
   final Set<String> symptoms;
   final Set<String> bowel;
@@ -816,6 +847,8 @@ class _ObservedDay {
   const _ObservedDay({
     required this.date,
     required this.nutrition,
+    required this.foodGroups,
+    required this.postMealFeelings,
     required this.activities,
     required this.symptoms,
     required this.bowel,

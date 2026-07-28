@@ -473,6 +473,22 @@ class _InsightPresentation {
         );
         icon = Icons.account_tree_outlined;
         color = AppColors.primaryDark;
+      case PersonalInsightKind.foodSensitivityAssociation:
+        title = AppStrings.insightFoodSensitivityTitle;
+        body = AppStrings.insightFoodSensitivityBody(
+          primary: primary,
+          secondary: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.food_bank_outlined;
+        color = AppColors.warning;
       case PersonalInsightKind.medicationAdherence:
         title = AppStrings.insightMedicationAdherenceTitle;
         body = AppStrings.insightMedicationAdherenceBody(

@@ -175,6 +175,42 @@ void main() {
     );
   });
 
+  test('gluten ve şişkinlik örüntüsünü temkinli hassasiyet içgörüsü yapar', () {
+    final logs = <DailyLog>[];
+    for (var day = 0; day < 20; day++) {
+      logs.add(
+        DailyLog(
+          date: DateTime(2026, 7, 1).add(Duration(days: day)),
+          mealTypes: const ['Kahvaltı'],
+          mealFoodGroups: day < 10
+              ? {
+                  'Kahvaltı': [AppStrings.nutritionFoodGroupOptions.first],
+                }
+              : const {
+                  'Kahvaltı': ['Yumurta'],
+                },
+          postMealFeelings: day < 8 || day == 15
+              ? [AppStrings.postMealFeelingOptions[3]]
+              : const ['Rahat'],
+          observedSections: const {DailyLogObservedSection.nutrition},
+        ),
+      );
+    }
+
+    final association = engine
+        .generate(logs: logs)
+        .firstWhere(
+          (insight) =>
+              insight.kind == PersonalInsightKind.foodSensitivityAssociation,
+        );
+
+    expect(association.withEventCount, 8);
+    expect(association.withTotal, 10);
+    expect(association.withoutEventCount, 1);
+    expect(association.withoutTotal, 10);
+    expect(association.lift, closeTo(8, 0.001));
+  });
+
   test('ertesi gün oluşan bağlantıyı aynı gün bağlantısından ayırır', () {
     final logs = <DailyLog>[];
     for (var day = 0; day < 24; day++) {
