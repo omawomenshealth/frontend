@@ -752,8 +752,9 @@ class _SheetHandle extends StatelessWidget {
 Future<void> _showDailyLogEditor(
   BuildContext context,
   DateTime date,
-  CalendarViewModel calendarVm,
-) async {
+  CalendarViewModel calendarVm, {
+  int initialIndex = 0,
+}) async {
   final dashboardVm = context.read<DashboardViewModel>();
   final settings = calendarVm.settings ?? dashboardVm.settings;
   if (settings == null) {
@@ -763,14 +764,20 @@ Future<void> _showDailyLogEditor(
     return;
   }
 
+  final section = switch (initialIndex) {
+    0 => DailyLogObservedSection.period,
+    1 => DailyLogObservedSection.nutrition,
+    2 => DailyLogObservedSection.symptom,
+    _ => DailyLogObservedSection.wellbeing,
+  };
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (_) => DailyLogSheet(
-      initialLog: DailyLog.empty(date),
+      initialLog: dashboardVm.initialLogForSection(section, date: date),
       settings: settings,
-      initialTabIndex: 0,
+      initialTabIndex: initialIndex,
       isSingleTab: true,
       onSave: (log) async {
         final success = log.flowIntensity != null
@@ -781,6 +788,79 @@ Future<void> _showDailyLogEditor(
       },
     ),
   );
+}
+
+Future<void> _showDailyLogTypePicker(
+  BuildContext context,
+  DateTime date,
+  CalendarViewModel calendarVm,
+) async {
+  final options = [
+    (
+      label: AppStrings.period,
+      icon: Icons.water_drop_outlined,
+      color: AppColors.periodPrimary,
+    ),
+    (
+      label: AppStrings.nutrition,
+      icon: Icons.restaurant_outlined,
+      color: AppColors.secondaryDark,
+    ),
+    (
+      label: AppStrings.symptom,
+      icon: Icons.healing_outlined,
+      color: AppColors.periodFlow,
+    ),
+    (
+      label: AppStrings.mood,
+      icon: Icons.mood_outlined,
+      color: AppColors.primaryDark,
+    ),
+  ];
+  final selected = await showModalBottomSheet<int>(
+    context: context,
+    backgroundColor: AppColors.surface,
+    showDragHandle: true,
+    builder: (sheetContext) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 4, 18, 18),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 4, 8, 10),
+              child: Text(
+                AppStrings.addDailyLog,
+                style: const TextStyle(
+                  fontFamily: 'CormorantGaramond',
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+            for (var index = 0; index < options.length; index++)
+              ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                leading: CircleAvatar(
+                  backgroundColor: options[index].color.withValues(alpha: 0.12),
+                  foregroundColor: options[index].color,
+                  child: Icon(options[index].icon),
+                ),
+                title: Text(options[index].label),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => Navigator.pop(sheetContext, index),
+              ),
+          ],
+        ),
+      ),
+    ),
+  );
+  if (selected == null || !context.mounted) return;
+  await _showDailyLogEditor(context, date, calendarVm, initialIndex: selected);
 }
 
 class _DayDetailSection extends StatelessWidget {
@@ -862,7 +942,7 @@ class _DayDetailSection extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: FilledButton.icon(
                   onPressed: () =>
-                      _showDailyLogEditor(context, selectedDay, vm),
+                      _showDailyLogTypePicker(context, selectedDay, vm),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -930,7 +1010,9 @@ class _DailyLogDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          DateFormat.Hm(AppStrings.localeName).format(log.date),
+          log.hasExplicitTime
+              ? DateFormat.Hm(AppStrings.localeName).format(log.date)
+              : AppStrings.timeNotAdded,
           style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
@@ -1069,7 +1151,11 @@ class _DailyLogDetails extends StatelessWidget {
           : value.medications
                 .map(
                   (item) =>
-                      '${item.name} · ${item.taken ? AppStrings.yes : AppStrings.no}',
+                      '${item.name} · '
+                      '${AppStrings.localizeStoredValue(item.time)} · '
+                      '${AppStrings.localizeStoredValue(item.dosage)} · '
+                      '${AppStrings.localizeStoredValue(item.stomachState)} · '
+                      '${item.taken ? AppStrings.doseTaken : AppStrings.no}',
                 )
                 .join(', '),
     );
@@ -1080,7 +1166,11 @@ class _DailyLogDetails extends StatelessWidget {
           : value.supplements
                 .map(
                   (item) =>
-                      '${item.name} · ${item.taken ? AppStrings.yes : AppStrings.no}',
+                      '${item.name} · '
+                      '${AppStrings.localizeStoredValue(item.time)} · '
+                      '${AppStrings.localizeStoredValue(item.dosage)} · '
+                      '${AppStrings.localizeStoredValue(item.stomachState)} · '
+                      '${item.taken ? AppStrings.doseTaken : AppStrings.no}',
                 )
                 .join(', '),
     );
@@ -1115,18 +1205,18 @@ class _DailyLogDetails extends StatelessWidget {
           : AppStrings.localizeStoredValue(value.flowIntensity!),
     );
     add(
-      AppStrings.periodStartedToday,
-      value.periodStartedToday == null
-          ? null
-          : value.periodStartedToday!
-          ? AppStrings.yes
-          : AppStrings.no,
-    );
-    add(
       AppStrings.vaginalDischarge,
       value.vaginalDischargePresent == null
           ? null
           : DailyLogFormatters.vaginalDischarge(value),
+    );
+    add(
+      AppStrings.sexualActivity,
+      value.sexualActivity == null
+          ? null
+          : value.sexualActivity!
+          ? AppStrings.yes
+          : AppStrings.no,
     );
     add(AppStrings.notes, value.notes);
     return result;

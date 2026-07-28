@@ -16,7 +16,7 @@ class AuthViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   bool _privacyConsentRequired = false;
-  String _privacyNoticeVersion = '2026-07-24';
+  String _privacyNoticeVersion = '2026-07-28';
 
   AuthViewModel(this._storage, this._api, this._sync);
 

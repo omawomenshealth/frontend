@@ -38,84 +38,11 @@ class PersonalInsightEngine {
     final today = currentTime.dateOnly;
     final insights = <PersonalInsight>[];
     final loggedDays = snapshots.length;
-    final firstDate = snapshots.first.date;
-    final lastDate = snapshots.last.date;
-    final spanDays = lastDate.difference(firstDate).inDays + 1;
-
-    if (loggedDays < 3) {
-      insights.add(
-        PersonalInsight(
-          id: 'data_building',
-          kind: PersonalInsightKind.dataBuilding,
-          priority: 120,
-          evidenceCount: loggedDays,
-          evidenceUnit: PersonalInsightEvidenceUnit.days,
-          value: loggedDays,
-        ),
-      );
-    } else {
-      insights.add(
-        PersonalInsight(
-          id: 'recording_summary',
-          kind: PersonalInsightKind.recordingSummary,
-          priority: 30,
-          evidenceCount: loggedDays,
-          evidenceUnit: PersonalInsightEvidenceUnit.days,
-          value: loggedDays,
-          comparisonValue: spanDays,
-        ),
-      );
-    }
 
     _addCycleInsights(insights, snapshots, today);
     _addDischargeInsights(insights, logs, snapshots, today, settings);
 
     if (loggedDays >= 3) {
-      _addFrequentValueInsight(
-        insights: insights,
-        id: 'frequent_mood',
-        kind: PersonalInsightKind.frequentMood,
-        priority: 72,
-        valuesByDay: snapshots
-            .where((snapshot) => snapshot.mood != null)
-            .map((snapshot) => <String>{snapshot.mood!}),
-        observedDays: snapshots
-            .where((snapshot) => snapshot.mood != null)
-            .length,
-      );
-      _addFrequentValueInsight(
-        insights: insights,
-        id: 'recurring_symptom',
-        kind: PersonalInsightKind.recurringSymptom,
-        priority: 88,
-        valuesByDay: snapshots.map((snapshot) => snapshot.symptoms),
-        observedDays: loggedDays,
-      );
-      _addFrequentValueInsight(
-        insights: insights,
-        id: 'frequent_activity',
-        kind: PersonalInsightKind.frequentActivity,
-        priority: 58,
-        valuesByDay: snapshots.map((snapshot) => snapshot.activities),
-        observedDays: loggedDays,
-      );
-      _addFrequentValueInsight(
-        insights: insights,
-        id: 'frequent_nutrition',
-        kind: PersonalInsightKind.frequentNutrition,
-        priority: 54,
-        valuesByDay: snapshots.map((snapshot) => snapshot.nutritionTags),
-        observedDays: loggedDays,
-      );
-      _addFrequentValueInsight(
-        insights: insights,
-        id: 'frequent_bowel',
-        kind: PersonalInsightKind.frequentBowel,
-        priority: 50,
-        valuesByDay: snapshots.map((snapshot) => snapshot.bowelActivity),
-        observedDays: loggedDays,
-      );
-
       _addCooccurrenceInsights(insights, snapshots);
     }
 
@@ -427,38 +354,6 @@ class PersonalInsightEngine {
         ),
       );
     }
-  }
-
-  void _addFrequentValueInsight({
-    required List<PersonalInsight> insights,
-    required String id,
-    required PersonalInsightKind kind,
-    required int priority,
-    required Iterable<Set<String>> valuesByDay,
-    required int observedDays,
-  }) {
-    final counts = <String, int>{};
-    for (final values in valuesByDay) {
-      for (final value in values) {
-        final normalized = AppStrings.canonicalizeStoredValue(value);
-        counts[normalized] = (counts[normalized] ?? 0) + 1;
-      }
-    }
-    final top = _topEntry(counts);
-    if (top == null || top.value < 2) return;
-
-    insights.add(
-      PersonalInsight(
-        id: id,
-        kind: kind,
-        priority: priority,
-        evidenceCount: observedDays,
-        evidenceUnit: PersonalInsightEvidenceUnit.days,
-        primaryLabel: top.key,
-        value: top.value,
-        total: observedDays,
-      ),
-    );
   }
 
   void _addCooccurrenceInsights(

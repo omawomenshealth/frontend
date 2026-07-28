@@ -23,37 +23,41 @@ void main() {
     expect(engine.generate(const []), isEmpty);
   });
 
-  test('üç günde tekrarlayan ruh hali ve belirtiyi bulur', () {
-    final logs = [
-      DailyLog(
-        date: DateTime(2026, 7, 1, 9),
-        mood: 'Mutlu',
-        painLocations: const ['Baş ağrısı'],
-      ),
-      DailyLog(
-        date: DateTime(2026, 7, 2, 10),
-        mood: 'Happy',
-        painLocations: const ['Headache'],
-      ),
-      DailyLog(
-        date: DateTime(2026, 7, 3, 11),
-        mood: 'Yorgun',
-        painLocations: const ['Bel ağrısı'],
-      ),
-    ];
+  test(
+    'salt sıklık kartlarını kaldırır, birlikte değişim ilişkisini korur',
+    () {
+      final logs = [
+        DailyLog(
+          date: DateTime(2026, 7, 1, 9),
+          mood: 'Mutlu',
+          painLocations: const ['Baş ağrısı'],
+        ),
+        DailyLog(
+          date: DateTime(2026, 7, 2, 10),
+          mood: 'Happy',
+          painLocations: const ['Headache'],
+        ),
+        DailyLog(
+          date: DateTime(2026, 7, 3, 11),
+          mood: 'Yorgun',
+          painLocations: const ['Bel ağrısı'],
+        ),
+      ];
 
-    final insights = engine.generate(logs, now: DateTime(2026, 7, 10));
-    final mood = insightOf(insights, PersonalInsightKind.frequentMood);
-    final symptom = insightOf(insights, PersonalInsightKind.recurringSymptom);
+      final insights = engine.generate(logs, now: DateTime(2026, 7, 10));
+      final mood = insightOf(insights, PersonalInsightKind.frequentMood);
+      final symptom = insightOf(insights, PersonalInsightKind.recurringSymptom);
+      final relationship = insightOf(
+        insights,
+        PersonalInsightKind.symptomMoodCooccurrence,
+      );
 
-    expect(mood, isNotNull);
-    expect(mood!.primaryLabel, 'Mutlu');
-    expect(mood.value, 2);
-    expect(mood.total, 3);
-    expect(symptom, isNotNull);
-    expect(symptom!.primaryLabel, 'Baş ağrısı');
-    expect(symptom.value, 2);
-  });
+      expect(mood, isNull);
+      expect(symptom, isNull);
+      expect(relationship, isNotNull);
+      expect(relationship!.value, 2);
+    },
+  );
 
   test('ruh hali ve döngü fazı bağlantısını ana insight listesine ekler', () {
     final start = DateTime(2026, 1, 1);
@@ -205,14 +209,31 @@ void main() {
     expect(adherence?.total, 3);
   });
 
-  test('üçten az kayıtlı günde veri oluşumu kartı gösterir', () {
+  test('üçten az kayıtlı günde yalnızca kayıt sayısı kartı göstermez', () {
     final insights = engine.generate([
       DailyLog(date: DateTime(2026, 7, 1), mood: 'İyi'),
       DailyLog(date: DateTime(2026, 7, 2), mood: 'İyi'),
     ], now: DateTime(2026, 7, 3));
 
-    expect(insightOf(insights, PersonalInsightKind.dataBuilding), isNotNull);
+    expect(insightOf(insights, PersonalInsightKind.dataBuilding), isNull);
+    expect(insightOf(insights, PersonalInsightKind.recordingSummary), isNull);
     expect(insightOf(insights, PersonalInsightKind.frequentMood), isNull);
+  });
+
+  test('dokuz günün üçündeki bağırsak kaydını içgörü yapmaz', () {
+    final insights = engine.generate(
+      List.generate(
+        9,
+        (day) => DailyLog(
+          date: DateTime(2026, 7, day + 1),
+          bowelActivity: day < 3 ? const ['Normal'] : const [],
+          mood: 'İyi',
+        ),
+      ),
+      now: DateTime(2026, 7, 10),
+    );
+
+    expect(insightOf(insights, PersonalInsightKind.frequentBowel), isNull);
   });
 
   test('verimli pencereyle uyumlu akıntı kaydını temkinli kart yapar', () {

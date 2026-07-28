@@ -613,6 +613,7 @@ class _MedicationReminderFormSheetState
                 TextFormField(
                   controller: _customItemController,
                   autofocus: true,
+                  maxLength: 200,
                   decoration: InputDecoration(
                     labelText: AppStrings.reminderItem,
                   ),
@@ -640,6 +641,7 @@ class _MedicationReminderFormSheetState
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _customDoseController,
+                  maxLength: 200,
                   decoration: InputDecoration(
                     labelText: AppStrings.customDosage,
                     hintText: AppStrings.customDosageHint,

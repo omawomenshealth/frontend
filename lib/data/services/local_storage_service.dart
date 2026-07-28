@@ -291,30 +291,23 @@ class LocalStorageService {
   /// Döndürülen liste eskiden yeniye doğru sıralıdır.
   List<DateTime> getPeriodStartDates() {
     final allLogs = loadAllLogs();
-    final bleedingLogs = allLogs
-        .where((log) => log.flowIntensity != null)
-        .toList();
     final bleedingDays =
-        bleedingLogs.map((log) => log.date.dateOnly).toSet().toList()..sort();
+        allLogs
+            .where((log) => log.flowIntensity != null)
+            .map((log) => log.date.dateOnly)
+            .toSet()
+            .toList()
+          ..sort();
 
     if (bleedingDays.isEmpty) return [];
 
-    final periodStarts = <DateTime>[];
-    for (var index = 0; index < bleedingDays.length; index++) {
-      final day = bleedingDays[index];
-      final dayLogs = bleedingLogs.where((log) => log.date.dateOnly == day);
-      final explicitlyStarted = dayLogs.any(
-        (log) => log.periodStartedToday == true,
-      );
-      final explicitlyNotStarted = dayLogs.every(
-        (log) => log.periodStartedToday == false,
-      );
-      final beginsNewBleedingGroup =
-          index == 0 || day.difference(bleedingDays[index - 1]).inDays > 1;
-
-      if (explicitlyStarted ||
-          beginsNewBleedingGroup && !explicitlyNotStarted) {
-        periodStarts.add(day);
+    // Yeni bir kanama kaydı, önceki kanama gününe bitişik değilse yeni adet
+    // başlangıcıdır. Eski yedeklerde bulunan `periodStartedToday` bayrağı artık
+    // hesaplamayı etkilemez; böylece ardışık günlerdeki kayıtlar tek dönem kalır.
+    final periodStarts = <DateTime>[bleedingDays.first];
+    for (var index = 1; index < bleedingDays.length; index++) {
+      if (bleedingDays[index].difference(bleedingDays[index - 1]).inDays > 1) {
+        periodStarts.add(bleedingDays[index]);
       }
     }
 

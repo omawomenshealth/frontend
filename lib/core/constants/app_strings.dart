@@ -253,6 +253,11 @@ enum _TextKey {
   logNutritionHint,
   logMedicationQuestion,
   logMedicationHint,
+  medicationTime,
+  medicationDose,
+  medicationStomachState,
+  medicationTakenStatus,
+  medicationLogEmptyHint,
   logMoodQuestion,
   logMoodHint,
   logAnythingElse,
@@ -346,8 +351,14 @@ enum _TextKey {
   dischargeSymptoms,
   dischargeTrackingHint,
   dischargeMedicalDisclaimer,
+  sexualActivityQuestion,
   notesHint,
   selectLogTime,
+  pastLogTimeQuestion,
+  pastLogTimeHint,
+  addTime,
+  saveWithoutTime,
+  timeNotAdded,
   logSaveFailed,
   supplementExample,
   medicationExample,
@@ -917,6 +928,12 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.logMedicationQuestion: 'Bugünkü rutinin nasıl?',
   _TextKey.logMedicationHint:
       'İlaç ve takviyelerini işaretle, dozlarını ve hatırlatmalarını tek yerde düzenle.',
+  _TextKey.medicationTime: 'Saat',
+  _TextKey.medicationDose: 'Doz',
+  _TextKey.medicationStomachState: 'Aç / tok',
+  _TextKey.medicationTakenStatus: 'Alındı durumu',
+  _TextKey.medicationLogEmptyHint:
+      'İlaç veya takviye eklemek ve hatırlatıcı kurmak için + butonunu kullan.',
   _TextKey.logMoodQuestion: 'Şu anda nasıl hissediyorsun?',
   _TextKey.logMoodHint: 'Fazla düşünmene gerek yok; şu ana en yakın olanı seç.',
   _TextKey.logAnythingElse: 'Başka ne fark ediyorsun?',
@@ -1021,8 +1038,15 @@ const Map<_TextKey, String> _turkishTexts = {
       'Renk tek başına yorumlanmaz. Kıvam, koku ve eşlik eden bulguları da kaydet.',
   _TextKey.dischargeMedicalDisclaimer:
       'Bu takip tanı veya kesin ovülasyon sonucu vermez. Olağandışı ya da süren değişikliklerde sağlık profesyoneline danış.',
+  _TextKey.sexualActivityQuestion: 'Bugün cinsel aktivite oldu mu?',
   _TextKey.notesHint: 'Bugün hakkında notlarınız...',
   _TextKey.selectLogTime: 'Kayıt Saatini Seçin',
+  _TextKey.pastLogTimeQuestion: 'Bu kayda saat eklemek ister misin?',
+  _TextKey.pastLogTimeHint:
+      'Saat isteğe bağlıdır. Saat eklemeden de bu güne kayıt yapabilirsin.',
+  _TextKey.addTime: 'Saat ekle',
+  _TextKey.saveWithoutTime: 'Saat olmadan kaydet',
+  _TextKey.timeNotAdded: 'Saat eklenmedi',
   _TextKey.logSaveFailed: 'Kayıt tamamlanamadı. Lütfen tekrar deneyin.',
   _TextKey.supplementExample: 'Örn: D Vitamini',
   _TextKey.medicationExample: 'Örn: 500 mg Parol',
@@ -1596,6 +1620,12 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.logMedicationQuestion: 'How is today’s routine?',
   _TextKey.logMedicationHint:
       'Check your medications and supplements, then manage doses and reminders in one place.',
+  _TextKey.medicationTime: 'Time',
+  _TextKey.medicationDose: 'Dose',
+  _TextKey.medicationStomachState: 'Empty / with food',
+  _TextKey.medicationTakenStatus: 'Taken status',
+  _TextKey.medicationLogEmptyHint:
+      'Use the + button to add a medication or supplement or set a reminder.',
   _TextKey.logMoodQuestion: 'How do you feel right now?',
   _TextKey.logMoodHint:
       'No need to overthink it; choose what feels closest right now.',
@@ -1701,8 +1731,15 @@ const Map<_TextKey, String> _englishTexts = {
       'Color is not interpreted alone. Also record consistency, odor, and accompanying findings.',
   _TextKey.dischargeMedicalDisclaimer:
       'This tracking does not diagnose a condition or confirm ovulation. Contact a healthcare professional for unusual or persistent changes.',
+  _TextKey.sexualActivityQuestion: 'Was there sexual activity today?',
   _TextKey.notesHint: 'Your notes about today...',
   _TextKey.selectLogTime: 'Select Log Time',
+  _TextKey.pastLogTimeQuestion: 'Would you like to add a time to this log?',
+  _TextKey.pastLogTimeHint:
+      'Time is optional. You can save the log for this day without adding one.',
+  _TextKey.addTime: 'Add time',
+  _TextKey.saveWithoutTime: 'Save without time',
+  _TextKey.timeNotAdded: 'Time not added',
   _TextKey.logSaveFailed: 'The log could not be saved. Please try again.',
   _TextKey.supplementExample: 'Example: Vitamin D',
   _TextKey.medicationExample: 'Example: Paracetamol 500 mg',
@@ -3087,6 +3124,14 @@ class AppStrings {
   static String get logMedicationQuestion =>
       _text(_TextKey.logMedicationQuestion);
   static String get logMedicationHint => _text(_TextKey.logMedicationHint);
+  static String get medicationTime => _text(_TextKey.medicationTime);
+  static String get medicationDose => _text(_TextKey.medicationDose);
+  static String get medicationStomachState =>
+      _text(_TextKey.medicationStomachState);
+  static String get medicationTakenStatus =>
+      _text(_TextKey.medicationTakenStatus);
+  static String get medicationLogEmptyHint =>
+      _text(_TextKey.medicationLogEmptyHint);
   static String get logMoodQuestion => _text(_TextKey.logMoodQuestion);
   static String get logMoodHint => _text(_TextKey.logMoodHint);
   static String get logAnythingElse => _text(_TextKey.logAnythingElse);
@@ -3189,8 +3234,15 @@ class AppStrings {
       _text(_TextKey.dischargeTrackingHint);
   static String get dischargeMedicalDisclaimer =>
       _text(_TextKey.dischargeMedicalDisclaimer);
+  static String get sexualActivityQuestion =>
+      _text(_TextKey.sexualActivityQuestion);
   static String get notesHint => _text(_TextKey.notesHint);
   static String get selectLogTime => _text(_TextKey.selectLogTime);
+  static String get pastLogTimeQuestion => _text(_TextKey.pastLogTimeQuestion);
+  static String get pastLogTimeHint => _text(_TextKey.pastLogTimeHint);
+  static String get addTime => _text(_TextKey.addTime);
+  static String get saveWithoutTime => _text(_TextKey.saveWithoutTime);
+  static String get timeNotAdded => _text(_TextKey.timeNotAdded);
   static String get logSaveFailed => _text(_TextKey.logSaveFailed);
   static String get supplementExample => _text(_TextKey.supplementExample);
   static String get medicationExample => _text(_TextKey.medicationExample);

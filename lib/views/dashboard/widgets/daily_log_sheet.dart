@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../data/models/period_log_model.dart';
+import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/models/user_settings_model.dart';
+import '../../../data/services/local_storage_service.dart';
+import 'medication_reminder_section.dart';
 
 class DailyLogSheet extends StatefulWidget {
   final DailyLog initialLog;
@@ -33,7 +37,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   var _isSaving = false;
 
   late int _flowIndex;
-  late bool _periodStartedToday;
   late Set<String> _periodSymptoms;
 
   late int _waterGlasses;
@@ -44,6 +47,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   final _symptomSearchController = TextEditingController();
   late Set<String> _symptoms;
   late int _symptomSeverityIndex;
+  late bool? _sexualActivity;
+  late bool? _vaginalDischargePresent;
+  late VaginalDischargeColor? _vaginalDischargeColor;
+  late VaginalDischargeConsistency? _vaginalDischargeConsistency;
+  late VaginalDischargeAmount? _vaginalDischargeAmount;
+  late Set<VaginalDischargeSymptom> _vaginalDischargeSymptoms;
+
+  late List<MedicationEntry> _medications;
+  late List<MedicationEntry> _supplements;
 
   late int _moodIndex;
   var _moodStep = 1;
@@ -61,14 +73,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       _log.flowIntensity,
       fallback: 2,
     );
-    _periodStartedToday = _log.periodStartedToday ?? true;
     _periodSymptoms = _localizedSet(
       _log.symptoms,
       AppStrings.periodSymptomOptions,
     );
 
     _waterGlasses = _log.waterIntakeMl == null
-        ? 4
+        ? 0
         : (_log.waterIntakeMl! / 250).round().clamp(0, 12);
     _meals = _localizedSet(_log.mealTypes, AppStrings.nutritionMealOptions);
     if (_meals.isEmpty) {
@@ -89,6 +100,21 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
     _symptoms = _localizedSet(_log.symptoms, _allSymptomOptions);
     _symptomSeverityIndex = (_log.symptomSeverity ?? 2) - 1;
+    _sexualActivity = _log.sexualActivity;
+    _vaginalDischargePresent = _log.vaginalDischargePresent;
+    _vaginalDischargeColor = _log.vaginalDischargeColor;
+    _vaginalDischargeConsistency = _log.vaginalDischargeConsistency;
+    _vaginalDischargeAmount = _log.vaginalDischargeAmount;
+    _vaginalDischargeSymptoms = {..._log.vaginalDischargeSymptoms};
+
+    _medications = _initialMedicationEntries(
+      _log.medications,
+      widget.settings.dailyMedications,
+    );
+    _supplements = _initialMedicationEntries(
+      _log.supplements,
+      widget.settings.dailySupplements,
+    );
 
     _moodIndex = _localizedIndex(
       AppStrings.moodCheckInOptions,
@@ -135,6 +161,34 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       if (options.contains(localized)) result.add(localized);
     }
     return result;
+  }
+
+  List<MedicationEntry> _initialMedicationEntries(
+    List<MedicationEntry> saved,
+    List<String> configuredNames,
+  ) {
+    final entries = <String, MedicationEntry>{};
+    for (final entry in saved) {
+      entries[entry.name] = entry.copyWith(
+        time: AppStrings.localizeStoredValue(entry.time),
+        stomachState: AppStrings.localizeStoredValue(entry.stomachState),
+        dosage: AppStrings.localizeStoredValue(entry.dosage),
+      );
+    }
+    for (final rawName in configuredNames) {
+      final name = rawName.trim();
+      if (name.isEmpty) continue;
+      entries.putIfAbsent(
+        name,
+        () => MedicationEntry(
+          name: name,
+          time: AppStrings.medicationTimes.first,
+          stomachState: AppStrings.stomachStates.first,
+          dosage: AppStrings.dosageOptions.first,
+        ),
+      );
+    }
+    return entries.values.toList();
   }
 
   int get _cycleDay {
@@ -190,7 +244,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   child: ListView(
                     key: ValueKey('$_logType-$_moodStep'),
                     controller: scrollController,
-                    padding: const EdgeInsets.fromLTRB(18, 4, 18, 24),
+                    padding: const EdgeInsets.fromLTRB(18, 4, 18, 104),
                     children: [_buildContent()],
                   ),
                 ),
@@ -376,49 +430,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           color: AppColors.periodPrimary,
           onChanged: (index) => setState(() => _flowIndex = index),
         ),
-        const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.fromLTRB(16, 12, 10, 12),
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.78),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: AppColors.outline),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppStrings.periodStartedToday,
-                      style: const TextStyle(
-                        fontFamily: 'CormorantGaramond',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      AppStrings.periodStartedHint,
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        height: 1.35,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                value: _periodStartedToday,
-                activeTrackColor: AppColors.periodPrimary,
-                onChanged: (value) =>
-                    setState(() => _periodStartedToday = value),
-              ),
-            ],
-          ),
-        ),
         const SizedBox(height: 25),
         _SectionTitle(AppStrings.logAnythingElse),
         const SizedBox(height: 11),
@@ -479,6 +490,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
                   ),
                   _RoundButton(
+                    key: const ValueKey('water_decrement'),
                     icon: Icons.remove_rounded,
                     color: AppColors.secondary,
                     filled: false,
@@ -488,6 +500,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   ),
                   const SizedBox(width: 9),
                   _RoundButton(
+                    key: const ValueKey('water_increment'),
                     icon: Icons.add_rounded,
                     color: AppColors.secondary,
                     filled: true,
@@ -576,6 +589,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           selected: _cravings,
           color: AppColors.secondary,
         ),
+        const SizedBox(height: 28),
+        _buildNutritionMedicationSection(),
       ],
     );
   }
@@ -694,6 +709,221 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               ],
             ),
           ],
+        const SizedBox(height: 26),
+        _buildBodyTrackingCard(),
+      ],
+    );
+  }
+
+  Widget _buildBodyTrackingCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.outline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(AppStrings.sexualActivity),
+          const SizedBox(height: 5),
+          Text(
+            AppStrings.sexualActivityQuestion,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 11),
+          _buildBooleanChoices(
+            value: _sexualActivity,
+            color: AppColors.primary,
+            onChanged: (value) => setState(() => _sexualActivity = value),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 19),
+            child: Divider(height: 1, color: AppColors.outline),
+          ),
+          _SectionTitle(AppStrings.vaginalDischarge),
+          const SizedBox(height: 5),
+          Text(
+            AppStrings.dischargePresent,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 11),
+          _buildBooleanChoices(
+            value: _vaginalDischargePresent,
+            color: AppColors.secondaryDark,
+            onChanged: (value) {
+              setState(() {
+                _vaginalDischargePresent = value;
+                if (!value) {
+                  _vaginalDischargeColor = null;
+                  _vaginalDischargeConsistency = null;
+                  _vaginalDischargeAmount = null;
+                  _vaginalDischargeSymptoms.clear();
+                }
+              });
+            },
+          ),
+          if (_vaginalDischargePresent == true) ...[
+            const SizedBox(height: 20),
+            _buildDischargeChoiceSection(
+              title: AppStrings.dischargeColor,
+              options: AppStrings.dischargeColorOptions,
+              selectedIndex: _vaginalDischargeColor?.index,
+              onSelected: (index) => setState(
+                () => _vaginalDischargeColor =
+                    VaginalDischargeColor.values[index],
+              ),
+            ),
+            const SizedBox(height: 18),
+            _buildDischargeChoiceSection(
+              title: AppStrings.dischargeConsistency,
+              options: AppStrings.dischargeConsistencyOptions,
+              selectedIndex: _vaginalDischargeConsistency?.index,
+              onSelected: (index) => setState(
+                () => _vaginalDischargeConsistency =
+                    VaginalDischargeConsistency.values[index],
+              ),
+            ),
+            const SizedBox(height: 18),
+            _buildDischargeChoiceSection(
+              title: AppStrings.dischargeAmount,
+              options: AppStrings.dischargeAmountOptions,
+              selectedIndex: _vaginalDischargeAmount?.index,
+              onSelected: (index) => setState(
+                () => _vaginalDischargeAmount =
+                    VaginalDischargeAmount.values[index],
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              AppStrings.dischargeSymptoms.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 9),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (
+                  var index = 0;
+                  index < AppStrings.dischargeSymptomOptions.length;
+                  index++
+                )
+                  _PillChoice(
+                    label: AppStrings.dischargeSymptomOptions[index],
+                    selected: _vaginalDischargeSymptoms.contains(
+                      VaginalDischargeSymptom.values[index],
+                    ),
+                    color: AppColors.secondaryDark,
+                    onTap: () {
+                      final symptom = VaginalDischargeSymptom.values[index];
+                      setState(() {
+                        if (_vaginalDischargeSymptoms.contains(symptom)) {
+                          _vaginalDischargeSymptoms.remove(symptom);
+                        } else {
+                          _vaginalDischargeSymptoms.add(symptom);
+                        }
+                      });
+                    },
+                  ),
+              ],
+            ),
+            const SizedBox(height: 15),
+            Text(
+              AppStrings.dischargeTrackingHint,
+              style: const TextStyle(
+                fontSize: 11,
+                height: 1.45,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 7),
+            Text(
+              AppStrings.dischargeMedicalDisclaimer,
+              style: const TextStyle(
+                fontSize: 10,
+                height: 1.4,
+                color: AppColors.textHint,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBooleanChoices({
+    required bool? value,
+    required Color color,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: _PillChoice(
+            label: AppStrings.yes,
+            selected: value == true,
+            color: color,
+            onTap: () => onChanged(true),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _PillChoice(
+            label: AppStrings.no,
+            selected: value == false,
+            color: color,
+            onTap: () => onChanged(false),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDischargeChoiceSection({
+    required String title,
+    required List<String> options,
+    required int? selectedIndex,
+    required ValueChanged<int> onSelected,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.4,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 9),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (var index = 0; index < options.length; index++)
+              _PillChoice(
+                label: options[index],
+                selected: selectedIndex == index,
+                color: AppColors.secondaryDark,
+                onTap: () => onSelected(index),
+              ),
+          ],
+        ),
       ],
     );
   }
@@ -818,6 +1048,465 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         _symptoms.add(label);
       }
     });
+  }
+
+  Widget _buildNutritionMedicationSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(child: _SectionTitle(AppStrings.medicationAndSupplement)),
+            IconButton.filledTonal(
+              tooltip: AppStrings.add,
+              onPressed: _showMedicationActions,
+              style: IconButton.styleFrom(
+                backgroundColor: AppColors.medicationPrimary.withValues(
+                  alpha: 0.12,
+                ),
+                foregroundColor: AppColors.medicationPrimary,
+              ),
+              icon: const Icon(Icons.add_rounded),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        if (_medications.isEmpty && _supplements.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.outline),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.medication_outlined,
+                  color: AppColors.medicationPrimary,
+                  size: 24,
+                ),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Text(
+                    AppStrings.medicationLogEmptyHint,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      height: 1.45,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else ...[
+          if (_medications.isNotEmpty)
+            _buildMedicationGroup(
+              title: AppStrings.medications,
+              entries: _medications,
+              icon: Icons.medication_outlined,
+            ),
+          if (_medications.isNotEmpty && _supplements.isNotEmpty)
+            const SizedBox(height: 24),
+          if (_supplements.isNotEmpty)
+            _buildMedicationGroup(
+              title: AppStrings.supplements,
+              entries: _supplements,
+              icon: Icons.spa_outlined,
+            ),
+          const SizedBox(height: 18),
+          Text(
+            AppStrings.medicationDisclaimer,
+            style: const TextStyle(
+              fontSize: 10,
+              height: 1.4,
+              color: AppColors.textHint,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _showMedicationActions() async {
+    final action = await showModalBottomSheet<_MedicationNutritionAction>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 2, 8, 8),
+                child: _SectionTitle(AppStrings.medicationAndSupplement),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.medication_outlined,
+                  color: AppColors.medicationPrimary,
+                ),
+                title: Text(AppStrings.newMedication),
+                onTap: () => Navigator.pop(
+                  sheetContext,
+                  _MedicationNutritionAction.addMedication,
+                ),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.spa_outlined,
+                  color: AppColors.secondaryDark,
+                ),
+                title: Text(AppStrings.newSupplement),
+                onTap: () => Navigator.pop(
+                  sheetContext,
+                  _MedicationNutritionAction.addSupplement,
+                ),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.add_alarm_rounded,
+                  color: AppColors.primaryDark,
+                ),
+                title: Text(AppStrings.createReminder),
+                onTap: () => Navigator.pop(
+                  sheetContext,
+                  _MedicationNutritionAction.manageReminders,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (action == null || !mounted) return;
+    switch (action) {
+      case _MedicationNutritionAction.addMedication:
+        await _addMedicationOrSupplement(medication: true);
+      case _MedicationNutritionAction.addSupplement:
+        await _addMedicationOrSupplement(medication: false);
+      case _MedicationNutritionAction.manageReminders:
+        await _openReminderManager();
+    }
+  }
+
+  Future<void> _addMedicationOrSupplement({required bool medication}) async {
+    var customValue = '';
+    final name = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          medication ? AppStrings.newMedication : AppStrings.newSupplement,
+        ),
+        content: TextField(
+          autofocus: true,
+          maxLength: 200,
+          decoration: InputDecoration(
+            labelText: medication
+                ? AppStrings.medications
+                : AppStrings.supplements,
+            hintText: medication
+                ? AppStrings.medicationExample
+                : AppStrings.supplementExample,
+          ),
+          onChanged: (value) => customValue = value,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, customValue.trim()),
+            child: Text(AppStrings.add),
+          ),
+        ],
+      ),
+    );
+    if (name == null || name.isEmpty || !mounted) return;
+
+    final entries = medication ? _medications : _supplements;
+    final alreadyExists = entries.any(
+      (entry) => entry.name.toLowerCase() == name.toLowerCase(),
+    );
+    if (alreadyExists) return;
+
+    final storage = context.read<LocalStorageService>();
+    final settings = storage.loadSettings() ?? widget.settings;
+    if (medication) {
+      await storage.saveCustomMedication(name);
+      await storage.saveSettings(
+        settings.copyWith(
+          dailyMedications: {...settings.dailyMedications, name}.toList(),
+        ),
+      );
+    } else {
+      await storage.saveCustomSupplement(name);
+      await storage.saveSettings(
+        settings.copyWith(
+          dailySupplements: {...settings.dailySupplements, name}.toList(),
+        ),
+      );
+    }
+    if (!mounted) return;
+    setState(() {
+      entries.add(
+        MedicationEntry(
+          name: name,
+          time: AppStrings.medicationTimes.first,
+          stomachState: AppStrings.stomachStates.first,
+          dosage: AppStrings.dosageOptions.first,
+        ),
+      );
+    });
+  }
+
+  Future<void> _openReminderManager() {
+    final storage = context.read<LocalStorageService>();
+    final medicationNames = {
+      ...widget.settings.dailyMedications,
+      ...storage.getCustomMedications(),
+      ..._medications.map((entry) => entry.name),
+    }.toList();
+    final supplementNames = {
+      ...widget.settings.dailySupplements,
+      ...storage.getCustomSupplements(),
+      ..._supplements.map((entry) => entry.name),
+    }.toList();
+
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.92,
+        minChildSize: 0.6,
+        maxChildSize: 0.96,
+        expand: false,
+        builder: (sheetContext, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+            children: [
+              const _SheetHandle(),
+              const SizedBox(height: 16),
+              _SectionTitle(AppStrings.reminderPlans),
+              const SizedBox(height: 16),
+              _SectionTitle(AppStrings.medications),
+              MedicationReminderSection(
+                itemType: MedicationPlanItemType.medication,
+                availableItems: medicationNames,
+                color: AppColors.medicationPrimary,
+              ),
+              const SizedBox(height: 24),
+              _SectionTitle(AppStrings.supplements),
+              MedicationReminderSection(
+                itemType: MedicationPlanItemType.supplement,
+                availableItems: supplementNames,
+                color: AppColors.secondaryDark,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMedicationGroup({
+    required String title,
+    required List<MedicationEntry> entries,
+    required IconData icon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle(title),
+        const SizedBox(height: 11),
+        for (var index = 0; index < entries.length; index++) ...[
+          _buildMedicationEntryCard(
+            entry: entries[index],
+            icon: icon,
+            onChanged: (updated) => setState(() => entries[index] = updated),
+          ),
+          if (index != entries.length - 1) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildMedicationEntryCard({
+    required MedicationEntry entry,
+    required IconData icon,
+    required ValueChanged<MedicationEntry> onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: entry.taken
+              ? AppColors.medicationTaken.withValues(alpha: 0.55)
+              : AppColors.outline,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.medicationPrimary.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 20, color: AppColors.medicationPrimary),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(
+                  entry.name,
+                  style: const TextStyle(
+                    fontFamily: 'CormorantGaramond',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          _buildMedicationDropdown(
+            label: AppStrings.medicationTime,
+            value: entry.time,
+            options: AppStrings.medicationTimes,
+            onChanged: (value) => onChanged(entry.copyWith(time: value)),
+          ),
+          const SizedBox(height: 11),
+          _buildMedicationDropdown(
+            label: AppStrings.medicationDose,
+            value: entry.dosage,
+            options: AppStrings.dosageOptions,
+            onChanged: (value) => onChanged(entry.copyWith(dosage: value)),
+          ),
+          const SizedBox(height: 11),
+          _buildMedicationDropdown(
+            label: AppStrings.medicationStomachState,
+            value: entry.stomachState,
+            options: AppStrings.stomachStates,
+            onChanged: (value) =>
+                onChanged(entry.copyWith(stomachState: value)),
+          ),
+          const SizedBox(height: 11),
+          Container(
+            padding: const EdgeInsets.fromLTRB(13, 6, 7, 6),
+            decoration: BoxDecoration(
+              color: AppColors.scaffoldBackground,
+              borderRadius: BorderRadius.circular(17),
+              border: Border.all(color: AppColors.outline),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppStrings.medicationTakenStatus,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        entry.taken ? AppStrings.doseTaken : AppStrings.no,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: entry.taken
+                              ? AppColors.medicationTaken
+                              : AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch.adaptive(
+                  value: entry.taken,
+                  activeTrackColor: AppColors.medicationTaken,
+                  onChanged: (value) => onChanged(entry.copyWith(taken: value)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMedicationDropdown({
+    required String label,
+    required String value,
+    required List<String> options,
+    required ValueChanged<String> onChanged,
+  }) {
+    final available = <String>[...options];
+    if (!available.contains(value)) available.add(value);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(13, 7, 10, 7),
+      decoration: BoxDecoration(
+        color: AppColors.scaffoldBackground,
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: AppColors.outline),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 72,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: value,
+                isExpanded: true,
+                isDense: true,
+                borderRadius: BorderRadius.circular(18),
+                items: [
+                  for (final option in available)
+                    DropdownMenuItem(value: option, child: Text(option)),
+                ],
+                onChanged: (selected) {
+                  if (selected != null) onChanged(selected);
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildMoodPage() {
@@ -1022,7 +1711,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Future<void> _addCustomContext(bool companion) async {
-    final controller = TextEditingController();
+    var customValue = '';
     final value = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -1036,21 +1725,23 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        content: TextField(controller: controller, autofocus: true),
+        content: TextField(
+          autofocus: true,
+          maxLength: 120,
+          onChanged: (value) => customValue = value,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(AppStrings.cancel),
           ),
           FilledButton(
-            onPressed: () =>
-                Navigator.pop(dialogContext, controller.text.trim()),
+            onPressed: () => Navigator.pop(dialogContext, customValue.trim()),
             child: Text(AppStrings.add),
           ),
         ],
       ),
     );
-    controller.dispose();
     if (!mounted || value == null || value.isEmpty) return;
     setState(() {
       (companion ? _moodCompanions : _moodPlaces).add(value);
@@ -1135,7 +1826,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     await _saveLog();
   }
 
-  DailyLog _preparedLog(DateTime finalDate) {
+  DailyLog _preparedLog(DateTime finalDate, {required bool hasExplicitTime}) {
     final observed = <DailyLogObservedSection>{
       ..._log.observedSections,
       switch (_logType) {
@@ -1145,34 +1836,53 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         _ => DailyLogObservedSection.wellbeing,
       },
     };
+    if (_logType == 1 && (_medications.isNotEmpty || _supplements.isNotEmpty)) {
+      observed.add(DailyLogObservedSection.medication);
+    }
 
     return switch (_logType) {
       0 => _log.copyWith(
         date: finalDate,
+        hasExplicitTime: hasExplicitTime,
         flowIntensity: AppStrings.flowOptions[_flowIndex],
-        periodStartedToday: _periodStartedToday,
         symptoms: _periodSymptoms.toList(),
         painLocations: _matchingPainLocations(_periodSymptoms),
         observedSections: observed,
       ),
       1 => _log.copyWith(
         date: finalDate,
+        hasExplicitTime: hasExplicitTime,
         waterIntakeMl: _waterGlasses * 250,
         mealTypes: _meals.toList(),
         nutritionQuality:
             AppStrings.nutritionQualityOptions[_nutritionQualityIndex],
         cravings: _cravings.toList(),
+        medications: _medications,
+        supplements: _supplements,
         observedSections: observed,
       ),
       2 => _log.copyWith(
         date: finalDate,
+        hasExplicitTime: hasExplicitTime,
         symptoms: _symptoms.toList(),
         symptomSeverity: _symptomSeverityIndex + 1,
         painLocations: _matchingPainLocations(_symptoms),
+        sexualActivity: _sexualActivity,
+        vaginalDischargePresent: _vaginalDischargePresent,
+        vaginalDischargeColor: _vaginalDischargeColor,
+        clearVaginalDischargeColor: _vaginalDischargePresent != true,
+        vaginalDischargeConsistency: _vaginalDischargeConsistency,
+        clearVaginalDischargeConsistency: _vaginalDischargePresent != true,
+        vaginalDischargeAmount: _vaginalDischargeAmount,
+        clearVaginalDischargeAmount: _vaginalDischargePresent != true,
+        vaginalDischargeSymptoms: _vaginalDischargePresent == true
+            ? _vaginalDischargeSymptoms
+            : const {},
         observedSections: observed,
       ),
       _ => _log.copyWith(
         date: finalDate,
+        hasExplicitTime: hasExplicitTime,
         mood: AppStrings.moodCheckInOptions[_moodIndex],
         moodEmoji: AppStrings.moodCheckInEmojis[_moodIndex],
         moodCompanions: _moodCompanions.toList(),
@@ -1195,26 +1905,40 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   Future<void> _saveLog() async {
     final today = AppTime.now.dateOnly;
     var finalDate = _log.date;
+    var hasExplicitTime = _log.hasExplicitTime;
     if (_log.date.dateOnly.isBefore(today)) {
-      final pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(_log.date),
-        helpText: AppStrings.selectLogTime,
-      );
-      if (pickedTime == null) return;
-      finalDate = DateTime(
-        _log.date.year,
-        _log.date.month,
-        _log.date.day,
-        pickedTime.hour,
-        pickedTime.minute,
-      );
+      final choice = await _choosePastLogTime();
+      if (choice == null) return;
+      if (choice == _PastLogTimeChoice.withTime) {
+        if (!mounted) return;
+        final pickedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.fromDateTime(_log.date),
+          helpText: AppStrings.selectLogTime,
+        );
+        if (pickedTime == null) return;
+        finalDate = DateTime(
+          _log.date.year,
+          _log.date.month,
+          _log.date.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+        hasExplicitTime = true;
+      } else {
+        if (!_log.hasData) {
+          finalDate = _log.date.dateOnly;
+        }
+        hasExplicitTime = false;
+      }
     }
 
     setState(() => _isSaving = true);
     var success = false;
     try {
-      success = await widget.onSave(_preparedLog(finalDate));
+      success = await widget.onSave(
+        _preparedLog(finalDate, hasExplicitTime: hasExplicitTime),
+      );
     } catch (_) {
       success = false;
     }
@@ -1241,6 +1965,40 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       );
     }
   }
+
+  Future<_PastLogTimeChoice?> _choosePastLogTime() {
+    return showDialog<_PastLogTimeChoice>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(AppStrings.pastLogTimeQuestion),
+        content: Text(AppStrings.pastLogTimeHint),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(AppStrings.cancel),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, _PastLogTimeChoice.withoutTime),
+            child: Text(AppStrings.saveWithoutTime),
+          ),
+          FilledButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, _PastLogTimeChoice.withTime),
+            child: Text(AppStrings.addTime),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+enum _PastLogTimeChoice { withTime, withoutTime }
+
+enum _MedicationNutritionAction {
+  addMedication,
+  addSupplement,
+  manageReminders,
 }
 
 class _SheetHandle extends StatelessWidget {
@@ -1330,6 +2088,7 @@ class _RoundButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const _RoundButton({
+    super.key,
     required this.icon,
     required this.color,
     required this.filled,

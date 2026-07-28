@@ -25,7 +25,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
 
   bool get _granted => _status?['granted'] == true;
   String get _noticeVersion =>
-      _status?['noticeVersion'] as String? ?? '2026-07-24';
+      _status?['noticeVersion'] as String? ?? '2026-07-28';
 
   @override
   void initState() {
@@ -162,8 +162,10 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
     AppStrings.of(context);
     final isTurkish = AppStrings.isTurkish;
     final notice = isTurkish
-        ? 'Bulut eşitlemesini seçerseniz döngü, belirti, ilaç, takviye ve profil '
-              'ayarları sağlık takibi amacıyla işlenir. Veriler aktarım sırasında '
+        ? 'Bulut eşitlemesini seçerseniz döngü, belirti, ilaç, takviye, hatırlatma '
+              'planı, aldım/atladım doz yanıtı ve profil ayarları sağlık takibi '
+              'amacıyla işlenir. Cihaza özel bildirim planlama durumu buluta '
+              'gönderilmez. Veriler aktarım sırasında '
               'TLS, veritabanında kullanıcıya özel AES-256-GCM anahtarıyla '
               'korunur. Google yalnızca oturum açma ve satın alma doğrulaması '
               'kapsamında hizmet sağlar. Bulut eşitlemesi isteğe bağlıdır. '
@@ -171,7 +173,9 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
               'tamamen silebilirsiniz. Test sürümündeki veri sorumlusu iletişim '
               'bilgileri üretimden önce tamamlanacaktır.'
         : 'If you choose cloud sync, cycle, symptom, medication, supplement, '
-              'and profile settings are processed for health tracking. Data is '
+              'reminder plan, taken/skipped dose response, and profile settings '
+              'are processed for health tracking. Device-specific notification '
+              'scheduling state is not uploaded. Data is '
               'protected by TLS in transit and a per-user AES-256-GCM key in the '
               'database. Google is used only for sign-in and purchase '
               'verification. Cloud sync is optional. You may export your data, '

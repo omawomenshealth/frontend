@@ -112,4 +112,32 @@ void main() {
     expect(refreshed!.averageCycleLength, 28);
     expect(refreshed.averagePeriodLength, 4);
   });
+
+  test(
+    'eski baslangic bayraklari olsa da ardisik kanama kayitlari tek adet sayilir',
+    () async {
+      final firstStart = DateTime(2026, 5, 1);
+      for (var day = 0; day < 3; day++) {
+        await storage.saveDailyLog(
+          DailyLog(
+            date: firstStart.add(Duration(days: day, hours: 9)),
+            flowIntensity: 'Orta',
+            periodStartedToday: true,
+          ),
+        );
+      }
+      await storage.saveDailyLog(
+        DailyLog(
+          date: firstStart.add(const Duration(days: 28, hours: 9)),
+          flowIntensity: 'Orta',
+          periodStartedToday: false,
+        ),
+      );
+
+      expect(storage.getPeriodStartDates(), [
+        firstStart,
+        firstStart.add(const Duration(days: 28)),
+      ]);
+    },
+  );
 }

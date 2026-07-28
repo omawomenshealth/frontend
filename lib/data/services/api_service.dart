@@ -164,6 +164,8 @@ class ApiService {
     required List<Map<String, dynamic>> logs,
     required List<String> customMedications,
     required List<String> customSupplements,
+    required List<Map<String, dynamic>> medicationReminderPlans,
+    required List<Map<String, dynamic>> medicationDoseRecords,
     bool replaceExisting = true,
   }) async {
     final url = Uri.parse('$baseUrl/api/sync/upload');
@@ -178,6 +180,8 @@ class ApiService {
             'logs': logs,
             'customMedications': customMedications,
             'customSupplements': customSupplements,
+            'medicationReminderPlans': medicationReminderPlans,
+            'medicationDoseRecords': medicationDoseRecords,
             'replaceExisting': replaceExisting,
           }),
         ),

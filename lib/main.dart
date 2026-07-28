@@ -77,43 +77,95 @@ void main() async {
   runApp(MyApp(storage: storage, notificationService: notificationService));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final LocalStorageService storage;
   final NotificationService? notificationService;
 
   const MyApp({super.key, required this.storage, this.notificationService});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  final _homeShellKey = GlobalKey<_HomeShellState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Future<bool> didPopRoute() async {
+    final navigator = _navigatorKey.currentState;
+    final homeShell = _homeShellKey.currentState;
+    if (navigator == null || homeShell == null || !homeShell.mounted) {
+      return false;
+    }
+
+    final homeRouteIsCurrent =
+        ModalRoute.of(homeShell.context)?.isCurrent ?? false;
+    if (homeRouteIsCurrent && homeShell.isHomePageSelected) {
+      return false;
+    }
+
+    navigator.popUntil(
+      (route) => route.settings.name == '/home' || route.isFirst,
+    );
+    homeShell.showHomePage();
+    return true;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final apiService = ApiService(storage);
-    final syncService = SyncService(storage, apiService);
-    final reminders = notificationService ?? NotificationService();
+    final apiService = ApiService(widget.storage);
+    final reminders = widget.notificationService ?? NotificationService();
+    final syncService = SyncService(widget.storage, apiService, reminders);
 
     return MultiProvider(
       providers: [
-        Provider<LocalStorageService>.value(value: storage),
+        Provider<LocalStorageService>.value(value: widget.storage),
         Provider<NotificationService>.value(value: reminders),
         Provider<ApiService>.value(value: apiService),
         Provider<SyncService>.value(value: syncService),
         ChangeNotifierProvider(
           create: (_) =>
-              PremiumPurchaseService(storage, apiService)..initialize(),
+              PremiumPurchaseService(widget.storage, apiService)..initialize(),
         ),
         ChangeNotifierProvider(
-          create: (_) => AuthViewModel(storage, apiService, syncService),
+          create: (_) => AuthViewModel(widget.storage, apiService, syncService),
         ),
         ChangeNotifierProvider(
-          create: (_) => OnboardingViewModel(storage, syncService),
+          create: (_) => OnboardingViewModel(widget.storage, syncService),
         ),
-        ChangeNotifierProvider(create: (_) => DashboardViewModel(storage)),
-        ChangeNotifierProvider(create: (_) => InsightsViewModel(storage)),
-        ChangeNotifierProvider(create: (_) => CalendarViewModel(storage)),
         ChangeNotifierProvider(
-          create: (_) =>
-              ProfileViewModel(storage, syncService, apiService, reminders),
+          create: (_) => DashboardViewModel(widget.storage),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => InsightsViewModel(widget.storage),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CalendarViewModel(widget.storage),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ProfileViewModel(
+            widget.storage,
+            syncService,
+            apiService,
+            reminders,
+          ),
         ),
       ],
       child: MaterialApp(
+        navigatorKey: _navigatorKey,
         onGenerateTitle: (_) => AppStrings.appName,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
@@ -126,11 +178,11 @@ class MyApp extends StatelessWidget {
         supportedLocales: AppStrings.supportedLocales,
         localeResolutionCallback: (locale, _) =>
             AppStrings.resolveLocale(locale),
-        initialRoute: storage.isOnboardingComplete ? '/home' : '/auth',
+        initialRoute: widget.storage.isOnboardingComplete ? '/home' : '/auth',
         routes: {
           '/auth': (context) => const AuthView(),
           '/onboarding': (context) => const OnboardingView(),
-          '/home': (context) => const HomeShell(),
+          '/home': (context) => HomeShell(key: _homeShellKey),
           '/privacy': (context) => const PrivacyCenterView(),
         },
       ),
@@ -148,6 +200,13 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
+
+  bool get isHomePageSelected => _currentIndex == 0;
+
+  void showHomePage() {
+    if (_currentIndex == 0) return;
+    setState(() => _currentIndex = 0);
+  }
 
   @override
   void initState() {

@@ -203,14 +203,18 @@ class DashboardView extends StatelessWidget {
     int initialIndex = 0,
     bool isSingleTab = false,
   }) {
+    final section = switch (initialIndex) {
+      0 => DailyLogObservedSection.period,
+      1 => DailyLogObservedSection.nutrition,
+      2 => DailyLogObservedSection.symptom,
+      _ => DailyLogObservedSection.wellbeing,
+    };
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => DailyLogSheet(
-        initialLog: DailyLog.empty(
-          vm.selectedDate.isToday ? AppTime.now : vm.selectedDate,
-        ),
+        initialLog: vm.initialLogForSection(section),
         settings: vm.settings!,
         initialTabIndex: initialIndex,
         isSingleTab: isSingleTab,

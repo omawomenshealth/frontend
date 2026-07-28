@@ -1,92 +1,79 @@
-# Veri Depolama Şeması (Local Storage Schema)
+# OMA veri depolama ve senkronizasyon şeması
 
-Bu belge, uygulamanın SharedPreferences üzerinde kaydettiği tüm verileri, veri yapılarını, alanları ve tiplerini özetlemektedir. Bu şema, ilerleyen süreçte verilerin bir bulut veritabanına (Firebase, PostgreSQL, vb.) aktarılması için referans niteliğindedir.
+Son doğrulama: 2026-07-28
 
----
+Bu belge uygulamanın kullanıcıya gösterdiği ve topladığı verilerin cihazdaki
+şifreli yerel kasa ile PostgreSQL bulut yedeğindeki karşılığını özetler.
 
-## 1. SharedPreferences Anahtarları (Keys)
+## Yerel kasa
 
-Uygulamanın SharedPreferences üzerinde kullandığı tüm anahtarlar şunlardır:
+`LocalStorageService`, korumalı değerleri AES-256-GCM şifreli zarflar hâlinde
+SharedPreferences üzerinde tutar. Zarf anahtarı Android Keystore / iOS Keychain
+üzerinden sağlanır. Fiziksel anahtar adları da HMAC ile maskelenir.
 
-| Anahtar (Key) | Tip | Açıklama |
-| :--- | :--- | :--- |
-| `user_settings` | `String` (JSON) | Kullanıcının kişisel profili, sağlık geçmişi ve genel ayarları. |
-| `daily_log_<tarih>` | `String` (JSON) | `<tarih>` gününe ait günlük log kaydı (örn: `daily_log_2026-07-11T00:00:00.000`). |
-| `daily_log_dates` | `List<String>` | Log kaydı girilmiş tüm günlerin ISO 8601 formatındaki tarih listesi. |
-| `all_custom_medications` | `List<String>` | Kullanıcının geçmişte elle yazdığı tüm özel ilaçların benzersiz listesi. |
-| `all_custom_supplements` | `List<String>` | Kullanıcının geçmişte elle yazdığı tüm özel takviyelerin benzersiz listesi. |
+| Mantıksal anahtar | İçerik | Bulut yedeği |
+|---|---|---|
+| `user_settings` | Profil, sağlık ve döngü ayarları | `user_settings` |
+| `daily_log_<timestamp>` | Günlük sağlık ve iyi oluş kaydı | `daily_logs` |
+| `daily_log_dates` | Yerel günlük kayıt indeksi | Hayır; loglardan türetilir |
+| `all_custom_medications` | Özel ilaç adları | `custom_medications` |
+| `all_custom_supplements` | Özel takviye adları | `custom_supplements` |
+| `medication_reminder_plans_v1` | İlaç/takviye hatırlatma planları | `medication_reminder_plans` |
+| `medication_dose_records_v1` | Planlı doz ve aldım/atladım yanıtları | `medication_dose_records` |
+| `auth_*` | Oturum ve son senkronizasyon bilgisi | Sağlık yedeğine eklenmez |
+| `virtual_days_offset` | Geliştirme zamanı kaydırma değeri | Hayır |
 
----
+Bildirim işletim sistemine planlandı mı bilgisi cihaza özeldir. Bu nedenle
+`notificationScheduled` ve `notificationScheduledAt` buluta taşınmaz; geri
+kalan plan ile aldım/atladım yanıtı cihazlar arasında eşitlenir.
 
-## 2. Model Yapıları ve Alanları (Fields & Types)
+## Günlük kayıt alanları
 
-### A. Günlük Kayıt Modeli (`DailyLog`)
-Her bir güne ait detaylı sağlık ve wellness parametrelerini tutar.
+`DailyLog` aşağıdaki alanların tamamını `toJson` / `fromJson` ile kayıpsız
+saklar ve aynı şifreli nesne buluta yüklenir:
 
-| Alan Adı (Field) | Dart Tipi | JSON Karşılığı | Açıklama / Seçenekler |
-| :--- | :--- | :--- | :--- |
-| `date` | `DateTime` | `String` (ISO 8601) | Günlüğün ait olduğu tarih ve saat. |
-| `activities` | `List<String>` | `List<dynamic>` | Fiziksel aktiviteler (Örn: 'Fitness', 'Yürüyüş', 'Koşu'). |
-| `nutritionTags` | `List<String>` | `List<dynamic>` | Beslenme etiketleri (Örn: 'Tuzlu', 'Tatlı', 'Ev Yemeği'). |
-| `nutritionNotes` | `String?` | `String` veya `null` | Beslenmeye dair özel notlar. |
-| `supplements` | `List<MedicationEntry>` | `List<Map>` | O gün kullanılan takviyeler (Yapısı aşağıda açıklanmıştır). |
-| `medications` | `List<MedicationEntry>` | `List<Map>` | O gün kullanılan ilaçlar (Yapısı aşağıda açıklanmıştır). |
-| `mood` | `String?` | `String` veya `null` | Ruh hali seviyesi (Örn: 'Mutlu', 'Huzurlu', 'Normal', 'Kötü'). |
-| `moodEmoji` | `String?` | `String` veya `null` | Ruh haline karşılık gelen emoji (Örn: '😊', '😌', '🙂'). |
-| `moodNote` | `String?` | `String` veya `null` | Ruh haline dair yazılan notlar. |
-| `sexualActivity` | `bool?` | `bool` veya `null` | O gün cinsel aktivite oldu mu (`true`/`false`). |
-| `bowelActivity` | `List<String>` | `List<dynamic>` | Bağırsak durumu (Örn: 'Normal', 'Kabızlık', 'İshal'). |
-| `painLocations` | `List<String>` | `List<dynamic>` | Vücuttaki ağrılar/semptomlar (Örn: 'Baş ağrısı', 'Bel ağrısı'). |
-| `flowIntensity` | `String?` | `String` veya `null` | Regl kanama yoğunluğu (`'Lekelenme'`, `'Hafif'`, `'Orta'`, `'Yoğun'`). |
-| `periodPainLevel` | `int?` | `int` veya `null` | Varsa regl ağrısı düzeyi (0 ile 5 arası). |
-| `notes` | `String?` | `String` veya `null` | Gün hakkında eklenen serbest genel notlar. |
+- kayıt zamanı: `date`; kullanıcı saat eklememişse `hasExplicitTime: false`
+- hareket: `activities`
+- beslenme: `nutritionTags`, `mealTypes`, `nutritionQuality`, `cravings`,
+  `nutritionNotes`, `waterIntakeMl`, `caffeineServings`
+- ilaç ve takviye: `medications`, `supplements`; her girişte ad, zaman,
+  aç/tok durumu, doz ve alındı bilgisi
+- ruh hâli ve iyi oluş: `mood`, `moodEmoji`, `moodNote`, `moodCompanions`,
+  `moodPlaces`, `sleepDurationMinutes`, `sleepQuality`, `stressLevel`,
+  `energyLevel`
+- diğer sağlık kayıtları: `sexualActivity`, `bowelActivity`,
+  `painLocations`, `symptoms`, `symptomSeverity`
+- adet: `flowIntensity`, `periodPainLevel`
+- vajinal akıntı: var/yok, renk, kıvam, miktar ve eşlik eden belirtiler
+- genel not ve kullanıcının doldurduğu bölümler: `notes`, `observedSections`
 
----
+Eski yedeklerdeki `periodStartedToday` alanı yalnızca geriye dönük okunabilirlik
+için modelde tutulur. Yeni adet başlangıcı ayrı bir soruyla alınmaz. Kanama
+kayıtları tarihe göre gruplanır; ardışık grubun ilk günü adet başlangıcıdır.
 
-### B. İlaç / Takviye Kayıt Girişi (`MedicationEntry`)
-`DailyLog` içinde ilaçlar ve takviyelerin alım detaylarını tutar.
+## Profil ve ayarlar
 
-| Alan Adı (Field) | Dart Tipi | JSON Karşılığı | Açıklama / Seçenekler |
-| :--- | :--- | :--- | :--- |
-| `name` | `String` | `String` | İlacın/takviyenin adı (Örn: "D Vitamini", "Parol"). |
-| `time` | `String` | `String` | Alım vakti (`'Sabah'`, `'Öğle'`, `'Akşam'`). |
-| `stomachState` | `String` | `String` | Tokluk durumu (`'Aç'`, `'Tok'`). |
-| `taken` | `bool` | `bool` | Bugün alındı/içildi mi işaretlendi mi (`true`/`false`). |
+`UserSettings` içindeki ad, onboarding durumu, sigara kullanımı ve süresi,
+kilo, boy, yaş, ilişki/cinsel yaşam tercihleri, çocuk isteği, kan tahlili notu,
+kronik hastalıklar, döngü ve adet süreleri, son adet tarihi, menopoz durumu,
+doğum kontrol yöntemi, kadın hastalıkları, günlük ilaç/takviye listeleri ve
+bildirim tercihi tek şifreli nesne olarak saklanır ve yedeklenir.
 
----
+## Bulut veritabanı
 
-### C. Kullanıcı Ayarları Modeli (`UserSettings`)
-Kullanıcı profili ve döngü hesaplama verilerini tutar.
+Sağlık tablolarında içerik düz kolonlara ayrılmaz. Her kullanıcı için üretilen
+DEK ile AES-256-GCM şifrelenmiş `encrypted_payload` saklanır. DEK ayrıca ortam
+KMS/secret anahtarından gelen KEK ile sarılır. Günlük kayıt tarihi ham tutulmaz;
+kullanıcı anahtarına bağlı kör indeks `log_id` olarak kullanılır.
 
-| Alan Adı (Field) | Dart Tipi | JSON Karşılığı | Açıklama / Seçenekler |
-| :--- | :--- | :--- | :--- |
-| `userName` | `String` | `String` | Kullanıcının adı. |
-| `isOnboardingComplete`| `bool` | `bool` | Uygulama kurulum/tanıtım adımı tamamlandı mı. |
-| `isSmoker` | `bool` | `bool` | Sigara kullanıyor mu. |
-| `smokingYears` | `int?` | `int` veya `null` | Sigara kullanım yılı. |
-| `weight` | `double?` | `double` veya `null` | Kilo (kg). |
-| `height` | `double?` | `double` veya `null` | Boy (cm). |
-| `age` | `int?` | `int` veya `null` | Yaş. |
-| `relationshipStatus` | `String?` | `String` veya `null` | İlişki durumu. |
-| `sexuallyActive` | `bool?` | `bool` veya `null` | Cinsel aktiflik durumu. |
-| `wantsChildrenInYear`| `bool?` | `bool` veya `null` | 1 yıl içinde çocuk sahibi olmak istiyor mu. |
-| `bloodTestResults` | `String?` | `String` veya `null` | Kan tahlili serbest notu/sonucu. |
-| `chronicDiseases` | `List<String>` | `List<dynamic>` | Kronik hastalıklar listesi. |
-| `averageCycleLength` | `int` | `int` | Ortalama regl döngü süresi (Örn: `28`). |
-| `averagePeriodLength`| `int` | `int` | Ortalama adet kanaması gün sayısı (Örn: `5`). |
-| `lastPeriodDate` | `DateTime?` | `String` veya `null` | En son adet başlangıç tarihi (ISO 8601). |
-| `menopauseStatus` | `MenopauseStatus`| `String` (enum name) | Menopoz durumu (`'none'`, `'pre'`, `'peri'`, `'post'`). |
-| `birthControlMethod` | `String?` | `String` veya `null` | Doğum kontrol yöntemi. |
-| `womenDiseases` | `List<String>` | `List<dynamic>` | Kadın hastalıkları listesi. |
-| `dailyMedications` | `List<String>` | `List<dynamic>` | Her gün düzenli alınan varsayılan ilaç listesi. |
-| `dailySupplements` | `List<String>` | `List<dynamic>` | Her gün düzenli alınan varsayılan takviye listesi. |
-| `notificationsEnabled`| `bool` | `bool` | Bildirim izin durumu. |
+Bulut yedeğine dâhil teknik tablolar:
 
----
+- `users`, `user_data_keys`
+- `user_settings`, `daily_logs`
+- `custom_medications`, `custom_supplements`
+- `medication_reminder_plans`, `medication_dose_records`
+- açık rıza, oturum, premium ve gizlilik denetim tabloları
 
-## 3. Database Taşıma (Migration) Önerileri
-
-Bu SharedPreferences yapısını SQL veya NoSQL bir veritabanına taşımak oldukça kolaydır:
-1. **Kullanıcı Tablosu**: `UserSettings` içindeki alanlar doğrudan `users` veya `user_profiles` tablosuna kolon olarak yerleştirilebilir.
-2. **Loglar Tablosu**: `DailyLog` verileri `daily_logs` adında bir tabloya kaydedilir. Tarih birincil anahtar (Primary Key / Composite Key) veya indeks olarak kullanılabilir.
-3. **İlişkili Tablolar (İlaç/Takviye Alımları)**: `daily_logs` tablosuyla ilişkili (Foreign Key) `log_medications` ve `log_supplements` şeklinde iki detay tablosu oluşturulup bire çok (one-to-many) ilişki kurulabilir.
+Rıza geri çekildiğinde tüm bulut sağlık tabloları silinir. Hesap silindiğinde
+`users` yabancı anahtarına bağlı kayıtlar ve kullanıcı veri anahtarı cascade ile
+silinir. Gizlilik dışa aktarımı hatırlatma planları ve doz yanıtlarını da içerir.

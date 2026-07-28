@@ -100,9 +100,10 @@ class MedicationEntry {
 
 /// Günlük kayıt modeli — tüm wellness modüllerini birleşik tutar.
 class DailyLog {
-  static const int schemaVersion = 4;
+  static const int schemaVersion = 5;
 
   final DateTime date;
+  final bool hasExplicitTime;
 
   // ── Hareket Durumu ───────────────────────────────────────
   final List<String> activities; // Fitness, Yürüyüş, vb.
@@ -164,6 +165,7 @@ class DailyLog {
 
   DailyLog({
     required this.date,
+    this.hasExplicitTime = true,
     this.activities = const [],
     this.nutritionTags = const [],
     this.mealTypes = const [],
@@ -228,6 +230,7 @@ class DailyLog {
 
   DailyLog copyWith({
     DateTime? date,
+    bool? hasExplicitTime,
     List<String>? activities,
     List<String>? nutritionTags,
     List<String>? mealTypes,
@@ -277,6 +280,7 @@ class DailyLog {
   }) {
     return DailyLog(
       date: date ?? this.date,
+      hasExplicitTime: hasExplicitTime ?? this.hasExplicitTime,
       activities: activities ?? this.activities,
       nutritionTags: nutritionTags ?? this.nutritionTags,
       mealTypes: mealTypes ?? this.mealTypes,
@@ -375,6 +379,7 @@ class DailyLog {
   Map<String, dynamic> toJson() => {
     'schemaVersion': schemaVersion,
     'date': date.toIso8601String(),
+    'hasExplicitTime': hasExplicitTime,
     'activities': activities,
     'nutritionTags': nutritionTags,
     'mealTypes': mealTypes,
@@ -418,6 +423,7 @@ class DailyLog {
   factory DailyLog.fromJson(Map<String, dynamic> json) {
     return DailyLog(
       date: DateTime.parse(json['date'] as String),
+      hasExplicitTime: json['hasExplicitTime'] as bool? ?? true,
       activities: List<String>.from(json['activities'] ?? []),
       nutritionTags: List<String>.from(json['nutritionTags'] ?? []),
       mealTypes: List<String>.from(json['mealTypes'] ?? []),
@@ -577,7 +583,7 @@ class DailyLog {
           merged[item.name] = item;
         } else {
           merged[item.name] = existing.copyWith(
-            taken: existing.taken || item.taken,
+            taken: existing.taken,
             dosage: existing.dosage.isNotEmpty ? existing.dosage : item.dosage,
             time: existing.time.isNotEmpty ? existing.time : item.time,
             stomachState: existing.stomachState.isNotEmpty
@@ -596,6 +602,7 @@ class DailyLog {
 
     return DailyLog(
       date: date, // Timestamp korunur — her kayıt kendi zamanıyla ayrıdır
+      hasExplicitTime: hasExplicitTime,
       activities: (activities + other.activities).toSet().toList(),
       nutritionTags: (nutritionTags + other.nutritionTags).toSet().toList(),
       mealTypes: (mealTypes + other.mealTypes).toSet().toList(),

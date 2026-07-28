@@ -50,6 +50,45 @@ void main() {
     expect(find.byIcon(Icons.close_rounded), findsOneWidget);
   });
 
+  testWidgets('geri tuşu önce ana sayfaya döner', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await storage.init();
+    await storage.saveSettings(
+      UserSettings(isOnboardingComplete: true, userName: 'Test'),
+    );
+
+    await tester.pumpWidget(MyApp(storage: storage));
+    await tester.pumpAndSettle();
+
+    var navigation = tester.widget<BottomNavigationBar>(
+      find.byType(BottomNavigationBar),
+    );
+    navigation.onTap!(3);
+    await tester.pumpAndSettle();
+    navigation = tester.widget<BottomNavigationBar>(
+      find.byType(BottomNavigationBar),
+    );
+    expect(navigation.currentIndex, 3);
+
+    Navigator.of(tester.element(find.byType(HomeShell))).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const Scaffold(body: Text('Alt sayfa')),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Alt sayfa'), findsOneWidget);
+
+    expect(await tester.binding.handlePopRoute(), isTrue);
+    await tester.pumpAndSettle();
+
+    navigation = tester.widget<BottomNavigationBar>(
+      find.byType(BottomNavigationBar),
+    );
+    expect(navigation.currentIndex, 0);
+    expect(await tester.binding.handlePopRoute(), isFalse);
+  });
+
   testWidgets('karşılaştırmalı bağlantı insight kartında gösterilir', (
     WidgetTester tester,
   ) async {
@@ -99,6 +138,7 @@ void main() {
         DailyLog(
           date: DateTime(2026, 1, 1).add(Duration(days: day)),
           painLocations: const ['Baş ağrısı'],
+          mood: 'Yorgun',
           observedSections: const {DailyLogObservedSection.wellbeing},
         ),
       );
@@ -112,7 +152,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.byKey(const ValueKey('personal_insight_recurring_symptom')),
+      find.byKey(const ValueKey('personal_insight_symptom_mood_cooccurrence')),
       findsOneWidget,
     );
 

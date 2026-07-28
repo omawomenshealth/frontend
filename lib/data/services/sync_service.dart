@@ -1,17 +1,20 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 
+import '../models/medication_reminder_model.dart';
 import '../models/user_settings_model.dart';
 import '../models/period_log_model.dart';
 import 'local_storage_service.dart';
 import 'api_service.dart';
+import 'notification_service.dart';
 
 /// Yerel şifreli kasa verileri ile PostgreSQL bulut veritabanı
 /// arasındaki senkronizasyonu yöneten servis.
 class SyncService {
   final LocalStorageService _storage;
   final ApiService _api;
+  final NotificationService? _notifications;
 
-  SyncService(this._storage, this._api);
+  SyncService(this._storage, this._api, [this._notifications]);
 
   /// 1. Yerel verileri doğrudan buluta yedekler (Upload/Backup).
   Future<bool> backupToCloud() async {
@@ -27,6 +30,8 @@ class SyncService {
       // Yerel özel ilaç ve takviye listeleri
       final meds = _storage.getCustomMedications();
       final sups = _storage.getCustomSupplements();
+      final reminderPlans = _storage.loadMedicationReminderPlans();
+      final doseRecords = _storage.loadMedicationDoseRecords();
 
       // Sunucuya yükle
       final success = await _api.uploadSync(
@@ -34,6 +39,10 @@ class SyncService {
         logs: logs.map((l) => l.toJson()).toList(),
         customMedications: meds,
         customSupplements: sups,
+        medicationReminderPlans: reminderPlans
+            .map((plan) => plan.toJson())
+            .toList(),
+        medicationDoseRecords: _doseRecordsForCloud(doseRecords),
       );
 
       return success;
@@ -82,6 +91,13 @@ class SyncService {
       final cloudSupplements = List<String>.from(
         cloudData['customSupplements'] as List? ?? const [],
       );
+      final cloudReminderPlans =
+          cloudData.containsKey('medicationReminderPlans')
+          ? _parseReminderPlans(cloudData['medicationReminderPlans'])
+          : localSnapshot.medicationReminderPlans;
+      final cloudDoseRecords = cloudData.containsKey('medicationDoseRecords')
+          ? _parseDoseRecords(cloudData['medicationDoseRecords'])
+          : localSnapshot.medicationDoseRecords;
 
       localReplacementStarted = true;
       await _replaceLocalData(
@@ -89,6 +105,8 @@ class SyncService {
         logs: cloudLogs,
         customMedications: cloudMedications,
         customSupplements: cloudSupplements,
+        medicationReminderPlans: cloudReminderPlans,
+        medicationDoseRecords: cloudDoseRecords,
         authToken: localSnapshot.authToken,
         authRefreshToken: localSnapshot.authRefreshToken,
         authEmail: localSnapshot.authEmail,
@@ -96,6 +114,7 @@ class SyncService {
         authGoogleId: localSnapshot.authGoogleId,
         lastSyncTime: DateTime.now().toIso8601String(),
       );
+      await _refreshDeviceReminders();
 
       return true;
     } catch (e) {
@@ -117,6 +136,8 @@ class SyncService {
       logs: _storage.loadAllLogs(),
       customMedications: _storage.getCustomMedications(),
       customSupplements: _storage.getCustomSupplements(),
+      medicationReminderPlans: _storage.loadMedicationReminderPlans(),
+      medicationDoseRecords: _storage.loadMedicationDoseRecords(),
       authToken: _storage.authToken,
       authRefreshToken: _storage.authRefreshToken,
       authEmail: _storage.authEmail,
@@ -132,6 +153,8 @@ class SyncService {
       logs: snapshot.logs,
       customMedications: snapshot.customMedications,
       customSupplements: snapshot.customSupplements,
+      medicationReminderPlans: snapshot.medicationReminderPlans,
+      medicationDoseRecords: snapshot.medicationDoseRecords,
       authToken: snapshot.authToken,
       authRefreshToken: snapshot.authRefreshToken,
       authEmail: snapshot.authEmail,
@@ -146,6 +169,8 @@ class SyncService {
     required List<DailyLog> logs,
     required List<String> customMedications,
     required List<String> customSupplements,
+    required List<MedicationReminderPlan> medicationReminderPlans,
+    required List<MedicationDoseRecord> medicationDoseRecords,
     required String? authToken,
     required String? authRefreshToken,
     required String? authEmail,
@@ -202,6 +227,14 @@ class SyncService {
       await _storage.saveCustomSupplements(customSupplements),
       'Takviye listesi yazma',
     );
+    requireSuccess(
+      await _storage.saveMedicationReminderPlans(medicationReminderPlans),
+      'İlaç hatırlatma planlarını yazma',
+    );
+    requireSuccess(
+      await _storage.saveMedicationDoseRecords(medicationDoseRecords),
+      'İlaç doz geçmişini yazma',
+    );
     if (settings != null) {
       requireSuccess(
         await _storage.saveSettings(settings),
@@ -244,6 +277,23 @@ class SyncService {
       ).toSet();
       final mergedSups = localSups.union(cloudSups).toList();
       await _storage.saveCustomSupplements(mergedSups);
+
+      final localPlans = _storage.loadMedicationReminderPlans();
+      final cloudPlans = _parseReminderPlans(
+        cloudData['medicationReminderPlans'],
+      );
+      final mergedPlans = _mergeReminderPlans(localPlans, cloudPlans);
+      await _storage.saveMedicationReminderPlans(mergedPlans);
+
+      final localDoseRecords = _storage.loadMedicationDoseRecords();
+      final cloudDoseRecords = _parseDoseRecords(
+        cloudData['medicationDoseRecords'],
+      );
+      final mergedDoseRecords = _mergeDoseRecords(
+        localDoseRecords,
+        cloudDoseRecords,
+      );
+      await _storage.saveMedicationDoseRecords(mergedDoseRecords);
 
       // ── B. Ayarları Birleştir ──
       final localSettings = _storage.loadSettings() ?? UserSettings();
@@ -330,13 +380,147 @@ class SyncService {
         logs: mergedLogsMap.values.map((l) => l.toJson()).toList(),
         customMedications: mergedMeds,
         customSupplements: mergedSups,
+        medicationReminderPlans: mergedPlans
+            .map((plan) => plan.toJson())
+            .toList(),
+        medicationDoseRecords: _doseRecordsForCloud(mergedDoseRecords),
       );
+      if (success) await _refreshDeviceReminders();
 
       return success;
     } catch (e) {
       debugPrint('Senkronizasyon birleştirme hatası: $e');
       return false;
     }
+  }
+
+  static List<MedicationReminderPlan> _parseReminderPlans(Object? raw) {
+    if (raw == null) return [];
+    if (raw is! List) {
+      throw const FormatException('Bulut hatırlatma planları geçersiz.');
+    }
+    return raw
+        .map(
+          (item) => MedicationReminderPlan.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          ),
+        )
+        .toList();
+  }
+
+  static List<MedicationDoseRecord> _parseDoseRecords(Object? raw) {
+    if (raw == null) return [];
+    if (raw is! List) {
+      throw const FormatException('Bulut doz geçmişi geçersiz.');
+    }
+    return raw
+        .map(
+          (item) => MedicationDoseRecord.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          ),
+        )
+        .toList();
+  }
+
+  static List<MedicationReminderPlan> _mergeReminderPlans(
+    List<MedicationReminderPlan> local,
+    List<MedicationReminderPlan> cloud,
+  ) {
+    final merged = <String, MedicationReminderPlan>{
+      for (final plan in cloud) plan.id: plan,
+    };
+    for (final plan in local) {
+      final other = merged[plan.id];
+      if (other == null || !plan.updatedAt.isBefore(other.updatedAt)) {
+        merged[plan.id] = plan;
+      }
+    }
+    final result = merged.values.toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return result;
+  }
+
+  static List<MedicationDoseRecord> _mergeDoseRecords(
+    List<MedicationDoseRecord> local,
+    List<MedicationDoseRecord> cloud,
+  ) {
+    final merged = <String, MedicationDoseRecord>{
+      for (final record in cloud)
+        record.id: MedicationDoseRecord(
+          id: record.id,
+          planId: record.planId,
+          itemType: record.itemType,
+          itemName: record.itemName,
+          dosage: record.dosage,
+          scheduledAt: record.scheduledAt,
+          notificationScheduled: false,
+          notificationScheduledAt: null,
+          status: record.status,
+          respondedAt: record.respondedAt,
+        ),
+    };
+
+    for (final localRecord in local) {
+      final cloudRecord = merged[localRecord.id];
+      if (cloudRecord == null) {
+        merged[localRecord.id] = localRecord;
+        continue;
+      }
+      final cloudResponseIsNewer =
+          cloudRecord.respondedAt != null &&
+          (localRecord.respondedAt == null ||
+              cloudRecord.respondedAt!.isAfter(localRecord.respondedAt!));
+      merged[localRecord.id] = MedicationDoseRecord(
+        id: localRecord.id,
+        planId: localRecord.planId,
+        itemType: localRecord.itemType,
+        itemName: localRecord.itemName,
+        dosage: localRecord.dosage,
+        scheduledAt: localRecord.scheduledAt,
+        notificationScheduled: localRecord.notificationScheduled,
+        notificationScheduledAt: localRecord.notificationScheduledAt,
+        status: cloudResponseIsNewer
+            ? cloudRecord.status
+            : localRecord.status ?? cloudRecord.status,
+        respondedAt: cloudResponseIsNewer
+            ? cloudRecord.respondedAt
+            : localRecord.respondedAt ?? cloudRecord.respondedAt,
+      );
+    }
+
+    final result = merged.values.toList()
+      ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+    return result;
+  }
+
+  static List<Map<String, dynamic>> _doseRecordsForCloud(
+    List<MedicationDoseRecord> records,
+  ) {
+    return records.map((record) {
+      final json = record.toJson();
+      // İşletim sistemi bildirim durumu cihaza özeldir.
+      json['notificationScheduled'] = false;
+      json['notificationScheduledAt'] = null;
+      return json;
+    }).toList();
+  }
+
+  Future<void> _refreshDeviceReminders() async {
+    final notifications = _notifications;
+    if (notifications == null) return;
+    var scheduledDoseIds = <String>{};
+    try {
+      final result = await notifications.rescheduleMedicationReminders(
+        plans: _storage.loadMedicationReminderPlans(),
+      );
+      scheduledDoseIds = result.scheduledDoses.map((dose) => dose.id).toSet();
+    } catch (error) {
+      debugPrint('Eşitlenen hatırlatıcılar zamanlanamadı: $error');
+    }
+    await _storage.refreshMedicationDoseRecords(
+      plans: _storage.loadMedicationReminderPlans(),
+      notificationScheduledDoseIds: scheduledDoseIds,
+    );
   }
 }
 
@@ -345,6 +529,8 @@ class _LocalSnapshot {
   final List<DailyLog> logs;
   final List<String> customMedications;
   final List<String> customSupplements;
+  final List<MedicationReminderPlan> medicationReminderPlans;
+  final List<MedicationDoseRecord> medicationDoseRecords;
   final String? authToken;
   final String? authRefreshToken;
   final String? authEmail;
@@ -357,6 +543,8 @@ class _LocalSnapshot {
     required this.logs,
     required this.customMedications,
     required this.customSupplements,
+    required this.medicationReminderPlans,
+    required this.medicationDoseRecords,
     required this.authToken,
     required this.authRefreshToken,
     required this.authEmail,

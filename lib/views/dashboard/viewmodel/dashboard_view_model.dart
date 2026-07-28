@@ -40,6 +40,71 @@ class DashboardViewModel extends ChangeNotifier {
 
   bool get hasPeriodTracking => _settings != null;
 
+  DailyLog initialLogForSection(
+    DailyLogObservedSection section, {
+    DateTime? date,
+  }) {
+    final targetDate = date ?? _selectedDate;
+    final logs = targetDate.isSameDay(_selectedDate)
+        ? _todayLogs
+        : _storage.loadLogsForDate(targetDate);
+    DailyLog? matchingLog;
+    for (final log in logs) {
+      if (log.observedSections.contains(section) ||
+          _hasLegacySectionData(log, section)) {
+        matchingLog = log;
+        break;
+      }
+    }
+    if (matchingLog != null) {
+      if (section == DailyLogObservedSection.nutrition &&
+          matchingLog.medications.isEmpty &&
+          matchingLog.supplements.isEmpty) {
+        for (final log in logs) {
+          if (log.observedSections.contains(
+                DailyLogObservedSection.medication,
+              ) ||
+              _hasLegacySectionData(log, DailyLogObservedSection.medication)) {
+            return matchingLog.copyWith(
+              medications: log.medications,
+              supplements: log.supplements,
+              observedSections: {
+                ...matchingLog.observedSections,
+                DailyLogObservedSection.medication,
+              },
+            );
+          }
+        }
+      }
+      return matchingLog;
+    }
+    final initialDate = targetDate.isToday ? AppTime.now : targetDate.dateOnly;
+    return DailyLog.empty(initialDate);
+  }
+
+  bool _hasLegacySectionData(DailyLog log, DailyLogObservedSection section) {
+    return switch (section) {
+      DailyLogObservedSection.period => log.flowIntensity != null,
+      DailyLogObservedSection.nutrition =>
+        log.waterIntakeMl != null ||
+            log.mealTypes.isNotEmpty ||
+            log.nutritionQuality != null ||
+            log.cravings.isNotEmpty ||
+            log.nutritionTags.isNotEmpty,
+      DailyLogObservedSection.medication =>
+        log.medications.isNotEmpty || log.supplements.isNotEmpty,
+      DailyLogObservedSection.symptom =>
+        log.sexualActivity != null ||
+            log.vaginalDischargePresent != null ||
+            log.vaginalDischargeSymptoms.isNotEmpty ||
+            (log.symptoms.isNotEmpty && log.flowIntensity == null),
+      DailyLogObservedSection.wellbeing =>
+        log.mood != null ||
+            log.moodCompanions.isNotEmpty ||
+            log.moodPlaces.isNotEmpty,
+    };
+  }
+
   /// Takvimde tarih seçildiğinde çağrılır.
   void selectDate(DateTime date) {
     _selectedDate = date;
@@ -148,8 +213,8 @@ class DashboardViewModel extends ChangeNotifier {
     _personalInsights = generated
         .where(
           (insight) => switch (insight.kind) {
-            PersonalInsightKind.dataBuilding ||
-            PersonalInsightKind.recurringSymptom ||
+            PersonalInsightKind.symptomMoodCooccurrence ||
+            PersonalInsightKind.symptomBleedingCooccurrence ||
             PersonalInsightKind.structuredAssociation ||
             PersonalInsightKind.moodCyclePhaseAssociation ||
             PersonalInsightKind.energyCyclePhaseAssociation ||
