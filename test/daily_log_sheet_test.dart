@@ -279,7 +279,7 @@ void main() {
     expect(harness.savedLog, isNull);
   });
 
-  testWidgets('Belirti ekranı arama ve renkli seçim kartlarını kaydeder', (
+  testWidgets('Belirti grupları kartlar içinde gösterilir ve kaydedilir', (
     tester,
   ) async {
     final harness = await _pumpLogSheet(tester, initialIndex: 2);
@@ -287,6 +287,16 @@ void main() {
     expect(find.text(AppStrings.symptomQuestion), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text(AppStrings.symptomOverall), findsOneWidget);
+    for (final title in [
+      AppStrings.symptomOverall,
+      AppStrings.symptomBody,
+      AppStrings.symptomSkinHair,
+      AppStrings.symptomEnergy,
+      AppStrings.symptomSleep,
+      AppStrings.symptomDigestion,
+    ]) {
+      expect(find.byKey(ValueKey('symptom_group_$title')), findsOneWidget);
+    }
 
     final cramps = find.text(AppStrings.symptomBodyOptions.first);
     await tester.ensureVisible(cramps);

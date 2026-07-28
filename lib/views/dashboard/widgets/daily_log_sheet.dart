@@ -678,50 +678,65 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               group.items.any(
                 (item) => item.label.toLowerCase().contains(query),
               )) ...[
-            const SizedBox(height: 20),
-            Text(
-              group.title,
-              style: const TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.6,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 9),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                const spacing = 8.0;
-                final tileWidth = (constraints.maxWidth - spacing) / 2;
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: [
-                    for (final item in group.items)
-                      if (query.isEmpty ||
-                          item.label.toLowerCase().contains(query))
-                        SizedBox(
-                          width: tileWidth,
-                          child: _SymptomTile(
-                            item: item,
-                            selected: _symptoms.contains(item.label),
-                            severity: _symptomSeverities[item.label] ?? 2,
-                            onTap: () => _toggleSymptom(item.label),
-                            onSeverityChanged: (severity) => setState(
-                              () => _symptomSeverities[item.label] = severity,
-                            ),
-                          ),
-                        ),
-                  ],
-                );
-              },
-            ),
+            const SizedBox(height: 14),
+            _buildSymptomGroupCard(group, query),
           ],
         const SizedBox(height: 22),
         _buildDreamCard(),
         const SizedBox(height: 26),
         _buildBodyTrackingCard(),
       ],
+    );
+  }
+
+  Widget _buildSymptomGroupCard(_SymptomGroup group, String query) {
+    final visibleItems = group.items
+        .where(
+          (item) => query.isEmpty || item.label.toLowerCase().contains(query),
+        )
+        .toList(growable: false);
+
+    return Container(
+      key: ValueKey('symptom_group_${group.title}'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.outline),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(group.title),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const spacing = 8.0;
+              final tileWidth = (constraints.maxWidth - spacing) / 2;
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  for (final item in visibleItems)
+                    SizedBox(
+                      width: tileWidth,
+                      child: _SymptomTile(
+                        item: item,
+                        selected: _symptoms.contains(item.label),
+                        severity: _symptomSeverities[item.label] ?? 2,
+                        onTap: () => _toggleSymptom(item.label),
+                        onSeverityChanged: (severity) => setState(
+                          () => _symptomSeverities[item.label] = severity,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
