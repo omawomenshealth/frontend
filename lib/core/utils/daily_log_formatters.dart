@@ -4,6 +4,17 @@ import '../constants/app_strings.dart';
 class DailyLogFormatters {
   DailyLogFormatters._();
 
+  static String sexualActivity(DailyLog log) {
+    if (log.sexualActivityTypes.isNotEmpty) {
+      return log.sexualActivityTypes
+          .map((type) => AppStrings.sexualActivityOptions[type.index])
+          .join(', ');
+    }
+    if (log.sexualActivity == true) return AppStrings.yes;
+    if (log.sexualActivity == false) return AppStrings.no;
+    return AppStrings.notSpecified;
+  }
+
   static String vaginalDischarge(DailyLog log) {
     if (log.vaginalDischargePresent == false) return AppStrings.no;
     if (log.vaginalDischargePresent != true) return AppStrings.notSpecified;

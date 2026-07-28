@@ -203,6 +203,12 @@ class DashboardView extends StatelessWidget {
     int initialIndex = 0,
     bool isSingleTab = false,
   }) {
+    if (vm.selectedDate.dateOnly.isAfter(AppTime.now.dateOnly)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.futureLogNotAllowed)));
+      return;
+    }
     final section = switch (initialIndex) {
       0 => DailyLogObservedSection.period,
       1 => DailyLogObservedSection.nutrition,

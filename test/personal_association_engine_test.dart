@@ -73,6 +73,20 @@ void main() {
       }),
       throwsFormatException,
     );
+    expect(
+      () => DailyLog.fromJson({
+        'date': DateTime(2026, 1, 1).toIso8601String(),
+        'symptomSeverities': {'Kramp': 4},
+      }),
+      throwsFormatException,
+    );
+    expect(
+      () => DailyLog.fromJson({
+        'date': DateTime(2026, 1, 1).toIso8601String(),
+        'sexualActivityTypes': ['none', 'protected'],
+      }),
+      throwsFormatException,
+    );
   });
 
   test('akıntı yok yanıtı bulut birleşiminde ayrıntılarla çelişmez', () {

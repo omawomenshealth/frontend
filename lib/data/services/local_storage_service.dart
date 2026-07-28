@@ -136,6 +136,8 @@ class LocalStorageService {
   /// Günlük kayıt kaydet ve istatistikleri otomatik güncelle.
   /// Her kayıt kendi tam timestamp'iyle ayrı bir entry — günde N kayıt desteklenir.
   Future<bool> saveDailyLog(DailyLog log) async {
+    if (log.date.dateOnly.isAfter(AppTime.now.dateOnly)) return false;
+
     // Tam timestamp bazlı key: her farklı anın kaydı ayrıdır
     final keyStr = log.date.toIso8601String();
     final key = '$_logPrefix$keyStr';

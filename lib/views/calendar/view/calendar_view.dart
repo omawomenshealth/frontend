@@ -249,6 +249,8 @@ class _CalendarViewState extends State<CalendarView> {
   }
 
   Widget _buildEditPeriodButton() {
+    final selectedDay = context.read<CalendarViewModel>().selectedDay;
+    final canLog = !selectedDay.dateOnly.isAfter(AppTime.now.dateOnly);
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
@@ -261,10 +263,12 @@ class _CalendarViewState extends State<CalendarView> {
         ],
       ),
       child: FilledButton(
-        onPressed: () async {
-          final vm = context.read<CalendarViewModel>();
-          await _showDailyLogEditor(context, vm.selectedDay, vm);
-        },
+        onPressed: canLog
+            ? () async {
+                final vm = context.read<CalendarViewModel>();
+                await _showDailyLogEditor(context, vm.selectedDay, vm);
+              }
+            : null,
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
@@ -755,6 +759,12 @@ Future<void> _showDailyLogEditor(
   CalendarViewModel calendarVm, {
   int initialIndex = 0,
 }) async {
+  if (date.dateOnly.isAfter(AppTime.now.dateOnly)) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(AppStrings.futureLogNotAllowed)));
+    return;
+  }
   final dashboardVm = context.read<DashboardViewModel>();
   final settings = calendarVm.settings ?? dashboardVm.settings;
   if (settings == null) {
@@ -795,6 +805,12 @@ Future<void> _showDailyLogTypePicker(
   DateTime date,
   CalendarViewModel calendarVm,
 ) async {
+  if (date.dateOnly.isAfter(AppTime.now.dateOnly)) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(AppStrings.futureLogNotAllowed)));
+    return;
+  }
   final options = [
     (
       label: AppStrings.period,
@@ -874,6 +890,7 @@ class _DayDetailSection extends StatelessWidget {
         final vm = context.read<CalendarViewModel>();
         final logs = vm.selectedDayLogs.where((log) => log.hasData).toList();
         final isPeriod = vm.isPeriodDay(selectedDay);
+        final canLog = !selectedDay.dateOnly.isAfter(AppTime.now.dateOnly);
 
         return Container(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
@@ -941,8 +958,9 @@ class _DayDetailSection extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: FilledButton.icon(
-                  onPressed: () =>
-                      _showDailyLogTypePicker(context, selectedDay, vm),
+                  onPressed: canLog
+                      ? () => _showDailyLogTypePicker(context, selectedDay, vm)
+                      : null,
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -1190,11 +1208,22 @@ class _DailyLogDetails extends StatelessWidget {
       AppStrings.symptom,
       value.symptoms.isEmpty
           ? null
-          : value.symptoms.map(AppStrings.localizeStoredValue).join(', '),
+          : value.symptoms
+                .map((symptom) {
+                  final localized = AppStrings.localizeStoredValue(symptom);
+                  final severity =
+                      value.symptomSeverities[symptom] ??
+                      value.symptomSeverities[localized] ??
+                      value.symptomSeverity;
+                  if (severity == null) return localized;
+                  return '$localized '
+                      '(${AppStrings.symptomSeverityOptions[severity - 1]})';
+                })
+                .join(', '),
     );
     add(
       AppStrings.symptomStrength,
-      value.symptomSeverity == null
+      value.symptomSeverities.isNotEmpty || value.symptomSeverity == null
           ? null
           : AppStrings.symptomSeverityOptions[value.symptomSeverity! - 1],
     );
@@ -1212,11 +1241,9 @@ class _DailyLogDetails extends StatelessWidget {
     );
     add(
       AppStrings.sexualActivity,
-      value.sexualActivity == null
+      value.sexualActivity == null && value.sexualActivityTypes.isEmpty
           ? null
-          : value.sexualActivity!
-          ? AppStrings.yes
-          : AppStrings.no,
+          : DailyLogFormatters.sexualActivity(value),
     );
     add(AppStrings.notes, value.notes);
     return result;

@@ -360,6 +360,7 @@ enum _TextKey {
   saveWithoutTime,
   timeNotAdded,
   logSaveFailed,
+  futureLogNotAllowed,
   supplementExample,
   medicationExample,
   previouslyAdded,
@@ -612,6 +613,7 @@ enum _ListKey {
   moodCheckInOptions,
   moodCompanionOptions,
   moodPlaceOptions,
+  sexualActivityOptions,
   nutritionMealOptions,
   nutritionQualityOptions,
   nutritionCravingOptions,
@@ -626,6 +628,7 @@ enum _ListKey {
   bowelActivityOptions,
   painLocations,
   flowOptions,
+  dischargePresenceOptions,
   dischargeColors,
   dischargeConsistencies,
   dischargeAmounts,
@@ -947,7 +950,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.periodStartedHint:
       'OMA’nın döngünün başlangıcını doğru belirlemesine yardımcı olur.',
   _TextKey.mealsToday: 'Bugünkü öğünler',
-  _TextKey.mealsFeel: 'Sana nasıl hissettirdiler?',
+  _TextKey.mealsFeel: 'Nasıl beslendin?',
   _TextKey.cravingsQuestion: 'Canın özellikle ne çekti?',
   _TextKey.hydrationGlasses: '{count} / {goal} bardak',
   _TextKey.symptomQuestion: 'Bedeninde ne hissediyorsun?',
@@ -1048,6 +1051,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.saveWithoutTime: 'Saat olmadan kaydet',
   _TextKey.timeNotAdded: 'Saat eklenmedi',
   _TextKey.logSaveFailed: 'Kayıt tamamlanamadı. Lütfen tekrar deneyin.',
+  _TextKey.futureLogNotAllowed: 'Gelecek tarihlere günlük kayıt eklenemez.',
   _TextKey.supplementExample: 'Örn: D Vitamini',
   _TextKey.medicationExample: 'Örn: 500 mg Parol',
   _TextKey.previouslyAdded: 'Önceden Eklenenler:',
@@ -1639,7 +1643,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.periodStartedToday: 'Period started today?',
   _TextKey.periodStartedHint: 'Helps OMA anchor the start of your cycle.',
   _TextKey.mealsToday: 'Meals today',
-  _TextKey.mealsFeel: 'How did they feel?',
+  _TextKey.mealsFeel: 'How did you eat?',
   _TextKey.cravingsQuestion: 'Any cravings?',
   _TextKey.hydrationGlasses: '{count} / {goal} glasses',
   _TextKey.symptomQuestion: 'What are you feeling in your body?',
@@ -1741,6 +1745,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.saveWithoutTime: 'Save without time',
   _TextKey.timeNotAdded: 'Time not added',
   _TextKey.logSaveFailed: 'The log could not be saved. Please try again.',
+  _TextKey.futureLogNotAllowed: 'Daily logs cannot be added for future dates.',
   _TextKey.supplementExample: 'Example: Vitamin D',
   _TextKey.medicationExample: 'Example: Paracetamol 500 mg',
   _TextKey.previouslyAdded: 'Previously Added:',
@@ -2104,6 +2109,13 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Yoldayım',
     'Sosyal ortam',
   ],
+  _ListKey.sexualActivityOptions: [
+    'Partnerle',
+    'Mastürbasyon',
+    'Korunmalı',
+    'Korunmasız',
+    'Aktivite olmadı',
+  ],
   _ListKey.nutritionMealOptions: [
     'Kahvaltı',
     'Öğle yemeği',
@@ -2173,6 +2185,7 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Mide ağrısı',
   ],
   _ListKey.flowOptions: ['Lekelenme', 'Hafif', 'Orta', 'Yoğun'],
+  _ListKey.dischargePresenceOptions: ['Var', 'Yok'],
   _ListKey.dischargeColors: [
     'Şeffaf',
     'Beyaz',
@@ -2326,6 +2339,13 @@ const Map<_ListKey, List<String>> _englishLists = {
     'In transit',
     'Social',
   ],
+  _ListKey.sexualActivityOptions: [
+    'With a partner',
+    'Masturbation',
+    'Protected',
+    'Unprotected',
+    'No activity',
+  ],
   _ListKey.nutritionMealOptions: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
   _ListKey.nutritionQualityOptions: ['Light', 'Balanced', 'Heavy'],
   _ListKey.nutritionCravingOptions: [
@@ -2390,6 +2410,7 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Stomach pain',
   ],
   _ListKey.flowOptions: ['Spotting', 'Light', 'Medium', 'Heavy'],
+  _ListKey.dischargePresenceOptions: ['Present', 'None'],
   _ListKey.dischargeColors: [
     'Clear',
     'White',
@@ -3244,6 +3265,7 @@ class AppStrings {
   static String get saveWithoutTime => _text(_TextKey.saveWithoutTime);
   static String get timeNotAdded => _text(_TextKey.timeNotAdded);
   static String get logSaveFailed => _text(_TextKey.logSaveFailed);
+  static String get futureLogNotAllowed => _text(_TextKey.futureLogNotAllowed);
   static String get supplementExample => _text(_TextKey.supplementExample);
   static String get medicationExample => _text(_TextKey.medicationExample);
   static String get previouslyAdded => _text(_TextKey.previouslyAdded);
@@ -3570,6 +3592,8 @@ class AppStrings {
   static List<String> get moodCompanionOptions =>
       _list(_ListKey.moodCompanionOptions);
   static List<String> get moodPlaceOptions => _list(_ListKey.moodPlaceOptions);
+  static List<String> get sexualActivityOptions =>
+      _list(_ListKey.sexualActivityOptions);
   static List<String> get nutritionMealOptions =>
       _list(_ListKey.nutritionMealOptions);
   static List<String> get nutritionQualityOptions =>
@@ -3596,6 +3620,8 @@ class AppStrings {
       _list(_ListKey.bowelActivityOptions);
   static List<String> get painLocations => _list(_ListKey.painLocations);
   static List<String> get flowOptions => _list(_ListKey.flowOptions);
+  static List<String> get dischargePresenceOptions =>
+      _list(_ListKey.dischargePresenceOptions);
   static List<String> get dischargeColorOptions =>
       _list(_ListKey.dischargeColors);
   static List<String> get dischargeConsistencyOptions =>

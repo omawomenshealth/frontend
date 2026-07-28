@@ -46,6 +46,14 @@ enum VaginalDischargeSymptom {
   pelvicPain,
 }
 
+enum SexualActivityType {
+  partnered,
+  masturbation,
+  protected,
+  unprotected,
+  none,
+}
+
 /// İlaç/Takviye alım kaydı.
 class MedicationEntry {
   final String name;
@@ -100,7 +108,7 @@ class MedicationEntry {
 
 /// Günlük kayıt modeli — tüm wellness modüllerini birleşik tutar.
 class DailyLog {
-  static const int schemaVersion = 5;
+  static const int schemaVersion = 6;
 
   final DateTime date;
   final bool hasExplicitTime;
@@ -136,6 +144,7 @@ class DailyLog {
 
   // ── Cinsel Aktivite ──────────────────────────────────────
   final bool? sexualActivity;
+  final Set<SexualActivityType> sexualActivityTypes;
 
   // ── Bağırsak Aktivitesi ──────────────────────────────────
   final List<String> bowelActivity; // Normal, Kabızlık, İshal, vb.
@@ -144,6 +153,7 @@ class DailyLog {
   final List<String> painLocations; // Baş ağrısı, Bel ağrısı, vb.
   final List<String> symptoms;
   final int? symptomSeverity;
+  final Map<String, int> symptomSeverities;
 
   // ── Regl (Kadınlar için) ─────────────────────────────────
   final String? flowIntensity; // Yok, Lekelenme, Hafif, Orta, Yoğun
@@ -186,10 +196,12 @@ class DailyLog {
     this.stressLevel,
     this.energyLevel,
     this.sexualActivity,
+    Set<SexualActivityType> sexualActivityTypes = const {},
     this.bowelActivity = const [],
     this.painLocations = const [],
     this.symptoms = const [],
     this.symptomSeverity,
+    Map<String, int> symptomSeverities = const {},
     this.flowIntensity,
     this.periodPainLevel,
     this.periodStartedToday,
@@ -212,6 +224,24 @@ class DailyLog {
              symptomSeverity >= 1 && symptomSeverity <= 3,
        ),
        assert(
+         symptomSeverities.values.every(
+           (severity) => severity >= 1 && severity <= 3,
+         ),
+       ),
+       assert(
+         !sexualActivityTypes.contains(SexualActivityType.none) ||
+             sexualActivityTypes.length == 1,
+       ),
+       assert(
+         sexualActivity != true ||
+             !sexualActivityTypes.contains(SexualActivityType.none),
+       ),
+       assert(
+         sexualActivity != false ||
+             sexualActivityTypes.isEmpty ||
+             sexualActivityTypes.contains(SexualActivityType.none),
+       ),
+       assert(
          waterIntakeMl == null || waterIntakeMl >= 0 && waterIntakeMl <= 10000,
        ),
        assert(
@@ -225,6 +255,8 @@ class DailyLog {
                  vaginalDischargeAmount == null &&
                  vaginalDischargeSymptoms.isEmpty,
        ),
+       sexualActivityTypes = Set.unmodifiable(sexualActivityTypes),
+       symptomSeverities = Map.unmodifiable(symptomSeverities),
        vaginalDischargeSymptoms = Set.unmodifiable(vaginalDischargeSymptoms),
        observedSections = Set.unmodifiable(observedSections);
 
@@ -235,6 +267,7 @@ class DailyLog {
     List<String>? nutritionTags,
     List<String>? mealTypes,
     String? nutritionQuality,
+    bool clearNutritionQuality = false,
     List<String>? cravings,
     String? nutritionNotes,
     int? waterIntakeMl,
@@ -257,10 +290,14 @@ class DailyLog {
     int? energyLevel,
     bool clearEnergyLevel = false,
     bool? sexualActivity,
+    bool clearSexualActivity = false,
+    Set<SexualActivityType>? sexualActivityTypes,
     List<String>? bowelActivity,
     List<String>? painLocations,
     List<String>? symptoms,
     int? symptomSeverity,
+    bool clearSymptomSeverity = false,
+    Map<String, int>? symptomSeverities,
     String? flowIntensity,
     bool clearFlowIntensity = false,
     int? periodPainLevel,
@@ -284,7 +321,9 @@ class DailyLog {
       activities: activities ?? this.activities,
       nutritionTags: nutritionTags ?? this.nutritionTags,
       mealTypes: mealTypes ?? this.mealTypes,
-      nutritionQuality: nutritionQuality ?? this.nutritionQuality,
+      nutritionQuality: clearNutritionQuality
+          ? null
+          : nutritionQuality ?? this.nutritionQuality,
       cravings: cravings ?? this.cravings,
       nutritionNotes: nutritionNotes ?? this.nutritionNotes,
       waterIntakeMl: clearWaterIntake
@@ -308,11 +347,17 @@ class DailyLog {
           : sleepQuality ?? this.sleepQuality,
       stressLevel: clearStressLevel ? null : stressLevel ?? this.stressLevel,
       energyLevel: clearEnergyLevel ? null : energyLevel ?? this.energyLevel,
-      sexualActivity: sexualActivity ?? this.sexualActivity,
+      sexualActivity: clearSexualActivity
+          ? null
+          : sexualActivity ?? this.sexualActivity,
+      sexualActivityTypes: sexualActivityTypes ?? this.sexualActivityTypes,
       bowelActivity: bowelActivity ?? this.bowelActivity,
       painLocations: painLocations ?? this.painLocations,
       symptoms: symptoms ?? this.symptoms,
-      symptomSeverity: symptomSeverity ?? this.symptomSeverity,
+      symptomSeverity: clearSymptomSeverity
+          ? null
+          : symptomSeverity ?? this.symptomSeverity,
+      symptomSeverities: symptomSeverities ?? this.symptomSeverities,
       flowIntensity: clearFlowIntensity
           ? null
           : flowIntensity ?? this.flowIntensity,
@@ -360,10 +405,12 @@ class DailyLog {
         stressLevel != null ||
         energyLevel != null ||
         sexualActivity != null ||
+        sexualActivityTypes.isNotEmpty ||
         bowelActivity.isNotEmpty ||
         painLocations.isNotEmpty ||
         symptoms.isNotEmpty ||
         symptomSeverity != null ||
+        symptomSeverities.isNotEmpty ||
         flowIntensity != null ||
         periodPainLevel != null ||
         periodStartedToday != null ||
@@ -400,10 +447,14 @@ class DailyLog {
     'stressLevel': stressLevel,
     'energyLevel': energyLevel,
     'sexualActivity': sexualActivity,
+    'sexualActivityTypes': sexualActivityTypes
+        .map((type) => type.name)
+        .toList(),
     'bowelActivity': bowelActivity,
     'painLocations': painLocations,
     'symptoms': symptoms,
     'symptomSeverity': symptomSeverity,
+    'symptomSeverities': symptomSeverities,
     'flowIntensity': flowIntensity,
     'periodPainLevel': periodPainLevel,
     'periodStartedToday': periodStartedToday,
@@ -482,6 +533,7 @@ class DailyLog {
         maximum: 5,
       ),
       sexualActivity: json['sexualActivity'] as bool?,
+      sexualActivityTypes: _readSexualActivityTypes(json),
       bowelActivity: List<String>.from(json['bowelActivity'] ?? []),
       painLocations: List<String>.from(json['painLocations'] ?? []),
       symptoms: List<String>.from(json['symptoms'] ?? []),
@@ -491,6 +543,7 @@ class DailyLog {
         minimum: 1,
         maximum: 3,
       ),
+      symptomSeverities: _readSymptomSeverities(json),
       flowIntensity: json['flowIntensity'] as String?,
       periodPainLevel: json['periodPainLevel'] as int?,
       periodStartedToday: json['periodStartedToday'] as bool?,
@@ -524,6 +577,66 @@ class DailyLog {
           )
           .toSet(),
     );
+  }
+
+  static Map<String, int> _readSymptomSeverities(Map<String, dynamic> json) {
+    final raw = json['symptomSeverities'];
+    if (raw == null) return const {};
+    if (raw is! Map) {
+      throw const FormatException('symptomSeverities bir nesne olmalıdır.');
+    }
+    final result = <String, int>{};
+    for (final entry in raw.entries) {
+      final key = entry.key;
+      final value = entry.value;
+      if (key is! String || key.isEmpty || key.length > 120) {
+        throw const FormatException(
+          'symptomSeverities geçersiz bir belirti içeriyor.',
+        );
+      }
+      if (value is! num ||
+          !value.isFinite ||
+          value != value.roundToDouble() ||
+          value < 1 ||
+          value > 3) {
+        throw const FormatException(
+          'symptomSeverities değerleri 1-3 arasında olmalıdır.',
+        );
+      }
+      result[key] = value.toInt();
+    }
+    return result;
+  }
+
+  static Set<SexualActivityType> _readSexualActivityTypes(
+    Map<String, dynamic> json,
+  ) {
+    final raw = json['sexualActivityTypes'];
+    if (raw == null) return const {};
+    if (raw is! List) {
+      throw const FormatException('sexualActivityTypes bir liste olmalıdır.');
+    }
+    final result = <SexualActivityType>{};
+    for (final value in raw) {
+      if (value is! String) {
+        throw const FormatException(
+          'sexualActivityTypes geçersiz bir değer içeriyor.',
+        );
+      }
+      try {
+        result.add(SexualActivityType.values.byName(value));
+      } on ArgumentError {
+        throw const FormatException(
+          'sexualActivityTypes geçersiz bir değer içeriyor.',
+        );
+      }
+    }
+    if (result.contains(SexualActivityType.none) && result.length > 1) {
+      throw const FormatException(
+        'Aktivite olmadı seçeneği diğer türlerle birlikte kullanılamaz.',
+      );
+    }
+    return result;
   }
 
   static int? _readOptionalInt(
@@ -599,6 +712,18 @@ class DailyLog {
         vaginalDischargePresent ?? other.vaginalDischargePresent;
     final mergeDischargeDetails = mergedDischargePresent == true;
     final otherHasDischarge = other.vaginalDischargePresent == true;
+    final mergedSexualActivity = sexualActivity ?? other.sexualActivity;
+    final mergedSexualActivityTypes = {
+      ...other.sexualActivityTypes,
+      ...sexualActivityTypes,
+    };
+    if (mergedSexualActivity == true) {
+      mergedSexualActivityTypes.remove(SexualActivityType.none);
+    } else if (mergedSexualActivity == false) {
+      mergedSexualActivityTypes
+        ..clear()
+        ..add(SexualActivityType.none);
+    }
 
     return DailyLog(
       date: date, // Timestamp korunur — her kayıt kendi zamanıyla ayrıdır
@@ -626,11 +751,13 @@ class DailyLog {
       sleepQuality: sleepQuality ?? other.sleepQuality,
       stressLevel: stressLevel ?? other.stressLevel,
       energyLevel: energyLevel ?? other.energyLevel,
-      sexualActivity: sexualActivity ?? other.sexualActivity,
+      sexualActivity: mergedSexualActivity,
+      sexualActivityTypes: mergedSexualActivityTypes,
       bowelActivity: (bowelActivity + other.bowelActivity).toSet().toList(),
       painLocations: (painLocations + other.painLocations).toSet().toList(),
       symptoms: (symptoms + other.symptoms).toSet().toList(),
       symptomSeverity: symptomSeverity ?? other.symptomSeverity,
+      symptomSeverities: {...other.symptomSeverities, ...symptomSeverities},
       flowIntensity: flowIntensity ?? other.flowIntensity,
       periodPainLevel: periodPainLevel ?? other.periodPainLevel,
       periodStartedToday: periodStartedToday ?? other.periodStartedToday,

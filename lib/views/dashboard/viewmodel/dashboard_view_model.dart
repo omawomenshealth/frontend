@@ -95,6 +95,7 @@ class DashboardViewModel extends ChangeNotifier {
         log.medications.isNotEmpty || log.supplements.isNotEmpty,
       DailyLogObservedSection.symptom =>
         log.sexualActivity != null ||
+            log.sexualActivityTypes.isNotEmpty ||
             log.vaginalDischargePresent != null ||
             log.vaginalDischargeSymptoms.isNotEmpty ||
             (log.symptoms.isNotEmpty && log.flowIntensity == null),

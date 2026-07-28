@@ -69,6 +69,15 @@ void main() {
     expect(find.byTooltip(AppStrings.calendarLegend), findsOneWidget);
     expect(tester.takeException(), isNull);
 
+    calendar.selectDay(DateTime.now().add(const Duration(days: 1)));
+    await tester.pump();
+    final futureEditButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, AppStrings.editPeriodDates),
+    );
+    expect(futureEditButton.onPressed, isNull);
+
+    calendar.selectDay(DateTime.now());
+    await tester.pump();
     await tester.tap(find.text(AppStrings.year));
     await tester.pumpAndSettle();
     expect(find.text('${DateTime.now().year}'), findsOneWidget);

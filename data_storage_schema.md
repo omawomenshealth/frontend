@@ -42,7 +42,8 @@ saklar ve aynı şifreli nesne buluta yüklenir:
   `moodPlaces`, `sleepDurationMinutes`, `sleepQuality`, `stressLevel`,
   `energyLevel`
 - diğer sağlık kayıtları: `sexualActivity`, `bowelActivity`,
-  `painLocations`, `symptoms`, `symptomSeverity`
+  `sexualActivityTypes`, `painLocations`, `symptoms`, `symptomSeverity` ve
+  belirti bazında 1-3 şiddet değerlerini tutan `symptomSeverities`
 - adet: `flowIntensity`, `periodPainLevel`
 - vajinal akıntı: var/yok, renk, kıvam, miktar ve eşlik eden belirtiler
 - genel not ve kullanıcının doldurduğu bölümler: `notes`, `observedSections`
@@ -50,6 +51,9 @@ saklar ve aynı şifreli nesne buluta yüklenir:
 Eski yedeklerdeki `periodStartedToday` alanı yalnızca geriye dönük okunabilirlik
 için modelde tutulur. Yeni adet başlangıcı ayrı bir soruyla alınmaz. Kanama
 kayıtları tarihe göre gruplanır; ardışık grubun ilk günü adet başlangıcıdır.
+
+Gelecek tarihli günlük kayıtlar arayüzde açılamaz ve yerel depolama katmanı
+tarafından da reddedilir.
 
 ## Profil ve ayarlar
 

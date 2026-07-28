@@ -309,11 +309,12 @@ class DoctorReportView extends StatelessWidget {
   String _symptomsText(DailyLog log) {
     final values = {...log.painLocations, ...log.symptoms};
     if (values.isEmpty) return '';
-    final severity = log.symptomSeverity == null
-        ? ''
-        : ' (${AppStrings.symptomStrength}: ${log.symptomSeverity}/3)';
     return '${AppStrings.symptom}: '
-        '${values.map(AppStrings.localizeStoredValue).join(', ')}$severity';
+        '${values.map((symptom) {
+          final localized = AppStrings.localizeStoredValue(symptom);
+          final severity = log.symptomSeverities[symptom] ?? log.symptomSeverities[localized] ?? log.symptomSeverity;
+          return severity == null ? localized : '$localized ($severity/3)';
+        }).join(', ')}';
   }
 
   String _periodAndDischargeText(DailyLog log) {

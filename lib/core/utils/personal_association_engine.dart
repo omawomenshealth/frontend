@@ -647,6 +647,7 @@ class PersonalAssociationEngine {
             log.painLocations.isNotEmpty ||
             log.symptoms.isNotEmpty ||
             log.sexualActivity != null ||
+            log.sexualActivityTypes.isNotEmpty ||
             (log.notes?.isNotEmpty ?? false);
       }
 

@@ -13,6 +13,19 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  test('Yerel depolama gelecek tarihli günlük kaydı reddeder', () async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await storage.init();
+
+    final saved = await storage.saveDailyLog(
+      DailyLog.empty(DateTime.now().add(const Duration(days: 1))),
+    );
+
+    expect(saved, isFalse);
+    expect(storage.loadAllLogs(), isEmpty);
+  });
+
   test('Hızlı su kaydı günün mevcut beslenme toplamını yeniden açar', () async {
     SharedPreferences.setMockInitialValues({});
     final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
@@ -134,6 +147,7 @@ void main() {
     expect(find.text(AppStrings.logNutritionQuestion), findsOneWidget);
     expect(find.text(AppStrings.hydrationGlasses(0, 8)), findsOneWidget);
     expect(find.text(AppStrings.mealsToday), findsOneWidget);
+    expect(find.text(AppStrings.mealsFeel), findsOneWidget);
     expect(find.text(AppStrings.saveNutrition), findsOneWidget);
     expect(tester.takeException(), isNull);
 
@@ -142,15 +156,18 @@ void main() {
     final dinner = find.text(AppStrings.nutritionMealOptions[2]);
     await tester.ensureVisible(dinner);
     await tester.tap(dinner);
-    await tester.tap(find.text(AppStrings.saveNutrition));
+    final balanced = find.text(AppStrings.nutritionQualityOptions[1]);
+    await tester.ensureVisible(balanced);
+    await tester.pumpAndSettle();
+    await tester.tap(balanced);
+    await tester.tap(
+      find.widgetWithText(FilledButton, AppStrings.saveNutrition),
+    );
     await tester.pumpAndSettle();
 
     expect(harness.savedLog, isNotNull);
     expect(harness.savedLog!.waterIntakeMl, 500);
-    expect(
-      harness.savedLog!.mealTypes,
-      contains(AppStrings.nutritionMealOptions[2]),
-    );
+    expect(harness.savedLog!.mealTypes, [AppStrings.nutritionMealOptions[2]]);
     expect(
       AppStrings.localizeStoredValue(harness.savedLog!.nutritionQuality!),
       AppStrings.nutritionQualityOptions[1],
@@ -180,6 +197,20 @@ void main() {
     expect(harness.savedLog!.waterIntakeMl, 1000);
   });
 
+  testWidgets('Gelecek tarihe günlük kayıt eklenemez', (tester) async {
+    final harness = await _pumpLogSheet(
+      tester,
+      initialIndex: 1,
+      initialLog: DailyLog.empty(DateTime.now().add(const Duration(days: 1))),
+    );
+
+    await tester.tap(find.text(AppStrings.saveNutrition));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.futureLogNotAllowed), findsOneWidget);
+    expect(harness.savedLog, isNull);
+  });
+
   testWidgets('Belirti ekranı arama ve renkli seçim kartlarını kaydeder', (
     tester,
   ) async {
@@ -192,6 +223,13 @@ void main() {
     final cramps = find.text(AppStrings.symptomBodyOptions.first);
     await tester.ensureVisible(cramps);
     await tester.tap(cramps);
+    await tester.pumpAndSettle();
+    final severitySlider = find.byKey(
+      ValueKey('symptom_severity_${AppStrings.symptomBodyOptions.first}'),
+    );
+    expect(severitySlider, findsOneWidget);
+    tester.widget<Slider>(severitySlider).onChanged!(3);
+    await tester.pumpAndSettle();
     await tester.tap(find.text(AppStrings.save));
     await tester.pumpAndSettle();
 
@@ -200,7 +238,11 @@ void main() {
       harness.savedLog!.symptoms,
       contains(AppStrings.symptomBodyOptions.first),
     );
-    expect(harness.savedLog!.symptomSeverity, 2);
+    expect(harness.savedLog!.symptomSeverity, 3);
+    expect(
+      harness.savedLog!.symptomSeverities[AppStrings.symptomBodyOptions.first],
+      3,
+    );
     expect(
       harness.savedLog!.observedSections,
       contains(DailyLogObservedSection.symptom),
@@ -219,11 +261,12 @@ void main() {
     expect(sexualQuestion, findsOneWidget);
     expect(find.text(AppStrings.dischargePresent), findsOneWidget);
 
-    final sexualYes = find.text(AppStrings.yes).first;
-    await tester.ensureVisible(sexualYes);
+    final partnered = find.text(AppStrings.sexualActivityOptions[0]);
+    await tester.ensureVisible(partnered);
     await tester.pumpAndSettle();
-    await tester.tap(sexualYes);
-    final dischargeYes = find.text(AppStrings.yes).at(1);
+    await tester.tap(partnered);
+    await tester.tap(find.text(AppStrings.sexualActivityOptions[2]));
+    final dischargeYes = find.text(AppStrings.dischargePresenceOptions.first);
     await tester.ensureVisible(dischargeYes);
     await tester.pumpAndSettle();
     await tester.tap(dischargeYes);
@@ -250,6 +293,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(harness.savedLog!.sexualActivity, isTrue);
+    expect(
+      harness.savedLog!.sexualActivityTypes,
+      containsAll({SexualActivityType.partnered, SexualActivityType.protected}),
+    );
     expect(harness.savedLog!.vaginalDischargePresent, isTrue);
     expect(
       harness.savedLog!.vaginalDischargeColor,
@@ -287,10 +334,19 @@ void main() {
     await tester.ensureVisible(medicationSection);
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.logNutritionQuestion), findsOneWidget);
+    expect(find.text(AppStrings.medicationTime), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('medication_section_toggle')));
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.medicationTime), findsNothing);
+
+    await tester.tap(
+      find.byKey(const ValueKey('medication_entry_medication:test ilacı')),
+    );
+    await tester.pumpAndSettle();
     expect(find.text(AppStrings.medicationTime), findsOneWidget);
     expect(find.text(AppStrings.medicationDose), findsOneWidget);
     expect(find.text(AppStrings.medicationStomachState), findsOneWidget);
-    expect(find.text(AppStrings.medicationTakenStatus), findsOneWidget);
 
     final takenSwitch = find.byType(Switch);
     await tester.ensureVisible(takenSwitch);
@@ -309,6 +365,52 @@ void main() {
       harness.savedLog!.observedSections,
       contains(DailyLogObservedSection.medication),
     );
+  });
+
+  testWidgets('Birden fazla ilaç ve takviye kompakt satırlarda açılır', (
+    tester,
+  ) async {
+    await _pumpLogSheet(
+      tester,
+      initialIndex: 1,
+      settings: UserSettings(
+        isOnboardingComplete: true,
+        userName: 'Test',
+        lastPeriodDate: DateTime.now().subtract(const Duration(days: 2)),
+        dailyMedications: const ['İlaç A', 'İlaç B'],
+        dailySupplements: const ['Takviye A', 'Takviye B'],
+      ),
+    );
+
+    final medicationSection = find.text(AppStrings.medicationAndSupplement);
+    await tester.ensureVisible(medicationSection);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('medication_section_toggle')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('İlaç A'), findsOneWidget);
+    expect(find.text('İlaç B'), findsOneWidget);
+    expect(find.text('Takviye A'), findsOneWidget);
+    expect(find.text('Takviye B'), findsOneWidget);
+    expect(find.text(AppStrings.medicationTime), findsNothing);
+
+    final medicationA = find.byKey(
+      const ValueKey('medication_entry_medication:ilaç a'),
+    );
+    await tester.ensureVisible(medicationA);
+    await tester.pumpAndSettle();
+    await tester.tap(medicationA);
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.medicationTime), findsOneWidget);
+
+    final medicationB = find.byKey(
+      const ValueKey('medication_entry_medication:ilaç b'),
+    );
+    await tester.ensureVisible(medicationB);
+    await tester.pumpAndSettle();
+    await tester.tap(medicationB);
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.medicationTime), findsOneWidget);
   });
 
   testWidgets('Beslenme sekmesindeki artı butonu ilaç ekler', (tester) async {
@@ -386,8 +488,11 @@ void main() {
       moodEmoji: '🙂',
       moodCompanions: const ['Arkadaşlar'],
       moodPlaces: const ['Dışarıda'],
+      sexualActivity: true,
+      sexualActivityTypes: const {SexualActivityType.masturbation},
       symptoms: const ['Kramp'],
       symptomSeverity: 2,
+      symptomSeverities: const {'Kramp': 2},
       flowIntensity: 'Orta',
       observedSections: const {
         DailyLogObservedSection.period,
@@ -406,6 +511,8 @@ void main() {
     expect(restored.moodPlaces, original.moodPlaces);
     expect(restored.symptoms, original.symptoms);
     expect(restored.symptomSeverity, 2);
+    expect(restored.symptomSeverities, original.symptomSeverities);
+    expect(restored.sexualActivityTypes, original.sexualActivityTypes);
     expect(restored.periodStartedToday, isNull);
     expect(restored.hasExplicitTime, isFalse);
     expect(restored.observedSections, original.observedSections);

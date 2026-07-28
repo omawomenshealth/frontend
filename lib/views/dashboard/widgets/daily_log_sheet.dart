@@ -41,13 +41,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   late int _waterGlasses;
   late Set<String> _meals;
-  late int _nutritionQualityIndex;
+  int? _nutritionQualityIndex;
   late Set<String> _cravings;
 
   final _symptomSearchController = TextEditingController();
   late Set<String> _symptoms;
-  late int _symptomSeverityIndex;
+  late Map<String, int> _symptomSeverities;
   late bool? _sexualActivity;
+  late Set<SexualActivityType> _sexualActivityTypes;
   late bool? _vaginalDischargePresent;
   late VaginalDischargeColor? _vaginalDischargeColor;
   late VaginalDischargeConsistency? _vaginalDischargeConsistency;
@@ -56,6 +57,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   late List<MedicationEntry> _medications;
   late List<MedicationEntry> _supplements;
+  var _medicationSectionExpanded = false;
+  String? _expandedMedicationEntry;
 
   late int _moodIndex;
   var _moodStep = 1;
@@ -82,25 +85,34 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ? 0
         : (_log.waterIntakeMl! / 250).round().clamp(0, 12);
     _meals = _localizedSet(_log.mealTypes, AppStrings.nutritionMealOptions);
-    if (_meals.isEmpty) {
-      _meals = {
-        AppStrings.nutritionMealOptions[0],
-        AppStrings.nutritionMealOptions[1],
-      };
-    }
-    _nutritionQualityIndex = _localizedIndex(
-      AppStrings.nutritionQualityOptions,
-      _log.nutritionQuality,
-      fallback: 1,
-    );
+    _nutritionQualityIndex = _log.nutritionQuality == null
+        ? null
+        : _localizedIndex(
+            AppStrings.nutritionQualityOptions,
+            _log.nutritionQuality,
+            fallback: 1,
+          );
     _cravings = _localizedSet(
       _log.cravings,
       AppStrings.nutritionCravingOptions,
     );
 
     _symptoms = _localizedSet(_log.symptoms, _allSymptomOptions);
-    _symptomSeverityIndex = (_log.symptomSeverity ?? 2) - 1;
+    _symptomSeverities = {
+      for (final rawSymptom in _log.symptoms)
+        AppStrings.localizeStoredValue(rawSymptom):
+            _log.symptomSeverities[rawSymptom] ??
+            _log.symptomSeverities[AppStrings.localizeStoredValue(
+              rawSymptom,
+            )] ??
+            _log.symptomSeverity ??
+            2,
+    };
     _sexualActivity = _log.sexualActivity;
+    _sexualActivityTypes = {..._log.sexualActivityTypes};
+    if (_sexualActivity == false && _sexualActivityTypes.isEmpty) {
+      _sexualActivityTypes.add(SexualActivityType.none);
+    }
     _vaginalDischargePresent = _log.vaginalDischargePresent;
     _vaginalDischargeColor = _log.vaginalDischargeColor;
     _vaginalDischargeConsistency = _log.vaginalDischargeConsistency;
@@ -554,29 +566,19 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 24),
         _SectionTitle(AppStrings.mealsFeel),
         const SizedBox(height: 11),
-        Row(
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
           children: AppStrings.nutritionQualityOptions.asMap().entries.map((
             entry,
           ) {
-            final selected = entry.key == _nutritionQualityIndex;
-            final activeColor = entry.key == 1
-                ? AppColors.primary
-                : AppColors.secondary;
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  right:
-                      entry.key == AppStrings.nutritionQualityOptions.length - 1
-                      ? 0
-                      : 8,
-                ),
-                child: _PillChoice(
-                  label: entry.value,
-                  selected: selected,
-                  color: activeColor,
-                  onTap: () =>
-                      setState(() => _nutritionQualityIndex = entry.key),
-                ),
+            return _PillChoice(
+              label: entry.value,
+              selected: entry.key == _nutritionQualityIndex,
+              color: AppColors.secondary,
+              onTap: () => setState(
+                () => _nutritionQualityIndex =
+                    _nutritionQualityIndex == entry.key ? null : entry.key,
               ),
             );
           }).toList(),
@@ -626,54 +628,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ),
           ),
         ),
-        if (_symptoms.isNotEmpty) ...[
-          const SizedBox(height: 18),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.symptomStrength.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.4,
-                    color: AppColors.primaryDark,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: AppStrings.symptomSeverityOptions
-                      .asMap()
-                      .entries
-                      .map((entry) {
-                        return Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              right: entry.key == 2 ? 0 : 7,
-                            ),
-                            child: _PillChoice(
-                              label: entry.value,
-                              selected: entry.key == _symptomSeverityIndex,
-                              color: AppColors.primary,
-                              onTap: () => setState(
-                                () => _symptomSeverityIndex = entry.key,
-                              ),
-                            ),
-                          ),
-                        );
-                      })
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
-        ],
         for (final group in groups)
           if (query.isEmpty ||
               group.items.any(
@@ -690,23 +644,32 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               ),
             ),
             const SizedBox(height: 9),
-            GridView.count(
-              shrinkWrap: true,
-              primary: false,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 3.75,
-              children: [
-                for (final item in group.items)
-                  if (query.isEmpty || item.label.toLowerCase().contains(query))
-                    _SymptomTile(
-                      item: item,
-                      selected: _symptoms.contains(item.label),
-                      onTap: () => _toggleSymptom(item.label),
-                    ),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                const spacing = 8.0;
+                final tileWidth = (constraints.maxWidth - spacing) / 2;
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: [
+                    for (final item in group.items)
+                      if (query.isEmpty ||
+                          item.label.toLowerCase().contains(query))
+                        SizedBox(
+                          width: tileWidth,
+                          child: _SymptomTile(
+                            item: item,
+                            selected: _symptoms.contains(item.label),
+                            severity: _symptomSeverities[item.label] ?? 2,
+                            onTap: () => _toggleSymptom(item.label),
+                            onSeverityChanged: (severity) => setState(
+                              () => _symptomSeverities[item.label] = severity,
+                            ),
+                          ),
+                        ),
+                  ],
+                );
+              },
             ),
           ],
         const SizedBox(height: 26),
@@ -736,10 +699,20 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ),
           ),
           const SizedBox(height: 11),
-          _buildBooleanChoices(
-            value: _sexualActivity,
+          _buildTrackingChoices(
+            options: AppStrings.sexualActivityOptions,
+            icons: const [
+              Icons.favorite_outline_rounded,
+              Icons.self_improvement_rounded,
+              Icons.health_and_safety_outlined,
+              Icons.shield_outlined,
+              Icons.block_rounded,
+            ],
+            selectedIndices: _sexualActivityTypes
+                .map((type) => type.index)
+                .toSet(),
             color: AppColors.primary,
-            onChanged: (value) => setState(() => _sexualActivity = value),
+            onSelected: _toggleSexualActivityType,
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 19),
@@ -755,10 +728,16 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ),
           ),
           const SizedBox(height: 11),
-          _buildBooleanChoices(
-            value: _vaginalDischargePresent,
+          _buildTrackingChoices(
+            options: AppStrings.dischargePresenceOptions,
+            icons: const [Icons.water_drop_outlined, Icons.water_drop_outlined],
+            selectedIndices: {
+              if (_vaginalDischargePresent == true) 0,
+              if (_vaginalDischargePresent == false) 1,
+            },
             color: AppColors.secondaryDark,
-            onChanged: (value) {
+            onSelected: (index) {
+              final value = index == 0;
               setState(() {
                 _vaginalDischargePresent = value;
                 if (!value) {
@@ -864,32 +843,57 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     );
   }
 
-  Widget _buildBooleanChoices({
-    required bool? value,
+  Widget _buildTrackingChoices({
+    required List<String> options,
+    required List<IconData> icons,
+    required Set<int> selectedIndices,
     required Color color,
-    required ValueChanged<bool> onChanged,
+    required ValueChanged<int> onSelected,
   }) {
-    return Row(
-      children: [
-        Expanded(
-          child: _PillChoice(
-            label: AppStrings.yes,
-            selected: value == true,
-            color: color,
-            onTap: () => onChanged(true),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _PillChoice(
-            label: AppStrings.no,
-            selected: value == false,
-            color: color,
-            onTap: () => onChanged(false),
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 8.0;
+        final width = (constraints.maxWidth - spacing) / 2;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (var index = 0; index < options.length; index++)
+              SizedBox(
+                width: width,
+                child: _TrackingChoiceTile(
+                  label: options[index],
+                  icon: icons[index],
+                  selected: selectedIndices.contains(index),
+                  color: color,
+                  onTap: () => onSelected(index),
+                ),
+              ),
+          ],
+        );
+      },
     );
+  }
+
+  void _toggleSexualActivityType(int index) {
+    final type = SexualActivityType.values[index];
+    setState(() {
+      if (type == SexualActivityType.none) {
+        _sexualActivityTypes
+          ..clear()
+          ..add(SexualActivityType.none);
+        _sexualActivity = false;
+        return;
+      }
+
+      _sexualActivityTypes.remove(SexualActivityType.none);
+      if (_sexualActivityTypes.contains(type)) {
+        _sexualActivityTypes.remove(type);
+      } else {
+        _sexualActivityTypes.add(type);
+      }
+      _sexualActivity = _sexualActivityTypes.isEmpty ? null : true;
+    });
   }
 
   Widget _buildDischargeChoiceSection({
@@ -1044,62 +1048,144 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     setState(() {
       if (_symptoms.contains(label)) {
         _symptoms.remove(label);
+        _symptomSeverities.remove(label);
       } else {
         _symptoms.add(label);
+        _symptomSeverities[label] = 2;
       }
     });
   }
 
   Widget _buildNutritionMedicationSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(child: _SectionTitle(AppStrings.medicationAndSupplement)),
-            IconButton.filledTonal(
-              tooltip: AppStrings.add,
-              onPressed: _showMedicationActions,
-              style: IconButton.styleFrom(
-                backgroundColor: AppColors.medicationPrimary.withValues(
-                  alpha: 0.12,
-                ),
-                foregroundColor: AppColors.medicationPrimary,
-              ),
-              icon: const Icon(Icons.add_rounded),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        if (_medications.isEmpty && _supplements.isEmpty)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.outline),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.medication_outlined,
-                  color: AppColors.medicationPrimary,
-                  size: 24,
-                ),
-                const SizedBox(width: 11),
-                Expanded(
-                  child: Text(
-                    AppStrings.medicationLogEmptyHint,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      height: 1.45,
-                      color: AppColors.textSecondary,
+    final summary =
+        '${AppStrings.medications}: ${_medications.length}  •  '
+        '${AppStrings.supplements}: ${_supplements.length}';
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: Color.lerp(AppColors.surface, _tone, 0.035),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _tone.withValues(alpha: 0.24)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    key: const ValueKey('medication_section_toggle'),
+                    onTap: () => setState(
+                      () => _medicationSectionExpanded =
+                          !_medicationSectionExpanded,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 11, 8, 11),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              color: _tone.withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.medication_outlined,
+                              color: _tone,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppStrings.medicationAndSupplement,
+                                  style: const TextStyle(
+                                    fontFamily: 'CormorantGaramond',
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 1),
+                                Text(
+                                  summary,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 10.5,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          AnimatedRotation(
+                            turns: _medicationSectionExpanded ? 0.5 : 0,
+                            duration: const Duration(milliseconds: 180),
+                            child: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: _tone,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 9),
+                child: IconButton.filled(
+                  tooltip: AppStrings.add,
+                  onPressed: _showMedicationActions,
+                  style: IconButton.styleFrom(
+                    backgroundColor: _tone,
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.add_rounded),
+                ),
+              ),
+            ],
+          ),
+          if (_medicationSectionExpanded) ...[
+            Divider(height: 1, color: _tone.withValues(alpha: 0.18)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+              child: _buildNutritionMedicationDetails(),
             ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNutritionMedicationDetails() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_medications.isEmpty && _supplements.isEmpty)
+          Row(
+            children: [
+              Icon(Icons.info_outline_rounded, color: _tone, size: 19),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  AppStrings.medicationLogEmptyHint,
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    height: 1.4,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ],
           )
         else ...[
           if (_medications.isNotEmpty)
@@ -1107,16 +1193,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               title: AppStrings.medications,
               entries: _medications,
               icon: Icons.medication_outlined,
+              groupKey: 'medication',
             ),
           if (_medications.isNotEmpty && _supplements.isNotEmpty)
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
           if (_supplements.isNotEmpty)
             _buildMedicationGroup(
               title: AppStrings.supplements,
               entries: _supplements,
               icon: Icons.spa_outlined,
+              groupKey: 'supplement',
             ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
           Text(
             AppStrings.medicationDisclaimer,
             style: const TextStyle(
@@ -1131,6 +1219,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Future<void> _showMedicationActions() async {
+    final tone = _tone;
     final action = await showModalBottomSheet<_MedicationNutritionAction>(
       context: context,
       backgroundColor: AppColors.surface,
@@ -1147,10 +1236,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 child: _SectionTitle(AppStrings.medicationAndSupplement),
               ),
               ListTile(
-                leading: const Icon(
-                  Icons.medication_outlined,
-                  color: AppColors.medicationPrimary,
-                ),
+                leading: Icon(Icons.medication_outlined, color: tone),
                 title: Text(AppStrings.newMedication),
                 onTap: () => Navigator.pop(
                   sheetContext,
@@ -1158,10 +1244,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 ),
               ),
               ListTile(
-                leading: const Icon(
-                  Icons.spa_outlined,
-                  color: AppColors.secondaryDark,
-                ),
+                leading: Icon(Icons.spa_outlined, color: tone),
                 title: Text(AppStrings.newSupplement),
                 onTap: () => Navigator.pop(
                   sheetContext,
@@ -1169,10 +1252,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 ),
               ),
               ListTile(
-                leading: const Icon(
-                  Icons.add_alarm_rounded,
-                  color: AppColors.primaryDark,
-                ),
+                leading: Icon(Icons.add_alarm_rounded, color: tone),
                 title: Text(AppStrings.createReminder),
                 onTap: () => Navigator.pop(
                   sheetContext,
@@ -1223,6 +1303,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, customValue.trim()),
+            style: FilledButton.styleFrom(backgroundColor: _tone),
             child: Text(AppStrings.add),
           ),
         ],
@@ -1263,6 +1344,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           dosage: AppStrings.dosageOptions.first,
         ),
       );
+      _medicationSectionExpanded = true;
     });
   }
 
@@ -1306,14 +1388,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               MedicationReminderSection(
                 itemType: MedicationPlanItemType.medication,
                 availableItems: medicationNames,
-                color: AppColors.medicationPrimary,
+                color: _tone,
               ),
               const SizedBox(height: 24),
               _SectionTitle(AppStrings.supplements),
               MedicationReminderSection(
                 itemType: MedicationPlanItemType.supplement,
                 availableItems: supplementNames,
-                color: AppColors.secondaryDark,
+                color: _tone,
               ),
             ],
           ),
@@ -1326,19 +1408,29 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     required String title,
     required List<MedicationEntry> entries,
     required IconData icon,
+    required String groupKey,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionTitle(title),
-        const SizedBox(height: 11),
+        Text(
+          title,
+          style: const TextStyle(
+            fontFamily: 'CormorantGaramond',
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
         for (var index = 0; index < entries.length; index++) ...[
           _buildMedicationEntryCard(
             entry: entries[index],
             icon: icon,
+            entryKey: '$groupKey:${entries[index].name.toLowerCase()}',
             onChanged: (updated) => setState(() => entries[index] = updated),
           ),
-          if (index != entries.length - 1) const SizedBox(height: 12),
+          if (index != entries.length - 1) const SizedBox(height: 7),
         ],
       ],
     );
@@ -1347,113 +1439,145 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   Widget _buildMedicationEntryCard({
     required MedicationEntry entry,
     required IconData icon,
+    required String entryKey,
     required ValueChanged<MedicationEntry> onChanged,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
+    final expanded = _expandedMedicationEntry == entryKey;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: entry.taken
-              ? AppColors.medicationTaken.withValues(alpha: 0.55)
+          color: expanded || entry.taken
+              ? _tone.withValues(alpha: 0.55)
               : AppColors.outline,
         ),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.medicationPrimary.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, size: 20, color: AppColors.medicationPrimary),
-              ),
-              const SizedBox(width: 11),
               Expanded(
-                child: Text(
-                  entry.name,
-                  style: const TextStyle(
-                    fontFamily: 'CormorantGaramond',
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    key: ValueKey('medication_entry_$entryKey'),
+                    onTap: () => setState(
+                      () =>
+                          _expandedMedicationEntry = expanded ? null : entryKey,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(9, 8, 4, 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: _tone.withValues(alpha: 0.11),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(icon, size: 16, color: _tone),
+                          ),
+                          const SizedBox(width: 9),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  entry.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontFamily: 'CormorantGaramond',
+                                    fontSize: 16,
+                                    height: 1.05,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '${entry.time} · ${entry.dosage} · '
+                                  '${entry.stomachState}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 9.5,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          AnimatedRotation(
+                            turns: expanded ? 0.5 : 0,
+                            duration: const Duration(milliseconds: 180),
+                            child: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 20,
+                              color: _tone,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          _buildMedicationDropdown(
-            label: AppStrings.medicationTime,
-            value: entry.time,
-            options: AppStrings.medicationTimes,
-            onChanged: (value) => onChanged(entry.copyWith(time: value)),
-          ),
-          const SizedBox(height: 11),
-          _buildMedicationDropdown(
-            label: AppStrings.medicationDose,
-            value: entry.dosage,
-            options: AppStrings.dosageOptions,
-            onChanged: (value) => onChanged(entry.copyWith(dosage: value)),
-          ),
-          const SizedBox(height: 11),
-          _buildMedicationDropdown(
-            label: AppStrings.medicationStomachState,
-            value: entry.stomachState,
-            options: AppStrings.stomachStates,
-            onChanged: (value) =>
-                onChanged(entry.copyWith(stomachState: value)),
-          ),
-          const SizedBox(height: 11),
-          Container(
-            padding: const EdgeInsets.fromLTRB(13, 6, 7, 6),
-            decoration: BoxDecoration(
-              color: AppColors.scaffoldBackground,
-              borderRadius: BorderRadius.circular(17),
-              border: Border.all(color: AppColors.outline),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppStrings.medicationTakenStatus,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        entry.taken ? AppStrings.doseTaken : AppStrings.no,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: entry.taken
-                              ? AppColors.medicationTaken
-                              : AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Switch.adaptive(
+              Transform.scale(
+                scale: 0.78,
+                child: Switch.adaptive(
                   value: entry.taken,
-                  activeTrackColor: AppColors.medicationTaken,
+                  activeTrackColor: _tone,
                   onChanged: (value) => onChanged(entry.copyWith(taken: value)),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 2),
+            ],
           ),
+          if (expanded) ...[
+            Divider(height: 1, color: _tone.withValues(alpha: 0.14)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 9),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _buildMedicationDropdown(
+                      label: AppStrings.medicationTime,
+                      value: entry.time,
+                      options: AppStrings.medicationTimes,
+                      onChanged: (value) =>
+                          onChanged(entry.copyWith(time: value)),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: _buildMedicationDropdown(
+                      label: AppStrings.medicationDose,
+                      value: entry.dosage,
+                      options: AppStrings.dosageOptions,
+                      onChanged: (value) =>
+                          onChanged(entry.copyWith(dosage: value)),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: _buildMedicationDropdown(
+                      label: AppStrings.medicationStomachState,
+                      value: entry.stomachState,
+                      options: AppStrings.stomachStates,
+                      onChanged: (value) =>
+                          onChanged(entry.copyWith(stomachState: value)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -1468,40 +1592,51 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final available = <String>[...options];
     if (!available.contains(value)) available.add(value);
     return Container(
-      padding: const EdgeInsets.fromLTRB(13, 7, 10, 7),
+      padding: const EdgeInsets.fromLTRB(7, 5, 5, 4),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground,
-        borderRadius: BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(11),
         border: Border.all(color: AppColors.outline),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 72,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textSecondary,
-              ),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textSecondary,
             ),
           ),
-          Expanded(
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: value,
-                isExpanded: true,
-                isDense: true,
-                borderRadius: BorderRadius.circular(18),
-                items: [
-                  for (final option in available)
-                    DropdownMenuItem(value: option, child: Text(option)),
-                ],
-                onChanged: (selected) {
-                  if (selected != null) onChanged(selected);
-                },
+          const SizedBox(height: 1),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              isDense: true,
+              borderRadius: BorderRadius.circular(14),
+              style: const TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
               ),
+              items: [
+                for (final option in available)
+                  DropdownMenuItem(
+                    value: option,
+                    child: Text(
+                      option,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+              onChanged: (selected) {
+                if (selected != null) onChanged(selected);
+              },
             ),
           ),
         ],
@@ -1839,6 +1974,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     if (_logType == 1 && (_medications.isNotEmpty || _supplements.isNotEmpty)) {
       observed.add(DailyLogObservedSection.medication);
     }
+    final selectedSymptomSeverities = {
+      for (final symptom in _symptoms)
+        symptom: _symptomSeverities[symptom] ?? 2,
+    };
+    final overallSymptomSeverity = selectedSymptomSeverities.isEmpty
+        ? null
+        : (selectedSymptomSeverities.values.reduce((a, b) => a + b) /
+                  selectedSymptomSeverities.length)
+              .round();
 
     return switch (_logType) {
       0 => _log.copyWith(
@@ -1854,8 +1998,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         hasExplicitTime: hasExplicitTime,
         waterIntakeMl: _waterGlasses * 250,
         mealTypes: _meals.toList(),
-        nutritionQuality:
-            AppStrings.nutritionQualityOptions[_nutritionQualityIndex],
+        nutritionQuality: _nutritionQualityIndex == null
+            ? null
+            : AppStrings.nutritionQualityOptions[_nutritionQualityIndex!],
+        clearNutritionQuality: _nutritionQualityIndex == null,
         cravings: _cravings.toList(),
         medications: _medications,
         supplements: _supplements,
@@ -1865,9 +2011,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         date: finalDate,
         hasExplicitTime: hasExplicitTime,
         symptoms: _symptoms.toList(),
-        symptomSeverity: _symptomSeverityIndex + 1,
+        symptomSeverity: overallSymptomSeverity,
+        clearSymptomSeverity: overallSymptomSeverity == null,
+        symptomSeverities: selectedSymptomSeverities,
         painLocations: _matchingPainLocations(_symptoms),
         sexualActivity: _sexualActivity,
+        clearSexualActivity: _sexualActivity == null,
+        sexualActivityTypes: _sexualActivityTypes,
         vaginalDischargePresent: _vaginalDischargePresent,
         vaginalDischargeColor: _vaginalDischargeColor,
         clearVaginalDischargeColor: _vaginalDischargePresent != true,
@@ -1904,6 +2054,16 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   Future<void> _saveLog() async {
     final today = AppTime.now.dateOnly;
+    if (_log.date.dateOnly.isAfter(today)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.futureLogNotAllowed),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
     var finalDate = _log.date;
     var hasExplicitTime = _log.hasExplicitTime;
     if (_log.date.dateOnly.isBefore(today)) {
@@ -2209,81 +2369,174 @@ class _SymptomItem {
 class _SymptomTile extends StatelessWidget {
   final _SymptomItem item;
   final bool selected;
+  final int severity;
   final VoidCallback onTap;
+  final ValueChanged<int> onSeverityChanged;
 
   const _SymptomTile({
     required this.item,
     required this.selected,
+    required this.severity,
+    required this.onTap,
+    required this.onSeverityChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          height: 44,
+          decoration: BoxDecoration(
+            color: Color.lerp(item.color, Colors.white, selected ? 0.78 : 0.88),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: selected ? item.color : AppColors.outline,
+              width: selected ? 1.6 : 1,
+            ),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(5, 4, 8, 4),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: item.color,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(item.icon, color: Colors.white, size: 15),
+                    ),
+                    const SizedBox(width: 7),
+                    Expanded(
+                      child: Text(
+                        item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    if (selected)
+                      Icon(
+                        Icons.check_circle_rounded,
+                        color: item.color,
+                        size: 17,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (selected)
+          SizedBox(
+            height: 29,
+            child: Semantics(
+              label: '${item.label} · ${AppStrings.symptomStrength}',
+              value: AppStrings.symptomSeverityOptions[severity - 1],
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  trackHeight: 3,
+                  activeTrackColor: item.color,
+                  inactiveTrackColor: item.color.withValues(alpha: 0.18),
+                  thumbColor: item.color,
+                  overlayShape: SliderComponentShape.noOverlay,
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 5.5,
+                  ),
+                  activeTickMarkColor: Colors.white,
+                  inactiveTickMarkColor: item.color.withValues(alpha: 0.42),
+                ),
+                child: Slider(
+                  key: ValueKey('symptom_severity_${item.label}'),
+                  value: severity.toDouble(),
+                  min: 1,
+                  max: 3,
+                  divisions: 2,
+                  label: AppStrings.symptomSeverityOptions[severity - 1],
+                  onChanged: (value) => onSeverityChanged(value.round()),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _TrackingChoiceTile extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _TrackingChoiceTile({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.color,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Color.lerp(item.color, Colors.white, 0.84),
-      borderRadius: BorderRadius.circular(24),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 160),
-              padding: const EdgeInsets.fromLTRB(5, 4, 8, 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: selected ? item.color : AppColors.outline,
-                  width: selected ? 1.8 : 1,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
+      height: 46,
+      decoration: BoxDecoration(
+        color: selected
+            ? color.withValues(alpha: 0.13)
+            : AppColors.scaffoldBackground,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: selected ? color : AppColors.outline,
+          width: selected ? 1.5 : 1,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: selected ? color : AppColors.textHint,
                 ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: item.color,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(item.icon, color: Colors.white, size: 15),
-                  ),
-                  const SizedBox(width: 7),
-                  Expanded(
-                    child: Text(
-                      item.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                      color: selected ? color : AppColors.textPrimary,
                     ),
                   ),
-                ],
-              ),
+                ),
+                if (selected) Icon(Icons.check_rounded, size: 16, color: color),
+              ],
             ),
-            if (selected)
-              Positioned(
-                right: -2,
-                top: -3,
-                child: Container(
-                  width: 18,
-                  height: 18,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryDark,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: Colors.white,
-                    size: 12,
-                  ),
-                ),
-              ),
-          ],
+          ),
         ),
       ),
     );

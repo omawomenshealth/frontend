@@ -65,15 +65,21 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
   }
 
   Future<void> _openForm([MedicationReminderPlan? existing]) async {
+    final baseTheme = Theme.of(context);
     final plan = await showModalBottomSheet<MedicationReminderPlan>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: AppColors.surface,
-      builder: (_) => MedicationReminderFormSheet(
-        itemType: widget.itemType,
-        availableItems: widget.availableItems,
-        existing: existing,
+      builder: (_) => Theme(
+        data: baseTheme.copyWith(
+          colorScheme: baseTheme.colorScheme.copyWith(primary: widget.color),
+        ),
+        child: MedicationReminderFormSheet(
+          itemType: widget.itemType,
+          availableItems: widget.availableItems,
+          existing: existing,
+        ),
       ),
     );
     if (plan != null && mounted) await _savePlan(plan);
@@ -351,16 +357,19 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
           ),
           Switch(
             value: plan.enabled,
+            activeTrackColor: widget.color,
             onChanged: _busy ? null : (value) => _togglePlan(plan, value),
           ),
           IconButton(
             tooltip: AppStrings.edit,
             onPressed: _busy ? null : () => _openForm(plan),
+            style: IconButton.styleFrom(foregroundColor: widget.color),
             icon: const Icon(Icons.edit_outlined, size: 20),
           ),
           IconButton(
             tooltip: AppStrings.delete,
             onPressed: _busy ? null : () => _deletePlan(plan),
+            style: IconButton.styleFrom(foregroundColor: widget.color),
             icon: const Icon(Icons.delete_outline_rounded, size: 20),
           ),
         ],
@@ -411,7 +420,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
                       : Icons.notifications_off_outlined,
                   size: 17,
                   color: dose.notificationScheduled
-                      ? AppColors.primary
+                      ? widget.color
                       : AppColors.textHint,
                 ),
               ),
