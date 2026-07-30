@@ -23,41 +23,114 @@ void main() {
     expect(engine.generate(const []), isEmpty);
   });
 
-  test(
-    'salt sıklık kartlarını kaldırır, birlikte değişim ilişkisini korur',
-    () {
-      final logs = [
-        DailyLog(
-          date: DateTime(2026, 7, 1, 9),
-          mood: 'Mutlu',
-          painLocations: const ['Baş ağrısı'],
-        ),
-        DailyLog(
-          date: DateTime(2026, 7, 2, 10),
-          mood: 'Happy',
-          painLocations: const ['Headache'],
-        ),
-        DailyLog(
-          date: DateTime(2026, 7, 3, 11),
-          mood: 'Yorgun',
-          painLocations: const ['Bel ağrısı'],
-        ),
-      ];
+  test('az örnekli ruh hali eşleşmesini anlamlı insight gibi sunmaz', () {
+    final logs = [
+      DailyLog(
+        date: DateTime(2026, 7, 1, 9),
+        mood: 'Mutlu',
+        painLocations: const ['Baş ağrısı'],
+      ),
+      DailyLog(
+        date: DateTime(2026, 7, 2, 10),
+        mood: 'Happy',
+        painLocations: const ['Headache'],
+      ),
+      DailyLog(
+        date: DateTime(2026, 7, 3, 11),
+        mood: 'Yorgun',
+        painLocations: const ['Bel ağrısı'],
+      ),
+    ];
 
-      final insights = engine.generate(logs, now: DateTime(2026, 7, 10));
-      final mood = insightOf(insights, PersonalInsightKind.frequentMood);
-      final symptom = insightOf(insights, PersonalInsightKind.recurringSymptom);
-      final relationship = insightOf(
-        insights,
-        PersonalInsightKind.symptomMoodCooccurrence,
-      );
+    final insights = engine.generate(logs, now: DateTime(2026, 7, 10));
+    final mood = insightOf(insights, PersonalInsightKind.frequentMood);
+    final symptom = insightOf(insights, PersonalInsightKind.recurringSymptom);
+    final relationship = insightOf(
+      insights,
+      PersonalInsightKind.symptomMoodCooccurrence,
+    );
 
-      expect(mood, isNull);
-      expect(symptom, isNull);
-      expect(relationship, isNotNull);
-      expect(relationship!.value, 2);
-    },
-  );
+    expect(mood, isNull);
+    expect(symptom, isNull);
+    expect(relationship, isNull);
+  });
+
+  test('ilk gluten ve şişkinlik kaydında takip insightı üretir', () {
+    final insights = engine.generate([
+      DailyLog(
+        date: DateTime(2026, 7, 30, 12),
+        mealTypes: const ['Kahvaltı'],
+        mealFoodGroups: const {
+          'Kahvaltı': ['Gluten', 'Süt ürünleri'],
+        },
+        postMealFeelings: const ['Şişkin'],
+        symptoms: const ['Yorgunluk'],
+        observedSections: const {
+          DailyLogObservedSection.nutrition,
+          DailyLogObservedSection.symptom,
+        },
+      ),
+    ], now: DateTime(2026, 7, 30, 13));
+
+    final observation = insightOf(
+      insights,
+      PersonalInsightKind.foodObservationStarted,
+    );
+    expect(observation, isNotNull);
+    expect(observation!.primaryLabel, 'Gluten');
+    expect(observation.secondaryLabel, 'Şişkin');
+    expect(
+      observation.contextLabels,
+      containsAll(['Süt ürünleri', 'Yorgunluk']),
+    );
+    expect(observation.shouldNotify, isTrue);
+  });
+
+  test('tekrarlayan gluten ve şişkinlik kaydını oluşan örüntü yapar', () {
+    final insights = engine.generate([
+      for (var day = 28; day <= 30; day++)
+        DailyLog(
+          date: DateTime(2026, 7, day, 12),
+          mealTypes: const ['Kahvaltı'],
+          mealFoodGroups: const {
+            'Kahvaltı': ['Gluten'],
+          },
+          postMealFeelings: const ['Şişkin'],
+          observedSections: const {DailyLogObservedSection.nutrition},
+        ),
+    ], now: DateTime(2026, 7, 30, 13));
+
+    final pattern = insightOf(
+      insights,
+      PersonalInsightKind.foodPatternBuilding,
+    );
+    expect(pattern, isNotNull);
+    expect(pattern!.withEventCount, 3);
+    expect(pattern.withTotal, 3);
+  });
+
+  test('laktoz ve şişkinlik için de aynı erken takip akışını kullanır', () {
+    final insights = engine.generate([
+      DailyLog(
+        date: DateTime(2026, 7, 30, 12),
+        mealTypes: const ['Öğle yemeği'],
+        mealFoodGroups: const {
+          'Öğle yemeği': ['Laktoz içeren'],
+        },
+        postMealFeelings: const ['Şişkin'],
+        observedSections: const {DailyLogObservedSection.nutrition},
+      ),
+    ], now: DateTime(2026, 7, 30, 13));
+
+    final observation = insightOf(
+      insights,
+      PersonalInsightKind.foodObservationStarted,
+    );
+    expect(observation, isNotNull);
+    expect(observation!.primaryLabel, 'Laktoz içeren');
+    expect(observation.secondaryLabel, 'Şişkin');
+    expect(observation.shouldNotify, isTrue);
+  });
 
   test('ruh hali ve döngü fazı bağlantısını ana insight listesine ekler', () {
     final start = DateTime(2026, 1, 1);
@@ -121,7 +194,7 @@ void main() {
     expect(phaseEnergy.withoutTotal, 51);
   });
 
-  test('döngü uzunluğu, aralığı ve tamamlanan kanama süresini hesaplar', () {
+  test('özet yerine yalnızca döngü değişimini insight olarak üretir', () {
     final logs = <DailyLog>[];
     for (final start in [
       DateTime(2026, 1, 1),
@@ -143,11 +216,11 @@ void main() {
     final variation = insightOf(insights, PersonalInsightKind.cycleVariation);
     final duration = insightOf(insights, PersonalInsightKind.periodDuration);
 
-    expect(cycleLength?.value, 28);
+    expect(cycleLength, isNull);
     expect(variation?.value, 28);
     expect(variation?.comparisonValue, 28);
     expect(variation?.total, 2);
-    expect(duration?.value, 3);
+    expect(duration, isNull);
   });
 
   test('ilaç kutuları gerçek plan olmadan uyum oranı üretmez', () {
@@ -174,7 +247,7 @@ void main() {
     );
   });
 
-  test('gerçek planlanan doz kayıtlarından uyum oranı üretir', () {
+  test('planlanan doz yanıtlarından özet insight üretmez', () {
     MedicationDoseRecord dose(String id, MedicationDoseResponseStatus? status) {
       return MedicationDoseRecord(
         id: id,
@@ -204,9 +277,7 @@ void main() {
       PersonalInsightKind.medicationAdherence,
     );
 
-    expect(adherence, isNotNull);
-    expect(adherence?.value, 2);
-    expect(adherence?.total, 3);
+    expect(adherence, isNull);
   });
 
   test('üçten az kayıtlı günde yalnızca kayıt sayısı kartı göstermez', () {
@@ -343,6 +414,95 @@ void main() {
 
     expect(
       insightOf(insights, PersonalInsightKind.menstrualDischargeContext),
+      isNotNull,
+    );
+  });
+
+  test(
+    'ilk adet başlangıcını sayaç yerine takip başlangıcı olarak açıklar',
+    () {
+      final insights = engine.generate([
+        DailyLog(
+          date: DateTime(2026, 7, 30),
+          flowIntensity: 'Orta',
+          observedSections: const {DailyLogObservedSection.period},
+        ),
+      ], now: DateTime(2026, 7, 30, 12));
+
+      expect(
+        insightOf(insights, PersonalInsightKind.periodTrackingStarted),
+        isNotNull,
+      );
+    },
+  );
+
+  test('belirtiyi gün sayısı yerine adet dönemleri arasında karşılaştırır', () {
+    final logs = <DailyLog>[
+      for (final start in [DateTime(2026, 6, 1), DateTime(2026, 6, 29)]) ...[
+        DailyLog(
+          date: start,
+          flowIntensity: 'Orta',
+          symptoms: const ['Kramplar'],
+        ),
+        DailyLog(
+          date: start.add(const Duration(days: 1)),
+          flowIntensity: 'Hafif',
+        ),
+      ],
+    ];
+
+    final insights = engine.generate(logs, now: DateTime(2026, 7, 5));
+    final pattern = insightOf(
+      insights,
+      PersonalInsightKind.periodSymptomPattern,
+    );
+    expect(pattern, isNotNull);
+    expect(pattern!.value, 2);
+    expect(pattern.total, 2);
+  });
+
+  test('21-35 gün dışındaki son döngüyü değerlendirme insightı yapar', () {
+    final insights = engine.generate([
+      DailyLog(date: DateTime(2026, 6, 1), flowIntensity: 'Orta'),
+      DailyLog(date: DateTime(2026, 7, 11), flowIntensity: 'Orta'),
+    ], now: DateTime(2026, 7, 11, 12));
+    final review = insightOf(insights, PersonalInsightKind.cycleTimingReview);
+
+    expect(review, isNotNull);
+    expect(review!.value, 40);
+    expect(review.notificationLevel, PersonalInsightNotificationLevel.review);
+  });
+
+  test('7 günü aşan tamamlanmış kanama kaydını değerlendirmeye taşır', () {
+    final insights = engine.generate([
+      for (var day = 0; day < 8; day++)
+        DailyLog(
+          date: DateTime(2026, 7, 1).add(Duration(days: day)),
+          flowIntensity: 'Orta',
+        ),
+    ], now: DateTime(2026, 7, 10));
+    final review = insightOf(
+      insights,
+      PersonalInsightKind.periodDurationReview,
+    );
+
+    expect(review, isNotNull);
+    expect(review!.value, 8);
+    expect(review.shouldNotify, isTrue);
+  });
+
+  test('olağan görünümlü akıntıyı kişisel baz çizgi kaydı yapar', () {
+    final insights = engine.generate([
+      DailyLog(
+        date: DateTime(2026, 7, 30),
+        vaginalDischargePresent: true,
+        vaginalDischargeColor: VaginalDischargeColor.clear,
+        vaginalDischargeConsistency: VaginalDischargeConsistency.creamy,
+      ),
+    ], now: DateTime(2026, 7, 30, 12));
+
+    expect(
+      insightOf(insights, PersonalInsightKind.dischargeBaselineObservation),
       isNotNull,
     );
   });

@@ -62,14 +62,30 @@ void main() {
         UserSettings(isOnboardingComplete: true, userName: 'Test'),
       );
       final now = DateTime.now();
+      final scheduledAt = DateTime(now.year, now.month, now.day, 23, 55);
+      final reminderPlan = MedicationReminderPlan(
+        id: 'plan-1',
+        itemType: MedicationPlanItemType.medication,
+        itemName: 'Test ilacı',
+        dosage: '3 Adet',
+        time: const ReminderClockTime(hour: 23, minute: 55),
+        frequency: MedicationPlanFrequency.everyDay,
+        weekdays: const {1, 2, 3, 4, 5, 6, 7},
+        startDate: DateTime(now.year, now.month, now.day),
+        endDate: null,
+        enabled: true,
+        createdAt: now,
+        updatedAt: now,
+      );
+      await storage.saveMedicationReminderPlans([reminderPlan]);
       await storage.saveMedicationDoseRecords([
         MedicationDoseRecord(
-          id: 'today-dose',
-          planId: 'plan-1',
+          id: MedicationScheduleCalculator.doseId(reminderPlan.id, scheduledAt),
+          planId: reminderPlan.id,
           itemType: MedicationPlanItemType.medication,
           itemName: 'Test ilacı',
           dosage: '3 Adet',
-          scheduledAt: DateTime(now.year, now.month, now.day, 23, 55),
+          scheduledAt: scheduledAt,
           notificationScheduled: true,
           notificationScheduledAt: now,
           status: null,
@@ -173,13 +189,16 @@ void main() {
     await storage.saveSettings(
       UserSettings(isOnboardingComplete: true, userName: 'Test'),
     );
-    for (var day = 0; day < 3; day++) {
+    for (var day = 0; day < 20; day++) {
       await storage.saveDailyLog(
         DailyLog(
           date: DateTime(2026, 1, 1).add(Duration(days: day)),
-          painLocations: const ['Baş ağrısı'],
-          mood: 'Yorgun',
-          observedSections: const {DailyLogObservedSection.wellbeing},
+          nutritionTags: day < 10 ? const ['Tuzlu'] : const [],
+          painLocations: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
+          observedSections: const {
+            DailyLogObservedSection.nutrition,
+            DailyLogObservedSection.wellbeing,
+          },
         ),
       );
     }
@@ -191,10 +210,7 @@ void main() {
       find.byKey(const ValueKey('dashboard_personal_insights')),
       findsOneWidget,
     );
-    expect(
-      find.byKey(const ValueKey('personal_insight_symptom_mood_cooccurrence')),
-      findsOneWidget,
-    );
+    expect(find.byType(PersonalInsightCard), findsWidgets);
 
     final viewAllButton = find.byKey(
       const ValueKey('dashboard_view_all_insights'),

@@ -27,6 +27,8 @@ class LocalStorageService {
   static const String _medicationReminderPlansKey =
       'medication_reminder_plans_v1';
   static const String _medicationDoseRecordsKey = 'medication_dose_records_v1';
+  static const String _insightNotificationHistoryKey =
+      'insight_notification_history_v1';
 
   final LocalKeyStore _keyStore;
   LocalEncryptedStore? _encryptedStore;
@@ -105,6 +107,7 @@ class LocalStorageService {
       key == _virtualDaysOffsetKey ||
       key == _medicationReminderPlansKey ||
       key == _medicationDoseRecordsKey ||
+      key == _insightNotificationHistoryKey ||
       key.startsWith(_logPrefix);
 
   // ── Kullanıcı Ayarları ─────────────────────────────────
@@ -284,6 +287,18 @@ class LocalStorageService {
   /// Kayıtlı tüm günleri (saatsiz) al.
   Set<DateTime> getLogDates() {
     return _getDatesSet().map((s) => DateTime.parse(s).dateOnly).toSet();
+  }
+
+  Set<String> loadNotifiedInsightIds() =>
+      (_p.getStringList(_insightNotificationHistoryKey) ?? const <String>[])
+          .toSet();
+
+  Future<bool> markInsightNotificationSent(String insightId) {
+    final ids = loadNotifiedInsightIds()..add(insightId);
+    final limited = ids.length <= 100
+        ? ids.toList(growable: false)
+        : ids.skip(ids.length - 100).toList(growable: false);
+    return _p.setStringList(_insightNotificationHistoryKey, limited);
   }
 
   // ── Döngü Hesaplama ─────────────────────────────────────

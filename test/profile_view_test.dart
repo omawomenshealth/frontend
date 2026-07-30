@@ -81,8 +81,29 @@ void main() {
 
     final name = tester.widget<Text>(find.text('Özge'));
     expect(name.style?.fontFamily, 'CormorantGaramond');
+    expect(find.byTooltip(AppStrings.medicationAndSupplement), findsNothing);
 
-    await tester.tap(find.byTooltip(AppStrings.basicInformation));
+    final medicationsAndReminders = find.text(
+      AppStrings.medicationsAndReminders,
+    );
+    await tester.ensureVisible(medicationsAndReminders);
+    await tester.tap(medicationsAndReminders);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('profile_medication_reminders')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('profile_supplement_reminders')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byIcon(Icons.close).first);
+    await tester.pumpAndSettle();
+
+    final basicInformation = find.byTooltip(AppStrings.basicInformation);
+    await tester.ensureVisible(basicInformation);
+    await tester.tap(basicInformation);
     await tester.pumpAndSettle();
 
     expect(find.text(AppStrings.basicInformationEdit), findsOneWidget);

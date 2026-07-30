@@ -8,10 +8,12 @@ import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/cycle_rules.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/personal_insight_model.dart';
+import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
+import '../../dashboard/widgets/medication_reminder_section.dart';
 import '../../articles/widgets/premium_paywall.dart';
 
 import 'doctor_report_view.dart';
@@ -1007,6 +1009,15 @@ class _ProfileMechanics extends StatelessWidget {
         },
         child: StatefulBuilder(
           builder: (ctx2, setSheetState) {
+            final storage = ctx2.read<LocalStorageService>();
+            final medicationNames = {
+              ...vm.settings.dailyMedications,
+              ...storage.getCustomMedications(),
+            }.toList();
+            final supplementNames = {
+              ...vm.settings.dailySupplements,
+              ...storage.getCustomSupplements(),
+            }.toList();
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1049,6 +1060,13 @@ class _ProfileMechanics extends StatelessWidget {
                     setSheetState(() {});
                   }
                 }),
+                MedicationReminderSection(
+                  key: const ValueKey('profile_medication_reminders'),
+                  itemType: MedicationPlanItemType.medication,
+                  availableItems: medicationNames,
+                  color: AppColors.medicationPrimary,
+                  onChanged: () => ctx2.read<DashboardViewModel>().loadData(),
+                ),
                 const SizedBox(height: 20),
 
                 // Takviyeler
@@ -1088,6 +1106,13 @@ class _ProfileMechanics extends StatelessWidget {
                     setSheetState(() {});
                   }
                 }),
+                MedicationReminderSection(
+                  key: const ValueKey('profile_supplement_reminders'),
+                  itemType: MedicationPlanItemType.supplement,
+                  availableItems: supplementNames,
+                  color: AppColors.success,
+                  onChanged: () => ctx2.read<DashboardViewModel>().loadData(),
+                ),
               ],
             );
           },

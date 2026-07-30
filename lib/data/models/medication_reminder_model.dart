@@ -31,7 +31,7 @@ class MedicationReminderPlan {
   final MedicationPlanItemType itemType;
   final String itemName;
   final String dosage;
-  final ReminderClockTime time;
+  final List<ReminderClockTime> times;
   final MedicationPlanFrequency frequency;
 
   /// DateTime.weekday biçiminde 1 (Pazartesi) - 7 (Pazar).
@@ -47,7 +47,8 @@ class MedicationReminderPlan {
     required this.itemType,
     required this.itemName,
     required this.dosage,
-    required this.time,
+    required ReminderClockTime time,
+    List<ReminderClockTime>? times,
     required this.frequency,
     required Set<int> weekdays,
     required this.startDate,
@@ -55,7 +56,13 @@ class MedicationReminderPlan {
     required this.enabled,
     required this.createdAt,
     required this.updatedAt,
-  }) : weekdays = Set.unmodifiable(weekdays);
+  }) : times = List.unmodifiable(
+         _normalizeTimes(times == null || times.isEmpty ? [time] : times),
+       ),
+       weekdays = Set.unmodifiable(weekdays);
+
+  /// Eski tek-saat kullanan çağrılar ve kayıtlar için ilk bildirim saati.
+  ReminderClockTime get time => times.first;
 
   bool isScheduledOn(DateTime date) {
     final day = DateTime(date.year, date.month, date.day);
@@ -74,6 +81,7 @@ class MedicationReminderPlan {
     String? itemName,
     String? dosage,
     ReminderClockTime? time,
+    List<ReminderClockTime>? times,
     MedicationPlanFrequency? frequency,
     Set<int>? weekdays,
     DateTime? startDate,
@@ -88,6 +96,7 @@ class MedicationReminderPlan {
       itemName: itemName ?? this.itemName,
       dosage: dosage ?? this.dosage,
       time: time ?? this.time,
+      times: times ?? (time == null ? this.times : [time]),
       frequency: frequency ?? this.frequency,
       weekdays: weekdays ?? this.weekdays,
       startDate: startDate ?? this.startDate,
@@ -104,6 +113,7 @@ class MedicationReminderPlan {
     'itemName': itemName,
     'dosage': dosage,
     'time': time.toJson(),
+    'times': times.map((value) => value.toJson()).toList(),
     'frequency': frequency.name,
     'weekdays': weekdays.toList()..sort(),
     'startDate': startDate.toIso8601String(),
@@ -114,6 +124,16 @@ class MedicationReminderPlan {
   };
 
   factory MedicationReminderPlan.fromJson(Map<String, dynamic> json) {
+    final legacyTime = ReminderClockTime.fromJson(
+      Map<String, dynamic>.from(json['time'] as Map),
+    );
+    final storedTimes = (json['times'] as List?)
+        ?.map(
+          (value) => ReminderClockTime.fromJson(
+            Map<String, dynamic>.from(value as Map),
+          ),
+        )
+        .toList();
     return MedicationReminderPlan(
       id: json['id'] as String,
       itemType: MedicationPlanItemType.values.byName(
@@ -121,9 +141,8 @@ class MedicationReminderPlan {
       ),
       itemName: json['itemName'] as String,
       dosage: json['dosage'] as String,
-      time: ReminderClockTime.fromJson(
-        Map<String, dynamic>.from(json['time'] as Map),
-      ),
+      time: legacyTime,
+      times: storedTimes,
       frequency: MedicationPlanFrequency.values.byName(
         json['frequency'] as String,
       ),
@@ -139,6 +158,22 @@ class MedicationReminderPlan {
   }
 
   String toJsonString() => jsonEncode(toJson());
+
+  static List<ReminderClockTime> _normalizeTimes(
+    Iterable<ReminderClockTime> values,
+  ) {
+    final unique = <int, ReminderClockTime>{};
+    for (final value in values) {
+      unique[value.hour * 60 + value.minute] = value;
+    }
+    final sorted = unique.values.toList()
+      ..sort((left, right) {
+        final leftMinutes = left.hour * 60 + left.minute;
+        final rightMinutes = right.hour * 60 + right.minute;
+        return leftMinutes.compareTo(rightMinutes);
+      });
+    return sorted.take(3).toList(growable: false);
+  }
 }
 
 /// Planlanan tek bir dozun kalıcı takip kaydı.
@@ -285,21 +320,23 @@ class MedicationScheduleCalculator {
     for (var offset = 0; offset <= maxSearchDays; offset++) {
       for (final plan in planList) {
         if (!plan.isScheduledOn(day)) continue;
-        final scheduledAt = DateTime(
-          day.year,
-          day.month,
-          day.day,
-          plan.time.hour,
-          plan.time.minute,
-        );
-        if (scheduledAt.isBefore(from)) continue;
-        doses.add(
-          PlannedMedicationDose(
-            id: doseId(plan.id, scheduledAt),
-            plan: plan,
-            scheduledAt: scheduledAt,
-          ),
-        );
+        for (final time in plan.times) {
+          final scheduledAt = DateTime(
+            day.year,
+            day.month,
+            day.day,
+            time.hour,
+            time.minute,
+          );
+          if (scheduledAt.isBefore(from)) continue;
+          doses.add(
+            PlannedMedicationDose(
+              id: doseId(plan.id, scheduledAt),
+              plan: plan,
+              scheduledAt: scheduledAt,
+            ),
+          );
+        }
       }
       if (doses.length >= limit) break;
       day = day.add(const Duration(days: 1));
@@ -323,23 +360,25 @@ class MedicationScheduleCalculator {
     while (!day.isAfter(lastDay)) {
       for (final plan in plans) {
         if (!plan.isScheduledOn(day)) continue;
-        final scheduledAt = DateTime(
-          day.year,
-          day.month,
-          day.day,
-          plan.time.hour,
-          plan.time.minute,
-        );
-        if (scheduledAt.isBefore(from) || scheduledAt.isAfter(through)) {
-          continue;
+        for (final time in plan.times) {
+          final scheduledAt = DateTime(
+            day.year,
+            day.month,
+            day.day,
+            time.hour,
+            time.minute,
+          );
+          if (scheduledAt.isBefore(from) || scheduledAt.isAfter(through)) {
+            continue;
+          }
+          doses.add(
+            PlannedMedicationDose(
+              id: doseId(plan.id, scheduledAt),
+              plan: plan,
+              scheduledAt: scheduledAt,
+            ),
+          );
         }
-        doses.add(
-          PlannedMedicationDose(
-            id: doseId(plan.id, scheduledAt),
-            plan: plan,
-            scheduledAt: scheduledAt,
-          ),
-        );
       }
       day = day.add(const Duration(days: 1));
     }

@@ -27,8 +27,16 @@ enum _TextKey {
   insightCycleLengthBody,
   insightCycleVariationTitle,
   insightCycleVariationBody,
+  insightCycleTimingReviewTitle,
+  insightCycleTimingReviewBody,
   insightPeriodDurationTitle,
   insightPeriodDurationBody,
+  insightPeriodTrackingTitle,
+  insightPeriodTrackingBody,
+  insightPeriodSymptomTitle,
+  insightPeriodSymptomBody,
+  insightPeriodDurationReviewTitle,
+  insightPeriodDurationReviewBody,
   insightFrequentMoodTitle,
   insightFrequentMoodBody,
   insightRecurringSymptomTitle,
@@ -50,12 +58,20 @@ enum _TextKey {
   insightAssociationTitle,
   insightAssociationSameDayBody,
   insightAssociationNextDayBody,
+  insightFoodObservationTitle,
+  insightFoodObservationBody,
+  insightFoodPatternBuildingTitle,
+  insightFoodPatternBuildingBody,
   insightFoodSensitivityTitle,
   insightFoodSensitivityBody,
+  insightContextAlsoSeen,
+  insightContextTrackNext,
   insightMedicationSkipAssociationTitle,
   insightMedicationSkipAssociationBody,
   insightMedicationAdherenceTitle,
   insightMedicationAdherenceBody,
+  insightDischargeBaselineTitle,
+  insightDischargeBaselineBody,
   insightFertileDischargeTitle,
   insightFertileDischargeBody,
   insightMenstrualDischargeTitle,
@@ -70,6 +86,10 @@ enum _TextKey {
   insightEvidenceCycles,
   insightEvidenceEntries,
   insightEvidenceRecords,
+  insightNotificationTitle,
+  insightNotificationBody,
+  insightNotificationChannelName,
+  insightNotificationChannelDescription,
   articles,
   explore,
   exploreSearchHint,
@@ -574,6 +594,7 @@ enum _TextKey {
   doseUnit,
   doseCountLabel,
   notificationTime,
+  selectAtLeastOneNotificationTime,
   repeatPeriod,
   everyDay,
   selectedDays,
@@ -685,9 +706,22 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightCycleVariationTitle: 'Döngü aralığın',
   _TextKey.insightCycleVariationBody:
       'Hesaplanabilen son {count} döngün {min}–{max} gün arasında değişti.',
+  _TextKey.insightCycleTimingReviewTitle: 'Bu döngünün zamanlamasını not ettim',
+  _TextKey.insightCycleTimingReviewBody:
+      'Son iki adet başlangıcın arasında {length} gün vardı. Tek bir döngü farklı olabilir; bu süre senin için olağandışıysa veya tekrar ederse bir sağlık profesyoneliyle görüş.',
   _TextKey.insightPeriodDurationTitle: 'Son tamamlanan kanama kaydın',
   _TextKey.insightPeriodDurationBody:
       'Ardışık kanama kayıtların {duration} gün sürdü.',
+  _TextKey.insightPeriodTrackingTitle: 'Yeni döngünün başlangıcı kaydedildi',
+  _TextKey.insightPeriodTrackingBody:
+      'Bu adet başlangıcını döngünün ilk referans noktası olarak not ettim. Bir sonraki başlangıç kaydında döngü süreni hesaplayıp kişisel değişimini karşılaştırabileceğiz.',
+  _TextKey.insightPeriodSymptomTitle: 'Adet dönemlerinde tekrarlayan belirti',
+  _TextKey.insightPeriodSymptomBody:
+      '{label}, kaydettiğin {total} adet döneminin {count} tanesinde görüldü. Şiddetini ve günlük akışı kaydetmek, bunun dönemler arasında değişip değişmediğini anlamamıza yardım eder.',
+  _TextKey.insightPeriodDurationReviewTitle:
+      'Kanama süresindeki değişikliği takip edelim',
+  _TextKey.insightPeriodDurationReviewBody:
+      'Son tamamlanan kanama kaydın {duration} gün sürdü{comparison}. Tek kayıt nedenini göstermez; süre senin için olağandışıysa, 7 günü aşıyorsa veya tekrar ederse sağlık profesyoneline danış.',
   _TextKey.insightFrequentMoodTitle: 'En sık kaydettiğin his',
   _TextKey.insightFrequentMoodBody:
       '{label}, ruh hâli girdiğin {total} günün {count} tanesinde yer aldı.',
@@ -721,9 +755,20 @@ const Map<_TextKey, String> _turkishTexts = {
       '{primary} kaydedilen {withTotal} günün {withEvent} tanesinde aynı gün {secondary} de kaydedildi (%{withPercent}). {primary} kaydedilmeyen {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; neden-sonuç değildir.',
   _TextKey.insightAssociationNextDayBody:
       '{primary} kaydedilen {withTotal} günün {withEvent} tanesini izleyen gün {secondary} kaydedildi (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; neden-sonuç değildir.',
+  _TextKey.insightFoodObservationTitle: 'Bunu birlikte takip edelim',
+  _TextKey.insightFoodObservationBody:
+      '{primary} ile {secondary} aynı kayıtta ilk kez birlikte göründü. Hassasiyet demek için çok erken. Benzer öğünleri; diğer içerikler, mevcut sindirim/enerji/uyku işaretleri, döngü fazı ve {primary} olmayan günlerle birlikte karşılaştırmaya devam edeceğiz.',
+  _TextKey.insightFoodPatternBuildingTitle:
+      'Besin ve sindirim örüntüsü oluşuyor',
+  _TextKey.insightFoodPatternBuildingBody:
+      '{primary} bulunan {withTotal} günün {withEvent} tanesinde {secondary} da kaydedildi. Bu eşleşme tekrar ediyor, ancak henüz hassasiyet sonucu çıkarılamaz. {primary} olmayan günler ve diğer etkenler arttıkça karşılaştırma daha anlamlı olacak.',
   _TextKey.insightFoodSensitivityTitle: 'Besin ve sindirim örüntüsü',
   _TextKey.insightFoodSensitivityBody:
-      '{primary} içeren öğünlerden sonraki {withTotal} kaydın {withEvent} tanesinde {secondary} işaretlendi (%{withPercent}). {primary} olmayan {withoutTotal} karşılaştırılabilir kayıtta bu oran %{withoutPercent}. Bu örüntü bir hassasiyet olasılığını düşündürebilir; tanı değildir. Tekrarlarsa bir sağlık profesyoneliyle görüş.',
+      '{primary} içeren öğünlerden sonraki {withTotal} kaydın {withEvent} tanesinde {secondary} işaretlendi (%{withPercent}). {primary} olmayan {withoutTotal} karşılaştırılabilir kayıtta bu oran %{withoutPercent}. Bu örüntü olası bir hassasiyetle uyumlu olabilir; tanı değildir. Bir besini elemeden önce sağlık profesyoneliyle görüş.',
+  _TextKey.insightContextAlsoSeen:
+      'Aynı günlerde {contexts} da sık kaydedildi; bunlar sonucu etkiliyor olabilir.',
+  _TextKey.insightContextTrackNext:
+      'Daha net ayırmak için diğer öğün içeriklerini, belirtinin zamanını ve mevcut sindirim, enerji, uyku ile döngü işaretlerini de kaydet.',
   _TextKey.insightMedicationSkipAssociationTitle:
       'Doz yanıtından sonra görülen örüntü',
   _TextKey.insightMedicationSkipAssociationBody:
@@ -731,6 +776,9 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightMedicationAdherenceTitle: 'Planlanan doz yanıtların',
   _TextKey.insightMedicationAdherenceBody:
       'Zamanı geçmiş {total} planlı dozun {taken} tanesini “alındı” olarak yanıtladın. Yanıtsız dozlar alındı sayılmaz.',
+  _TextKey.insightDischargeBaselineTitle: 'Akıntı kaydını bağlama ekledim',
+  _TextKey.insightDischargeBaselineBody:
+      'Son {color}{consistency} kaydında eşlik eden bir bulgu işaretlenmedi. Berrak veya beyaz akıntı ve kıvam değişimleri döngü boyunca görülebilir; senin olağan örüntünü anlamak için renk, kıvam, koku ve döngü zamanını birlikte izleyeceğim.',
   _TextKey.insightFertileDischargeTitle:
       'Akıntı kaydı ve tahmini verimli dönem',
   _TextKey.insightFertileDischargeBody:
@@ -750,6 +798,12 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightEvidenceCycles: 'Hesaplanan döngü: {count}',
   _TextKey.insightEvidenceEntries: 'İşaretleme girişi: {count}',
   _TextKey.insightEvidenceRecords: 'Kayıt: {count}',
+  _TextKey.insightNotificationTitle: 'Yeni bir OMA içgörüsü hazır',
+  _TextKey.insightNotificationBody:
+      'Kayıtlarında takip etmeye değer yeni bir bağlantı var. Ayrıntıları uygulamada gör.',
+  _TextKey.insightNotificationChannelName: 'Kişisel içgörüler',
+  _TextKey.insightNotificationChannelDescription:
+      'Yeni ve önemli kişisel örüntüler hazır olduğunda haber verir.',
   _TextKey.articles: 'Yazılar',
   _TextKey.explore: 'Keşfet',
   _TextKey.exploreSearchHint: 'Yazı ve ritüellerde ara...',
@@ -987,7 +1041,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.symptomSleep: 'Uyku',
   _TextKey.symptomDigestion: 'Sindirim',
   _TextKey.dreamQuestion: 'Rüya gördün mü?',
-  _TextKey.dreamNoteQuestion: 'Rüyanı not etmek ister misin?',
+  _TextKey.dreamNoteQuestion: 'Rüyanı kaydetmek ister misin?',
   _TextKey.dreamNoteHint: 'Hatırladığın kadarıyla rüyanı yazabilirsin',
   _TextKey.moodBehindQuestion: '{mood} hissetmenin ardında ne var?',
   _TextKey.moodContextHint:
@@ -1320,6 +1374,8 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.doseUnit: 'Adet',
   _TextKey.doseCountLabel: '{count} Adet',
   _TextKey.notificationTime: 'Bildirim saati',
+  _TextKey.selectAtLeastOneNotificationTime:
+      'En az bir bildirim saati seçmelisin.',
   _TextKey.repeatPeriod: 'Tekrarlama periyodu',
   _TextKey.everyDay: 'Her gün',
   _TextKey.selectedDays: 'Seçili günler',
@@ -1396,9 +1452,23 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightCycleVariationTitle: 'Your cycle range',
   _TextKey.insightCycleVariationBody:
       'Your latest {count} calculable cycles ranged from {min} to {max} days.',
+  _TextKey.insightCycleTimingReviewTitle: 'I noted this cycle timing',
+  _TextKey.insightCycleTimingReviewBody:
+      'There were {length} days between your two latest period starts. A single cycle can differ; contact a healthcare professional if this is unusual for you or repeats.',
   _TextKey.insightPeriodDurationTitle: 'Latest completed bleeding record',
   _TextKey.insightPeriodDurationBody:
       'Your consecutive bleeding records lasted {duration} days.',
+  _TextKey.insightPeriodTrackingTitle: 'A new cycle start is recorded',
+  _TextKey.insightPeriodTrackingBody:
+      'I saved this period start as the first reference point for your cycle. When you record the next start, we can calculate your cycle length and compare your personal variation.',
+  _TextKey.insightPeriodSymptomTitle:
+      'A symptom repeating across period records',
+  _TextKey.insightPeriodSymptomBody:
+      '{label} appeared in {count} of your {total} recorded periods. Logging its intensity and daily flow will help show whether it changes between periods.',
+  _TextKey.insightPeriodDurationReviewTitle:
+      'Let’s follow this bleeding-duration change',
+  _TextKey.insightPeriodDurationReviewBody:
+      'Your latest completed bleeding record lasted {duration} days{comparison}. One record cannot show the reason; contact a healthcare professional if this is unusual for you, lasts longer than 7 days, or repeats.',
   _TextKey.insightFrequentMoodTitle: 'Your most logged feeling',
   _TextKey.insightFrequentMoodBody:
       '{label} appeared on {count} of the {total} days when you logged a mood.',
@@ -1431,9 +1501,20 @@ const Map<_TextKey, String> _englishTexts = {
       'On {withEvent} of {withTotal} days with {primary}, {secondary} was also logged that day ({withPercent}%). On {withoutTotal} comparable days without {primary}, the rate was {withoutPercent}%. This is an association, not cause and effect.',
   _TextKey.insightAssociationNextDayBody:
       '{secondary} was logged the next day after {withEvent} of {withTotal} days with {primary} ({withPercent}%). On the other {withoutTotal} comparable days, the rate was {withoutPercent}%. This is an association, not cause and effect.',
+  _TextKey.insightFoodObservationTitle: 'Let’s follow this together',
+  _TextKey.insightFoodObservationBody:
+      '{primary} and {secondary} appeared in the same entry for the first time. It is too early to call this a sensitivity. We will compare similar meals alongside other ingredients, existing digestion/energy/sleep check-ins, cycle phase, and days without {primary}.',
+  _TextKey.insightFoodPatternBuildingTitle:
+      'A food and digestion pattern is forming',
+  _TextKey.insightFoodPatternBuildingBody:
+      '{secondary} was also recorded on {withEvent} of {withTotal} days with {primary}. The pairing is repeating, but it is still too early to infer a sensitivity. More days without {primary} and more context will make the comparison more useful.',
   _TextKey.insightFoodSensitivityTitle: 'Food and digestion pattern',
   _TextKey.insightFoodSensitivityBody:
-      '{secondary} was logged after {withEvent} of {withTotal} meals containing {primary} ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable logs without {primary}. This pattern may suggest a possible sensitivity, but it is not a diagnosis. Consult a healthcare professional if it repeats.',
+      '{secondary} was logged after {withEvent} of {withTotal} meals containing {primary} ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable logs without {primary}. This may be compatible with a possible sensitivity, but it is not a diagnosis. Talk to a healthcare professional before eliminating a food.',
+  _TextKey.insightContextAlsoSeen:
+      '{contexts} also appeared often on the same days and may be affecting the result.',
+  _TextKey.insightContextTrackNext:
+      'To separate the signals, also log other meal ingredients, symptom timing, and the existing digestion, energy, sleep, and cycle check-ins.',
   _TextKey.insightMedicationSkipAssociationTitle:
       'Pattern after a dose response',
   _TextKey.insightMedicationSkipAssociationBody:
@@ -1441,6 +1522,10 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightMedicationAdherenceTitle: 'Your planned dose responses',
   _TextKey.insightMedicationAdherenceBody:
       'You marked {taken} of {total} past planned doses as “taken”. Unanswered doses are not counted as taken.',
+  _TextKey.insightDischargeBaselineTitle:
+      'I added this discharge entry to your baseline',
+  _TextKey.insightDischargeBaselineBody:
+      'No accompanying finding was marked with your latest {color}{consistency} entry. Clear or white discharge and consistency can change across the cycle; I will follow color, consistency, odor, and cycle timing together to learn what is usual for you.',
   _TextKey.insightFertileDischargeTitle:
       'Discharge entry and estimated fertile window',
   _TextKey.insightFertileDischargeBody:
@@ -1460,6 +1545,12 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightEvidenceCycles: 'Calculated cycles: {count}',
   _TextKey.insightEvidenceEntries: 'Check entries: {count}',
   _TextKey.insightEvidenceRecords: 'Records: {count}',
+  _TextKey.insightNotificationTitle: 'A new OMA insight is ready',
+  _TextKey.insightNotificationBody:
+      'There is a new connection worth following in your logs. Open the app for details.',
+  _TextKey.insightNotificationChannelName: 'Personal insights',
+  _TextKey.insightNotificationChannelDescription:
+      'Alerts you when a new, meaningful personal pattern is ready.',
   _TextKey.articles: 'Articles',
   _TextKey.explore: 'Explore',
   _TextKey.exploreSearchHint: 'Search for stories, rituals...',
@@ -1695,7 +1786,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.symptomSleep: 'Sleep',
   _TextKey.symptomDigestion: 'Digestion',
   _TextKey.dreamQuestion: 'Did you dream?',
-  _TextKey.dreamNoteQuestion: 'Would you like to note your dream?',
+  _TextKey.dreamNoteQuestion: 'Would you like to record your dream?',
   _TextKey.dreamNoteHint: 'Write down as much of your dream as you remember',
   _TextKey.moodBehindQuestion: 'What’s behind feeling {mood}?',
   _TextKey.moodContextHint:
@@ -2027,6 +2118,8 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.doseUnit: 'Count',
   _TextKey.doseCountLabel: '{count} count',
   _TextKey.notificationTime: 'Notification time',
+  _TextKey.selectAtLeastOneNotificationTime:
+      'Choose at least one notification time.',
   _TextKey.repeatPeriod: 'Repeat period',
   _TextKey.everyDay: 'Every day',
   _TextKey.selectedDays: 'Selected days',
@@ -2184,17 +2277,27 @@ const Map<_ListKey, List<String>> _turkishLists = {
   ],
   _ListKey.nutritionFoodGroups: [
     'Gluten',
+    'Buğday',
     'Süt ürünleri',
+    'Laktoz içeren',
     'Yumurta',
     'Kuruyemiş',
+    'Yer fıstığı',
+    'Soya',
+    'Susam',
     'Baklagiller',
     'Kırmızı et',
     'Tavuk',
     'Balık',
+    'Kabuklu deniz ürünleri',
     'Sebze',
     'Meyve',
+    'Soğan / sarımsak',
     'İşlenmiş gıda',
     'Acı / baharatlı',
+    'Çok yağlı / kızartma',
+    'Yapay tatlandırıcılı',
+    'Kafeinli',
   ],
   _ListKey.postMealFeelings: [
     'Rahat',
@@ -2468,17 +2571,27 @@ const Map<_ListKey, List<String>> _englishLists = {
   ],
   _ListKey.nutritionFoodGroups: [
     'Gluten',
+    'Wheat',
     'Dairy',
+    'Lactose-containing',
     'Eggs',
     'Nuts',
+    'Peanuts',
+    'Soy',
+    'Sesame',
     'Legumes',
     'Red meat',
     'Poultry',
     'Fish',
+    'Crustacean shellfish',
     'Vegetables',
     'Fruit',
+    'Onion / garlic',
     'Processed food',
     'Spicy food',
+    'High-fat / fried',
+    'Artificially sweetened',
+    'Caffeinated',
   ],
   _ListKey.postMealFeelings: [
     'Comfortable',
@@ -2666,6 +2779,7 @@ class AppStrings {
       'metric:below_typical_water';
   static const dischargeColorFeaturePrefix = 'dischargeColor:';
   static const dischargeConsistencyFeaturePrefix = 'dischargeConsistency:';
+  static const dischargeSymptomFeaturePrefix = 'dischargeSymptom:';
   static const cyclePhaseFeaturePrefix = 'cyclePhase:';
 
   static const delegate = _AppStringsDelegate();
@@ -2775,6 +2889,11 @@ class AppStrings {
         value.substring(dischargeConsistencyFeaturePrefix.length),
       );
     }
+    if (value.startsWith(dischargeSymptomFeaturePrefix)) {
+      return dischargeSymptomLabelByName(
+        value.substring(dischargeSymptomFeaturePrefix.length),
+      );
+    }
     if (value.startsWith(cyclePhaseFeaturePrefix)) {
       return switch (value.substring(cyclePhaseFeaturePrefix.length)) {
         'menstrual' => menstrualPhase,
@@ -2857,10 +2976,43 @@ class AppStrings {
     'min': min,
     'max': max,
   });
+  static String get insightCycleTimingReviewTitle =>
+      _text(_TextKey.insightCycleTimingReviewTitle);
+  static String insightCycleTimingReviewBody(int length) =>
+      _format(_TextKey.insightCycleTimingReviewBody, {'length': length});
   static String get insightPeriodDurationTitle =>
       _text(_TextKey.insightPeriodDurationTitle);
   static String insightPeriodDurationBody(int duration) =>
       _format(_TextKey.insightPeriodDurationBody, {'duration': duration});
+  static String get insightPeriodTrackingTitle =>
+      _text(_TextKey.insightPeriodTrackingTitle);
+  static String get insightPeriodTrackingBody =>
+      _text(_TextKey.insightPeriodTrackingBody);
+  static String get insightPeriodSymptomTitle =>
+      _text(_TextKey.insightPeriodSymptomTitle);
+  static String insightPeriodSymptomBody({
+    required String label,
+    required int count,
+    required int total,
+  }) => _format(_TextKey.insightPeriodSymptomBody, {
+    'label': label,
+    'count': count,
+    'total': total,
+  });
+  static String get insightPeriodDurationReviewTitle =>
+      _text(_TextKey.insightPeriodDurationReviewTitle);
+  static String insightPeriodDurationReviewBody({
+    required int duration,
+    int? comparison,
+  }) => _format(_TextKey.insightPeriodDurationReviewBody, {
+    'duration': duration,
+    'comparison': comparison == null
+        ? ''
+        : (isTurkish
+              ? '; önceki tamamlanmış kayıtlarının ortancası $comparison gündü'
+              : '; the median of your earlier completed records was '
+                    '$comparison days'),
+  });
   static String get insightFrequentMoodTitle =>
       _text(_TextKey.insightFrequentMoodTitle);
   static String insightFrequentMoodBody({
@@ -3001,6 +3153,28 @@ class AppStrings {
       'withoutPercent': withoutPercent,
     },
   );
+  static String get insightFoodObservationTitle =>
+      _text(_TextKey.insightFoodObservationTitle);
+  static String insightFoodObservationBody({
+    required String primary,
+    required String secondary,
+  }) => _format(_TextKey.insightFoodObservationBody, {
+    'primary': primary,
+    'secondary': secondary,
+  });
+  static String get insightFoodPatternBuildingTitle =>
+      _text(_TextKey.insightFoodPatternBuildingTitle);
+  static String insightFoodPatternBuildingBody({
+    required String primary,
+    required String secondary,
+    required int withEvent,
+    required int withTotal,
+  }) => _format(_TextKey.insightFoodPatternBuildingBody, {
+    'primary': primary,
+    'secondary': secondary,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+  });
   static String get insightFoodSensitivityTitle =>
       _text(_TextKey.insightFoodSensitivityTitle);
   static String insightFoodSensitivityBody({
@@ -3020,6 +3194,13 @@ class AppStrings {
     'withPercent': withPercent,
     'withoutPercent': withoutPercent,
   });
+  static String insightContextNote(List<String> contexts) {
+    if (contexts.isEmpty) return _text(_TextKey.insightContextTrackNext);
+    return _format(_TextKey.insightContextAlsoSeen, {
+      'contexts': contexts.join(', '),
+    });
+  }
+
   static String get insightMedicationSkipAssociationTitle =>
       _text(_TextKey.insightMedicationSkipAssociationTitle);
   static String insightMedicationSkipAssociationBody({
@@ -3047,6 +3228,15 @@ class AppStrings {
   }) => _format(_TextKey.insightMedicationAdherenceBody, {
     'taken': taken,
     'total': total,
+  });
+  static String get insightDischargeBaselineTitle =>
+      _text(_TextKey.insightDischargeBaselineTitle);
+  static String insightDischargeBaselineBody({
+    required String color,
+    String? consistency,
+  }) => _format(_TextKey.insightDischargeBaselineBody, {
+    'color': color,
+    'consistency': consistency == null ? '' : ', $consistency',
   });
   static String get insightFertileDischargeTitle =>
       _text(_TextKey.insightFertileDischargeTitle);
@@ -3088,6 +3278,14 @@ class AppStrings {
       _format(_TextKey.insightEvidenceEntries, {'count': count});
   static String insightEvidenceRecords(int count) =>
       _format(_TextKey.insightEvidenceRecords, {'count': count});
+  static String get insightNotificationTitle =>
+      _text(_TextKey.insightNotificationTitle);
+  static String get insightNotificationBody =>
+      _text(_TextKey.insightNotificationBody);
+  static String get insightNotificationChannelName =>
+      _text(_TextKey.insightNotificationChannelName);
+  static String get insightNotificationChannelDescription =>
+      _text(_TextKey.insightNotificationChannelDescription);
   static String get articles => _text(_TextKey.articles);
   static String get explore => _text(_TextKey.explore);
   static String get exploreSearchHint => _text(_TextKey.exploreSearchHint);
@@ -3723,6 +3921,8 @@ class AppStrings {
   static String dosageCount(int count) =>
       _format(_TextKey.doseCountLabel, {'count': count});
   static String get notificationTime => _text(_TextKey.notificationTime);
+  static String get selectAtLeastOneNotificationTime =>
+      _text(_TextKey.selectAtLeastOneNotificationTime);
   static String get repeatPeriod => _text(_TextKey.repeatPeriod);
   static String get everyDay => _text(_TextKey.everyDay);
   static String get selectedDays => _text(_TextKey.selectedDays);
@@ -3868,6 +4068,18 @@ class AppStrings {
       _ => -1,
     };
     return index < 0 ? name : dischargeConsistencyOptions[index];
+  }
+
+  static String dischargeSymptomLabelByName(String name) {
+    final index = switch (name) {
+      'unusualOdor' => 0,
+      'itching' => 1,
+      'burning' => 2,
+      'painfulUrination' => 3,
+      'pelvicPain' => 4,
+      _ => -1,
+    };
+    return index < 0 ? name : dischargeSymptomOptions[index];
   }
 
   static List<String> get shortWeekdays => _list(_ListKey.shortWeekdays);

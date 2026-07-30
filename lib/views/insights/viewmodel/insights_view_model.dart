@@ -23,19 +23,11 @@ class InsightsViewModel extends ChangeNotifier {
     final logs = _storage.loadAllLogs();
     final doseRecords = _storage.loadMedicationDoseRecords();
     final settings = _storage.loadSettings();
-    _insights = _engine
-        .generate(logs, doseRecords: doseRecords, settings: settings)
-        .where(
-          (insight) =>
-              insight.kind != PersonalInsightKind.dataBuilding &&
-              insight.kind != PersonalInsightKind.recordingSummary &&
-              insight.kind != PersonalInsightKind.frequentMood &&
-              insight.kind != PersonalInsightKind.recurringSymptom &&
-              insight.kind != PersonalInsightKind.frequentActivity &&
-              insight.kind != PersonalInsightKind.frequentNutrition &&
-              insight.kind != PersonalInsightKind.frequentBowel,
-        )
-        .toList(growable: false);
+    _insights = _engine.generate(
+      logs,
+      doseRecords: doseRecords,
+      settings: settings,
+    );
 
     _isLoading = false;
     notifyListeners();

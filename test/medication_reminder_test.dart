@@ -17,6 +17,8 @@ void main() {
     Set<int> weekdays = const {1, 2, 3, 4, 5, 6, 7},
     DateTime? startDate,
     DateTime? endDate,
+    List<ReminderClockTime>? times,
+    bool enabled = true,
   }) {
     final createdAt = DateTime(2026, 7, 1);
     return MedicationReminderPlan(
@@ -25,11 +27,12 @@ void main() {
       itemName: 'Test ilacı',
       dosage: '1 Adet',
       time: const ReminderClockTime(hour: 9, minute: 30),
+      times: times,
       frequency: frequency,
       weekdays: weekdays,
       startDate: startDate ?? DateTime(2026, 7, 20),
       endDate: endDate,
-      enabled: true,
+      enabled: enabled,
       createdAt: createdAt,
       updatedAt: createdAt,
     );
@@ -85,6 +88,31 @@ void main() {
     );
 
     expect(doses.single.scheduledAt, DateTime(2027, 1, 1, 9, 30));
+  });
+
+  test('sabah, öğle ve akşam için üç ayrı doz ve bildirim saati üretir', () {
+    final reminderPlan = plan(
+      times: const [
+        ReminderClockTime(hour: 8, minute: 15),
+        ReminderClockTime(hour: 13, minute: 0),
+        ReminderClockTime(hour: 21, minute: 30),
+      ],
+    );
+    final doses = MedicationScheduleCalculator.between(
+      plans: [reminderPlan],
+      from: DateTime(2026, 7, 20),
+      through: DateTime(2026, 7, 20, 23, 59),
+    );
+
+    expect(doses.map((dose) => dose.scheduledAt), [
+      DateTime(2026, 7, 20, 8, 15),
+      DateTime(2026, 7, 20, 13),
+      DateTime(2026, 7, 20, 21, 30),
+    ]);
+    expect(
+      MedicationReminderPlan.fromJson(reminderPlan.toJson()).times,
+      hasLength(3),
+    );
   });
 
   test('planlanan doz ve yanıtı yerel depoda kalıcı tutulur', () async {
@@ -170,6 +198,21 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Bildirim saati'), findsOneWidget);
+    for (final timeLabel in AppStrings.medicationTimes) {
+      expect(find.text(timeLabel), findsOneWidget);
+    }
+    expect(
+      tester
+          .widget<Switch>(find.byKey(const ValueKey('reminder_time_toggle_0')))
+          .value,
+      isTrue,
+    );
+    expect(
+      tester
+          .widget<Switch>(find.byKey(const ValueKey('reminder_time_toggle_1')))
+          .value,
+      isFalse,
+    );
     expect(find.text('Tekrarlama periyodu'), findsOneWidget);
     expect(find.text('Başlangıç tarihi'), findsOneWidget);
     expect(find.text('Bitiş tarihi'), findsOneWidget);
@@ -180,5 +223,65 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('reminder_dose_increment')));
     await tester.pump();
     expect(find.text(AppStrings.dosageCount(3)), findsOneWidget);
+  });
+
+  testWidgets('kapatılan planın bugünkü eski dozu ana sayfada gösterilmez', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await storage.init();
+    await AppStrings.delegate.load(const Locale('tr', 'TR'));
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final activePlan = plan(
+      startDate: today,
+      times: [ReminderClockTime(hour: now.hour, minute: now.minute)],
+    );
+    await storage.saveMedicationReminderPlans([activePlan]);
+    final scheduledAt = DateTime(
+      today.year,
+      today.month,
+      today.day,
+      now.hour,
+      now.minute,
+    );
+    await storage.saveMedicationDoseRecords([
+      MedicationDoseRecord(
+        id: MedicationScheduleCalculator.doseId(activePlan.id, scheduledAt),
+        planId: activePlan.id,
+        itemType: MedicationPlanItemType.medication,
+        itemName: activePlan.itemName,
+        dosage: activePlan.dosage,
+        scheduledAt: scheduledAt,
+        notificationScheduled: true,
+        notificationScheduledAt: now,
+        status: null,
+        respondedAt: null,
+      ),
+    ]);
+
+    Widget card() => Provider<LocalStorageService>.value(
+      value: storage,
+      child: MaterialApp(
+        home: Scaffold(
+          body: TodaysMedicationDosesCard(color: AppColors.medicationPrimary),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(card());
+    expect(
+      find.byKey(const ValueKey('dashboard_planned_doses')),
+      findsOneWidget,
+    );
+
+    await storage.upsertMedicationReminderPlan(
+      activePlan.copyWith(enabled: false, updatedAt: DateTime.now()),
+    );
+    await tester.pumpWidget(card());
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('dashboard_planned_doses')), findsNothing);
   });
 }

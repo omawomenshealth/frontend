@@ -75,11 +75,21 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, now.day);
     final end = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+    final activePlans = _storage
+        .loadMedicationReminderPlans()
+        .where((plan) => plan.enabled)
+        .toList(growable: false);
+    final activeDoseIds = MedicationScheduleCalculator.between(
+      plans: activePlans,
+      from: start,
+      through: end,
+    ).map((dose) => dose.id).toSet();
     _doses =
         _storage
             .loadMedicationDoseRecords()
             .where(
               (dose) =>
+                  activeDoseIds.contains(dose.id) &&
                   !dose.scheduledAt.isBefore(start) &&
                   !dose.scheduledAt.isAfter(end),
             )
@@ -87,6 +97,12 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
           ..sort(
             (left, right) => left.scheduledAt.compareTo(right.scheduledAt),
           );
+  }
+
+  @override
+  void didUpdateWidget(covariant TodaysMedicationDosesCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _reload();
   }
 
   Future<void> _record(
@@ -251,12 +267,14 @@ class MedicationReminderSection extends StatefulWidget {
   final MedicationPlanItemType itemType;
   final List<String> availableItems;
   final Color color;
+  final VoidCallback? onChanged;
 
   const MedicationReminderSection({
     super.key,
     required this.itemType,
     required this.availableItems,
     required this.color,
+    this.onChanged,
   });
 
   @override
@@ -323,6 +341,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
       requestPermission: requestPermission,
     );
     _reload();
+    widget.onChanged?.call();
 
     if (!mounted) return;
     setState(() => _busy = false);
@@ -376,6 +395,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
       notificationScheduledDoseIds: scheduledDoseIds,
     );
     _reload();
+    widget.onChanged?.call();
     if (!mounted) return;
     setState(() => _busy = false);
     ScaffoldMessenger.of(
@@ -464,7 +484,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
   }
 
   Widget _buildPlanCard(MedicationReminderPlan plan) {
-    final time = _formatTime(plan.time);
+    final time = plan.times.map(_formatTime).join(' · ');
     final schedule = plan.frequency == MedicationPlanFrequency.everyDay
         ? AppStrings.reminderSummaryDaily(time)
         : AppStrings.reminderSummaryDays(
@@ -578,7 +598,7 @@ class _MedicationReminderFormSheetState
   late List<String> _itemOptions;
   late String _selectedItem;
   late int _doseCount;
-  late TimeOfDay _time;
+  late List<TimeOfDay?> _times;
   late MedicationPlanFrequency _frequency;
   late Set<int> _weekdays;
   late DateTime _startDate;
@@ -614,9 +634,19 @@ class _MedicationReminderFormSheetState
     final initialDosage = widget.initialDosage?.trim();
     _doseCount = _doseCountFromText(existing?.dosage ?? initialDosage);
 
-    _time = existing == null
-        ? const TimeOfDay(hour: 9, minute: 0)
-        : TimeOfDay(hour: existing.time.hour, minute: existing.time.minute);
+    _times = List<TimeOfDay?>.filled(3, null);
+    if (existing == null) {
+      _times[0] = const TimeOfDay(hour: 9, minute: 0);
+    } else {
+      for (final clock in existing.times) {
+        var slot = _slotForHour(clock.hour);
+        if (_times[slot] != null) {
+          slot = _times.indexWhere((value) => value == null);
+        }
+        if (slot == -1) break;
+        _times[slot] = TimeOfDay(hour: clock.hour, minute: clock.minute);
+      }
+    }
     _frequency = existing?.frequency ?? MedicationPlanFrequency.everyDay;
     _weekdays = Set<int>.from(
       existing?.weekdays ?? const {1, 2, 3, 4, 5, 6, 7},
@@ -734,12 +764,19 @@ class _MedicationReminderFormSheetState
                 ),
               ),
               const SizedBox(height: 12),
-              _pickerTile(
-                icon: Icons.schedule_rounded,
-                label: AppStrings.notificationTime,
-                value: _time.format(context),
-                onTap: _pickTime,
+              Text(
+                AppStrings.notificationTime,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
               ),
+              const SizedBox(height: 8),
+              for (var index = 0; index < _times.length; index++) ...[
+                _buildTimeSlot(index),
+                if (index != _times.length - 1) const SizedBox(height: 8),
+              ],
               const SizedBox(height: 12),
               DropdownButtonFormField<MedicationPlanFrequency>(
                 initialValue: _frequency,
@@ -846,9 +883,58 @@ class _MedicationReminderFormSheetState
     );
   }
 
-  Future<void> _pickTime() async {
-    final value = await showTimePicker(context: context, initialTime: _time);
-    if (value != null && mounted) setState(() => _time = value);
+  Widget _buildTimeSlot(int index) {
+    final value = _times[index];
+    return Container(
+      key: ValueKey('reminder_time_slot_$index'),
+      padding: const EdgeInsets.fromLTRB(12, 5, 4, 5),
+      decoration: BoxDecoration(
+        color: AppColors.scaffoldBackground,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.outline),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.schedule_rounded,
+            size: 19,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              AppStrings.medicationTimes[index],
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          if (value != null)
+            TextButton(
+              key: ValueKey('reminder_time_pick_$index'),
+              onPressed: () => _pickTime(index),
+              child: Text(value.format(context)),
+            ),
+          Switch(
+            key: ValueKey('reminder_time_toggle_$index'),
+            value: value != null,
+            onChanged: (enabled) => setState(() {
+              _times[index] = enabled ? _defaultTimeForSlot(index) : null;
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickTime(int index) async {
+    final value = await showTimePicker(
+      context: context,
+      initialTime: _times[index] ?? _defaultTimeForSlot(index),
+    );
+    if (value != null && mounted) setState(() => _times[index] = value);
   }
 
   Future<void> _pickDate({required bool isStart}) async {
@@ -873,6 +959,11 @@ class _MedicationReminderFormSheetState
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final selectedTimes = _times.whereType<TimeOfDay>().toList();
+    if (selectedTimes.isEmpty) {
+      _showValidation(AppStrings.selectAtLeastOneNotificationTime);
+      return;
+    }
     if (_frequency == MedicationPlanFrequency.selectedWeekdays &&
         _weekdays.isEmpty) {
       _showValidation(AppStrings.selectAtLeastOneDay);
@@ -888,12 +979,18 @@ class _MedicationReminderFormSheetState
     final itemName = _selectedItem == AppStrings.custom
         ? _customItemController.text.trim()
         : _selectedItem;
+    final reminderTimes = selectedTimes
+        .map(
+          (value) => ReminderClockTime(hour: value.hour, minute: value.minute),
+        )
+        .toList();
     final plan = MedicationReminderPlan(
       id: existing?.id ?? 'plan_${now.microsecondsSinceEpoch}',
       itemType: widget.itemType,
       itemName: itemName,
       dosage: AppStrings.dosageCount(_doseCount),
-      time: ReminderClockTime(hour: _time.hour, minute: _time.minute),
+      time: reminderTimes.first,
+      times: reminderTimes,
       frequency: _frequency,
       weekdays: _frequency == MedicationPlanFrequency.everyDay
           ? const {1, 2, 3, 4, 5, 6, 7}
@@ -923,4 +1020,16 @@ class _MedicationReminderFormSheetState
     final match = RegExp(r'\d+').firstMatch(value);
     return (int.tryParse(match?.group(0) ?? '') ?? 1).clamp(1, 12);
   }
+
+  int _slotForHour(int hour) {
+    if (hour < 12) return 0;
+    if (hour < 17) return 1;
+    return 2;
+  }
+
+  TimeOfDay _defaultTimeForSlot(int index) => switch (index) {
+    0 => const TimeOfDay(hour: 9, minute: 0),
+    1 => const TimeOfDay(hour: 13, minute: 0),
+    _ => const TimeOfDay(hour: 20, minute: 0),
+  };
 }

@@ -211,6 +211,42 @@ void main() {
     expect(association.lift, closeTo(8, 0.001));
   });
 
+  test('laktoz içeren öğünleri de karşılaştırmalı hassasiyet adayı yapar', () {
+    final logs = <DailyLog>[];
+    for (var day = 0; day < 20; day++) {
+      logs.add(
+        DailyLog(
+          date: DateTime(2026, 8, 1).add(Duration(days: day)),
+          mealTypes: const ['Öğle yemeği'],
+          mealFoodGroups: day < 10
+              ? const {
+                  'Öğle yemeği': ['Laktoz içeren'],
+                }
+              : const {
+                  'Öğle yemeği': ['Yumurta'],
+                },
+          postMealFeelings: day < 8 || day == 15
+              ? const ['Şişkin']
+              : const ['Rahat'],
+          observedSections: const {DailyLogObservedSection.nutrition},
+        ),
+      );
+    }
+
+    final association = engine
+        .generate(logs: logs)
+        .firstWhere(
+          (insight) =>
+              insight.kind == PersonalInsightKind.foodSensitivityAssociation &&
+              insight.primaryLabel == 'Laktoz içeren',
+        );
+
+    expect(association.withEventCount, 8);
+    expect(association.withTotal, 10);
+    expect(association.withoutEventCount, 1);
+    expect(association.withoutTotal, 10);
+  });
+
   test('ertesi gün oluşan bağlantıyı aynı gün bağlantısından ayırır', () {
     final logs = <DailyLog>[];
     for (var day = 0; day < 24; day++) {

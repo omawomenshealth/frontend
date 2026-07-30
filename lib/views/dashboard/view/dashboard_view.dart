@@ -132,7 +132,6 @@ class DashboardView extends StatelessWidget {
                         isSingleTab: true,
                       ),
                     ),
-                    TodaysMedicationDosesCard(color: accent),
                     const SizedBox(height: 38),
                     if (vm.personalInsights.isNotEmpty)
                       _PersonalInsightsPreview(
@@ -142,6 +141,7 @@ class DashboardView extends StatelessWidget {
                       )
                     else
                       _InsightPlaceholder(accent: accent),
+                    TodaysMedicationDosesCard(color: accent),
                   ],
                 ),
               ),

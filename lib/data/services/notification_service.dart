@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -26,11 +28,16 @@ class ReminderScheduleResult {
 /// "alındı/atlandı" yanıtı [MedicationDoseRecord] üzerinde ayrıca kaydedilir.
 class NotificationService {
   static const _payloadPrefix = 'oma_medication_dose:';
+  static const _insightPayloadPrefix = 'oma_insight:';
   static const _channelId = 'oma_medication_reminders_v1';
+  static const _insightChannelId = 'oma_personal_insights_v1';
   static const _maxPendingMedicationNotifications = 50;
 
   final FlutterLocalNotificationsPlugin _plugin;
+  final StreamController<String> _insightSelections =
+      StreamController<String>.broadcast();
   bool _initialized = false;
+  String? _pendingInsightSelection;
 
   NotificationService({FlutterLocalNotificationsPlugin? plugin})
     : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
@@ -39,6 +46,13 @@ class NotificationService {
       !kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.android ||
           defaultTargetPlatform == TargetPlatform.iOS);
+  Stream<String> get insightSelections => _insightSelections.stream;
+
+  String? takePendingInsightSelection() {
+    final value = _pendingInsightSelection;
+    _pendingInsightSelection = null;
+    return value;
+  }
 
   Future<void> init() async {
     if (!isSupported || _initialized) return;
@@ -55,7 +69,15 @@ class NotificationService {
     );
     const settings = InitializationSettings(android: android, iOS: ios);
 
-    await _plugin.initialize(settings: settings);
+    await _plugin.initialize(
+      settings: settings,
+      onDidReceiveNotificationResponse: _handleNotificationResponse,
+    );
+    final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+    final launchPayload = launchDetails?.notificationResponse?.payload;
+    if (launchDetails?.didNotificationLaunchApp ?? false) {
+      _captureInsightSelection(launchPayload);
+    }
     _initialized = true;
   }
 
@@ -83,6 +105,61 @@ class NotificationService {
         >()
         ?.requestPermissions(alert: true, badge: true, sound: true);
     return granted ?? false;
+  }
+
+  Future<bool> requestInsightPermissions() async {
+    if (!isSupported) return false;
+    await init();
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      return await android?.requestNotificationsPermission() ?? true;
+    }
+    return await _plugin
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >()
+            ?.requestPermissions(alert: true, badge: true, sound: true) ??
+        false;
+  }
+
+  Future<bool> scheduleInsightReady({
+    required String insightId,
+    DateTime? deliverAt,
+  }) async {
+    if (!isSupported) return false;
+    await init();
+
+    final scheduledAt =
+        deliverAt ?? DateTime.now().add(const Duration(seconds: 45));
+    final notificationId = _notificationId('insight:$insightId');
+    await _plugin.cancel(id: notificationId);
+    await _plugin.zonedSchedule(
+      id: notificationId,
+      title: AppStrings.insightNotificationTitle,
+      body: AppStrings.insightNotificationBody,
+      scheduledDate: timezone.TZDateTime.from(scheduledAt, timezone.local),
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          _insightChannelId,
+          AppStrings.insightNotificationChannelName,
+          channelDescription: AppStrings.insightNotificationChannelDescription,
+          importance: Importance.high,
+          priority: Priority.high,
+          category: AndroidNotificationCategory.status,
+          visibility: NotificationVisibility.secret,
+        ),
+        iOS: const DarwinNotificationDetails(
+          threadIdentifier: 'oma_personal_insights',
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: '$_insightPayloadPrefix$insightId',
+    );
+    return true;
   }
 
   /// Tüm OMA ilaç/takviye bildirimlerini yeniden üretir.
@@ -166,6 +243,18 @@ class NotificationService {
         await _plugin.cancel(id: notification.id);
       }
     }
+  }
+
+  void _handleNotificationResponse(NotificationResponse response) {
+    _captureInsightSelection(response.payload);
+  }
+
+  void _captureInsightSelection(String? payload) {
+    if (payload == null || !payload.startsWith(_insightPayloadPrefix)) return;
+    final insightId = payload.substring(_insightPayloadPrefix.length);
+    if (insightId.isEmpty) return;
+    _pendingInsightSelection = insightId;
+    _insightSelections.add(insightId);
   }
 
   /// FNV-1a ile süreçler arasında kararlı, pozitif 31 bit bildirim kimliği.

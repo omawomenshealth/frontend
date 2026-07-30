@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -90,17 +91,36 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final _navigatorKey = GlobalKey<NavigatorState>();
   final _homeShellKey = GlobalKey<_HomeShellState>();
+  StreamSubscription<String>? _insightNotificationSubscription;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _insightNotificationSubscription = widget
+        .notificationService
+        ?.insightSelections
+        .listen((_) => _showInsightsFromNotification());
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _insightNotificationSubscription?.cancel();
     super.dispose();
+  }
+
+  void _showInsightsFromNotification() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final navigator = _navigatorKey.currentState;
+      final homeShell = _homeShellKey.currentState;
+      if (navigator == null || homeShell == null || !homeShell.mounted) return;
+      widget.notificationService?.takePendingInsightSelection();
+      navigator.popUntil(
+        (route) => route.settings.name == '/home' || route.isFirst,
+      );
+      homeShell.showInsightsPage();
+    });
   }
 
   @override
@@ -147,7 +167,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) => OnboardingViewModel(widget.storage, syncService),
         ),
         ChangeNotifierProvider(
-          create: (_) => DashboardViewModel(widget.storage),
+          create: (_) => DashboardViewModel(widget.storage, reminders),
         ),
         ChangeNotifierProvider(
           create: (_) => InsightsViewModel(widget.storage),
@@ -208,10 +228,19 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
     setState(() => _currentIndex = 0);
   }
 
+  void showInsightsPage() => _selectPage(2);
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final notifications = context.read<NotificationService>();
+      if (notifications.takePendingInsightSelection() != null) {
+        showInsightsPage();
+      }
+    });
   }
 
   @override

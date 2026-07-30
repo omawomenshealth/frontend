@@ -422,7 +422,11 @@ class _InsightStoryPage extends StatelessWidget {
     return switch (value.kind) {
       PersonalInsightKind.cycleLength ||
       PersonalInsightKind.cycleVariation ||
-      PersonalInsightKind.periodDuration => [
+      PersonalInsightKind.cycleTimingReview ||
+      PersonalInsightKind.periodDuration ||
+      PersonalInsightKind.periodTrackingStarted ||
+      PersonalInsightKind.periodSymptomPattern ||
+      PersonalInsightKind.periodDurationReview => [
         AppStrings.myCycles,
         AppStrings.dailyLog,
       ],
@@ -439,10 +443,23 @@ class _InsightStoryPage extends StatelessWidget {
         AppStrings.nutrition,
         AppStrings.energyLevel,
       ],
+      PersonalInsightKind.foodObservationStarted ||
+      PersonalInsightKind.foodPatternBuilding ||
+      PersonalInsightKind.foodSensitivityAssociation => [
+        AppStrings.nutrition,
+        AppStrings.dailyFactors,
+      ],
       PersonalInsightKind.medicationAdherence ||
       PersonalInsightKind.medicationSkipSymptomAssociation => [
         AppStrings.medications,
         AppStrings.dailyLog,
+      ],
+      PersonalInsightKind.dischargeBaselineObservation ||
+      PersonalInsightKind.fertileDischargeSignal ||
+      PersonalInsightKind.menstrualDischargeContext ||
+      PersonalInsightKind.dischargeHealthNotice => [
+        AppStrings.vaginalDischarge,
+        AppStrings.myCycles,
       ],
       _ => [AppStrings.dailyLog, AppStrings.myCycles],
     };

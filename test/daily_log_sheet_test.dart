@@ -86,6 +86,13 @@ void main() {
     final harness = await _pumpLogSheet(tester, initialIndex: 0);
 
     final openSymptoms = find.byKey(const ValueKey('period_open_symptoms'));
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('period_symptom_choices')),
+        matching: openSymptoms,
+      ),
+      findsOneWidget,
+    );
     await tester.ensureVisible(openSymptoms);
     await tester.drag(find.byType(Scrollable).first, const Offset(0, -120));
     await tester.pumpAndSettle();
@@ -194,7 +201,11 @@ void main() {
         ValueKey('meal_quality_${mealIndex}_$mealIndex'),
       );
       await tester.ensureVisible(quality);
-      await tester.tap(quality);
+      tester
+          .widget<InkWell>(
+            find.descendant(of: quality, matching: find.byType(InkWell)),
+          )
+          .onTap!();
       await tester.pumpAndSettle();
     }
     final breakfastGluten = find.byKey(const ValueKey('meal_food_0_0'));
@@ -338,6 +349,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(sexualQuestion, findsOneWidget);
     expect(find.text(AppStrings.dischargePresent), findsOneWidget);
+    expect(find.byKey(const ValueKey('sexual_activity_card')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('vaginal_discharge_card')),
+      findsOneWidget,
+    );
 
     final partnered = find.text(AppStrings.sexualActivityOptions[0]);
     await tester.ensureVisible(partnered);
@@ -397,23 +413,26 @@ void main() {
   testWidgets('Rüya isteğe bağlı notuyla kaydedilir', (tester) async {
     final harness = await _pumpLogSheet(tester, initialIndex: 2);
 
+    expect(find.byKey(const ValueKey('dream_card')), findsNothing);
+    final vividDreams = find.text(
+      AppStrings.symptomSleepOptions[AppStrings.symptomSleepOptions.length - 2],
+    );
+    final vividDreamTile = find
+        .ancestor(of: vividDreams, matching: find.byType(InkWell))
+        .first;
+    tester.widget<InkWell>(vividDreamTile).onTap!();
+    await tester.pumpAndSettle();
+
     final dreamCard = find.byKey(const ValueKey('dream_card'));
     await tester.ensureVisible(dreamCard);
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, -150));
     await tester.pumpAndSettle();
 
-    final dreamYes = find.byKey(const ValueKey('dream_choice_0'));
-    tester
-        .widget<InkWell>(
-          find.descendant(of: dreamYes, matching: find.byType(InkWell)),
-        )
-        .onTap!();
-    await tester.pumpAndSettle();
-
-    final dreamField = find.descendant(
-      of: dreamCard,
-      matching: find.byType(TextField),
+    expect(find.text(AppStrings.dreamNoteQuestion), findsOneWidget);
+    final sleepCard = find.byKey(
+      ValueKey('symptom_group_${AppStrings.symptomSleep}'),
     );
+    expect(find.descendant(of: sleepCard, matching: dreamCard), findsOneWidget);
+    final dreamField = find.byKey(const ValueKey('dream_note_field'));
     expect(dreamField, findsOneWidget);
     await tester.enterText(dreamField, 'Deniz kenarında yürüyordum.');
     await tester.tap(find.text(AppStrings.save));
@@ -651,6 +670,61 @@ void main() {
     expect(harness.savedLog!.hasExplicitTime, isFalse);
     expect(harness.savedLog!.date.hour, 0);
     expect(harness.savedLog!.date.minute, 0);
+  });
+
+  testWidgets('yinelenen günlük faktör alanları gösterilmez', (tester) async {
+    final harness = await _pumpLogSheet(tester, initialIndex: 2);
+
+    expect(find.byKey(const ValueKey('daily_factors_card')), findsNothing);
+    expect(
+      find.byKey(const ValueKey('sleep_duration_increment')),
+      findsNothing,
+    );
+    expect(find.byKey(const ValueKey('sleep_quality_2')), findsNothing);
+    expect(find.byKey(const ValueKey('stress_level_4')), findsNothing);
+    expect(find.byKey(const ValueKey('energy_level_2')), findsNothing);
+
+    final existingEnergy = find.text(AppStrings.symptomEnergyOptions.first);
+    await tester.ensureVisible(existingEnergy);
+    await tester.pumpAndSettle();
+    await tester.tap(existingEnergy);
+
+    final existingDigestion = find.text(AppStrings.symptomDigestionOptions[4]);
+    await tester.ensureVisible(existingDigestion);
+    await tester.pumpAndSettle();
+    await tester.tap(existingDigestion);
+    await tester.tap(find.text(AppStrings.save));
+    await tester.pumpAndSettle();
+
+    expect(harness.savedLog!.sleepDurationMinutes, isNull);
+    expect(harness.savedLog!.sleepQuality, isNull);
+    expect(harness.savedLog!.stressLevel, isNull);
+    expect(harness.savedLog!.energyLevel, isNull);
+    expect(
+      harness.savedLog!.symptoms,
+      contains(AppStrings.symptomEnergyOptions.first),
+    );
+    expect(
+      harness.savedLog!.symptoms,
+      contains(AppStrings.symptomDigestionOptions[4]),
+    );
+  });
+
+  testWidgets('kafein kaydedilir, yinelenen bağırsak bağlamı gösterilmez', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(tester, initialIndex: 1);
+
+    final caffeineCard = find.byKey(const ValueKey('caffeine_card'));
+    await tester.ensureVisible(caffeineCard);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('caffeine_increment')));
+    expect(find.text(AppStrings.bowelActivity), findsNothing);
+    await tester.tap(find.text(AppStrings.saveNutrition));
+    await tester.pumpAndSettle();
+
+    expect(harness.savedLog!.caffeineServings, 1);
+    expect(harness.savedLog!.bowelActivity, isEmpty);
   });
 
   test('Yeni sade kayit alanlari JSON yedeginde kaybolmaz', () {

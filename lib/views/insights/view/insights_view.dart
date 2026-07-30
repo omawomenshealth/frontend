@@ -322,6 +322,9 @@ class _InsightPresentation {
     final secondary = insight.secondaryLabel == null
         ? ''
         : AppStrings.localizeInsightFeature(insight.secondaryLabel!);
+    final contexts = insight.contextLabels
+        .map(AppStrings.localizeInsightFeature)
+        .toList(growable: false);
 
     late final String title;
     late final String body;
@@ -356,11 +359,38 @@ class _InsightPresentation {
         );
         icon = Icons.show_chart_rounded;
         color = AppColors.luteal;
+      case PersonalInsightKind.cycleTimingReview:
+        title = AppStrings.insightCycleTimingReviewTitle;
+        body = AppStrings.insightCycleTimingReviewBody(insight.value!);
+        icon = Icons.event_repeat_rounded;
+        color = AppColors.warning;
       case PersonalInsightKind.periodDuration:
         title = AppStrings.insightPeriodDurationTitle;
         body = AppStrings.insightPeriodDurationBody(insight.value!);
         icon = Icons.water_drop_rounded;
         color = AppColors.periodFlow;
+      case PersonalInsightKind.periodTrackingStarted:
+        title = AppStrings.insightPeriodTrackingTitle;
+        body = AppStrings.insightPeriodTrackingBody;
+        icon = Icons.bookmark_added_outlined;
+        color = AppColors.periodPrimary;
+      case PersonalInsightKind.periodSymptomPattern:
+        title = AppStrings.insightPeriodSymptomTitle;
+        body = AppStrings.insightPeriodSymptomBody(
+          label: primary,
+          count: insight.value!,
+          total: insight.total!,
+        );
+        icon = Icons.monitor_heart_outlined;
+        color = AppColors.periodPrimary;
+      case PersonalInsightKind.periodDurationReview:
+        title = AppStrings.insightPeriodDurationReviewTitle;
+        body = AppStrings.insightPeriodDurationReviewBody(
+          duration: insight.value!,
+          comparison: insight.comparisonValue,
+        );
+        icon = Icons.timelapse_rounded;
+        color = AppColors.warning;
       case PersonalInsightKind.frequentMood:
         title = AppStrings.insightFrequentMoodTitle;
         body = AppStrings.insightFrequentMoodBody(
@@ -473,20 +503,25 @@ class _InsightPresentation {
         );
         icon = Icons.account_tree_outlined;
         color = AppColors.primaryDark;
+      case PersonalInsightKind.foodObservationStarted:
+        title = AppStrings.insightFoodObservationTitle;
+        body =
+            '${AppStrings.insightFoodObservationBody(primary: primary, secondary: secondary)} '
+            '${AppStrings.insightContextNote(contexts)}';
+        icon = Icons.search_rounded;
+        color = AppColors.secondaryDark;
+      case PersonalInsightKind.foodPatternBuilding:
+        title = AppStrings.insightFoodPatternBuildingTitle;
+        body =
+            '${AppStrings.insightFoodPatternBuildingBody(primary: primary, secondary: secondary, withEvent: insight.withEventCount!, withTotal: insight.withTotal!)} '
+            '${AppStrings.insightContextNote(contexts)}';
+        icon = Icons.hub_outlined;
+        color = AppColors.secondaryDark;
       case PersonalInsightKind.foodSensitivityAssociation:
         title = AppStrings.insightFoodSensitivityTitle;
-        body = AppStrings.insightFoodSensitivityBody(
-          primary: primary,
-          secondary: secondary,
-          withEvent: insight.withEventCount!,
-          withTotal: insight.withTotal!,
-          withoutTotal: insight.withoutTotal!,
-          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
-          withoutPercent: _percentage(
-            insight.withoutEventCount!,
-            insight.withoutTotal!,
-          ),
-        );
+        body =
+            '${AppStrings.insightFoodSensitivityBody(primary: primary, secondary: secondary, withEvent: insight.withEventCount!, withTotal: insight.withTotal!, withoutTotal: insight.withoutTotal!, withPercent: _percentage(insight.withEventCount!, insight.withTotal!), withoutPercent: _percentage(insight.withoutEventCount!, insight.withoutTotal!))} '
+            '${AppStrings.insightContextNote(contexts)}';
         icon = Icons.food_bank_outlined;
         color = AppColors.warning;
       case PersonalInsightKind.medicationAdherence:
@@ -513,6 +548,14 @@ class _InsightPresentation {
         );
         icon = Icons.medication_liquid_outlined;
         color = AppColors.accent;
+      case PersonalInsightKind.dischargeBaselineObservation:
+        title = AppStrings.insightDischargeBaselineTitle;
+        body = AppStrings.insightDischargeBaselineBody(
+          color: primary,
+          consistency: secondary.isEmpty ? null : secondary,
+        );
+        icon = Icons.water_drop_outlined;
+        color = AppColors.info;
       case PersonalInsightKind.fertileDischargeSignal:
         title = AppStrings.insightFertileDischargeTitle;
         body = AppStrings.insightFertileDischargeBody(
@@ -543,7 +586,8 @@ class _InsightPresentation {
   }
 
   static String _evidenceText(PersonalInsight insight) {
-    if (insight.confidence != null) {
+    if (insight.confidence != null &&
+        insight.evidenceUnit == PersonalInsightEvidenceUnit.days) {
       return AppStrings.insightAssociationEvidence(
         confidence: AppStrings.insightConfidenceLabel(insight.confidence!.name),
         count: insight.evidenceCount,

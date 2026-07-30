@@ -33,7 +33,7 @@ class PersonalAssociationEngine {
     if (days.length < _minimumComparableDays) return const [];
 
     final candidates = <_AssociationCandidate>[];
-    _addDailyLogCandidates(candidates, days);
+    _addDailyLogCandidates(candidates, days, settings);
     _addMetricCandidates(candidates, days);
     _addMoodCyclePhaseCandidates(candidates, days, settings);
     _addEnergyCyclePhaseCandidates(candidates, days, settings);
@@ -342,6 +342,7 @@ class PersonalAssociationEngine {
   void _addDailyLogCandidates(
     List<_AssociationCandidate> candidates,
     Map<DateTime, _ObservedDay> days,
+    UserSettings? settings,
   ) {
     final nutritionLabels = _allLabels(days.values.map((day) => day.nutrition));
     final activityLabels = _allLabels(days.values.map((day) => day.activities));
@@ -352,22 +353,29 @@ class PersonalAssociationEngine {
         (day) => day.mood == null ? const <String>{} : {day.mood!},
       ),
     );
-    final gluten = _canonical(AppStrings.nutritionFoodGroupOptions.first);
-    final bloating = _canonical(AppStrings.postMealFeelingOptions[3]);
-    if (days.values.any((day) => day.foodGroups.contains(gluten)) &&
-        days.values.any((day) => day.postMealFeelings.contains(bloating))) {
-      _testCandidate(
-        candidates: candidates,
-        days: days,
-        kind: PersonalInsightKind.foodSensitivityAssociation,
-        primaryLabel: gluten,
-        secondaryLabel: bloating,
-        lagDays: 0,
-        exposureObserved: (day) => day.nutritionObserved,
-        exposurePresent: (day) => day.foodGroups.contains(gluten),
-        outcomeObserved: (day) => day.nutritionObserved,
-        outcomePresent: (day) => day.postMealFeelings.contains(bloating),
-      );
+    final foodGroupLabels = _allLabels(
+      days.values.map((day) => day.foodGroups),
+    );
+    final adverseFeelingLabels =
+        _allLabels(days.values.map((day) => day.postMealFeelings)).intersection(
+          AppStrings.postMealFeelingOptions.skip(3).map(_canonical).toSet(),
+        );
+    for (final food in foodGroupLabels) {
+      for (final feeling in adverseFeelingLabels) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.foodSensitivityAssociation,
+          primaryLabel: food,
+          secondaryLabel: feeling,
+          lagDays: 0,
+          exposureObserved: (day) => day.nutritionObserved,
+          exposurePresent: (day) => day.foodGroups.contains(food),
+          outcomeObserved: (day) => day.nutritionObserved,
+          outcomePresent: (day) => day.postMealFeelings.contains(feeling),
+          contextLabels: _foodContextLabels(days, food, feeling, settings),
+        );
+      }
     }
 
     for (final exposure in nutritionLabels) {
@@ -398,7 +406,7 @@ class PersonalAssociationEngine {
             lagDays: lag,
             exposureObserved: (day) => day.nutritionObserved,
             exposurePresent: (day) => day.nutrition.contains(exposure),
-            outcomeObserved: (day) => day.nutritionObserved,
+            outcomeObserved: (day) => day.wellbeingObserved,
             outcomePresent: (day) => day.bowel.contains(outcome),
           );
         }
@@ -439,6 +447,69 @@ class PersonalAssociationEngine {
         }
       }
     }
+  }
+
+  List<String> _foodContextLabels(
+    Map<DateTime, _ObservedDay> days,
+    String food,
+    String feeling,
+    UserSettings? settings,
+  ) {
+    final pairedDays = days.values
+        .where(
+          (day) =>
+              day.foodGroups.contains(food) &&
+              day.postMealFeelings.contains(feeling),
+        )
+        .toList(growable: false);
+    if (pairedDays.isEmpty) return const [];
+
+    final counts = <String, int>{};
+    final cycle = _buildCyclePhaseContext(days, settings);
+    final existingCheckInSignals = {
+      ...AppStrings.symptomDigestionOptions.map(_canonical),
+      ...AppStrings.symptomEnergyOptions.map(_canonical),
+      ...AppStrings.symptomSleepOptions.map(_canonical),
+    };
+    for (final day in pairedDays) {
+      for (final otherFood in day.foodGroups.where((item) => item != food)) {
+        counts[otherFood] = (counts[otherFood] ?? 0) + 1;
+      }
+      for (final signal in day.symptoms.where(
+        (item) =>
+            existingCheckInSignals.contains(item) &&
+            !_sameSignal(item, feeling),
+      )) {
+        counts[signal] = (counts[signal] ?? 0) + 1;
+      }
+      if ((day.stressLevel ?? 0) >= 4) {
+        counts[AppStrings.insightFeatureHighStressToken] =
+            (counts[AppStrings.insightFeatureHighStressToken] ?? 0) + 1;
+      }
+      if ((day.sleepQuality ?? 6) <= 2) {
+        counts[AppStrings.insightFeaturePoorSleepToken] =
+            (counts[AppStrings.insightFeaturePoorSleepToken] ?? 0) + 1;
+      }
+      if ((day.caffeineServings ?? 0) >= 2) {
+        counts[AppStrings.insightFeatureHighCaffeineToken] =
+            (counts[AppStrings.insightFeatureHighCaffeineToken] ?? 0) + 1;
+      }
+      final phase = cycle?.phaseAt(day);
+      if (phase != null) {
+        final token = '${AppStrings.cyclePhaseFeaturePrefix}${phase.name}';
+        counts[token] = (counts[token] ?? 0) + 1;
+      }
+    }
+
+    final threshold = (pairedDays.length + 1) ~/ 2;
+    final ranked =
+        counts.entries.where((entry) => entry.value >= threshold).toList()
+          ..sort((left, right) {
+            final count = right.value.compareTo(left.value);
+            if (count != 0) return count;
+            return left.key.compareTo(right.key);
+          });
+    return ranked.take(3).map((entry) => entry.key).toList(growable: false);
   }
 
   void _addMedicationCandidates(
@@ -490,6 +561,7 @@ class PersonalAssociationEngine {
     required bool Function(_ObservedDay day) exposurePresent,
     required bool Function(_ObservedDay day) outcomeObserved,
     required bool Function(_ObservedDay day) outcomePresent,
+    List<String> contextLabels = const [],
   }) {
     var withEvent = 0;
     var withTotal = 0;
@@ -553,6 +625,7 @@ class PersonalAssociationEngine {
         withoutTotal: withoutTotal,
         lift: lift,
         probability: probability,
+        contextLabels: contextLabels,
         stableAcrossHalves: _isStableAcrossHalves(
           observations,
           expectedDifference: withRate - withoutRate,
@@ -627,6 +700,9 @@ class PersonalAssociationEngine {
       var hasBleeding = false;
       var nutritionObserved = false;
       var wellbeingObserved = false;
+      final digestionSignals = AppStrings.symptomDigestionOptions
+          .map(_canonical)
+          .toSet();
 
       for (final log in dayLogs) {
         nutrition.addAll(log.nutritionTags.map(_canonical));
@@ -639,6 +715,9 @@ class PersonalAssociationEngine {
         symptoms.addAll(log.painLocations.map(_canonical));
         symptoms.addAll(log.symptoms.map(_canonical));
         bowel.addAll(log.bowelActivity.map(_canonical));
+        bowel.addAll(
+          log.symptoms.map(_canonical).where(digestionSignals.contains),
+        );
         if (log.mood != null) mood = _canonical(log.mood!);
         sleepDurationMinutes = log.sleepDurationMinutes ?? sleepDurationMinutes;
         sleepQuality = log.sleepQuality ?? sleepQuality;
@@ -713,6 +792,18 @@ class PersonalAssociationEngine {
   }
 
   String _canonical(String value) => AppStrings.canonicalizeStoredValue(value);
+
+  bool _sameSignal(String left, String right) {
+    String normalize(String value) => _canonical(
+      value,
+    ).toLowerCase().replaceAll(RegExp(r'[^a-z0-9çğıöşü]'), '');
+
+    final normalizedLeft = normalize(left);
+    final normalizedRight = normalize(right);
+    return normalizedLeft == normalizedRight ||
+        normalizedLeft.startsWith(normalizedRight) ||
+        normalizedRight.startsWith(normalizedLeft);
+  }
 
   double _fisherExactTwoSided(int a, int b, int c, int d) {
     final row1 = a + b;
@@ -889,6 +980,7 @@ class _AssociationCandidate {
   final int withoutTotal;
   final double lift;
   final double probability;
+  final List<String> contextLabels;
   final bool stableAcrossHalves;
   double adjustedProbability = 1.0;
 
@@ -904,6 +996,7 @@ class _AssociationCandidate {
     required this.withoutTotal,
     required this.lift,
     required this.probability,
+    this.contextLabels = const [],
     required this.stableAcrossHalves,
   });
 
@@ -956,6 +1049,12 @@ class _AssociationCandidate {
       lift: lift,
       adjustedProbability: adjustedProbability,
       confidence: confidence,
+      contextLabels: contextLabels,
+      notificationLevel:
+          kind == PersonalInsightKind.foodSensitivityAssociation ||
+              kind == PersonalInsightKind.medicationSkipSymptomAssociation
+          ? PersonalInsightNotificationLevel.gentle
+          : PersonalInsightNotificationLevel.none,
     );
   }
 }

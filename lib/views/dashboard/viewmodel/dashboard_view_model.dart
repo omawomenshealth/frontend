@@ -3,6 +3,7 @@ import '../../../data/models/user_settings_model.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../data/services/notification_service.dart';
 import '../../../core/utils/personal_insight_engine.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
@@ -12,11 +13,12 @@ import '../../../core/constants/app_strings.dart';
 /// Dashboard iş mantığı.
 class DashboardViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
+  final NotificationService? _notifications;
   final PersonalInsightEngine _insightEngine = const PersonalInsightEngine();
 
   static const int _previewInsightLimit = 2;
 
-  DashboardViewModel(this._storage) {
+  DashboardViewModel(this._storage, [this._notifications]) {
     loadData();
   }
 
@@ -93,7 +95,9 @@ class DashboardViewModel extends ChangeNotifier {
             log.postMealFeelings.isNotEmpty ||
             log.nutritionQuality != null ||
             log.cravings.isNotEmpty ||
-            log.nutritionTags.isNotEmpty,
+            log.nutritionTags.isNotEmpty ||
+            log.bowelActivity.isNotEmpty ||
+            log.caffeineServings != null,
       DailyLogObservedSection.medication =>
         log.medications.isNotEmpty || log.supplements.isNotEmpty,
       DailyLogObservedSection.symptom =>
@@ -107,7 +111,11 @@ class DashboardViewModel extends ChangeNotifier {
       DailyLogObservedSection.wellbeing =>
         log.mood != null ||
             log.moodCompanions.isNotEmpty ||
-            log.moodPlaces.isNotEmpty,
+            log.moodPlaces.isNotEmpty ||
+            log.sleepDurationMinutes != null ||
+            log.sleepQuality != null ||
+            log.stressLevel != null ||
+            log.energyLevel != null,
     };
   }
 
@@ -217,32 +225,73 @@ class DashboardViewModel extends ChangeNotifier {
       settings: _settings,
     );
     _personalInsights = generated
-        .where(
-          (insight) => switch (insight.kind) {
-            PersonalInsightKind.symptomMoodCooccurrence ||
-            PersonalInsightKind.symptomBleedingCooccurrence ||
-            PersonalInsightKind.structuredAssociation ||
-            PersonalInsightKind.foodSensitivityAssociation ||
-            PersonalInsightKind.moodCyclePhaseAssociation ||
-            PersonalInsightKind.energyCyclePhaseAssociation ||
-            PersonalInsightKind.medicationAdherence ||
-            PersonalInsightKind.medicationSkipSymptomAssociation ||
-            PersonalInsightKind.fertileDischargeSignal ||
-            PersonalInsightKind.dischargeHealthNotice => true,
-            _ => false,
-          },
-        )
         .take(_previewInsightLimit)
         .toList(growable: false);
   }
 
   /// Günlük kaydı ekle veya güncelle.
   Future<bool> saveLog(DailyLog log) async {
+    final beforeIds = _insightEngine
+        .generate(
+          _storage.loadAllLogs(),
+          doseRecords: _storage.loadMedicationDoseRecords(),
+          settings: _storage.loadSettings(),
+        )
+        .where((insight) => insight.shouldNotify)
+        .map((insight) => insight.id)
+        .toSet();
     final success = await _storage.saveDailyLog(log);
     if (!success) return false;
     await _syncStateAfterSave(log.date);
+    await _notifyForNewInsight(beforeIds);
     notifyListeners();
     return true;
+  }
+
+  Future<void> _notifyForNewInsight(Set<String> beforeIds) async {
+    final notifications = _notifications;
+    if (notifications == null ||
+        !notifications.isSupported ||
+        _settings?.notificationsEnabled == false) {
+      return;
+    }
+    final sentIds = _storage.loadNotifiedInsightIds();
+    final candidates =
+        _insightEngine
+            .generate(
+              _storage.loadAllLogs(),
+              doseRecords: _storage.loadMedicationDoseRecords(),
+              settings: _settings,
+            )
+            .where(
+              (insight) =>
+                  insight.shouldNotify &&
+                  !beforeIds.contains(insight.id) &&
+                  !sentIds.contains(insight.id),
+            )
+            .toList()
+          ..sort((left, right) {
+            final urgency = right.notificationLevel.index.compareTo(
+              left.notificationLevel.index,
+            );
+            if (urgency != 0) return urgency;
+            return right.priority.compareTo(left.priority);
+          });
+    if (candidates.isEmpty) return;
+
+    try {
+      final permissionGranted = await notifications.requestInsightPermissions();
+      if (!permissionGranted) return;
+      final candidate = candidates.first;
+      final scheduled = await notifications.scheduleInsightReady(
+        insightId: candidate.id,
+      );
+      if (scheduled) {
+        await _storage.markInsightNotificationSent(candidate.id);
+      }
+    } catch (error) {
+      debugPrint('Insight bildirimi planlanamadı: $error');
+    }
   }
 
   /// Adet girişi yapıldığında döngü istatistiklerini yeniden hesaplar.

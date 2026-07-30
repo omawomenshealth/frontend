@@ -5,7 +5,11 @@ enum PersonalInsightKind {
   recordingSummary,
   cycleLength,
   cycleVariation,
+  cycleTimingReview,
   periodDuration,
+  periodTrackingStarted,
+  periodSymptomPattern,
+  periodDurationReview,
   frequentMood,
   recurringSymptom,
   frequentActivity,
@@ -16,9 +20,12 @@ enum PersonalInsightKind {
   moodCyclePhaseAssociation,
   energyCyclePhaseAssociation,
   structuredAssociation,
+  foodObservationStarted,
+  foodPatternBuilding,
   foodSensitivityAssociation,
   medicationAdherence,
   medicationSkipSymptomAssociation,
+  dischargeBaselineObservation,
   fertileDischargeSignal,
   menstrualDischargeContext,
   dischargeHealthNotice,
@@ -27,6 +34,8 @@ enum PersonalInsightKind {
 enum PersonalInsightEvidenceUnit { days, cycles, entries, records }
 
 enum PersonalInsightConfidence { emerging, moderate, strong }
+
+enum PersonalInsightNotificationLevel { none, gentle, review }
 
 /// Arayüz metninden bağımsız, kanıtı ve sayısal değerleri taşıyan içgörü.
 ///
@@ -51,6 +60,8 @@ class PersonalInsight {
   final double? lift;
   final double? adjustedProbability;
   final PersonalInsightConfidence? confidence;
+  final List<String> contextLabels;
+  final PersonalInsightNotificationLevel notificationLevel;
 
   const PersonalInsight({
     required this.id,
@@ -71,5 +82,10 @@ class PersonalInsight {
     this.lift,
     this.adjustedProbability,
     this.confidence,
+    this.contextLabels = const [],
+    this.notificationLevel = PersonalInsightNotificationLevel.none,
   });
+
+  bool get shouldNotify =>
+      notificationLevel != PersonalInsightNotificationLevel.none;
 }

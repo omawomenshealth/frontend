@@ -42,8 +42,6 @@ class ProfileView extends StatelessWidget {
                     accent: accent,
                     onEditProfile: () =>
                         _mechanics._showBasicInfoSheet(context, profile),
-                    onOpenReminders: () =>
-                        _mechanics._showMedicationSheet(context, profile),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 116),
@@ -193,7 +191,6 @@ class _ProfileHero extends StatelessWidget {
   final int cycleDay;
   final Color accent;
   final VoidCallback onEditProfile;
-  final VoidCallback onOpenReminders;
 
   const _ProfileHero({
     required this.profile,
@@ -201,7 +198,6 @@ class _ProfileHero extends StatelessWidget {
     required this.cycleDay,
     required this.accent,
     required this.onEditProfile,
-    required this.onOpenReminders,
   });
 
   @override
@@ -298,12 +294,7 @@ class _ProfileHero extends StatelessWidget {
                     ),
                   ),
                 ),
-                _RoundIconButton(
-                  icon: Icons.notifications_none_rounded,
-                  accent: accent,
-                  tooltip: AppStrings.medicationAndSupplement,
-                  onTap: onOpenReminders,
-                ),
+                const SizedBox(width: 46, height: 46),
               ],
             ),
           ),
