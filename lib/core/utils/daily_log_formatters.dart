@@ -30,6 +30,24 @@ class DailyLogFormatters {
         .join(' • ');
   }
 
+  static String mealPostFeelings(DailyLog log) {
+    if (log.mealPostFeelings.isNotEmpty) {
+      return log.mealPostFeelings.entries
+          .map(
+            (entry) =>
+                '${AppStrings.localizeStoredValue(entry.key)}: '
+                '${entry.value.map(AppStrings.localizeStoredValue).join(", ")}',
+          )
+          .join(' • ');
+    }
+    if (log.postMealFeelings.isNotEmpty) {
+      return log.postMealFeelings
+          .map(AppStrings.localizeStoredValue)
+          .join(', ');
+    }
+    return AppStrings.notSpecified;
+  }
+
   static String dream(DailyLog log) {
     if (log.dreamRemembered == false) return AppStrings.no;
     if (log.dreamRemembered != true) return AppStrings.notSpecified;

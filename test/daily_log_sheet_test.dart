@@ -176,7 +176,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Her ana öğün kendi beslenme ağırlığıyla kaydedilir', (
+  testWidgets('Öğün ayrıntısı etiket altında açılır ve küçültülebilir', (
     tester,
   ) async {
     final harness = await _pumpLogSheet(tester, initialIndex: 1);
@@ -184,30 +184,30 @@ void main() {
     expect(find.text(AppStrings.logNutritionQuestion), findsOneWidget);
     expect(find.text(AppStrings.hydrationGlasses(0, 8)), findsOneWidget);
     expect(find.text(AppStrings.mealsToday), findsOneWidget);
-    expect(find.text(AppStrings.mealsFeel), findsOneWidget);
+    expect(find.text(AppStrings.mealsFeel), findsNothing);
+    for (final quality in AppStrings.nutritionQualityOptions) {
+      expect(find.text(quality), findsNothing);
+    }
     expect(find.text(AppStrings.saveNutrition), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     await tester.tap(find.byKey(const ValueKey('water_increment')));
     await tester.tap(find.byKey(const ValueKey('water_increment')));
-    for (var index = 0; index < 3; index++) {
-      final meal = find.text(AppStrings.nutritionMealOptions[index]);
-      await tester.ensureVisible(meal);
-      await tester.tap(meal);
-      await tester.pumpAndSettle();
-    }
-    for (var mealIndex = 0; mealIndex < 3; mealIndex++) {
-      final quality = find.byKey(
-        ValueKey('meal_quality_${mealIndex}_$mealIndex'),
-      );
-      await tester.ensureVisible(quality);
-      tester
-          .widget<InkWell>(
-            find.descendant(of: quality, matching: find.byType(InkWell)),
-          )
-          .onTap!();
-      await tester.pumpAndSettle();
-    }
+    final breakfast = find.text(AppStrings.nutritionMealOptions.first);
+    await tester.ensureVisible(breakfast);
+    await tester.tap(breakfast);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('meal_details_0')), findsOneWidget);
+
+    final breakfastExpand = find.byKey(const ValueKey('meal_expand_0'));
+    await tester.ensureVisible(breakfastExpand);
+    tester.widget<IconButton>(breakfastExpand).onPressed!();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('meal_details_0')), findsNothing);
+    tester.widget<IconButton>(breakfastExpand).onPressed!();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('meal_details_0')), findsOneWidget);
+
     final breakfastGluten = find.byKey(const ValueKey('meal_food_0_0'));
     await tester.ensureVisible(breakfastGluten);
     tester
@@ -216,16 +216,38 @@ void main() {
         )
         .onTap!();
     await tester.pumpAndSettle();
-    final bloated = find.text(AppStrings.postMealFeelingOptions[3]);
-    await tester.ensureVisible(bloated);
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, -120));
-    await tester.pumpAndSettle();
+    expect(
+      find.text(AppStrings.howFeltAfterEating.toUpperCase()),
+      findsOneWidget,
+    );
+    final breakfastBloated = find.byKey(const ValueKey('meal_feeling_0_3'));
+    await tester.ensureVisible(breakfastBloated);
     tester
         .widget<InkWell>(
-          find.ancestor(of: bloated, matching: find.byType(InkWell)).first,
+          find.descendant(of: breakfastBloated, matching: find.byType(InkWell)),
         )
         .onTap!();
     await tester.pumpAndSettle();
+    await tester.ensureVisible(breakfastExpand);
+    tester.widget<IconButton>(breakfastExpand).onPressed!();
+    await tester.pumpAndSettle();
+
+    for (var index = 1; index < 3; index++) {
+      final meal = find.text(AppStrings.nutritionMealOptions[index]);
+      await tester.ensureVisible(meal);
+      tester
+          .widget<InkWell>(
+            find.ancestor(of: meal, matching: find.byType(InkWell)).first,
+          )
+          .onTap!();
+      await tester.pumpAndSettle();
+      expect(find.byKey(ValueKey('meal_details_$index')), findsOneWidget);
+      final expand = find.byKey(ValueKey('meal_expand_$index'));
+      await tester.ensureVisible(expand);
+      tester.widget<IconButton>(expand).onPressed!();
+      await tester.pumpAndSettle();
+    }
+
     await tester.tap(
       find.widgetWithText(FilledButton, AppStrings.saveNutrition),
     );
@@ -237,19 +259,16 @@ void main() {
       harness.savedLog!.mealTypes,
       AppStrings.nutritionMealOptions.take(3),
     );
-    expect(harness.savedLog!.mealQualities, {
-      AppStrings.nutritionMealOptions[0]: AppStrings.nutritionQualityOptions[0],
-      AppStrings.nutritionMealOptions[1]: AppStrings.nutritionQualityOptions[1],
-      AppStrings.nutritionMealOptions[2]: AppStrings.nutritionQualityOptions[2],
-    });
+    expect(harness.savedLog!.mealQualities, isEmpty);
     expect(
       harness.savedLog!.mealFoodGroups[AppStrings.nutritionMealOptions.first],
       contains(AppStrings.nutritionFoodGroupOptions.first),
     );
     expect(
-      harness.savedLog!.postMealFeelings,
+      harness.savedLog!.mealPostFeelings[AppStrings.nutritionMealOptions.first],
       contains(AppStrings.postMealFeelingOptions[3]),
     );
+    expect(harness.savedLog!.postMealFeelings, isEmpty);
     expect(harness.savedLog!.nutritionQuality, isNull);
   });
 
@@ -585,6 +604,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Yeni ilaç'), findsOneWidget);
+    final taken = find.byKey(
+      const ValueKey('medication_taken_medication:yeni ilaç'),
+    );
+    await tester.ensureVisible(taken);
+    await tester.tap(taken);
+    await tester.pumpAndSettle();
     expect(
       harness.storage.loadSettings()!.dailyMedications,
       contains('Yeni ilaç'),
@@ -593,6 +618,7 @@ void main() {
     await tester.tap(find.text(AppStrings.saveNutrition));
     await tester.pumpAndSettle();
     expect(harness.savedLog!.medications.single.name, 'Yeni ilaç');
+    expect(harness.savedLog!.medications.single.taken, isTrue);
   });
 
   testWidgets('İlaç satırındaki alarm seçili ilaçla hatırlatıcıyı açar', (
@@ -736,7 +762,9 @@ void main() {
       mealFoodGroups: const {
         'Öğle': ['Gluten', 'Sebze'],
       },
-      postMealFeelings: const ['Şişkin'],
+      mealPostFeelings: const {
+        'Öğle': ['Şişkin'],
+      },
       nutritionQuality: 'Dengeli',
       cravings: const ['Tatlı'],
       mood: 'İyi',
@@ -764,6 +792,7 @@ void main() {
     expect(restored.mealTypes, original.mealTypes);
     expect(restored.mealQualities, original.mealQualities);
     expect(restored.mealFoodGroups, original.mealFoodGroups);
+    expect(restored.mealPostFeelings, original.mealPostFeelings);
     expect(restored.postMealFeelings, original.postMealFeelings);
     expect(restored.nutritionQuality, original.nutritionQuality);
     expect(restored.cravings, original.cravings);

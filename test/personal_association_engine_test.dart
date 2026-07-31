@@ -136,13 +136,20 @@ void main() {
     expect(association.withoutTotal, 10);
   });
 
-  test('aynı gün beslenme-belirti bağlantısını karşılaştırmalı bulur', () {
+  test('arayüzdeki besin grubu ile aynı gün belirtisini karşılaştırır', () {
     final logs = <DailyLog>[];
     for (var day = 0; day < 20; day++) {
       logs.add(
         DailyLog(
           date: DateTime(2026, 1, 1).add(Duration(days: day)),
-          nutritionTags: day < 10 ? const ['Tuzlu'] : const [],
+          mealTypes: const ['Kahvaltı'],
+          mealFoodGroups: day < 10
+              ? const {
+                  'Kahvaltı': ['Gluten'],
+                }
+              : const {
+                  'Kahvaltı': ['Yumurta'],
+                },
           painLocations: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
@@ -156,7 +163,7 @@ void main() {
     final association = insights.firstWhere(
       (insight) =>
           insight.kind == PersonalInsightKind.structuredAssociation &&
-          insight.primaryLabel == 'Tuzlu' &&
+          insight.primaryLabel == 'Gluten' &&
           insight.secondaryLabel == 'Şişkinlik' &&
           insight.lagDays == 0,
     );
@@ -189,9 +196,11 @@ void main() {
               : const {
                   'Kahvaltı': ['Yumurta'],
                 },
-          postMealFeelings: day < 8 || day == 15
-              ? [AppStrings.postMealFeelingOptions[3]]
-              : const ['Rahat'],
+          mealPostFeelings: {
+            'Kahvaltı': day < 8 || day == 15
+                ? [AppStrings.postMealFeelingOptions[3]]
+                : const ['Rahat'],
+          },
           observedSections: const {DailyLogObservedSection.nutrition},
         ),
       );
@@ -225,9 +234,11 @@ void main() {
               : const {
                   'Öğle yemeği': ['Yumurta'],
                 },
-          postMealFeelings: day < 8 || day == 15
-              ? const ['Şişkin']
-              : const ['Rahat'],
+          mealPostFeelings: {
+            'Öğle yemeği': day < 8 || day == 15
+                ? const ['Şişkin']
+                : const ['Rahat'],
+          },
           observedSections: const {DailyLogObservedSection.nutrition},
         ),
       );
@@ -247,13 +258,20 @@ void main() {
     expect(association.withoutTotal, 10);
   });
 
-  test('ertesi gün oluşan bağlantıyı aynı gün bağlantısından ayırır', () {
+  test('besin grubuyla ertesi gün oluşan bağlantıyı ayırır', () {
     final logs = <DailyLog>[];
     for (var day = 0; day < 24; day++) {
       logs.add(
         DailyLog(
           date: DateTime(2026, 2, 1).add(Duration(days: day)),
-          nutritionTags: day.isEven ? const ['Paketli'] : const [],
+          mealTypes: const ['Kahvaltı'],
+          mealFoodGroups: day.isEven
+              ? const {
+                  'Kahvaltı': ['Gluten'],
+                }
+              : const {
+                  'Kahvaltı': ['Yumurta'],
+                },
           painLocations: day.isOdd ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
@@ -267,7 +285,7 @@ void main() {
     final delayed = insights.firstWhere(
       (insight) =>
           insight.kind == PersonalInsightKind.structuredAssociation &&
-          insight.primaryLabel == 'Paketli' &&
+          insight.primaryLabel == 'Gluten' &&
           insight.secondaryLabel == 'Şişkinlik' &&
           insight.lagDays == 1,
     );
@@ -380,7 +398,7 @@ void main() {
     );
   });
 
-  test('daha seyrek görülen ters yönlü bağlantıyı da bulur', () {
+  test('arayüzde olmayan eski aktivite alanını insight adayı yapmaz', () {
     final logs = <DailyLog>[];
     for (var day = 0; day < 20; day++) {
       logs.add(
@@ -396,21 +414,17 @@ void main() {
     }
 
     final insights = engine.generate(logs: logs);
-    final association = insights.firstWhere(
-      (insight) =>
-          insight.kind == PersonalInsightKind.structuredAssociation &&
-          insight.primaryLabel == 'Yürüyüş' &&
-          insight.secondaryLabel == 'Baş ağrısı' &&
-          insight.lagDays == 0,
+    expect(
+      insights.where(
+        (insight) =>
+            insight.kind == PersonalInsightKind.structuredAssociation &&
+            insight.primaryLabel == 'Yürüyüş',
+      ),
+      isEmpty,
     );
-
-    expect(association.withEventCount, 1);
-    expect(association.withTotal, 10);
-    expect(association.withoutEventCount, 8);
-    expect(association.withoutTotal, 10);
   });
 
-  test('iki rastlantısal eşleşmeden ilişki kartı üretmez', () {
+  test('arayüzde olmayan eski beslenme etiketini analiz etmez', () {
     final logs = List.generate(12, (day) {
       return DailyLog(
         date: DateTime(2026, 3, 1).add(Duration(days: day)),

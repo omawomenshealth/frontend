@@ -168,7 +168,7 @@ class MedicationEntry {
 
 /// Günlük kayıt modeli — tüm wellness modüllerini birleşik tutar.
 class DailyLog {
-  static const int schemaVersion = 8;
+  static const int schemaVersion = 9;
 
   final DateTime date;
   final bool hasExplicitTime;
@@ -181,6 +181,8 @@ class DailyLog {
   final List<String> mealTypes;
   final Map<String, String> mealQualities;
   final Map<String, List<String>> mealFoodGroups;
+  final Map<String, List<String>> mealPostFeelings;
+  // Eski yedeklerle uyumluluk için tutulur. Yeni kayıtlar mealPostFeelings kullanır.
   final List<String> postMealFeelings;
   // Eski yedeklerle uyumluluk için tutulur. Yeni kayıtlar mealQualities kullanır.
   final String? nutritionQuality;
@@ -247,6 +249,7 @@ class DailyLog {
     this.mealTypes = const [],
     Map<String, String> mealQualities = const {},
     Map<String, List<String>> mealFoodGroups = const {},
+    Map<String, List<String>> mealPostFeelings = const {},
     this.postMealFeelings = const [],
     this.nutritionQuality,
     this.cravings = const [],
@@ -331,6 +334,10 @@ class DailyLog {
          for (final entry in mealFoodGroups.entries)
            entry.key: List<String>.unmodifiable(entry.value),
        }),
+       mealPostFeelings = Map<String, List<String>>.unmodifiable({
+         for (final entry in mealPostFeelings.entries)
+           entry.key: List<String>.unmodifiable(entry.value),
+       }),
        sexualActivityTypes = Set.unmodifiable(sexualActivityTypes),
        symptomSeverities = Map.unmodifiable(symptomSeverities),
        vaginalDischargeSymptoms = Set.unmodifiable(vaginalDischargeSymptoms),
@@ -344,6 +351,7 @@ class DailyLog {
     List<String>? mealTypes,
     Map<String, String>? mealQualities,
     Map<String, List<String>>? mealFoodGroups,
+    Map<String, List<String>>? mealPostFeelings,
     List<String>? postMealFeelings,
     String? nutritionQuality,
     bool clearNutritionQuality = false,
@@ -406,6 +414,7 @@ class DailyLog {
       mealTypes: mealTypes ?? this.mealTypes,
       mealQualities: mealQualities ?? this.mealQualities,
       mealFoodGroups: mealFoodGroups ?? this.mealFoodGroups,
+      mealPostFeelings: mealPostFeelings ?? this.mealPostFeelings,
       postMealFeelings: postMealFeelings ?? this.postMealFeelings,
       nutritionQuality: clearNutritionQuality
           ? null
@@ -481,6 +490,7 @@ class DailyLog {
         mealTypes.isNotEmpty ||
         mealQualities.isNotEmpty ||
         mealFoodGroups.isNotEmpty ||
+        mealPostFeelings.isNotEmpty ||
         postMealFeelings.isNotEmpty ||
         nutritionQuality != null ||
         cravings.isNotEmpty ||
@@ -527,6 +537,7 @@ class DailyLog {
     'mealTypes': mealTypes,
     'mealQualities': mealQualities,
     'mealFoodGroups': mealFoodGroups,
+    'mealPostFeelings': mealPostFeelings,
     'postMealFeelings': postMealFeelings,
     'nutritionQuality': nutritionQuality,
     'cravings': cravings,
@@ -580,6 +591,7 @@ class DailyLog {
       mealTypes: List<String>.from(json['mealTypes'] ?? []),
       mealQualities: _readStringMap(json, 'mealQualities'),
       mealFoodGroups: _readStringListMap(json, 'mealFoodGroups'),
+      mealPostFeelings: _readStringListMap(json, 'mealPostFeelings'),
       postMealFeelings: List<String>.from(json['postMealFeelings'] ?? []),
       nutritionQuality: json['nutritionQuality'] as String?,
       cravings: List<String>.from(json['cravings'] ?? []),
@@ -910,6 +922,10 @@ class DailyLog {
       mealFoodGroups: _mergeStringListMaps(
         other.mealFoodGroups,
         mealFoodGroups,
+      ),
+      mealPostFeelings: _mergeStringListMaps(
+        other.mealPostFeelings,
+        mealPostFeelings,
       ),
       postMealFeelings: (postMealFeelings + other.postMealFeelings)
           .toSet()

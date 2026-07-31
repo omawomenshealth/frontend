@@ -217,6 +217,8 @@ enum _TextKey {
   none,
   unknown,
   today,
+  expand,
+  collapse,
   notes,
   name,
   age,
@@ -1167,6 +1169,8 @@ const Map<_TextKey, String> _turkishTexts = {
       'Daha fazla veri girdikçe istatistikler daha doğru olacak',
   _TextKey.calendar: 'Takvim',
   _TextKey.close: 'Kapat',
+  _TextKey.expand: 'Genişlet',
+  _TextKey.collapse: 'Küçült',
   _TextKey.month: 'Ay',
   _TextKey.editPeriodDates: 'Adet tarihlerini düzenle',
   _TextKey.calendarLegend: 'Takvim açıklaması',
@@ -1913,6 +1917,8 @@ const Map<_TextKey, String> _englishTexts = {
       'Your statistics will become more accurate as you add more data',
   _TextKey.calendar: 'Calendar',
   _TextKey.close: 'Close',
+  _TextKey.expand: 'Expand',
+  _TextKey.collapse: 'Collapse',
   _TextKey.month: 'Month',
   _TextKey.editPeriodDates: 'Edit period dates',
   _TextKey.calendarLegend: 'Calendar key',
@@ -3698,6 +3704,8 @@ class AppStrings {
   static String get cycleStatisticsHint => _text(_TextKey.cycleStatisticsHint);
   static String get calendar => _text(_TextKey.calendar);
   static String get close => _text(_TextKey.close);
+  static String get expand => _text(_TextKey.expand);
+  static String get collapse => _text(_TextKey.collapse);
   static String get month => _text(_TextKey.month);
   static String get editPeriodDates => _text(_TextKey.editPeriodDates);
   static String get calendarLegend => _text(_TextKey.calendarLegend);

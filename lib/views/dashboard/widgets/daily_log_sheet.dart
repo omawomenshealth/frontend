@@ -44,9 +44,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   late int _waterGlasses;
   late Set<String> _meals;
+  late Set<String> _expandedMeals;
   late Map<String, int> _mealQualityIndices;
   late Map<String, Set<String>> _mealFoodGroups;
-  late Set<String> _postMealFeelings;
+  late Map<String, Set<String>> _mealPostFeelings;
+  late Set<String> _legacyPostMealFeelings;
   late Set<String> _cravings;
   late int? _caffeineServings;
 
@@ -93,6 +95,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ? 0
         : (_log.waterIntakeMl! / 250).round().clamp(0, 12);
     _meals = _localizedSet(_log.mealTypes, AppStrings.nutritionMealOptions);
+    _expandedMeals = <String>{};
     _mealQualityIndices = {
       for (final entry in _log.mealQualities.entries)
         AppStrings.localizeStoredValue(entry.key): _localizedIndex(
@@ -117,10 +120,21 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             .map(AppStrings.localizeStoredValue)
             .toSet(),
     };
-    _postMealFeelings = _localizedSet(
+    _mealPostFeelings = {
+      for (final entry in _log.mealPostFeelings.entries)
+        AppStrings.localizeStoredValue(entry.key): entry.value
+            .map(AppStrings.localizeStoredValue)
+            .toSet(),
+    };
+    _legacyPostMealFeelings = _localizedSet(
       _log.postMealFeelings,
       AppStrings.postMealFeelingOptions,
     );
+    if (_mealPostFeelings.isEmpty &&
+        _legacyPostMealFeelings.isNotEmpty &&
+        _meals.length == 1) {
+      _mealPostFeelings[_meals.single] = {..._legacyPostMealFeelings};
+    }
     _cravings = _localizedSet(
       _log.cravings,
       AppStrings.nutritionCravingOptions,
@@ -615,32 +629,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 25),
         _SectionTitle(AppStrings.mealsToday),
         const SizedBox(height: 11),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final meal in AppStrings.nutritionMealOptions)
-              _PillChoice(
-                label: meal,
-                selected: _meals.contains(meal),
-                color: AppColors.secondary,
-                onTap: () => _toggleMeal(meal),
-              ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        _SectionTitle(AppStrings.mealsFeel),
-        for (final meal in AppStrings.nutritionMealOptions.where(
-          _meals.contains,
-        )) ...[const SizedBox(height: 11), _buildMealDetails(meal)],
-        const SizedBox(height: 25),
-        _SectionTitle(AppStrings.howFeltAfterEating),
-        const SizedBox(height: 11),
-        _buildSimpleChoices(
-          options: AppStrings.postMealFeelingOptions,
-          selected: _postMealFeelings,
-          color: AppColors.secondary,
-        ),
+        for (final meal in AppStrings.nutritionMealOptions) ...[
+          _buildMealAccordion(meal),
+          if (meal != AppStrings.nutritionMealOptions.last)
+            const SizedBox(height: 8),
+        ],
         const SizedBox(height: 25),
         _SectionTitle(AppStrings.cravingsQuestion),
         const SizedBox(height: 11),
@@ -1822,6 +1815,23 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   ),
                 ),
               ),
+              IconButton(
+                key: ValueKey('medication_taken_$entryKey'),
+                tooltip: AppStrings.doseTaken,
+                visualDensity: VisualDensity.compact,
+                onPressed: () => onChanged(entry.copyWith(taken: !entry.taken)),
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 160),
+                  child: Icon(
+                    entry.taken
+                        ? Icons.check_circle_rounded
+                        : Icons.check_circle_outline_rounded,
+                    key: ValueKey(entry.taken),
+                    size: 22,
+                    color: entry.taken ? AppColors.success : _tone,
+                  ),
+                ),
+              ),
               const SizedBox(width: 7),
             ],
           ),
@@ -2302,10 +2312,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   void _toggleMeal(String meal) {
     setState(() {
       if (_meals.remove(meal)) {
+        _expandedMeals.remove(meal);
         _mealQualityIndices.remove(meal);
         _mealFoodGroups.remove(meal);
+        _mealPostFeelings.remove(meal);
       } else {
         _meals.add(meal);
+        _expandedMeals.add(meal);
       }
     });
   }
@@ -2319,57 +2332,133 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return AppStrings.nutritionQualityOptions[selectedValues.single];
   }
 
-  Widget _buildMealDetails(String meal) {
+  Widget _buildMealAccordion(String meal) {
     final mealIndex = AppStrings.nutritionMealOptions.indexOf(meal);
+    final selected = _meals.contains(meal);
+    final expanded = selected && _expandedMeals.contains(meal);
+
+    return AnimatedContainer(
+      key: ValueKey('meal_option_$mealIndex'),
+      duration: const Duration(milliseconds: 180),
+      decoration: BoxDecoration(
+        color: selected
+            ? AppColors.secondary.withValues(alpha: 0.055)
+            : AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: selected ? AppColors.secondary : AppColors.outline,
+          width: selected ? 1.4 : 1,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _toggleMeal(meal),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(13, 11, 8, 11),
+                      child: Row(
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 160),
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? AppColors.secondary
+                                  : Colors.transparent,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: selected
+                                    ? AppColors.secondary
+                                    : AppColors.textHint,
+                                width: 1.4,
+                              ),
+                            ),
+                            child: selected
+                                ? const Icon(
+                                    Icons.check_rounded,
+                                    size: 14,
+                                    color: Colors.white,
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              meal,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: selected
+                                    ? FontWeight.w800
+                                    : FontWeight.w600,
+                                color: selected
+                                    ? AppColors.secondaryDark
+                                    : AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              if (selected)
+                IconButton(
+                  key: ValueKey('meal_expand_$mealIndex'),
+                  tooltip: expanded ? AppStrings.collapse : AppStrings.expand,
+                  onPressed: () => setState(() {
+                    if (!_expandedMeals.remove(meal)) {
+                      _expandedMeals.add(meal);
+                    }
+                  }),
+                  icon: AnimatedRotation(
+                    turns: expanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    child: const Icon(Icons.keyboard_arrow_down_rounded),
+                  ),
+                  color: AppColors.secondary,
+                ),
+              const SizedBox(width: 4),
+            ],
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            child: expanded
+                ? _buildMealDetails(meal, mealIndex)
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMealDetails(String meal, int mealIndex) {
     final selectedFoods = _mealFoodGroups.putIfAbsent(meal, () => <String>{});
+    final selectedFeelings = _mealPostFeelings.putIfAbsent(
+      meal,
+      () => <String>{},
+    );
     return Container(
+      key: ValueKey('meal_details_$mealIndex'),
+      width: double.infinity,
       padding: const EdgeInsets.fromLTRB(12, 11, 12, 12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.outline),
+        border: Border(
+          top: BorderSide(color: AppColors.secondary.withValues(alpha: 0.18)),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            meal,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          if (_supportsMealQuality(meal)) ...[
-            const SizedBox(height: 9),
-            Row(
-              children: [
-                for (final quality
-                    in AppStrings.nutritionQualityOptions.asMap().entries) ...[
-                  if (quality.key > 0) const SizedBox(width: 5),
-                  Expanded(
-                    child: _PillChoice(
-                      key: ValueKey('meal_quality_${mealIndex}_${quality.key}'),
-                      label: quality.value,
-                      selected: _mealQualityIndices[meal] == quality.key,
-                      color: AppColors.secondary,
-                      onTap: () => setState(() {
-                        if (_mealQualityIndices[meal] == quality.key) {
-                          _mealQualityIndices.remove(meal);
-                        } else {
-                          _mealQualityIndices[meal] = quality.key;
-                        }
-                      }),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ],
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 11),
-            child: Divider(height: 1, color: AppColors.outline),
-          ),
           Text(
             AppStrings.whatDidYouEat.toUpperCase(),
             style: const TextStyle(
@@ -2411,6 +2500,32 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 enabled: true,
                 onTap: () => _addCustomFoodGroup(meal),
               ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            AppStrings.howFeltAfterEating.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            children: [
+              for (final feeling
+                  in AppStrings.postMealFeelingOptions.asMap().entries)
+                _PillChoice(
+                  key: ValueKey('meal_feeling_${mealIndex}_${feeling.key}'),
+                  label: feeling.value,
+                  selected: selectedFeelings.contains(feeling.value),
+                  color: AppColors.secondary,
+                  onTap: () => _toggleChoice(selectedFeelings, feeling.value),
+                ),
             ],
           ),
         ],
@@ -2566,7 +2681,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             if (_meals.contains(entry.key) && entry.value.isNotEmpty)
               entry.key: entry.value.toList(),
         },
-        postMealFeelings: _postMealFeelings.toList(),
+        mealPostFeelings: {
+          for (final entry in _mealPostFeelings.entries)
+            if (_meals.contains(entry.key) && entry.value.isNotEmpty)
+              entry.key: entry.value.toList(),
+        },
+        postMealFeelings:
+            _mealPostFeelings.values.any((feelings) => feelings.isNotEmpty)
+            ? const []
+            : _legacyPostMealFeelings.toList(),
         nutritionQuality: _legacyNutritionQuality,
         clearNutritionQuality: _legacyNutritionQuality == null,
         cravings: _cravings.toList(),

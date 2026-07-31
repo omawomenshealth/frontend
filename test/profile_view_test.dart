@@ -1,4 +1,5 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
+import 'package:app_proje_a/core/constants/color_constants.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/api_service.dart';
@@ -98,7 +99,12 @@ void main() {
       find.byKey(const ValueKey('profile_supplement_reminders')),
       findsOneWidget,
     );
-    await tester.tap(find.byIcon(Icons.close).first);
+    expect(find.byKey(const ValueKey('profile_edit_sheet')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('profile_edit_sheet_save')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('profile_edit_sheet_close')));
     await tester.pumpAndSettle();
 
     final basicInformation = find.byTooltip(AppStrings.basicInformation);
@@ -108,6 +114,11 @@ void main() {
 
     expect(find.text(AppStrings.basicInformationEdit), findsOneWidget);
     expect(find.byType(TextField), findsWidgets);
+    final sheet = tester.widget<Container>(
+      find.byKey(const ValueKey('profile_edit_sheet')),
+    );
+    final decoration = sheet.decoration! as BoxDecoration;
+    expect(decoration.color, AppColors.scaffoldBackground);
     expect(tester.takeException(), isNull);
   });
 }

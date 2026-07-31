@@ -92,6 +92,7 @@ class DashboardViewModel extends ChangeNotifier {
             log.mealTypes.isNotEmpty ||
             log.mealQualities.isNotEmpty ||
             log.mealFoodGroups.isNotEmpty ||
+            log.mealPostFeelings.isNotEmpty ||
             log.postMealFeelings.isNotEmpty ||
             log.nutritionQuality != null ||
             log.cravings.isNotEmpty ||
@@ -345,6 +346,7 @@ class DashboardViewModel extends ChangeNotifier {
           l.mealTypes.isNotEmpty ||
           l.mealQualities.isNotEmpty ||
           l.mealFoodGroups.isNotEmpty ||
+          l.mealPostFeelings.isNotEmpty ||
           l.postMealFeelings.isNotEmpty ||
           l.nutritionQuality != null ||
           l.cravings.isNotEmpty ||

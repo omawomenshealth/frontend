@@ -63,7 +63,9 @@ void main() {
         mealFoodGroups: const {
           'Kahvaltı': ['Gluten', 'Süt ürünleri'],
         },
-        postMealFeelings: const ['Şişkin'],
+        mealPostFeelings: const {
+          'Kahvaltı': ['Şişkin'],
+        },
         symptoms: const ['Yorgunluk'],
         observedSections: const {
           DailyLogObservedSection.nutrition,
@@ -95,7 +97,9 @@ void main() {
           mealFoodGroups: const {
             'Kahvaltı': ['Gluten'],
           },
-          postMealFeelings: const ['Şişkin'],
+          mealPostFeelings: const {
+            'Kahvaltı': ['Şişkin'],
+          },
           observedSections: const {DailyLogObservedSection.nutrition},
         ),
     ], now: DateTime(2026, 7, 30, 13));
@@ -117,7 +121,9 @@ void main() {
         mealFoodGroups: const {
           'Öğle yemeği': ['Laktoz içeren'],
         },
-        postMealFeelings: const ['Şişkin'],
+        mealPostFeelings: const {
+          'Öğle yemeği': ['Şişkin'],
+        },
         observedSections: const {DailyLogObservedSection.nutrition},
       ),
     ], now: DateTime(2026, 7, 30, 13));
@@ -130,6 +136,41 @@ void main() {
     expect(observation!.primaryLabel, 'Laktoz içeren');
     expect(observation.secondaryLabel, 'Şişkin');
     expect(observation.shouldNotify, isTrue);
+  });
+
+  test('farklı öğünün hissini diğer öğünün besiniyle eşleştirmez', () {
+    final insights = engine.generate([
+      DailyLog(
+        date: DateTime(2026, 7, 30, 12),
+        mealTypes: const ['Kahvaltı', 'Öğle yemeği'],
+        mealFoodGroups: const {
+          'Kahvaltı': ['Gluten'],
+          'Öğle yemeği': ['Yumurta'],
+        },
+        mealPostFeelings: const {
+          'Kahvaltı': ['Rahat'],
+          'Öğle yemeği': ['Şişkin'],
+        },
+        observedSections: const {DailyLogObservedSection.nutrition},
+      ),
+    ], now: DateTime(2026, 7, 30, 13));
+
+    expect(
+      insights.any(
+        (insight) =>
+            insight.primaryLabel == 'Gluten' &&
+            insight.secondaryLabel == 'Şişkin',
+      ),
+      isFalse,
+    );
+    expect(
+      insights.any(
+        (insight) =>
+            insight.primaryLabel == 'Yumurta' &&
+            insight.secondaryLabel == 'Şişkin',
+      ),
+      isTrue,
+    );
   });
 
   test('ruh hali ve döngü fazı bağlantısını ana insight listesine ekler', () {

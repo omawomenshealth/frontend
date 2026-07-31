@@ -280,12 +280,12 @@ class PersonalInsightEngine {
         .toSet();
     final pairDays = <String, List<_DailySnapshot>>{};
     for (final snapshot in snapshots) {
-      for (final food in snapshot.foodGroups) {
-        for (final feeling in snapshot.postMealFeelings.where(
-          adverseFeelings.contains,
-        )) {
-          pairDays.putIfAbsent('$food\u0000$feeling', () => []).add(snapshot);
+      for (final pair in snapshot.foodFeelingPairs) {
+        final labels = pair.split('\u0000');
+        if (labels.length != 2 || !adverseFeelings.contains(labels.last)) {
+          continue;
         }
+        pairDays.putIfAbsent(pair, () => []).add(snapshot);
       }
     }
     if (pairDays.isEmpty) return;
@@ -605,6 +605,7 @@ class PersonalInsightEngine {
           final nutritionTags = <String>{};
           final foodGroups = <String>{};
           final postMealFeelings = <String>{};
+          final foodFeelingPairs = <String>{};
           final bowelActivity = <String>{};
           int? sleepQuality;
           int? stressLevel;
@@ -627,9 +628,36 @@ class PersonalInsightEngine {
                   .expand((items) => items)
                   .map(AppStrings.canonicalizeStoredValue),
             );
-            postMealFeelings.addAll(
-              log.postMealFeelings.map(AppStrings.canonicalizeStoredValue),
-            );
+            final foodsByMeal = {
+              for (final entry in log.mealFoodGroups.entries)
+                AppStrings.canonicalizeStoredValue(entry.key): entry.value
+                    .map(AppStrings.canonicalizeStoredValue)
+                    .toSet(),
+            };
+            if (log.mealPostFeelings.isNotEmpty) {
+              for (final entry in log.mealPostFeelings.entries) {
+                final meal = AppStrings.canonicalizeStoredValue(entry.key);
+                final feelings = entry.value
+                    .map(AppStrings.canonicalizeStoredValue)
+                    .toSet();
+                postMealFeelings.addAll(feelings);
+                for (final food in foodsByMeal[meal] ?? const <String>{}) {
+                  for (final feeling in feelings) {
+                    foodFeelingPairs.add('$food\u0000$feeling');
+                  }
+                }
+              }
+            } else {
+              final legacyFeelings = log.postMealFeelings
+                  .map(AppStrings.canonicalizeStoredValue)
+                  .toSet();
+              postMealFeelings.addAll(legacyFeelings);
+              for (final food in foodsByMeal.values.expand((items) => items)) {
+                for (final feeling in legacyFeelings) {
+                  foodFeelingPairs.add('$food\u0000$feeling');
+                }
+              }
+            }
             bowelActivity.addAll(log.bowelActivity);
             sleepQuality = log.sleepQuality ?? sleepQuality;
             stressLevel = log.stressLevel ?? stressLevel;
@@ -641,6 +669,7 @@ class PersonalInsightEngine {
                 ) ||
                 log.mealTypes.isNotEmpty ||
                 log.mealFoodGroups.isNotEmpty ||
+                log.mealPostFeelings.isNotEmpty ||
                 log.postMealFeelings.isNotEmpty ||
                 log.nutritionTags.isNotEmpty ||
                 log.waterIntakeMl != null ||
@@ -656,6 +685,7 @@ class PersonalInsightEngine {
             nutritionTags: nutritionTags,
             foodGroups: foodGroups,
             postMealFeelings: postMealFeelings,
+            foodFeelingPairs: foodFeelingPairs,
             bowelActivity: bowelActivity,
             sleepQuality: sleepQuality,
             stressLevel: stressLevel,
@@ -716,6 +746,7 @@ class _DailySnapshot {
   final Set<String> nutritionTags;
   final Set<String> foodGroups;
   final Set<String> postMealFeelings;
+  final Set<String> foodFeelingPairs;
   final Set<String> bowelActivity;
   final int? sleepQuality;
   final int? stressLevel;
@@ -731,6 +762,7 @@ class _DailySnapshot {
     required this.nutritionTags,
     required this.foodGroups,
     required this.postMealFeelings,
+    required this.foodFeelingPairs,
     required this.bowelActivity,
     required this.sleepQuality,
     required this.stressLevel,

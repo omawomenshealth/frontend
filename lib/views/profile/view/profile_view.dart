@@ -538,9 +538,12 @@ class _ProfileMechanics extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
         title: AppStrings.basicInformationEdit,
+        icon: Icons.person_outline_rounded,
+        accent: AppColors.primary,
         onSave: () async {
           vm.updateUserName(nameCtrl.text.trim());
           vm.updateWeight(double.tryParse(weightCtrl.text));
@@ -653,12 +656,19 @@ class _ProfileMechanics extends StatelessWidget {
                         vm.toggleChronicDisease(disease);
                         setSheetState(() {});
                       },
-                      selectedColor: AppColors.accent.withValues(alpha: 0.15),
-                      checkmarkColor: AppColors.accent,
+                      backgroundColor: AppColors.surface,
+                      selectedColor: AppColors.primaryLight,
+                      checkmarkColor: AppColors.primaryDark,
+                      side: BorderSide(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.outline,
+                      ),
+                      shape: const StadiumBorder(),
                       labelStyle: TextStyle(
                         fontSize: 12,
                         color: isSelected
-                            ? AppColors.accent
+                            ? AppColors.primaryDark
                             : AppColors.textPrimary,
                       ),
                     );
@@ -676,9 +686,12 @@ class _ProfileMechanics extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
         title: AppStrings.womenHealthEdit,
+        icon: Icons.favorite_border_rounded,
+        accent: AppColors.periodPrimary,
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {
@@ -929,9 +942,14 @@ class _ProfileMechanics extends StatelessWidget {
                             vm.updateBirthControlMethod(method);
                             setSheetState(() {});
                           },
-                          selectedColor: AppColors.periodLight.withValues(
-                            alpha: 0.2,
+                          backgroundColor: AppColors.surface,
+                          selectedColor: AppColors.periodLight,
+                          side: BorderSide(
+                            color: isSelected
+                                ? AppColors.periodPrimary
+                                : AppColors.outline,
                           ),
+                          shape: const StadiumBorder(),
                           labelStyle: TextStyle(
                             fontSize: 12,
                             color: isSelected
@@ -968,9 +986,14 @@ class _ProfileMechanics extends StatelessWidget {
                         vm.toggleWomenDisease(disease);
                         setSheetState(() {});
                       },
-                      selectedColor: AppColors.periodPrimary.withValues(
-                        alpha: 0.15,
+                      backgroundColor: AppColors.surface,
+                      selectedColor: AppColors.periodLight,
+                      side: BorderSide(
+                        color: isSelected
+                            ? AppColors.periodPrimary
+                            : AppColors.outline,
                       ),
+                      shape: const StadiumBorder(),
                       checkmarkColor: AppColors.periodPrimary,
                       labelStyle: TextStyle(
                         fontSize: 12,
@@ -996,9 +1019,12 @@ class _ProfileMechanics extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
         title: AppStrings.medicationSupplementEdit,
+        icon: Icons.medication_outlined,
+        accent: AppColors.medicationPrimary,
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {
@@ -1049,17 +1075,28 @@ class _ProfileMechanics extends StatelessWidget {
                       backgroundColor: AppColors.medicationPrimary.withValues(
                         alpha: 0.1,
                       ),
+                      side: BorderSide(
+                        color: AppColors.medicationPrimary.withValues(
+                          alpha: 0.28,
+                        ),
+                      ),
+                      shape: const StadiumBorder(),
                     );
                   }).toList(),
                 ),
                 const SizedBox(height: 8),
-                _addItemRow(medCtrl, AppStrings.newMedication, () {
-                  if (medCtrl.text.trim().isNotEmpty) {
-                    vm.addMedication(medCtrl.text.trim());
-                    medCtrl.clear();
-                    setSheetState(() {});
-                  }
-                }),
+                _addItemRow(
+                  medCtrl,
+                  AppStrings.newMedication,
+                  () {
+                    if (medCtrl.text.trim().isNotEmpty) {
+                      vm.addMedication(medCtrl.text.trim());
+                      medCtrl.clear();
+                      setSheetState(() {});
+                    }
+                  },
+                  color: AppColors.medicationPrimary,
+                ),
                 MedicationReminderSection(
                   key: const ValueKey('profile_medication_reminders'),
                   itemType: MedicationPlanItemType.medication,
@@ -1095,6 +1132,10 @@ class _ProfileMechanics extends StatelessWidget {
                         setSheetState(() {});
                       },
                       backgroundColor: AppColors.success.withValues(alpha: 0.1),
+                      side: BorderSide(
+                        color: AppColors.success.withValues(alpha: 0.28),
+                      ),
+                      shape: const StadiumBorder(),
                     );
                   }).toList(),
                 ),
@@ -1105,7 +1146,7 @@ class _ProfileMechanics extends StatelessWidget {
                     supCtrl.clear();
                     setSheetState(() {});
                   }
-                }),
+                }, color: AppColors.success),
                 MedicationReminderSection(
                   key: const ValueKey('profile_supplement_reminders'),
                   itemType: MedicationPlanItemType.supplement,
@@ -1138,7 +1179,12 @@ class _ProfileMechanics extends StatelessWidget {
         vm.updateMenopauseStatus(status);
         setSheetState(() {});
       },
-      selectedColor: AppColors.periodPrimary.withValues(alpha: 0.15),
+      backgroundColor: AppColors.surface,
+      selectedColor: AppColors.periodLight,
+      side: BorderSide(
+        color: isSelected ? AppColors.periodPrimary : AppColors.outline,
+      ),
+      shape: const StadiumBorder(),
       labelStyle: TextStyle(
         fontSize: 12,
         color: isSelected ? AppColors.periodPrimary : AppColors.textPrimary,
@@ -1149,8 +1195,9 @@ class _ProfileMechanics extends StatelessWidget {
   Widget _addItemRow(
     TextEditingController ctrl,
     String hint,
-    VoidCallback onAdd,
-  ) {
+    VoidCallback onAdd, {
+    Color color = AppColors.primary,
+  }) {
     return Row(
       children: [
         Expanded(
@@ -1161,30 +1208,28 @@ class _ProfileMechanics extends StatelessWidget {
               hintStyle: const TextStyle(fontSize: 13),
               isDense: true,
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(
-                  color: AppColors.textHint.withValues(alpha: 0.3),
-                ),
+                horizontal: 15,
+                vertical: 13,
               ),
             ),
           ),
         ),
         const SizedBox(width: 8),
-        ElevatedButton(
-          onPressed: onAdd,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+        SizedBox(
+          height: 48,
+          child: FilledButton.icon(
+            onPressed: onAdd,
+            style: FilledButton.styleFrom(
+              backgroundColor: color,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            icon: const Icon(Icons.add_rounded, size: 18),
+            label: Text(AppStrings.add),
           ),
-          child: Text(AppStrings.add),
         ),
       ],
     );
@@ -1205,10 +1250,9 @@ class _ProfileMechanics extends StatelessWidget {
         labelStyle: const TextStyle(fontSize: 13),
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
+          horizontal: 15,
+          vertical: 14,
         ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -1223,10 +1267,10 @@ class _ProfileMechanics extends StatelessWidget {
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.12)
               : AppColors.background,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.transparent,
-            width: 1.5,
+            color: isSelected ? AppColors.primary : AppColors.outline,
+            width: isSelected ? 1.5 : 1,
           ),
         ),
         child: Text(
@@ -1649,99 +1693,166 @@ class _ProfileMechanics extends StatelessWidget {
 
 class _EditSheet extends StatelessWidget {
   final String title;
+  final IconData icon;
+  final Color accent;
   final Widget child;
   final VoidCallback onSave;
 
   const _EditSheet({
     required this.title,
+    required this.icon,
+    required this.accent,
     required this.child,
     required this.onSave,
   });
 
   @override
   Widget build(BuildContext context) {
+    final baseTheme = Theme.of(context);
+    final themedData = baseTheme.copyWith(
+      colorScheme: baseTheme.colorScheme.copyWith(primary: accent),
+      inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
+        filled: true,
+        fillColor: AppColors.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 14,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.outline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: accent, width: 1.5),
+        ),
+      ),
+    );
+
     return DraggableScrollableSheet(
-      initialChildSize: 0.85,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
+      initialChildSize: 0.9,
+      minChildSize: 0.52,
+      maxChildSize: 0.97,
       builder: (context, scrollController) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            children: [
-              // Tutamaç
-              Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.textHint.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
+        return Theme(
+          data: themedData,
+          child: Container(
+            key: const ValueKey('profile_edit_sheet'),
+            decoration: BoxDecoration(
+              color: AppColors.scaffoldBackground,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(30),
               ),
-              // Başlık
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontFamily: 'CormorantGaramond',
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.textPrimary.withValues(alpha: 0.08),
+                  blurRadius: 28,
+                  offset: const Offset(0, -8),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  width: 42,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.textHint.withValues(alpha: 0.32),
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 12, 14, 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(icon, color: accent, size: 21),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontFamily: 'CormorantGaramond',
+                            fontSize: 22,
+                            height: 1.1,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
-                ),
-              ),
-              // İçerik
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: child,
-                ),
-              ),
-              // Kaydet butonu
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: onSave,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.outline),
+                        ),
+                        child: IconButton(
+                          key: const ValueKey('profile_edit_sheet_close'),
+                          tooltip: AppStrings.close,
+                          padding: EdgeInsets.zero,
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close_rounded, size: 18),
+                        ),
                       ),
-                    ),
-                    icon: const Icon(Icons.check_circle_outline),
-                    label: Text(
-                      AppStrings.save,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                    ],
+                  ),
+                ),
+                Divider(height: 1, color: accent.withValues(alpha: 0.12)),
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
+                    child: child,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+                  decoration: const BoxDecoration(
+                    color: AppColors.surface,
+                    border: Border(top: BorderSide(color: AppColors.outline)),
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: FilledButton.icon(
+                        key: const ValueKey('profile_edit_sheet_save'),
+                        onPressed: onSave,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: accent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                        ),
+                        icon: const Icon(Icons.check_rounded, size: 20),
+                        label: Text(
+                          AppStrings.save,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

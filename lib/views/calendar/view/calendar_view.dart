@@ -1164,11 +1164,9 @@ class _DailyLogDetails extends StatelessWidget {
     );
     add(
       AppStrings.howFeltAfterEating,
-      value.postMealFeelings.isEmpty
+      value.mealPostFeelings.isEmpty && value.postMealFeelings.isEmpty
           ? null
-          : value.postMealFeelings
-                .map(AppStrings.localizeStoredValue)
-                .join(', '),
+          : DailyLogFormatters.mealPostFeelings(value),
     );
     add(
       AppStrings.cravingsQuestion,

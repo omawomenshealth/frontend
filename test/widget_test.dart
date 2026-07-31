@@ -158,7 +158,14 @@ void main() {
       await storage.saveDailyLog(
         DailyLog(
           date: DateTime(2026, 1, 1).add(Duration(days: day)),
-          nutritionTags: day < 10 ? const ['Tuzlu'] : const [],
+          mealTypes: const ['Kahvaltı'],
+          mealFoodGroups: day < 10
+              ? const {
+                  'Kahvaltı': ['Gluten'],
+                }
+              : const {
+                  'Kahvaltı': ['Yumurta'],
+                },
           painLocations: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
@@ -193,7 +200,14 @@ void main() {
       await storage.saveDailyLog(
         DailyLog(
           date: DateTime(2026, 1, 1).add(Duration(days: day)),
-          nutritionTags: day < 10 ? const ['Tuzlu'] : const [],
+          mealTypes: const ['Kahvaltı'],
+          mealFoodGroups: day < 10
+              ? const {
+                  'Kahvaltı': ['Gluten'],
+                }
+              : const {
+                  'Kahvaltı': ['Yumurta'],
+                },
           painLocations: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,

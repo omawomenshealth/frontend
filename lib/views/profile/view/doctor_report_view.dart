@@ -280,9 +280,9 @@ class DoctorReportView extends StatelessWidget {
       if (log.mealFoodGroups.isNotEmpty)
         '${AppStrings.whatDidYouEat}: '
             '${DailyLogFormatters.mealFoodGroups(log)}',
-      if (log.postMealFeelings.isNotEmpty)
+      if (log.mealPostFeelings.isNotEmpty || log.postMealFeelings.isNotEmpty)
         '${AppStrings.howFeltAfterEating}: '
-            '${log.postMealFeelings.map(AppStrings.localizeStoredValue).join(', ')}',
+            '${DailyLogFormatters.mealPostFeelings(log)}',
       if (log.cravings.isNotEmpty)
         '${AppStrings.cravingsQuestion}: '
             '${log.cravings.map(AppStrings.localizeStoredValue).join(', ')}',
@@ -482,6 +482,7 @@ class DoctorReportView extends StatelessWidget {
                         l.mealTypes.isNotEmpty ||
                         l.mealQualities.isNotEmpty ||
                         l.mealFoodGroups.isNotEmpty ||
+                        l.mealPostFeelings.isNotEmpty ||
                         l.postMealFeelings.isNotEmpty ||
                         l.nutritionQuality != null ||
                         l.cravings.isNotEmpty ||
@@ -839,6 +840,7 @@ class DoctorReportView extends StatelessWidget {
                 l.mealTypes.isNotEmpty ||
                 l.mealQualities.isNotEmpty ||
                 l.mealFoodGroups.isNotEmpty ||
+                l.mealPostFeelings.isNotEmpty ||
                 l.postMealFeelings.isNotEmpty ||
                 l.nutritionQuality != null ||
                 l.cravings.isNotEmpty ||
@@ -1276,6 +1278,7 @@ class DoctorReportView extends StatelessWidget {
                   l.mealTypes.isNotEmpty ||
                   l.mealQualities.isNotEmpty ||
                   l.mealFoodGroups.isNotEmpty ||
+                  l.mealPostFeelings.isNotEmpty ||
                   l.postMealFeelings.isNotEmpty ||
                   l.nutritionQuality != null ||
                   l.cravings.isNotEmpty ||

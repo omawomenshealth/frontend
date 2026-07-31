@@ -35,8 +35,10 @@ saklar ve aynı şifreli nesne buluta yüklenir:
 - kayıt zamanı: `date`; kullanıcı saat eklememişse `hasExplicitTime: false`
 - hareket: `activities`
 - beslenme: `nutritionTags`, `mealTypes`, öğün bazında `mealQualities` ve
-  `mealFoodGroups`, `postMealFeelings`, `nutritionQuality`, `cravings`,
-  `nutritionNotes`, `waterIntakeMl`, `caffeineServings`
+  `mealFoodGroups`, öğün bazında `mealPostFeelings`, `nutritionQuality`,
+  `cravings`, `nutritionNotes`, `waterIntakeMl`, `caffeineServings`.
+  Eski günlük kayıtlar için ortak `postMealFeelings` alanı yalnızca geriye
+  dönük uyumluluk amacıyla okunmaya devam eder
 - ilaç ve takviye: `medications`, `supplements`; her girişte ad, birden fazla
   zaman seçimi (`times`), aç/tok durumu, toplam adet (`doseCount`) ve
   işaretlenen adet (`takenDoseCount`) bilgisi. Eski `time`, `dosage` ve `taken`

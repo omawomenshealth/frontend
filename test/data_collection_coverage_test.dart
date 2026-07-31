@@ -13,6 +13,9 @@ void main() {
       mealFoodGroups: const {
         'Kahvaltı': ['Gluten', 'Yumurta'],
       },
+      mealPostFeelings: const {
+        'Kahvaltı': ['Enerjik', 'Şişkin'],
+      },
       postMealFeelings: const ['Enerjik', 'Şişkin'],
       nutritionQuality: 'Dengeli',
       cravings: const ['Tatlı'],

@@ -33,7 +33,7 @@ class PersonalAssociationEngine {
     if (days.length < _minimumComparableDays) return const [];
 
     final candidates = <_AssociationCandidate>[];
-    _addDailyLogCandidates(candidates, days, settings);
+    _addVisibleLogCandidates(candidates, days, settings);
     _addMetricCandidates(candidates, days);
     _addMoodCyclePhaseCandidates(candidates, days, settings);
     _addEnergyCyclePhaseCandidates(candidates, days, settings);
@@ -339,46 +339,48 @@ class PersonalAssociationEngine {
     }
   }
 
-  void _addDailyLogCandidates(
+  void _addVisibleLogCandidates(
     List<_AssociationCandidate> candidates,
     Map<DateTime, _ObservedDay> days,
     UserSettings? settings,
   ) {
-    final nutritionLabels = _allLabels(days.values.map((day) => day.nutrition));
-    final activityLabels = _allLabels(days.values.map((day) => day.activities));
-    final symptomLabels = _allLabels(days.values.map((day) => day.symptoms));
-    final bowelLabels = _allLabels(days.values.map((day) => day.bowel));
-    final moodLabels = _allLabels(
-      days.values.map(
-        (day) => day.mood == null ? const <String>{} : {day.mood!},
-      ),
-    );
     final foodGroupLabels = _allLabels(
       days.values.map((day) => day.foodGroups),
     );
-    final adverseFeelingLabels =
-        _allLabels(days.values.map((day) => day.postMealFeelings)).intersection(
-          AppStrings.postMealFeelingOptions.skip(3).map(_canonical).toSet(),
-        );
-    for (final food in foodGroupLabels) {
-      for (final feeling in adverseFeelingLabels) {
-        _testCandidate(
-          candidates: candidates,
-          days: days,
-          kind: PersonalInsightKind.foodSensitivityAssociation,
-          primaryLabel: food,
-          secondaryLabel: feeling,
-          lagDays: 0,
-          exposureObserved: (day) => day.nutritionObserved,
-          exposurePresent: (day) => day.foodGroups.contains(food),
-          outcomeObserved: (day) => day.nutritionObserved,
-          outcomePresent: (day) => day.postMealFeelings.contains(feeling),
-          contextLabels: _foodContextLabels(days, food, feeling, settings),
-        );
+    final symptomLabels = _allLabels(days.values.map((day) => day.symptoms));
+    final adverseFeelings = AppStrings.postMealFeelingOptions
+        .skip(3)
+        .map(_canonical)
+        .toSet();
+    final observedFoodFeelingPairs = _allLabels(
+      days.values.map((day) => day.foodFeelingPairs),
+    );
+    for (final pair in observedFoodFeelingPairs) {
+      final labels = pair.split('\u0000');
+      if (labels.length != 2 || !adverseFeelings.contains(labels.last)) {
+        continue;
       }
+      final food = labels.first;
+      final feeling = labels.last;
+      _testCandidate(
+        candidates: candidates,
+        days: days,
+        kind: PersonalInsightKind.foodSensitivityAssociation,
+        primaryLabel: food,
+        secondaryLabel: feeling,
+        lagDays: 0,
+        exposureObserved: (day) => day.nutritionObserved,
+        exposurePresent: (day) => day.foodGroups.contains(food),
+        outcomeObserved: (day) => day.nutritionObserved,
+        outcomePresent: (day) =>
+            day.foodFeelingPairs.contains(pair) ||
+            !day.foodGroups.contains(food) &&
+                day.postMealFeelings.contains(feeling),
+        contextLabels: _foodContextLabels(days, food, feeling, settings),
+      );
     }
 
-    for (final exposure in nutritionLabels) {
+    for (final exposure in foodGroupLabels) {
       for (final outcome in symptomLabels) {
         for (final lag in const [0, 1]) {
           _testCandidate(
@@ -389,60 +391,9 @@ class PersonalAssociationEngine {
             secondaryLabel: outcome,
             lagDays: lag,
             exposureObserved: (day) => day.nutritionObserved,
-            exposurePresent: (day) => day.nutrition.contains(exposure),
+            exposurePresent: (day) => day.foodGroups.contains(exposure),
             outcomeObserved: (day) => day.wellbeingObserved,
             outcomePresent: (day) => day.symptoms.contains(outcome),
-          );
-        }
-      }
-      for (final outcome in bowelLabels) {
-        for (final lag in const [0, 1]) {
-          _testCandidate(
-            candidates: candidates,
-            days: days,
-            kind: PersonalInsightKind.structuredAssociation,
-            primaryLabel: exposure,
-            secondaryLabel: outcome,
-            lagDays: lag,
-            exposureObserved: (day) => day.nutritionObserved,
-            exposurePresent: (day) => day.nutrition.contains(exposure),
-            outcomeObserved: (day) => day.wellbeingObserved,
-            outcomePresent: (day) => day.bowel.contains(outcome),
-          );
-        }
-      }
-    }
-
-    for (final exposure in activityLabels) {
-      for (final outcome in symptomLabels) {
-        for (final lag in const [0, 1]) {
-          _testCandidate(
-            candidates: candidates,
-            days: days,
-            kind: PersonalInsightKind.structuredAssociation,
-            primaryLabel: exposure,
-            secondaryLabel: outcome,
-            lagDays: lag,
-            exposureObserved: (day) => day.wellbeingObserved,
-            exposurePresent: (day) => day.activities.contains(exposure),
-            outcomeObserved: (day) => day.wellbeingObserved,
-            outcomePresent: (day) => day.symptoms.contains(outcome),
-          );
-        }
-      }
-      for (final outcome in moodLabels) {
-        for (final lag in const [0, 1]) {
-          _testCandidate(
-            candidates: candidates,
-            days: days,
-            kind: PersonalInsightKind.structuredAssociation,
-            primaryLabel: exposure,
-            secondaryLabel: outcome,
-            lagDays: lag,
-            exposureObserved: (day) => day.wellbeingObserved,
-            exposurePresent: (day) => day.activities.contains(exposure),
-            outcomeObserved: (day) => day.wellbeingObserved,
-            outcomePresent: (day) => day.mood == outcome,
           );
         }
       }
@@ -456,11 +407,7 @@ class PersonalAssociationEngine {
     UserSettings? settings,
   ) {
     final pairedDays = days.values
-        .where(
-          (day) =>
-              day.foodGroups.contains(food) &&
-              day.postMealFeelings.contains(feeling),
-        )
+        .where((day) => day.foodFeelingPairs.contains('$food\u0000$feeling'))
         .toList(growable: false);
     if (pairedDays.isEmpty) return const [];
 
@@ -684,12 +631,10 @@ class PersonalAssociationEngine {
 
     return grouped.map((date, dayLogs) {
       dayLogs.sort((left, right) => left.date.compareTo(right.date));
-      final nutrition = <String>{};
       final foodGroups = <String>{};
       final postMealFeelings = <String>{};
-      final activities = <String>{};
+      final foodFeelingPairs = <String>{};
       final symptoms = <String>{};
-      final bowel = <String>{};
       String? mood;
       int? sleepDurationMinutes;
       int? sleepQuality;
@@ -700,24 +645,36 @@ class PersonalAssociationEngine {
       var hasBleeding = false;
       var nutritionObserved = false;
       var wellbeingObserved = false;
-      final digestionSignals = AppStrings.symptomDigestionOptions
-          .map(_canonical)
-          .toSet();
-
       for (final log in dayLogs) {
-        nutrition.addAll(log.nutritionTags.map(_canonical));
         foodGroups.addAll(
           log.mealFoodGroups.values.expand((items) => items).map(_canonical),
         );
-        postMealFeelings.addAll(log.postMealFeelings.map(_canonical));
-        nutrition.addAll(foodGroups);
-        activities.addAll(log.activities.map(_canonical));
+        final foodsByMeal = {
+          for (final entry in log.mealFoodGroups.entries)
+            _canonical(entry.key): entry.value.map(_canonical).toSet(),
+        };
+        if (log.mealPostFeelings.isNotEmpty) {
+          for (final entry in log.mealPostFeelings.entries) {
+            final meal = _canonical(entry.key);
+            final feelings = entry.value.map(_canonical).toSet();
+            postMealFeelings.addAll(feelings);
+            for (final food in foodsByMeal[meal] ?? const <String>{}) {
+              for (final feeling in feelings) {
+                foodFeelingPairs.add('$food\u0000$feeling');
+              }
+            }
+          }
+        } else {
+          final legacyFeelings = log.postMealFeelings.map(_canonical).toSet();
+          postMealFeelings.addAll(legacyFeelings);
+          for (final food in foodsByMeal.values.expand((items) => items)) {
+            for (final feeling in legacyFeelings) {
+              foodFeelingPairs.add('$food\u0000$feeling');
+            }
+          }
+        }
         symptoms.addAll(log.painLocations.map(_canonical));
         symptoms.addAll(log.symptoms.map(_canonical));
-        bowel.addAll(log.bowelActivity.map(_canonical));
-        bowel.addAll(
-          log.symptoms.map(_canonical).where(digestionSignals.contains),
-        );
         if (log.mood != null) mood = _canonical(log.mood!);
         sleepDurationMinutes = log.sleepDurationMinutes ?? sleepDurationMinutes;
         sleepQuality = log.sleepQuality ?? sleepQuality;
@@ -730,17 +687,13 @@ class PersonalAssociationEngine {
         nutritionObserved =
             nutritionObserved ||
             log.observedSections.contains(DailyLogObservedSection.nutrition) ||
-            log.nutritionTags.isNotEmpty ||
             log.mealTypes.isNotEmpty ||
-            log.mealQualities.isNotEmpty ||
             log.mealFoodGroups.isNotEmpty ||
+            log.mealPostFeelings.isNotEmpty ||
             log.postMealFeelings.isNotEmpty ||
-            log.nutritionQuality != null ||
             log.cravings.isNotEmpty ||
-            log.bowelActivity.isNotEmpty ||
             log.waterIntakeMl != null ||
-            log.caffeineServings != null ||
-            (log.nutritionNotes?.isNotEmpty ?? false);
+            log.caffeineServings != null;
         wellbeingObserved =
             wellbeingObserved ||
             log.observedSections.contains(DailyLogObservedSection.wellbeing) ||
@@ -749,7 +702,6 @@ class PersonalAssociationEngine {
             log.sleepQuality != null ||
             log.stressLevel != null ||
             log.energyLevel != null ||
-            log.activities.isNotEmpty ||
             log.painLocations.isNotEmpty ||
             log.symptoms.isNotEmpty ||
             log.sexualActivity != null ||
@@ -761,12 +713,10 @@ class PersonalAssociationEngine {
         date,
         _ObservedDay(
           date: date,
-          nutrition: nutrition,
           foodGroups: foodGroups,
           postMealFeelings: postMealFeelings,
-          activities: activities,
+          foodFeelingPairs: foodFeelingPairs,
           symptoms: symptoms,
-          bowel: bowel,
           mood: mood,
           sleepDurationMinutes: sleepDurationMinutes,
           sleepQuality: sleepQuality,
@@ -918,12 +868,10 @@ class _CyclePhaseContext {
 
 class _ObservedDay {
   final DateTime date;
-  final Set<String> nutrition;
   final Set<String> foodGroups;
   final Set<String> postMealFeelings;
-  final Set<String> activities;
+  final Set<String> foodFeelingPairs;
   final Set<String> symptoms;
-  final Set<String> bowel;
   final String? mood;
   final int? sleepDurationMinutes;
   final int? sleepQuality;
@@ -937,12 +885,10 @@ class _ObservedDay {
 
   const _ObservedDay({
     required this.date,
-    required this.nutrition,
     required this.foodGroups,
     required this.postMealFeelings,
-    required this.activities,
+    required this.foodFeelingPairs,
     required this.symptoms,
-    required this.bowel,
     required this.mood,
     required this.sleepDurationMinutes,
     required this.sleepQuality,
