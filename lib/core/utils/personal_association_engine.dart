@@ -36,7 +36,6 @@ class PersonalAssociationEngine {
     _addVisibleLogCandidates(candidates, days, settings);
     _addMetricCandidates(candidates, days);
     _addMoodCyclePhaseCandidates(candidates, days, settings);
-    _addEnergyCyclePhaseCandidates(candidates, days, settings);
     _addMedicationCandidates(candidates, days, doseRecords);
     if (candidates.isEmpty) return const [];
 
@@ -94,48 +93,6 @@ class PersonalAssociationEngine {
     }
   }
 
-  void _addEnergyCyclePhaseCandidates(
-    List<_AssociationCandidate> candidates,
-    Map<DateTime, _ObservedDay> days,
-    UserSettings? settings,
-  ) {
-    final cycle = _buildCyclePhaseContext(days, settings);
-    if (cycle == null) return;
-
-    void testEnergyPattern({
-      required _ObservedCyclePhase phase,
-      required String energyLabel,
-      required bool Function(int value) matches,
-    }) {
-      _testCandidate(
-        candidates: candidates,
-        days: days,
-        kind: PersonalInsightKind.energyCyclePhaseAssociation,
-        primaryLabel: energyLabel,
-        secondaryLabel: '${AppStrings.cyclePhaseFeaturePrefix}${phase.name}',
-        lagDays: 0,
-        exposureObserved: (day) =>
-            day.energyLevel != null && cycle.phaseAt(day) != null,
-        exposurePresent: (day) => cycle.phaseAt(day) == phase,
-        outcomeObserved: (day) => day.energyLevel != null,
-        outcomePresent: (day) => matches(day.energyLevel!),
-      );
-    }
-
-    for (final phase in _ObservedCyclePhase.values) {
-      testEnergyPattern(
-        phase: phase,
-        energyLabel: AppStrings.insightFeatureLowEnergyToken,
-        matches: (value) => value <= 2,
-      );
-      testEnergyPattern(
-        phase: phase,
-        energyLabel: AppStrings.insightFeatureHighEnergyToken,
-        matches: (value) => value >= 4,
-      );
-    }
-  }
-
   _CyclePhaseContext? _buildCyclePhaseContext(
     Map<DateTime, _ObservedDay> days,
     UserSettings? settings,
@@ -185,156 +142,25 @@ class PersonalAssociationEngine {
     final waterValues =
         days.values.map((day) => day.waterIntakeMl).whereType<int>().toList()
           ..sort();
-    final sleepValues =
-        days.values
-            .map((day) => day.sleepDurationMinutes)
-            .whereType<int>()
-            .toList()
-          ..sort();
     final typicalWater = waterValues.length < _minimumComparableDays
         ? null
         : _median(waterValues);
-    final typicalSleep = sleepValues.length < _minimumComparableDays
-        ? null
-        : _median(sleepValues);
-
-    void test({
-      required String primary,
-      required String secondary,
-      required int lagDays,
-      required bool Function(_ObservedDay) exposureObserved,
-      required bool Function(_ObservedDay) exposurePresent,
-      required bool Function(_ObservedDay) outcomeObserved,
-      required bool Function(_ObservedDay) outcomePresent,
-    }) {
-      _testCandidate(
-        candidates: candidates,
-        days: days,
-        kind: PersonalInsightKind.structuredAssociation,
-        primaryLabel: primary,
-        secondaryLabel: secondary,
-        lagDays: lagDays,
-        exposureObserved: exposureObserved,
-        exposurePresent: exposurePresent,
-        outcomeObserved: outcomeObserved,
-        outcomePresent: outcomePresent,
-      );
-    }
-
-    if (typicalSleep != null && typicalSleep > 0) {
-      test(
-        primary: AppStrings.insightFeatureShortSleepToken,
-        secondary: AppStrings.insightFeatureLowEnergyToken,
-        lagDays: 0,
-        exposureObserved: (day) => day.sleepDurationMinutes != null,
-        exposurePresent: (day) => day.sleepDurationMinutes! < typicalSleep,
-        outcomeObserved: (day) => day.energyLevel != null,
-        outcomePresent: (day) => day.energyLevel! <= 2,
-      );
-    }
-    test(
-      primary: AppStrings.insightFeaturePoorSleepToken,
-      secondary: AppStrings.insightFeatureLowEnergyToken,
-      lagDays: 0,
-      exposureObserved: (day) => day.sleepQuality != null,
-      exposurePresent: (day) => day.sleepQuality! <= 2,
-      outcomeObserved: (day) => day.energyLevel != null,
-      outcomePresent: (day) => day.energyLevel! <= 2,
-    );
-    if (typicalSleep != null && typicalSleep > 0) {
-      test(
-        primary: AppStrings.insightFeatureShortSleepToken,
-        secondary: AppStrings.insightFeatureHighStressToken,
-        lagDays: 0,
-        exposureObserved: (day) => day.sleepDurationMinutes != null,
-        exposurePresent: (day) => day.sleepDurationMinutes! < typicalSleep,
-        outcomeObserved: (day) => day.stressLevel != null,
-        outcomePresent: (day) => day.stressLevel! >= 4,
-      );
-    }
-    test(
-      primary: AppStrings.insightFeatureHighStressToken,
-      secondary: AppStrings.insightFeaturePoorSleepToken,
-      lagDays: 1,
-      exposureObserved: (day) => day.stressLevel != null,
-      exposurePresent: (day) => day.stressLevel! >= 4,
-      outcomeObserved: (day) => day.sleepQuality != null,
-      outcomePresent: (day) => day.sleepQuality! <= 2,
-    );
-    test(
-      primary: AppStrings.insightFeatureHighCaffeineToken,
-      secondary: AppStrings.insightFeaturePoorSleepToken,
-      lagDays: 1,
-      exposureObserved: (day) => day.caffeineServings != null,
-      exposurePresent: (day) => day.caffeineServings! >= 2,
-      outcomeObserved: (day) => day.sleepQuality != null,
-      outcomePresent: (day) => day.sleepQuality! <= 2,
-    );
-    if (typicalSleep != null && typicalSleep > 0) {
-      test(
-        primary: AppStrings.insightFeatureHighCaffeineToken,
-        secondary: AppStrings.insightFeatureShortSleepToken,
-        lagDays: 1,
-        exposureObserved: (day) => day.caffeineServings != null,
-        exposurePresent: (day) => day.caffeineServings! >= 2,
-        outcomeObserved: (day) => day.sleepDurationMinutes != null,
-        outcomePresent: (day) => day.sleepDurationMinutes! < typicalSleep,
-      );
-    }
-    if (typicalWater != null && typicalWater > 0) {
-      test(
-        primary: AppStrings.insightFeatureBelowTypicalWaterToken,
-        secondary: AppStrings.insightFeatureLowEnergyToken,
-        lagDays: 0,
-        exposureObserved: (day) => day.waterIntakeMl != null,
-        exposurePresent: (day) => day.waterIntakeMl! < typicalWater,
-        outcomeObserved: (day) => day.energyLevel != null,
-        outcomePresent: (day) => day.energyLevel! <= 2,
-      );
-    }
+    if (typicalWater == null || typicalWater <= 0) return;
 
     for (final symptom in symptomLabels) {
       for (final lag in const [0, 1]) {
-        if (typicalSleep != null && typicalSleep > 0) {
-          test(
-            primary: AppStrings.insightFeatureShortSleepToken,
-            secondary: symptom,
-            lagDays: lag,
-            exposureObserved: (day) => day.sleepDurationMinutes != null,
-            exposurePresent: (day) => day.sleepDurationMinutes! < typicalSleep,
-            outcomeObserved: (day) => day.wellbeingObserved,
-            outcomePresent: (day) => day.symptoms.contains(symptom),
-          );
-        }
-        test(
-          primary: AppStrings.insightFeaturePoorSleepToken,
-          secondary: symptom,
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.structuredAssociation,
+          primaryLabel: AppStrings.insightFeatureBelowTypicalWaterToken,
+          secondaryLabel: symptom,
           lagDays: lag,
-          exposureObserved: (day) => day.sleepQuality != null,
-          exposurePresent: (day) => day.sleepQuality! <= 2,
+          exposureObserved: (day) => day.waterIntakeMl != null,
+          exposurePresent: (day) => day.waterIntakeMl! < typicalWater,
           outcomeObserved: (day) => day.wellbeingObserved,
           outcomePresent: (day) => day.symptoms.contains(symptom),
         );
-        test(
-          primary: AppStrings.insightFeatureHighStressToken,
-          secondary: symptom,
-          lagDays: lag,
-          exposureObserved: (day) => day.stressLevel != null,
-          exposurePresent: (day) => day.stressLevel! >= 4,
-          outcomeObserved: (day) => day.wellbeingObserved,
-          outcomePresent: (day) => day.symptoms.contains(symptom),
-        );
-        if (typicalWater != null && typicalWater > 0) {
-          test(
-            primary: AppStrings.insightFeatureBelowTypicalWaterToken,
-            secondary: symptom,
-            lagDays: lag,
-            exposureObserved: (day) => day.waterIntakeMl != null,
-            exposurePresent: (day) => day.waterIntakeMl! < typicalWater,
-            outcomeObserved: (day) => day.wellbeingObserved,
-            outcomePresent: (day) => day.symptoms.contains(symptom),
-          );
-        }
       }
     }
   }
@@ -428,14 +254,6 @@ class PersonalAssociationEngine {
             !_sameSignal(item, feeling),
       )) {
         counts[signal] = (counts[signal] ?? 0) + 1;
-      }
-      if ((day.stressLevel ?? 0) >= 4) {
-        counts[AppStrings.insightFeatureHighStressToken] =
-            (counts[AppStrings.insightFeatureHighStressToken] ?? 0) + 1;
-      }
-      if ((day.sleepQuality ?? 6) <= 2) {
-        counts[AppStrings.insightFeaturePoorSleepToken] =
-            (counts[AppStrings.insightFeaturePoorSleepToken] ?? 0) + 1;
       }
       if ((day.caffeineServings ?? 0) >= 2) {
         counts[AppStrings.insightFeatureHighCaffeineToken] =
@@ -636,10 +454,6 @@ class PersonalAssociationEngine {
       final foodFeelingPairs = <String>{};
       final symptoms = <String>{};
       String? mood;
-      int? sleepDurationMinutes;
-      int? sleepQuality;
-      int? stressLevel;
-      int? energyLevel;
       int? waterIntakeMl;
       int? caffeineServings;
       var hasBleeding = false;
@@ -676,10 +490,6 @@ class PersonalAssociationEngine {
         symptoms.addAll(log.painLocations.map(_canonical));
         symptoms.addAll(log.symptoms.map(_canonical));
         if (log.mood != null) mood = _canonical(log.mood!);
-        sleepDurationMinutes = log.sleepDurationMinutes ?? sleepDurationMinutes;
-        sleepQuality = log.sleepQuality ?? sleepQuality;
-        stressLevel = log.stressLevel ?? stressLevel;
-        energyLevel = log.energyLevel ?? energyLevel;
         waterIntakeMl = log.waterIntakeMl ?? waterIntakeMl;
         caffeineServings = log.caffeineServings ?? caffeineServings;
         hasBleeding = hasBleeding || log.flowIntensity != null;
@@ -698,10 +508,6 @@ class PersonalAssociationEngine {
             wellbeingObserved ||
             log.observedSections.contains(DailyLogObservedSection.wellbeing) ||
             log.mood != null ||
-            log.sleepDurationMinutes != null ||
-            log.sleepQuality != null ||
-            log.stressLevel != null ||
-            log.energyLevel != null ||
             log.painLocations.isNotEmpty ||
             log.symptoms.isNotEmpty ||
             log.sexualActivity != null ||
@@ -718,10 +524,6 @@ class PersonalAssociationEngine {
           foodFeelingPairs: foodFeelingPairs,
           symptoms: symptoms,
           mood: mood,
-          sleepDurationMinutes: sleepDurationMinutes,
-          sleepQuality: sleepQuality,
-          stressLevel: stressLevel,
-          energyLevel: energyLevel,
           waterIntakeMl: waterIntakeMl,
           caffeineServings: caffeineServings,
           hasBleeding: hasBleeding,
@@ -873,10 +675,6 @@ class _ObservedDay {
   final Set<String> foodFeelingPairs;
   final Set<String> symptoms;
   final String? mood;
-  final int? sleepDurationMinutes;
-  final int? sleepQuality;
-  final int? stressLevel;
-  final int? energyLevel;
   final int? waterIntakeMl;
   final int? caffeineServings;
   final bool hasBleeding;
@@ -890,10 +688,6 @@ class _ObservedDay {
     required this.foodFeelingPairs,
     required this.symptoms,
     required this.mood,
-    required this.sleepDurationMinutes,
-    required this.sleepQuality,
-    required this.stressLevel,
-    required this.energyLevel,
     required this.waterIntakeMl,
     required this.caffeineServings,
     required this.hasBleeding,

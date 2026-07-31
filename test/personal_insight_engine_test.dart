@@ -1,4 +1,3 @@
-import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/utils/personal_insight_engine.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
@@ -204,36 +203,36 @@ void main() {
     expect(phaseMood.withoutTotal, 63);
   });
 
-  test('enerji ve döngü fazı bağlantısını ana insight listesine ekler', () {
-    final start = DateTime(2026, 1, 1);
-    final logs = List.generate(84, (day) {
-      final dayInCycle = day % 28;
-      return DailyLog(
-        date: start.add(Duration(days: day)),
-        energyLevel: dayInCycle >= 17 ? 2 : 4,
+  test(
+    'arayüzde olmayan eski enerji alanını ana insight listesine eklemez',
+    () {
+      final start = DateTime(2026, 1, 1);
+      final logs = List.generate(84, (day) {
+        final dayInCycle = day % 28;
+        return DailyLog(
+          date: start.add(Duration(days: day)),
+          energyLevel: dayInCycle >= 17 ? 2 : 4,
+        );
+      });
+
+      final insights = engine.generate(
+        logs,
+        now: DateTime(2026, 3, 26),
+        settings: UserSettings(
+          lastPeriodDate: start,
+          averageCycleLength: 28,
+          averagePeriodLength: 5,
+        ),
       );
-    });
-
-    final insights = engine.generate(
-      logs,
-      now: DateTime(2026, 3, 26),
-      settings: UserSettings(
-        lastPeriodDate: start,
-        averageCycleLength: 28,
-        averagePeriodLength: 5,
-      ),
-    );
-    final phaseEnergy = insights.firstWhere(
-      (insight) =>
-          insight.kind == PersonalInsightKind.energyCyclePhaseAssociation &&
-          insight.primaryLabel == AppStrings.insightFeatureLowEnergyToken &&
-          insight.secondaryLabel == 'cyclePhase:luteal',
-    );
-
-    expect(phaseEnergy.withEventCount, 33);
-    expect(phaseEnergy.withTotal, 33);
-    expect(phaseEnergy.withoutTotal, 51);
-  });
+      expect(
+        insights.where(
+          (insight) =>
+              insight.kind == PersonalInsightKind.energyCyclePhaseAssociation,
+        ),
+        isEmpty,
+      );
+    },
+  );
 
   test('özet yerine yalnızca döngü değişimini insight olarak üretir', () {
     final logs = <DailyLog>[];

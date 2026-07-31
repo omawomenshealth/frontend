@@ -107,15 +107,18 @@ void main() {
     expect(merged.vaginalDischargeSymptoms, isEmpty);
   });
 
-  test('kısa uyku ile düşük enerji bağlantısını karşılaştırmalı bulur', () {
+  test('arayüzdeki su kaydı ile belirtiyi karşılaştırmalı bulur', () {
     final logs = <DailyLog>[];
     for (var day = 0; day < 20; day++) {
       logs.add(
         DailyLog(
           date: DateTime(2026, 6, 1).add(Duration(days: day)),
-          sleepDurationMinutes: day < 10 ? 360 : 480,
-          energyLevel: day < 8 || day == 15 ? 2 : 4,
-          observedSections: const {DailyLogObservedSection.wellbeing},
+          waterIntakeMl: day < 10 ? 1000 : 2000,
+          painLocations: day < 8 || day == 15 ? const ['Baş ağrısı'] : const [],
+          observedSections: const {
+            DailyLogObservedSection.nutrition,
+            DailyLogObservedSection.wellbeing,
+          },
         ),
       );
     }
@@ -126,8 +129,8 @@ void main() {
           (insight) =>
               insight.kind == PersonalInsightKind.structuredAssociation &&
               insight.primaryLabel ==
-                  AppStrings.insightFeatureShortSleepToken &&
-              insight.secondaryLabel == AppStrings.insightFeatureLowEnergyToken,
+                  AppStrings.insightFeatureBelowTypicalWaterToken &&
+              insight.secondaryLabel == 'Baş ağrısı',
         );
 
     expect(association.withEventCount, 8);
@@ -333,42 +336,34 @@ void main() {
     },
   );
 
-  test(
-    'enerji düzeyini döngü fazındaki diğer enerji günleriyle karşılaştırır',
-    () {
-      final start = DateTime(2026, 1, 1);
-      final logs = List.generate(84, (day) {
-        final dayInCycle = day % 28;
-        final isLuteal = dayInCycle >= 17;
-        return DailyLog(
-          date: start.add(Duration(days: day)),
-          energyLevel: isLuteal ? 2 : 4,
-          observedSections: const {DailyLogObservedSection.wellbeing},
-        );
-      });
-
-      final insights = engine.generate(
-        logs: logs,
-        settings: UserSettings(
-          lastPeriodDate: start,
-          averageCycleLength: 28,
-          averagePeriodLength: 5,
-        ),
+  test('arayüzde olmayan eski enerji alanını insight adayı yapmaz', () {
+    final start = DateTime(2026, 1, 1);
+    final logs = List.generate(84, (day) {
+      final dayInCycle = day % 28;
+      final isLuteal = dayInCycle >= 17;
+      return DailyLog(
+        date: start.add(Duration(days: day)),
+        energyLevel: isLuteal ? 2 : 4,
+        observedSections: const {DailyLogObservedSection.wellbeing},
       );
-      final association = insights.firstWhere(
+    });
+
+    final insights = engine.generate(
+      logs: logs,
+      settings: UserSettings(
+        lastPeriodDate: start,
+        averageCycleLength: 28,
+        averagePeriodLength: 5,
+      ),
+    );
+    expect(
+      insights.where(
         (insight) =>
-            insight.kind == PersonalInsightKind.energyCyclePhaseAssociation &&
-            insight.primaryLabel == AppStrings.insightFeatureLowEnergyToken &&
-            insight.secondaryLabel == 'cyclePhase:luteal',
-      );
-
-      expect(association.withEventCount, 33);
-      expect(association.withTotal, 33);
-      expect(association.withoutEventCount, 0);
-      expect(association.withoutTotal, 51);
-      expect(association.confidence, PersonalInsightConfidence.strong);
-    },
-  );
+            insight.kind == PersonalInsightKind.energyCyclePhaseAssociation,
+      ),
+      isEmpty,
+    );
+  });
 
   test('döngü sinyali uygun değilse faz-ruh hali bağlantısını bastırır', () {
     final start = DateTime(2026, 1, 1);
@@ -419,6 +414,29 @@ void main() {
         (insight) =>
             insight.kind == PersonalInsightKind.structuredAssociation &&
             insight.primaryLabel == 'Yürüyüş',
+      ),
+      isEmpty,
+    );
+  });
+
+  test('arayüzde olmayan eski stres alanını insight adayı yapmaz', () {
+    final logs = <DailyLog>[];
+    for (var day = 0; day < 20; day++) {
+      logs.add(
+        DailyLog(
+          date: DateTime(2026, 5, 1).add(Duration(days: day)),
+          stressLevel: day < 10 ? 5 : 1,
+          painLocations: day < 8 || day == 15 ? const ['Baş ağrısı'] : const [],
+          observedSections: const {DailyLogObservedSection.wellbeing},
+        ),
+      );
+    }
+
+    final insights = engine.generate(logs: logs);
+    expect(
+      insights.where(
+        (insight) =>
+            insight.primaryLabel == AppStrings.insightFeatureHighStressToken,
       ),
       isEmpty,
     );

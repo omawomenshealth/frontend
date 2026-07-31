@@ -395,14 +395,6 @@ class PersonalInsightEngine {
       )) {
         counts[signal] = (counts[signal] ?? 0) + 1;
       }
-      if ((day.stressLevel ?? 0) >= 4) {
-        counts[AppStrings.insightFeatureHighStressToken] =
-            (counts[AppStrings.insightFeatureHighStressToken] ?? 0) + 1;
-      }
-      if ((day.sleepQuality ?? 6) <= 2) {
-        counts[AppStrings.insightFeaturePoorSleepToken] =
-            (counts[AppStrings.insightFeaturePoorSleepToken] ?? 0) + 1;
-      }
       if ((day.caffeineServings ?? 0) >= 2) {
         counts[AppStrings.insightFeatureHighCaffeineToken] =
             (counts[AppStrings.insightFeatureHighCaffeineToken] ?? 0) + 1;
@@ -599,30 +591,20 @@ class PersonalInsightEngine {
         .map((date) {
           final dayLogs = byDate[date]!
             ..sort((a, b) => a.date.compareTo(b.date));
-          String? mood;
           final symptoms = <String>{};
-          final activities = <String>{};
-          final nutritionTags = <String>{};
           final foodGroups = <String>{};
-          final postMealFeelings = <String>{};
           final foodFeelingPairs = <String>{};
-          final bowelActivity = <String>{};
-          int? sleepQuality;
-          int? stressLevel;
           int? caffeineServings;
           var nutritionObserved = false;
           var hasBleeding = false;
 
           for (final log in dayLogs) {
-            if (log.mood != null) mood = log.mood;
             symptoms.addAll(
               log.painLocations.map(AppStrings.canonicalizeStoredValue),
             );
             symptoms.addAll(
               log.symptoms.map(AppStrings.canonicalizeStoredValue),
             );
-            activities.addAll(log.activities);
-            nutritionTags.addAll(log.nutritionTags);
             foodGroups.addAll(
               log.mealFoodGroups.values
                   .expand((items) => items)
@@ -640,7 +622,6 @@ class PersonalInsightEngine {
                 final feelings = entry.value
                     .map(AppStrings.canonicalizeStoredValue)
                     .toSet();
-                postMealFeelings.addAll(feelings);
                 for (final food in foodsByMeal[meal] ?? const <String>{}) {
                   for (final feeling in feelings) {
                     foodFeelingPairs.add('$food\u0000$feeling');
@@ -651,16 +632,12 @@ class PersonalInsightEngine {
               final legacyFeelings = log.postMealFeelings
                   .map(AppStrings.canonicalizeStoredValue)
                   .toSet();
-              postMealFeelings.addAll(legacyFeelings);
               for (final food in foodsByMeal.values.expand((items) => items)) {
                 for (final feeling in legacyFeelings) {
                   foodFeelingPairs.add('$food\u0000$feeling');
                 }
               }
             }
-            bowelActivity.addAll(log.bowelActivity);
-            sleepQuality = log.sleepQuality ?? sleepQuality;
-            stressLevel = log.stressLevel ?? stressLevel;
             caffeineServings = log.caffeineServings ?? caffeineServings;
             nutritionObserved =
                 nutritionObserved ||
@@ -671,7 +648,6 @@ class PersonalInsightEngine {
                 log.mealFoodGroups.isNotEmpty ||
                 log.mealPostFeelings.isNotEmpty ||
                 log.postMealFeelings.isNotEmpty ||
-                log.nutritionTags.isNotEmpty ||
                 log.waterIntakeMl != null ||
                 log.caffeineServings != null;
             hasBleeding = hasBleeding || log.flowIntensity != null;
@@ -679,16 +655,9 @@ class PersonalInsightEngine {
 
           return _DailySnapshot(
             date: date,
-            mood: mood,
             symptoms: symptoms,
-            activities: activities,
-            nutritionTags: nutritionTags,
             foodGroups: foodGroups,
-            postMealFeelings: postMealFeelings,
             foodFeelingPairs: foodFeelingPairs,
-            bowelActivity: bowelActivity,
-            sleepQuality: sleepQuality,
-            stressLevel: stressLevel,
             caffeineServings: caffeineServings,
             nutritionObserved: nutritionObserved,
             hasBleeding: hasBleeding,
@@ -740,32 +709,18 @@ class PersonalInsightEngine {
 
 class _DailySnapshot {
   final DateTime date;
-  final String? mood;
   final Set<String> symptoms;
-  final Set<String> activities;
-  final Set<String> nutritionTags;
   final Set<String> foodGroups;
-  final Set<String> postMealFeelings;
   final Set<String> foodFeelingPairs;
-  final Set<String> bowelActivity;
-  final int? sleepQuality;
-  final int? stressLevel;
   final int? caffeineServings;
   final bool nutritionObserved;
   final bool hasBleeding;
 
   const _DailySnapshot({
     required this.date,
-    required this.mood,
     required this.symptoms,
-    required this.activities,
-    required this.nutritionTags,
     required this.foodGroups,
-    required this.postMealFeelings,
     required this.foodFeelingPairs,
-    required this.bowelActivity,
-    required this.sleepQuality,
-    required this.stressLevel,
     required this.caffeineServings,
     required this.nutritionObserved,
     required this.hasBleeding,
