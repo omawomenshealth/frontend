@@ -274,6 +274,7 @@ class _InsightStoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final chain = _chainFor(insight);
     return SingleChildScrollView(
+      key: PageStorageKey<String>('insight_story_${insight.id}'),
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(24, 26, 24, 18),
       child: Column(
@@ -435,6 +436,10 @@ class _InsightStoryPage extends StatelessWidget {
         AppStrings.mood,
         AppStrings.myCycles,
       ],
+      PersonalInsightKind.symptomCyclePhaseAssociation => [
+        AppStrings.symptom,
+        AppStrings.myCycles,
+      ],
       PersonalInsightKind.energyCyclePhaseAssociation => [
         AppStrings.energyLevel,
         AppStrings.myCycles,
@@ -459,6 +464,11 @@ class _InsightStoryPage extends StatelessWidget {
       PersonalInsightKind.menstrualDischargeContext ||
       PersonalInsightKind.dischargeHealthNotice => [
         AppStrings.vaginalDischarge,
+        AppStrings.myCycles,
+      ],
+      PersonalInsightKind.sexualAfterFeelingPattern ||
+      PersonalInsightKind.unprotectedFertileWindowNotice => [
+        AppStrings.sexualActivity,
         AppStrings.myCycles,
       ],
       _ => [AppStrings.dailyLog, AppStrings.myCycles],

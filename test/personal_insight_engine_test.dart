@@ -1,3 +1,4 @@
+import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/utils/personal_insight_engine.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
@@ -546,4 +547,131 @@ void main() {
       isNotNull,
     );
   });
+
+  test('cinsel aktivite sonrası tekrar eden hissi örüntü olarak üretir', () {
+    final insights = engine.generate([
+      DailyLog(
+        date: DateTime(2026, 7, 20),
+        sexualActivity: true,
+        sexualActivityTypes: const {SexualActivityType.partnered},
+        sexualAfterFeelings: const {SexualAfterFeeling.comfortable},
+      ),
+      DailyLog(
+        date: DateTime(2026, 7, 24),
+        sexualActivity: true,
+        sexualActivityTypes: const {SexualActivityType.partnered},
+        sexualAfterFeelings: const {
+          SexualAfterFeeling.comfortable,
+          SexualAfterFeeling.connected,
+        },
+      ),
+      DailyLog(
+        date: DateTime(2026, 7, 29),
+        sexualActivity: true,
+        sexualActivityTypes: const {SexualActivityType.masturbation},
+        sexualAfterFeelings: const {SexualAfterFeeling.neutral},
+      ),
+    ], now: DateTime(2026, 7, 30));
+
+    final pattern = insightOf(
+      insights,
+      PersonalInsightKind.sexualAfterFeelingPattern,
+    );
+    expect(pattern, isNotNull);
+    expect(pattern!.value, 2);
+    expect(pattern.total, 3);
+    expect(
+      pattern.primaryLabel,
+      '${AppStrings.sexualAfterFeelingFeaturePrefix}comfortable',
+    );
+  });
+
+  test('korunmasız ilişki tahmini verimli pencereyle çakışınca uyarır', () {
+    final insights = engine.generate(
+      [
+        DailyLog(
+          date: DateTime(2026, 7, 13),
+          sexualActivity: true,
+          sexualActivityTypes: const {
+            SexualActivityType.partnered,
+            SexualActivityType.unprotected,
+          },
+        ),
+      ],
+      now: DateTime(2026, 7, 13, 12),
+      settings: UserSettings(
+        lastPeriodDate: DateTime(2026, 7, 1),
+        averageCycleLength: 28,
+        averagePeriodLength: 5,
+      ),
+    );
+
+    final notice = insightOf(
+      insights,
+      PersonalInsightKind.unprotectedFertileWindowNotice,
+    );
+    expect(notice, isNotNull);
+    expect(notice!.notificationLevel, PersonalInsightNotificationLevel.review);
+  });
+
+  test('hormonal korunmada tahmini verimli pencere uyarısını üretmez', () {
+    final insights = engine.generate(
+      [
+        DailyLog(
+          date: DateTime(2026, 7, 13),
+          sexualActivity: true,
+          sexualActivityTypes: const {
+            SexualActivityType.partnered,
+            SexualActivityType.unprotected,
+          },
+        ),
+      ],
+      now: DateTime(2026, 7, 13),
+      settings: UserSettings(
+        lastPeriodDate: DateTime(2026, 7, 1),
+        birthControlMethod: 'Doğum kontrol hapı',
+      ),
+    );
+
+    expect(
+      insightOf(insights, PersonalInsightKind.unprotectedFertileWindowNotice),
+      isNull,
+    );
+  });
+
+  test(
+    'belirti ile döngü fazını gözlemlenmiş yok günleriyle karşılaştırır',
+    () {
+      final start = DateTime(2026, 1, 1);
+      final logs = List.generate(84, (day) {
+        final dayInCycle = day % 28;
+        return DailyLog(
+          date: start.add(Duration(days: day)),
+          symptoms: dayInCycle < 5 ? const ['Kramplar'] : const [],
+          observedSections: const {DailyLogObservedSection.symptom},
+        );
+      });
+
+      final insights = engine.generate(
+        logs,
+        now: DateTime(2026, 3, 26),
+        settings: UserSettings(
+          lastPeriodDate: start,
+          averageCycleLength: 28,
+          averagePeriodLength: 5,
+        ),
+      );
+      final phasePattern = insights.firstWhere(
+        (insight) =>
+            insight.kind == PersonalInsightKind.symptomCyclePhaseAssociation &&
+            insight.primaryLabel == 'Kramplar' &&
+            insight.secondaryLabel == 'cyclePhase:menstrual',
+      );
+
+      expect(phasePattern.withEventCount, 15);
+      expect(phasePattern.withTotal, 15);
+      expect(phasePattern.withoutEventCount, 0);
+      expect(phasePattern.withoutTotal, 69);
+    },
+  );
 }

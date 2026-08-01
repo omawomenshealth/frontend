@@ -56,12 +56,22 @@ class DailyLogFormatters {
   }
 
   static String sexualActivity(DailyLog log) {
-    if (log.sexualActivityTypes.isNotEmpty) {
-      return log.sexualActivityTypes
-          .map((type) => AppStrings.sexualActivityOptions[type.index])
+    String withAfterFeelings(String activity) {
+      if (log.sexualAfterFeelings.isEmpty) return activity;
+      final feelings = log.sexualAfterFeelings
+          .map((feeling) => AppStrings.sexualAfterFeelingOptions[feeling.index])
           .join(', ');
+      return '$activity • ${AppStrings.sexualAfterFeelingSummary(feelings)}';
     }
-    if (log.sexualActivity == true) return AppStrings.yes;
+
+    if (log.sexualActivityTypes.isNotEmpty) {
+      return withAfterFeelings(
+        log.sexualActivityTypes
+            .map((type) => AppStrings.sexualActivityOptions[type.index])
+            .join(', '),
+      );
+    }
+    if (log.sexualActivity == true) return withAfterFeelings(AppStrings.yes);
     if (log.sexualActivity == false) return AppStrings.no;
     return AppStrings.notSpecified;
   }

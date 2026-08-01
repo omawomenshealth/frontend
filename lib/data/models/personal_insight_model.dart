@@ -18,6 +18,7 @@ enum PersonalInsightKind {
   symptomMoodCooccurrence,
   symptomBleedingCooccurrence,
   moodCyclePhaseAssociation,
+  symptomCyclePhaseAssociation,
   energyCyclePhaseAssociation,
   structuredAssociation,
   foodObservationStarted,
@@ -29,6 +30,8 @@ enum PersonalInsightKind {
   fertileDischargeSignal,
   menstrualDischargeContext,
   dischargeHealthNotice,
+  sexualAfterFeelingPattern,
+  unprotectedFertileWindowNotice,
 }
 
 enum PersonalInsightEvidenceUnit { days, cycles, entries, records }

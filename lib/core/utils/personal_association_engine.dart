@@ -36,6 +36,7 @@ class PersonalAssociationEngine {
     _addVisibleLogCandidates(candidates, days, settings);
     _addMetricCandidates(candidates, days);
     _addMoodCyclePhaseCandidates(candidates, days, settings);
+    _addSymptomCyclePhaseCandidates(candidates, days, settings);
     _addMedicationCandidates(candidates, days, doseRecords);
     if (candidates.isEmpty) return const [];
 
@@ -88,6 +89,34 @@ class PersonalAssociationEngine {
           exposurePresent: (day) => cycle.phaseAt(day) == phase,
           outcomeObserved: (day) => day.mood != null,
           outcomePresent: (day) => day.mood == mood,
+        );
+      }
+    }
+  }
+
+  void _addSymptomCyclePhaseCandidates(
+    List<_AssociationCandidate> candidates,
+    Map<DateTime, _ObservedDay> days,
+    UserSettings? settings,
+  ) {
+    final cycle = _buildCyclePhaseContext(days, settings);
+    if (cycle == null) return;
+
+    final symptomLabels = _allLabels(days.values.map((day) => day.symptoms));
+    for (final phase in _ObservedCyclePhase.values) {
+      for (final symptom in symptomLabels) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.symptomCyclePhaseAssociation,
+          primaryLabel: symptom,
+          secondaryLabel: '${AppStrings.cyclePhaseFeaturePrefix}${phase.name}',
+          lagDays: 0,
+          exposureObserved: (day) =>
+              day.symptomObserved && cycle.phaseAt(day) != null,
+          exposurePresent: (day) => cycle.phaseAt(day) == phase,
+          outcomeObserved: (day) => day.symptomObserved,
+          outcomePresent: (day) => day.symptoms.contains(symptom),
         );
       }
     }
@@ -158,7 +187,7 @@ class PersonalAssociationEngine {
           lagDays: lag,
           exposureObserved: (day) => day.waterIntakeMl != null,
           exposurePresent: (day) => day.waterIntakeMl! < typicalWater,
-          outcomeObserved: (day) => day.wellbeingObserved,
+          outcomeObserved: (day) => day.symptomObserved,
           outcomePresent: (day) => day.symptoms.contains(symptom),
         );
       }
@@ -218,7 +247,7 @@ class PersonalAssociationEngine {
             lagDays: lag,
             exposureObserved: (day) => day.nutritionObserved,
             exposurePresent: (day) => day.foodGroups.contains(exposure),
-            outcomeObserved: (day) => day.wellbeingObserved,
+            outcomeObserved: (day) => day.symptomObserved,
             outcomePresent: (day) => day.symptoms.contains(outcome),
           );
         }
@@ -308,7 +337,7 @@ class PersonalAssociationEngine {
           lagDays: 1,
           exposureObserved: (day) => responseByDate.containsKey(day.date),
           exposurePresent: (day) => responseByDate[day.date] ?? false,
-          outcomeObserved: (day) => day.wellbeingObserved,
+          outcomeObserved: (day) => day.symptomObserved,
           outcomePresent: (day) => day.symptoms.contains(symptom),
         );
       }
@@ -458,7 +487,7 @@ class PersonalAssociationEngine {
       int? caffeineServings;
       var hasBleeding = false;
       var nutritionObserved = false;
-      var wellbeingObserved = false;
+      var symptomObserved = false;
       for (final log in dayLogs) {
         foodGroups.addAll(
           log.mealFoodGroups.values.expand((items) => items).map(_canonical),
@@ -504,15 +533,12 @@ class PersonalAssociationEngine {
             log.cravings.isNotEmpty ||
             log.waterIntakeMl != null ||
             log.caffeineServings != null;
-        wellbeingObserved =
-            wellbeingObserved ||
+        symptomObserved =
+            symptomObserved ||
+            log.observedSections.contains(DailyLogObservedSection.symptom) ||
             log.observedSections.contains(DailyLogObservedSection.wellbeing) ||
-            log.mood != null ||
             log.painLocations.isNotEmpty ||
-            log.symptoms.isNotEmpty ||
-            log.sexualActivity != null ||
-            log.sexualActivityTypes.isNotEmpty ||
-            (log.notes?.isNotEmpty ?? false);
+            log.symptoms.isNotEmpty;
       }
 
       return MapEntry(
@@ -528,7 +554,7 @@ class PersonalAssociationEngine {
           caffeineServings: caffeineServings,
           hasBleeding: hasBleeding,
           nutritionObserved: nutritionObserved,
-          wellbeingObserved: wellbeingObserved,
+          symptomObserved: symptomObserved,
         ),
       );
     });
@@ -679,7 +705,7 @@ class _ObservedDay {
   final int? caffeineServings;
   final bool hasBleeding;
   final bool nutritionObserved;
-  final bool wellbeingObserved;
+  final bool symptomObserved;
 
   const _ObservedDay({
     required this.date,
@@ -692,7 +718,7 @@ class _ObservedDay {
     required this.caffeineServings,
     required this.hasBleeding,
     required this.nutritionObserved,
-    required this.wellbeingObserved,
+    required this.symptomObserved,
   });
 }
 

@@ -40,7 +40,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   var _isSaving = false;
 
   late int _flowIndex;
-  late Set<String> _periodSymptoms;
 
   late int _waterGlasses;
   late Set<String> _meals;
@@ -57,6 +56,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   late Map<String, int> _symptomSeverities;
   late bool? _sexualActivity;
   late Set<SexualActivityType> _sexualActivityTypes;
+  late Set<SexualAfterFeeling> _sexualAfterFeelings;
   late bool? _vaginalDischargePresent;
   late VaginalDischargeColor? _vaginalDischargeColor;
   late VaginalDischargeConsistency? _vaginalDischargeConsistency;
@@ -86,11 +86,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       _log.flowIntensity,
       fallback: 2,
     );
-    _periodSymptoms = _localizedSet(
-      _log.symptoms,
-      AppStrings.periodSymptomOptions,
-    );
-
     _waterGlasses = _log.waterIntakeMl == null
         ? 0
         : (_log.waterIntakeMl! / 250).round().clamp(0, 12);
@@ -154,6 +149,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     };
     _sexualActivity = _log.sexualActivity;
     _sexualActivityTypes = {..._log.sexualActivityTypes};
+    _sexualAfterFeelings = {..._log.sexualAfterFeelings};
     if (_sexualActivity == false && _sexualActivityTypes.isEmpty) {
       _sexualActivityTypes.add(SexualActivityType.none);
     }
@@ -197,14 +193,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     super.dispose();
   }
 
-  List<String> get _allSymptomOptions => [
-    ...AppStrings.symptomOverallOptions,
-    ...AppStrings.symptomBodyOptions,
-    ...AppStrings.symptomSkinHairOptions,
-    ...AppStrings.symptomEnergyOptions,
-    ...AppStrings.symptomSleepOptions,
-    ...AppStrings.symptomDigestionOptions,
-  ];
+  List<String> get _allSymptomOptions => AppStrings.allSymptomOptions;
 
   int _localizedIndex(
     List<String> options,
@@ -506,9 +495,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               for (final option in AppStrings.periodSymptomOptions)
                 _PillChoice(
                   label: option,
-                  selected: _periodSymptoms.contains(option),
+                  selected: _symptoms.contains(option),
                   color: AppColors.periodPrimary,
-                  onTap: () => _toggleChoice(_periodSymptoms, option),
+                  onTap: () => _toggleSymptom(option),
                 ),
               Tooltip(
                 message: AppStrings.symptom,
@@ -946,6 +935,43 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             color: AppColors.primary,
             onSelected: _toggleSexualActivityType,
           ),
+          if (_sexualActivity == true) ...[
+            const SizedBox(height: 20),
+            Text(
+              AppStrings.sexualAfterFeelingQuestion,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 9),
+            Wrap(
+              key: const ValueKey('sexual_after_feeling_choices'),
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (
+                  var index = 0;
+                  index < AppStrings.sexualAfterFeelingOptions.length;
+                  index++
+                )
+                  _PillChoice(
+                    label: AppStrings.sexualAfterFeelingOptions[index],
+                    selected: _sexualAfterFeelings.contains(
+                      SexualAfterFeeling.values[index],
+                    ),
+                    color: AppColors.primary,
+                    onTap: () => setState(() {
+                      final feeling = SexualAfterFeeling.values[index];
+                      if (!_sexualAfterFeelings.remove(feeling)) {
+                        _sexualAfterFeelings.add(feeling);
+                      }
+                    }),
+                  ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -1131,6 +1157,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         _sexualActivityTypes
           ..clear()
           ..add(SexualActivityType.none);
+        _sexualAfterFeelings.clear();
         _sexualActivity = false;
         return;
       }
@@ -1139,9 +1166,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       if (_sexualActivityTypes.contains(type)) {
         _sexualActivityTypes.remove(type);
       } else {
+        if (type == SexualActivityType.protected) {
+          _sexualActivityTypes.remove(SexualActivityType.unprotected);
+        } else if (type == SexualActivityType.unprotected) {
+          _sexualActivityTypes.remove(SexualActivityType.protected);
+        }
         _sexualActivityTypes.add(type);
       }
       _sexualActivity = _sexualActivityTypes.isEmpty ? null : true;
+      if (_sexualActivity != true) _sexualAfterFeelings.clear();
     });
   }
 
@@ -2662,8 +2695,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         date: finalDate,
         hasExplicitTime: hasExplicitTime,
         flowIntensity: AppStrings.flowOptions[_flowIndex],
-        symptoms: _periodSymptoms.toList(),
-        painLocations: _matchingPainLocations(_periodSymptoms),
+        symptoms: _symptoms.toList(),
+        symptomSeverity: overallSymptomSeverity,
+        clearSymptomSeverity: overallSymptomSeverity == null,
+        symptomSeverities: selectedSymptomSeverities,
+        painLocations: _matchingPainLocations(_symptoms),
         observedSections: observed,
       ),
       1 => _log.copyWith(
@@ -2710,6 +2746,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         sexualActivity: _sexualActivity,
         clearSexualActivity: _sexualActivity == null,
         sexualActivityTypes: _sexualActivityTypes,
+        sexualAfterFeelings: _sexualAfterFeelings,
         vaginalDischargePresent: _vaginalDischargePresent,
         vaginalDischargeColor: _vaginalDischargeColor,
         clearVaginalDischargeColor: _vaginalDischargePresent != true,

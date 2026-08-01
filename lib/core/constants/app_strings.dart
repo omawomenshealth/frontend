@@ -53,6 +53,8 @@ enum _TextKey {
   insightSymptomBleedingBody,
   insightMoodCyclePhaseTitle,
   insightMoodCyclePhaseBody,
+  insightSymptomCyclePhaseTitle,
+  insightSymptomCyclePhaseBody,
   insightEnergyCyclePhaseTitle,
   insightEnergyCyclePhaseBody,
   insightAssociationTitle,
@@ -78,6 +80,10 @@ enum _TextKey {
   insightMenstrualDischargeBody,
   insightDischargeHealthTitle,
   insightDischargeHealthBody,
+  insightSexualAfterPatternTitle,
+  insightSexualAfterPatternBody,
+  insightUnprotectedFertileTitle,
+  insightUnprotectedFertileBody,
   insightConfidenceEmerging,
   insightConfidenceModerate,
   insightConfidenceStrong,
@@ -382,6 +388,8 @@ enum _TextKey {
   dischargeTrackingHint,
   dischargeMedicalDisclaimer,
   sexualActivityQuestion,
+  sexualAfterFeelingQuestion,
+  sexualAfterFeelingSummary,
   notesHint,
   selectLogTime,
   pastLogTimeQuestion,
@@ -650,6 +658,7 @@ enum _ListKey {
   moodCompanionOptions,
   moodPlaceOptions,
   sexualActivityOptions,
+  sexualAfterFeelingOptions,
   nutritionMealOptions,
   nutritionQualityOptions,
   nutritionCravingOptions,
@@ -748,6 +757,9 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightMoodCyclePhaseTitle: 'Döngü fazında öne çıkan ruh hâli',
   _TextKey.insightMoodCyclePhaseBody:
       '{mood}, “{phase}” günlerinde ruh hâli girdiğin {withTotal} günün {withEvent} tanesinde kaydedildi (%{withPercent}). Diğer fazlarda ruh hâli girdiğin {withoutTotal} günde bu oran %{withoutPercent}. Bu bir ilişkidir; döngü fazının ruh hâline neden olduğunu göstermez.',
+  _TextKey.insightSymptomCyclePhaseTitle: 'Döngü fazında tekrarlayan belirti',
+  _TextKey.insightSymptomCyclePhaseBody:
+      '{symptom}, “{phase}” günlerinde belirti takibi yaptığın {withTotal} günün {withEvent} tanesinde kaydedildi (%{withPercent}). Diğer fazlarda belirti takibi yaptığın {withoutTotal} günde bu oran %{withoutPercent}. Bu bir zamanlama ilişkisidir; nedeni göstermez.',
   _TextKey.insightEnergyCyclePhaseTitle:
       'Döngü fazında öne çıkan enerji düzeyi',
   _TextKey.insightEnergyCyclePhaseBody:
@@ -791,6 +803,14 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightDischargeHealthTitle: 'Akıntı değişikliğini değerlendirin',
   _TextKey.insightDischargeHealthBody:
       'Son kaydında renk, kıvam, koku veya eşlik eden bulgulardan değerlendirilmesi gereken bir değişiklik işaretlendi. Bu, enfeksiyon dahil farklı nedenlerle görülebilir; uygulama nedenini belirleyemez veya tanı koyamaz. Değişiklik yeniyse, sürerse ya da kötüleşirse sağlık profesyoneline başvur.',
+  _TextKey.insightSexualAfterPatternTitle:
+      'Cinsel aktivite sonrası tekrar eden his',
+  _TextKey.insightSexualAfterPatternBody:
+      '{feeling}, cinsel aktivite sonrası his kaydettiğin {total} girişin {count} tanesinde yer aldı. Bu yalnızca kişisel kayıt örüntündür; tek başına bir sağlık sonucu göstermez.',
+  _TextKey.insightUnprotectedFertileTitle:
+      'Korunmasız ilişki ve tahmini verimli dönem',
+  _TextKey.insightUnprotectedFertileBody:
+      'Son korunmasız ilişki kaydın tahmini verimli pencereyle çakışıyor. Takvim tahmini ovülasyonu veya gebeliği doğrulamaz. Gebelik istemiyorsan, acil korunma seçenekleri zamana bağlı olduğundan bir sağlık profesyoneli ya da eczacıyla gecikmeden görüş.',
   _TextKey.insightConfidenceEmerging: 'Oluşan bağlantı',
   _TextKey.insightConfidenceModerate: 'Orta güven',
   _TextKey.insightConfidenceStrong: 'Daha güçlü kanıt',
@@ -1122,6 +1142,9 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.dischargeMedicalDisclaimer:
       'Bu takip tanı veya kesin ovülasyon sonucu vermez. Olağandışı ya da süren değişikliklerde sağlık profesyoneline danış.',
   _TextKey.sexualActivityQuestion: 'Bugün cinsel aktivite oldu mu?',
+  _TextKey.sexualAfterFeelingQuestion:
+      'Cinsel aktivite sonrasında nasıl hissettirdi?',
+  _TextKey.sexualAfterFeelingSummary: 'Sonrasında: {feelings}',
   _TextKey.notesHint: 'Bugün hakkında notlarınız...',
   _TextKey.selectLogTime: 'Kayıt Saatini Seçin',
   _TextKey.pastLogTimeQuestion: 'Bu kayda saat eklemek ister misin?',
@@ -1497,6 +1520,9 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightMoodCyclePhaseTitle: 'Mood pattern by cycle phase',
   _TextKey.insightMoodCyclePhaseBody:
       '{mood} was logged on {withEvent} of {withTotal} mood-logged days during {phase} ({withPercent}%). On {withoutTotal} mood-logged days in other phases, the rate was {withoutPercent}%. This is an association; it does not show that the cycle phase caused the mood.',
+  _TextKey.insightSymptomCyclePhaseTitle: 'A symptom pattern by cycle phase',
+  _TextKey.insightSymptomCyclePhaseBody:
+      '{symptom} was logged on {withEvent} of {withTotal} symptom-tracked days during {phase} ({withPercent}%). On {withoutTotal} symptom-tracked days in other phases, the rate was {withoutPercent}%. This is a timing association and does not show the cause.',
   _TextKey.insightEnergyCyclePhaseTitle: 'Energy pattern by cycle phase',
   _TextKey.insightEnergyCyclePhaseBody:
       '{energy} appeared on {withEvent} of {withTotal} energy-logged days during {phase} ({withPercent}%). On {withoutTotal} energy-logged days in other phases, the rate was {withoutPercent}%. This is an association; it does not show that the cycle phase caused the energy level.',
@@ -1541,6 +1567,14 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightDischargeHealthTitle: 'Review this discharge change',
   _TextKey.insightDischargeHealthBody:
       'Your latest entry includes a color, consistency, odor, or accompanying finding worth reviewing. This can have different causes, including infection; the app cannot identify the cause or diagnose it. Contact a healthcare professional if the change is new, persists, or worsens.',
+  _TextKey.insightSexualAfterPatternTitle:
+      'A recurring feeling after sexual activity',
+  _TextKey.insightSexualAfterPatternBody:
+      '{feeling} appeared in {count} of your {total} entries with an after-sex feeling. This is only a pattern in your personal logs and does not show a health outcome by itself.',
+  _TextKey.insightUnprotectedFertileTitle:
+      'Unprotected sex and the estimated fertile window',
+  _TextKey.insightUnprotectedFertileBody:
+      'Your latest unprotected-sex entry overlaps with the estimated fertile window. Calendar estimates do not confirm ovulation or pregnancy. If you do not want a pregnancy, emergency contraception is time-sensitive; contact a healthcare professional or pharmacist promptly.',
   _TextKey.insightConfidenceEmerging: 'Emerging connection',
   _TextKey.insightConfidenceModerate: 'Moderate confidence',
   _TextKey.insightConfidenceStrong: 'Stronger evidence',
@@ -1870,6 +1904,9 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.dischargeMedicalDisclaimer:
       'This tracking does not diagnose a condition or confirm ovulation. Contact a healthcare professional for unusual or persistent changes.',
   _TextKey.sexualActivityQuestion: 'Was there sexual activity today?',
+  _TextKey.sexualAfterFeelingQuestion:
+      'How did you feel after sexual activity?',
+  _TextKey.sexualAfterFeelingSummary: 'Afterwards: {feelings}',
   _TextKey.notesHint: 'Your notes about today...',
   _TextKey.selectLogTime: 'Select Log Time',
   _TextKey.pastLogTimeQuestion: 'Would you like to add a time to this log?',
@@ -2265,6 +2302,17 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Korunmasız',
     'Aktivite olmadı',
   ],
+  _ListKey.sexualAfterFeelingOptions: [
+    'Rahat',
+    'Bağ kurmuş',
+    'Sakin',
+    'Enerjik',
+    'Nötr',
+    'Yorgun',
+    'Hassas',
+    'Rahatsız',
+    'Ağrı',
+  ],
   _ListKey.nutritionMealOptions: [
     'Kahvaltı',
     'Öğle yemeği',
@@ -2564,6 +2612,17 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Unprotected',
     'No activity',
   ],
+  _ListKey.sexualAfterFeelingOptions: [
+    'Comfortable',
+    'Connected',
+    'Calm',
+    'Energized',
+    'Neutral',
+    'Tired',
+    'Sensitive',
+    'Uncomfortable',
+    'Pain',
+  ],
   _ListKey.nutritionMealOptions: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
   _ListKey.nutritionQualityOptions: ['Light', 'Medium', 'Heavy'],
   _ListKey.nutritionCravingOptions: [
@@ -2787,6 +2846,7 @@ class AppStrings {
   static const dischargeConsistencyFeaturePrefix = 'dischargeConsistency:';
   static const dischargeSymptomFeaturePrefix = 'dischargeSymptom:';
   static const cyclePhaseFeaturePrefix = 'cyclePhase:';
+  static const sexualAfterFeelingFeaturePrefix = 'sexualAfterFeeling:';
 
   static const delegate = _AppStringsDelegate();
 
@@ -2908,6 +2968,23 @@ class AppStrings {
         'luteal' => lutealPhase,
         final name => name,
       };
+    }
+    if (value.startsWith(sexualAfterFeelingFeaturePrefix)) {
+      final index = switch (value.substring(
+        sexualAfterFeelingFeaturePrefix.length,
+      )) {
+        'comfortable' => 0,
+        'connected' => 1,
+        'calm' => 2,
+        'energized' => 3,
+        'neutral' => 4,
+        'tired' => 5,
+        'sensitive' => 6,
+        'uncomfortable' => 7,
+        'pain' => 8,
+        _ => -1,
+      };
+      return index >= 0 ? sexualAfterFeelingOptions[index] : value;
     }
     return switch (value) {
       insightFeatureShortSleepToken => _text(_TextKey.insightFeatureShortSleep),
@@ -3115,6 +3192,25 @@ class AppStrings {
     'withPercent': withPercent,
     'withoutPercent': withoutPercent,
   });
+  static String get insightSymptomCyclePhaseTitle =>
+      _text(_TextKey.insightSymptomCyclePhaseTitle);
+  static String insightSymptomCyclePhaseBody({
+    required String symptom,
+    required String phase,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightSymptomCyclePhaseBody, {
+    'symptom': symptom,
+    'phase': phase,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
   static String get insightEnergyCyclePhaseTitle =>
       _text(_TextKey.insightEnergyCyclePhaseTitle);
   static String insightEnergyCyclePhaseBody({
@@ -3261,6 +3357,21 @@ class AppStrings {
       _text(_TextKey.insightDischargeHealthTitle);
   static String get insightDischargeHealthBody =>
       _text(_TextKey.insightDischargeHealthBody);
+  static String get insightSexualAfterPatternTitle =>
+      _text(_TextKey.insightSexualAfterPatternTitle);
+  static String insightSexualAfterPatternBody({
+    required String feeling,
+    required int count,
+    required int total,
+  }) => _format(_TextKey.insightSexualAfterPatternBody, {
+    'feeling': feeling,
+    'count': count,
+    'total': total,
+  });
+  static String get insightUnprotectedFertileTitle =>
+      _text(_TextKey.insightUnprotectedFertileTitle);
+  static String get insightUnprotectedFertileBody =>
+      _text(_TextKey.insightUnprotectedFertileBody);
   static String insightConfidenceLabel(String confidenceName) {
     return switch (confidenceName) {
       'strong' => _text(_TextKey.insightConfidenceStrong),
@@ -3655,6 +3766,10 @@ class AppStrings {
       _text(_TextKey.dischargeMedicalDisclaimer);
   static String get sexualActivityQuestion =>
       _text(_TextKey.sexualActivityQuestion);
+  static String get sexualAfterFeelingQuestion =>
+      _text(_TextKey.sexualAfterFeelingQuestion);
+  static String sexualAfterFeelingSummary(String feelings) =>
+      _format(_TextKey.sexualAfterFeelingSummary, {'feelings': feelings});
   static String get notesHint => _text(_TextKey.notesHint);
   static String get selectLogTime => _text(_TextKey.selectLogTime);
   static String get pastLogTimeQuestion => _text(_TextKey.pastLogTimeQuestion);
@@ -4004,6 +4119,8 @@ class AppStrings {
   static List<String> get moodPlaceOptions => _list(_ListKey.moodPlaceOptions);
   static List<String> get sexualActivityOptions =>
       _list(_ListKey.sexualActivityOptions);
+  static List<String> get sexualAfterFeelingOptions =>
+      _list(_ListKey.sexualAfterFeelingOptions);
   static List<String> get nutritionMealOptions =>
       _list(_ListKey.nutritionMealOptions);
   static List<String> get nutritionQualityOptions =>
@@ -4030,6 +4147,15 @@ class AppStrings {
       _list(_ListKey.symptomSleepOptions);
   static List<String> get symptomDigestionOptions =>
       _list(_ListKey.symptomDigestionOptions);
+  static List<String> get allSymptomOptions => List<String>.unmodifiable({
+    ...periodSymptomOptions,
+    ...symptomOverallOptions,
+    ...symptomBodyOptions,
+    ...symptomSkinHairOptions,
+    ...symptomEnergyOptions,
+    ...symptomSleepOptions,
+    ...symptomDigestionOptions,
+  });
   static List<String> get bowelActivityOptions =>
       _list(_ListKey.bowelActivityOptions);
   static List<String> get painLocations => _list(_ListKey.painLocations);

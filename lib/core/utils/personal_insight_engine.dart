@@ -44,6 +44,7 @@ class PersonalInsightEngine {
       settings,
     );
     _addDischargeInsights(insights, logs, snapshots, today, settings);
+    _addSexualInsights(insights, logs, snapshots, today, settings);
     insights.addAll(associationInsights);
 
     insights.sort((a, b) {
@@ -53,6 +54,95 @@ class PersonalInsightEngine {
     });
 
     return insights.take(_maxInsights).toList(growable: false);
+  }
+
+  void _addSexualInsights(
+    List<PersonalInsight> insights,
+    List<DailyLog> logs,
+    List<_DailySnapshot> snapshots,
+    DateTime today,
+    UserSettings? settings,
+  ) {
+    final feelingLogs = logs
+        .where(
+          (log) =>
+              log.sexualActivity == true && log.sexualAfterFeelings.isNotEmpty,
+        )
+        .toList(growable: false);
+    if (feelingLogs.length >= 2) {
+      final counts = <SexualAfterFeeling, int>{};
+      for (final log in feelingLogs) {
+        for (final feeling in log.sexualAfterFeelings) {
+          counts[feeling] = (counts[feeling] ?? 0) + 1;
+        }
+      }
+      final ranked = counts.entries.toList()
+        ..sort((left, right) {
+          final count = right.value.compareTo(left.value);
+          if (count != 0) return count;
+          return left.key.index.compareTo(right.key.index);
+        });
+      final recurring = ranked.first;
+      if (recurring.value >= 2 && recurring.value / feelingLogs.length >= 0.5) {
+        insights.add(
+          PersonalInsight(
+            id: 'sexual_after_${recurring.key.name}',
+            kind: PersonalInsightKind.sexualAfterFeelingPattern,
+            priority: 103,
+            evidenceCount: feelingLogs.length,
+            evidenceUnit: PersonalInsightEvidenceUnit.entries,
+            primaryLabel:
+                '${AppStrings.sexualAfterFeelingFeaturePrefix}'
+                '${recurring.key.name}',
+            value: recurring.value,
+            total: feelingLogs.length,
+            confidence: feelingLogs.length >= 4
+                ? PersonalInsightConfidence.moderate
+                : PersonalInsightConfidence.emerging,
+          ),
+        );
+      }
+    }
+
+    final unprotectedLogs =
+        logs
+            .where(
+              (log) =>
+                  log.sexualActivity == true &&
+                  log.sexualActivityTypes.contains(
+                    SexualActivityType.unprotected,
+                  ),
+            )
+            .toList()
+          ..sort((left, right) => left.date.compareTo(right.date));
+    if (unprotectedLogs.isEmpty) return;
+
+    final latest = unprotectedLogs.last;
+    final entryDate = latest.date.dateOnly;
+    final ageInDays = today.difference(entryDate).inDays;
+    final fertilityPredictionAllowed =
+        settings?.menopauseStatus != MenopauseStatus.peri &&
+        settings?.menopauseStatus != MenopauseStatus.post &&
+        !AppStrings.birthControlMayAffectCycleSignals(
+          settings?.birthControlMethod,
+        );
+    final cycle = _buildInsightCycleContext(snapshots, settings, today);
+    if (ageInDays >= 0 &&
+        ageInDays <= 5 &&
+        fertilityPredictionAllowed &&
+        cycle != null &&
+        cycle.isFertileDay(entryDate)) {
+      insights.add(
+        PersonalInsight(
+          id: 'unprotected_fertile_${entryDate.toIso8601String()}',
+          kind: PersonalInsightKind.unprotectedFertileWindowNotice,
+          priority: 124,
+          evidenceCount: 1,
+          evidenceUnit: PersonalInsightEvidenceUnit.entries,
+          notificationLevel: PersonalInsightNotificationLevel.review,
+        ),
+      );
+    }
   }
 
   void _addDischargeInsights(

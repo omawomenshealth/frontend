@@ -69,7 +69,7 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
           '${presentation.body}',
       child: Container(
         width: double.infinity,
-        height: 410,
+        height: 420,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: presentation.softColor,

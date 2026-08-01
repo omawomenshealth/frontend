@@ -113,6 +113,48 @@ void main() {
     expect(find.text(AppStrings.symptomQuestion), findsOneWidget);
   });
 
+  testWidgets('Adet ve belirti ekranı aynı belirti seçim durumunu kullanır', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(tester, initialIndex: 0);
+    final sharedSymptom = find.text(AppStrings.periodSymptomOptions.first);
+    final periodSymptomTap = find.ancestor(
+      of: sharedSymptom,
+      matching: find.byType(InkWell),
+    );
+    tester.widget<InkWell>(periodSymptomTap).onTap!();
+    await tester.pumpAndSettle();
+
+    final openSymptoms = find.byKey(const ValueKey('period_open_symptoms'));
+    final openSymptomsTap = find.descendant(
+      of: openSymptoms,
+      matching: find.byType(InkWell),
+    );
+    tester.widget<InkWell>(openSymptomsTap).onTap!();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.saveAndContinue));
+    await tester.pumpAndSettle();
+
+    final sameSymptomOnSymptomPage = find.text(
+      AppStrings.symptomBodyOptions.first,
+    );
+    final symptomPageTap = find.ancestor(
+      of: sameSymptomOnSymptomPage,
+      matching: find.byType(InkWell),
+    );
+    tester.widget<InkWell>(symptomPageTap).onTap!();
+    await tester.pumpAndSettle();
+    final save = find.text(AppStrings.save);
+    await tester.ensureVisible(save);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+
+    expect(
+      harness.savedLog!.symptoms,
+      isNot(contains(AppStrings.periodSymptomOptions.first)),
+    );
+  });
+
   testWidgets('Ruh hali önce seçilir, bağlam soruları ikinci ekranda açılır', (
     tester,
   ) async {
@@ -338,7 +380,9 @@ void main() {
     expect(severitySlider, findsOneWidget);
     tester.widget<Slider>(severitySlider).onChanged!(3);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(AppStrings.save));
+    final save = find.text(AppStrings.save);
+    await tester.ensureVisible(save);
+    await tester.tap(save);
     await tester.pumpAndSettle();
 
     expect(harness.savedLog, isNotNull);
@@ -379,6 +423,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(partnered);
     await tester.tap(find.text(AppStrings.sexualActivityOptions[2]));
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.sexualAfterFeelingQuestion), findsOneWidget);
+    final afterFeeling = find.text(AppStrings.sexualAfterFeelingOptions.first);
+    await tester.ensureVisible(afterFeeling);
+    await tester.tap(afterFeeling);
     final dischargeYes = find.text(AppStrings.dischargePresenceOptions.first);
     await tester.ensureVisible(dischargeYes);
     await tester.pumpAndSettle();
@@ -410,6 +459,10 @@ void main() {
       harness.savedLog!.sexualActivityTypes,
       containsAll({SexualActivityType.partnered, SexualActivityType.protected}),
     );
+    expect(
+      harness.savedLog!.sexualAfterFeelings,
+      contains(SexualAfterFeeling.comfortable),
+    );
     expect(harness.savedLog!.vaginalDischargePresent, isTrue);
     expect(
       harness.savedLog!.vaginalDischargeColor,
@@ -426,6 +479,41 @@ void main() {
     expect(
       harness.savedLog!.vaginalDischargeSymptoms,
       contains(VaginalDischargeSymptom.unusualOdor),
+    );
+  });
+
+  testWidgets('Korunmalı ve korunmasız seçimleri birbirini kaldırır', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(tester, initialIndex: 2);
+
+    final protected = find.text(AppStrings.sexualActivityOptions[2]);
+    final unprotected = find.text(AppStrings.sexualActivityOptions[3]);
+    final protectedTap = find.ancestor(
+      of: protected,
+      matching: find.byType(InkWell),
+    );
+    tester.widget<InkWell>(protectedTap).onTap!();
+    await tester.pumpAndSettle();
+    final unprotectedTap = find.ancestor(
+      of: unprotected,
+      matching: find.byType(InkWell),
+    );
+    tester.widget<InkWell>(unprotectedTap).onTap!();
+    await tester.pumpAndSettle();
+
+    final saveButton = find.text(AppStrings.save);
+    await tester.ensureVisible(saveButton);
+    await tester.tap(saveButton);
+    await tester.pumpAndSettle();
+
+    expect(
+      harness.savedLog!.sexualActivityTypes,
+      contains(SexualActivityType.unprotected),
+    );
+    expect(
+      harness.savedLog!.sexualActivityTypes,
+      isNot(contains(SexualActivityType.protected)),
     );
   });
 

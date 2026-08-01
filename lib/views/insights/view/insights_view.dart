@@ -470,6 +470,22 @@ class _InsightPresentation {
         );
         icon = Icons.donut_large_rounded;
         color = AppColors.luteal;
+      case PersonalInsightKind.symptomCyclePhaseAssociation:
+        title = AppStrings.insightSymptomCyclePhaseTitle;
+        body = AppStrings.insightSymptomCyclePhaseBody(
+          symptom: primary,
+          phase: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.monitor_heart_outlined;
+        color = AppColors.periodPrimary;
       case PersonalInsightKind.energyCyclePhaseAssociation:
         title = AppStrings.insightEnergyCyclePhaseTitle;
         body = AppStrings.insightEnergyCyclePhaseBody(
@@ -572,6 +588,20 @@ class _InsightPresentation {
       case PersonalInsightKind.dischargeHealthNotice:
         title = AppStrings.insightDischargeHealthTitle;
         body = AppStrings.insightDischargeHealthBody;
+        icon = Icons.health_and_safety_outlined;
+        color = AppColors.warning;
+      case PersonalInsightKind.sexualAfterFeelingPattern:
+        title = AppStrings.insightSexualAfterPatternTitle;
+        body = AppStrings.insightSexualAfterPatternBody(
+          feeling: primary,
+          count: insight.value!,
+          total: insight.total!,
+        );
+        icon = Icons.favorite_outline_rounded;
+        color = AppColors.secondaryDark;
+      case PersonalInsightKind.unprotectedFertileWindowNotice:
+        title = AppStrings.insightUnprotectedFertileTitle;
+        body = AppStrings.insightUnprotectedFertileBody;
         icon = Icons.health_and_safety_outlined;
         color = AppColors.warning;
     }

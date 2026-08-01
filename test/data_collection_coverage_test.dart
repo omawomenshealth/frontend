@@ -56,6 +56,10 @@ void main() {
         SexualActivityType.partnered,
         SexualActivityType.protected,
       },
+      sexualAfterFeelings: const {
+        SexualAfterFeeling.comfortable,
+        SexualAfterFeeling.connected,
+      },
       bowelActivity: const ['Normal'],
       painLocations: const ['Bel'],
       symptoms: const ['Kramp'],
@@ -81,5 +85,52 @@ void main() {
     final restored = DailyLog.fromJson(original.toJson());
 
     expect(restored.toJson(), original.toJson());
+  });
+
+  test('korunmalı ve korunmasız JSON seçimi birlikte kabul edilmez', () {
+    expect(
+      () => DailyLog.fromJson({
+        'date': DateTime(2026, 8, 1).toIso8601String(),
+        'sexualActivity': true,
+        'sexualActivityTypes': ['protected', 'unprotected'],
+      }),
+      throwsFormatException,
+    );
+  });
+
+  test('cinsel aktivite sonrası his, aktivite olmadan kabul edilmez', () {
+    expect(
+      () => DailyLog.fromJson({
+        'date': DateTime(2026, 8, 1).toIso8601String(),
+        'sexualActivity': false,
+        'sexualActivityTypes': ['none'],
+        'sexualAfterFeelings': ['comfortable'],
+      }),
+      throwsFormatException,
+    );
+  });
+
+  test('birleştirmede güncel korunma seçimi çelişen eski seçimi kaldırır', () {
+    final current = DailyLog(
+      date: DateTime(2026, 8, 1),
+      sexualActivity: true,
+      sexualActivityTypes: const {SexualActivityType.unprotected},
+    );
+    final older = DailyLog(
+      date: DateTime(2026, 8, 1),
+      sexualActivity: true,
+      sexualActivityTypes: const {SexualActivityType.protected},
+    );
+
+    final merged = current.mergeWith(older);
+
+    expect(
+      merged.sexualActivityTypes,
+      contains(SexualActivityType.unprotected),
+    );
+    expect(
+      merged.sexualActivityTypes,
+      isNot(contains(SexualActivityType.protected)),
+    );
   });
 }

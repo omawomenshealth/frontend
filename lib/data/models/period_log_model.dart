@@ -54,6 +54,18 @@ enum SexualActivityType {
   none,
 }
 
+enum SexualAfterFeeling {
+  comfortable,
+  connected,
+  calm,
+  energized,
+  neutral,
+  tired,
+  sensitive,
+  uncomfortable,
+  pain,
+}
+
 /// İlaç/Takviye alım kaydı.
 class MedicationEntry {
   final String name;
@@ -168,7 +180,7 @@ class MedicationEntry {
 
 /// Günlük kayıt modeli — tüm wellness modüllerini birleşik tutar.
 class DailyLog {
-  static const int schemaVersion = 9;
+  static const int schemaVersion = 10;
 
   final DateTime date;
   final bool hasExplicitTime;
@@ -213,6 +225,7 @@ class DailyLog {
   // ── Cinsel Aktivite ──────────────────────────────────────
   final bool? sexualActivity;
   final Set<SexualActivityType> sexualActivityTypes;
+  final Set<SexualAfterFeeling> sexualAfterFeelings;
 
   // ── Bağırsak Aktivitesi ──────────────────────────────────
   final List<String> bowelActivity; // Normal, Kabızlık, İshal, vb.
@@ -271,6 +284,7 @@ class DailyLog {
     this.dreamNote,
     this.sexualActivity,
     Set<SexualActivityType> sexualActivityTypes = const {},
+    Set<SexualAfterFeeling> sexualAfterFeelings = const {},
     this.bowelActivity = const [],
     this.painLocations = const [],
     this.symptoms = const [],
@@ -307,6 +321,10 @@ class DailyLog {
              sexualActivityTypes.length == 1,
        ),
        assert(
+         !sexualActivityTypes.contains(SexualActivityType.protected) ||
+             !sexualActivityTypes.contains(SexualActivityType.unprotected),
+       ),
+       assert(
          sexualActivity != true ||
              !sexualActivityTypes.contains(SexualActivityType.none),
        ),
@@ -315,6 +333,7 @@ class DailyLog {
              sexualActivityTypes.isEmpty ||
              sexualActivityTypes.contains(SexualActivityType.none),
        ),
+       assert(sexualAfterFeelings.isEmpty || sexualActivity == true),
        assert(
          waterIntakeMl == null || waterIntakeMl >= 0 && waterIntakeMl <= 10000,
        ),
@@ -339,6 +358,7 @@ class DailyLog {
            entry.key: List<String>.unmodifiable(entry.value),
        }),
        sexualActivityTypes = Set.unmodifiable(sexualActivityTypes),
+       sexualAfterFeelings = Set.unmodifiable(sexualAfterFeelings),
        symptomSeverities = Map.unmodifiable(symptomSeverities),
        vaginalDischargeSymptoms = Set.unmodifiable(vaginalDischargeSymptoms),
        observedSections = Set.unmodifiable(observedSections);
@@ -383,6 +403,7 @@ class DailyLog {
     bool? sexualActivity,
     bool clearSexualActivity = false,
     Set<SexualActivityType>? sexualActivityTypes,
+    Set<SexualAfterFeeling>? sexualAfterFeelings,
     List<String>? bowelActivity,
     List<String>? painLocations,
     List<String>? symptoms,
@@ -450,6 +471,9 @@ class DailyLog {
           ? null
           : sexualActivity ?? this.sexualActivity,
       sexualActivityTypes: sexualActivityTypes ?? this.sexualActivityTypes,
+      sexualAfterFeelings: clearSexualActivity || sexualActivity == false
+          ? const {}
+          : sexualAfterFeelings ?? this.sexualAfterFeelings,
       bowelActivity: bowelActivity ?? this.bowelActivity,
       painLocations: painLocations ?? this.painLocations,
       symptoms: symptoms ?? this.symptoms,
@@ -511,6 +535,7 @@ class DailyLog {
         (dreamNote?.isNotEmpty ?? false) ||
         sexualActivity != null ||
         sexualActivityTypes.isNotEmpty ||
+        sexualAfterFeelings.isNotEmpty ||
         bowelActivity.isNotEmpty ||
         painLocations.isNotEmpty ||
         symptoms.isNotEmpty ||
@@ -560,6 +585,9 @@ class DailyLog {
     'sexualActivity': sexualActivity,
     'sexualActivityTypes': sexualActivityTypes
         .map((type) => type.name)
+        .toList(),
+    'sexualAfterFeelings': sexualAfterFeelings
+        .map((feeling) => feeling.name)
         .toList(),
     'bowelActivity': bowelActivity,
     'painLocations': painLocations,
@@ -651,6 +679,7 @@ class DailyLog {
       dreamNote: json['dreamNote'] as String?,
       sexualActivity: json['sexualActivity'] as bool?,
       sexualActivityTypes: _readSexualActivityTypes(json),
+      sexualAfterFeelings: _readSexualAfterFeelings(json),
       bowelActivity: List<String>.from(json['bowelActivity'] ?? []),
       painLocations: List<String>.from(json['painLocations'] ?? []),
       symptoms: List<String>.from(json['symptoms'] ?? []),
@@ -819,6 +848,52 @@ class DailyLog {
         'Aktivite olmadı seçeneği diğer türlerle birlikte kullanılamaz.',
       );
     }
+    if (result.contains(SexualActivityType.protected) &&
+        result.contains(SexualActivityType.unprotected)) {
+      throw const FormatException(
+        'Korunmalı ve korunmasız aynı kayıtta birlikte kullanılamaz.',
+      );
+    }
+    final sexualActivity = json['sexualActivity'];
+    if (sexualActivity == true && result.contains(SexualActivityType.none) ||
+        sexualActivity == false &&
+            result.isNotEmpty &&
+            !result.contains(SexualActivityType.none)) {
+      throw const FormatException(
+        'sexualActivity ile sexualActivityTypes çelişiyor.',
+      );
+    }
+    return result;
+  }
+
+  static Set<SexualAfterFeeling> _readSexualAfterFeelings(
+    Map<String, dynamic> json,
+  ) {
+    final raw = json['sexualAfterFeelings'];
+    if (raw == null) return const {};
+    if (raw is! List) {
+      throw const FormatException('sexualAfterFeelings bir liste olmalıdır.');
+    }
+    final result = <SexualAfterFeeling>{};
+    for (final value in raw) {
+      if (value is! String) {
+        throw const FormatException(
+          'sexualAfterFeelings geçersiz bir değer içeriyor.',
+        );
+      }
+      try {
+        result.add(SexualAfterFeeling.values.byName(value));
+      } on ArgumentError {
+        throw const FormatException(
+          'sexualAfterFeelings geçersiz bir değer içeriyor.',
+        );
+      }
+    }
+    if (result.isNotEmpty && json['sexualActivity'] != true) {
+      throw const FormatException(
+        'Cinsel aktivite sonrası his için cinsel aktivite kaydı gerekir.',
+      );
+    }
     return result;
   }
 
@@ -904,6 +979,24 @@ class DailyLog {
       ...other.sexualActivityTypes,
       ...sexualActivityTypes,
     };
+    final preferredProtection =
+        sexualActivityTypes.contains(SexualActivityType.protected)
+        ? SexualActivityType.protected
+        : sexualActivityTypes.contains(SexualActivityType.unprotected)
+        ? SexualActivityType.unprotected
+        : null;
+    if (preferredProtection != null) {
+      mergedSexualActivityTypes.remove(
+        preferredProtection == SexualActivityType.protected
+            ? SexualActivityType.unprotected
+            : SexualActivityType.protected,
+      );
+    } else if (mergedSexualActivityTypes.contains(
+          SexualActivityType.protected,
+        ) &&
+        mergedSexualActivityTypes.contains(SexualActivityType.unprotected)) {
+      mergedSexualActivityTypes.remove(SexualActivityType.unprotected);
+    }
     if (mergedSexualActivity == true) {
       mergedSexualActivityTypes.remove(SexualActivityType.none);
     } else if (mergedSexualActivity == false) {
@@ -954,6 +1047,9 @@ class DailyLog {
       dreamNote: (dreamNote?.isNotEmpty ?? false) ? dreamNote : other.dreamNote,
       sexualActivity: mergedSexualActivity,
       sexualActivityTypes: mergedSexualActivityTypes,
+      sexualAfterFeelings: mergedSexualActivity == true
+          ? {...other.sexualAfterFeelings, ...sexualAfterFeelings}
+          : const {},
       bowelActivity: (bowelActivity + other.bowelActivity).toSet().toList(),
       painLocations: (painLocations + other.painLocations).toSet().toList(),
       symptoms: (symptoms + other.symptoms).toSet().toList(),
