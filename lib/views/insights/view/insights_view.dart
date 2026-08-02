@@ -182,116 +182,159 @@ class InsightsListView extends StatelessWidget {
 
 class PersonalInsightCard extends StatelessWidget {
   final PersonalInsight insight;
+  final VoidCallback? onTap;
 
-  const PersonalInsightCard({super.key, required this.insight});
+  const PersonalInsightCard({super.key, required this.insight, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final presentation = _InsightPresentation.from(insight);
-    return Semantics(
-      label: '${presentation.title}. ${presentation.body}',
-      child: Container(
-        key: ValueKey('personal_insight_${insight.id}'),
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.lerp(presentation.color, Colors.white, 0.83)!,
-              Color.lerp(presentation.color, Colors.white, 0.93)!,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: presentation.color.withValues(alpha: 0.12),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
+    final card = Container(
+      key: ValueKey('personal_insight_${insight.id}'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color.lerp(presentation.color, Colors.white, 0.83)!,
+            Color.lerp(presentation.color, Colors.white, 0.93)!,
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: presentation.color.withValues(alpha: 0.13),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                presentation.icon,
-                size: 22,
-                color: presentation.color,
-              ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: presentation.color.withValues(alpha: 0.12),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: presentation.color.withValues(alpha: 0.13),
+              borderRadius: BorderRadius.circular(14),
             ),
-            const SizedBox(width: 13),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    presentation.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
+            child: Icon(presentation.icon, size: 22, color: presentation.color),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  presentation.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    presentation.body,
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      height: 1.45,
-                      color: AppColors.textSecondary,
-                    ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  presentation.body,
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.45,
+                    color: AppColors.textSecondary,
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 9,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: presentation.color.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(9),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.fact_check_outlined,
-                          size: 13,
-                          color: presentation.color,
-                        ),
-                        const SizedBox(width: 5),
-                        Expanded(
-                          child: Text(
-                            presentation.evidence,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: presentation.color,
-                            ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: presentation.color.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.fact_check_outlined,
+                        size: 13,
+                        color: presentation.color,
+                      ),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Text(
+                          presentation.evidence,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: presentation.color,
                           ),
                         ),
+                      ),
+                      if (onTap != null) ...[
+                        const SizedBox(width: 5),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 14,
+                          color: presentation.color,
+                        ),
                       ],
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+
+    return Semantics(
+      button: onTap != null,
+      label: '${presentation.title}. ${presentation.body}',
+      child: onTap == null
+          ? card
+          : _PressableInsightCard(onTap: onTap!, child: card),
+    );
+  }
+}
+
+class _PressableInsightCard extends StatefulWidget {
+  final VoidCallback onTap;
+  final Widget child;
+
+  const _PressableInsightCard({required this.onTap, required this.child});
+
+  @override
+  State<_PressableInsightCard> createState() => _PressableInsightCardState();
+}
+
+class _PressableInsightCardState extends State<_PressableInsightCard> {
+  var _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapUp: (_) => setState(() => _pressed = false),
+        onTapCancel: () => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: _pressed ? 0.98 : 1,
+          duration: const Duration(milliseconds: 120),
+          child: widget.child,
         ),
       ),
     );

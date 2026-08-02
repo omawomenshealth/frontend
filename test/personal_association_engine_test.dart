@@ -299,6 +299,79 @@ void main() {
     expect(delayed.withoutEventCount, 0);
   });
 
+  test('besin grubuyla ertesi gün cilt belirtisini karşılaştırır', () {
+    final logs = <DailyLog>[];
+    for (var day = 0; day < 24; day++) {
+      logs.add(
+        DailyLog(
+          date: DateTime(2026, 4, 1).add(Duration(days: day)),
+          mealTypes: const ['Kahvaltı'],
+          mealFoodGroups: day.isEven
+              ? const {
+                  'Kahvaltı': ['Gluten'],
+                }
+              : const {
+                  'Kahvaltı': ['Yumurta'],
+                },
+          symptoms: day.isOdd ? const ['Yağlı cilt'] : const [],
+          observedSections: const {
+            DailyLogObservedSection.nutrition,
+            DailyLogObservedSection.symptom,
+          },
+        ),
+      );
+    }
+
+    final delayed = engine
+        .generate(logs: logs)
+        .firstWhere(
+          (insight) =>
+              insight.kind == PersonalInsightKind.structuredAssociation &&
+              insight.primaryLabel == 'Gluten' &&
+              insight.secondaryLabel == 'Yağlı cilt' &&
+              insight.lagDays == 1,
+        );
+
+    expect(delayed.withEventCount, 12);
+    expect(delayed.withTotal, 12);
+    expect(delayed.withoutEventCount, 0);
+    expect(delayed.withoutTotal, 11);
+  });
+
+  test('saç belirtisini bulunduğu döngü fazıyla karşılaştırır', () {
+    final start = DateTime(2026, 1, 1);
+    final logs = List.generate(84, (day) {
+      final dayInCycle = day % 28;
+      return DailyLog(
+        date: start.add(Duration(days: day)),
+        symptoms: dayInCycle < 5 ? const ['Saç dökülmesi'] : const [],
+        observedSections: const {DailyLogObservedSection.symptom},
+      );
+    });
+
+    final phasePattern = engine
+        .generate(
+          logs: logs,
+          settings: UserSettings(
+            lastPeriodDate: start,
+            averageCycleLength: 28,
+            averagePeriodLength: 5,
+          ),
+        )
+        .firstWhere(
+          (insight) =>
+              insight.kind ==
+                  PersonalInsightKind.symptomCyclePhaseAssociation &&
+              insight.primaryLabel == 'Saç dökülmesi' &&
+              insight.secondaryLabel == 'cyclePhase:menstrual',
+        );
+
+    expect(phasePattern.withEventCount, 15);
+    expect(phasePattern.withTotal, 15);
+    expect(phasePattern.withoutEventCount, 0);
+    expect(phasePattern.withoutTotal, 69);
+  });
+
   test(
     'ruh halini döngü fazındaki diğer ruh hali günleriyle karşılaştırır',
     () {

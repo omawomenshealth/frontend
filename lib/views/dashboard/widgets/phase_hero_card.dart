@@ -84,20 +84,11 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
               height: 252,
               child: Opacity(
                 opacity: 0.92,
-                child: ShaderMask(
-                  blendMode: BlendMode.dstIn,
-                  shaderCallback: (bounds) => const RadialGradient(
-                    center: Alignment(0.1, -0.12),
-                    radius: 0.72,
-                    colors: [Colors.white, Colors.white, Colors.transparent],
-                    stops: [0, 0.56, 1],
-                  ).createShader(bounds),
-                  child: Image.asset(
-                    presentation.assetPath,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                  ),
+                child: Image.asset(
+                  presentation.assetPath,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center,
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
                 ),
               ),
             ),
@@ -350,7 +341,7 @@ class _PhasePresentation {
       CyclePhase.menstrual => _PhasePresentation(
         color: AppColors.periodPrimary,
         softColor: AppColors.periodLight,
-        assetPath: 'assets/images/oma-hero-menstrual.jpg',
+        assetPath: 'assets/images/oma-hero-menstrual-cutout.png',
         phaseLabel: AppStrings.menstrualPhase,
         headline: AppStrings.phaseMenstrualHeadline,
         body: AppStrings.phaseMenstrualBody,
@@ -362,7 +353,7 @@ class _PhasePresentation {
       CyclePhase.follicular => _PhasePresentation(
         color: AppColors.primary,
         softColor: const Color(0xFFEAF0E5),
-        assetPath: 'assets/images/oma-hero-follicular.jpg',
+        assetPath: 'assets/images/oma-hero-follicular-cutout.png',
         phaseLabel: AppStrings.follicularPhase,
         headline: AppStrings.phaseFollicularHeadline,
         body: AppStrings.phaseFollicularBody,
@@ -374,7 +365,7 @@ class _PhasePresentation {
       CyclePhase.ovulation => _PhasePresentation(
         color: AppColors.ovulation,
         softColor: const Color(0xFFECE7F3),
-        assetPath: 'assets/images/oma-hero-ovulation.jpg',
+        assetPath: 'assets/images/oma-hero-ovulation-cutout.png',
         phaseLabel: AppStrings.estimatedOvulationWindow,
         headline: AppStrings.phaseOvulationHeadline,
         body: AppStrings.phaseOvulationBody,
@@ -386,7 +377,7 @@ class _PhasePresentation {
       CyclePhase.luteal => _PhasePresentation(
         color: AppColors.lutealDark,
         softColor: const Color(0xFFFFF3D9),
-        assetPath: 'assets/images/oma-hero-luteal.jpg',
+        assetPath: 'assets/images/oma-hero-luteal-cutout.png',
         phaseLabel: AppStrings.lutealPhase,
         headline: AppStrings.phaseLutealHeadline,
         body: AppStrings.phaseLutealBody,

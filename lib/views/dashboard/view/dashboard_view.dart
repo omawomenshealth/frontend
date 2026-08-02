@@ -8,6 +8,7 @@ import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/period_log_model.dart';
+import '../../../data/models/personal_insight_model.dart';
 import '../../calendar/view/calendar_view.dart' as cal;
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../../insights/view/insights_view.dart';
@@ -138,6 +139,8 @@ class DashboardView extends StatelessWidget {
                         vm: vm,
                         accent: accent,
                         onViewAll: () => _openInsights(context),
+                        onInsightTap: (insight) =>
+                            _openInsight(context, insight),
                       )
                     else
                       _InsightPlaceholder(accent: accent),
@@ -167,6 +170,15 @@ class DashboardView extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const InsightsView()),
+    );
+  }
+
+  void _openInsight(BuildContext context, PersonalInsight insight) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => InsightsView(initialInsightId: insight.id),
+      ),
     );
   }
 
@@ -391,11 +403,13 @@ class _PersonalInsightsPreview extends StatelessWidget {
   final DashboardViewModel vm;
   final Color accent;
   final VoidCallback onViewAll;
+  final ValueChanged<PersonalInsight> onInsightTap;
 
   const _PersonalInsightsPreview({
     required this.vm,
     required this.accent,
     required this.onViewAll,
+    required this.onInsightTap,
   });
 
   @override
@@ -453,7 +467,10 @@ class _PersonalInsightsPreview extends StatelessWidget {
             separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemBuilder: (context, index) => SizedBox(
               width: 300,
-              child: PersonalInsightCard(insight: vm.personalInsights[index]),
+              child: PersonalInsightCard(
+                insight: vm.personalInsights[index],
+                onTap: () => onInsightTap(vm.personalInsights[index]),
+              ),
             ),
           ),
         ),

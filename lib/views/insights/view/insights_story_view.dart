@@ -4,8 +4,14 @@ part of 'insights_view.dart';
 class InsightsView extends StatefulWidget {
   final VoidCallback? onClose;
   final bool isActive;
+  final String? initialInsightId;
 
-  const InsightsView({super.key, this.onClose, this.isActive = true});
+  const InsightsView({
+    super.key,
+    this.onClose,
+    this.isActive = true,
+    this.initialInsightId,
+  });
 
   @override
   State<InsightsView> createState() => _InsightsViewState();
@@ -39,6 +45,14 @@ class _InsightsViewState extends State<InsightsView>
   @override
   void didUpdateWidget(covariant InsightsView oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialInsightId != widget.initialInsightId) {
+      _index = 0;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_pageController.hasClients) return;
+        _pageController.jumpToPage(0);
+        _startProgress();
+      });
+    }
     if (oldWidget.isActive == widget.isActive) return;
     if (widget.isActive) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -69,7 +83,7 @@ class _InsightsViewState extends State<InsightsView>
 
     return Consumer<InsightsViewModel>(
       builder: (context, viewModel, _) {
-        final insights = viewModel.insights;
+        final insights = _orderedInsights(viewModel.insights);
         _syncStoryCount(insights.length);
 
         return Scaffold(
@@ -148,6 +162,21 @@ class _InsightsViewState extends State<InsightsView>
         );
       },
     );
+  }
+
+  List<PersonalInsight> _orderedInsights(List<PersonalInsight> insights) {
+    final requestedId = widget.initialInsightId;
+    if (requestedId == null || insights.length < 2) return insights;
+
+    final startIndex = insights.indexWhere(
+      (insight) => insight.id == requestedId,
+    );
+    if (startIndex <= 0) return insights;
+
+    return [
+      ...insights.sublist(startIndex),
+      ...insights.sublist(0, startIndex),
+    ];
   }
 
   void _syncStoryCount(int count) {

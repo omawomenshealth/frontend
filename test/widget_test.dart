@@ -85,7 +85,11 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    final pageView = tester.widget<PageView>(find.byType(PageView));
+    final storyPageView = find.descendant(
+      of: find.byType(InsightsView),
+      matching: find.byType(PageView),
+    );
+    final pageView = tester.widget<PageView>(storyPageView);
     expect(pageView.controller!.page, 0);
 
     await tester.pump(const Duration(milliseconds: 4400));
@@ -235,7 +239,7 @@ void main() {
     expect(find.byIcon(Icons.arrow_forward_rounded), findsWidgets);
   });
 
-  testWidgets('seçilen insightlar ana sayfada gösterilir ve tümü açılır', (
+  testWidgets('ana sayfadaki insight kartları kendi detayını ve tümünü açar', (
     WidgetTester tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -273,6 +277,52 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(PersonalInsightCard), findsWidgets);
+
+    final previewCards = find.descendant(
+      of: find.byKey(const ValueKey('dashboard_personal_insights')),
+      matching: find.byType(PersonalInsightCard),
+    );
+    final cards = tester.widgetList<PersonalInsightCard>(previewCards).toList();
+    expect(cards.length, greaterThan(1));
+    expect(cards.every((card) => card.onTap != null), isTrue);
+
+    final firstInsight = cards.first.insight;
+    final tappedInsight = cards[1].insight;
+    await tester.ensureVisible(previewCards.at(1));
+    await tester.tap(previewCards.at(1));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 450));
+
+    final openedDetail = tester.widget<InsightsView>(find.byType(InsightsView));
+    expect(openedDetail.initialInsightId, tappedInsight.id);
+    expect(
+      find
+          .byKey(PageStorageKey<String>('insight_story_${tappedInsight.id}'))
+          .hitTestable(),
+      findsOneWidget,
+    );
+
+    final storyPageView = find.descendant(
+      of: find.byType(InsightsView),
+      matching: find.byType(PageView),
+    );
+    final pageView = tester.widget<PageView>(storyPageView);
+    final storyCount = pageView.childrenDelegate.estimatedChildCount!;
+    for (var index = 1; index < storyCount; index++) {
+      final nextButton = find.widgetWithText(FilledButton, AppStrings.next);
+      await tester.tap(nextButton);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+    expect(
+      find
+          .byKey(PageStorageKey<String>('insight_story_${firstInsight.id}'))
+          .hitTestable(),
+      findsOneWidget,
+    );
+
+    Navigator.of(tester.element(find.byType(InsightsView))).pop();
+    await tester.pumpAndSettle();
 
     final viewAllButton = find.byKey(
       const ValueKey('dashboard_view_all_insights'),
