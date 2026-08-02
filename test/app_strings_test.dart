@@ -49,7 +49,19 @@ void main() {
         withoutPercent: 10,
         lagDays: 0,
       ),
-      contains('This is an association, not cause and effect.'),
+      contains('only shows a trace worth revisiting.'),
+    );
+    expect(
+      AppStrings.insightMoodPlaceBody(
+        mood: 'Great',
+        place: 'Seaside park',
+        withEvent: 8,
+        withTotal: 10,
+        withoutTotal: 10,
+        withPercent: 80,
+        withoutPercent: 10,
+      ),
+      contains('Let’s gently follow'),
     );
   });
 
@@ -105,6 +117,86 @@ void main() {
       'olduğunu göstermez.',
     );
   });
+
+  test(
+    'Dinamik Türkçe insight cümleleri bağımsız de veya da kullanmaz',
+    () async {
+      await AppStrings.delegate.load(const Locale('tr', 'TR'));
+      final texts = [
+        AppStrings.insightMoodSymptomBody(
+          mood: 'Hassas',
+          symptom: 'Baş ağrısı',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+        ),
+        AppStrings.insightMoodFoodBody(
+          mood: 'İyi',
+          food: 'Ev yapımı granola',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+        ),
+        AppStrings.insightMoodCravingBody(
+          mood: 'Düşük',
+          craving: 'Çikolata',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+        ),
+        AppStrings.insightFoodBowelBody(
+          food: 'Acılı ev yemeği',
+          bowel: 'Şişkinlik',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+          lagDays: 0,
+        ),
+        AppStrings.insightMoodPlaceBody(
+          mood: 'Harika',
+          place: 'Sahil parkı',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+        ),
+        AppStrings.insightMoodCompanionBody(
+          mood: 'İyi',
+          companion: 'Yakın arkadaşım',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+        ),
+        AppStrings.insightAssociationBody(
+          primary: 'Gluten',
+          secondary: 'Şişkinlik',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+          lagDays: 0,
+        ),
+      ];
+      final standaloneDeDa = RegExp(
+        r'(^|\s)(de|da)(?=\s|[.,;:!?])',
+        caseSensitive: false,
+      );
+
+      expect(texts.where(standaloneDeDa.hasMatch), isEmpty);
+    },
+  );
 
   test('Desteklenmeyen dil İngilizceye düşer', () {
     expect(

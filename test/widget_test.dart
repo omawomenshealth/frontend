@@ -52,6 +52,54 @@ void main() {
     expect(find.byIcon(Icons.close_rounded), findsOneWidget);
   });
 
+  testWidgets('İçgörü süre barı dolunca sonraki kart otomatik oynar', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await storage.init();
+    await storage.saveSettings(
+      UserSettings(isOnboardingComplete: true, userName: 'Test'),
+    );
+    final start = DateTime.now().subtract(const Duration(days: 19));
+    for (var day = 0; day < 20; day++) {
+      await storage.saveDailyLog(
+        DailyLog(
+          date: start.add(Duration(days: day)),
+          mood: day < 10 ? 'İyi' : 'Nötr',
+          symptoms: day < 8 || day == 15 ? const ['Baş ağrısı'] : const [],
+          moodPlaces: day < 8 || day == 15 ? const ['Ev'] : const [],
+          observedSections: const {
+            DailyLogObservedSection.wellbeing,
+            DailyLogObservedSection.symptom,
+          },
+        ),
+      );
+    }
+
+    await tester.pumpWidget(MyApp(storage: storage));
+    await tester.pump();
+    tester.widget<BottomNavigationBar>(find.byType(BottomNavigationBar)).onTap!(
+      2,
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final pageView = tester.widget<PageView>(find.byType(PageView));
+    expect(pageView.controller!.page, 0);
+
+    await tester.pump(const Duration(milliseconds: 4400));
+    final halfFilled = tester.widget<FractionallySizedBox>(
+      find.byKey(const ValueKey('insight_progress_fill_0')),
+    );
+    expect(halfFilled.widthFactor, inInclusiveRange(0.45, 0.55));
+
+    await tester.pump(const Duration(milliseconds: 4700));
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(pageView.controller!.page, closeTo(1, 0.01));
+  });
+
   testWidgets(
     'planlanan dozlar ana ekranda, eski yolculuk şeridi olmadan görünür',
     (tester) async {

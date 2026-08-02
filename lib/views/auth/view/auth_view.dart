@@ -17,145 +17,88 @@ class AuthView extends StatelessWidget {
     return Consumer<AuthViewModel>(
       builder: (context, vm, _) {
         return Scaffold(
-          body: Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFFFFEF8),
-                  Color(0xFFFAFAEE),
-                  Color(0xFFE8EFDF),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+          backgroundColor: AppColors.scaffoldBackground,
+          body: Stack(
+            children: [
+              const Positioned(
+                top: -118,
+                right: -92,
+                child: _AuthGlow(size: 284, color: AppColors.primaryLight),
               ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Column(
-                  children: [
-                    const Spacer(flex: 2),
-
-                    // Logo / İkon
-                    Container(
-                      width: 124,
-                      height: 124,
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.16),
-                            blurRadius: 28,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Image.asset(
-                          ImageConstants.logo,
-                          fit: BoxFit.contain,
-                          semanticLabel: AppStrings.appName,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Uygulama adı
-                    Text(
-                      AppStrings.appName,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppStrings.appSlogan,
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 16,
-                      ),
-                    ),
-
-                    const Spacer(flex: 3),
-
-                    // Hata mesajı varsa göster
-                    if (vm.errorMessage != null) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.accentLight,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          vm.errorMessage!,
-                          style: const TextStyle(
-                            color: AppColors.error,
-                            fontSize: 13,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // Google ile Giriş Yap butonu
-                    CustomButton(
-                      text: AppStrings.googleConnect,
-                      icon: Icons.login_rounded,
-                      isLoading: vm.isLoading,
-                      onPressed: () => _handleGoogleLogin(context, vm),
-                      gradient: const LinearGradient(
-                        colors: [AppColors.surface, AppColors.primaryLight],
-                      ),
-                      textColor: AppColors.primaryDark,
-                    ),
-                    const SizedBox(height: 16),
-
-                    if (kDebugMode) ...[
-                      // Sunucu ayrıca ALLOW_MOCK_AUTH ile izin vermelidir.
-                      CustomButton(
-                        text: AppStrings.developerMode,
-                        icon: Icons.bug_report_outlined,
-                        isLoading: vm.isLoading,
-                        onPressed: () => _showMockLoginDialog(context, vm),
-                        isOutlined: true,
-                        backgroundColor: AppColors.primary,
-                        textColor: AppColors.primary,
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-
-                    // Giriş yapmadan devam et
-                    TextButton(
-                      onPressed: vm.isLoading
-                          ? null
-                          : () => _navigateToOnboarding(context),
-                      child: Text(
-                        AppStrings.continueWithoutLogin,
-                        style: TextStyle(
-                          color: AppColors.primaryDark,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.underline,
-                          decorationColor: AppColors.primary,
+              const Positioned(
+                top: 205,
+                left: -104,
+                child: _AuthGlow(size: 210, color: AppColors.accentLight),
+              ),
+              const Positioned(
+                bottom: -104,
+                right: -82,
+                child: _AuthGlow(size: 230, color: AppColors.secondaryLight),
+              ),
+              SafeArea(
+                child: CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(22, 18, 22, 18),
+                      sliver: SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 10),
+                            const _AuthLogo(),
+                            const SizedBox(height: 20),
+                            Text(
+                              AppStrings.appName,
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                                fontFamily: 'CormorantGaramond',
+                                fontSize: 44,
+                                height: 1,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                            const SizedBox(height: 9),
+                            Text(
+                              AppStrings.appSlogan,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 15,
+                                height: 1.4,
+                              ),
+                            ),
+                            const Spacer(),
+                            _AuthActionCard(vm: vm, owner: this),
+                            const SizedBox(height: 18),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.shield_outlined,
+                                  size: 15,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  AppStrings.privacyAndData,
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
-
-                    const Spacer(flex: 1),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
         );
       },
@@ -405,6 +348,158 @@ class AuthView extends StatelessWidget {
             child: Text(AppStrings.merge),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AuthActionCard extends StatelessWidget {
+  final AuthViewModel vm;
+  final AuthView owner;
+
+  const _AuthActionCard({required this.vm, required this.owner});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.9)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryDark.withValues(alpha: 0.08),
+            blurRadius: 30,
+            offset: const Offset(0, 14),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            AppStrings.loginToContinue,
+            style: const TextStyle(
+              color: AppColors.textPrimary,
+              fontFamily: 'CormorantGaramond',
+              fontSize: 21,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 16),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            child: vm.errorMessage == null
+                ? const SizedBox.shrink()
+                : Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.accentLight,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: AppColors.error.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: Text(
+                        vm.errorMessage!,
+                        style: const TextStyle(
+                          color: AppColors.error,
+                          fontSize: 12.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+          ),
+          CustomButton(
+            text: AppStrings.googleConnect,
+            icon: Icons.g_mobiledata_rounded,
+            isLoading: vm.isLoading,
+            onPressed: () => owner._handleGoogleLogin(context, vm),
+            gradient: AppColors.primaryGradient,
+          ),
+          const SizedBox(height: 11),
+          CustomButton(
+            text: AppStrings.continueWithoutLogin,
+            icon: Icons.arrow_forward_rounded,
+            isLoading: vm.isLoading,
+            onPressed: () => owner._navigateToOnboarding(context),
+            isOutlined: true,
+            backgroundColor: AppColors.primary,
+            textColor: AppColors.primaryDark,
+          ),
+          if (kDebugMode) ...[
+            const SizedBox(height: 10),
+            TextButton.icon(
+              onPressed: vm.isLoading
+                  ? null
+                  : () => owner._showMockLoginDialog(context, vm),
+              icon: const Icon(Icons.bug_report_outlined, size: 16),
+              label: Text(AppStrings.developerMode),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.textSecondary,
+                textStyle: const TextStyle(fontSize: 11.5),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _AuthLogo extends StatelessWidget {
+  const _AuthLogo();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 126,
+      height: 126,
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(42),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.24)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryDark.withValues(alpha: 0.1),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(13),
+        child: Image.asset(
+          ImageConstants.logo,
+          fit: BoxFit.contain,
+          semanticLabel: AppStrings.appName,
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthGlow extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const _AuthGlow({required this.size, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.72),
+          shape: BoxShape.circle,
+        ),
       ),
     );
   }

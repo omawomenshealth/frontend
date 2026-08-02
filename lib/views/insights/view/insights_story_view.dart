@@ -3,22 +3,30 @@ part of 'insights_view.dart';
 /// Kişisel içgörüleri kaynak tasarımdaki hikâye akışıyla gösterir.
 class InsightsView extends StatefulWidget {
   final VoidCallback? onClose;
+  final bool isActive;
 
-  const InsightsView({super.key, this.onClose});
+  const InsightsView({super.key, this.onClose, this.isActive = true});
 
   @override
   State<InsightsView> createState() => _InsightsViewState();
 }
 
-class _InsightsViewState extends State<InsightsView> {
+class _InsightsViewState extends State<InsightsView>
+    with SingleTickerProviderStateMixin {
+  static const _storyDuration = Duration(seconds: 9);
+
   final PageController _pageController = PageController();
-  Timer? _autoAdvance;
+  late final AnimationController _progressController;
   int _index = 0;
   int _knownStoryCount = 0;
 
   @override
   void initState() {
     super.initState();
+    _progressController = AnimationController(
+      vsync: this,
+      duration: _storyDuration,
+    )..addStatusListener(_handleProgressStatus);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final viewModel = context.read<InsightsViewModel>();
@@ -29,8 +37,25 @@ class _InsightsViewState extends State<InsightsView> {
   }
 
   @override
+  void didUpdateWidget(covariant InsightsView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isActive == widget.isActive) return;
+    if (widget.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _startProgress();
+      });
+    } else {
+      _progressController
+        ..stop()
+        ..value = 0;
+    }
+  }
+
+  @override
   void dispose() {
-    _autoAdvance?.cancel();
+    _progressController
+      ..removeStatusListener(_handleProgressStatus)
+      ..dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -67,6 +92,7 @@ class _InsightsViewState extends State<InsightsView> {
                     count: insights.isEmpty ? 1 : insights.length,
                     index: _index,
                     accent: accent,
+                    progress: _progressController,
                   ),
                   _StoryHeader(accent: accent, onClose: _close),
                   if (viewModel.isLoading && insights.isEmpty)
@@ -89,7 +115,7 @@ class _InsightsViewState extends State<InsightsView> {
                         itemCount: insights.length,
                         onPageChanged: (value) {
                           setState(() => _index = value);
-                          _scheduleAutoAdvance(insights.length);
+                          _startProgress();
                         },
                         itemBuilder: (context, index) {
                           final insight = insights[index];
@@ -128,24 +154,34 @@ class _InsightsViewState extends State<InsightsView> {
     if (_knownStoryCount == count) return;
     _knownStoryCount = count;
     if (count == 0) {
-      _autoAdvance?.cancel();
+      _progressController
+        ..stop()
+        ..value = 0;
       return;
     }
     if (_index >= count) {
       _index = 0;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _scheduleAutoAdvance(count);
+      if (mounted) _startProgress();
     });
   }
 
-  void _scheduleAutoAdvance(int count) {
-    _autoAdvance?.cancel();
-    if (count < 2) return;
-    _autoAdvance = Timer(const Duration(seconds: 9), () {
-      if (!mounted) return;
-      _goTo((_index + 1) % count, count);
-    });
+  void _startProgress() {
+    if (!widget.isActive || _knownStoryCount == 0) return;
+    _progressController.forward(from: 0);
+  }
+
+  void _handleProgressStatus(AnimationStatus status) {
+    if (status != AnimationStatus.completed ||
+        !mounted ||
+        !widget.isActive ||
+        _knownStoryCount == 0) {
+      return;
+    }
+    if (_index < _knownStoryCount - 1) {
+      _goTo(_index + 1, _knownStoryCount);
+    }
   }
 
   void _goTo(int target, int count) {
@@ -158,7 +194,7 @@ class _InsightsViewState extends State<InsightsView> {
   }
 
   void _close() {
-    _autoAdvance?.cancel();
+    _progressController.stop();
     if (widget.onClose != null) {
       widget.onClose!();
       return;
@@ -180,38 +216,47 @@ class _StoryProgress extends StatelessWidget {
   final int count;
   final int index;
   final Color accent;
+  final Animation<double> progress;
 
   const _StoryProgress({
     required this.count,
     required this.index,
     required this.accent,
+    required this.progress,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-      child: Row(
-        children: [
-          for (var item = 0; item < count; item++) ...[
-            Expanded(
-              child: Container(
-                height: 4,
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(99),
-                ),
-                alignment: Alignment.centerLeft,
-                child: FractionallySizedBox(
-                  widthFactor: item < index ? 1 : (item == index ? 0.62 : 0),
-                  child: ColoredBox(color: accent),
+    return AnimatedBuilder(
+      animation: progress,
+      builder: (context, _) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+        child: Row(
+          children: [
+            for (var item = 0; item < count; item++) ...[
+              Expanded(
+                child: Container(
+                  key: ValueKey('insight_progress_$item'),
+                  height: 4,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    key: ValueKey('insight_progress_fill_$item'),
+                    widthFactor: item < index
+                        ? 1
+                        : (item == index ? progress.value : 0),
+                    child: ColoredBox(color: accent),
+                  ),
                 ),
               ),
-            ),
-            if (item != count - 1) const SizedBox(width: 6),
+              if (item != count - 1) const SizedBox(width: 6),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -420,7 +465,7 @@ class _InsightStoryPage extends StatelessWidget {
   }
 
   List<String> _chainFor(PersonalInsight value) {
-    return switch (value.kind) {
+    final chain = switch (value.kind) {
       PersonalInsightKind.cycleLength ||
       PersonalInsightKind.cycleVariation ||
       PersonalInsightKind.cycleTimingReview ||
@@ -435,6 +480,27 @@ class _InsightStoryPage extends StatelessWidget {
       PersonalInsightKind.moodCyclePhaseAssociation => [
         AppStrings.mood,
         AppStrings.myCycles,
+      ],
+      PersonalInsightKind.moodSymptomAssociation => [
+        AppStrings.mood,
+        AppStrings.symptom,
+      ],
+      PersonalInsightKind.moodFoodAssociation ||
+      PersonalInsightKind.moodCravingAssociation => [
+        AppStrings.mood,
+        AppStrings.nutrition,
+      ],
+      PersonalInsightKind.foodBowelAssociation => [
+        AppStrings.nutrition,
+        AppStrings.bowelActivity,
+      ],
+      PersonalInsightKind.moodPlaceAssociation => [
+        AppStrings.mood,
+        AppStrings.moodWhere,
+      ],
+      PersonalInsightKind.moodCompanionAssociation => [
+        AppStrings.mood,
+        AppStrings.moodWhoWith,
       ],
       PersonalInsightKind.symptomCyclePhaseAssociation => [
         AppStrings.symptom,
@@ -473,7 +539,10 @@ class _InsightStoryPage extends StatelessWidget {
       ],
       _ => [AppStrings.dailyLog, AppStrings.myCycles],
     };
+    return chain.map(_storySourceLabel).toList(growable: false);
   }
+
+  String _storySourceLabel(String value) => value.replaceFirst('📊 ', '');
 }
 
 class _StoryNavigation extends StatelessWidget {

@@ -111,31 +111,41 @@ class _CustomButtonState extends State<CustomButton>
                       strokeWidth: 2.5,
                     ),
                   )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (widget.icon != null) ...[
-                        Icon(
-                          widget.icon,
-                          color: widget.isOutlined
-                              ? (widget.backgroundColor ?? AppColors.primary)
-                              : widget.textColor,
-                          size: 20,
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (widget.icon != null) ...[
+                          Icon(
+                            widget.icon,
+                            color: widget.isOutlined
+                                ? (widget.backgroundColor ?? AppColors.primary)
+                                : widget.textColor,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Flexible(
+                          child: Text(
+                            widget.text,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: widget.isOutlined
+                                  ? (widget.backgroundColor ??
+                                        AppColors.primary)
+                                  : widget.textColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
                         ),
-                        const SizedBox(width: 8),
                       ],
-                      Text(
-                        widget.text,
-                        style: TextStyle(
-                          color: widget.isOutlined
-                              ? (widget.backgroundColor ?? AppColors.primary)
-                              : widget.textColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
           ),
         ),

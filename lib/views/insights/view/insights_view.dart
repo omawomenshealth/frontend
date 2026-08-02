@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -502,6 +500,103 @@ class _InsightPresentation {
         );
         icon = Icons.bolt_rounded;
         color = AppColors.warning;
+      case PersonalInsightKind.moodSymptomAssociation:
+        title = AppStrings.insightMoodSymptomTitle;
+        body = AppStrings.insightMoodSymptomBody(
+          mood: primary,
+          symptom: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.psychology_alt_outlined;
+        color = AppColors.accent;
+      case PersonalInsightKind.moodFoodAssociation:
+        title = AppStrings.insightMoodFoodTitle;
+        body = AppStrings.insightMoodFoodBody(
+          mood: primary,
+          food: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.restaurant_menu_rounded;
+        color = AppColors.secondaryDark;
+      case PersonalInsightKind.moodCravingAssociation:
+        title = AppStrings.insightMoodCravingTitle;
+        body = AppStrings.insightMoodCravingBody(
+          mood: primary,
+          craving: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.icecream_outlined;
+        color = AppColors.secondary;
+      case PersonalInsightKind.foodBowelAssociation:
+        title = AppStrings.insightFoodBowelTitle;
+        body = AppStrings.insightFoodBowelBody(
+          food: primary,
+          bowel: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+          lagDays: insight.lagDays!,
+        );
+        icon = Icons.waves_rounded;
+        color = AppColors.info;
+      case PersonalInsightKind.moodPlaceAssociation:
+        title = AppStrings.insightMoodPlaceTitle;
+        body = AppStrings.insightMoodPlaceBody(
+          mood: primary,
+          place: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.place_outlined;
+        color = AppColors.primaryDark;
+      case PersonalInsightKind.moodCompanionAssociation:
+        title = AppStrings.insightMoodCompanionTitle;
+        body = AppStrings.insightMoodCompanionBody(
+          mood: primary,
+          companion: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.people_alt_outlined;
+        color = AppColors.primary;
       case PersonalInsightKind.structuredAssociation:
         title = AppStrings.insightAssociationTitle;
         body = AppStrings.insightAssociationBody(

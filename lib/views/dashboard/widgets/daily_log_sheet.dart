@@ -179,11 +179,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       _log.mood,
       fallback: 1,
     );
-    _moodCompanions = _localizedSet(
+    _moodCompanions = _localizedSetPreservingCustom(
       _log.moodCompanions,
       AppStrings.moodCompanionOptions,
     );
-    _moodPlaces = _localizedSet(_log.moodPlaces, AppStrings.moodPlaceOptions);
+    _moodPlaces = _localizedSetPreservingCustom(
+      _log.moodPlaces,
+      AppStrings.moodPlaceOptions,
+    );
   }
 
   @override
@@ -211,6 +214,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     for (final value in values) {
       final localized = AppStrings.localizeStoredValue(value);
       if (options.contains(localized)) result.add(localized);
+    }
+    return result;
+  }
+
+  Set<String> _localizedSetPreservingCustom(
+    List<String> values,
+    List<String> options,
+  ) {
+    final result = <String>{};
+    for (final value in values) {
+      final localized = AppStrings.localizeStoredValue(value).trim();
+      if (localized.isNotEmpty) result.add(localized);
     }
     return result;
   }

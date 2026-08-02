@@ -22,7 +22,7 @@ class PersonalAssociationEngine {
   static const _minimumRateDifference = 0.20;
   static const _minimumLift = 1.50;
   static const _maximumAdjustedProbability = 0.20;
-  static const _maximumResults = 3;
+  static const _maximumResults = 6;
 
   List<PersonalInsight> generate({
     required List<DailyLog> logs,
@@ -34,6 +34,7 @@ class PersonalAssociationEngine {
 
     final candidates = <_AssociationCandidate>[];
     _addVisibleLogCandidates(candidates, days, settings);
+    _addRequestedConnectionCandidates(candidates, days);
     _addMetricCandidates(candidates, days);
     _addMoodCyclePhaseCandidates(candidates, days, settings);
     _addSymptomCyclePhaseCandidates(candidates, days, settings);
@@ -52,15 +53,152 @@ class PersonalAssociationEngine {
     accepted.sort((a, b) {
       final confidence = b.confidence.index.compareTo(a.confidence.index);
       if (confidence != 0) return confidence;
+      final direction = (b.rateDifference > 0 ? 1 : 0).compareTo(
+        a.rateDifference > 0 ? 1 : 0,
+      );
+      if (direction != 0) return direction;
       final score = b.score.compareTo(a.score);
       if (score != 0) return score;
       return a.id.compareTo(b.id);
     });
 
-    return accepted
+    final distinct = <_AssociationCandidate>[];
+    final seenMoodOutcomes = <String>{};
+    for (final candidate in accepted) {
+      if (_isMoodConnection(candidate.kind)) {
+        final key = '${candidate.kind.name}\u0000${candidate.secondaryLabel}';
+        if (!seenMoodOutcomes.add(key)) continue;
+      }
+      distinct.add(candidate);
+    }
+
+    return distinct
         .take(_maximumResults)
         .map((candidate) => candidate.toInsight())
         .toList(growable: false);
+  }
+
+  bool _isMoodConnection(PersonalInsightKind kind) =>
+      kind == PersonalInsightKind.moodSymptomAssociation ||
+      kind == PersonalInsightKind.moodFoodAssociation ||
+      kind == PersonalInsightKind.moodCravingAssociation ||
+      kind == PersonalInsightKind.moodPlaceAssociation ||
+      kind == PersonalInsightKind.moodCompanionAssociation;
+
+  /// Günlük kayıt ekranındaki ruh hâli, belirti, besin, aşerme, sindirim,
+  /// yer ve kişi seçimlerini karşılaştırır. Aday etiketleri sabit katalogdan
+  /// değil doğrudan kayıtlardan geldiği için "+" ile eklenen özel besin, yer
+  /// ve kişi değerleri de aynı istatistiksel kontrolden geçer.
+  void _addRequestedConnectionCandidates(
+    List<_AssociationCandidate> candidates,
+    Map<DateTime, _ObservedDay> days,
+  ) {
+    final moods = days.values
+        .map((day) => day.mood)
+        .whereType<String>()
+        .toSet();
+    final symptoms = _allLabels(days.values.map((day) => day.symptoms));
+    final foods = _allLabels(days.values.map((day) => day.foodGroups));
+    final cravings = _allLabels(days.values.map((day) => day.cravings))
+      ..remove(_canonical(AppStrings.nutritionCravingOptions.last));
+    final bowelActivities = _allLabels(
+      days.values.map((day) => day.bowelActivities),
+    );
+    final places = _allLabels(days.values.map((day) => day.moodPlaces));
+    final companions = _allLabels(days.values.map((day) => day.moodCompanions));
+
+    for (final mood in moods) {
+      for (final symptom in symptoms) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.moodSymptomAssociation,
+          primaryLabel: mood,
+          secondaryLabel: symptom,
+          lagDays: 0,
+          exposureObserved: (day) => day.wellbeingObserved && day.mood != null,
+          exposurePresent: (day) => day.mood == mood,
+          outcomeObserved: (day) => day.symptomObserved,
+          outcomePresent: (day) => day.symptoms.contains(symptom),
+        );
+      }
+      for (final food in foods) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.moodFoodAssociation,
+          primaryLabel: mood,
+          secondaryLabel: food,
+          lagDays: 0,
+          exposureObserved: (day) => day.wellbeingObserved && day.mood != null,
+          exposurePresent: (day) => day.mood == mood,
+          outcomeObserved: (day) => day.nutritionObserved,
+          outcomePresent: (day) => day.foodGroups.contains(food),
+        );
+      }
+      for (final craving in cravings) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.moodCravingAssociation,
+          primaryLabel: mood,
+          secondaryLabel: craving,
+          lagDays: 0,
+          exposureObserved: (day) => day.wellbeingObserved && day.mood != null,
+          exposurePresent: (day) => day.mood == mood,
+          outcomeObserved: (day) => day.nutritionObserved,
+          outcomePresent: (day) => day.cravings.contains(craving),
+        );
+      }
+      for (final place in places) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.moodPlaceAssociation,
+          primaryLabel: mood,
+          secondaryLabel: place,
+          lagDays: 0,
+          exposureObserved: (day) => day.wellbeingObserved && day.mood != null,
+          exposurePresent: (day) => day.mood == mood,
+          outcomeObserved: (day) => day.wellbeingObserved,
+          outcomePresent: (day) => day.moodPlaces.contains(place),
+        );
+      }
+      for (final companion in companions) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.moodCompanionAssociation,
+          primaryLabel: mood,
+          secondaryLabel: companion,
+          lagDays: 0,
+          exposureObserved: (day) => day.wellbeingObserved && day.mood != null,
+          exposurePresent: (day) => day.mood == mood,
+          outcomeObserved: (day) => day.wellbeingObserved,
+          outcomePresent: (day) => day.moodCompanions.contains(companion),
+        );
+      }
+    }
+
+    for (final food in foods) {
+      for (final bowelActivity in bowelActivities) {
+        for (final lag in const [0, 1]) {
+          _testCandidate(
+            candidates: candidates,
+            days: days,
+            kind: PersonalInsightKind.foodBowelAssociation,
+            primaryLabel: food,
+            secondaryLabel: bowelActivity,
+            lagDays: lag,
+            exposureObserved: (day) => day.nutritionObserved,
+            exposurePresent: (day) => day.foodGroups.contains(food),
+            outcomeObserved: (day) => day.bowelObserved,
+            outcomePresent: (day) =>
+                day.bowelActivities.contains(bowelActivity),
+          );
+        }
+      }
+    }
   }
 
   void _addMoodCyclePhaseCandidates(
@@ -482,12 +620,18 @@ class PersonalAssociationEngine {
       final postMealFeelings = <String>{};
       final foodFeelingPairs = <String>{};
       final symptoms = <String>{};
+      final cravings = <String>{};
+      final bowelActivities = <String>{};
+      final moodCompanions = <String>{};
+      final moodPlaces = <String>{};
       String? mood;
       int? waterIntakeMl;
       int? caffeineServings;
       var hasBleeding = false;
       var nutritionObserved = false;
       var symptomObserved = false;
+      var wellbeingObserved = false;
+      var bowelObserved = false;
       for (final log in dayLogs) {
         foodGroups.addAll(
           log.mealFoodGroups.values.expand((items) => items).map(_canonical),
@@ -518,6 +662,14 @@ class PersonalAssociationEngine {
         }
         symptoms.addAll(log.painLocations.map(_canonical));
         symptoms.addAll(log.symptoms.map(_canonical));
+        cravings.addAll(log.cravings.map(_canonical));
+        bowelActivities.addAll(log.bowelActivity.map(_canonical));
+        moodCompanions.addAll(log.moodCompanions.map(_canonical));
+        moodPlaces.addAll(log.moodPlaces.map(_canonical));
+        final bowelSymptomSignals = log.symptoms
+            .map(_canonical)
+            .where(_isBowelSignal);
+        bowelActivities.addAll(bowelSymptomSignals);
         if (log.mood != null) mood = _canonical(log.mood!);
         waterIntakeMl = log.waterIntakeMl ?? waterIntakeMl;
         caffeineServings = log.caffeineServings ?? caffeineServings;
@@ -533,12 +685,27 @@ class PersonalAssociationEngine {
             log.cravings.isNotEmpty ||
             log.waterIntakeMl != null ||
             log.caffeineServings != null;
+        final legacyWellbeingSymptomObservation =
+            log.observedSections.contains(DailyLogObservedSection.wellbeing) &&
+            log.mood == null &&
+            log.moodCompanions.isEmpty &&
+            log.moodPlaces.isEmpty;
         symptomObserved =
             symptomObserved ||
             log.observedSections.contains(DailyLogObservedSection.symptom) ||
-            log.observedSections.contains(DailyLogObservedSection.wellbeing) ||
+            legacyWellbeingSymptomObservation ||
             log.painLocations.isNotEmpty ||
             log.symptoms.isNotEmpty;
+        wellbeingObserved =
+            wellbeingObserved ||
+            log.observedSections.contains(DailyLogObservedSection.wellbeing) ||
+            log.mood != null ||
+            log.moodCompanions.isNotEmpty ||
+            log.moodPlaces.isNotEmpty;
+        bowelObserved =
+            bowelObserved ||
+            log.bowelActivity.isNotEmpty ||
+            log.observedSections.contains(DailyLogObservedSection.symptom);
       }
 
       return MapEntry(
@@ -549,12 +716,18 @@ class PersonalAssociationEngine {
           postMealFeelings: postMealFeelings,
           foodFeelingPairs: foodFeelingPairs,
           symptoms: symptoms,
+          cravings: cravings,
+          bowelActivities: bowelActivities,
+          moodCompanions: moodCompanions,
+          moodPlaces: moodPlaces,
           mood: mood,
           waterIntakeMl: waterIntakeMl,
           caffeineServings: caffeineServings,
           hasBleeding: hasBleeding,
           nutritionObserved: nutritionObserved,
           symptomObserved: symptomObserved,
+          wellbeingObserved: wellbeingObserved,
+          bowelObserved: bowelObserved,
         ),
       );
     });
@@ -570,6 +743,19 @@ class PersonalAssociationEngine {
   }
 
   String _canonical(String value) => AppStrings.canonicalizeStoredValue(value);
+
+  bool _isBowelSignal(String value) {
+    final options = AppStrings.symptomDigestionOptions;
+    final bowelSignals = {
+      _canonical(options[1]),
+      _canonical(options[2]),
+      _canonical(options[4]),
+      _canonical(options[5]),
+      _canonical(options[6]),
+      _canonical(options[7]),
+    };
+    return bowelSignals.contains(value);
+  }
 
   bool _sameSignal(String left, String right) {
     String normalize(String value) => _canonical(
@@ -700,12 +886,18 @@ class _ObservedDay {
   final Set<String> postMealFeelings;
   final Set<String> foodFeelingPairs;
   final Set<String> symptoms;
+  final Set<String> cravings;
+  final Set<String> bowelActivities;
+  final Set<String> moodCompanions;
+  final Set<String> moodPlaces;
   final String? mood;
   final int? waterIntakeMl;
   final int? caffeineServings;
   final bool hasBleeding;
   final bool nutritionObserved;
   final bool symptomObserved;
+  final bool wellbeingObserved;
+  final bool bowelObserved;
 
   const _ObservedDay({
     required this.date,
@@ -713,12 +905,18 @@ class _ObservedDay {
     required this.postMealFeelings,
     required this.foodFeelingPairs,
     required this.symptoms,
+    required this.cravings,
+    required this.bowelActivities,
+    required this.moodCompanions,
+    required this.moodPlaces,
     required this.mood,
     required this.waterIntakeMl,
     required this.caffeineServings,
     required this.hasBleeding,
     required this.nutritionObserved,
     required this.symptomObserved,
+    required this.wellbeingObserved,
+    required this.bowelObserved,
   });
 }
 

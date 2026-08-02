@@ -287,7 +287,10 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
         children: [
           DashboardView(onOpenInsights: () => _selectPage(2)),
           const ArticlesView(),
-          InsightsView(onClose: () => _selectPage(0)),
+          InsightsView(
+            isActive: _currentIndex == 2,
+            onClose: () => _selectPage(0),
+          ),
           const ProfileView(),
         ],
       ),

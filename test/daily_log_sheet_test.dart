@@ -218,6 +218,29 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Kaydedilmiş özel kişi ve yer yeniden açıldığında korunur', (
+    tester,
+  ) async {
+    await _pumpLogSheet(
+      tester,
+      initialIndex: 3,
+      initialLog: DailyLog(
+        date: DateTime.now(),
+        mood: 'İyi',
+        moodCompanions: const ['Yakın arkadaşım'],
+        moodPlaces: const ['Sahil parkı'],
+        observedSections: const {DailyLogObservedSection.wellbeing},
+      ),
+    );
+
+    await tester.tap(find.text(AppStrings.continueAction));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Yakın arkadaşım'), findsOneWidget);
+    expect(find.text('Sahil parkı'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Öğün ayrıntısı etiket altında açılır ve küçültülebilir', (
     tester,
   ) async {

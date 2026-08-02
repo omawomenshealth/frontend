@@ -509,4 +509,187 @@ void main() {
     expect(association.withoutEventCount, 1);
     expect(association.withoutTotal, 10);
   });
+
+  test(
+    'ruh hali ile belirtiyi iki gözlemlenmiş sekme arasında karşılaştırır',
+    () {
+      final logs = _pairedLogs(
+        (date, exposed, event) => DailyLog(
+          date: date,
+          mood: exposed ? 'İyi' : 'Nötr',
+          symptoms: event ? const ['Baş ağrısı'] : const [],
+          observedSections: const {
+            DailyLogObservedSection.wellbeing,
+            DailyLogObservedSection.symptom,
+          },
+        ),
+      );
+
+      final insights = engine.generate(logs: logs);
+      final association = insights.firstWhere(
+        (insight) =>
+            insight.kind == PersonalInsightKind.moodSymptomAssociation &&
+            insight.primaryLabel == 'İyi' &&
+            insight.secondaryLabel == 'Baş ağrısı',
+      );
+
+      _expectEightToOnePattern(association);
+      expect(
+        insights.where(
+          (insight) =>
+              insight.kind == PersonalInsightKind.moodSymptomAssociation &&
+              insight.secondaryLabel == 'Baş ağrısı',
+        ),
+        hasLength(1),
+      );
+    },
+  );
+
+  test('ruh hali ile artıdan eklenen özel besini karşılaştırır', () {
+    final logs = _pairedLogs(
+      (date, exposed, event) => DailyLog(
+        date: date,
+        mood: exposed ? 'İyi' : 'Nötr',
+        mealTypes: const ['Kahvaltı'],
+        mealFoodGroups: event
+            ? const {
+                'Kahvaltı': ['Ev yapımı granola'],
+              }
+            : const {},
+        observedSections: const {
+          DailyLogObservedSection.wellbeing,
+          DailyLogObservedSection.nutrition,
+        },
+      ),
+    );
+
+    final association = engine
+        .generate(logs: logs)
+        .firstWhere(
+          (insight) =>
+              insight.kind == PersonalInsightKind.moodFoodAssociation &&
+              insight.primaryLabel == 'İyi' &&
+              insight.secondaryLabel == 'Ev yapımı granola',
+        );
+
+    _expectEightToOnePattern(association);
+  });
+
+  test('ruh hali ile canın ne çekti seçimini karşılaştırır', () {
+    final logs = _pairedLogs(
+      (date, exposed, event) => DailyLog(
+        date: date,
+        mood: exposed ? 'İyi' : 'Nötr',
+        cravings: [event ? 'Çikolata' : 'Hiçbiri'],
+        observedSections: const {
+          DailyLogObservedSection.wellbeing,
+          DailyLogObservedSection.nutrition,
+        },
+      ),
+    );
+
+    final association = engine
+        .generate(logs: logs)
+        .firstWhere(
+          (insight) =>
+              insight.kind == PersonalInsightKind.moodCravingAssociation &&
+              insight.primaryLabel == 'İyi' &&
+              insight.secondaryLabel == 'Çikolata',
+        );
+
+    _expectEightToOnePattern(association);
+  });
+
+  test('özel besin ile belirtilerdeki bağırsak sinyalini karşılaştırır', () {
+    final logs = _pairedLogs(
+      (date, exposed, event) => DailyLog(
+        date: date,
+        mealTypes: const ['Akşam yemeği'],
+        mealFoodGroups: exposed
+            ? const {
+                'Akşam yemeği': ['Acılı ev yemeği'],
+              }
+            : const {},
+        symptoms: event ? const ['Kabızlık'] : const [],
+        observedSections: const {
+          DailyLogObservedSection.nutrition,
+          DailyLogObservedSection.symptom,
+        },
+      ),
+    );
+
+    final association = engine
+        .generate(logs: logs)
+        .firstWhere(
+          (insight) =>
+              insight.kind == PersonalInsightKind.foodBowelAssociation &&
+              insight.primaryLabel == 'Acılı ev yemeği' &&
+              insight.secondaryLabel == 'Kabızlık' &&
+              insight.lagDays == 0,
+        );
+
+    _expectEightToOnePattern(association);
+  });
+
+  test('ruh hali ile artıdan eklenen özel yeri karşılaştırır', () {
+    final logs = _pairedLogs(
+      (date, exposed, event) => DailyLog(
+        date: date,
+        mood: exposed ? 'İyi' : 'Nötr',
+        moodPlaces: event ? const ['Sahil parkı'] : const [],
+        observedSections: const {DailyLogObservedSection.wellbeing},
+      ),
+    );
+
+    final association = engine
+        .generate(logs: logs)
+        .firstWhere(
+          (insight) =>
+              insight.kind == PersonalInsightKind.moodPlaceAssociation &&
+              insight.primaryLabel == 'İyi' &&
+              insight.secondaryLabel == 'Sahil parkı',
+        );
+
+    _expectEightToOnePattern(association);
+  });
+
+  test('ruh hali ile artıdan eklenen özel kişiyi karşılaştırır', () {
+    final logs = _pairedLogs(
+      (date, exposed, event) => DailyLog(
+        date: date,
+        mood: exposed ? 'İyi' : 'Nötr',
+        moodCompanions: event ? const ['Yakın arkadaşım'] : const [],
+        observedSections: const {DailyLogObservedSection.wellbeing},
+      ),
+    );
+
+    final association = engine
+        .generate(logs: logs)
+        .firstWhere(
+          (insight) =>
+              insight.kind == PersonalInsightKind.moodCompanionAssociation &&
+              insight.primaryLabel == 'İyi' &&
+              insight.secondaryLabel == 'Yakın arkadaşım',
+        );
+
+    _expectEightToOnePattern(association);
+  });
+}
+
+List<DailyLog> _pairedLogs(
+  DailyLog Function(DateTime date, bool exposed, bool event) build,
+) {
+  final start = DateTime(2026, 7, 1);
+  return List.generate(20, (day) {
+    final exposed = day < 10;
+    final event = day < 8 || day == 15;
+    return build(start.add(Duration(days: day)), exposed, event);
+  });
+}
+
+void _expectEightToOnePattern(PersonalInsight association) {
+  expect(association.withEventCount, 8);
+  expect(association.withTotal, 10);
+  expect(association.withoutEventCount, 1);
+  expect(association.withoutTotal, 10);
 }

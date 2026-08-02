@@ -33,7 +33,7 @@ class FeelingCard extends StatelessWidget {
         ),
       _QuickAction(
         label: AppStrings.symptom,
-        icon: Icons.add_rounded,
+        icon: Icons.medical_information_outlined,
         foreground: AppColors.periodFlow,
         background: const Color(0xFFF4E4DE),
         onTap: onSymptomTap,
@@ -47,7 +47,7 @@ class FeelingCard extends StatelessWidget {
       ),
       _QuickAction(
         label: AppStrings.nutrition,
-        icon: Icons.bolt_outlined,
+        icon: Icons.restaurant_menu_rounded,
         foreground: AppColors.primaryDark,
         background: const Color(0xFFE6EEE0),
         onTap: onNutritionTap,

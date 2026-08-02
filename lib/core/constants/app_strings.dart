@@ -57,6 +57,19 @@ enum _TextKey {
   insightSymptomCyclePhaseBody,
   insightEnergyCyclePhaseTitle,
   insightEnergyCyclePhaseBody,
+  insightMoodSymptomTitle,
+  insightMoodSymptomBody,
+  insightMoodFoodTitle,
+  insightMoodFoodBody,
+  insightMoodCravingTitle,
+  insightMoodCravingBody,
+  insightFoodBowelTitle,
+  insightFoodBowelSameDayBody,
+  insightFoodBowelNextDayBody,
+  insightMoodPlaceTitle,
+  insightMoodPlaceBody,
+  insightMoodCompanionTitle,
+  insightMoodCompanionBody,
   insightAssociationTitle,
   insightAssociationSameDayBody,
   insightAssociationNextDayBody,
@@ -702,7 +715,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightsEmptyDescription:
       'Ana Sayfa’dan günlük kayıt ekledikçe kişisel özetlerin burada görünecek.',
   _TextKey.insightsDisclaimer:
-      'İçgörüler yalnızca kayıtlarındaki örüntüleri gösterir; tıbbi tanı veya neden-sonuç ilişkisi değildir.',
+      'Bunu bir tanı olarak değil, kayıtlarında birlikte görünen küçük bir ipucu olarak düşün. Seni rahatsız eden veya süren bir değişiklik varsa bir sağlık profesyoneliyle görüş.',
   _TextKey.personalInsightsPreviewTitle: 'Sana özel içgörüler',
   _TextKey.viewAllInsights: 'Tümünü gör',
   _TextKey.insightDataBuildingTitle: 'Örüntün oluşmaya başladı',
@@ -753,7 +766,7 @@ const Map<_TextKey, String> _turkishTexts = {
       '{primary} ile {secondary} aynı günde {count} kez kaydedildi. Bu yalnızca bir eşleşmedir.',
   _TextKey.insightSymptomBleedingTitle: 'Kanama günlerindeki belirti',
   _TextKey.insightSymptomBleedingBody:
-      '{label}, kanama kaydı olan {total} günün {count} tanesinde de işaretlendi.',
+      '{label}, kanama kaydı olan {total} günün {count} tanesinde işaretlendi.',
   _TextKey.insightMoodCyclePhaseTitle: 'Döngü fazında öne çıkan ruh hâli',
   _TextKey.insightMoodCyclePhaseBody:
       '{mood}, “{phase}” günlerinde ruh hâli girdiğin {withTotal} günün {withEvent} tanesinde kaydedildi (%{withPercent}). Diğer fazlarda ruh hâli girdiğin {withoutTotal} günde bu oran %{withoutPercent}. Bu bir ilişkidir; döngü fazının ruh hâline neden olduğunu göstermez.',
@@ -764,25 +777,52 @@ const Map<_TextKey, String> _turkishTexts = {
       'Döngü fazında öne çıkan enerji düzeyi',
   _TextKey.insightEnergyCyclePhaseBody:
       '{energy}, “{phase}” günlerinde enerji düzeyi girdiğin {withTotal} günün {withEvent} tanesinde görüldü (%{withPercent}). Diğer fazlarda enerji düzeyi girdiğin {withoutTotal} günde bu oran %{withoutPercent}. Bu bir ilişkidir; döngü fazının enerji düzeyine neden olduğunu göstermez.',
-  _TextKey.insightAssociationTitle: 'Kayıtlarında öne çıkan bağlantı',
+  _TextKey.insightMoodSymptomTitle:
+      'Ruh halinle bedeninin verdiği sinyal yan yana geliyor',
+  _TextKey.insightMoodSymptomBody:
+      'Küçük bir şey fark ettim: {mood} hissettiğin {withTotal} günün {withEvent} tanesinde {symptom} eşlik etti (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Şimdilik bunu birlikte izleyeceğimiz bir ipucu olarak tutalım.',
+  _TextKey.insightMoodFoodTitle:
+      'Ruh halinle besin seçimlerin arasında bir iz var',
+  _TextKey.insightMoodFoodBody:
+      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde {food} kaydı oluşturdun (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bazen hisler seçimlerimize eşlik eder; birkaç yeni kayıt resmi netleştirecek.',
+  _TextKey.insightMoodCravingTitle:
+      'Canının çektiği şey ruh haline eşlik ediyor olabilir',
+  _TextKey.insightMoodCravingBody:
+      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde {craving} isteği kaydettin (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bu yalnızca kayıtlarındaki bir yakınlık; seni yargılamadan takip etmeyi sürdürelim.',
+  _TextKey.insightFoodBowelTitle:
+      'Yediklerinle bağırsak ritmin arasında bir iz var',
+  _TextKey.insightFoodBowelSameDayBody:
+      '{food} kaydettiğin {withTotal} günün {withEvent} tanesinde {bowel} işaretledin (%{withPercent}). {food} olmayan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Tek başına nedenini söylemez; tekrar edip etmediğine birlikte bakalım.',
+  _TextKey.insightFoodBowelNextDayBody:
+      '{food} kaydettiğin {withTotal} günün {withEvent} tanesini izleyen gün {bowel} işaretledin (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bu gecikmeli iz tekrar ederse daha anlamlı hale gelecek.',
+  _TextKey.insightMoodPlaceTitle:
+      'Bulunduğun yer ruh haline eşlik ediyor olabilir',
+  _TextKey.insightMoodPlaceBody:
+      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde “{place}” konumunu seçtin (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Ortamın sana nasıl geldiğini fark etmek için bunu nazikçe izleyelim.',
+  _TextKey.insightMoodCompanionTitle:
+      'Yanındaki kişilerle ruh halin arasında bir örüntü var',
+  _TextKey.insightMoodCompanionBody:
+      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde “{companion}” seçeneğini işaretledin (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bu kimse hakkında bir yargı değil; yalnızca senin kayıtlarında beliren bir bağlam.',
+  _TextKey.insightAssociationTitle:
+      'Birlikte takip etmeye değer küçük bir ipucu',
   _TextKey.insightAssociationSameDayBody:
-      '{primary} kaydedilen {withTotal} günün {withEvent} tanesinde aynı gün {secondary} de kaydedildi (%{withPercent}). {primary} kaydedilmeyen {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; neden-sonuç değildir.',
+      '{primary} kaydettiğin {withTotal} günün {withEvent} tanesinde {secondary} eşlik etti (%{withPercent}). {primary} olmayan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bu nedenini söylemez; sadece yeniden bakmaya değer bir iz gösterir.',
   _TextKey.insightAssociationNextDayBody:
-      '{primary} kaydedilen {withTotal} günün {withEvent} tanesini izleyen gün {secondary} kaydedildi (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; neden-sonuç değildir.',
+      '{primary} kaydettiğin {withTotal} günün {withEvent} tanesini izleyen gün {secondary} vardı (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Şimdilik bunu tekrar edip etmediğine bakacağımız bir ipucu olarak tutalım.',
   _TextKey.insightFoodObservationTitle: 'Bunu birlikte takip edelim',
   _TextKey.insightFoodObservationBody:
       '{primary} ile {secondary} aynı kayıtta ilk kez birlikte göründü. Hassasiyet demek için çok erken. Benzer öğünleri; diğer içerikler, mevcut sindirim/enerji/uyku işaretleri, döngü fazı ve {primary} olmayan günlerle birlikte karşılaştırmaya devam edeceğiz.',
   _TextKey.insightFoodPatternBuildingTitle:
       'Besin ve sindirim örüntüsü oluşuyor',
   _TextKey.insightFoodPatternBuildingBody:
-      '{primary} bulunan {withTotal} günün {withEvent} tanesinde {secondary} da kaydedildi. Bu eşleşme tekrar ediyor, ancak henüz hassasiyet sonucu çıkarılamaz. {primary} olmayan günler ve diğer etkenler arttıkça karşılaştırma daha anlamlı olacak.',
+      '{primary} bulunan {withTotal} günün {withEvent} tanesinde {secondary} kaydedildi. Bu eşleşme tekrar ediyor, ancak henüz hassasiyet sonucu çıkarılamaz. {primary} olmayan günler ve diğer etkenler arttıkça karşılaştırma daha anlamlı olacak.',
   _TextKey.insightFoodSensitivityTitle: 'Besin ve sindirim örüntüsü',
   _TextKey.insightFoodSensitivityBody:
       '{primary} içeren öğünlerden sonraki {withTotal} kaydın {withEvent} tanesinde {secondary} işaretlendi (%{withPercent}). {primary} olmayan {withoutTotal} karşılaştırılabilir kayıtta bu oran %{withoutPercent}. Bu örüntü olası bir hassasiyetle uyumlu olabilir; tanı değildir. Bir besini elemeden önce sağlık profesyoneliyle görüş.',
   _TextKey.insightContextAlsoSeen:
-      'Aynı günlerde {contexts} da sık kaydedildi; bunlar sonucu etkiliyor olabilir.',
+      'Aynı günlerin kayıtlarında {contexts} sık göründü; bunlar sonucu etkiliyor olabilir.',
   _TextKey.insightContextTrackNext:
-      'Daha net ayırmak için diğer öğün içeriklerini, belirtinin zamanını ve mevcut sindirim, enerji, uyku ile döngü işaretlerini de kaydet.',
+      'Daha net ayırmak için diğer öğün içeriklerini, belirtinin zamanını ve mevcut sindirim, enerji, uyku ile döngü işaretlerini kaydet.',
   _TextKey.insightMedicationSkipAssociationTitle:
       'Doz yanıtından sonra görülen örüntü',
   _TextKey.insightMedicationSkipAssociationBody:
@@ -802,7 +842,7 @@ const Map<_TextKey, String> _turkishTexts = {
       'Son {color} akıntı kaydın adet veya kanama günüyle örtüşüyor. Bu kart yalnızca zamanlama bağlamı verir ve rengin nedenini belirlemez. Adet dışında kanlı görünüm tekrarlarsa sağlık profesyoneline danış.',
   _TextKey.insightDischargeHealthTitle: 'Akıntı değişikliğini değerlendirin',
   _TextKey.insightDischargeHealthBody:
-      'Son kaydında renk, kıvam, koku veya eşlik eden bulgulardan değerlendirilmesi gereken bir değişiklik işaretlendi. Bu, enfeksiyon dahil farklı nedenlerle görülebilir; uygulama nedenini belirleyemez veya tanı koyamaz. Değişiklik yeniyse, sürerse ya da kötüleşirse sağlık profesyoneline başvur.',
+      'Son kaydında renk, kıvam, koku veya eşlik eden bulgulardan değerlendirilmesi gereken bir değişiklik işaretlendi. Bu, enfeksiyon dahil farklı nedenlerle görülebilir; uygulama nedenini belirleyemez veya tanı koyamaz. Değişiklik yeniyse, sürerse veya kötüleşirse sağlık profesyoneline başvur.',
   _TextKey.insightSexualAfterPatternTitle:
       'Cinsel aktivite sonrası tekrar eden his',
   _TextKey.insightSexualAfterPatternBody:
@@ -810,12 +850,12 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.insightUnprotectedFertileTitle:
       'Korunmasız ilişki ve tahmini verimli dönem',
   _TextKey.insightUnprotectedFertileBody:
-      'Son korunmasız ilişki kaydın tahmini verimli pencereyle çakışıyor. Takvim tahmini ovülasyonu veya gebeliği doğrulamaz. Gebelik istemiyorsan, acil korunma seçenekleri zamana bağlı olduğundan bir sağlık profesyoneli ya da eczacıyla gecikmeden görüş.',
-  _TextKey.insightConfidenceEmerging: 'Oluşan bağlantı',
-  _TextKey.insightConfidenceModerate: 'Orta güven',
-  _TextKey.insightConfidenceStrong: 'Daha güçlü kanıt',
+      'Son korunmasız ilişki kaydın tahmini verimli pencereyle çakışıyor. Takvim tahmini ovülasyonu veya gebeliği doğrulamaz. Gebelik istemiyorsan, acil korunma seçenekleri zamana bağlı olduğundan bir sağlık profesyoneli veya eczacıyla gecikmeden görüş.',
+  _TextKey.insightConfidenceEmerging: 'Yeni yeni belirginleşiyor',
+  _TextKey.insightConfidenceModerate: 'Tutarlı görünmeye başladı',
+  _TextKey.insightConfidenceStrong: 'Güçlü bir örüntüye benziyor',
   _TextKey.insightAssociationEvidence:
-      '{confidence} • {count} karşılaştırılabilir gün',
+      'Bunu {count} karşılaştırılabilir günde fark ettim • {confidence}',
   _TextKey.insightEvidenceDays: 'Kayıtlı gün: {count}',
   _TextKey.insightEvidenceCycles: 'Hesaplanan döngü: {count}',
   _TextKey.insightEvidenceEntries: 'İşaretleme girişi: {count}',
@@ -856,7 +896,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.exploreFocus: 'Odak',
   _TextKey.readTimeMinutes: '{count} dk',
   _TextKey.insightStoryHeader: 'OMA İÇGÖRÜSÜ · BUGÜN',
-  _TextKey.insightExplanationLabel: 'OMA’NIN AÇIKLAMASI',
+  _TextKey.insightExplanationLabel: 'BU İPUCU NEYE DAYANIYOR?',
   _TextKey.previousInsight: 'Önceki içgörü',
   _TextKey.nextInsight: 'Sonraki içgörü',
   _TextKey.insightStoryDone: 'Bitti',
@@ -1464,7 +1504,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightsEmptyDescription:
       'Add daily logs from Home and your personal summaries will appear here.',
   _TextKey.insightsDisclaimer:
-      'Insights show patterns in your records only; they are not a medical diagnosis or evidence of cause and effect.',
+      'Think of this as a small clue appearing in your logs, not a diagnosis. If a change worries you or continues, talk with a healthcare professional.',
   _TextKey.personalInsightsPreviewTitle: 'Your personal insights',
   _TextKey.viewAllInsights: 'View all',
   _TextKey.insightDataBuildingTitle: 'Your pattern is taking shape',
@@ -1526,11 +1566,37 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightEnergyCyclePhaseTitle: 'Energy pattern by cycle phase',
   _TextKey.insightEnergyCyclePhaseBody:
       '{energy} appeared on {withEvent} of {withTotal} energy-logged days during {phase} ({withPercent}%). On {withoutTotal} energy-logged days in other phases, the rate was {withoutPercent}%. This is an association; it does not show that the cycle phase caused the energy level.',
-  _TextKey.insightAssociationTitle: 'A connection in your logs',
+  _TextKey.insightMoodSymptomTitle:
+      'Your mood and a body signal are showing up together',
+  _TextKey.insightMoodSymptomBody:
+      'I noticed something small: on {withEvent} of {withTotal} days you felt {mood}, you also logged {symptom} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. For now, let’s keep it as a clue to follow together.',
+  _TextKey.insightMoodFoodTitle:
+      'There is a trace between your mood and food choices',
+  _TextKey.insightMoodFoodBody:
+      'On {withEvent} of {withTotal} days you felt {mood}, you also logged {food} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. Feelings can travel alongside our choices; a few more logs will make the picture clearer.',
+  _TextKey.insightMoodCravingTitle:
+      'What you craved may be travelling with your mood',
+  _TextKey.insightMoodCravingBody:
+      'On {withEvent} of {withTotal} days you felt {mood}, you said you craved {craving} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This is only a closeness in your logs, so let’s keep watching without judgment.',
+  _TextKey.insightFoodBowelTitle:
+      'There is a trace between food and your bowel rhythm',
+  _TextKey.insightFoodBowelSameDayBody:
+      'On {withEvent} of {withTotal} days with {food}, you also logged {bowel} that day ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable days without {food}. It cannot tell us why on its own; let’s see whether it repeats.',
+  _TextKey.insightFoodBowelNextDayBody:
+      'After {withEvent} of {withTotal} days with {food}, {bowel} appeared the next day ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This delayed trace will become more useful if it repeats.',
+  _TextKey.insightMoodPlaceTitle:
+      'Where you were may be travelling with your mood',
+  _TextKey.insightMoodPlaceBody:
+      'On {withEvent} of {withTotal} days you felt {mood}, you selected “{place}” ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. Let’s gently follow how that environment feels to you.',
+  _TextKey.insightMoodCompanionTitle:
+      'There is a pattern between your mood and who was there',
+  _TextKey.insightMoodCompanionBody:
+      'On {withEvent} of {withTotal} days you felt {mood}, “{companion}” was with you ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This is not a judgment about anyone, only context appearing in your logs.',
+  _TextKey.insightAssociationTitle: 'A small clue worth following together',
   _TextKey.insightAssociationSameDayBody:
-      'On {withEvent} of {withTotal} days with {primary}, {secondary} was also logged that day ({withPercent}%). On {withoutTotal} comparable days without {primary}, the rate was {withoutPercent}%. This is an association, not cause and effect.',
+      'On {withEvent} of {withTotal} days with {primary}, {secondary} was also there that day ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable days without {primary}. It does not tell us why, only shows a trace worth revisiting.',
   _TextKey.insightAssociationNextDayBody:
-      '{secondary} was logged the next day after {withEvent} of {withTotal} days with {primary} ({withPercent}%). On the other {withoutTotal} comparable days, the rate was {withoutPercent}%. This is an association, not cause and effect.',
+      '{secondary} appeared the next day after {withEvent} of {withTotal} days with {primary} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. For now, let’s keep it as a clue and see whether it repeats.',
   _TextKey.insightFoodObservationTitle: 'Let’s follow this together',
   _TextKey.insightFoodObservationBody:
       '{primary} and {secondary} appeared in the same entry for the first time. It is too early to call this a sensitivity. We will compare similar meals alongside other ingredients, existing digestion/energy/sleep check-ins, cycle phase, and days without {primary}.',
@@ -1575,10 +1641,11 @@ const Map<_TextKey, String> _englishTexts = {
       'Unprotected sex and the estimated fertile window',
   _TextKey.insightUnprotectedFertileBody:
       'Your latest unprotected-sex entry overlaps with the estimated fertile window. Calendar estimates do not confirm ovulation or pregnancy. If you do not want a pregnancy, emergency contraception is time-sensitive; contact a healthcare professional or pharmacist promptly.',
-  _TextKey.insightConfidenceEmerging: 'Emerging connection',
-  _TextKey.insightConfidenceModerate: 'Moderate confidence',
-  _TextKey.insightConfidenceStrong: 'Stronger evidence',
-  _TextKey.insightAssociationEvidence: '{confidence} • {count} comparable days',
+  _TextKey.insightConfidenceEmerging: 'Just starting to appear',
+  _TextKey.insightConfidenceModerate: 'Starting to look consistent',
+  _TextKey.insightConfidenceStrong: 'Looks like a strong pattern',
+  _TextKey.insightAssociationEvidence:
+      'I noticed this across {count} comparable days • {confidence}',
   _TextKey.insightEvidenceDays: 'Logged days: {count}',
   _TextKey.insightEvidenceCycles: 'Calculated cycles: {count}',
   _TextKey.insightEvidenceEntries: 'Check entries: {count}',
@@ -1616,7 +1683,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.exploreFocus: 'Focus',
   _TextKey.readTimeMinutes: '{count} mins',
   _TextKey.insightStoryHeader: 'OMA INSIGHT · TODAY',
-  _TextKey.insightExplanationLabel: 'OMA’S EXPLANATION',
+  _TextKey.insightExplanationLabel: 'WHAT IS THIS CLUE BASED ON?',
   _TextKey.previousInsight: 'Previous insight',
   _TextKey.nextInsight: 'Next insight',
   _TextKey.insightStoryDone: 'Done',
@@ -3224,6 +3291,126 @@ class AppStrings {
   }) => _format(_TextKey.insightEnergyCyclePhaseBody, {
     'energy': energy,
     'phase': phase,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightMoodSymptomTitle =>
+      _text(_TextKey.insightMoodSymptomTitle);
+  static String insightMoodSymptomBody({
+    required String mood,
+    required String symptom,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightMoodSymptomBody, {
+    'mood': mood,
+    'symptom': symptom,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightMoodFoodTitle =>
+      _text(_TextKey.insightMoodFoodTitle);
+  static String insightMoodFoodBody({
+    required String mood,
+    required String food,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightMoodFoodBody, {
+    'mood': mood,
+    'food': food,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightMoodCravingTitle =>
+      _text(_TextKey.insightMoodCravingTitle);
+  static String insightMoodCravingBody({
+    required String mood,
+    required String craving,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightMoodCravingBody, {
+    'mood': mood,
+    'craving': craving,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightFoodBowelTitle =>
+      _text(_TextKey.insightFoodBowelTitle);
+  static String insightFoodBowelBody({
+    required String food,
+    required String bowel,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+    required int lagDays,
+  }) => _format(
+    lagDays == 0
+        ? _TextKey.insightFoodBowelSameDayBody
+        : _TextKey.insightFoodBowelNextDayBody,
+    {
+      'food': food,
+      'bowel': bowel,
+      'withEvent': withEvent,
+      'withTotal': withTotal,
+      'withoutTotal': withoutTotal,
+      'withPercent': withPercent,
+      'withoutPercent': withoutPercent,
+    },
+  );
+  static String get insightMoodPlaceTitle =>
+      _text(_TextKey.insightMoodPlaceTitle);
+  static String insightMoodPlaceBody({
+    required String mood,
+    required String place,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightMoodPlaceBody, {
+    'mood': mood,
+    'place': place,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightMoodCompanionTitle =>
+      _text(_TextKey.insightMoodCompanionTitle);
+  static String insightMoodCompanionBody({
+    required String mood,
+    required String companion,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightMoodCompanionBody, {
+    'mood': mood,
+    'companion': companion,
     'withEvent': withEvent,
     'withTotal': withTotal,
     'withoutTotal': withoutTotal,
