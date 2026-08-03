@@ -2,6 +2,7 @@ import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/constants/color_constants.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
+import 'package:app_proje_a/data/models/lab_result_model.dart';
 import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
@@ -37,6 +38,12 @@ void main() {
         age: 31,
         height: 168,
         weight: 62,
+        labResults: const {
+          'hba1c': LabResult(value: '42', unit: 'mmol/mol'),
+          'ferritin': LabResult(value: '38', unit: 'µg/L'),
+        },
+        labTestDate: DateTime(2026, 7, 18),
+        labTestFasting: true,
         lastPeriodDate: DateTime.now().subtract(const Duration(days: 13)),
       ),
     );
@@ -78,6 +85,10 @@ void main() {
     expect(find.text('Şu anki modun'), findsOneWidget);
     expect(find.text('Döngü takibim'), findsOneWidget);
     expect(find.text('OMA Premium'), findsOneWidget);
+    expect(find.text('HbA1c'), findsOneWidget);
+    expect(find.text('42 mmol/mol'), findsOneWidget);
+    expect(find.text('Ferritin'), findsOneWidget);
+    expect(find.text('38 µg/L'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     final name = tester.widget<Text>(find.text('Özge'));

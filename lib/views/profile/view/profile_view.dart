@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/shared_widgets/lab_results_form.dart';
+import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
@@ -533,7 +535,6 @@ class _ProfileMechanics extends StatelessWidget {
     final smokingYearsCtrl = TextEditingController(
       text: s.smokingYears?.toString() ?? '0',
     );
-    final bloodTestCtrl = TextEditingController(text: s.bloodTestResults ?? '');
 
     showModalBottomSheet(
       context: context,
@@ -550,7 +551,6 @@ class _ProfileMechanics extends StatelessWidget {
           vm.updateHeight(double.tryParse(heightCtrl.text));
           vm.updateAge(int.tryParse(ageCtrl.text));
           vm.updateSmokingYears(int.tryParse(smokingYearsCtrl.text) ?? 0);
-          vm.updateBloodTestResults(bloodTestCtrl.text.trim());
           await vm.saveSettings();
           // Dashboard ve Takvimi de güncelle
           if (ctx.mounted) {
@@ -565,12 +565,6 @@ class _ProfileMechanics extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _sheetField(AppStrings.name, nameCtrl),
-                const SizedBox(height: 12),
-                _sheetField(
-                  AppStrings.lastBloodValuesTest,
-                  bloodTestCtrl,
-                  maxLines: 3,
-                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -677,6 +671,50 @@ class _ProfileMechanics extends StatelessWidget {
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+
+  void _showLabResultsSheet(
+    BuildContext context,
+    ProfileViewModel vm, {
+    Color accent = AppColors.primary,
+  }) {
+    var results = Map<String, LabResult>.from(vm.settings.labResults);
+    var testDate = vm.settings.labTestDate;
+    var fasting = vm.settings.labTestFasting;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _EditSheet(
+        title: AppStrings.isTurkish
+            ? 'Laboratuvar değerleri'
+            : 'Laboratory results',
+        icon: Icons.science_outlined,
+        accent: accent,
+        onSave: () async {
+          vm.updateLaboratoryResults(
+            results: results,
+            testDate: testDate,
+            fasting: fasting,
+          );
+          await vm.saveSettings();
+          if (ctx.mounted) Navigator.pop(ctx);
+        },
+        child: LabResultsForm(
+          key: const ValueKey('profile_lab_results_form'),
+          initialResults: results,
+          initialTestDate: testDate,
+          initialFasting: fasting,
+          legacyResults: vm.settings.bloodTestResults,
+          accent: accent,
+          onResultsChanged: (value) => results = value,
+          onTestDateChanged: (value) => testDate = value,
+          onFastingChanged: (value) => fasting = value,
         ),
       ),
     );

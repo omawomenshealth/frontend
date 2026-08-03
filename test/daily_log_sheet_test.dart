@@ -1,4 +1,5 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
+import 'package:app_proje_a/core/constants/color_constants.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
@@ -423,6 +424,90 @@ void main() {
       contains(DailyLogObservedSection.symptom),
     );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Belirti menüsü ana ekran temasını tek renk olarak kullanır', (
+    tester,
+  ) async {
+    const themeTone = AppColors.ovulation;
+    await _pumpLogSheet(tester, initialIndex: 2, themeColor: themeTone);
+
+    for (var index = 0; index < 4; index++) {
+      final label = AppStrings.symptomBodyOptions[index];
+      final tile = tester.widget<AnimatedContainer>(
+        find.byKey(ValueKey('symptom_tile_surface_$label')),
+      );
+      final decoration = tile.decoration! as BoxDecoration;
+      expect(
+        (decoration.border! as Border).top.color,
+        themeTone.withValues(alpha: 0.62),
+      );
+    }
+
+    final saveButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, AppStrings.save),
+    );
+    expect(saveButton.style!.backgroundColor!.resolve({}), themeTone);
+  });
+
+  testWidgets('Adet menüsü ana ekran tema renginden etkilenmez', (
+    tester,
+  ) async {
+    await _pumpLogSheet(
+      tester,
+      initialIndex: 0,
+      themeColor: AppColors.ovulation,
+    );
+
+    final saveButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, AppStrings.savePeriod),
+    );
+    expect(
+      saveButton.style!.backgroundColor!.resolve({}),
+      AppColors.periodPrimary,
+    );
+  });
+
+  testWidgets('Beslenme ve kimleydin menüleri aynı tek tema rengini kullanır', (
+    tester,
+  ) async {
+    const themeTone = AppColors.ovulation;
+    await _pumpLogSheet(tester, initialIndex: 1, themeColor: themeTone);
+
+    for (var index = 0; index < 4; index++) {
+      final meal = tester.widget<AnimatedContainer>(
+        find.byKey(ValueKey('meal_option_$index')),
+      );
+      final decoration = meal.decoration! as BoxDecoration;
+      expect(
+        (decoration.border! as Border).top.color,
+        themeTone.withValues(alpha: 0.52),
+      );
+    }
+
+    final nutritionSave = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, AppStrings.saveNutrition),
+    );
+    expect(nutritionSave.style!.backgroundColor!.resolve({}), themeTone);
+
+    Navigator.of(tester.element(find.byType(DailyLogSheet))).pop();
+    await tester.pumpAndSettle();
+    await _pumpLogSheet(tester, initialIndex: 3, themeColor: themeTone);
+    await tester.tap(find.text(AppStrings.continueAction));
+    await tester.pumpAndSettle();
+
+    for (var index = 0; index < 4; index++) {
+      final choice = find.byKey(ValueKey('mood_companion_$index'));
+      final material = tester.widget<Material>(
+        find.descendant(of: choice, matching: find.byType(Material)).first,
+      );
+      expect(material.color, Color.lerp(AppColors.surface, themeTone, 0.09));
+    }
+
+    final moodSave = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, AppStrings.saveMoment),
+    );
+    expect(moodSave.style!.backgroundColor!.resolve({}), themeTone);
   });
 
   testWidgets('Cinsel aktivite ve ayrıntılı akıntı kaydı görünür ve saklanır', (
@@ -926,6 +1011,7 @@ Future<_LogHarness> _pumpLogSheet(
   required int initialIndex,
   DailyLog? initialLog,
   UserSettings? settings,
+  Color themeColor = AppColors.primary,
 }) async {
   tester.view.physicalSize = const Size(360, 800);
   tester.view.devicePixelRatio = 1;
@@ -971,6 +1057,7 @@ Future<_LogHarness> _pumpLogSheet(
                     builder: (_) => DailyLogSheet(
                       initialLog: initialLog ?? DailyLog.empty(DateTime.now()),
                       settings: storage.loadSettings()!,
+                      themeColor: themeColor,
                       initialTabIndex: initialIndex,
                       isSingleTab: true,
                       onSettingsChanged: () async {

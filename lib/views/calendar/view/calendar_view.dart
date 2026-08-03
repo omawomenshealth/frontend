@@ -788,6 +788,9 @@ Future<void> _showDailyLogEditor(
     builder: (_) => DailyLogSheet(
       initialLog: dashboardVm.initialLogForSection(section, date: date),
       settings: settings,
+      themeColor: AppColors.forCyclePhase(
+        dashboardVm.periodCalculator?.phaseAt(date),
+      ),
       initialTabIndex: initialIndex,
       isSingleTab: true,
       onSettingsChanged: () async {

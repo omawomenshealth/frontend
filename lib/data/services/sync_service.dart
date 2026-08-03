@@ -314,6 +314,10 @@ class SyncService {
         age: localSettings.age ?? cloudSettings.age,
         bloodTestResults:
             localSettings.bloodTestResults ?? cloudSettings.bloodTestResults,
+        labResults: {...cloudSettings.labResults, ...localSettings.labResults},
+        labTestDate: localSettings.labTestDate ?? cloudSettings.labTestDate,
+        labTestFasting:
+            localSettings.labTestFasting ?? cloudSettings.labTestFasting,
         relationshipStatus:
             localSettings.relationshipStatus ??
             cloudSettings.relationshipStatus,

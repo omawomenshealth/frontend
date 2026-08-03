@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user_settings_model.dart';
+import '../../../data/models/lab_result_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/notification_service.dart';
@@ -193,8 +194,18 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateBloodTestResults(String? value) {
-    _settings = _settings.copyWith(bloodTestResults: value);
+  void updateLaboratoryResults({
+    required Map<String, LabResult> results,
+    required DateTime? testDate,
+    required bool? fasting,
+  }) {
+    _settings = _settings.copyWith(
+      labResults: Map<String, LabResult>.from(results),
+      labTestDate: testDate,
+      clearLabTestDate: testDate == null,
+      labTestFasting: fasting,
+      clearLabTestFasting: fasting == null,
+    );
     notifyListeners();
   }
 

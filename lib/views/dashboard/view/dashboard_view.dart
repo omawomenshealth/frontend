@@ -42,7 +42,7 @@ class DashboardView extends StatelessWidget {
         final calculator = vm.periodCalculator;
         final phase =
             calculator?.phaseAt(vm.selectedDate) ?? CyclePhase.follicular;
-        final accent = _phaseColor(phase);
+        final accent = AppColors.forCyclePhase(phase);
         final cycleDay = _cycleDay(calculator, vm.selectedDate);
         final periodCount = phase == CyclePhase.menstrual
             ? cycleDay
@@ -201,15 +201,6 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Color _phaseColor(CyclePhase phase) {
-    return switch (phase) {
-      CyclePhase.menstrual => AppColors.periodPrimary,
-      CyclePhase.follicular => AppColors.primary,
-      CyclePhase.ovulation => AppColors.ovulation,
-      CyclePhase.luteal => AppColors.lutealDark,
-    };
-  }
-
   void _showDailyLogSheet(
     BuildContext context,
     DashboardViewModel vm, {
@@ -235,6 +226,9 @@ class DashboardView extends StatelessWidget {
       builder: (context) => DailyLogSheet(
         initialLog: vm.initialLogForSection(section),
         settings: vm.settings!,
+        themeColor: AppColors.forCyclePhase(
+          vm.periodCalculator?.phaseAt(vm.selectedDate),
+        ),
         initialTabIndex: initialIndex,
         isSingleTab: isSingleTab,
         onSettingsChanged: () async {

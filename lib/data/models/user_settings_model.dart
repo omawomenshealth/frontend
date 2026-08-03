@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../core/utils/cycle_rules.dart';
+import 'lab_result_model.dart';
 
 /// Menopoz durumu.
 enum MenopauseStatus { none, pre, peri, post }
@@ -23,7 +24,13 @@ class UserSettings {
   final String? relationshipStatus;
   final bool? sexuallyActive;
   final bool? wantsChildrenInYear;
+
+  /// Eski sürümlerdeki serbest metin alanı. Yeni kayıtlar [labResults]
+  /// üzerinden tutulur; mevcut kullanıcı verisini kaybetmemek için korunur.
   final String? bloodTestResults;
+  final Map<String, LabResult> labResults;
+  final DateTime? labTestDate;
+  final bool? labTestFasting;
   final List<String> chronicDiseases;
 
   // Kadın sağlığı
@@ -52,6 +59,9 @@ class UserSettings {
     this.sexuallyActive,
     this.wantsChildrenInYear,
     this.bloodTestResults,
+    this.labResults = const {},
+    this.labTestDate,
+    this.labTestFasting,
     this.chronicDiseases = const [],
     this.averageCycleLength = CycleRules.defaultCycleLength,
     this.averagePeriodLength = CycleRules.defaultPeriodLength,
@@ -76,6 +86,11 @@ class UserSettings {
     bool? sexuallyActive,
     bool? wantsChildrenInYear,
     String? bloodTestResults,
+    Map<String, LabResult>? labResults,
+    DateTime? labTestDate,
+    bool clearLabTestDate = false,
+    bool? labTestFasting,
+    bool clearLabTestFasting = false,
     List<String>? chronicDiseases,
     int? averageCycleLength,
     int? averagePeriodLength,
@@ -99,6 +114,11 @@ class UserSettings {
       sexuallyActive: sexuallyActive ?? this.sexuallyActive,
       wantsChildrenInYear: wantsChildrenInYear ?? this.wantsChildrenInYear,
       bloodTestResults: bloodTestResults ?? this.bloodTestResults,
+      labResults: labResults ?? this.labResults,
+      labTestDate: clearLabTestDate ? null : (labTestDate ?? this.labTestDate),
+      labTestFasting: clearLabTestFasting
+          ? null
+          : (labTestFasting ?? this.labTestFasting),
       chronicDiseases: chronicDiseases ?? this.chronicDiseases,
       averageCycleLength: averageCycleLength ?? this.averageCycleLength,
       averagePeriodLength: averagePeriodLength ?? this.averagePeriodLength,
@@ -125,6 +145,11 @@ class UserSettings {
       'sexuallyActive': sexuallyActive,
       'wantsChildrenInYear': wantsChildrenInYear,
       'bloodTestResults': bloodTestResults,
+      'labResults': labResults.map(
+        (testId, result) => MapEntry(testId, result.toJson()),
+      ),
+      'labTestDate': labTestDate?.toIso8601String(),
+      'labTestFasting': labTestFasting,
       'chronicDiseases': chronicDiseases,
       'averageCycleLength': averageCycleLength,
       'averagePeriodLength': averagePeriodLength,
@@ -145,6 +170,19 @@ class UserSettings {
     final rawPeriodLength =
         (json['averagePeriodLength'] as num?)?.toInt() ??
         CycleRules.defaultPeriodLength;
+    final rawLabResults = json['labResults'];
+    final labResults = <String, LabResult>{};
+    if (rawLabResults is Map) {
+      for (final entry in rawLabResults.entries) {
+        final value = entry.value;
+        if (value is Map) {
+          final result = LabResult.fromJson(Map<String, dynamic>.from(value));
+          if (result.value.trim().isNotEmpty && result.unit.trim().isNotEmpty) {
+            labResults[entry.key.toString()] = result;
+          }
+        }
+      }
+    }
 
     return UserSettings(
       userName: json['userName'] as String? ?? '',
@@ -158,6 +196,11 @@ class UserSettings {
       sexuallyActive: json['sexuallyActive'] as bool?,
       wantsChildrenInYear: json['wantsChildrenInYear'] as bool?,
       bloodTestResults: json['bloodTestResults'] as String?,
+      labResults: labResults,
+      labTestDate: json['labTestDate'] != null
+          ? DateTime.tryParse(json['labTestDate'].toString())
+          : null,
+      labTestFasting: json['labTestFasting'] as bool?,
       chronicDiseases: List<String>.from(
         json['chronicDiseases'] as List? ?? const [],
       ),

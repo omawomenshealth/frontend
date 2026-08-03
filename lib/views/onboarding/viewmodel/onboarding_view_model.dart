@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user_settings_model.dart';
+import '../../../data/models/lab_result_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/sync_service.dart';
 import '../../../core/utils/cycle_rules.dart';
@@ -29,7 +30,9 @@ class OnboardingViewModel extends ChangeNotifier {
   String _relationshipStatus = AppStrings.relationshipStatusOptions.last;
   bool? _sexuallyActive;
   bool? _wantsChildrenInYear;
-  String? _bloodTestResults;
+  Map<String, LabResult> _labResults = {};
+  DateTime? _labTestDate;
+  bool? _labTestFasting;
   List<String> _chronicDiseases = [];
 
   // Kadın
@@ -58,7 +61,9 @@ class OnboardingViewModel extends ChangeNotifier {
   String get relationshipStatus => _relationshipStatus;
   bool? get sexuallyActive => _sexuallyActive;
   bool? get wantsChildrenInYear => _wantsChildrenInYear;
-  String? get bloodTestResults => _bloodTestResults;
+  Map<String, LabResult> get labResults => _labResults;
+  DateTime? get labTestDate => _labTestDate;
+  bool? get labTestFasting => _labTestFasting;
   List<String> get chronicDiseases => _chronicDiseases;
   int get averageCycleLength => _averageCycleLength;
   int get averagePeriodLength => _averagePeriodLength;
@@ -121,8 +126,16 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setBloodTestResults(String? value) {
-    _bloodTestResults = value;
+  void setLabResults(Map<String, LabResult> value) {
+    _labResults = Map<String, LabResult>.from(value);
+  }
+
+  void setLabTestDate(DateTime? value) {
+    _labTestDate = value;
+  }
+
+  void setLabTestFasting(bool? value) {
+    _labTestFasting = value;
     // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
   }
 
@@ -248,7 +261,9 @@ class OnboardingViewModel extends ChangeNotifier {
       relationshipStatus: _relationshipStatus,
       sexuallyActive: _sexuallyActive,
       wantsChildrenInYear: _wantsChildrenInYear,
-      bloodTestResults: _bloodTestResults,
+      labResults: _labResults,
+      labTestDate: _labTestDate,
+      labTestFasting: _labTestFasting,
       chronicDiseases: _chronicDiseases,
       averageCycleLength: _averageCycleLength,
       averagePeriodLength: _averagePeriodLength,

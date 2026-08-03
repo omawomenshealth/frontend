@@ -5,6 +5,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/cycle_rules.dart';
 import '../../../core/shared_widgets/custom_button.dart';
 import '../../../core/shared_widgets/oma_design_widgets.dart';
+import '../../../core/shared_widgets/lab_results_form.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
@@ -348,12 +349,20 @@ class _BasicInfoPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Kan değerleri — TextField kendi state'ini yönetir
-            _sectionTitle(AppStrings.bloodTestResults),
-            TextField(
-              onChanged: vm.setBloodTestResults,
-              maxLines: 3,
-              decoration: InputDecoration(hintText: AppStrings.bloodTestHint),
+            // Yapılandırılmış laboratuvar değerleri
+            _sectionTitle(
+              AppStrings.isTurkish
+                  ? 'Laboratuvar değerleri'
+                  : 'Laboratory results',
+            ),
+            LabResultsForm(
+              key: const ValueKey('onboarding_lab_results_form'),
+              initialResults: vm.labResults,
+              initialTestDate: vm.labTestDate,
+              initialFasting: vm.labTestFasting,
+              onResultsChanged: vm.setLabResults,
+              onTestDateChanged: vm.setLabTestDate,
+              onFastingChanged: vm.setLabTestFasting,
             ),
             const SizedBox(height: 24),
 

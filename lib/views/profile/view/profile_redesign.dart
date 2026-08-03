@@ -78,6 +78,35 @@ class ProfileView extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 30),
+                        _SectionTitle(
+                          text: AppStrings.isTurkish
+                              ? 'Laboratuvar değerleri'
+                              : 'Laboratory results',
+                          trailing: _RoundIconButton(
+                            icon: Icons.edit_outlined,
+                            accent: accent,
+                            tooltip: AppStrings.isTurkish
+                                ? 'Laboratuvar değerlerini düzenle'
+                                : 'Edit laboratory results',
+                            compact: true,
+                            onTap: () => _mechanics._showLabResultsSheet(
+                              context,
+                              profile,
+                              accent: accent,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _LabResultsCard(
+                          settings: profile.settings,
+                          accent: accent,
+                          onEdit: () => _mechanics._showLabResultsSheet(
+                            context,
+                            profile,
+                            accent: accent,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
                         _SectionTitle(text: AppStrings.profileSymptomPatterns),
                         const SizedBox(height: 12),
                         _PatternCard(
@@ -706,6 +735,222 @@ class _CycleOverviewCard extends StatelessWidget {
       MenopauseStatus.peri => AppStrings.periMenopause,
       MenopauseStatus.post => AppStrings.postMenopause,
     };
+  }
+}
+
+class _LabResultsCard extends StatelessWidget {
+  final UserSettings settings;
+  final Color accent;
+  final VoidCallback onEdit;
+
+  const _LabResultsCard({
+    required this.settings,
+    required this.accent,
+    required this.onEdit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isTurkish = AppStrings.isTurkish;
+    final availableDefinitions = LabTestCatalog.definitions.where((definition) {
+      final result = settings.labResults[definition.id];
+      return result != null && result.value.trim().isNotEmpty;
+    }).toList();
+    final legacy = settings.bloodTestResults?.trim();
+
+    return _SurfaceCard(
+      child: Padding(
+        padding: const EdgeInsets.all(17),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (availableDefinitions.isEmpty &&
+                (legacy == null || legacy.isEmpty))
+              InkWell(
+                key: const ValueKey('profile_lab_results_empty'),
+                borderRadius: BorderRadius.circular(15),
+                onTap: onEdit,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.09),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.science_outlined,
+                          size: 21,
+                          color: accent,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          isTurkish
+                              ? 'Sonuç eklemek için dokunun. Tüm alanlar isteğe bağlıdır.'
+                              : 'Tap to add results. Every field is optional.',
+                          style: const TextStyle(
+                            fontFamily: 'Karla',
+                            fontSize: 12,
+                            height: 1.35,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      Icon(Icons.chevron_right_rounded, color: accent),
+                    ],
+                  ),
+                ),
+              )
+            else ...[
+              if (settings.labTestDate != null ||
+                  settings.labTestFasting != null) ...[
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 7,
+                  children: [
+                    if (settings.labTestDate != null)
+                      _LabMetaChip(
+                        icon: Icons.calendar_month_outlined,
+                        label: settings.labTestDate!.toDotFormat(),
+                        accent: accent,
+                      ),
+                    if (settings.labTestFasting != null)
+                      _LabMetaChip(
+                        icon: Icons.restaurant_outlined,
+                        label: settings.labTestFasting!
+                            ? (isTurkish ? 'Açlık' : 'Fasting')
+                            : (isTurkish ? 'Tokluk' : 'Non-fasting'),
+                        accent: accent,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+              ],
+              for (
+                var index = 0;
+                index < availableDefinitions.length;
+                index++
+              ) ...[
+                _LabResultRow(
+                  definition: availableDefinitions[index],
+                  result: settings.labResults[availableDefinitions[index].id]!,
+                ),
+                if (index < availableDefinitions.length - 1)
+                  const _SoftDivider(),
+              ],
+              if (availableDefinitions.isEmpty &&
+                  legacy != null &&
+                  legacy.isNotEmpty) ...[
+                Text(
+                  isTurkish
+                      ? 'Önceki serbest kayıt'
+                      : 'Previous free-text entry',
+                  style: const TextStyle(
+                    fontFamily: 'Karla',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  legacy,
+                  style: const TextStyle(
+                    fontFamily: 'Karla',
+                    fontSize: 13,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LabMetaChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color accent;
+
+  const _LabMetaChip({
+    required this.icon,
+    required this.label,
+    required this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: accent),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Karla',
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: accent,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LabResultRow extends StatelessWidget {
+  final LabTestDefinition definition;
+  final LabResult result;
+
+  const _LabResultRow({required this.definition, required this.result});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              definition.label(AppStrings.isTurkish),
+              style: const TextStyle(
+                fontFamily: 'Karla',
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            '${result.value} ${result.unit}',
+            textAlign: TextAlign.end,
+            style: const TextStyle(
+              fontFamily: 'Karla',
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

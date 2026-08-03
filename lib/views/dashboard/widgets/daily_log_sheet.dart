@@ -19,6 +19,7 @@ class DailyLogSheet extends StatefulWidget {
   final Future<void> Function()? onSettingsChanged;
   final int initialTabIndex;
   final bool isSingleTab;
+  final Color themeColor;
 
   const DailyLogSheet({
     super.key,
@@ -28,6 +29,7 @@ class DailyLogSheet extends StatefulWidget {
     this.onSettingsChanged,
     this.initialTabIndex = 0,
     this.isSingleTab = false,
+    this.themeColor = AppColors.primary,
   });
 
   @override
@@ -269,9 +271,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   Color get _tone => switch (_logType) {
     0 => AppColors.periodPrimary,
-    1 => AppColors.secondary,
-    2 => AppColors.secondary,
-    _ => AppColors.primary,
+    _ => widget.themeColor,
   };
 
   bool get _isMoodContext => _logType == 3 && _moodStep == 2;
@@ -557,11 +557,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       children: [
                         Text(
                           AppStrings.logHydration.toUpperCase(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.6,
-                            color: AppColors.primaryDark,
+                            color: _tone,
                           ),
                         ),
                         const SizedBox(height: 7),
@@ -579,7 +579,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   _RoundButton(
                     key: const ValueKey('water_decrement'),
                     icon: Icons.remove_rounded,
-                    color: AppColors.secondary,
+                    color: _tone,
                     filled: false,
                     enabled: _waterGlasses > 0,
                     onTap: () =>
@@ -589,7 +589,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   _RoundButton(
                     key: const ValueKey('water_increment'),
                     icon: Icons.add_rounded,
-                    color: AppColors.secondary,
+                    color: _tone,
                     filled: true,
                     enabled: _waterGlasses < 12,
                     onTap: () =>
@@ -607,21 +607,17 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       margin: EdgeInsets.only(right: index == 7 ? 0 : 6),
                       decoration: BoxDecoration(
                         color: filled
-                            ? AppColors.secondaryLight
+                            ? Color.lerp(AppColors.surface, _tone, 0.16)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(9),
                         border: Border.all(
-                          color: filled
-                              ? AppColors.secondary
-                              : AppColors.outline,
+                          color: filled ? _tone : _tone.withValues(alpha: 0.26),
                         ),
                       ),
                       child: Icon(
                         Icons.local_drink_outlined,
                         size: 16,
-                        color: filled
-                            ? AppColors.secondary
-                            : AppColors.textHint,
+                        color: filled ? _tone : _tone.withValues(alpha: 0.52),
                       ),
                     ),
                   );
@@ -644,7 +640,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         _buildSimpleChoices(
           options: AppStrings.nutritionCravingOptions,
           selected: _cravings,
-          color: AppColors.secondary,
         ),
         const SizedBox(height: 25),
         _buildCaffeineCard(),
@@ -661,7 +656,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: _tone.withValues(alpha: 0.42)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -704,10 +699,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-            color: AppColors.secondaryLight.withValues(alpha: 0.65),
+            color: Color.lerp(AppColors.surface, _tone, 0.13),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, size: 19, color: AppColors.secondaryDark),
+          child: Icon(icon, size: 19, color: _tone),
         ),
         const SizedBox(width: 11),
         Expanded(
@@ -736,7 +731,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         _RoundButton(
           key: ValueKey('${keyPrefix}_decrement'),
           icon: Icons.remove_rounded,
-          color: AppColors.secondaryDark,
+          color: _tone,
           filled: false,
           enabled: canDecrease,
           onTap: onDecrease,
@@ -745,7 +740,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         _RoundButton(
           key: ValueKey('${keyPrefix}_increment'),
           icon: Icons.add_rounded,
-          color: AppColors.secondaryDark,
+          color: _tone,
           filled: true,
           enabled: true,
           onTap: onIncrease,
@@ -771,17 +766,21 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
             hintText: AppStrings.searchSymptoms,
-            prefixIcon: const Icon(Icons.search_rounded, size: 19),
+            prefixIcon: Icon(Icons.search_rounded, size: 19, color: _tone),
             filled: true,
             fillColor: AppColors.surface,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),
-              borderSide: const BorderSide(color: AppColors.outline),
+              borderSide: BorderSide(color: _tone.withValues(alpha: 0.42)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),
-              borderSide: const BorderSide(color: AppColors.outline),
+              borderSide: BorderSide(color: _tone.withValues(alpha: 0.42)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(24),
+              borderSide: BorderSide(color: _tone, width: 1.6),
             ),
           ),
         ),
@@ -807,6 +806,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           (item) => query.isEmpty || item.label.toLowerCase().contains(query),
         )
         .toList(growable: false);
+    final groupTone = _tone;
 
     return Container(
       key: ValueKey('symptom_group_${group.title}'),
@@ -814,7 +814,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: groupTone.withValues(alpha: 0.42)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -872,9 +872,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AppColors.secondaryDark.withValues(alpha: 0.24),
-        ),
+        border: Border.all(color: _tone.withValues(alpha: 0.32)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -900,11 +898,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               fillColor: AppColors.surface,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: AppColors.outline),
+                borderSide: BorderSide(color: _tone.withValues(alpha: 0.42)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: AppColors.outline),
+                borderSide: BorderSide(color: _tone.withValues(alpha: 0.42)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: _tone, width: 1.6),
               ),
             ),
           ),
@@ -947,7 +949,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             selectedIndices: _sexualActivityTypes
                 .map((type) => type.index)
                 .toSet(),
-            color: AppColors.primary,
+            color: _tone,
             onSelected: _toggleSexualActivityType,
           ),
           if (_sexualActivity == true) ...[
@@ -976,7 +978,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     selected: _sexualAfterFeelings.contains(
                       SexualAfterFeeling.values[index],
                     ),
-                    color: AppColors.primary,
+                    color: _tone,
+                    colorizeIdle: true,
                     onTap: () => setState(() {
                       final feeling = SexualAfterFeeling.values[index];
                       if (!_sexualAfterFeelings.remove(feeling)) {
@@ -1021,7 +1024,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               if (_vaginalDischargePresent == true) 0,
               if (_vaginalDischargePresent == false) 1,
             },
-            color: AppColors.secondaryDark,
+            color: _tone,
             onSelected: (index) {
               final value = index == 0;
               setState(() {
@@ -1091,7 +1094,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     selected: _vaginalDischargeSymptoms.contains(
                       VaginalDischargeSymptom.values[index],
                     ),
-                    color: AppColors.secondaryDark,
+                    color: _tone,
+                    colorizeIdle: true,
                     onTap: () {
                       final symptom = VaginalDischargeSymptom.values[index];
                       setState(() {
@@ -1220,7 +1224,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               _PillChoice(
                 label: options[index],
                 selected: selectedIndex == index,
-                color: AppColors.secondaryDark,
+                color: _tone,
+                colorizeIdle: true,
                 onTap: () => onSelected(index),
               ),
           ],
@@ -1230,17 +1235,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   List<_SymptomGroup> get _symptomGroups {
-    List<_SymptomItem> items(
-      List<String> labels,
-      List<IconData> icons,
-      List<Color> colors,
-    ) {
+    List<_SymptomItem> items(List<String> labels, List<IconData> icons) {
       return [
         for (var index = 0; index < labels.length; index++)
           _SymptomItem(
             label: labels[index],
             icon: icons[index % icons.length],
-            color: colors[index % colors.length],
+            color: _tone,
           ),
       ];
     }
@@ -1248,96 +1249,54 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return [
       _SymptomGroup(
         title: AppStrings.symptomOverall,
-        items: items(
-          AppStrings.symptomOverallOptions,
-          [Icons.thumb_up_alt_outlined],
-          [const Color(0xFFB8A6C9)],
-        ),
+        items: items(AppStrings.symptomOverallOptions, [
+          Icons.thumb_up_alt_outlined,
+        ]),
       ),
       _SymptomGroup(
         title: AppStrings.symptomBody,
-        items: items(
-          AppStrings.symptomBodyOptions,
-          [
-            Icons.radio_button_checked_rounded,
-            Icons.psychology_outlined,
-            Icons.local_fire_department_outlined,
-            Icons.air_rounded,
-            Icons.auto_awesome_outlined,
-            Icons.waves_rounded,
-          ],
-          [
-            const Color(0xFFC0606E),
-            const Color(0xFF8A72B0),
-            const Color(0xFFD4835C),
-            const Color(0xFF89986D),
-            const Color(0xFFC48AA8),
-            const Color(0xFF8FA88A),
-          ],
-        ),
+        items: items(AppStrings.symptomBodyOptions, [
+          Icons.radio_button_checked_rounded,
+          Icons.psychology_outlined,
+          Icons.local_fire_department_outlined,
+          Icons.air_rounded,
+          Icons.auto_awesome_outlined,
+          Icons.waves_rounded,
+        ]),
       ),
       _SymptomGroup(
         title: AppStrings.symptomSkinHair,
-        items: items(
-          AppStrings.symptomSkinHairOptions,
-          [
-            Icons.water_drop_outlined,
-            Icons.cloud_outlined,
-            Icons.water_drop_outlined,
-            Icons.content_cut_rounded,
-          ],
-          [
-            const Color(0xFFC0606E),
-            const Color(0xFFB8A6C9),
-            const Color(0xFF89986D),
-            const Color(0xFFA87960),
-          ],
-        ),
+        items: items(AppStrings.symptomSkinHairOptions, [
+          Icons.water_drop_outlined,
+          Icons.cloud_outlined,
+          Icons.water_drop_outlined,
+          Icons.content_cut_rounded,
+        ]),
       ),
       _SymptomGroup(
         title: AppStrings.symptomEnergy,
-        items: items(
-          AppStrings.symptomEnergyOptions,
-          [
-            Icons.battery_2_bar_rounded,
-            Icons.bolt_rounded,
-            Icons.center_focus_strong_outlined,
-            Icons.cloud_outlined,
-          ],
-          [
-            const Color(0xFFC0606E),
-            const Color(0xFFD4A15C),
-            const Color(0xFF89986D),
-            const Color(0xFF8A72B0),
-          ],
-        ),
+        items: items(AppStrings.symptomEnergyOptions, [
+          Icons.battery_2_bar_rounded,
+          Icons.bolt_rounded,
+          Icons.center_focus_strong_outlined,
+          Icons.cloud_outlined,
+        ]),
       ),
       _SymptomGroup(
         title: AppStrings.symptomSleep,
         showsDreamRecorder: true,
-        items: items(
-          AppStrings.symptomSleepOptions,
-          [Icons.dark_mode_outlined],
-          [const Color(0xFF8A72B0)],
-        ),
+        items: items(AppStrings.symptomSleepOptions, [
+          Icons.dark_mode_outlined,
+        ]),
       ),
       _SymptomGroup(
         title: AppStrings.symptomDigestion,
-        items: items(
-          AppStrings.symptomDigestionOptions,
-          [
-            Icons.cookie_outlined,
-            Icons.restaurant_outlined,
-            Icons.waves_rounded,
-            Icons.local_fire_department_outlined,
-          ],
-          [
-            const Color(0xFFD4A15C),
-            const Color(0xFFA87960),
-            const Color(0xFF89986D),
-            const Color(0xFFC0606E),
-          ],
-        ),
+        items: items(AppStrings.symptomDigestionOptions, [
+          Icons.cookie_outlined,
+          Icons.restaurant_outlined,
+          Icons.waves_rounded,
+          Icons.local_fire_department_outlined,
+        ]),
       ),
     ];
   }
@@ -1594,6 +1553,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         content: TextField(
           autofocus: true,
           maxLength: 200,
+          cursorColor: _tone,
           decoration: InputDecoration(
             labelText: medication
                 ? AppStrings.medications
@@ -1601,12 +1561,17 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             hintText: medication
                 ? AppStrings.medicationExample
                 : AppStrings.supplementExample,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: _tone, width: 1.6),
+            ),
           ),
           onChanged: (value) => customValue = value,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
+            style: TextButton.styleFrom(foregroundColor: _tone),
             child: Text(AppStrings.cancel),
           ),
           FilledButton(
@@ -1764,7 +1729,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         border: Border.all(
           color: expanded || entry.taken
               ? _tone.withValues(alpha: 0.55)
-              : AppColors.outline,
+              : _tone.withValues(alpha: 0.30),
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -1876,7 +1841,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         : Icons.check_circle_outline_rounded,
                     key: ValueKey(entry.taken),
                     size: 22,
-                    color: entry.taken ? AppColors.success : _tone,
+                    color: _tone,
                   ),
                 ),
               ),
@@ -1912,6 +1877,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           label: time,
                           selected: entry.times.contains(time),
                           color: _tone,
+                          colorizeIdle: true,
                           onTap: () {
                             final times = {...entry.times};
                             if (!times.remove(time)) times.add(time);
@@ -1988,6 +1954,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           label: state,
                           selected: entry.stomachState == state,
                           color: _tone,
+                          colorizeIdle: true,
                           onTap: () =>
                               onChanged(entry.copyWith(stomachState: state)),
                         ),
@@ -2085,7 +2052,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Widget _buildMoodPage() {
-    final tone = _moodColors[_moodIndex];
+    final tone = _tone;
     return Column(
       children: [
         _buildIntro(
@@ -2140,11 +2107,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 12),
         Text(
           AppStrings.moodCheckInOptions[_moodIndex],
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'CormorantGaramond',
             fontSize: 29,
             fontWeight: FontWeight.w700,
-            color: AppColors.primaryDark,
+            color: _tone,
           ),
         ),
         const SizedBox(height: 28),
@@ -2157,14 +2124,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       ],
     );
   }
-
-  List<Color> get _moodColors => const [
-    Color(0xFFB7A5C9),
-    Color(0xFFE1A6A8),
-    Color(0xFFC8BFAE),
-    Color(0xFFA8B892),
-    Color(0xFF8FA982),
-  ];
 
   Widget _buildMoodContextPage() {
     final mood = AppStrings.moodCheckInOptions[_moodIndex].toLowerCase();
@@ -2180,20 +2139,20 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.72),
+            color: Color.lerp(AppColors.surface, _tone, 0.09),
             borderRadius: BorderRadius.circular(23),
-            border: Border.all(color: AppColors.primaryLight),
+            border: Border.all(color: _tone.withValues(alpha: 0.42)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 AppStrings.omaNote,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.5,
-                  color: AppColors.primaryDark,
+                  color: _tone,
                 ),
               ),
               const SizedBox(height: 8),
@@ -2258,26 +2217,37 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       spacing: 8,
       runSpacing: 8,
       children: [
-        for (final option in options)
+        for (final entry in options.asMap().entries)
           _PillChoice(
-            label: option,
-            selected: selected.contains(option),
-            color: AppColors.primary,
-            onTap: () => _toggleChoice(selected, option),
+            key: ValueKey(
+              'mood_${companion ? 'companion' : 'place'}_${entry.key}',
+            ),
+            label: entry.value,
+            selected: selected.contains(entry.value),
+            color: _tone,
+            colorizeIdle: true,
+            onTap: () => _toggleChoice(selected, entry.value),
           ),
-        for (final option in selected.where(
-          (value) => !options.contains(value),
-        ))
+        for (final entry
+            in selected
+                .where((value) => !options.contains(value))
+                .toList()
+                .asMap()
+                .entries)
           _PillChoice(
-            label: option,
+            key: ValueKey(
+              'mood_${companion ? 'companion' : 'place'}_custom_${entry.key}',
+            ),
+            label: entry.value,
             selected: true,
-            color: AppColors.primary,
-            onTap: () => _toggleChoice(selected, option),
+            color: _tone,
+            colorizeIdle: true,
+            onTap: () => _toggleChoice(selected, entry.value),
           ),
         _RoundButton(
           key: ValueKey(companion ? 'mood_companion_add' : 'mood_place_add'),
           icon: Icons.add_rounded,
-          color: AppColors.primary,
+          color: _tone,
           filled: false,
           enabled: true,
           onTap: () => _addCustomContext(companion),
@@ -2304,15 +2274,24 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         content: TextField(
           autofocus: true,
           maxLength: 120,
+          cursorColor: _tone,
+          decoration: InputDecoration(
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: _tone, width: 1.6),
+            ),
+          ),
           onChanged: (value) => customValue = value,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
+            style: TextButton.styleFrom(foregroundColor: _tone),
             child: Text(AppStrings.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, customValue.trim()),
+            style: FilledButton.styleFrom(backgroundColor: _tone),
             child: Text(AppStrings.add),
           ),
         ],
@@ -2327,18 +2306,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   Widget _buildSimpleChoices({
     required List<String> options,
     required Set<String> selected,
-    required Color color,
   }) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
-        for (final option in options)
+        for (final entry in options.asMap().entries)
           _PillChoice(
-            label: option,
-            selected: selected.contains(option),
-            color: color,
-            onTap: () => _toggleChoice(selected, option),
+            label: entry.value,
+            selected: selected.contains(entry.value),
+            color: _tone,
+            colorizeIdle: true,
+            onTap: () => _toggleChoice(selected, entry.value),
           ),
       ],
     );
@@ -2384,17 +2363,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final mealIndex = AppStrings.nutritionMealOptions.indexOf(meal);
     final selected = _meals.contains(meal);
     final expanded = selected && _expandedMeals.contains(meal);
+    final tone = _tone;
 
     return AnimatedContainer(
       key: ValueKey('meal_option_$mealIndex'),
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
         color: selected
-            ? AppColors.secondary.withValues(alpha: 0.055)
-            : AppColors.surface,
+            ? Color.lerp(AppColors.surface, tone, 0.16)
+            : Color.lerp(AppColors.surface, tone, 0.045),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: selected ? AppColors.secondary : AppColors.outline,
+          color: selected ? tone : tone.withValues(alpha: 0.52),
           width: selected ? 1.4 : 1,
         ),
       ),
@@ -2417,14 +2397,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                             width: 22,
                             height: 22,
                             decoration: BoxDecoration(
-                              color: selected
-                                  ? AppColors.secondary
-                                  : Colors.transparent,
+                              color: selected ? tone : Colors.transparent,
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: selected
-                                    ? AppColors.secondary
-                                    : AppColors.textHint,
+                                    ? tone
+                                    : tone.withValues(alpha: 0.72),
                                 width: 1.4,
                               ),
                             ),
@@ -2445,9 +2423,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                                 fontWeight: selected
                                     ? FontWeight.w800
                                     : FontWeight.w600,
-                                color: selected
-                                    ? AppColors.secondaryDark
-                                    : AppColors.textPrimary,
+                                color: selected ? tone : AppColors.textPrimary,
                               ),
                             ),
                           ),
@@ -2471,7 +2447,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     duration: const Duration(milliseconds: 180),
                     child: const Icon(Icons.keyboard_arrow_down_rounded),
                   ),
-                  color: AppColors.secondary,
+                  color: tone,
                 ),
               const SizedBox(width: 4),
             ],
@@ -2489,6 +2465,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Widget _buildMealDetails(String meal, int mealIndex) {
+    final tone = _tone;
     final selectedFoods = _mealFoodGroups.putIfAbsent(meal, () => <String>{});
     final selectedFeelings = _mealPostFeelings.putIfAbsent(
       meal,
@@ -2500,9 +2477,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       padding: const EdgeInsets.fromLTRB(12, 11, 12, 12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.secondary.withValues(alpha: 0.18)),
-        ),
+        border: Border(top: BorderSide(color: tone.withValues(alpha: 0.26))),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2527,23 +2502,30 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   key: ValueKey('meal_food_${mealIndex}_${food.key}'),
                   label: food.value,
                   selected: selectedFoods.contains(food.value),
-                  color: AppColors.secondary,
+                  color: tone,
+                  colorizeIdle: true,
                   onTap: () => _toggleChoice(selectedFoods, food.value),
                 ),
-              for (final food in selectedFoods.where(
-                (value) =>
-                    !AppStrings.nutritionFoodGroupOptions.contains(value),
-              ))
+              for (final food
+                  in selectedFoods
+                      .where(
+                        (value) => !AppStrings.nutritionFoodGroupOptions
+                            .contains(value),
+                      )
+                      .toList()
+                      .asMap()
+                      .entries)
                 _PillChoice(
-                  label: food,
+                  label: food.value,
                   selected: true,
-                  color: AppColors.secondary,
-                  onTap: () => _toggleChoice(selectedFoods, food),
+                  color: tone,
+                  colorizeIdle: true,
+                  onTap: () => _toggleChoice(selectedFoods, food.value),
                 ),
               _RoundButton(
                 key: ValueKey('meal_food_add_$mealIndex'),
                 icon: Icons.add_rounded,
-                color: AppColors.secondary,
+                color: tone,
                 filled: false,
                 enabled: true,
                 onTap: () => _addCustomFoodGroup(meal),
@@ -2571,7 +2553,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   key: ValueKey('meal_feeling_${mealIndex}_${feeling.key}'),
                   label: feeling.value,
                   selected: selectedFeelings.contains(feeling.value),
-                  color: AppColors.secondary,
+                  color: tone,
+                  colorizeIdle: true,
                   onTap: () => _toggleChoice(selectedFeelings, feeling.value),
                 ),
             ],
@@ -2590,15 +2573,24 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         content: TextField(
           autofocus: true,
           maxLength: 120,
+          cursorColor: _tone,
+          decoration: InputDecoration(
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: _tone, width: 1.6),
+            ),
+          ),
           onChanged: (text) => customValue = text,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
+            style: TextButton.styleFrom(foregroundColor: _tone),
             child: Text(AppStrings.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, customValue.trim()),
+            style: FilledButton.styleFrom(backgroundColor: _tone),
             child: Text(AppStrings.add),
           ),
         ],
@@ -2827,6 +2819,17 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           context: context,
           initialTime: TimeOfDay.fromDateTime(_log.date),
           helpText: AppStrings.selectLogTime,
+          builder: (pickerContext, child) {
+            if (child == null) return const SizedBox.shrink();
+            if (_logType == 0) return child;
+            final pickerTheme = Theme.of(pickerContext);
+            return Theme(
+              data: pickerTheme.copyWith(
+                colorScheme: pickerTheme.colorScheme.copyWith(primary: _tone),
+              ),
+              child: child,
+            );
+          },
         );
         if (pickedTime == null) return false;
         finalDate = DateTime(
@@ -2892,16 +2895,25 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
+            style: _logType == 0
+                ? null
+                : TextButton.styleFrom(foregroundColor: _tone),
             child: Text(AppStrings.cancel),
           ),
           TextButton(
             onPressed: () =>
                 Navigator.pop(dialogContext, _PastLogTimeChoice.withoutTime),
+            style: _logType == 0
+                ? null
+                : TextButton.styleFrom(foregroundColor: _tone),
             child: Text(AppStrings.saveWithoutTime),
           ),
           FilledButton(
             onPressed: () =>
                 Navigator.pop(dialogContext, _PastLogTimeChoice.withTime),
+            style: _logType == 0
+                ? null
+                : FilledButton.styleFrom(backgroundColor: _tone),
             child: Text(AppStrings.addTime),
           ),
         ],
@@ -2958,6 +2970,7 @@ class _PillChoice extends StatelessWidget {
   final String label;
   final bool selected;
   final Color color;
+  final bool colorizeIdle;
   final VoidCallback onTap;
 
   const _PillChoice({
@@ -2965,13 +2978,18 @@ class _PillChoice extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.color,
+    this.colorizeIdle = false,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? color : AppColors.surface,
+      color: selected
+          ? color
+          : colorizeIdle
+          ? Color.lerp(AppColors.surface, color, 0.09)
+          : AppColors.surface,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: onTap,
@@ -2981,7 +2999,14 @@ class _PillChoice extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: selected ? color : AppColors.outline),
+            border: Border.all(
+              color: selected
+                  ? color
+                  : colorizeIdle
+                  ? color.withValues(alpha: 0.62)
+                  : AppColors.outline,
+              width: selected || colorizeIdle ? 1.2 : 1,
+            ),
           ),
           child: Text(
             label,
@@ -3021,7 +3046,9 @@ class _RoundButton extends StatelessWidget {
       child: Material(
         color: filled ? color : AppColors.surface,
         shape: CircleBorder(
-          side: BorderSide(color: filled ? color : AppColors.outline),
+          side: BorderSide(
+            color: filled ? color : color.withValues(alpha: 0.38),
+          ),
         ),
         child: InkWell(
           customBorder: const CircleBorder(),
@@ -3029,11 +3056,7 @@ class _RoundButton extends StatelessWidget {
           child: SizedBox(
             width: 40,
             height: 40,
-            child: Icon(
-              icon,
-              size: 18,
-              color: filled ? Colors.white : AppColors.textPrimary,
-            ),
+            child: Icon(icon, size: 18, color: filled ? Colors.white : color),
           ),
         ),
       ),
@@ -3146,21 +3169,22 @@ class _SymptomTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const tone = AppColors.secondaryDark;
+    final tone = item.color;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         AnimatedContainer(
+          key: ValueKey('symptom_tile_surface_${item.label}'),
           duration: const Duration(milliseconds: 160),
           height: 60,
           decoration: BoxDecoration(
             color: selected
-                ? tone.withValues(alpha: 0.13)
-                : AppColors.scaffoldBackground,
+                ? tone.withValues(alpha: 0.18)
+                : Color.lerp(AppColors.surface, tone, 0.075),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: selected ? tone : AppColors.outline,
-              width: selected ? 1.5 : 1,
+              color: selected ? tone : tone.withValues(alpha: 0.62),
+              width: selected ? 1.6 : 1.15,
             ),
           ),
           clipBehavior: Clip.antiAlias,
@@ -3178,14 +3202,10 @@ class _SymptomTile extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: selected
                             ? tone.withValues(alpha: 0.15)
-                            : Colors.transparent,
+                            : tone.withValues(alpha: 0.09),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        item.icon,
-                        color: selected ? tone : AppColors.textHint,
-                        size: 16,
-                      ),
+                      child: Icon(item.icon, color: tone, size: 16),
                     ),
                     const SizedBox(width: 7),
                     Expanded(
@@ -3267,11 +3287,11 @@ class _TrackingChoiceTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: selected
             ? color.withValues(alpha: 0.13)
-            : AppColors.scaffoldBackground,
+            : Color.lerp(AppColors.surface, color, 0.075),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: selected ? color : AppColors.outline,
-          width: selected ? 1.5 : 1,
+          color: selected ? color : color.withValues(alpha: 0.62),
+          width: selected ? 1.5 : 1.1,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -3283,11 +3303,7 @@ class _TrackingChoiceTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
               children: [
-                Icon(
-                  icon,
-                  size: 18,
-                  color: selected ? color : AppColors.textHint,
-                ),
+                Icon(icon, size: 18, color: color),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

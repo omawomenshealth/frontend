@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/period_calculator.dart';
+
 /// Figma'daki OMA arayuzunden uretilen ortak renk sistemi.
 ///
 /// Ekranlar dogrudan hex renk kullanmak yerine bu anlamsal renkleri tuketir.
@@ -15,6 +17,14 @@ class AppColors {
   static const Color secondaryDark = Color(0xFF5E4E96);
   static const Color accent = Color(0xFFC0606E);
   static const Color accentLight = Color(0xFFF7E5E7);
+
+  static Color forCyclePhase(CyclePhase? phase) => switch (phase) {
+    CyclePhase.menstrual => periodPrimary,
+    CyclePhase.follicular => primary,
+    CyclePhase.ovulation => ovulation,
+    CyclePhase.luteal => lutealDark,
+    null => primary,
+  };
 
   // Yuzeyler
   static const Color background = Color(0xFFF7F2EC);

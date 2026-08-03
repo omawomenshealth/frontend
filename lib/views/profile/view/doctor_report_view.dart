@@ -10,6 +10,7 @@ import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/daily_log_formatters.dart';
 import '../../../data/models/period_log_model.dart';
+import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 
@@ -176,11 +177,10 @@ class DoctorReportView extends StatelessWidget {
                           .join(', ')
                     : AppStrings.noConditions,
               ),
-              if (settings.bloodTestResults != null &&
-                  settings.bloodTestResults!.isNotEmpty)
+              if (_hasLaboratoryResults(settings))
                 _infoRow(
                   AppStrings.lastBloodValues,
-                  settings.bloodTestResults!,
+                  _formatLaboratoryResults(settings),
                 ),
               const SizedBox(height: 24),
 
@@ -774,9 +774,10 @@ class DoctorReportView extends StatelessWidget {
     sb.writeln(
       '${AppStrings.chronicDiseases}: ${settings.chronicDiseases.isNotEmpty ? settings.chronicDiseases.map(AppStrings.localizeStoredValue).join(", ") : AppStrings.noConditions}',
     );
-    if (settings.bloodTestResults != null &&
-        settings.bloodTestResults!.isNotEmpty) {
-      sb.writeln('${AppStrings.lastBloodValues}: ${settings.bloodTestResults}');
+    if (_hasLaboratoryResults(settings)) {
+      sb.writeln(
+        '${AppStrings.lastBloodValues}:\n${_formatLaboratoryResults(settings)}',
+      );
     }
     sb.writeln('');
 
@@ -1093,11 +1094,10 @@ class DoctorReportView extends StatelessWidget {
                           .join(', ')
                     : AppStrings.noConditions,
               ),
-              if (settings.bloodTestResults != null &&
-                  settings.bloodTestResults!.isNotEmpty)
+              if (_hasLaboratoryResults(settings))
                 _pdfInfoRow(
                   AppStrings.lastBloodValues,
-                  settings.bloodTestResults!,
+                  _formatLaboratoryResults(settings),
                 ),
               pw.SizedBox(height: 16),
 
@@ -1451,4 +1451,44 @@ class DoctorReportView extends StatelessWidget {
       }).toList(),
     );
   }
+}
+
+bool _hasLaboratoryResults(UserSettings settings) {
+  return settings.labResults.isNotEmpty ||
+      (settings.bloodTestResults?.trim().isNotEmpty ?? false);
+}
+
+String _formatLaboratoryResults(UserSettings settings) {
+  final lines = <String>[];
+  if (settings.labTestDate != null) {
+    lines.add(
+      '${AppStrings.isTurkish ? 'Test tarihi' : 'Test date'}: '
+      '${settings.labTestDate!.toDotFormat()}',
+    );
+  }
+  if (settings.labTestFasting != null) {
+    final fasting = settings.labTestFasting!
+        ? (AppStrings.isTurkish ? 'Evet' : 'Yes')
+        : (AppStrings.isTurkish ? 'Hayır' : 'No');
+    lines.add(
+      '${AppStrings.isTurkish ? 'Açlık numunesi' : 'Fasting sample'}: $fasting',
+    );
+  }
+  final structured = LabTestCatalog.formatResults(
+    settings.labResults,
+    isTurkish: AppStrings.isTurkish,
+  );
+  if (structured.isNotEmpty) lines.add(structured);
+
+  final legacy = settings.bloodTestResults?.trim();
+  if (legacy != null && legacy.isNotEmpty) {
+    if (structured.isNotEmpty) {
+      lines.add(
+        '${AppStrings.isTurkish ? 'Önceki serbest kayıt' : 'Previous free-text entry'}: $legacy',
+      );
+    } else {
+      lines.add(legacy);
+    }
+  }
+  return lines.join('\n');
 }
