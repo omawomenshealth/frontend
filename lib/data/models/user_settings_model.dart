@@ -6,11 +6,36 @@ import 'lab_result_model.dart';
 /// Menopoz durumu.
 enum MenopauseStatus { none, pre, peri, post }
 
+const _userSettingsJsonFields = {
+  'userName',
+  'isOnboardingComplete',
+  'isSmoker',
+  'smokingYears',
+  'weight',
+  'height',
+  'age',
+  'relationshipStatus',
+  'sexuallyActive',
+  'wantsChildrenInYear',
+  'labResults',
+  'labTestDate',
+  'labTestFasting',
+  'chronicDiseases',
+  'averageCycleLength',
+  'averagePeriodLength',
+  'lastPeriodDate',
+  'menopauseStatus',
+  'birthControlMethod',
+  'womenDiseases',
+  'dailyMedications',
+  'dailySupplements',
+  'notificationsEnabled',
+};
+
 /// Kullanıcı profil ve ayar bilgilerini tutan model.
 ///
 /// Uygulama kadın sağlığı ve adet döngüsü odaklı olduğu için ayrıca bir
-/// cinsiyet alanı tutulmaz. Eski yedeklerdeki `gender`, `andropauseStatus`
-/// ve `menDiseases` alanları JSON okunurken güvenle yok sayılır.
+/// cinsiyet alanı tutulmaz.
 class UserSettings {
   final String userName;
   final bool isOnboardingComplete;
@@ -25,9 +50,6 @@ class UserSettings {
   final bool? sexuallyActive;
   final bool? wantsChildrenInYear;
 
-  /// Eski sürümlerdeki serbest metin alanı. Yeni kayıtlar [labResults]
-  /// üzerinden tutulur; mevcut kullanıcı verisini kaybetmemek için korunur.
-  final String? bloodTestResults;
   final Map<String, LabResult> labResults;
   final DateTime? labTestDate;
   final bool? labTestFasting;
@@ -58,7 +80,6 @@ class UserSettings {
     this.relationshipStatus,
     this.sexuallyActive,
     this.wantsChildrenInYear,
-    this.bloodTestResults,
     this.labResults = const {},
     this.labTestDate,
     this.labTestFasting,
@@ -85,7 +106,6 @@ class UserSettings {
     String? relationshipStatus,
     bool? sexuallyActive,
     bool? wantsChildrenInYear,
-    String? bloodTestResults,
     Map<String, LabResult>? labResults,
     DateTime? labTestDate,
     bool clearLabTestDate = false,
@@ -113,7 +133,6 @@ class UserSettings {
       relationshipStatus: relationshipStatus ?? this.relationshipStatus,
       sexuallyActive: sexuallyActive ?? this.sexuallyActive,
       wantsChildrenInYear: wantsChildrenInYear ?? this.wantsChildrenInYear,
-      bloodTestResults: bloodTestResults ?? this.bloodTestResults,
       labResults: labResults ?? this.labResults,
       labTestDate: clearLabTestDate ? null : (labTestDate ?? this.labTestDate),
       labTestFasting: clearLabTestFasting
@@ -144,7 +163,6 @@ class UserSettings {
       'relationshipStatus': relationshipStatus,
       'sexuallyActive': sexuallyActive,
       'wantsChildrenInYear': wantsChildrenInYear,
-      'bloodTestResults': bloodTestResults,
       'labResults': labResults.map(
         (testId, result) => MapEntry(testId, result.toJson()),
       ),
@@ -164,6 +182,14 @@ class UserSettings {
   }
 
   factory UserSettings.fromJson(Map<String, dynamic> json) {
+    final unknown = json.keys
+        .where((key) => !_userSettingsJsonFields.contains(key))
+        .toList();
+    if (unknown.isNotEmpty) {
+      throw FormatException(
+        'UserSettings desteklenmeyen alan içeriyor: ${unknown.join(', ')}',
+      );
+    }
     final rawCycleLength =
         (json['averageCycleLength'] as num?)?.toInt() ??
         CycleRules.defaultCycleLength;
@@ -195,7 +221,6 @@ class UserSettings {
       relationshipStatus: json['relationshipStatus'] as String?,
       sexuallyActive: json['sexuallyActive'] as bool?,
       wantsChildrenInYear: json['wantsChildrenInYear'] as bool?,
-      bloodTestResults: json['bloodTestResults'] as String?,
       labResults: labResults,
       labTestDate: json['labTestDate'] != null
           ? DateTime.tryParse(json['labTestDate'].toString())

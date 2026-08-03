@@ -85,7 +85,7 @@ MedicationReminderPlan _plan() {
     itemType: MedicationPlanItemType.supplement,
     itemName: 'Demir',
     dosage: '1 adet',
-    time: const ReminderClockTime(hour: 9, minute: 30),
+    times: const [ReminderClockTime(hour: 9, minute: 30)],
     frequency: MedicationPlanFrequency.everyDay,
     weekdays: const {1, 2, 3, 4, 5, 6, 7},
     startDate: DateTime(2026, 7, 28),

@@ -690,9 +690,6 @@ class PersonalInsightEngine {
 
           for (final log in dayLogs) {
             symptoms.addAll(
-              log.painLocations.map(AppStrings.canonicalizeStoredValue),
-            );
-            symptoms.addAll(
               log.symptoms.map(AppStrings.canonicalizeStoredValue),
             );
             foodGroups.addAll(
@@ -718,15 +715,6 @@ class PersonalInsightEngine {
                   }
                 }
               }
-            } else {
-              final legacyFeelings = log.postMealFeelings
-                  .map(AppStrings.canonicalizeStoredValue)
-                  .toSet();
-              for (final food in foodsByMeal.values.expand((items) => items)) {
-                for (final feeling in legacyFeelings) {
-                  foodFeelingPairs.add('$food\u0000$feeling');
-                }
-              }
             }
             caffeineServings = log.caffeineServings ?? caffeineServings;
             nutritionObserved =
@@ -737,7 +725,6 @@ class PersonalInsightEngine {
                 log.mealTypes.isNotEmpty ||
                 log.mealFoodGroups.isNotEmpty ||
                 log.mealPostFeelings.isNotEmpty ||
-                log.postMealFeelings.isNotEmpty ||
                 log.waterIntakeMl != null ||
                 log.caffeineServings != null;
             hasBleeding = hasBleeding || log.flowIntensity != null;

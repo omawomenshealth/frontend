@@ -20,7 +20,7 @@ final class FlutterSecureLocalKeyStore implements LocalKeyStore {
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(
       resetOnError: false,
-      migrateWithBackup: true,
+      migrateWithBackup: false,
       storageNamespace: 'oma_local_vault',
     ),
     iOptions: IOSOptions(
@@ -68,12 +68,9 @@ final class MemoryLocalKeyStore implements LocalKeyStore {
 /// telefonun ham dosyalarında görünmez.
 final class LocalEncryptedStore {
   static const _ciphertextPrefix = 'oma:v2:';
-  static const _legacyCiphertextPrefix = 'oma:v1:';
   static const _entryKeyPrefix = 'oma_encrypted_entry_v2_';
   static const _envelopeVersion = 2;
-  static const _legacyEnvelopeVersion = 1;
   static const _aadPrefix = 'oma-local-preference-v2';
-  static const _legacyAadPrefix = 'oma-local-preference-v1';
 
   final SharedPreferences _preferences;
   final LocalKeyStore _keyStore;
@@ -92,16 +89,18 @@ final class LocalEncryptedStore {
     _cache.clear();
 
     final allKeys = _preferences.getKeys();
-    final legacyKeys = allKeys.where(_isProtectedKey).toList(growable: false);
+    final unsupportedPlaintextKeys = allKeys
+        .where(_isProtectedKey)
+        .toList(growable: false);
+    for (final key in unsupportedPlaintextKeys) {
+      if (!await _preferences.remove(key)) {
+        throw StateError('Korumasız yerel kayıt temizlenemedi: $key');
+      }
+    }
     final encryptedEntryKeys = allKeys
         .where((key) => key.startsWith(_entryKeyPrefix))
         .toList(growable: false);
-    final hasEncryptedData =
-        encryptedEntryKeys.isNotEmpty ||
-        legacyKeys.any((key) {
-          final raw = _preferences.get(key);
-          return raw is String && raw.startsWith(_legacyCiphertextPrefix);
-        });
+    final hasEncryptedData = encryptedEntryKeys.isNotEmpty;
 
     final storedKey = await _keyStore.read();
     if (storedKey == null && hasEncryptedData) {
@@ -132,35 +131,6 @@ final class LocalEncryptedStore {
       _cache[entry.logicalKey] = entry.value;
     }
 
-    // Eski kurulumdaki açık kayıt adları ve plaintext değerler kayıt kayıt
-    // taşınır. Önce anonim anahtarlı ciphertext yazılır, sonra eski kayıt
-    // silinir. Uygulama geçiş ortasında kapansa bile işlem yeniden denenebilir.
-    for (final logicalKey in legacyKeys) {
-      final raw = _preferences.get(logicalKey);
-      if (raw == null) continue;
-
-      if (_cache.containsKey(logicalKey)) {
-        if (!await _preferences.remove(logicalKey)) {
-          throw StateError('Eski yerel kayıt temizlenemedi: $logicalKey');
-        }
-        continue;
-      }
-
-      final normalized =
-          raw is String && raw.startsWith(_legacyCiphertextPrefix)
-          ? await _decryptLegacyValue(logicalKey, raw)
-          : _normalizeLegacyValue(raw);
-      if (!await _storeEntry(logicalKey, normalized)) {
-        throw StateError(
-          'Yerel veri şifreleme geçişi tamamlanamadı: $logicalKey',
-        );
-      }
-      if (!await _preferences.remove(logicalKey)) {
-        throw StateError('Eski yerel kayıt temizlenemedi: $logicalKey');
-      }
-      _cache[logicalKey] = normalized;
-    }
-
     _initialized = true;
   }
 
@@ -184,10 +154,9 @@ final class LocalEncryptedStore {
   Future<bool> remove(String key) async {
     _requireInitialized();
     final physicalKey = await _physicalKey(key);
-    final encryptedRemoved = await _preferences.remove(physicalKey);
-    final legacyRemoved = await _preferences.remove(key);
-    if (encryptedRemoved && legacyRemoved) _cache.remove(key);
-    return encryptedRemoved && legacyRemoved;
+    final removed = await _preferences.remove(physicalKey);
+    if (removed) _cache.remove(key);
+    return removed;
   }
 
   /// Yalnızca OMA'nın korumalı kayıtlarını ve yerel veri anahtarını siler.
@@ -333,37 +302,6 @@ final class LocalEncryptedStore {
     }
   }
 
-  Future<Object> _decryptLegacyValue(String logicalKey, String encoded) async {
-    try {
-      final envelopeJson = utf8.decode(
-        base64Url.decode(encoded.substring(_legacyCiphertextPrefix.length)),
-      );
-      final envelope = Map<String, dynamic>.from(
-        jsonDecode(envelopeJson) as Map,
-      );
-      if (envelope['v'] != _legacyEnvelopeVersion) {
-        throw const FormatException('Eski şifreli veri sürümü desteklenmiyor.');
-      }
-      final box = SecretBox(
-        base64Decode(envelope['c'] as String),
-        nonce: base64Decode(envelope['n'] as String),
-        mac: Mac(base64Decode(envelope['m'] as String)),
-      );
-      final plaintext = await _algorithm.decrypt(
-        box,
-        secretKey: _secretKey!,
-        aad: utf8.encode('$_legacyAadPrefix:$logicalKey'),
-      );
-      return _deserializeValue(
-        Map<String, dynamic>.from(jsonDecode(utf8.decode(plaintext)) as Map),
-      );
-    } catch (_) {
-      throw StateError(
-        'Eski yerel şifreli veri doğrulanamadı veya açılamadı: $logicalKey',
-      );
-    }
-  }
-
   Map<String, dynamic> _serializeValue(Object value) {
     if (value is String) return {'t': 'string', 'v': value};
     if (value is List<String>) return {'t': 'stringList', 'v': value};
@@ -383,13 +321,6 @@ final class LocalEncryptedStore {
       default:
         throw const FormatException('Yerel veri tipi desteklenmiyor.');
     }
-  }
-
-  Object _normalizeLegacyValue(Object value) {
-    if (value is String) return value;
-    if (value is List) return List<String>.from(value);
-    if (value is int) return value.toString();
-    throw StateError('Eski yerel veri tipi şifrelenemiyor.');
   }
 
   void _requireInitialized() {

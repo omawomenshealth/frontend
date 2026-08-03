@@ -1,4 +1,5 @@
 import 'package:app_proje_a/data/models/period_log_model.dart';
+import 'package:app_proje_a/data/models/lab_result_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
@@ -12,7 +13,7 @@ Iterable<String> _encryptedKeys(SharedPreferences preferences) =>
 
 void main() {
   test(
-    'eski plaintext verileri ilk açılışta şifreler ve yeniden okuyabilir',
+    'desteklenmeyen korumasız yerel kayıtları içeri aktarmadan temizler',
     () async {
       SharedPreferences.setMockInitialValues({
         'auth_token': 'legacy-jwt',
@@ -24,27 +25,14 @@ void main() {
 
       await first.init();
 
-      expect(first.authToken, 'legacy-jwt');
-      expect(first.getCustomMedications(), ['Legacy ilaç']);
-      expect(first.virtualDaysOffset, 17);
+      expect(first.authToken, isNull);
+      expect(first.getCustomMedications(), isEmpty);
+      expect(first.virtualDaysOffset, 0);
       final preferences = await SharedPreferences.getInstance();
       expect(preferences.get('auth_token'), isNull);
       expect(preferences.get('all_custom_medications'), isNull);
       expect(preferences.get('virtual_days_offset'), isNull);
-      expect(_encryptedKeys(preferences), hasLength(3));
-      for (final key in _encryptedKeys(preferences)) {
-        expect(key, isNot(contains('auth')));
-        expect(key, isNot(contains('medication')));
-        final raw = preferences.getString(key)!;
-        expect(raw, startsWith('oma:v2:'));
-        expect(raw, isNot(contains('legacy-jwt')));
-        expect(raw, isNot(contains('Legacy ilaç')));
-      }
-
-      final restarted = LocalStorageService(keyStore: keyStore);
-      await restarted.init();
-      expect(restarted.authToken, 'legacy-jwt');
-      expect(restarted.getCustomMedications(), ['Legacy ilaç']);
+      expect(_encryptedKeys(preferences), isEmpty);
     },
   );
 
@@ -60,7 +48,7 @@ void main() {
       await storage.saveSettings(
         UserSettings(
           userName: 'Gizli kullanıcı',
-          bloodTestResults: 'Gizli kan',
+          labResults: const {'iron': LabResult(value: '12.4', unit: 'µmol/L')},
         ),
       );
       await storage.saveDailyLog(

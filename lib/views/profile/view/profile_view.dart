@@ -138,12 +138,6 @@ class _ProfileMechanics extends StatelessWidget {
                               .map(AppStrings.localizeStoredValue)
                               .join(', '),
                         ),
-                      if (s.bloodTestResults != null &&
-                          s.bloodTestResults!.isNotEmpty)
-                        _infoRow(
-                          AppStrings.lastBloodValues,
-                          s.bloodTestResults!,
-                        ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -710,7 +704,6 @@ class _ProfileMechanics extends StatelessWidget {
           initialResults: results,
           initialTestDate: testDate,
           initialFasting: fasting,
-          legacyResults: vm.settings.bloodTestResults,
           accent: accent,
           onResultsChanged: (value) => results = value,
           onTestDateChanged: (value) => testDate = value,

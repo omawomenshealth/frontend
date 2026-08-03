@@ -1,6 +1,6 @@
 # OMA veri depolama ve senkronizasyon şeması
 
-Son doğrulama: 2026-07-28
+Son doğrulama: 2026-08-03
 
 Bu belge uygulamanın kullanıcıya gösterdiği ve topladığı verilerin cihazdaki
 şifreli yerel kasa ile PostgreSQL bulut yedeğindeki karşılığını özetler.
@@ -18,8 +18,8 @@ SharedPreferences üzerinde tutar. Zarf anahtarı Android Keystore / iOS Keychai
 | `daily_log_dates` | Yerel günlük kayıt indeksi | Hayır; loglardan türetilir |
 | `all_custom_medications` | Özel ilaç adları | `custom_medications` |
 | `all_custom_supplements` | Özel takviye adları | `custom_supplements` |
-| `medication_reminder_plans_v1` | İlaç/takviye hatırlatma planları | `medication_reminder_plans` |
-| `medication_dose_records_v1` | Planlı doz ve aldım/atladım yanıtları | `medication_dose_records` |
+| `medication_reminder_plans` | İlaç/takviye hatırlatma planları | `medication_reminder_plans` |
+| `medication_dose_records` | Planlı doz ve aldım/atladım yanıtları | `medication_dose_records` |
 | `auth_*` | Oturum ve son senkronizasyon bilgisi | Sağlık yedeğine eklenmez |
 | `virtual_days_offset` | Geliştirme zamanı kaydırma değeri | Hayır |
 
@@ -34,29 +34,25 @@ saklar ve aynı şifreli nesne buluta yüklenir:
 
 - kayıt zamanı: `date`; kullanıcı saat eklememişse `hasExplicitTime: false`
 - hareket: `activities`
-- beslenme: `nutritionTags`, `mealTypes`, öğün bazında `mealQualities` ve
-  `mealFoodGroups`, öğün bazında `mealPostFeelings`, `nutritionQuality`,
-  `cravings`, `nutritionNotes`, `waterIntakeMl`, `caffeineServings`.
-  Eski günlük kayıtlar için ortak `postMealFeelings` alanı yalnızca geriye
-  dönük uyumluluk amacıyla okunmaya devam eder
+- beslenme: `nutritionTags`, `mealTypes`, öğün bazında `mealQualities`,
+  `mealFoodGroups` ve `mealPostFeelings`, ayrıca `cravings`, `nutritionNotes`,
+  `waterIntakeMl`, `caffeineServings`
 - ilaç ve takviye: `medications`, `supplements`; her girişte ad, birden fazla
   zaman seçimi (`times`), aç/tok durumu, toplam adet (`doseCount`) ve
-  işaretlenen adet (`takenDoseCount`) bilgisi. Eski `time`, `dosage` ve `taken`
-  alanları geriye dönük uyumluluk için birlikte yazılır
+  işaretlenen adet (`takenDoseCount`) bilgisi
 - ruh hâli ve iyi oluş: `mood`, `moodEmoji`, `moodNote`, `moodCompanions`,
   `moodPlaces`, `sleepDurationMinutes`, `sleepQuality`, `stressLevel`,
   `energyLevel`, rüya hatırlama durumu ve isteğe bağlı rüya notu
   (`dreamRemembered`, `dreamNote`)
 - diğer sağlık kayıtları: `sexualActivity`, `bowelActivity`,
-  `sexualActivityTypes`, `painLocations`, `symptoms`, `symptomSeverity` ve
-  belirti bazında 1-3 şiddet değerlerini tutan `symptomSeverities`
+  `sexualActivityTypes`, `symptoms` ve yalnızca belirti bazında 1-3 şiddet
+  değerlerini tutan `symptomSeverities`
 - adet: `flowIntensity`, `periodPainLevel`
 - vajinal akıntı: var/yok, renk, kıvam, miktar ve eşlik eden belirtiler
 - genel not ve kullanıcının doldurduğu bölümler: `notes`, `observedSections`
 
-Eski yedeklerdeki `periodStartedToday` alanı yalnızca geriye dönük okunabilirlik
-için modelde tutulur. Yeni adet başlangıcı ayrı bir soruyla alınmaz. Kanama
-kayıtları tarihe göre gruplanır; ardışık grubun ilk günü adet başlangıcıdır.
+Adet başlangıcı ayrı bir kopya alanla saklanmaz. Kanama kayıtları tarihe göre
+gruplanır; ardışık grubun ilk günü adet başlangıcı olarak türetilir.
 
 Gelecek tarihli günlük kayıtlar arayüzde açılamaz ve yerel depolama katmanı
 tarafından da reddedilir.
@@ -64,10 +60,12 @@ tarafından da reddedilir.
 ## Profil ve ayarlar
 
 `UserSettings` içindeki ad, onboarding durumu, sigara kullanımı ve süresi,
-kilo, boy, yaş, ilişki/cinsel yaşam tercihleri, çocuk isteği, kan tahlili notu,
-kronik hastalıklar, döngü ve adet süreleri, son adet tarihi, menopoz durumu,
-doğum kontrol yöntemi, kadın hastalıkları, günlük ilaç/takviye listeleri ve
-bildirim tercihi tek şifreli nesne olarak saklanır ve yedeklenir.
+kilo, boy, yaş, ilişki/cinsel yaşam tercihleri, çocuk isteği, yapılandırılmış
+laboratuvar sonuçları (`labResults`), test tarihi (`labTestDate`) ve açlık durumu
+(`labTestFasting`), kronik hastalıklar, döngü ve adet süreleri, son adet tarihi,
+menopoz durumu, doğum kontrol yöntemi, kadın hastalıkları, günlük
+ilaç/takviye listeleri ve bildirim tercihi tek şifreli nesne olarak saklanır ve
+yedeklenir. Serbest metin kan tahlili alanı tutulmaz.
 
 ## Bulut veritabanı
 
@@ -75,6 +73,7 @@ Sağlık tablolarında içerik düz kolonlara ayrılmaz. Her kullanıcı için �
 DEK ile AES-256-GCM şifrelenmiş `encrypted_payload` saklanır. DEK ayrıca ortam
 KMS/secret anahtarından gelen KEK ile sarılır. Günlük kayıt tarihi ham tutulmaz;
 kullanıcı anahtarına bağlı kör indeks `log_id` olarak kullanılır.
+Eski açık JSON kolonları ve bunları dönüştüren geriye uyumluluk şeması yoktur.
 
 Bulut yedeğine dâhil teknik tablolar:
 

@@ -12,6 +12,14 @@ class LabResult {
   Map<String, dynamic> toJson() => {'value': value, 'unit': unit};
 
   factory LabResult.fromJson(Map<String, dynamic> json) {
+    final unknown = json.keys
+        .where((key) => key != 'value' && key != 'unit')
+        .toList();
+    if (unknown.isNotEmpty) {
+      throw FormatException(
+        'LabResult desteklenmeyen alan içeriyor: ${unknown.join(', ')}',
+      );
+    }
     return LabResult(
       value: json['value']?.toString() ?? '',
       unit: json['unit']?.toString() ?? '',

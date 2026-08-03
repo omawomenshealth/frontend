@@ -16,8 +16,6 @@ void main() {
       mealPostFeelings: const {
         'Kahvaltı': ['Enerjik', 'Şişkin'],
       },
-      postMealFeelings: const ['Enerjik', 'Şişkin'],
-      nutritionQuality: 'Dengeli',
       cravings: const ['Tatlı'],
       nutritionNotes: 'Not',
       waterIntakeMl: 1750,
@@ -34,7 +32,7 @@ void main() {
       medications: [
         MedicationEntry(
           name: 'İlaç',
-          time: 'Akşam',
+          times: const {'Akşam'},
           stomachState: 'Aç',
           doseCount: 2,
           takenDoseCount: 0,
@@ -61,9 +59,7 @@ void main() {
         SexualAfterFeeling.connected,
       },
       bowelActivity: const ['Normal'],
-      painLocations: const ['Bel'],
       symptoms: const ['Kramp'],
-      symptomSeverity: 2,
       symptomSeverities: const {'Kramp': 2},
       flowIntensity: 'Orta',
       periodPainLevel: 3,
@@ -105,6 +101,23 @@ void main() {
         'sexualActivity': false,
         'sexualActivityTypes': ['none'],
         'sexualAfterFeelings': ['comfortable'],
+      }),
+      throwsFormatException,
+    );
+  });
+
+  test('günlük modeli eski ve yinelenen alanları kabul etmez', () {
+    expect(
+      () => DailyLog.fromJson({
+        'date': DateTime(2026, 8, 1).toIso8601String(),
+        'painLocations': ['Baş ağrısı'],
+      }),
+      throwsFormatException,
+    );
+    expect(
+      () => DailyLog.fromJson({
+        'date': DateTime(2026, 8, 1).toIso8601String(),
+        'symptomSeverity': 2,
       }),
       throwsFormatException,
     );

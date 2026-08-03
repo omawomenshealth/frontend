@@ -256,8 +256,6 @@ enum _TextKey {
   relationshipStatus,
   sexualActivity,
   wantsChildrenInYear,
-  bloodTestResults,
-  bloodTestHint,
   chronicDiseases,
   womenHealth,
   cycleAndHealthInformation,
@@ -311,8 +309,6 @@ enum _TextKey {
   saveMedication,
   saveMoment,
   continueAction,
-  periodStartedToday,
-  periodStartedHint,
   mealsToday,
   mealsFeel,
   whatDidYouEat,
@@ -524,7 +520,6 @@ enum _TextKey {
   reportCopied,
   pdfCreationError,
   basicInformationEdit,
-  lastBloodValuesTest,
   womenHealthEdit,
   medicationSupplementEdit,
   newMedication,
@@ -686,7 +681,6 @@ enum _ListKey {
   symptomSleepOptions,
   symptomDigestionOptions,
   bowelActivityOptions,
-  painLocations,
   flowOptions,
   dischargePresenceOptions,
   dischargeColors,
@@ -1022,8 +1016,6 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.relationshipStatus: 'İlişki Durumu',
   _TextKey.sexualActivity: 'Cinsel Aktivite',
   _TextKey.wantsChildrenInYear: '1 yıl içinde çocuk düşünüyor musunuz?',
-  _TextKey.bloodTestResults: 'Son 6 ayda bakılmış kan değerleri',
-  _TextKey.bloodTestHint: 'Varsa sonuçlarınızı girin veya bu adımı atlayın',
   _TextKey.chronicDiseases: 'Kronik Hastalıklar',
   _TextKey.womenHealth: 'Kadın Sağlığı',
   _TextKey.cycleAndHealthInformation: 'Döngü ve sağlık bilgileriniz',
@@ -1081,9 +1073,6 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.saveMedication: 'Rutini kaydet',
   _TextKey.saveMoment: 'Bu anı kaydet',
   _TextKey.continueAction: 'Devam Et',
-  _TextKey.periodStartedToday: 'Adetin bugün mü başladı?',
-  _TextKey.periodStartedHint:
-      'OMA’nın döngünün başlangıcını doğru belirlemesine yardımcı olur.',
   _TextKey.mealsToday: 'Bugünkü öğünler',
   _TextKey.mealsFeel: 'Nasıl beslendin?',
   _TextKey.whatDidYouEat: 'Ne yedin?',
@@ -1327,7 +1316,6 @@ const Map<_TextKey, String> _turkishTexts = {
       'Rapor kopyalandı! Doktorunuza WhatsApp vb. üzerinden gönderebilirsiniz.',
   _TextKey.pdfCreationError: 'PDF oluşturulurken hata: {error}',
   _TextKey.basicInformationEdit: 'Temel Bilgileri Düzenle',
-  _TextKey.lastBloodValuesTest: 'Son Kan Değerleri (Kan Testi)',
   _TextKey.womenHealthEdit: 'Kadın Sağlığı Bilgilerini Düzenle',
   _TextKey.medicationSupplementEdit: 'İlaç ve Takviyeleri Düzenle',
   _TextKey.newMedication: 'Yeni ilaç ekle',
@@ -1810,8 +1798,6 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.sexualActivity: 'Sexual Activity',
   _TextKey.wantsChildrenInYear:
       'Are you considering having a child within one year?',
-  _TextKey.bloodTestResults: 'Blood test results from the last 6 months',
-  _TextKey.bloodTestHint: 'Enter your results, or skip this step',
   _TextKey.chronicDiseases: 'Chronic Conditions',
   _TextKey.womenHealth: 'Women’s Health',
   _TextKey.cycleAndHealthInformation: 'Your cycle and health information',
@@ -1870,8 +1856,6 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.saveMedication: 'Save routine',
   _TextKey.saveMoment: 'Save this moment',
   _TextKey.continueAction: 'Continue',
-  _TextKey.periodStartedToday: 'Period started today?',
-  _TextKey.periodStartedHint: 'Helps OMA anchor the start of your cycle.',
   _TextKey.mealsToday: 'Meals today',
   _TextKey.mealsFeel: 'How did you eat?',
   _TextKey.whatDidYouEat: 'What did you eat?',
@@ -2114,7 +2098,6 @@ const Map<_TextKey, String> _englishTexts = {
       'Report copied! You can send it to your doctor via WhatsApp or another app.',
   _TextKey.pdfCreationError: 'Error creating PDF: {error}',
   _TextKey.basicInformationEdit: 'Edit Basic Information',
-  _TextKey.lastBloodValuesTest: 'Latest Blood Test Results',
   _TextKey.womenHealthEdit: 'Edit Women’s Health Information',
   _TextKey.medicationSupplementEdit: 'Edit Medications and Supplements',
   _TextKey.newMedication: 'Add a new medication',
@@ -2499,19 +2482,6 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Şişkinlik',
     'Gaz',
   ],
-  _ListKey.painLocations: [
-    'Şişkinlik',
-    'Rahatsızlık',
-    'Baş ağrısı',
-    'Diz ağrısı',
-    'Boyun ağrısı',
-    'Bel ağrısı',
-    'Bacak ağrısı',
-    'Ayak ağrısı',
-    'Kol ağrısı',
-    'Göğüs ağrısı',
-    'Mide ağrısı',
-  ],
   _ListKey.flowOptions: ['Lekelenme', 'Hafif', 'Orta', 'Yoğun'],
   _ListKey.dischargePresenceOptions: ['Var', 'Yok'],
   _ListKey.dischargeColors: [
@@ -2803,19 +2773,6 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Diarrhea',
     'Bloating',
     'Gas',
-  ],
-  _ListKey.painLocations: [
-    'Bloating',
-    'Discomfort',
-    'Headache',
-    'Knee pain',
-    'Neck pain',
-    'Lower back pain',
-    'Leg pain',
-    'Foot pain',
-    'Arm pain',
-    'Chest pain',
-    'Stomach pain',
   ],
   _ListKey.flowOptions: ['Spotting', 'Light', 'Medium', 'Heavy'],
   _ListKey.dischargePresenceOptions: ['Present', 'None'],
@@ -3777,8 +3734,6 @@ class AppStrings {
   static String get relationshipStatus => _text(_TextKey.relationshipStatus);
   static String get sexualActivity => _text(_TextKey.sexualActivity);
   static String get wantsChildrenInYear => _text(_TextKey.wantsChildrenInYear);
-  static String get bloodTestResults => _text(_TextKey.bloodTestResults);
-  static String get bloodTestHint => _text(_TextKey.bloodTestHint);
   static String get chronicDiseases => _text(_TextKey.chronicDiseases);
   static String get womenHealth => _text(_TextKey.womenHealth);
   static String get cycleAndHealthInformation =>
@@ -3853,8 +3808,6 @@ class AppStrings {
   static String get saveMedication => _text(_TextKey.saveMedication);
   static String get saveMoment => _text(_TextKey.saveMoment);
   static String get continueAction => _text(_TextKey.continueAction);
-  static String get periodStartedToday => _text(_TextKey.periodStartedToday);
-  static String get periodStartedHint => _text(_TextKey.periodStartedHint);
   static String get mealsToday => _text(_TextKey.mealsToday);
   static String get mealsFeel => _text(_TextKey.mealsFeel);
   static String get whatDidYouEat => _text(_TextKey.whatDidYouEat);
@@ -4105,7 +4058,6 @@ class AppStrings {
       _format(_TextKey.pdfCreationError, {'error': error});
   static String get basicInformationEdit =>
       _text(_TextKey.basicInformationEdit);
-  static String get lastBloodValuesTest => _text(_TextKey.lastBloodValuesTest);
   static String get womenHealthEdit => _text(_TextKey.womenHealthEdit);
   static String get medicationSupplementEdit =>
       _text(_TextKey.medicationSupplementEdit);
@@ -4345,7 +4297,6 @@ class AppStrings {
   });
   static List<String> get bowelActivityOptions =>
       _list(_ListKey.bowelActivityOptions);
-  static List<String> get painLocations => _list(_ListKey.painLocations);
   static List<String> get flowOptions => _list(_ListKey.flowOptions);
   static List<String> get dischargePresenceOptions =>
       _list(_ListKey.dischargePresenceOptions);

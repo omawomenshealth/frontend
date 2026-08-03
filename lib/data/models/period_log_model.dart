@@ -2,6 +2,70 @@ import 'dart:convert';
 
 import '../../core/constants/app_strings.dart';
 
+void _rejectUnknownJsonFields(
+  Map<String, dynamic> json,
+  Set<String> allowed,
+  String model,
+) {
+  final unknown = json.keys.where((key) => !allowed.contains(key)).toList();
+  if (unknown.isNotEmpty) {
+    throw FormatException(
+      '$model desteklenmeyen alan içeriyor: ${unknown.join(', ')}',
+    );
+  }
+}
+
+const _medicationEntryJsonFields = {
+  'name',
+  'times',
+  'stomachState',
+  'doseCount',
+  'takenDoseCount',
+};
+
+const _dailyLogJsonFields = {
+  'date',
+  'hasExplicitTime',
+  'activities',
+  'nutritionTags',
+  'mealTypes',
+  'mealQualities',
+  'mealFoodGroups',
+  'mealPostFeelings',
+  'cravings',
+  'nutritionNotes',
+  'waterIntakeMl',
+  'caffeineServings',
+  'supplements',
+  'medications',
+  'mood',
+  'moodEmoji',
+  'moodNote',
+  'moodCompanions',
+  'moodPlaces',
+  'sleepDurationMinutes',
+  'sleepQuality',
+  'stressLevel',
+  'energyLevel',
+  'dreamRemembered',
+  'dreamNote',
+  'sexualActivity',
+  'sexualActivityTypes',
+  'sexualAfterFeelings',
+  'bowelActivity',
+  'symptoms',
+  'symptomSeverities',
+  'flowIntensity',
+  'periodPainLevel',
+  'vaginalDischargePresent',
+  'vaginalDischargeColor',
+  'vaginalDischargeConsistency',
+  'vaginalDischargeAmount',
+  'vaginalDischargeSymptoms',
+  'notes',
+  'observedSections',
+};
+
 /// Kullanıcının günlük kayıt sırasında gerçekten gözden geçirip kaydettiği
 /// bölümler. Boş bırakılan alan ile "yok" yanıtını ayırmak için kullanılır.
 enum DailyLogObservedSection {
@@ -76,26 +140,14 @@ class MedicationEntry {
 
   MedicationEntry({
     required this.name,
-    String? time,
-    Set<String>? times,
+    required Set<String> times,
     required this.stomachState,
-    String? dosage,
-    int? doseCount,
-    bool taken = false,
-    int? takenDoseCount,
-  }) : times = Set.unmodifiable(
-         times != null && times.isNotEmpty
-             ? times
-             : {time ?? AppStrings.medicationTimes.first},
-       ),
-       doseCount = _normalizeDoseCount(
-         doseCount ?? _doseCountFromLegacy(dosage),
-       ),
-       takenDoseCount = _normalizeTakenDoseCount(
-         takenDoseCount,
-         taken,
-         doseCount ?? _doseCountFromLegacy(dosage),
-       );
+    this.doseCount = 1,
+    this.takenDoseCount = 0,
+  }) : assert(times.isNotEmpty),
+       assert(doseCount >= 1 && doseCount <= 12),
+       assert(takenDoseCount >= 0 && takenDoseCount <= doseCount),
+       times = Set.unmodifiable(times);
 
   String get time => times.join(', ');
   String get dosage => AppStrings.dosageCount(doseCount);
@@ -103,24 +155,19 @@ class MedicationEntry {
 
   MedicationEntry copyWith({
     String? name,
-    String? time,
     Set<String>? times,
     String? stomachState,
-    String? dosage,
     int? doseCount,
-    bool? taken,
     int? takenDoseCount,
   }) {
-    final nextDoseCount = _normalizeDoseCount(
-      doseCount ??
-          (dosage == null ? this.doseCount : _doseCountFromLegacy(dosage)),
+    final nextDoseCount = (doseCount ?? this.doseCount).clamp(1, 12);
+    final nextTakenDoseCount = (takenDoseCount ?? this.takenDoseCount).clamp(
+      0,
+      nextDoseCount,
     );
-    final nextTakenDoseCount = taken != null
-        ? (taken ? nextDoseCount : 0)
-        : (takenDoseCount ?? this.takenDoseCount).clamp(0, nextDoseCount);
     return MedicationEntry(
       name: name ?? this.name,
-      times: times ?? (time == null ? this.times : {time}),
+      times: times ?? this.times,
       stomachState: stomachState ?? this.stomachState,
       doseCount: nextDoseCount,
       takenDoseCount: nextTakenDoseCount,
@@ -129,59 +176,30 @@ class MedicationEntry {
 
   Map<String, dynamic> toJson() => {
     'name': name,
-    'time': time,
     'times': times.toList(),
     'stomachState': stomachState,
-    'dosage': dosage,
-    'taken': taken,
     'doseCount': doseCount,
     'takenDoseCount': takenDoseCount,
   };
 
   factory MedicationEntry.fromJson(Map<String, dynamic> json) {
+    _rejectUnknownJsonFields(
+      json,
+      _medicationEntryJsonFields,
+      'MedicationEntry',
+    );
     return MedicationEntry(
       name: json['name'] as String,
-      time: json['time'] as String? ?? AppStrings.medicationTimes.first,
-      times: (json['times'] as List<dynamic>?)?.whereType<String>().toSet(),
-      stomachState:
-          json['stomachState'] as String? ?? AppStrings.stomachStates.first,
-      dosage: json['dosage'] as String? ?? AppStrings.dosageOptions.first,
-      doseCount: (json['doseCount'] as num?)?.toInt(),
-      taken: json['taken'] as bool? ?? false,
-      takenDoseCount: (json['takenDoseCount'] as num?)?.toInt(),
-    );
-  }
-
-  static int _doseCountFromLegacy(String? value) {
-    if (value == null) return 1;
-    final lower = value.toLowerCase();
-    if (!lower.contains('adet') &&
-        !lower.contains('tablet') &&
-        !lower.contains('count')) {
-      return 1;
-    }
-    return int.tryParse(RegExp(r'\d+').firstMatch(value)?.group(0) ?? '') ?? 1;
-  }
-
-  static int _normalizeDoseCount(int value) => value.clamp(1, 12);
-
-  static int _normalizeTakenDoseCount(
-    int? value,
-    bool legacyTaken,
-    int rawDoseCount,
-  ) {
-    final normalizedDoseCount = _normalizeDoseCount(rawDoseCount);
-    return (value ?? (legacyTaken ? normalizedDoseCount : 0)).clamp(
-      0,
-      normalizedDoseCount,
+      times: (json['times'] as List<dynamic>).cast<String>().toSet(),
+      stomachState: json['stomachState'] as String,
+      doseCount: (json['doseCount'] as num).toInt(),
+      takenDoseCount: (json['takenDoseCount'] as num).toInt(),
     );
   }
 }
 
 /// Günlük kayıt modeli — tüm wellness modüllerini birleşik tutar.
 class DailyLog {
-  static const int schemaVersion = 10;
-
   final DateTime date;
   final bool hasExplicitTime;
 
@@ -194,10 +212,6 @@ class DailyLog {
   final Map<String, String> mealQualities;
   final Map<String, List<String>> mealFoodGroups;
   final Map<String, List<String>> mealPostFeelings;
-  // Eski yedeklerle uyumluluk için tutulur. Yeni kayıtlar mealPostFeelings kullanır.
-  final List<String> postMealFeelings;
-  // Eski yedeklerle uyumluluk için tutulur. Yeni kayıtlar mealQualities kullanır.
-  final String? nutritionQuality;
   final List<String> cravings;
   final String? nutritionNotes;
   final int? waterIntakeMl;
@@ -231,15 +245,12 @@ class DailyLog {
   final List<String> bowelActivity; // Normal, Kabızlık, İshal, vb.
 
   // ── Hisler & Ağrılar ────────────────────────────────────
-  final List<String> painLocations; // Baş ağrısı, Bel ağrısı, vb.
   final List<String> symptoms;
-  final int? symptomSeverity;
   final Map<String, int> symptomSeverities;
 
   // ── Regl (Kadınlar için) ─────────────────────────────────
   final String? flowIntensity; // Yok, Lekelenme, Hafif, Orta, Yoğun
   final int? periodPainLevel; // 0-5
-  final bool? periodStartedToday;
 
   // ── Vajinal Akıntı / Servikal Mukus ─────────────────────
   final bool? vaginalDischargePresent;
@@ -263,8 +274,6 @@ class DailyLog {
     Map<String, String> mealQualities = const {},
     Map<String, List<String>> mealFoodGroups = const {},
     Map<String, List<String>> mealPostFeelings = const {},
-    this.postMealFeelings = const [],
-    this.nutritionQuality,
     this.cravings = const [],
     this.nutritionNotes,
     this.waterIntakeMl,
@@ -286,13 +295,10 @@ class DailyLog {
     Set<SexualActivityType> sexualActivityTypes = const {},
     Set<SexualAfterFeeling> sexualAfterFeelings = const {},
     this.bowelActivity = const [],
-    this.painLocations = const [],
     this.symptoms = const [],
-    this.symptomSeverity,
     Map<String, int> symptomSeverities = const {},
     this.flowIntensity,
     this.periodPainLevel,
-    this.periodStartedToday,
     this.vaginalDischargePresent,
     this.vaginalDischargeColor,
     this.vaginalDischargeConsistency,
@@ -307,10 +313,6 @@ class DailyLog {
        assert(sleepQuality == null || sleepQuality >= 1 && sleepQuality <= 5),
        assert(stressLevel == null || stressLevel >= 1 && stressLevel <= 5),
        assert(energyLevel == null || energyLevel >= 1 && energyLevel <= 5),
-       assert(
-         symptomSeverity == null ||
-             symptomSeverity >= 1 && symptomSeverity <= 3,
-       ),
        assert(
          symptomSeverities.values.every(
            (severity) => severity >= 1 && severity <= 3,
@@ -372,9 +374,6 @@ class DailyLog {
     Map<String, String>? mealQualities,
     Map<String, List<String>>? mealFoodGroups,
     Map<String, List<String>>? mealPostFeelings,
-    List<String>? postMealFeelings,
-    String? nutritionQuality,
-    bool clearNutritionQuality = false,
     List<String>? cravings,
     String? nutritionNotes,
     int? waterIntakeMl,
@@ -405,16 +404,12 @@ class DailyLog {
     Set<SexualActivityType>? sexualActivityTypes,
     Set<SexualAfterFeeling>? sexualAfterFeelings,
     List<String>? bowelActivity,
-    List<String>? painLocations,
     List<String>? symptoms,
-    int? symptomSeverity,
-    bool clearSymptomSeverity = false,
     Map<String, int>? symptomSeverities,
     String? flowIntensity,
     bool clearFlowIntensity = false,
     int? periodPainLevel,
     bool clearPeriodPainLevel = false,
-    bool? periodStartedToday,
     bool? vaginalDischargePresent,
     bool clearVaginalDischargePresent = false,
     VaginalDischargeColor? vaginalDischargeColor,
@@ -436,10 +431,6 @@ class DailyLog {
       mealQualities: mealQualities ?? this.mealQualities,
       mealFoodGroups: mealFoodGroups ?? this.mealFoodGroups,
       mealPostFeelings: mealPostFeelings ?? this.mealPostFeelings,
-      postMealFeelings: postMealFeelings ?? this.postMealFeelings,
-      nutritionQuality: clearNutritionQuality
-          ? null
-          : nutritionQuality ?? this.nutritionQuality,
       cravings: cravings ?? this.cravings,
       nutritionNotes: nutritionNotes ?? this.nutritionNotes,
       waterIntakeMl: clearWaterIntake
@@ -475,11 +466,7 @@ class DailyLog {
           ? const {}
           : sexualAfterFeelings ?? this.sexualAfterFeelings,
       bowelActivity: bowelActivity ?? this.bowelActivity,
-      painLocations: painLocations ?? this.painLocations,
       symptoms: symptoms ?? this.symptoms,
-      symptomSeverity: clearSymptomSeverity
-          ? null
-          : symptomSeverity ?? this.symptomSeverity,
       symptomSeverities: symptomSeverities ?? this.symptomSeverities,
       flowIntensity: clearFlowIntensity
           ? null
@@ -487,7 +474,6 @@ class DailyLog {
       periodPainLevel: clearPeriodPainLevel
           ? null
           : periodPainLevel ?? this.periodPainLevel,
-      periodStartedToday: periodStartedToday ?? this.periodStartedToday,
       vaginalDischargePresent: clearVaginalDischargePresent
           ? null
           : vaginalDischargePresent ?? this.vaginalDischargePresent,
@@ -515,8 +501,6 @@ class DailyLog {
         mealQualities.isNotEmpty ||
         mealFoodGroups.isNotEmpty ||
         mealPostFeelings.isNotEmpty ||
-        postMealFeelings.isNotEmpty ||
-        nutritionQuality != null ||
         cravings.isNotEmpty ||
         (nutritionNotes?.isNotEmpty ?? false) ||
         waterIntakeMl != null ||
@@ -537,13 +521,10 @@ class DailyLog {
         sexualActivityTypes.isNotEmpty ||
         sexualAfterFeelings.isNotEmpty ||
         bowelActivity.isNotEmpty ||
-        painLocations.isNotEmpty ||
         symptoms.isNotEmpty ||
-        symptomSeverity != null ||
         symptomSeverities.isNotEmpty ||
         flowIntensity != null ||
         periodPainLevel != null ||
-        periodStartedToday != null ||
         vaginalDischargePresent != null ||
         vaginalDischargeColor != null ||
         vaginalDischargeConsistency != null ||
@@ -554,7 +535,6 @@ class DailyLog {
   }
 
   Map<String, dynamic> toJson() => {
-    'schemaVersion': schemaVersion,
     'date': date.toIso8601String(),
     'hasExplicitTime': hasExplicitTime,
     'activities': activities,
@@ -563,8 +543,6 @@ class DailyLog {
     'mealQualities': mealQualities,
     'mealFoodGroups': mealFoodGroups,
     'mealPostFeelings': mealPostFeelings,
-    'postMealFeelings': postMealFeelings,
-    'nutritionQuality': nutritionQuality,
     'cravings': cravings,
     'nutritionNotes': nutritionNotes,
     'waterIntakeMl': waterIntakeMl,
@@ -590,13 +568,10 @@ class DailyLog {
         .map((feeling) => feeling.name)
         .toList(),
     'bowelActivity': bowelActivity,
-    'painLocations': painLocations,
     'symptoms': symptoms,
-    'symptomSeverity': symptomSeverity,
     'symptomSeverities': symptomSeverities,
     'flowIntensity': flowIntensity,
     'periodPainLevel': periodPainLevel,
-    'periodStartedToday': periodStartedToday,
     'vaginalDischargePresent': vaginalDischargePresent,
     'vaginalDischargeColor': vaginalDischargeColor?.name,
     'vaginalDischargeConsistency': vaginalDischargeConsistency?.name,
@@ -611,6 +586,7 @@ class DailyLog {
   };
 
   factory DailyLog.fromJson(Map<String, dynamic> json) {
+    _rejectUnknownJsonFields(json, _dailyLogJsonFields, 'DailyLog');
     return DailyLog(
       date: DateTime.parse(json['date'] as String),
       hasExplicitTime: json['hasExplicitTime'] as bool? ?? true,
@@ -620,8 +596,6 @@ class DailyLog {
       mealQualities: _readStringMap(json, 'mealQualities'),
       mealFoodGroups: _readStringListMap(json, 'mealFoodGroups'),
       mealPostFeelings: _readStringListMap(json, 'mealPostFeelings'),
-      postMealFeelings: List<String>.from(json['postMealFeelings'] ?? []),
-      nutritionQuality: json['nutritionQuality'] as String?,
       cravings: List<String>.from(json['cravings'] ?? []),
       nutritionNotes: json['nutritionNotes'] as String?,
       waterIntakeMl: _readOptionalInt(
@@ -681,18 +655,10 @@ class DailyLog {
       sexualActivityTypes: _readSexualActivityTypes(json),
       sexualAfterFeelings: _readSexualAfterFeelings(json),
       bowelActivity: List<String>.from(json['bowelActivity'] ?? []),
-      painLocations: List<String>.from(json['painLocations'] ?? []),
       symptoms: List<String>.from(json['symptoms'] ?? []),
-      symptomSeverity: _readOptionalInt(
-        json,
-        'symptomSeverity',
-        minimum: 1,
-        maximum: 3,
-      ),
       symptomSeverities: _readSymptomSeverities(json),
       flowIntensity: json['flowIntensity'] as String?,
       periodPainLevel: json['periodPainLevel'] as int?,
-      periodStartedToday: json['periodStartedToday'] as bool?,
       vaginalDischargePresent: json['vaginalDischargePresent'] as bool?,
       vaginalDischargeColor: _readOptionalEnum(
         json,
@@ -1020,10 +986,6 @@ class DailyLog {
         other.mealPostFeelings,
         mealPostFeelings,
       ),
-      postMealFeelings: (postMealFeelings + other.postMealFeelings)
-          .toSet()
-          .toList(),
-      nutritionQuality: nutritionQuality ?? other.nutritionQuality,
       cravings: (cravings + other.cravings).toSet().toList(),
       nutritionNotes: (nutritionNotes != null && nutritionNotes!.isNotEmpty)
           ? nutritionNotes
@@ -1051,13 +1013,10 @@ class DailyLog {
           ? {...other.sexualAfterFeelings, ...sexualAfterFeelings}
           : const {},
       bowelActivity: (bowelActivity + other.bowelActivity).toSet().toList(),
-      painLocations: (painLocations + other.painLocations).toSet().toList(),
       symptoms: (symptoms + other.symptoms).toSet().toList(),
-      symptomSeverity: symptomSeverity ?? other.symptomSeverity,
       symptomSeverities: {...other.symptomSeverities, ...symptomSeverities},
       flowIntensity: flowIntensity ?? other.flowIntensity,
       periodPainLevel: periodPainLevel ?? other.periodPainLevel,
-      periodStartedToday: periodStartedToday ?? other.periodStartedToday,
       vaginalDischargePresent: mergedDischargePresent,
       vaginalDischargeColor: mergeDischargeDetails
           ? vaginalDischargeColor ??

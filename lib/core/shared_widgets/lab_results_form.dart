@@ -10,7 +10,6 @@ class LabResultsForm extends StatefulWidget {
   final Map<String, LabResult> initialResults;
   final DateTime? initialTestDate;
   final bool? initialFasting;
-  final String? legacyResults;
   final Color accent;
   final ValueChanged<Map<String, LabResult>> onResultsChanged;
   final ValueChanged<DateTime?> onTestDateChanged;
@@ -21,7 +20,6 @@ class LabResultsForm extends StatefulWidget {
     this.initialResults = const {},
     this.initialTestDate,
     this.initialFasting,
-    this.legacyResults,
     this.accent = AppColors.primary,
     required this.onResultsChanged,
     required this.onTestDateChanged,
@@ -109,7 +107,6 @@ class _LabResultsFormState extends State<LabResultsForm> {
 
   @override
   Widget build(BuildContext context) {
-    final legacy = widget.legacyResults?.trim();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -140,41 +137,6 @@ class _LabResultsFormState extends State<LabResultsForm> {
             ],
           ),
         ),
-        if (legacy != null && legacy.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AppColors.warning.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: AppColors.warning.withValues(alpha: 0.24),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _isTurkish ? 'Önceki kaydınız' : 'Your previous entry',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  legacy,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
         const SizedBox(height: 16),
         _buildContextFields(context),
         const SizedBox(height: 12),

@@ -274,13 +274,13 @@ class DoctorReportView extends StatelessWidget {
       if (log.mealTypes.isNotEmpty)
         '${AppStrings.mealsToday}: '
             '${log.mealTypes.map(AppStrings.localizeStoredValue).join(', ')}',
-      if (log.mealQualities.isNotEmpty || log.nutritionQuality != null)
+      if (log.mealQualities.isNotEmpty)
         '${AppStrings.mealsFeel}: '
             '${DailyLogFormatters.mealQualities(log)}',
       if (log.mealFoodGroups.isNotEmpty)
         '${AppStrings.whatDidYouEat}: '
             '${DailyLogFormatters.mealFoodGroups(log)}',
-      if (log.mealPostFeelings.isNotEmpty || log.postMealFeelings.isNotEmpty)
+      if (log.mealPostFeelings.isNotEmpty)
         '${AppStrings.howFeltAfterEating}: '
             '${DailyLogFormatters.mealPostFeelings(log)}',
       if (log.cravings.isNotEmpty)
@@ -315,12 +315,11 @@ class DoctorReportView extends StatelessWidget {
   }
 
   String _symptomsText(DailyLog log) {
-    final values = {...log.painLocations, ...log.symptoms};
-    if (values.isEmpty) return '';
+    if (log.symptoms.isEmpty) return '';
     return '${AppStrings.symptom}: '
-        '${values.map((symptom) {
+        '${log.symptoms.map((symptom) {
           final localized = AppStrings.localizeStoredValue(symptom);
-          final severity = log.symptomSeverities[symptom] ?? log.symptomSeverities[localized] ?? log.symptomSeverity;
+          final severity = log.symptomSeverities[symptom] ?? log.symptomSeverities[localized];
           return severity == null ? localized : '$localized ($severity/3)';
         }).join(', ')}';
   }
@@ -483,8 +482,6 @@ class DoctorReportView extends StatelessWidget {
                         l.mealQualities.isNotEmpty ||
                         l.mealFoodGroups.isNotEmpty ||
                         l.mealPostFeelings.isNotEmpty ||
-                        l.postMealFeelings.isNotEmpty ||
-                        l.nutritionQuality != null ||
                         l.cravings.isNotEmpty ||
                         l.bowelActivity.isNotEmpty ||
                         l.waterIntakeMl != null ||
@@ -555,7 +552,6 @@ class DoctorReportView extends StatelessWidget {
                   .where(
                     (l) =>
                         l.mood != null ||
-                        l.painLocations.isNotEmpty ||
                         l.symptoms.isNotEmpty ||
                         l.moodCompanions.isNotEmpty ||
                         l.moodPlaces.isNotEmpty ||
@@ -842,8 +838,6 @@ class DoctorReportView extends StatelessWidget {
                 l.mealQualities.isNotEmpty ||
                 l.mealFoodGroups.isNotEmpty ||
                 l.mealPostFeelings.isNotEmpty ||
-                l.postMealFeelings.isNotEmpty ||
-                l.nutritionQuality != null ||
                 l.cravings.isNotEmpty ||
                 l.bowelActivity.isNotEmpty ||
                 l.waterIntakeMl != null ||
@@ -912,7 +906,6 @@ class DoctorReportView extends StatelessWidget {
           .where(
             (l) =>
                 l.mood != null ||
-                l.painLocations.isNotEmpty ||
                 l.symptoms.isNotEmpty ||
                 l.moodCompanions.isNotEmpty ||
                 l.moodPlaces.isNotEmpty ||
@@ -1279,8 +1272,6 @@ class DoctorReportView extends StatelessWidget {
                   l.mealQualities.isNotEmpty ||
                   l.mealFoodGroups.isNotEmpty ||
                   l.mealPostFeelings.isNotEmpty ||
-                  l.postMealFeelings.isNotEmpty ||
-                  l.nutritionQuality != null ||
                   l.cravings.isNotEmpty ||
                   l.bowelActivity.isNotEmpty ||
                   l.waterIntakeMl != null ||
@@ -1349,7 +1340,6 @@ class DoctorReportView extends StatelessWidget {
             .where(
               (l) =>
                   l.mood != null ||
-                  l.painLocations.isNotEmpty ||
                   l.symptoms.isNotEmpty ||
                   l.moodCompanions.isNotEmpty ||
                   l.moodPlaces.isNotEmpty ||
@@ -1454,8 +1444,7 @@ class DoctorReportView extends StatelessWidget {
 }
 
 bool _hasLaboratoryResults(UserSettings settings) {
-  return settings.labResults.isNotEmpty ||
-      (settings.bloodTestResults?.trim().isNotEmpty ?? false);
+  return settings.labResults.isNotEmpty;
 }
 
 String _formatLaboratoryResults(UserSettings settings) {
@@ -1480,15 +1469,5 @@ String _formatLaboratoryResults(UserSettings settings) {
   );
   if (structured.isNotEmpty) lines.add(structured);
 
-  final legacy = settings.bloodTestResults?.trim();
-  if (legacy != null && legacy.isNotEmpty) {
-    if (structured.isNotEmpty) {
-      lines.add(
-        '${AppStrings.isTurkish ? 'Önceki serbest kayıt' : 'Previous free-text entry'}: $legacy',
-      );
-    } else {
-      lines.add(legacy);
-    }
-  }
   return lines.join('\n');
 }

@@ -651,16 +651,7 @@ class PersonalAssociationEngine {
               }
             }
           }
-        } else {
-          final legacyFeelings = log.postMealFeelings.map(_canonical).toSet();
-          postMealFeelings.addAll(legacyFeelings);
-          for (final food in foodsByMeal.values.expand((items) => items)) {
-            for (final feeling in legacyFeelings) {
-              foodFeelingPairs.add('$food\u0000$feeling');
-            }
-          }
         }
-        symptoms.addAll(log.painLocations.map(_canonical));
         symptoms.addAll(log.symptoms.map(_canonical));
         cravings.addAll(log.cravings.map(_canonical));
         bowelActivities.addAll(log.bowelActivity.map(_canonical));
@@ -681,20 +672,12 @@ class PersonalAssociationEngine {
             log.mealTypes.isNotEmpty ||
             log.mealFoodGroups.isNotEmpty ||
             log.mealPostFeelings.isNotEmpty ||
-            log.postMealFeelings.isNotEmpty ||
             log.cravings.isNotEmpty ||
             log.waterIntakeMl != null ||
             log.caffeineServings != null;
-        final legacyWellbeingSymptomObservation =
-            log.observedSections.contains(DailyLogObservedSection.wellbeing) &&
-            log.mood == null &&
-            log.moodCompanions.isEmpty &&
-            log.moodPlaces.isEmpty;
         symptomObserved =
             symptomObserved ||
             log.observedSections.contains(DailyLogObservedSection.symptom) ||
-            legacyWellbeingSymptomObservation ||
-            log.painLocations.isNotEmpty ||
             log.symptoms.isNotEmpty;
         wellbeingObserved =
             wellbeingObserved ||

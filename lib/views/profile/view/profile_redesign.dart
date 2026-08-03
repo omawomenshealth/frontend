@@ -756,16 +756,13 @@ class _LabResultsCard extends StatelessWidget {
       final result = settings.labResults[definition.id];
       return result != null && result.value.trim().isNotEmpty;
     }).toList();
-    final legacy = settings.bloodTestResults?.trim();
-
     return _SurfaceCard(
       child: Padding(
         padding: const EdgeInsets.all(17),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (availableDefinitions.isEmpty &&
-                (legacy == null || legacy.isEmpty))
+            if (availableDefinitions.isEmpty)
               InkWell(
                 key: const ValueKey('profile_lab_results_empty'),
                 borderRadius: BorderRadius.circular(15),
@@ -842,30 +839,6 @@ class _LabResultsCard extends StatelessWidget {
                 ),
                 if (index < availableDefinitions.length - 1)
                   const _SoftDivider(),
-              ],
-              if (availableDefinitions.isEmpty &&
-                  legacy != null &&
-                  legacy.isNotEmpty) ...[
-                Text(
-                  isTurkish
-                      ? 'Önceki serbest kayıt'
-                      : 'Previous free-text entry',
-                  style: const TextStyle(
-                    fontFamily: 'Karla',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  legacy,
-                  style: const TextStyle(
-                    fontFamily: 'Karla',
-                    fontSize: 13,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
               ],
             ],
           ],

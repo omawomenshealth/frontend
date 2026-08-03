@@ -49,7 +49,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   late Map<String, int> _mealQualityIndices;
   late Map<String, Set<String>> _mealFoodGroups;
   late Map<String, Set<String>> _mealPostFeelings;
-  late Set<String> _legacyPostMealFeelings;
   late Set<String> _cravings;
   late int? _caffeineServings;
 
@@ -101,16 +100,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           fallback: 1,
         ),
     };
-    if (_mealQualityIndices.isEmpty && _log.nutritionQuality != null) {
-      final legacyIndex = _localizedIndex(
-        AppStrings.nutritionQualityOptions,
-        _log.nutritionQuality,
-        fallback: 1,
-      );
-      for (final meal in _meals.where(_supportsMealQuality)) {
-        _mealQualityIndices[meal] = legacyIndex;
-      }
-    }
     _mealFoodGroups = {
       for (final entry in _log.mealFoodGroups.entries)
         AppStrings.localizeStoredValue(entry.key): entry.value
@@ -123,15 +112,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             .map(AppStrings.localizeStoredValue)
             .toSet(),
     };
-    _legacyPostMealFeelings = _localizedSet(
-      _log.postMealFeelings,
-      AppStrings.postMealFeelingOptions,
-    );
-    if (_mealPostFeelings.isEmpty &&
-        _legacyPostMealFeelings.isNotEmpty &&
-        _meals.length == 1) {
-      _mealPostFeelings[_meals.single] = {..._legacyPostMealFeelings};
-    }
     _cravings = _localizedSet(
       _log.cravings,
       AppStrings.nutritionCravingOptions,
@@ -146,7 +126,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             _log.symptomSeverities[AppStrings.localizeStoredValue(
               rawSymptom,
             )] ??
-            _log.symptomSeverity ??
             2,
     };
     _sexualActivity = _log.sexualActivity;
@@ -250,7 +229,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         name,
         () => MedicationEntry(
           name: name,
-          time: AppStrings.medicationTimes.first,
+          times: {AppStrings.medicationTimes.first},
           stomachState: AppStrings.stomachStates.first,
           doseCount: 1,
         ),
@@ -1613,7 +1592,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       entries.add(
         MedicationEntry(
           name: name,
-          time: AppStrings.medicationTimes.first,
+          times: {AppStrings.medicationTimes.first},
           stomachState: AppStrings.stomachStates.first,
           doseCount: 1,
         ),
@@ -1832,7 +1811,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 key: ValueKey('medication_taken_$entryKey'),
                 tooltip: AppStrings.doseTaken,
                 visualDensity: VisualDensity.compact,
-                onPressed: () => onChanged(entry.copyWith(taken: !entry.taken)),
+                onPressed: () => onChanged(
+                  entry.copyWith(
+                    takenDoseCount: entry.taken ? 0 : entry.doseCount,
+                  ),
+                ),
                 icon: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 160),
                   child: Icon(
@@ -2333,9 +2316,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     });
   }
 
-  bool _supportsMealQuality(String meal) =>
-      AppStrings.nutritionMealOptions.take(3).contains(meal);
-
   void _toggleMeal(String meal) {
     setState(() {
       if (_meals.remove(meal)) {
@@ -2348,15 +2328,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         _expandedMeals.add(meal);
       }
     });
-  }
-
-  String? get _legacyNutritionQuality {
-    final selectedValues = _mealQualityIndices.entries
-        .where((entry) => _meals.contains(entry.key))
-        .map((entry) => entry.value)
-        .toSet();
-    if (selectedValues.length != 1) return null;
-    return AppStrings.nutritionQualityOptions[selectedValues.single];
   }
 
   Widget _buildMealAccordion(String meal) {
@@ -2691,22 +2662,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       for (final symptom in _symptoms)
         symptom: _symptomSeverities[symptom] ?? 2,
     };
-    final overallSymptomSeverity = selectedSymptomSeverities.isEmpty
-        ? null
-        : (selectedSymptomSeverities.values.reduce((a, b) => a + b) /
-                  selectedSymptomSeverities.length)
-              .round();
-
     return switch (_logType) {
       0 => _log.copyWith(
         date: finalDate,
         hasExplicitTime: hasExplicitTime,
         flowIntensity: AppStrings.flowOptions[_flowIndex],
         symptoms: _symptoms.toList(),
-        symptomSeverity: overallSymptomSeverity,
-        clearSymptomSeverity: overallSymptomSeverity == null,
         symptomSeverities: selectedSymptomSeverities,
-        painLocations: _matchingPainLocations(_symptoms),
         observedSections: observed,
       ),
       1 => _log.copyWith(
@@ -2729,12 +2691,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             if (_meals.contains(entry.key) && entry.value.isNotEmpty)
               entry.key: entry.value.toList(),
         },
-        postMealFeelings:
-            _mealPostFeelings.values.any((feelings) => feelings.isNotEmpty)
-            ? const []
-            : _legacyPostMealFeelings.toList(),
-        nutritionQuality: _legacyNutritionQuality,
-        clearNutritionQuality: _legacyNutritionQuality == null,
         cravings: _cravings.toList(),
         caffeineServings: _caffeineServings,
         clearCaffeineServings: _caffeineServings == null,
@@ -2746,10 +2702,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         date: finalDate,
         hasExplicitTime: hasExplicitTime,
         symptoms: _symptoms.toList(),
-        symptomSeverity: overallSymptomSeverity,
-        clearSymptomSeverity: overallSymptomSeverity == null,
         symptomSeverities: selectedSymptomSeverities,
-        painLocations: _matchingPainLocations(_symptoms),
         sexualActivity: _sexualActivity,
         clearSexualActivity: _sexualActivity == null,
         sexualActivityTypes: _sexualActivityTypes,
@@ -2784,16 +2737,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         observedSections: observed,
       ),
     };
-  }
-
-  List<String> _matchingPainLocations(Set<String> selected) {
-    final painOptions = AppStrings.painLocations;
-    return selected.where((value) {
-      final canonical = AppStrings.canonicalizeStoredValue(value);
-      return painOptions.any(
-        (pain) => AppStrings.canonicalizeStoredValue(pain) == canonical,
-      );
-    }).toList();
   }
 
   Future<bool> _saveLog({bool closeSheet = true}) async {

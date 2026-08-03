@@ -57,7 +57,6 @@ void main() {
     final harness = await _pumpLogSheet(tester, initialIndex: 0);
 
     expect(find.text(AppStrings.logPeriodQuestion), findsOneWidget);
-    expect(find.text(AppStrings.periodStartedToday), findsNothing);
     expect(find.text(AppStrings.savePeriod), findsOneWidget);
     expect(find.byIcon(Icons.water_drop_rounded), findsWidgets);
     expect(tester.takeException(), isNull);
@@ -73,7 +72,6 @@ void main() {
       AppStrings.localizeStoredValue(harness.savedLog!.flowIntensity!),
       AppStrings.flowOptions.last,
     );
-    expect(harness.savedLog!.periodStartedToday, isNull);
     expect(
       harness.savedLog!.observedSections,
       contains(DailyLogObservedSection.period),
@@ -334,8 +332,6 @@ void main() {
       harness.savedLog!.mealPostFeelings[AppStrings.nutritionMealOptions.first],
       contains(AppStrings.postMealFeelingOptions[3]),
     );
-    expect(harness.savedLog!.postMealFeelings, isEmpty);
-    expect(harness.savedLog!.nutritionQuality, isNull);
   });
 
   testWidgets('Su kaydı mevcut günlük toplamın üzerine eklenir', (
@@ -414,7 +410,6 @@ void main() {
       harness.savedLog!.symptoms,
       contains(AppStrings.symptomBodyOptions.first),
     );
-    expect(harness.savedLog!.symptomSeverity, 3);
     expect(
       harness.savedLog!.symptomSeverities[AppStrings.symptomBodyOptions.first],
       3,
@@ -961,7 +956,6 @@ void main() {
       mealPostFeelings: const {
         'Öğle': ['Şişkin'],
       },
-      nutritionQuality: 'Dengeli',
       cravings: const ['Tatlı'],
       mood: 'İyi',
       moodEmoji: '🙂',
@@ -970,7 +964,6 @@ void main() {
       sexualActivity: true,
       sexualActivityTypes: const {SexualActivityType.masturbation},
       symptoms: const ['Kramp'],
-      symptomSeverity: 2,
       symptomSeverities: const {'Kramp': 2},
       dreamRemembered: true,
       dreamNote: 'Uçtuğumu gördüm.',
@@ -989,18 +982,14 @@ void main() {
     expect(restored.mealQualities, original.mealQualities);
     expect(restored.mealFoodGroups, original.mealFoodGroups);
     expect(restored.mealPostFeelings, original.mealPostFeelings);
-    expect(restored.postMealFeelings, original.postMealFeelings);
-    expect(restored.nutritionQuality, original.nutritionQuality);
     expect(restored.cravings, original.cravings);
     expect(restored.moodCompanions, original.moodCompanions);
     expect(restored.moodPlaces, original.moodPlaces);
     expect(restored.symptoms, original.symptoms);
-    expect(restored.symptomSeverity, 2);
     expect(restored.symptomSeverities, original.symptomSeverities);
     expect(restored.dreamRemembered, isTrue);
     expect(restored.dreamNote, original.dreamNote);
     expect(restored.sexualActivityTypes, original.sexualActivityTypes);
-    expect(restored.periodStartedToday, isNull);
     expect(restored.hasExplicitTime, isFalse);
     expect(restored.observedSections, original.observedSections);
   });

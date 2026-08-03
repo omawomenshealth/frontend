@@ -24,11 +24,10 @@ class LocalStorageService {
   static const String _authGoogleIdKey = 'auth_google_id';
   static const String _authLastSyncKey = 'auth_last_sync';
   static const String _virtualDaysOffsetKey = 'virtual_days_offset';
-  static const String _medicationReminderPlansKey =
-      'medication_reminder_plans_v1';
-  static const String _medicationDoseRecordsKey = 'medication_dose_records_v1';
+  static const String _medicationReminderPlansKey = 'medication_reminder_plans';
+  static const String _medicationDoseRecordsKey = 'medication_dose_records';
   static const String _insightNotificationHistoryKey =
-      'insight_notification_history_v1';
+      'insight_notification_history';
 
   final LocalKeyStore _keyStore;
   LocalEncryptedStore? _encryptedStore;
@@ -319,8 +318,7 @@ class LocalStorageService {
     if (bleedingDays.isEmpty) return [];
 
     // Yeni bir kanama kaydı, önceki kanama gününe bitişik değilse yeni adet
-    // başlangıcıdır. Eski yedeklerde bulunan `periodStartedToday` bayrağı artık
-    // hesaplamayı etkilemez; böylece ardışık günlerdeki kayıtlar tek dönem kalır.
+    // başlangıcıdır; ardışık günlerdeki kayıtlar tek dönem kalır.
     final periodStarts = <DateTime>[bleedingDays.first];
     for (var index = 1; index < bleedingDays.length; index++) {
       if (bleedingDays[index].difference(bleedingDays[index - 1]).inDays > 1) {

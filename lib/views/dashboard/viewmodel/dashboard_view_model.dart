@@ -52,8 +52,7 @@ class DashboardViewModel extends ChangeNotifier {
         : _storage.loadLogsForDate(targetDate);
     DailyLog? matchingLog;
     for (final log in logs) {
-      if (log.observedSections.contains(section) ||
-          _hasLegacySectionData(log, section)) {
+      if (log.observedSections.contains(section)) {
         matchingLog = log;
         break;
       }
@@ -64,9 +63,8 @@ class DashboardViewModel extends ChangeNotifier {
           matchingLog.supplements.isEmpty) {
         for (final log in logs) {
           if (log.observedSections.contains(
-                DailyLogObservedSection.medication,
-              ) ||
-              _hasLegacySectionData(log, DailyLogObservedSection.medication)) {
+            DailyLogObservedSection.medication,
+          )) {
             return matchingLog.copyWith(
               medications: log.medications,
               supplements: log.supplements,
@@ -82,42 +80,6 @@ class DashboardViewModel extends ChangeNotifier {
     }
     final initialDate = targetDate.isToday ? AppTime.now : targetDate.dateOnly;
     return DailyLog.empty(initialDate);
-  }
-
-  bool _hasLegacySectionData(DailyLog log, DailyLogObservedSection section) {
-    return switch (section) {
-      DailyLogObservedSection.period => log.flowIntensity != null,
-      DailyLogObservedSection.nutrition =>
-        log.waterIntakeMl != null ||
-            log.mealTypes.isNotEmpty ||
-            log.mealQualities.isNotEmpty ||
-            log.mealFoodGroups.isNotEmpty ||
-            log.mealPostFeelings.isNotEmpty ||
-            log.postMealFeelings.isNotEmpty ||
-            log.nutritionQuality != null ||
-            log.cravings.isNotEmpty ||
-            log.nutritionTags.isNotEmpty ||
-            log.bowelActivity.isNotEmpty ||
-            log.caffeineServings != null,
-      DailyLogObservedSection.medication =>
-        log.medications.isNotEmpty || log.supplements.isNotEmpty,
-      DailyLogObservedSection.symptom =>
-        log.sexualActivity != null ||
-            log.sexualActivityTypes.isNotEmpty ||
-            log.vaginalDischargePresent != null ||
-            log.vaginalDischargeSymptoms.isNotEmpty ||
-            log.dreamRemembered != null ||
-            (log.dreamNote?.isNotEmpty ?? false) ||
-            (log.symptoms.isNotEmpty && log.flowIntensity == null),
-      DailyLogObservedSection.wellbeing =>
-        log.mood != null ||
-            log.moodCompanions.isNotEmpty ||
-            log.moodPlaces.isNotEmpty ||
-            log.sleepDurationMinutes != null ||
-            log.sleepQuality != null ||
-            log.stressLevel != null ||
-            log.energyLevel != null,
-    };
   }
 
   /// Takvimde tarih seçildiğinde çağrılır.
@@ -318,7 +280,9 @@ class DashboardViewModel extends ChangeNotifier {
     final log = latestLog ?? DailyLog.empty(AppTime.now);
     final medications = List<MedicationEntry>.from(log.medications);
     if (index < medications.length) {
-      medications[index] = medications[index].copyWith(taken: taken);
+      medications[index] = medications[index].copyWith(
+        takenDoseCount: taken ? medications[index].doseCount : 0,
+      );
       await saveLog(log.copyWith(medications: medications));
     }
   }
@@ -328,7 +292,9 @@ class DashboardViewModel extends ChangeNotifier {
     final log = latestLog ?? DailyLog.empty(AppTime.now);
     final supplements = List<MedicationEntry>.from(log.supplements);
     if (index < supplements.length) {
-      supplements[index] = supplements[index].copyWith(taken: taken);
+      supplements[index] = supplements[index].copyWith(
+        takenDoseCount: taken ? supplements[index].doseCount : 0,
+      );
       await saveLog(log.copyWith(supplements: supplements));
     }
   }
@@ -347,8 +313,6 @@ class DashboardViewModel extends ChangeNotifier {
           l.mealQualities.isNotEmpty ||
           l.mealFoodGroups.isNotEmpty ||
           l.mealPostFeelings.isNotEmpty ||
-          l.postMealFeelings.isNotEmpty ||
-          l.nutritionQuality != null ||
           l.cravings.isNotEmpty ||
           l.waterIntakeMl != null,
     );

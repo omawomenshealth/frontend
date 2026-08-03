@@ -1155,7 +1155,7 @@ class _DailyLogDetails extends StatelessWidget {
     );
     add(
       AppStrings.mealsFeel,
-      value.mealQualities.isEmpty && value.nutritionQuality == null
+      value.mealQualities.isEmpty
           ? null
           : DailyLogFormatters.mealQualities(value),
     );
@@ -1167,7 +1167,7 @@ class _DailyLogDetails extends StatelessWidget {
     );
     add(
       AppStrings.howFeltAfterEating,
-      value.mealPostFeelings.isEmpty && value.postMealFeelings.isEmpty
+      value.mealPostFeelings.isEmpty
           ? null
           : DailyLogFormatters.mealPostFeelings(value),
     );
@@ -1226,12 +1226,6 @@ class _DailyLogDetails extends StatelessWidget {
           : value.bowelActivity.map(AppStrings.localizeStoredValue).join(', '),
     );
     add(
-      AppStrings.pain,
-      value.painLocations.isEmpty
-          ? null
-          : value.painLocations.map(AppStrings.localizeStoredValue).join(', '),
-    );
-    add(
       AppStrings.symptom,
       value.symptoms.isEmpty
           ? null
@@ -1240,19 +1234,12 @@ class _DailyLogDetails extends StatelessWidget {
                   final localized = AppStrings.localizeStoredValue(symptom);
                   final severity =
                       value.symptomSeverities[symptom] ??
-                      value.symptomSeverities[localized] ??
-                      value.symptomSeverity;
+                      value.symptomSeverities[localized];
                   if (severity == null) return localized;
                   return '$localized '
                       '(${AppStrings.symptomSeverityOptions[severity - 1]})';
                 })
                 .join(', '),
-    );
-    add(
-      AppStrings.symptomStrength,
-      value.symptomSeverities.isNotEmpty || value.symptomSeverity == null
-          ? null
-          : AppStrings.symptomSeverityOptions[value.symptomSeverity! - 1],
     );
     add(
       AppStrings.flow,

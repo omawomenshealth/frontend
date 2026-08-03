@@ -26,8 +26,7 @@ void main() {
       itemType: MedicationPlanItemType.medication,
       itemName: 'Test ilacı',
       dosage: '1 Adet',
-      time: const ReminderClockTime(hour: 9, minute: 30),
-      times: times,
+      times: times ?? const [ReminderClockTime(hour: 9, minute: 30)],
       frequency: frequency,
       weekdays: weekdays,
       startDate: startDate ?? DateTime(2026, 7, 20),
@@ -112,6 +111,13 @@ void main() {
     expect(
       MedicationReminderPlan.fromJson(reminderPlan.toJson()).times,
       hasLength(3),
+    );
+    expect(
+      () => MedicationReminderPlan.fromJson({
+        ...reminderPlan.toJson(),
+        'time': {'hour': 8, 'minute': 15},
+      }),
+      throwsFormatException,
     );
   });
 

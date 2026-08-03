@@ -54,7 +54,7 @@ void main() {
       restored.vaginalDischargeSymptoms,
       contains(VaginalDischargeSymptom.unusualOdor),
     );
-    expect(restored.toJson()['schemaVersion'], DailyLog.schemaVersion);
+    expect(restored.toJson().containsKey('schemaVersion'), isFalse);
     expect(restored.hasData, isTrue);
   });
 
@@ -114,7 +114,7 @@ void main() {
         DailyLog(
           date: DateTime(2026, 6, 1).add(Duration(days: day)),
           waterIntakeMl: day < 10 ? 1000 : 2000,
-          painLocations: day < 8 || day == 15 ? const ['Baş ağrısı'] : const [],
+          symptoms: day < 8 || day == 15 ? const ['Baş ağrısı'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
             DailyLogObservedSection.wellbeing,
@@ -153,7 +153,7 @@ void main() {
               : const {
                   'Kahvaltı': ['Yumurta'],
                 },
-          painLocations: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
+          symptoms: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
             DailyLogObservedSection.wellbeing,
@@ -275,7 +275,7 @@ void main() {
               : const {
                   'Kahvaltı': ['Yumurta'],
                 },
-          painLocations: day.isOdd ? const ['Şişkinlik'] : const [],
+          symptoms: day.isOdd ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
             DailyLogObservedSection.wellbeing,
@@ -473,7 +473,7 @@ void main() {
         DailyLog(
           date: DateTime(2026, 5, 1).add(Duration(days: day)),
           activities: day < 10 ? const ['Yürüyüş'] : const [],
-          painLocations: day == 5 || day >= 10 && day < 18
+          symptoms: day == 5 || day >= 10 && day < 18
               ? const ['Baş ağrısı']
               : const [],
           observedSections: const {DailyLogObservedSection.wellbeing},
@@ -499,7 +499,7 @@ void main() {
         DailyLog(
           date: DateTime(2026, 5, 1).add(Duration(days: day)),
           stressLevel: day < 10 ? 5 : 1,
-          painLocations: day < 8 || day == 15 ? const ['Baş ağrısı'] : const [],
+          symptoms: day < 8 || day == 15 ? const ['Baş ağrısı'] : const [],
           observedSections: const {DailyLogObservedSection.wellbeing},
         ),
       );
@@ -520,7 +520,7 @@ void main() {
       return DailyLog(
         date: DateTime(2026, 3, 1).add(Duration(days: day)),
         nutritionTags: day < 3 ? const ['Tuzlu'] : const [],
-        painLocations: day == 0 || day == 1 ? const ['Şişkinlik'] : const [],
+        symptoms: day == 0 || day == 1 ? const ['Şişkinlik'] : const [],
         observedSections: const {
           DailyLogObservedSection.nutrition,
           DailyLogObservedSection.wellbeing,
@@ -540,7 +540,7 @@ void main() {
       logs.add(
         DailyLog(
           date: start.add(Duration(days: day)),
-          painLocations: day >= 1 && day <= 8 || day == 20
+          symptoms: day >= 1 && day <= 8 || day == 20
               ? const ['Baş ağrısı']
               : const [],
           observedSections: const {DailyLogObservedSection.wellbeing},

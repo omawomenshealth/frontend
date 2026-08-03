@@ -28,17 +28,17 @@ void main() {
       DailyLog(
         date: DateTime(2026, 7, 1, 9),
         mood: 'Mutlu',
-        painLocations: const ['Baş ağrısı'],
+        symptoms: const ['Baş ağrısı'],
       ),
       DailyLog(
         date: DateTime(2026, 7, 2, 10),
         mood: 'Happy',
-        painLocations: const ['Headache'],
+        symptoms: const ['Headache'],
       ),
       DailyLog(
         date: DateTime(2026, 7, 3, 11),
         mood: 'Yorgun',
-        painLocations: const ['Bel ağrısı'],
+        symptoms: const ['Bel ağrısı'],
       ),
     ];
 
@@ -267,9 +267,9 @@ void main() {
   test('ilaç kutuları gerçek plan olmadan uyum oranı üretmez', () {
     MedicationEntry medication(bool taken) => MedicationEntry(
       name: 'Test ilacı',
-      time: 'Sabah',
+      times: const {'Sabah'},
       stomachState: 'Tok',
-      taken: taken,
+      takenDoseCount: taken ? 1 : 0,
     );
 
     final insights = engine.generate([

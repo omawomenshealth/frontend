@@ -14,9 +14,6 @@ class DailyLogFormatters {
           )
           .join(', ');
     }
-    if (log.nutritionQuality != null) {
-      return AppStrings.localizeStoredValue(log.nutritionQuality!);
-    }
     return AppStrings.notSpecified;
   }
 
@@ -39,11 +36,6 @@ class DailyLogFormatters {
                 '${entry.value.map(AppStrings.localizeStoredValue).join(", ")}',
           )
           .join(' • ');
-    }
-    if (log.postMealFeelings.isNotEmpty) {
-      return log.postMealFeelings
-          .map(AppStrings.localizeStoredValue)
-          .join(', ');
     }
     return AppStrings.notSpecified;
   }

@@ -312,8 +312,6 @@ class SyncService {
         weight: localSettings.weight ?? cloudSettings.weight,
         height: localSettings.height ?? cloudSettings.height,
         age: localSettings.age ?? cloudSettings.age,
-        bloodTestResults:
-            localSettings.bloodTestResults ?? cloudSettings.bloodTestResults,
         labResults: {...cloudSettings.labResults, ...localSettings.labResults},
         labTestDate: localSettings.labTestDate ?? cloudSettings.labTestDate,
         labTestFasting:
@@ -502,9 +500,8 @@ class SyncService {
   ) {
     return records.map((record) {
       final json = record.toJson();
-      // İşletim sistemi bildirim durumu cihaza özeldir.
-      json['notificationScheduled'] = false;
-      json['notificationScheduledAt'] = null;
+      json.remove('notificationScheduled');
+      json.remove('notificationScheduledAt');
       return json;
     }).toList();
   }

@@ -25,16 +25,6 @@ void main() {
     expect(restored.labTestFasting, isTrue);
   });
 
-  test('eski serbest metin kan sonucu kaydı geriye dönük okunur', () {
-    final restored = UserSettings.fromJson({
-      'userName': 'Eski kullanıcı',
-      'bloodTestResults': 'Demir 70',
-    });
-
-    expect(restored.bloodTestResults, 'Demir 70');
-    expect(restored.labResults, isEmpty);
-  });
-
   test('istenen temel testler ve yaygın birimleri katalogda bulunur', () {
     const requiredIds = {
       'iron',
@@ -68,6 +58,16 @@ void main() {
     expect(
       LabTestCatalog.byId('creatinine')?.units,
       containsAll(['µmol/L', 'mg/dL']),
+    );
+  });
+
+  test('profil modeli bilinmeyen ve eski alanları kabul etmez', () {
+    expect(
+      () => UserSettings.fromJson({
+        ...UserSettings().toJson(),
+        'bloodTestResults': 'Demir 70',
+      }),
+      throwsFormatException,
     );
   });
 }

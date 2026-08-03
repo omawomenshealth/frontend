@@ -989,7 +989,6 @@ class _MedicationReminderFormSheetState
       itemType: widget.itemType,
       itemName: itemName,
       dosage: AppStrings.dosageCount(_doseCount),
-      time: reminderTimes.first,
       times: reminderTimes,
       frequency: _frequency,
       weekdays: _frequency == MedicationPlanFrequency.everyDay

@@ -120,7 +120,7 @@ void main() {
         itemType: MedicationPlanItemType.medication,
         itemName: 'Test ilacı',
         dosage: '3 Adet',
-        time: const ReminderClockTime(hour: 23, minute: 55),
+        times: const [ReminderClockTime(hour: 23, minute: 55)],
         frequency: MedicationPlanFrequency.everyDay,
         weekdays: const {1, 2, 3, 4, 5, 6, 7},
         startDate: DateTime(now.year, now.month, now.day),
@@ -218,7 +218,7 @@ void main() {
               : const {
                   'Kahvaltı': ['Yumurta'],
                 },
-          painLocations: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
+          symptoms: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
             DailyLogObservedSection.wellbeing,
@@ -260,7 +260,7 @@ void main() {
               : const {
                   'Kahvaltı': ['Yumurta'],
                 },
-          painLocations: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
+          symptoms: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
             DailyLogObservedSection.wellbeing,

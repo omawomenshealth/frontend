@@ -1,5 +1,46 @@
 import 'dart:convert';
 
+void _rejectUnknownFields(
+  Map<String, dynamic> json,
+  Set<String> allowed,
+  String model,
+) {
+  final unknown = json.keys.where((key) => !allowed.contains(key)).toList();
+  if (unknown.isNotEmpty) {
+    throw FormatException(
+      '$model desteklenmeyen alan içeriyor: ${unknown.join(', ')}',
+    );
+  }
+}
+
+const _clockFields = {'hour', 'minute'};
+const _planFields = {
+  'id',
+  'itemType',
+  'itemName',
+  'dosage',
+  'times',
+  'frequency',
+  'weekdays',
+  'startDate',
+  'endDate',
+  'enabled',
+  'createdAt',
+  'updatedAt',
+};
+const _doseRecordFields = {
+  'id',
+  'planId',
+  'itemType',
+  'itemName',
+  'dosage',
+  'scheduledAt',
+  'notificationScheduled',
+  'notificationScheduledAt',
+  'status',
+  'respondedAt',
+};
+
 enum MedicationPlanItemType { medication, supplement }
 
 enum MedicationPlanFrequency { everyDay, selectedWeekdays }
@@ -18,6 +59,7 @@ class ReminderClockTime {
   Map<String, dynamic> toJson() => {'hour': hour, 'minute': minute};
 
   factory ReminderClockTime.fromJson(Map<String, dynamic> json) {
+    _rejectUnknownFields(json, _clockFields, 'ReminderClockTime');
     return ReminderClockTime(
       hour: json['hour'] as int,
       minute: json['minute'] as int,
@@ -47,8 +89,7 @@ class MedicationReminderPlan {
     required this.itemType,
     required this.itemName,
     required this.dosage,
-    required ReminderClockTime time,
-    List<ReminderClockTime>? times,
+    required List<ReminderClockTime> times,
     required this.frequency,
     required Set<int> weekdays,
     required this.startDate,
@@ -56,13 +97,9 @@ class MedicationReminderPlan {
     required this.enabled,
     required this.createdAt,
     required this.updatedAt,
-  }) : times = List.unmodifiable(
-         _normalizeTimes(times == null || times.isEmpty ? [time] : times),
-       ),
+  }) : assert(times.isNotEmpty),
+       times = List.unmodifiable(_normalizeTimes(times)),
        weekdays = Set.unmodifiable(weekdays);
-
-  /// Eski tek-saat kullanan çağrılar ve kayıtlar için ilk bildirim saati.
-  ReminderClockTime get time => times.first;
 
   bool isScheduledOn(DateTime date) {
     final day = DateTime(date.year, date.month, date.day);
@@ -80,7 +117,6 @@ class MedicationReminderPlan {
   MedicationReminderPlan copyWith({
     String? itemName,
     String? dosage,
-    ReminderClockTime? time,
     List<ReminderClockTime>? times,
     MedicationPlanFrequency? frequency,
     Set<int>? weekdays,
@@ -95,8 +131,7 @@ class MedicationReminderPlan {
       itemType: itemType,
       itemName: itemName ?? this.itemName,
       dosage: dosage ?? this.dosage,
-      time: time ?? this.time,
-      times: times ?? (time == null ? this.times : [time]),
+      times: times ?? this.times,
       frequency: frequency ?? this.frequency,
       weekdays: weekdays ?? this.weekdays,
       startDate: startDate ?? this.startDate,
@@ -112,7 +147,6 @@ class MedicationReminderPlan {
     'itemType': itemType.name,
     'itemName': itemName,
     'dosage': dosage,
-    'time': time.toJson(),
     'times': times.map((value) => value.toJson()).toList(),
     'frequency': frequency.name,
     'weekdays': weekdays.toList()..sort(),
@@ -124,16 +158,7 @@ class MedicationReminderPlan {
   };
 
   factory MedicationReminderPlan.fromJson(Map<String, dynamic> json) {
-    final legacyTime = ReminderClockTime.fromJson(
-      Map<String, dynamic>.from(json['time'] as Map),
-    );
-    final storedTimes = (json['times'] as List?)
-        ?.map(
-          (value) => ReminderClockTime.fromJson(
-            Map<String, dynamic>.from(value as Map),
-          ),
-        )
-        .toList();
+    _rejectUnknownFields(json, _planFields, 'MedicationReminderPlan');
     return MedicationReminderPlan(
       id: json['id'] as String,
       itemType: MedicationPlanItemType.values.byName(
@@ -141,8 +166,13 @@ class MedicationReminderPlan {
       ),
       itemName: json['itemName'] as String,
       dosage: json['dosage'] as String,
-      time: legacyTime,
-      times: storedTimes,
+      times: (json['times'] as List)
+          .map(
+            (value) => ReminderClockTime.fromJson(
+              Map<String, dynamic>.from(value as Map),
+            ),
+          )
+          .toList(),
       frequency: MedicationPlanFrequency.values.byName(
         json['frequency'] as String,
       ),
@@ -262,6 +292,7 @@ class MedicationDoseRecord {
   };
 
   factory MedicationDoseRecord.fromJson(Map<String, dynamic> json) {
+    _rejectUnknownFields(json, _doseRecordFields, 'MedicationDoseRecord');
     return MedicationDoseRecord(
       id: json['id'] as String,
       planId: json['planId'] as String,
