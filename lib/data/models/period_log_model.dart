@@ -38,6 +38,7 @@ const _dailyLogJsonFields = {
   'caffeineServings',
   'supplements',
   'medications',
+  'skincare',
   'mood',
   'moodEmoji',
   'moodNote',
@@ -72,6 +73,8 @@ enum DailyLogObservedSection {
   period,
   nutrition,
   medication,
+  supplement,
+  skincare,
   symptom,
   wellbeing,
 }
@@ -223,6 +226,9 @@ class DailyLog {
   // ── İlaçlar ──────────────────────────────────────────────
   final List<MedicationEntry> medications;
 
+  /// Cilt bakımında kullanılan aktif içerikler.
+  final List<String> skincare;
+
   // ── Ruh Hali ─────────────────────────────────────────────
   final String? mood; // Mutlu, Huzurlu, İyi, Normal, Kötü, vb.
   final String? moodEmoji; // 😊, 😌, 🙂, vb.
@@ -280,6 +286,7 @@ class DailyLog {
     this.caffeineServings,
     this.supplements = const [],
     this.medications = const [],
+    this.skincare = const [],
     this.mood,
     this.moodEmoji,
     this.moodNote,
@@ -382,6 +389,7 @@ class DailyLog {
     bool clearCaffeineServings = false,
     List<MedicationEntry>? supplements,
     List<MedicationEntry>? medications,
+    List<String>? skincare,
     String? mood,
     String? moodEmoji,
     String? moodNote,
@@ -441,6 +449,7 @@ class DailyLog {
           : caffeineServings ?? this.caffeineServings,
       supplements: supplements ?? this.supplements,
       medications: medications ?? this.medications,
+      skincare: skincare ?? this.skincare,
       mood: mood ?? this.mood,
       moodEmoji: moodEmoji ?? this.moodEmoji,
       moodNote: moodNote ?? this.moodNote,
@@ -507,6 +516,7 @@ class DailyLog {
         caffeineServings != null ||
         supplements.isNotEmpty ||
         medications.isNotEmpty ||
+        skincare.isNotEmpty ||
         mood != null ||
         (moodNote?.isNotEmpty ?? false) ||
         moodCompanions.isNotEmpty ||
@@ -549,6 +559,7 @@ class DailyLog {
     'caffeineServings': caffeineServings,
     'supplements': supplements.map((e) => e.toJson()).toList(),
     'medications': medications.map((e) => e.toJson()).toList(),
+    'skincare': skincare,
     'mood': mood,
     'moodEmoji': moodEmoji,
     'moodNote': moodNote,
@@ -620,6 +631,7 @@ class DailyLog {
               ?.map((e) => MedicationEntry.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      skincare: List<String>.from(json['skincare'] ?? const []),
       mood: json['mood'] as String?,
       moodEmoji: json['moodEmoji'] as String?,
       moodNote: json['moodNote'] as String?,
@@ -994,6 +1006,7 @@ class DailyLog {
       caffeineServings: caffeineServings ?? other.caffeineServings,
       supplements: mergeMeds(supplements, other.supplements),
       medications: mergeMeds(medications, other.medications),
+      skincare: (skincare + other.skincare).toSet().toList(),
       mood: mood ?? other.mood,
       moodEmoji: moodEmoji ?? other.moodEmoji,
       moodNote: (moodNote != null && moodNote!.isNotEmpty)

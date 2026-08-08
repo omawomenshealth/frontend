@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   MedicationReminderPlan plan({
     String id = 'plan-1',
+    MedicationPlanItemType itemType = MedicationPlanItemType.medication,
     MedicationPlanFrequency frequency = MedicationPlanFrequency.everyDay,
     Set<int> weekdays = const {1, 2, 3, 4, 5, 6, 7},
     DateTime? startDate,
@@ -23,7 +24,7 @@ void main() {
     final createdAt = DateTime(2026, 7, 1);
     return MedicationReminderPlan(
       id: id,
-      itemType: MedicationPlanItemType.medication,
+      itemType: itemType,
       itemName: 'Test ilacı',
       dosage: '1 Adet',
       times: times ?? const [ReminderClockTime(hour: 9, minute: 30)],
@@ -50,6 +51,18 @@ void main() {
     expect(doses.first.scheduledAt, DateTime(2026, 7, 20, 9, 30));
     expect(doses.last.scheduledAt, DateTime(2026, 7, 22, 9, 30));
     expect(doses.map((dose) => dose.id).toSet(), hasLength(3));
+  });
+
+  test('cilt bakımı hatırlatıcısı JSON yedeğinde korunur', () {
+    final skincarePlan = plan(
+      id: 'skincare-1',
+      itemType: MedicationPlanItemType.skincare,
+    );
+
+    expect(
+      MedicationReminderPlan.fromJson(skincarePlan.toJson()).itemType,
+      MedicationPlanItemType.skincare,
+    );
   });
 
   test('seçili gün planı yalnızca haftanın seçilen günlerinde doz üretir', () {

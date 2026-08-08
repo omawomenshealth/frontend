@@ -92,13 +92,13 @@ void main() {
     final pageView = tester.widget<PageView>(storyPageView);
     expect(pageView.controller!.page, 0);
 
-    await tester.pump(const Duration(milliseconds: 4400));
+    await tester.pump(const Duration(milliseconds: 5000));
     final halfFilled = tester.widget<FractionallySizedBox>(
       find.byKey(const ValueKey('insight_progress_fill_0')),
     );
     expect(halfFilled.widthFactor, inInclusiveRange(0.45, 0.55));
 
-    await tester.pump(const Duration(milliseconds: 4700));
+    await tester.pump(const Duration(milliseconds: 5100));
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(pageView.controller!.page, closeTo(1, 0.01));
@@ -221,7 +221,7 @@ void main() {
           symptoms: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
-            DailyLogObservedSection.wellbeing,
+            DailyLogObservedSection.symptom,
           },
         ),
       );
@@ -263,7 +263,7 @@ void main() {
           symptoms: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
-            DailyLogObservedSection.wellbeing,
+            DailyLogObservedSection.symptom,
           },
         ),
       );

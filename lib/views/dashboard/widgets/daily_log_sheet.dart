@@ -11,6 +11,7 @@ import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/notification_service.dart';
 import 'medication_reminder_section.dart';
+import 'tracking_catalog_selector.dart';
 
 class DailyLogSheet extends StatefulWidget {
   final DailyLog initialLog;
@@ -45,6 +46,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   late int _waterGlasses;
   late Set<String> _meals;
+  late List<String> _mealSlots;
   late Set<String> _expandedMeals;
   late Map<String, int> _mealQualityIndices;
   late Map<String, Set<String>> _mealFoodGroups;
@@ -68,6 +70,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   late List<MedicationEntry> _medications;
   late List<MedicationEntry> _supplements;
+  late Set<String> _skincare;
   var _medicationSectionExpanded = false;
   String? _expandedMedicationEntry;
 
@@ -80,7 +83,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   void initState() {
     super.initState();
     _log = widget.initialLog;
-    _logType = widget.initialTabIndex.clamp(0, 3);
+    _logType = widget.initialTabIndex.clamp(0, 5);
 
     _flowIndex = _localizedIndex(
       AppStrings.flowOptions,
@@ -91,6 +94,17 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ? 0
         : (_log.waterIntakeMl! / 250).round().clamp(0, 12);
     _meals = _localizedSet(_log.mealTypes, AppStrings.nutritionMealOptions);
+    _meals.addAll(
+      _log.mealTypes.where(
+        (meal) => !AppStrings.nutritionMealOptions.contains(meal),
+      ),
+    );
+    _mealSlots = [
+      ...AppStrings.nutritionMealOptions,
+      ..._meals.where(
+        (meal) => !AppStrings.nutritionMealOptions.contains(meal),
+      ),
+    ];
     _expandedMeals = <String>{};
     _mealQualityIndices = {
       for (final entry in _log.mealQualities.entries)
@@ -148,12 +162,23 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
     _medications = _initialMedicationEntries(
       _log.medications,
-      widget.settings.dailyMedications,
+      {
+        ...widget.settings.dailyMedications,
+        ...context.read<LocalStorageService>().getCustomMedications(),
+      }.toList(),
     );
     _supplements = _initialMedicationEntries(
       _log.supplements,
-      widget.settings.dailySupplements,
+      {
+        ...widget.settings.dailySupplements,
+        ...context.read<LocalStorageService>().getCustomSupplements(),
+      }.toList(),
     );
+    _skincare = {
+      ..._log.skincare,
+      ...widget.settings.dailySkincare,
+      ...context.read<LocalStorageService>().getCustomSkincare(),
+    };
 
     _moodIndex = _localizedIndex(
       AppStrings.moodCheckInOptions,
@@ -261,7 +286,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       0 => AppStrings.savePeriod,
       1 => AppStrings.saveNutrition,
       2 => AppStrings.save,
-      _ => AppStrings.saveMoment,
+      3 => AppStrings.saveMoment,
+      4 => AppStrings.saveMedicationAndSupplement,
+      _ => AppStrings.saveSkincare,
     };
   }
 
@@ -360,7 +387,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       0 => _buildPeriodPage(),
       1 => _buildNutritionPage(),
       2 => _buildSymptomPage(),
-      _ => _moodStep == 1 ? _buildMoodPage() : _buildMoodContextPage(),
+      3 => _moodStep == 1 ? _buildMoodPage() : _buildMoodContextPage(),
+      4 => _buildMedicationAndSupplementCatalogPage(),
+      _ => _buildSkincarePage(),
     };
   }
 
@@ -608,11 +637,24 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 25),
         _SectionTitle(AppStrings.mealsToday),
         const SizedBox(height: 11),
-        for (final meal in AppStrings.nutritionMealOptions) ...[
+        for (final meal in _mealSlots) ...[
           _buildMealAccordion(meal),
-          if (meal != AppStrings.nutritionMealOptions.last)
-            const SizedBox(height: 8),
+          if (meal != _mealSlots.last) const SizedBox(height: 8),
         ],
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            key: const ValueKey('add_snack'),
+            onPressed: _addSnackSlot,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: _tone,
+              side: BorderSide(color: _tone.withValues(alpha: 0.45)),
+            ),
+            icon: const Icon(Icons.add_rounded, size: 18),
+            label: Text(AppStrings.addSnack),
+          ),
+        ),
         const SizedBox(height: 25),
         _SectionTitle(AppStrings.cravingsQuestion),
         const SizedBox(height: 11),
@@ -622,10 +664,23 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ),
         const SizedBox(height: 25),
         _buildCaffeineCard(),
-        const SizedBox(height: 28),
-        _buildNutritionMedicationSection(),
+        const SizedBox(height: 12),
       ],
     );
+  }
+
+  void _addSnackSlot() {
+    setState(() {
+      var number = 2;
+      var label = AppStrings.snackNumber(number);
+      while (_mealSlots.contains(label)) {
+        number++;
+        label = AppStrings.snackNumber(number);
+      }
+      _mealSlots.add(label);
+      _meals.add(label);
+      _expandedMeals.add(label);
+    });
   }
 
   Widget _buildCaffeineCard() {
@@ -725,6 +780,250 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           onTap: onIncrease,
         ),
       ],
+    );
+  }
+
+  Widget _buildMedicationCatalogPage() {
+    final selected = _medications.map((entry) => entry.name).toSet();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildIntro(
+          title: AppStrings.medicationQuestion,
+          subtitle: AppStrings.medicationPageHint,
+        ),
+        const SizedBox(height: 20),
+        TrackingCatalogSelector(
+          searchHint: AppStrings.searchMedications,
+          categories: AppStrings.medicationCatalog,
+          hiddenAliases: AppStrings.hiddenMedicationSearchAliases,
+          selected: selected,
+          customItems: widget.settings.dailyMedications,
+          color: _tone,
+          icon: Icons.medication_outlined,
+          showSmartSearchHint: false,
+          onToggle: (item) =>
+              _toggleMedicationItem(item, entries: _medications),
+          onReminder: () => _showReminderManagerForType(
+            MedicationPlanItemType.medication,
+            selected.toList(),
+            _tone,
+          ),
+        ),
+        if (_medications.isNotEmpty) ...[
+          const SizedBox(height: 22),
+          _buildMedicationGroup(
+            title: AppStrings.medications,
+            entries: _medications,
+            icon: Icons.medication_outlined,
+            groupKey: MedicationPlanItemType.medication.name,
+            itemType: MedicationPlanItemType.medication,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildMedicationAndSupplementCatalogPage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildMedicationCatalogPage(),
+        const SizedBox(height: 30),
+        Divider(color: _tone.withValues(alpha: 0.24)),
+        const SizedBox(height: 24),
+        _buildSupplementCatalogPage(),
+      ],
+    );
+  }
+
+  Widget _buildSupplementCatalogPage() {
+    final selected = _supplements.map((entry) => entry.name).toSet();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildIntro(
+          title: AppStrings.supplementQuestion,
+          subtitle: AppStrings.supplementPageHint,
+        ),
+        const SizedBox(height: 20),
+        TrackingCatalogSelector(
+          searchHint: AppStrings.searchSupplements,
+          categories: {
+            AppStrings.supplementRoutine: AppStrings.supplementCatalog,
+          },
+          selected: selected,
+          customItems: context
+              .read<LocalStorageService>()
+              .getCustomSupplements(),
+          color: _tone,
+          icon: Icons.vaccines_outlined,
+          showSmartSearchHint: false,
+          onToggle: (item) =>
+              _toggleMedicationItem(item, entries: _supplements),
+          onAdd: () => _addCatalogSupplement(),
+          onReminder: () => _showReminderManagerForType(
+            MedicationPlanItemType.supplement,
+            selected.toList(),
+            _tone,
+          ),
+        ),
+        if (_supplements.isNotEmpty) ...[
+          const SizedBox(height: 22),
+          _buildMedicationGroup(
+            title: AppStrings.supplements,
+            entries: _supplements,
+            icon: Icons.vaccines_outlined,
+            groupKey: MedicationPlanItemType.supplement.name,
+            itemType: MedicationPlanItemType.supplement,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildSkincarePage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildIntro(
+          title: AppStrings.skincareQuestion,
+          subtitle: AppStrings.skincareHint,
+        ),
+        const SizedBox(height: 20),
+        TrackingCatalogSelector(
+          searchHint: AppStrings.searchSkincare,
+          categories: {AppStrings.skincareRoutine: AppStrings.skincareCatalog},
+          selected: _skincare,
+          customItems: context.read<LocalStorageService>().getCustomSkincare(),
+          color: _tone,
+          icon: Icons.spa_outlined,
+          showSmartSearchHint: false,
+          onToggle: (item) => _toggleChoice(_skincare, item),
+          onAdd: () => _addCatalogSkincare(),
+          onReminder: () => _showReminderManagerForType(
+            MedicationPlanItemType.skincare,
+            _skincare.toList(),
+            _tone,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _toggleMedicationItem(
+    String item, {
+    required List<MedicationEntry> entries,
+  }) {
+    setState(() {
+      final index = entries.indexWhere((entry) => entry.name == item);
+      if (index >= 0) {
+        entries.removeAt(index);
+      } else {
+        entries.add(
+          MedicationEntry(
+            name: item,
+            times: {AppStrings.medicationTimes.first},
+            stomachState: AppStrings.stomachStates.first,
+          ),
+        );
+      }
+    });
+  }
+
+  Future<String?> _promptCustomCatalogItem(String title) {
+    var value = '';
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: TextField(
+          autofocus: true,
+          maxLength: 120,
+          onChanged: (text) => value = text,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, value.trim()),
+            style: FilledButton.styleFrom(backgroundColor: _tone),
+            child: Text(AppStrings.add),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _addCatalogSupplement() async {
+    final name = await _promptCustomCatalogItem(AppStrings.addCustomSupplement);
+    if (!mounted || name == null || name.isEmpty) return;
+    final storage = context.read<LocalStorageService>();
+    await storage.saveCustomSupplement(name);
+    final settings = storage.loadSettings() ?? widget.settings;
+    await storage.saveSettings(
+      settings.copyWith(
+        dailySupplements: {...settings.dailySupplements, name}.toList(),
+      ),
+    );
+    if (!mounted) return;
+    _toggleMedicationItem(name, entries: _supplements);
+    await widget.onSettingsChanged?.call();
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(AppStrings.savedForLater)));
+  }
+
+  Future<void> _addCatalogSkincare() async {
+    final name = await _promptCustomCatalogItem(AppStrings.addCustomSkincare);
+    if (!mounted || name == null || name.isEmpty) return;
+    final storage = context.read<LocalStorageService>();
+    await storage.saveCustomSkincare(name);
+    final settings = storage.loadSettings() ?? widget.settings;
+    await storage.saveSettings(
+      settings.copyWith(
+        dailySkincare: {...settings.dailySkincare, name}.toList(),
+      ),
+    );
+    if (!mounted) return;
+    setState(() => _skincare.add(name));
+    await widget.onSettingsChanged?.call();
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(AppStrings.savedForLater)));
+  }
+
+  Future<void> _showReminderManagerForType(
+    MedicationPlanItemType itemType,
+    List<String> items,
+    Color color,
+  ) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.92,
+        ),
+        decoration: const BoxDecoration(
+          color: AppColors.scaffoldBackground,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 28),
+          child: MedicationReminderSection(
+            itemType: itemType,
+            availableItems: items,
+            color: color,
+          ),
+        ),
+      ),
     );
   }
 
@@ -1300,6 +1599,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     });
   }
 
+  // Kept only to migrate drafts created by pre-catalog app versions.
+  // ignore: unused_element
   Widget _buildNutritionMedicationSection() {
     final summary =
         '${AppStrings.medications}: ${_medications.length}  •  '
@@ -2331,7 +2632,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Widget _buildMealAccordion(String meal) {
-    final mealIndex = AppStrings.nutritionMealOptions.indexOf(meal);
+    final mealIndex = _mealSlots.indexOf(meal);
     final selected = _meals.contains(meal);
     final expanded = selected && _expandedMeals.contains(meal);
     final tone = _tone;
@@ -2463,45 +2764,20 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ),
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 7,
-            runSpacing: 7,
-            children: [
-              for (final food
-                  in AppStrings.nutritionFoodGroupOptions.asMap().entries)
-                _PillChoice(
-                  key: ValueKey('meal_food_${mealIndex}_${food.key}'),
-                  label: food.value,
-                  selected: selectedFoods.contains(food.value),
-                  color: tone,
-                  colorizeIdle: true,
-                  onTap: () => _toggleChoice(selectedFoods, food.value),
-                ),
-              for (final food
-                  in selectedFoods
-                      .where(
-                        (value) => !AppStrings.nutritionFoodGroupOptions
-                            .contains(value),
-                      )
-                      .toList()
-                      .asMap()
-                      .entries)
-                _PillChoice(
-                  label: food.value,
-                  selected: true,
-                  color: tone,
-                  colorizeIdle: true,
-                  onTap: () => _toggleChoice(selectedFoods, food.value),
-                ),
-              _RoundButton(
-                key: ValueKey('meal_food_add_$mealIndex'),
-                icon: Icons.add_rounded,
-                color: tone,
-                filled: false,
-                enabled: true,
-                onTap: () => _addCustomFoodGroup(meal),
-              ),
-            ],
+          TrackingCatalogSelector(
+            key: ValueKey('meal_catalog_$mealIndex'),
+            searchHint: AppStrings.searchFoods,
+            categories: AppStrings.nutritionCatalog,
+            hiddenAliases: AppStrings.hiddenFoodSearchAliases,
+            selected: selectedFoods,
+            customItems: context.read<LocalStorageService>().getCustomFoods(),
+            color: tone,
+            icon: Icons.restaurant_menu_rounded,
+            showSmartSearchHint: false,
+            showAddInCategories: true,
+            addLabel: AppStrings.addFood,
+            onToggle: (item) => _toggleChoice(selectedFoods, item),
+            onAdd: () => _addCustomFoodGroup(meal),
           ),
           const SizedBox(height: 16),
           Text(
@@ -2568,9 +2844,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       ),
     );
     if (!mounted || value == null || value.isEmpty) return;
+    await context.read<LocalStorageService>().saveCustomFood(value);
+    if (!mounted) return;
     setState(() {
       _mealFoodGroups.putIfAbsent(meal, () => <String>{}).add(value);
     });
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(AppStrings.savedForLater)));
   }
 
   Widget _buildBottomAction() {
@@ -2652,12 +2933,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         0 => DailyLogObservedSection.period,
         1 => DailyLogObservedSection.nutrition,
         2 => DailyLogObservedSection.symptom,
-        _ => DailyLogObservedSection.wellbeing,
+        3 => DailyLogObservedSection.wellbeing,
+        4 => DailyLogObservedSection.medication,
+        _ => DailyLogObservedSection.skincare,
       },
+      if (_logType == 4) DailyLogObservedSection.supplement,
     };
-    if (_logType == 1 && (_medications.isNotEmpty || _supplements.isNotEmpty)) {
-      observed.add(DailyLogObservedSection.medication);
-    }
     final selectedSymptomSeverities = {
       for (final symptom in _symptoms)
         symptom: _symptomSeverities[symptom] ?? 2,
@@ -2694,8 +2975,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         cravings: _cravings.toList(),
         caffeineServings: _caffeineServings,
         clearCaffeineServings: _caffeineServings == null,
-        medications: _medications,
-        supplements: _supplements,
         observedSections: observed,
       ),
       2 => _log.copyWith(
@@ -2727,13 +3006,26 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             _dreamNoteController.text.trim().isEmpty,
         observedSections: observed,
       ),
-      _ => _log.copyWith(
+      3 => _log.copyWith(
         date: finalDate,
         hasExplicitTime: hasExplicitTime,
         mood: AppStrings.moodCheckInOptions[_moodIndex],
         moodEmoji: AppStrings.moodCheckInEmojis[_moodIndex],
         moodCompanions: _moodCompanions.toList(),
         moodPlaces: _moodPlaces.toList(),
+        observedSections: observed,
+      ),
+      4 => _log.copyWith(
+        date: finalDate,
+        hasExplicitTime: hasExplicitTime,
+        medications: _medications,
+        supplements: _supplements,
+        observedSections: observed,
+      ),
+      _ => _log.copyWith(
+        date: finalDate,
+        hasExplicitTime: hasExplicitTime,
+        skincare: _skincare.toList(),
         observedSections: observed,
       ),
     };

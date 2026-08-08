@@ -91,6 +91,12 @@ class SyncService {
       final cloudSupplements = List<String>.from(
         cloudData['customSupplements'] as List? ?? const [],
       );
+      final cloudFoods = List<String>.from(
+        cloudData['customFoods'] as List? ?? const [],
+      );
+      final cloudSkincare = List<String>.from(
+        cloudData['customSkincare'] as List? ?? const [],
+      );
       final cloudReminderPlans =
           cloudData.containsKey('medicationReminderPlans')
           ? _parseReminderPlans(cloudData['medicationReminderPlans'])
@@ -105,6 +111,8 @@ class SyncService {
         logs: cloudLogs,
         customMedications: cloudMedications,
         customSupplements: cloudSupplements,
+        customFoods: cloudFoods,
+        customSkincare: cloudSkincare,
         medicationReminderPlans: cloudReminderPlans,
         medicationDoseRecords: cloudDoseRecords,
         authToken: localSnapshot.authToken,
@@ -136,6 +144,8 @@ class SyncService {
       logs: _storage.loadAllLogs(),
       customMedications: _storage.getCustomMedications(),
       customSupplements: _storage.getCustomSupplements(),
+      customFoods: _storage.getCustomFoods(),
+      customSkincare: _storage.getCustomSkincare(),
       medicationReminderPlans: _storage.loadMedicationReminderPlans(),
       medicationDoseRecords: _storage.loadMedicationDoseRecords(),
       authToken: _storage.authToken,
@@ -153,6 +163,8 @@ class SyncService {
       logs: snapshot.logs,
       customMedications: snapshot.customMedications,
       customSupplements: snapshot.customSupplements,
+      customFoods: snapshot.customFoods,
+      customSkincare: snapshot.customSkincare,
       medicationReminderPlans: snapshot.medicationReminderPlans,
       medicationDoseRecords: snapshot.medicationDoseRecords,
       authToken: snapshot.authToken,
@@ -169,6 +181,8 @@ class SyncService {
     required List<DailyLog> logs,
     required List<String> customMedications,
     required List<String> customSupplements,
+    required List<String> customFoods,
+    required List<String> customSkincare,
     required List<MedicationReminderPlan> medicationReminderPlans,
     required List<MedicationDoseRecord> medicationDoseRecords,
     required String? authToken,
@@ -228,6 +242,14 @@ class SyncService {
       'Takviye listesi yazma',
     );
     requireSuccess(
+      await _storage.saveCustomFoods(customFoods),
+      'Yiyecek listesi yazma',
+    );
+    requireSuccess(
+      await _storage.saveCustomSkincareItems(customSkincare),
+      'Cilt bakımı listesi yazma',
+    );
+    requireSuccess(
       await _storage.saveMedicationReminderPlans(medicationReminderPlans),
       'İlaç hatırlatma planlarını yazma',
     );
@@ -277,6 +299,20 @@ class SyncService {
       ).toSet();
       final mergedSups = localSups.union(cloudSups).toList();
       await _storage.saveCustomSupplements(mergedSups);
+
+      final localFoods = _storage.getCustomFoods().toSet();
+      final cloudFoods = List<String>.from(
+        cloudData['customFoods'] ?? [],
+      ).toSet();
+      final mergedFoods = localFoods.union(cloudFoods).toList();
+      await _storage.saveCustomFoods(mergedFoods);
+
+      final localSkincare = _storage.getCustomSkincare().toSet();
+      final cloudSkincare = List<String>.from(
+        cloudData['customSkincare'] ?? [],
+      ).toSet();
+      final mergedSkincare = localSkincare.union(cloudSkincare).toList();
+      await _storage.saveCustomSkincareItems(mergedSkincare);
 
       final localPlans = _storage.loadMedicationReminderPlans();
       final cloudPlans = _parseReminderPlans(
@@ -340,6 +376,9 @@ class SyncService {
         )).toList(),
         dailySupplements: (localSettings.dailySupplements.toSet().union(
           cloudSettings.dailySupplements.toSet(),
+        )).toList(),
+        dailySkincare: (localSettings.dailySkincare.toSet().union(
+          cloudSettings.dailySkincare.toSet(),
         )).toList(),
       );
       await _storage.saveSettings(mergedSettings);
@@ -530,6 +569,8 @@ class _LocalSnapshot {
   final List<DailyLog> logs;
   final List<String> customMedications;
   final List<String> customSupplements;
+  final List<String> customFoods;
+  final List<String> customSkincare;
   final List<MedicationReminderPlan> medicationReminderPlans;
   final List<MedicationDoseRecord> medicationDoseRecords;
   final String? authToken;
@@ -544,6 +585,8 @@ class _LocalSnapshot {
     required this.logs,
     required this.customMedications,
     required this.customSupplements,
+    required this.customFoods,
+    required this.customSkincare,
     required this.medicationReminderPlans,
     required this.medicationDoseRecords,
     required this.authToken,

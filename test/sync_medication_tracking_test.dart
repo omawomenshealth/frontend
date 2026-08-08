@@ -33,8 +33,14 @@ void main() {
     expect(await sync.backupToCloud(), isTrue);
     expect(api.uploadedReminderPlans.single['id'], plan.id);
     expect(api.uploadedDoseRecords.single['status'], 'taken');
-    expect(api.uploadedDoseRecords.single['notificationScheduled'], isFalse);
-    expect(api.uploadedDoseRecords.single['notificationScheduledAt'], isNull);
+    expect(
+      api.uploadedDoseRecords.single.containsKey('notificationScheduled'),
+      isFalse,
+    );
+    expect(
+      api.uploadedDoseRecords.single.containsKey('notificationScheduledAt'),
+      isFalse,
+    );
   });
 
   test('eski sunucu yaniti yerel hatirlatma verisini silmez', () async {

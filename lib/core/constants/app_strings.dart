@@ -1037,7 +1037,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.implant: 'İmplant',
   _TextKey.otherMethod: 'Diğer',
   _TextKey.womenDiseases: 'Kadın Hastalıkları',
-  _TextKey.commonWomenDiseases: 'Sık görülen kadın hastalıkları',
+  _TextKey.commonWomenDiseases: 'Kadın Hastalıkları',
   _TextKey.lastPeriodDate: 'Son adet başlangıç tarihi',
   _TextKey.selectDate: 'Tarih seçin',
   _TextKey.great: 'Harika! 🎉',
@@ -1819,7 +1819,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.implant: 'Implant',
   _TextKey.otherMethod: 'Other',
   _TextKey.womenDiseases: 'Gynecological Conditions',
-  _TextKey.commonWomenDiseases: 'Common gynecological conditions',
+  _TextKey.commonWomenDiseases: 'Gynecological Conditions',
   _TextKey.lastPeriodDate: 'First day of your last period',
   _TextKey.selectDate: 'Select a date',
   _TextKey.great: 'Great! 🎉',
@@ -2285,7 +2285,6 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Migren',
     'Romatizma',
     'Kolesterol Yüksekliği',
-    'Diğer',
   ],
   _ListKey.womenDiseases: [
     'Dismenore (Ağrılı Adet)',
@@ -2302,7 +2301,6 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Tekrarlayan Vajinal Enfeksiyon',
     'Vulvodini',
     'Vajinismus',
-    'Diğer',
   ],
   _ListKey.activityOptions: [
     'Fitness',
@@ -2582,7 +2580,6 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Migraine',
     'Rheumatic Disease',
     'High Cholesterol',
-    'Other',
   ],
   _ListKey.womenDiseases: [
     'Dysmenorrhea (Painful Periods)',
@@ -2599,7 +2596,6 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Recurrent Vaginal Infection',
     'Vulvodynia',
     'Vaginismus',
-    'Other',
   ],
   _ListKey.activityOptions: [
     'Fitness',
@@ -4268,6 +4264,132 @@ class AppStrings {
       _list(_ListKey.nutritionCravingOptions);
   static List<String> get nutritionFoodGroupOptions =>
       _list(_ListKey.nutritionFoodGroups);
+  static String get searchFoods =>
+      isTurkish ? 'Yiyecek veya kategori ara' : 'Search foods or categories';
+  static String get searchMedications => isTurkish
+      ? 'İlaç veya etken madde ara'
+      : 'Search medications or ingredients';
+  static String get searchSupplements =>
+      isTurkish ? 'Takviye ara' : 'Search supplements';
+  static String get searchSkincare =>
+      isTurkish ? 'İçerik ara' : 'Search ingredients';
+  static String get smartSearchHint => isTurkish
+      ? 'Yazdığın ürün görünmese bile doğru kategori bulunur.'
+      : 'Smart search finds the right category even when the product is hidden.';
+  static String get noSearchResults =>
+      isTurkish ? 'Eşleşen bir sonuç bulunamadı.' : 'No matching result found.';
+  static String get addSnack =>
+      isTurkish ? 'Yeni atıştırmalık ekle' : 'Add another snack';
+  static String snackNumber(int number) =>
+      isTurkish ? 'Atıştırmalık $number' : 'Snack $number';
+  static String get customFoods =>
+      isTurkish ? 'Kaydettiklerin' : 'Your saved foods';
+  static String get medicationCategories =>
+      isTurkish ? 'İlaç kategorileri' : 'Medication categories';
+  static String get supplementRoutine =>
+      isTurkish ? 'Takviye rutinin' : 'Your supplement routine';
+  static String get skincare => isTurkish ? 'Cilt bakımı' : 'Skincare';
+  static String get skincareRoutine =>
+      isTurkish ? 'Cilt bakım rutinin' : 'Your skincare routine';
+  static String get skincareQuestion => isTurkish
+      ? 'Bugün hangi aktif içerikleri kullandın?'
+      : 'Which active ingredients did you use today?';
+  static String get skincareHint => isTurkish
+      ? 'Ürün adı yerine içerikleri seç; OMA zamanla cildindeki örüntüleri takip etsin.'
+      : 'Choose ingredients instead of product names so OMA can track patterns over time.';
+  static String get medicationQuestion => isTurkish
+      ? 'Bugün hangi ilaçları kullandın?'
+      : 'Which medications did you take today?';
+  static String get medicationPageHint => isTurkish
+      ? 'Kategori seç veya akıllı aramayla kullandığın ilacı bul.'
+      : 'Choose a category or use smart search to find your medication.';
+  static String get supplementQuestion => isTurkish
+      ? 'Bugün hangi takviyeleri kullandın?'
+      : 'Which supplements did you take today?';
+  static String get supplementPageHint => isTurkish
+      ? 'Sık kullanılanlardan seçebilir veya kendi takviyeni ekleyebilirsin.'
+      : 'Choose a common supplement or add your own.';
+  static String get addCustomFood =>
+      isTurkish ? 'Yeni yiyecek ekle' : 'Add a new food';
+  static String get addFood => isTurkish ? 'Yemek ekle' : 'Add food';
+  static String get addCustomSupplement =>
+      isTurkish ? 'Yeni takviye ekle' : 'Add a new supplement';
+  static String get addCustomSkincare =>
+      isTurkish ? 'Yeni içerik ekle' : 'Add a new ingredient';
+  static String get createReminderShort =>
+      isTurkish ? 'Hatırlatıcı oluştur' : 'Create reminder';
+  static String get savedForLater => isTurkish
+      ? 'Kaydedildi; sonraki girişlerde yeniden seçebilirsin.'
+      : 'Saved and available for future entries.';
+  static String get addCustomWomenDisease =>
+      isTurkish ? 'Kadın hastalığı ekle' : 'Add a gynecological condition';
+  static String get addCustomChronicDisease =>
+      isTurkish ? 'Kronik hastalık ekle' : 'Add a chronic condition';
+  static String get conditionName =>
+      isTurkish ? 'Hastalık adı' : 'Condition name';
+  static String get medicationsSupplementsAndSkincare => isTurkish
+      ? 'İlaç, takviye ve cilt bakımı'
+      : 'Medication, supplements and skincare';
+  static String get saveSkincare =>
+      isTurkish ? 'Cilt bakımını kaydet' : 'Save skincare';
+  static String get saveSupplement =>
+      isTurkish ? 'Takviyeyi kaydet' : 'Save supplement';
+  static String get saveMedicationAndSupplement => isTurkish
+      ? 'İlaç ve takviyeyi kaydet'
+      : 'Save medication and supplements';
+  static String get periodLogAction => isTurkish ? 'Adet gir' : 'Log period';
+  static String get premiumRequired =>
+      isTurkish ? 'Premium gerekli' : 'Premium required';
+  static String get doctorReportPremiumDescription => isTurkish
+      ? 'Doktor raporunu oluşturmak ve PDF olarak paylaşmak için OMA Premium gerekir.'
+      : 'OMA Premium is required to create and share your doctor report as a PDF.';
+  static String get includeRelationshipHistoryQuestion => isTurkish
+      ? 'İlişki geçmişini rapora eklemek ister misin?'
+      : 'Would you like to include relationship history in the report?';
+  static String get includeRelationshipHistoryHint => isTurkish
+      ? 'Cinsel aktivite ve sonrasındaki hisler yalnızca onay verirsen raporda görünür.'
+      : 'Sexual activity and after-feelings appear only when you approve.';
+  static String get includeInReport =>
+      isTurkish ? 'Rapora ekle' : 'Include in report';
+  static String get doNotIncludeInReport =>
+      isTurkish ? 'Dahil etme' : 'Do not include';
+  static String get relationshipHistory =>
+      isTurkish ? 'İlişki geçmişi' : 'Relationship history';
+  static String activityRecordCount(int count) =>
+      isTurkish ? 'Kaydedilen aktivite: $count' : 'Recorded activities: $count';
+  static String get recordedActivityTypes =>
+      isTurkish ? 'Aktivite türleri' : 'Activity types';
+  static String get recordedAfterFeelings =>
+      isTurkish ? 'Aktivite sonrası hisler' : 'After-activity feelings';
+  static String get premiumDoctorReportInsightTitle => isTurkish
+      ? 'Kayıtların doktor görüşmesine hazır'
+      : 'Your records are ready for a doctor visit';
+  static String get premiumDoctorReportInsightBody => isTurkish
+      ? 'Düzenli girişlerin anlamlı bir özet oluşturdu. OMA Premium ile doktor raporunu PDF olarak hazırlayabilirsin.'
+      : 'Your regular entries now form a useful summary. With OMA Premium, you can prepare a PDF doctor report.';
+  static String get biotinInsightTitle => isTurkish
+      ? 'Biotin bazı kan testi sonuçlarını etkileyebilir'
+      : 'Biotin may affect some blood test results';
+  static String get biotinInsightBody => isTurkish
+      ? 'Bu bilinen bir laboratuvar etkileşimidir; tek başına vücudunda bir sorun olduğu anlamına gelmez. Özellikle tiroid kan testleri için biotini en az 2 gün önce bırakman önerilir. Süre teste ve doza göre değişebileceği için kullandığın ürünü sağlık profesyoneline veya laboratuvara söyle ve onların talimatını izle.'
+      : 'This is a known laboratory interaction and does not by itself mean that something is wrong in your body. For thyroid blood tests, stopping biotin at least 2 days beforehand is recommended. Because timing can vary by test and dose, tell your clinician or laboratory which product you use and follow their instructions.';
+  static String get biotinInsightEvidence => isTurkish
+      ? 'Takviye rutininde Biotin var'
+      : 'Biotin is in your supplement routine';
+  static String get bloodTests => isTurkish ? 'Kan testleri' : 'Blood tests';
+
+  static Map<String, List<String>> get nutritionCatalog =>
+      isTurkish ? _nutritionCatalogTr : _nutritionCatalogEn;
+  static Map<String, List<String>> get medicationCatalog =>
+      isTurkish ? _medicationCatalogTr : _medicationCatalogEn;
+  static List<String> get supplementCatalog =>
+      isTurkish ? _supplementCatalogTr : _supplementCatalogEn;
+  static List<String> get skincareCatalog =>
+      isTurkish ? _skincareCatalogTr : _skincareCatalogEn;
+  static Map<String, String> get hiddenFoodSearchAliases =>
+      isTurkish ? _hiddenFoodAliasesTr : _hiddenFoodAliasesEn;
+  static Map<String, String> get hiddenMedicationSearchAliases =>
+      isTurkish ? _hiddenMedicationAliasesTr : _hiddenMedicationAliasesEn;
   static List<String> get postMealFeelingOptions =>
       _list(_ListKey.postMealFeelings);
   static List<String> get periodSymptomOptions =>
@@ -4416,6 +4538,621 @@ class AppStrings {
 
   static String reportDateLine(String date) => '$reportDate: $date';
 }
+
+const Map<String, List<String>> _nutritionCatalogTr = {
+  'Alkollü içecekler': ['Bira', 'Kokteyl', 'Rakı', 'Şarap', 'Votka'],
+  'Atıştırmalıklar ve paketli ürünler': [
+    'Bisküvi',
+    'Cips',
+    'Granola bar',
+    'Kraker',
+    'Patlamış mısır',
+  ],
+  'Baharatlar, soslar ve acılı gıdalar': [
+    'Acı biber',
+    'Acı sos',
+    'Karabiber',
+    'Ketçap',
+    'Mayonez',
+  ],
+  'Baklagiller': ['Barbunya', 'Bezelye', 'Kuru fasulye', 'Mercimek', 'Nohut'],
+  'Balık ve deniz ürünleri': [
+    'Hamsi',
+    'Karides',
+    'Midye',
+    'Somon',
+    'Ton balığı',
+  ],
+  'Bitki çayları': [
+    'Adaçayı',
+    'Papatya çayı',
+    'Rezene çayı',
+    'Ihlamur',
+    'Yeşil çay',
+  ],
+  'Et ve kümes hayvanları': ['Dana eti', 'Hindi', 'Köfte', 'Kuzu eti', 'Tavuk'],
+  'Fermente, salamura, tütsülenmiş ve işlenmiş gıdalar': [
+    'Füme et',
+    'Kimchi',
+    'Salam',
+    'Sucuk',
+    'Turşu',
+  ],
+  'Gazlı ve asitli içecekler': [
+    'Gazoz',
+    'Kola',
+    'Limonata',
+    'Portakal suyu',
+    'Soda',
+  ],
+  'Gluten içeren tahıllar ve hamur işleri': [
+    'Börek',
+    'Bulgur',
+    'Ekmek',
+    'Makarna',
+    'Simit',
+  ],
+  'Glutensiz tahıllar ve nişastalı gıdalar': [
+    'Karabuğday',
+    'Kinoa',
+    'Mısır',
+    'Patates',
+    'Pirinç',
+  ],
+  'Kafeinli içecekler': [
+    'Enerji içeceği',
+    'Espresso',
+    'Filtre kahve',
+    'Siyah çay',
+    'Türk kahvesi',
+  ],
+  'Karma yemekler ve hazır öğünler': [
+    'Döner',
+    'Hamburger',
+    'Hazır çorba',
+    'Mantı',
+    'Pizza',
+  ],
+  'Kuruyemişler ve tohumlar': [
+    'Ay çekirdeği',
+    'Badem',
+    'Ceviz',
+    'Fındık',
+    'Yer fıstığı',
+  ],
+  'Meyveler': ['Çilek', 'Elma', 'Muz', 'Portakal', 'Üzüm'],
+  'Sebzeler': ['Brokoli', 'Domates', 'Ispanak', 'Kabak', 'Salatalık'],
+  'Süt ürünleri ve peynirler': [
+    'Beyaz peynir',
+    'Kaşar peyniri',
+    'Kefir',
+    'Süt',
+    'Yoğurt',
+  ],
+  'Tatlılar ve şekerli gıdalar': [
+    'Baklava',
+    'Çikolata',
+    'Dondurma',
+    'Pasta',
+    'Şekerleme',
+  ],
+  'Yağlar ve kızartılmış gıdalar': [
+    'Kızarmış hamur',
+    'Kızarmış tavuk',
+    'Patates kızartması',
+    'Tereyağı',
+    'Zeytinyağı',
+  ],
+  'Yumurta': [
+    'Haşlanmış yumurta',
+    'Menemen',
+    'Omlet',
+    'Sahanda yumurta',
+    'Yumurtalı ekmek',
+  ],
+};
+
+const Map<String, List<String>> _nutritionCatalogEn = {
+  'Alcoholic drinks': ['Beer', 'Cocktail', 'Rakı', 'Wine', 'Vodka'],
+  'Snacks and packaged foods': [
+    'Biscuits',
+    'Chips',
+    'Granola bar',
+    'Crackers',
+    'Popcorn',
+  ],
+  'Spices, sauces and spicy foods': [
+    'Chili pepper',
+    'Hot sauce',
+    'Black pepper',
+    'Ketchup',
+    'Mayonnaise',
+  ],
+  'Legumes': ['Kidney beans', 'Peas', 'White beans', 'Lentils', 'Chickpeas'],
+  'Fish and seafood': ['Anchovies', 'Shrimp', 'Mussels', 'Salmon', 'Tuna'],
+  'Herbal teas': [
+    'Sage tea',
+    'Chamomile tea',
+    'Fennel tea',
+    'Linden tea',
+    'Green tea',
+  ],
+  'Meat and poultry': ['Beef', 'Turkey', 'Meatballs', 'Lamb', 'Chicken'],
+  'Fermented, pickled, smoked and processed foods': [
+    'Smoked meat',
+    'Kimchi',
+    'Salami',
+    'Sujuk',
+    'Pickles',
+  ],
+  'Carbonated and acidic drinks': [
+    'Soda pop',
+    'Cola',
+    'Lemonade',
+    'Orange juice',
+    'Sparkling water',
+  ],
+  'Gluten grains and baked foods': [
+    'Pastry',
+    'Bulgur',
+    'Bread',
+    'Pasta',
+    'Bagel',
+  ],
+  'Gluten-free grains and starches': [
+    'Buckwheat',
+    'Quinoa',
+    'Corn',
+    'Potato',
+    'Rice',
+  ],
+  'Caffeinated drinks': [
+    'Energy drink',
+    'Espresso',
+    'Filter coffee',
+    'Black tea',
+    'Turkish coffee',
+  ],
+  'Mixed dishes and ready meals': [
+    'Döner',
+    'Hamburger',
+    'Instant soup',
+    'Dumplings',
+    'Pizza',
+  ],
+  'Nuts and seeds': [
+    'Sunflower seeds',
+    'Almonds',
+    'Walnuts',
+    'Hazelnuts',
+    'Peanuts',
+  ],
+  'Fruits': ['Strawberries', 'Apple', 'Banana', 'Orange', 'Grapes'],
+  'Vegetables': ['Broccoli', 'Tomato', 'Spinach', 'Zucchini', 'Cucumber'],
+  'Dairy and cheese': [
+    'Feta cheese',
+    'Yellow cheese',
+    'Kefir',
+    'Milk',
+    'Yogurt',
+  ],
+  'Desserts and sugary foods': [
+    'Baklava',
+    'Chocolate',
+    'Ice cream',
+    'Cake',
+    'Candy',
+  ],
+  'Fats and fried foods': [
+    'Fried dough',
+    'Fried chicken',
+    'French fries',
+    'Butter',
+    'Olive oil',
+  ],
+  'Eggs': ['Boiled egg', 'Menemen', 'Omelet', 'Fried egg', 'Eggy bread'],
+};
+
+const Map<String, List<String>> _medicationCatalogTr = {
+  'Ağrı, Ateş ve Kas': [
+    'Ağrı kesici',
+    'Ateş düşürücü',
+    'Antiinflamatuvar',
+    'Kas gevşetici',
+    'Migren ilacı',
+  ],
+  'Enfeksiyon': ['Antibiyotik', 'Antiviral', 'Antifungal', 'Antiparaziter'],
+  'Alerji ve Solunum': [
+    'Alerji ilacı / antihistaminik',
+    'Astım ilacı',
+    'Öksürük ilacı',
+    'Burun açıcı',
+    'Soğuk algınlığı / grip ilacı',
+  ],
+  'Mide ve Bağırsak': [
+    'Mide koruyucu / reflü ilacı',
+    'Antiasit',
+    'Bulantı / kusma ilacı',
+    'Gaz / şişkinlik ilacı',
+    'Bağırsak spazmı ilacı',
+    'İshal ilacı',
+    'Kabızlık ilacı / laksatif',
+  ],
+  'Kalp, Tansiyon ve Dolaşım': [
+    'Tansiyon ilacı',
+    'Kolesterol ilacı',
+    'Kan sulandırıcı',
+    'Antiplatelet',
+    'Kalp ritmi ilacı',
+    'Kalp yetmezliği ilacı',
+    'İdrar söktürücü / diüretik',
+  ],
+  'Diyabet ve Metabolizma': [
+    'Diyabet ilacı',
+    'İnsülin',
+    'Kan şekeri düzenleyici diğer ilaçlar',
+  ],
+  'Hormonlar ve Tiroid': [
+    'Tiroid ilacı',
+    'Kortizon / kortikosteroid',
+    'Diğer hormonal ilaçlar',
+  ],
+  'Kadın Sağlığı ve Üreme': [
+    'Doğum kontrol hapı',
+    'Diğer hormonal doğum kontrol yöntemleri',
+    'Menopoz hormon tedavisi',
+    'Vajinal enfeksiyon ilacı',
+    'Adet / regl şikâyetleri için kullanılan ilaçlar',
+    'Doğurganlık / fertilite ilaçları',
+  ],
+  'Ruh Sağlığı': [
+    'Antidepresan',
+    'Anksiyete ilacı',
+    'Sakinleştirici',
+    'Uyku ilacı',
+    'Duygudurum düzenleyici',
+    'Antipsikotik',
+  ],
+  'Sinir Sistemi': [
+    'Epilepsi / nöbet ilacı',
+    'DEHB ilacı',
+    'Parkinson ilacı',
+    'Demans ilacı',
+    'Nöropatik ağrı ilacı',
+  ],
+  'Kas, Eklem ve Kemik': [
+    'Romatizma ilacı',
+    'Osteoporoz ilacı',
+    'Gut ilacı',
+    'Eklem / kas inflamasyonu için ilaçlar',
+  ],
+  'Bağışıklık Sistemi': [
+    'Bağışıklık baskılayıcı',
+    'Bağışıklık düzenleyici',
+    'Biyolojik ilaçlar',
+  ],
+  'Cilt ve Saç': [
+    'Akne ilacı',
+    'Egzama / dermatit ilacı',
+    'Antifungal krem',
+    'Kortizonlu krem',
+    'Diğer dermatolojik krem / merhem',
+    'Saç / saç derisi tedavileri',
+  ],
+  'Göz, Kulak ve Ağız': [
+    'Göz damlası',
+    'Kulak damlası',
+    'Ağız / boğaz ilacı',
+    'Lokal antiseptik',
+  ],
+  'Diğer': [
+    'Lokal krem / merhem',
+    'Enjeksiyon',
+    'Düzenli kullanılan diğer ilaç',
+    'Gerektiğinde kullanılan diğer ilaç',
+  ],
+};
+
+const Map<String, List<String>> _medicationCatalogEn = {
+  'Pain, Fever and Muscle': [
+    'Pain reliever',
+    'Fever reducer',
+    'Anti-inflammatory',
+    'Muscle relaxant',
+    'Migraine medication',
+  ],
+  'Infection': ['Antibiotic', 'Antiviral', 'Antifungal', 'Antiparasitic'],
+  'Allergy and Respiratory': [
+    'Allergy medicine / antihistamine',
+    'Asthma medication',
+    'Cough medicine',
+    'Decongestant',
+    'Cold / flu medicine',
+  ],
+  'Stomach and Bowel': [
+    'Acid reflux medicine',
+    'Antacid',
+    'Nausea / vomiting medicine',
+    'Gas / bloating medicine',
+    'Bowel antispasmodic',
+    'Diarrhea medicine',
+    'Laxative',
+  ],
+  'Heart, Blood Pressure and Circulation': [
+    'Blood pressure medicine',
+    'Cholesterol medicine',
+    'Blood thinner',
+    'Antiplatelet',
+    'Heart rhythm medicine',
+    'Heart failure medicine',
+    'Diuretic',
+  ],
+  'Diabetes and Metabolism': [
+    'Diabetes medication',
+    'Insulin',
+    'Other blood sugar medication',
+  ],
+  'Hormones and Thyroid': [
+    'Thyroid medication',
+    'Corticosteroid',
+    'Other hormonal medication',
+  ],
+  "Women's Health and Reproduction": [
+    'Birth control pill',
+    'Other hormonal birth control',
+    'Menopause hormone therapy',
+    'Vaginal infection medicine',
+    'Period symptom medicine',
+    'Fertility medication',
+  ],
+  'Mental Health': [
+    'Antidepressant',
+    'Anxiety medication',
+    'Sedative',
+    'Sleep medication',
+    'Mood stabilizer',
+    'Antipsychotic',
+  ],
+  'Nervous System': [
+    'Epilepsy medication',
+    'ADHD medication',
+    "Parkinson's medication",
+    'Dementia medication',
+    'Neuropathic pain medication',
+  ],
+  'Muscle, Joint and Bone': [
+    'Rheumatism medicine',
+    'Osteoporosis medicine',
+    'Gout medicine',
+    'Joint / muscle inflammation medicine',
+  ],
+  'Immune System': [
+    'Immunosuppressant',
+    'Immunomodulator',
+    'Biologic medication',
+  ],
+  'Skin and Hair': [
+    'Acne medication',
+    'Eczema / dermatitis medicine',
+    'Antifungal cream',
+    'Steroid cream',
+    'Other dermatological cream',
+    'Hair / scalp treatment',
+  ],
+  'Eye, Ear and Mouth': [
+    'Eye drops',
+    'Ear drops',
+    'Mouth / throat medicine',
+    'Topical antiseptic',
+  ],
+  'Other': [
+    'Topical cream / ointment',
+    'Injection',
+    'Other regular medication',
+    'Other as-needed medication',
+  ],
+};
+
+const List<String> _supplementCatalogTr = [
+  'Magnezyum',
+  'D vitamini',
+  'B12 vitamini',
+  'C vitamini',
+  'Multivitamin',
+  'Omega-3 / Balık yağı',
+  'Demir',
+  'Folik asit / Folat',
+  'Çinko',
+  'Kalsiyum',
+  'Probiyotik',
+  'Kolajen',
+  'Biotin',
+  'B kompleks',
+  'Melatonin',
+  'Kreatin',
+  'Protein tozu',
+  'Elektrolit',
+  'Koenzim Q10 (CoQ10)',
+  'Ashwagandha',
+  'Zerdeçal / Kurkumin',
+  'İnositol',
+  'Vitamin E',
+  'Vitamin K / K2',
+  'Selenyum',
+];
+
+const List<String> _supplementCatalogEn = [
+  'Magnesium',
+  'Vitamin D',
+  'Vitamin B12',
+  'Vitamin C',
+  'Multivitamin',
+  'Omega-3 / Fish oil',
+  'Iron',
+  'Folic acid / Folate',
+  'Zinc',
+  'Calcium',
+  'Probiotic',
+  'Collagen',
+  'Biotin',
+  'B complex',
+  'Melatonin',
+  'Creatine',
+  'Protein powder',
+  'Electrolyte',
+  'Coenzyme Q10 (CoQ10)',
+  'Ashwagandha',
+  'Turmeric / Curcumin',
+  'Inositol',
+  'Vitamin E',
+  'Vitamin K / K2',
+  'Selenium',
+];
+
+const List<String> _skincareCatalogTr = [
+  'Hyalüronik asit',
+  'Cica / Centella Asiatica',
+  'Niasinamid',
+  'C vitamini',
+  'Retinol / Retinal',
+  'Salisilik asit',
+  'Glikolik asit',
+  'Laktik asit',
+  'Azelaik asit',
+  'Peptitler',
+  'Seramidler',
+  'Skualan',
+  'Panthenol',
+  'Allantoin',
+  'Arbutin / Alpha Arbutin',
+  'Traneksamik asit',
+  'Kojik asit',
+  'Benzoyl peroxide',
+  'Sülfür',
+  'Çinko',
+  'E vitamini',
+  'Ferulik asit',
+  'Resveratrol',
+  'Bakuchiol',
+  'Snail mucin / Salyangoz özü',
+  'Propolis',
+  'Pirinç özü',
+  'Yeşil çay özü',
+  'Meyan kökü özü',
+  'Beta glucan',
+  'Urea',
+  'PHA',
+  'AHA',
+  'BHA',
+];
+
+const List<String> _skincareCatalogEn = [
+  'Hyaluronic acid',
+  'Cica / Centella Asiatica',
+  'Niacinamide',
+  'Vitamin C',
+  'Retinol / Retinal',
+  'Salicylic acid',
+  'Glycolic acid',
+  'Lactic acid',
+  'Azelaic acid',
+  'Peptides',
+  'Ceramides',
+  'Squalane',
+  'Panthenol',
+  'Allantoin',
+  'Arbutin / Alpha Arbutin',
+  'Tranexamic acid',
+  'Kojic acid',
+  'Benzoyl peroxide',
+  'Sulfur',
+  'Zinc',
+  'Vitamin E',
+  'Ferulic acid',
+  'Resveratrol',
+  'Bakuchiol',
+  'Snail mucin',
+  'Propolis',
+  'Rice extract',
+  'Green tea extract',
+  'Licorice root extract',
+  'Beta glucan',
+  'Urea',
+  'PHA',
+  'AHA',
+  'BHA',
+];
+
+const Map<String, String> _hiddenFoodAliasesTr = {
+  'nugget': 'Et ve kümes hayvanları',
+  'tavuk nugget': 'Et ve kümes hayvanları',
+  'sosis': 'Fermente, salamura, tütsülenmiş ve işlenmiş gıdalar',
+  'pastırma': 'Fermente, salamura, tütsülenmiş ve işlenmiş gıdalar',
+  'lahmacun': 'Karma yemekler ve hazır öğünler',
+  'kebap': 'Karma yemekler ve hazır öğünler',
+  'tost': 'Gluten içeren tahıllar ve hamur işleri',
+  'kruvasan': 'Gluten içeren tahıllar ve hamur işleri',
+  'yulaf': 'Gluten içeren tahıllar ve hamur işleri',
+  'ayran': 'Süt ürünleri ve peynirler',
+  'mozzarella': 'Süt ürünleri ve peynirler',
+  'avokado': 'Meyveler',
+  'kuru üzüm': 'Meyveler',
+};
+
+const Map<String, String> _hiddenFoodAliasesEn = {
+  'nugget': 'Meat and poultry',
+  'chicken nugget': 'Meat and poultry',
+  'sausage': 'Fermented, pickled, smoked and processed foods',
+  'bacon': 'Fermented, pickled, smoked and processed foods',
+  'kebab': 'Mixed dishes and ready meals',
+  'toast': 'Gluten grains and baked foods',
+  'croissant': 'Gluten grains and baked foods',
+  'oats': 'Gluten grains and baked foods',
+  'avocado': 'Fruits',
+};
+
+const Map<String, String> _hiddenMedicationAliasesTr = {
+  'parol': 'Ağrı, Ateş ve Kas',
+  'minoset': 'Ağrı, Ateş ve Kas',
+  'majezik': 'Ağrı, Ateş ve Kas',
+  'arveles': 'Ağrı, Ateş ve Kas',
+  'augmentin': 'Enfeksiyon',
+  'amoklavin': 'Enfeksiyon',
+  'ventolin': 'Alerji ve Solunum',
+  'aerius': 'Alerji ve Solunum',
+  'nexium': 'Mide ve Bağırsak',
+  'lansor': 'Mide ve Bağırsak',
+  'beloc': 'Kalp, Tansiyon ve Dolaşım',
+  'norvasc': 'Kalp, Tansiyon ve Dolaşım',
+  'glifor': 'Diyabet ve Metabolizma',
+  'metformin': 'Diyabet ve Metabolizma',
+  'euthyrox': 'Hormonlar ve Tiroid',
+  'yasmin': 'Kadın Sağlığı ve Üreme',
+  'lustral': 'Ruh Sağlığı',
+  'prozac': 'Ruh Sağlığı',
+  'concerta': 'Sinir Sistemi',
+  'ritalin': 'Sinir Sistemi',
+  'lyrica': 'Sinir Sistemi',
+  'roaccutane': 'Cilt ve Saç',
+};
+
+const Map<String, String> _hiddenMedicationAliasesEn = {
+  'tylenol': 'Pain, Fever and Muscle',
+  'ibuprofen': 'Pain, Fever and Muscle',
+  'augmentin': 'Infection',
+  'amoxicillin': 'Infection',
+  'ventolin': 'Allergy and Respiratory',
+  'claritin': 'Allergy and Respiratory',
+  'nexium': 'Stomach and Bowel',
+  'pepto bismol': 'Stomach and Bowel',
+  'norvasc': 'Heart, Blood Pressure and Circulation',
+  'metformin': 'Diabetes and Metabolism',
+  'synthroid': 'Hormones and Thyroid',
+  'yasmin': "Women's Health and Reproduction",
+  'prozac': 'Mental Health',
+  'ritalin': 'Nervous System',
+  'accutane': 'Skin and Hair',
+};
 
 class _AppStringsDelegate extends LocalizationsDelegate<AppStrings> {
   const _AppStringsDelegate();

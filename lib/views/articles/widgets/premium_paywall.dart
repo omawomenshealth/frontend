@@ -5,7 +5,11 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/services/premium_purchase_service.dart';
 
-Future<void> showPremiumPaywall(BuildContext context) async {
+Future<void> showPremiumPaywall(
+  BuildContext context, {
+  String? title,
+  String? description,
+}) async {
   final premium = context.read<PremiumPurchaseService>();
   await premium.refreshEntitlement();
   if (!context.mounted || premium.isPremium) return;
@@ -58,7 +62,7 @@ Future<void> showPremiumPaywall(BuildContext context) async {
                 Text(
                   service.isPremium
                       ? AppStrings.premiumActive
-                      : AppStrings.unlockExpertArticles,
+                      : title ?? AppStrings.unlockExpertArticles,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 22,
@@ -70,7 +74,7 @@ Future<void> showPremiumPaywall(BuildContext context) async {
                 Text(
                   service.isPremium
                       ? AppStrings.premiumActiveDescription
-                      : AppStrings.premiumAccessDescription,
+                      : description ?? AppStrings.premiumAccessDescription,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: AppColors.textSecondary,

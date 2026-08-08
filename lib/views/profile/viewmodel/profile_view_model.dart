@@ -4,7 +4,6 @@ import '../../../data/models/lab_result_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/notification_service.dart';
-import '../../../core/utils/cycle_rules.dart';
 
 /// Profil iş mantığı — kullanıcı bilgilerini görüntüleme ve güncelleme.
 import '../../../data/services/sync_service.dart';
@@ -139,9 +138,22 @@ class ProfileViewModel extends ChangeNotifier {
 
   /// Ayarları yükle.
   void loadSettings() {
-    _settings = _storage.loadSettings() ?? UserSettings();
+    final loaded = _storage.loadSettings() ?? UserSettings();
+    _settings = loaded.copyWith(
+      chronicDiseases: loaded.chronicDiseases
+          .where((value) => !_isLegacyOther(value))
+          .toList(growable: false),
+      womenDiseases: loaded.womenDiseases
+          .where((value) => !_isLegacyOther(value))
+          .toList(growable: false),
+    );
     _isLoading = false;
     notifyListeners();
+  }
+
+  bool _isLegacyOther(String value) {
+    final normalized = value.trim().toLowerCase();
+    return normalized == 'diğer' || normalized == 'other';
   }
 
   // ── Temel Bilgi Güncellemeleri ────────────────────────
@@ -211,25 +223,6 @@ class ProfileViewModel extends ChangeNotifier {
 
   // ── Kadın Sağlığı Güncellemeleri ─────────────────────
 
-  void updateAverageCycleLength(int value) {
-    _settings = _settings.copyWith(
-      averageCycleLength: CycleRules.sanitizeCycleLength(value),
-    );
-    notifyListeners();
-  }
-
-  void updateAveragePeriodLength(int value) {
-    _settings = _settings.copyWith(
-      averagePeriodLength: CycleRules.sanitizePeriodLength(value),
-    );
-    notifyListeners();
-  }
-
-  void updateLastPeriodDate(DateTime? value) {
-    _settings = _settings.copyWith(lastPeriodDate: value);
-    notifyListeners();
-  }
-
   void updateMenopauseStatus(MenopauseStatus value) {
     _settings = _settings.copyWith(menopauseStatus: value);
     notifyListeners();
@@ -254,6 +247,17 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addWomenDisease(String disease) {
+    final value = disease.trim();
+    if (value.isEmpty || _containsCondition(_settings.womenDiseases, value)) {
+      return;
+    }
+    _settings = _settings.copyWith(
+      womenDiseases: [..._settings.womenDiseases, value],
+    );
+    notifyListeners();
+  }
+
   void toggleChronicDisease(String disease) {
     final diseases = List<String>.from(_settings.chronicDiseases);
     final existingIndex = diseases.indexWhere(
@@ -267,6 +271,23 @@ class ProfileViewModel extends ChangeNotifier {
     _settings = _settings.copyWith(chronicDiseases: diseases);
     notifyListeners();
   }
+
+  void addChronicDisease(String disease) {
+    final value = disease.trim();
+    if (value.isEmpty || _containsCondition(_settings.chronicDiseases, value)) {
+      return;
+    }
+    _settings = _settings.copyWith(
+      chronicDiseases: [..._settings.chronicDiseases, value],
+    );
+    notifyListeners();
+  }
+
+  bool _containsCondition(List<String> values, String candidate) => values.any(
+    (value) =>
+        AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
+        candidate.toLowerCase(),
+  );
 
   // ── İlaç & Takviye ──────────────────────────────────
 
@@ -295,6 +316,20 @@ class ProfileViewModel extends ChangeNotifier {
   void removeSupplement(String name) {
     final sups = List<String>.from(_settings.dailySupplements)..remove(name);
     _settings = _settings.copyWith(dailySupplements: sups);
+    notifyListeners();
+  }
+
+  void addSkincare(String name) {
+    if (name.isNotEmpty && !_settings.dailySkincare.contains(name)) {
+      final items = List<String>.from(_settings.dailySkincare)..add(name);
+      _settings = _settings.copyWith(dailySkincare: items);
+      notifyListeners();
+    }
+  }
+
+  void removeSkincare(String name) {
+    final items = List<String>.from(_settings.dailySkincare)..remove(name);
+    _settings = _settings.copyWith(dailySkincare: items);
     notifyListeners();
   }
 

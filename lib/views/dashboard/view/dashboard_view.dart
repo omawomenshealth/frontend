@@ -99,6 +99,12 @@ class DashboardView extends StatelessWidget {
                       cycleDay: cycleDay,
                       periodCount: periodCount,
                       onOpenInsights: () => _openInsights(context),
+                      onPeriodTap: () => _showDailyLogSheet(
+                        context,
+                        vm,
+                        initialIndex: 0,
+                        isSingleTab: true,
+                      ),
                     ),
                     const SizedBox(height: 30),
                     _SectionTitle(
@@ -107,7 +113,8 @@ class DashboardView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     FeelingCard(
-                      showPeriod: vm.hasPeriodTracking,
+                      showPeriod: false,
+                      themeColor: accent,
                       onPeriodTap: () => _showDailyLogSheet(
                         context,
                         vm,
@@ -130,6 +137,18 @@ class DashboardView extends StatelessWidget {
                         context,
                         vm,
                         initialIndex: 3,
+                        isSingleTab: true,
+                      ),
+                      onMedicationTap: () => _showDailyLogSheet(
+                        context,
+                        vm,
+                        initialIndex: 4,
+                        isSingleTab: true,
+                      ),
+                      onSkincareTap: () => _showDailyLogSheet(
+                        context,
+                        vm,
+                        initialIndex: 5,
                         isSingleTab: true,
                       ),
                     ),
@@ -217,7 +236,9 @@ class DashboardView extends StatelessWidget {
       0 => DailyLogObservedSection.period,
       1 => DailyLogObservedSection.nutrition,
       2 => DailyLogObservedSection.symptom,
-      _ => DailyLogObservedSection.wellbeing,
+      3 => DailyLogObservedSection.wellbeing,
+      4 => DailyLogObservedSection.medication,
+      _ => DailyLogObservedSection.skincare,
     };
     showModalBottomSheet(
       context: context,

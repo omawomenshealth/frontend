@@ -674,4 +674,36 @@ void main() {
       expect(phasePattern.withoutTotal, 69);
     },
   );
+
+  test('Biotin rutini kayıt olmasa da güvenlik içgörüsü üretir', () {
+    final insights = engine.generate(
+      const [],
+      settings: UserSettings(dailySupplements: const ['Biotin']),
+    );
+
+    final biotin = insightOf(
+      insights,
+      PersonalInsightKind.biotinLabInteraction,
+    );
+    expect(biotin, isNotNull);
+    expect(biotin!.primaryLabel, 'Biotin');
+    expect(biotin.notificationLevel, PersonalInsightNotificationLevel.gentle);
+  });
+
+  test('yedi kayıtlı gün Premium doktor raporu içgörüsü üretir', () {
+    final logs = List.generate(
+      7,
+      (day) => DailyLog(
+        date: DateTime(2026, 8, 1).add(Duration(days: day)),
+        observedSections: const {DailyLogObservedSection.symptom},
+      ),
+    );
+
+    final report = insightOf(
+      engine.generate(logs),
+      PersonalInsightKind.doctorReportPremiumReady,
+    );
+    expect(report, isNotNull);
+    expect(report!.evidenceCount, 7);
+  });
 }

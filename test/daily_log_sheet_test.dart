@@ -262,6 +262,7 @@ void main() {
     await tester.tap(breakfast);
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('meal_details_0')), findsOneWidget);
+    expect(find.text(AppStrings.smartSearchHint), findsNothing);
 
     final breakfastExpand = find.byKey(const ValueKey('meal_expand_0'));
     await tester.ensureVisible(breakfastExpand);
@@ -272,13 +273,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('meal_details_0')), findsOneWidget);
 
-    final breakfastGluten = find.byKey(const ValueKey('meal_food_0_0'));
-    await tester.ensureVisible(breakfastGluten);
-    tester
-        .widget<InkWell>(
-          find.descendant(of: breakfastGluten, matching: find.byType(InkWell)),
-        )
-        .onTap!();
+    final firstCategory = AppStrings.nutritionCatalog.entries.first;
+    final breakfastCategory = find.byKey(
+      ValueKey('catalog_category_${firstCategory.key}'),
+    );
+    await tester.ensureVisible(breakfastCategory);
+    await tester.tap(breakfastCategory);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(ValueKey('catalog_category_add_${firstCategory.key}')),
+      findsOneWidget,
+    );
+    final breakfastFood = find.byKey(
+      ValueKey('catalog_item_${firstCategory.value.first}'),
+    );
+    await tester.ensureVisible(breakfastFood);
+    await tester.tap(breakfastFood);
     await tester.pumpAndSettle();
     expect(
       find.text(AppStrings.howFeltAfterEating.toUpperCase()),
@@ -326,7 +336,7 @@ void main() {
     expect(harness.savedLog!.mealQualities, isEmpty);
     expect(
       harness.savedLog!.mealFoodGroups[AppStrings.nutritionMealOptions.first],
-      contains(AppStrings.nutritionFoodGroupOptions.first),
+      contains(firstCategory.value.first),
     );
     expect(
       harness.savedLog!.mealPostFeelings[AppStrings.nutritionMealOptions.first],
@@ -430,7 +440,7 @@ void main() {
     for (var index = 0; index < 4; index++) {
       final label = AppStrings.symptomBodyOptions[index];
       final tile = tester.widget<AnimatedContainer>(
-        find.byKey(ValueKey('symptom_tile_surface_$label')),
+        find.byKey(ValueKey('symptom_tile_surface_$label')).first,
       );
       final decoration = tile.decoration! as BoxDecoration;
       expect(
@@ -440,7 +450,7 @@ void main() {
     }
 
     final saveButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, AppStrings.save),
+      find.widgetWithText(FilledButton, AppStrings.save).last,
     );
     expect(saveButton.style!.backgroundColor!.resolve({}), themeTone);
   });
@@ -657,7 +667,7 @@ void main() {
   ) async {
     final harness = await _pumpLogSheet(
       tester,
-      initialIndex: 1,
+      initialIndex: 4,
       settings: UserSettings(
         isOnboardingComplete: true,
         userName: 'Test',
@@ -666,19 +676,15 @@ void main() {
       ),
     );
 
-    final medicationSection = find.text(AppStrings.medicationAndSupplement);
-    await tester.ensureVisible(medicationSection);
-    await tester.pumpAndSettle();
-    expect(find.text(AppStrings.logNutritionQuestion), findsOneWidget);
+    expect(find.text(AppStrings.medicationQuestion), findsOneWidget);
+    expect(find.text(AppStrings.supplementQuestion), findsOneWidget);
     expect(find.text(AppStrings.medicationTime), findsNothing);
 
-    await tester.tap(find.byKey(const ValueKey('medication_section_toggle')));
-    await tester.pumpAndSettle();
-    expect(find.text(AppStrings.medicationTime), findsNothing);
-
-    await tester.tap(
-      find.byKey(const ValueKey('medication_entry_medication:test ilacı')),
-    );
+    tester
+        .widget<InkWell>(
+          find.byKey(const ValueKey('medication_entry_medication:test ilacı')),
+        )
+        .onTap!();
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.medicationTime.toUpperCase()), findsOneWidget);
     expect(find.text(AppStrings.medicationDose), findsOneWidget);
@@ -703,14 +709,16 @@ void main() {
       final increment = find.byKey(
         const ValueKey('dose_increment_medication:test ilacı'),
       );
-      await tester.ensureVisible(increment);
-      await tester.tap(increment);
+      tester
+          .widget<InkWell>(
+            find.descendant(of: increment, matching: find.byType(InkWell)),
+          )
+          .onTap!();
       await tester.pumpAndSettle();
     }
     final thirdDose = find.byKey(const ValueKey('dose_circle_Test ilacı_2'));
-    await tester.ensureVisible(thirdDose);
-    await tester.tap(thirdDose);
-    await tester.tap(find.text(AppStrings.saveNutrition));
+    tester.widget<InkWell>(thirdDose).onTap!();
+    await tester.tap(find.text(AppStrings.saveMedicationAndSupplement));
     await tester.pumpAndSettle();
 
     final entry = harness.savedLog!.medications.single;
@@ -738,7 +746,7 @@ void main() {
   ) async {
     await _pumpLogSheet(
       tester,
-      initialIndex: 1,
+      initialIndex: 4,
       settings: UserSettings(
         isOnboardingComplete: true,
         userName: 'Test',
@@ -748,16 +756,10 @@ void main() {
       ),
     );
 
-    final medicationSection = find.text(AppStrings.medicationAndSupplement);
-    await tester.ensureVisible(medicationSection);
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('medication_section_toggle')));
-    await tester.pumpAndSettle();
-
-    expect(find.text('İlaç A'), findsOneWidget);
-    expect(find.text('İlaç B'), findsOneWidget);
-    expect(find.text('Takviye A'), findsOneWidget);
-    expect(find.text('Takviye B'), findsOneWidget);
+    expect(find.text('İlaç A'), findsWidgets);
+    expect(find.text('İlaç B'), findsWidgets);
+    expect(find.text('Takviye A'), findsWidgets);
+    expect(find.text('Takviye B'), findsWidgets);
     expect(find.text(AppStrings.medicationTime), findsNothing);
 
     final medicationA = find.byKey(
@@ -779,37 +781,29 @@ void main() {
     expect(find.text(AppStrings.medicationTime.toUpperCase()), findsOneWidget);
   });
 
-  testWidgets('Beslenme sekmesindeki artı butonu ilaç ekler', (tester) async {
-    final harness = await _pumpLogSheet(tester, initialIndex: 1);
+  testWidgets('İlaçta artı yoktur, takviyedeki artı kalıcı ekler', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(tester, initialIndex: 4);
 
-    final medicationSection = find.text(AppStrings.medicationAndSupplement);
-    await tester.ensureVisible(medicationSection);
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip(AppStrings.add));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(AppStrings.newMedication));
-    await tester.pumpAndSettle();
-
-    await tester.enterText(find.byType(TextField), 'Yeni ilaç');
-    await tester.tap(find.text(AppStrings.add));
+    final add = find.byKey(const ValueKey('tracking_catalog_add'));
+    expect(add, findsOneWidget);
+    tester.widget<OutlinedButton>(add).onPressed!();
     await tester.pumpAndSettle();
 
-    expect(find.text('Yeni ilaç'), findsOneWidget);
-    final taken = find.byKey(
-      const ValueKey('medication_taken_medication:yeni ilaç'),
-    );
-    await tester.ensureVisible(taken);
-    await tester.tap(taken);
+    await tester.enterText(find.byType(TextField).last, 'Yeni takviye');
+    await tester.tap(find.text(AppStrings.add).last);
     await tester.pumpAndSettle();
+
+    expect(find.text('Yeni takviye'), findsWidgets);
     expect(
-      harness.storage.loadSettings()!.dailyMedications,
-      contains('Yeni ilaç'),
+      harness.storage.loadSettings()!.dailySupplements,
+      contains('Yeni takviye'),
     );
     expect(harness.settingsChangeCount, 1);
-    await tester.tap(find.text(AppStrings.saveNutrition));
+    await tester.tap(find.text(AppStrings.saveMedicationAndSupplement));
     await tester.pumpAndSettle();
-    expect(harness.savedLog!.medications.single.name, 'Yeni ilaç');
-    expect(harness.savedLog!.medications.single.taken, isTrue);
+    expect(harness.savedLog!.supplements.single.name, 'Yeni takviye');
   });
 
   testWidgets('İlaç satırındaki alarm seçili ilaçla hatırlatıcıyı açar', (
@@ -817,7 +811,7 @@ void main() {
   ) async {
     await _pumpLogSheet(
       tester,
-      initialIndex: 1,
+      initialIndex: 4,
       settings: UserSettings(
         isOnboardingComplete: true,
         userName: 'Test',
@@ -826,17 +820,10 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(
-      find.byKey(const ValueKey('medication_section_toggle')),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('medication_section_toggle')));
-    await tester.pumpAndSettle();
     final reminder = find.byKey(
       const ValueKey('medication_reminder_medication:test ilacı'),
     );
-    await tester.ensureVisible(reminder);
-    await tester.tap(reminder);
+    tester.widget<IconButton>(reminder).onPressed!();
     await tester.pumpAndSettle();
 
     final itemField = tester.widget<DropdownButtonFormField<String>>(
@@ -846,21 +833,25 @@ void main() {
     expect(find.text(AppStrings.reminderEnabled), findsOneWidget);
   });
 
-  testWidgets('Beslenme sekmesinden hatırlatıcı formuna ulaşılır', (
-    tester,
-  ) async {
-    await _pumpLogSheet(tester, initialIndex: 1);
+  testWidgets('Birleşik sayfadan hatırlatıcı formuna ulaşılır', (tester) async {
+    await _pumpLogSheet(
+      tester,
+      initialIndex: 4,
+      settings: UserSettings(
+        isOnboardingComplete: true,
+        userName: 'Test',
+        dailyMedications: const ['Test ilacı'],
+      ),
+    );
 
-    final medicationSection = find.text(AppStrings.medicationAndSupplement);
-    await tester.ensureVisible(medicationSection);
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip(AppStrings.add));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(AppStrings.createReminder));
+    final reminder = find
+        .widgetWithText(FilledButton, AppStrings.createReminderShort)
+        .first;
+    tester.widget<FilledButton>(reminder).onPressed!();
     await tester.pumpAndSettle();
 
-    expect(find.text(AppStrings.reminderPlans), findsWidgets);
-    await tester.tap(find.text(AppStrings.createReminder).first);
+    expect(find.text(AppStrings.createReminder), findsWidgets);
+    await tester.tap(find.text(AppStrings.createReminder).last);
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.reminderItem), findsWidgets);
   });

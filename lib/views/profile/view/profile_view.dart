@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/shared_widgets/condition_selector.dart';
 import '../../../core/shared_widgets/lab_results_form.dart';
 import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
-import '../../../core/utils/cycle_rules.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../data/services/premium_purchase_service.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
@@ -185,7 +186,7 @@ class _ProfileMechanics extends StatelessWidget {
                   // ── 3. İlaç & Takviye ─────────────────────
                   _buildSectionCard(
                     context: context,
-                    title: AppStrings.medicationAndSupplement,
+                    title: AppStrings.medicationsSupplementsAndSkincare,
                     icon: Icons.edit_outlined,
                     onEdit: () => _showMedicationSheet(context, vm),
                     children: [
@@ -209,6 +210,13 @@ class _ProfileMechanics extends StatelessWidget {
                           AppStrings.supplements,
                           AppStrings.notSpecified,
                         ),
+                      if (s.dailySkincare.isNotEmpty)
+                        _infoRow(
+                          AppStrings.skincare,
+                          s.dailySkincare.join(', '),
+                        )
+                      else
+                        _infoRow(AppStrings.skincare, AppStrings.notSpecified),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -218,14 +226,7 @@ class _ProfileMechanics extends StatelessWidget {
                     context: context,
                     title: AppStrings.doctorReport,
                     icon: Icons.assignment_outlined,
-                    onEdit: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DoctorReportView(),
-                        ),
-                      );
-                    },
+                    onEdit: () => _openPremiumDoctorReport(context),
                     children: [
                       Text(
                         AppStrings.doctorReportDescription,
@@ -239,14 +240,7 @@ class _ProfileMechanics extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DoctorReportView(),
-                              ),
-                            );
-                          },
+                          onPressed: () => _openPremiumDoctorReport(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
@@ -273,99 +267,6 @@ class _ProfileMechanics extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              '⏰ ${AppStrings.timeTravel}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const Spacer(),
-                            if (AppTime.offsetDays != 0)
-                              GestureDetector(
-                                onTap: () async {
-                                  await AppTime.setOffsetDays(0);
-                                  if (!context.mounted) return;
-                                  await _refreshDateDependentData(context, vm);
-                                },
-                                child: Text(
-                                  AppStrings.reset,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          '${AppStrings.virtualDate}: ${AppTime.now.toDotFormat()} (${AppTime.now.turkishWeekday})',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        if (AppTime.offsetDays != 0) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            AppStrings.activeOffset(AppTime.offsetDays),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _timeTravelButton(
-                              context,
-                              vm,
-                              '+${AppStrings.dayCount(1)}',
-                              1,
-                            ),
-                            _timeTravelButton(
-                              context,
-                              vm,
-                              '+${AppStrings.dayCount(7)}',
-                              7,
-                            ),
-                            _timeTravelButton(
-                              context,
-                              vm,
-                              '+${AppStrings.dayCount(30)}',
-                              30,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -376,6 +277,24 @@ class _ProfileMechanics extends StatelessWidget {
   }
 
   // ── Bölüm Kartı ─────────────────────────────────────────
+  Future<void> _openPremiumDoctorReport(BuildContext context) async {
+    final premium = context.read<PremiumPurchaseService>();
+    await premium.refreshEntitlement();
+    if (!context.mounted) return;
+    if (!premium.isPremium) {
+      await showPremiumPaywall(
+        context,
+        title: AppStrings.premiumRequired,
+        description: AppStrings.doctorReportPremiumDescription,
+      );
+      if (!context.mounted || !premium.isPremium) return;
+    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const DoctorReportView()),
+    );
+  }
+
   Widget _buildSectionCard({
     required BuildContext context,
     required String title,
@@ -429,47 +348,6 @@ class _ProfileMechanics extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Widget _timeTravelButton(
-    BuildContext context,
-    ProfileViewModel vm,
-    String label,
-    int daysToAdd,
-  ) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-        foregroundColor: AppColors.primary,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-      onPressed: () async {
-        final newOffset = AppTime.offsetDays + daysToAdd;
-        await AppTime.setOffsetDays(newOffset);
-        if (!context.mounted) return;
-        await _refreshDateDependentData(context, vm);
-      },
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Future<void> _refreshDateDependentData(
-    BuildContext context,
-    ProfileViewModel profileViewModel,
-  ) async {
-    await context.read<LocalStorageService>().refreshCycleStatistics();
-    if (!context.mounted) return;
-
-    profileViewModel.loadSettings();
-    await Future.wait([
-      context.read<DashboardViewModel>().loadData(),
-      context.read<CalendarViewModel>().loadData(),
-    ]);
   }
 
   Widget _infoRow(String label, String value) {
@@ -629,38 +507,20 @@ class _ProfileMechanics extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: AppStrings.chronicDiseasesList.map((disease) {
-                    final isSelected = vm.settings.chronicDiseases.any(
-                      (value) =>
-                          AppStrings.localizeStoredValue(value) == disease,
-                    );
-                    return FilterChip(
-                      label: Text(disease),
-                      selected: isSelected,
-                      onSelected: (_) {
-                        vm.toggleChronicDisease(disease);
-                        setSheetState(() {});
-                      },
-                      backgroundColor: AppColors.surface,
-                      selectedColor: AppColors.primaryLight,
-                      checkmarkColor: AppColors.primaryDark,
-                      side: BorderSide(
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.outline,
-                      ),
-                      shape: const StadiumBorder(),
-                      labelStyle: TextStyle(
-                        fontSize: 12,
-                        color: isSelected
-                            ? AppColors.primaryDark
-                            : AppColors.textPrimary,
-                      ),
-                    );
-                  }).toList(),
+                ConditionSelector(
+                  catalogItems: AppStrings.chronicDiseasesList,
+                  selectedItems: vm.settings.chronicDiseases,
+                  color: AppColors.primary,
+                  addDialogTitle: AppStrings.addCustomChronicDisease,
+                  addButtonKey: 'profile_add_chronic_disease',
+                  onToggle: (disease) {
+                    vm.toggleChronicDisease(disease);
+                    setSheetState(() {});
+                  },
+                  onAdd: (disease) {
+                    vm.addChronicDisease(disease);
+                    setSheetState(() {});
+                  },
                 ),
               ],
             );
@@ -737,162 +597,6 @@ class _ProfileMechanics extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Döngü süresi
-                Text(
-                  AppStrings.menstrualCycleLength,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Slider(
-                        value: s.averageCycleLength.toDouble(),
-                        min: CycleRules.minCycleLength.toDouble(),
-                        max: CycleRules.maxCycleLength.toDouble(),
-                        divisions:
-                            CycleRules.maxCycleLength -
-                            CycleRules.minCycleLength,
-                        label: AppStrings.dayCount(s.averageCycleLength),
-                        onChanged: (v) {
-                          vm.updateAverageCycleLength(v.round());
-                          setSheetState(() {});
-                        },
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.periodPrimary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        AppStrings.dayCount(s.averageCycleLength),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.periodPrimary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Adet süresi
-                Text(
-                  AppStrings.periodLength,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Slider(
-                        value: s.averagePeriodLength.toDouble(),
-                        min: CycleRules.minPeriodLength.toDouble(),
-                        max: CycleRules.maxPeriodLength.toDouble(),
-                        divisions:
-                            CycleRules.maxPeriodLength -
-                            CycleRules.minPeriodLength,
-                        label: AppStrings.dayCount(s.averagePeriodLength),
-                        onChanged: (v) {
-                          vm.updateAveragePeriodLength(v.round());
-                          setSheetState(() {});
-                        },
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.periodPrimary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        AppStrings.dayCount(s.averagePeriodLength),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.periodPrimary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Son adet tarihi
-                Text(
-                  AppStrings.lastPeriodDate,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () async {
-                    final now = AppTime.now;
-                    final picked = await showDatePicker(
-                      context: ctx2,
-                      initialDate: s.lastPeriodDate ?? now,
-                      firstDate: now.subtract(const Duration(days: 90)),
-                      lastDate: now,
-                      locale: AppStrings.resolveLocale(
-                        Localizations.localeOf(ctx2),
-                      ),
-                    );
-                    if (picked != null) {
-                      vm.updateLastPeriodDate(picked);
-                      setSheetState(() {});
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.calendar_today,
-                          size: 20,
-                          color: AppColors.textSecondary,
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          s.lastPeriodDate != null
-                              ? s.lastPeriodDate!.toDotFormat()
-                              : AppStrings.selectDate,
-                          style: TextStyle(
-                            color: s.lastPeriodDate != null
-                                ? AppColors.textPrimary
-                                : AppColors.textHint,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
                 // Menopoz
                 Text(
                   AppStrings.menopauseStatus,
@@ -994,7 +698,7 @@ class _ProfileMechanics extends StatelessWidget {
 
                 // Kadın hastalıkları
                 Text(
-                  AppStrings.commonWomenDiseases,
+                  AppStrings.womenDiseases,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1002,38 +706,20 @@ class _ProfileMechanics extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: AppStrings.womenDiseasesList.map((disease) {
-                    final isSelected = s.womenDiseases.any(
-                      (value) =>
-                          AppStrings.localizeStoredValue(value) == disease,
-                    );
-                    return FilterChip(
-                      label: Text(disease),
-                      selected: isSelected,
-                      onSelected: (_) {
-                        vm.toggleWomenDisease(disease);
-                        setSheetState(() {});
-                      },
-                      backgroundColor: AppColors.surface,
-                      selectedColor: AppColors.periodLight,
-                      side: BorderSide(
-                        color: isSelected
-                            ? AppColors.periodPrimary
-                            : AppColors.outline,
-                      ),
-                      shape: const StadiumBorder(),
-                      checkmarkColor: AppColors.periodPrimary,
-                      labelStyle: TextStyle(
-                        fontSize: 12,
-                        color: isSelected
-                            ? AppColors.periodPrimary
-                            : AppColors.textPrimary,
-                      ),
-                    );
-                  }).toList(),
+                ConditionSelector(
+                  catalogItems: AppStrings.womenDiseasesList,
+                  selectedItems: s.womenDiseases,
+                  color: AppColors.periodPrimary,
+                  addDialogTitle: AppStrings.addCustomWomenDisease,
+                  addButtonKey: 'profile_add_women_disease',
+                  onToggle: (disease) {
+                    vm.toggleWomenDisease(disease);
+                    setSheetState(() {});
+                  },
+                  onAdd: (disease) {
+                    vm.addWomenDisease(disease);
+                    setSheetState(() {});
+                  },
                 ),
               ],
             );
@@ -1044,8 +730,8 @@ class _ProfileMechanics extends StatelessWidget {
   }
 
   void _showMedicationSheet(BuildContext context, ProfileViewModel vm) {
-    final medCtrl = TextEditingController();
     final supCtrl = TextEditingController();
+    final skincareCtrl = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -1074,6 +760,11 @@ class _ProfileMechanics extends StatelessWidget {
             final supplementNames = {
               ...vm.settings.dailySupplements,
               ...storage.getCustomSupplements(),
+            }.toList();
+            final skincareNames = {
+              ...AppStrings.skincareCatalog,
+              ...vm.settings.dailySkincare,
+              ...storage.getCustomSkincare(),
             }.toList();
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1114,19 +805,6 @@ class _ProfileMechanics extends StatelessWidget {
                       shape: const StadiumBorder(),
                     );
                   }).toList(),
-                ),
-                const SizedBox(height: 8),
-                _addItemRow(
-                  medCtrl,
-                  AppStrings.newMedication,
-                  () {
-                    if (medCtrl.text.trim().isNotEmpty) {
-                      vm.addMedication(medCtrl.text.trim());
-                      medCtrl.clear();
-                      setSheetState(() {});
-                    }
-                  },
-                  color: AppColors.medicationPrimary,
                 ),
                 MedicationReminderSection(
                   key: const ValueKey('profile_medication_reminders'),
@@ -1183,6 +861,65 @@ class _ProfileMechanics extends StatelessWidget {
                   itemType: MedicationPlanItemType.supplement,
                   availableItems: supplementNames,
                   color: AppColors.success,
+                  onChanged: () => ctx2.read<DashboardViewModel>().loadData(),
+                ),
+                const SizedBox(height: 20),
+
+                Text(
+                  AppStrings.skincare,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: vm.settings.dailySkincare.map((item) {
+                    return Chip(
+                      label: Text(item, style: const TextStyle(fontSize: 12)),
+                      deleteIcon: const Icon(
+                        Icons.close,
+                        size: 16,
+                        color: AppColors.error,
+                      ),
+                      onDeleted: () {
+                        vm.removeSkincare(item);
+                        setSheetState(() {});
+                      },
+                      backgroundColor: AppColors.skincarePrimary.withValues(
+                        alpha: 0.1,
+                      ),
+                      side: BorderSide(
+                        color: AppColors.skincarePrimary.withValues(
+                          alpha: 0.28,
+                        ),
+                      ),
+                      shape: const StadiumBorder(),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 8),
+                _addItemRow(
+                  skincareCtrl,
+                  AppStrings.addCustomSkincare,
+                  () async {
+                    final name = skincareCtrl.text.trim();
+                    if (name.isEmpty) return;
+                    vm.addSkincare(name);
+                    await storage.saveCustomSkincare(name);
+                    skincareCtrl.clear();
+                    setSheetState(() {});
+                  },
+                  color: AppColors.skincarePrimary,
+                ),
+                MedicationReminderSection(
+                  key: const ValueKey('profile_skincare_reminders'),
+                  itemType: MedicationPlanItemType.skincare,
+                  availableItems: skincareNames,
+                  color: AppColors.skincarePrimary,
                   onChanged: () => ctx2.read<DashboardViewModel>().loadData(),
                 ),
               ],

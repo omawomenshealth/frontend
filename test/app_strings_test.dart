@@ -83,6 +83,8 @@ void main() {
       isTrue,
     );
     expect(AppStrings.womenDiseasesList, contains('Adenomyozis'));
+    expect(AppStrings.womenDiseasesList, isNot(contains('Diğer')));
+    expect(AppStrings.chronicDiseasesList, isNot(contains('Diğer')));
     expect(AppStrings.symptomSkinHairOptions, contains('Yağlı cilt'));
     expect(AppStrings.symptomEnergyOptions, contains('Enerjik'));
     expect(AppStrings.symptomDigestionOptions, contains('Midem iyi'));

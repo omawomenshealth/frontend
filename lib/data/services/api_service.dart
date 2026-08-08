@@ -180,6 +180,8 @@ class ApiService {
             'logs': logs,
             'customMedications': customMedications,
             'customSupplements': customSupplements,
+            'customFoods': _storage.getCustomFoods(),
+            'customSkincare': _storage.getCustomSkincare(),
             'medicationReminderPlans': medicationReminderPlans,
             'medicationDoseRecords': medicationDoseRecords,
             'replaceExisting': replaceExisting,

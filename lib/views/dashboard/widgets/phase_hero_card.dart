@@ -11,6 +11,7 @@ class PhaseHeroCard extends StatefulWidget {
   final int cycleDay;
   final int periodCount;
   final VoidCallback onOpenInsights;
+  final VoidCallback onPeriodTap;
 
   const PhaseHeroCard({
     super.key,
@@ -18,6 +19,7 @@ class PhaseHeroCard extends StatefulWidget {
     required this.cycleDay,
     required this.periodCount,
     required this.onOpenInsights,
+    required this.onPeriodTap,
   });
 
   @override
@@ -158,35 +160,54 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Expanded(
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: FilledButton.icon(
-                            onPressed: widget.onOpenInsights,
-                            style: FilledButton.styleFrom(
-                              backgroundColor: presentation.color,
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size(0, 40),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: FilledButton.icon(
+                                key: const ValueKey('phase_period_log'),
+                                onPressed: widget.onPeriodTap,
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: presentation.color,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: const Size(0, 40),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 13,
+                                    vertical: 10,
+                                  ),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                icon: const Icon(
+                                  Icons.water_drop_outlined,
+                                  size: 15,
+                                ),
+                                label: Text(
+                                  AppStrings.periodLogAction,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
-                            iconAlignment: IconAlignment.end,
-                            icon: const Icon(
-                              Icons.north_east_rounded,
-                              size: 15,
-                            ),
-                            label: Text(
-                              presentation.readLabel,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
+                            const SizedBox(width: 7),
+                            IconButton.filledTonal(
+                              tooltip: presentation.readLabel,
+                              onPressed: widget.onOpenInsights,
+                              style: IconButton.styleFrom(
+                                foregroundColor: presentation.color,
+                                backgroundColor: Colors.white.withValues(
+                                  alpha: 0.78,
+                                ),
+                              ),
+                              icon: const Icon(
+                                Icons.north_east_rounded,
+                                size: 17,
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 12),

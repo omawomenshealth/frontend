@@ -117,7 +117,7 @@ void main() {
           symptoms: day < 8 || day == 15 ? const ['Baş ağrısı'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
-            DailyLogObservedSection.wellbeing,
+            DailyLogObservedSection.symptom,
           },
         ),
       );
@@ -156,7 +156,7 @@ void main() {
           symptoms: day < 8 || day == 15 ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
-            DailyLogObservedSection.wellbeing,
+            DailyLogObservedSection.symptom,
           },
         ),
       );
@@ -278,7 +278,7 @@ void main() {
           symptoms: day.isOdd ? const ['Şişkinlik'] : const [],
           observedSections: const {
             DailyLogObservedSection.nutrition,
-            DailyLogObservedSection.wellbeing,
+            DailyLogObservedSection.symptom,
           },
         ),
       );
@@ -543,7 +543,7 @@ void main() {
           symptoms: day >= 1 && day <= 8 || day == 20
               ? const ['Baş ağrısı']
               : const [],
-          observedSections: const {DailyLogObservedSection.wellbeing},
+          observedSections: const {DailyLogObservedSection.symptom},
         ),
       );
       if (day < 20) {

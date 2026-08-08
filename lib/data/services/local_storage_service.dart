@@ -17,6 +17,8 @@ class LocalStorageService {
   static const String _logDatesKey = 'daily_log_dates';
   static const String _allMedsKey = 'all_custom_medications';
   static const String _allSupsKey = 'all_custom_supplements';
+  static const String _allFoodsKey = 'all_custom_foods';
+  static const String _allSkincareKey = 'all_custom_skincare';
   static const String _authTokenKey = 'auth_token';
   static const String _authRefreshTokenKey = 'auth_refresh_token';
   static const String _authEmailKey = 'auth_email';
@@ -97,6 +99,8 @@ class LocalStorageService {
       key == _logDatesKey ||
       key == _allMedsKey ||
       key == _allSupsKey ||
+      key == _allFoodsKey ||
+      key == _allSkincareKey ||
       key == _authTokenKey ||
       key == _authRefreshTokenKey ||
       key == _authEmailKey ||
@@ -166,6 +170,9 @@ class LocalStorageService {
       }
       for (var entry in logToSave.supplements) {
         await saveCustomSupplement(entry.name);
+      }
+      for (final ingredient in logToSave.skincare) {
+        await saveCustomSkincare(ingredient);
       }
 
       // SİHİRLİ DOKUNUŞ: Veri her değiştiğinde istatistikleri arka planda sessizce güncelle
@@ -565,6 +572,46 @@ class LocalStorageService {
   /// Tüm özel takviyeleri toplu kaydet.
   Future<bool> saveCustomSupplements(List<String> list) async {
     return _p.setStringList(_allSupsKey, list);
+  }
+
+  /// Kullanıcının + ile eklediği yiyecekleri sonraki girişler için saklar.
+  List<String> getCustomFoods() => _p.getStringList(_allFoodsKey) ?? [];
+
+  Future<bool> saveCustomFood(String name) =>
+      _appendUnique(_allFoodsKey, name, getCustomFoods());
+
+  Future<bool> saveCustomFoods(List<String> list) =>
+      _p.setStringList(_allFoodsKey, _normalizedUnique(list));
+
+  /// Kullanıcının + ile eklediği cilt bakım içeriklerini saklar.
+  List<String> getCustomSkincare() => _p.getStringList(_allSkincareKey) ?? [];
+
+  Future<bool> saveCustomSkincare(String name) =>
+      _appendUnique(_allSkincareKey, name, getCustomSkincare());
+
+  Future<bool> saveCustomSkincareItems(List<String> list) =>
+      _p.setStringList(_allSkincareKey, _normalizedUnique(list));
+
+  Future<bool> _appendUnique(
+    String key,
+    String rawName,
+    List<String> current,
+  ) async {
+    final name = rawName.trim();
+    if (name.isEmpty ||
+        current.any((value) => value.toLowerCase() == name.toLowerCase())) {
+      return false;
+    }
+    return _p.setStringList(key, [...current, name]);
+  }
+
+  List<String> _normalizedUnique(Iterable<String> values) {
+    final seen = <String>{};
+    return [
+      for (final value in values)
+        if (value.trim().isNotEmpty && seen.add(value.trim().toLowerCase()))
+          value.trim(),
+    ];
   }
 
   // ── İlaç & Takviye Hatırlatıcıları ─────────────────────

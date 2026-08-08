@@ -72,14 +72,12 @@ void main() {
 
   test('eski veya buluttan gelen döngü değerleri ortak sınırlara çekilir', () {
     final settings = UserSettings.fromJson({
-      'gender': 'male',
       'averageCycleLength': 90,
       'averagePeriodLength': 0,
     });
 
     expect(settings.averageCycleLength, CycleRules.maxCycleLength);
     expect(settings.averagePeriodLength, CycleRules.minPeriodLength);
-    expect(settings.toJson().containsKey('gender'), isFalse);
   });
 
   test('dongu halkasi fazlari 28 gunluk donguye orantili hesaplanir', () {

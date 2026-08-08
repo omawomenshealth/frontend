@@ -40,13 +40,12 @@ class DoctorReportView extends StatelessWidget {
           IconButton(
             tooltip: AppStrings.downloadOrSharePdf,
             icon: const Icon(Icons.picture_as_pdf_outlined),
-            onPressed: () =>
-                _generateAndDownloadPdf(context, settings, allLogs),
+            onPressed: () => _prepareAndDownloadPdf(context, settings, allLogs),
           ),
           IconButton(
             tooltip: AppStrings.copyAsText,
             icon: const Icon(Icons.share_outlined),
-            onPressed: () => _copyReportToClipboard(context, settings, allLogs),
+            onPressed: () => _prepareAndCopyReport(context, settings, allLogs),
           ),
         ],
       ),
@@ -95,7 +94,7 @@ class DoctorReportView extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         ElevatedButton.icon(
-                          onPressed: () => _generateAndDownloadPdf(
+                          onPressed: () => _prepareAndDownloadPdf(
                             context,
                             settings,
                             allLogs,
@@ -314,6 +313,17 @@ class DoctorReportView extends StatelessWidget {
     ].join(', ');
   }
 
+  String _foodSelectionsText(DailyLog log) {
+    final parts = <String>[
+      ...log.nutritionTags.map(AppStrings.localizeStoredValue),
+      for (final entry in log.mealFoodGroups.entries)
+        if (entry.value.isNotEmpty)
+          '${AppStrings.localizeStoredValue(entry.key)}: '
+              '${entry.value.map(AppStrings.localizeStoredValue).join(', ')}',
+    ];
+    return parts.join(' · ');
+  }
+
   String _symptomsText(DailyLog log) {
     if (log.symptoms.isEmpty) return '';
     return '${AppStrings.symptom}: '
@@ -428,7 +438,7 @@ class DoctorReportView extends StatelessWidget {
               ),
               DataColumn(
                 label: Text(
-                  AppStrings.medicationAndSupplement,
+                  AppStrings.medicationsSupplementsAndSkincare,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
@@ -496,11 +506,7 @@ class DoctorReportView extends StatelessWidget {
                     .map((log) {
                       final timeStr =
                           '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-                      final nutritionStr = log.nutritionTags.isNotEmpty
-                          ? log.nutritionTags
-                                .map(AppStrings.localizeStoredValue)
-                                .join(', ')
-                          : '';
+                      final nutritionStr = _foodSelectionsText(log);
                       final bowelStr = log.bowelActivity.isNotEmpty
                           ? '${AppStrings.bowel}: ${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
                           : '';
@@ -518,7 +524,10 @@ class DoctorReportView extends StatelessWidget {
               // 3. İlaç & Takviye
               final logsWithMeds = dayLogs
                   .where(
-                    (l) => l.medications.isNotEmpty || l.supplements.isNotEmpty,
+                    (l) =>
+                        l.medications.isNotEmpty ||
+                        l.supplements.isNotEmpty ||
+                        l.skincare.isNotEmpty,
                   )
                   .toList();
               final String ilacText;
@@ -541,7 +550,13 @@ class DoctorReportView extends StatelessWidget {
                                 '${s.name} (${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
                           )
                           .toList();
-                      final all = [...activeMeds, ...activeSups];
+                      final all = [
+                        ...activeMeds,
+                        ...activeSups,
+                        ...log.skincare.map(
+                          (item) => '${AppStrings.skincare}: $item',
+                        ),
+                      ];
                       return '$timeStr ${all.join(", ")}';
                     })
                     .join('\n----------------\n');
@@ -742,11 +757,67 @@ class DoctorReportView extends StatelessWidget {
 
   // ── Paylaş/Kopyala Mantığı ──────────────────────────────────────────
 
-  Future<void> _copyReportToClipboard(
+  Future<bool?> _chooseRelationshipHistory(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: const Icon(Icons.privacy_tip_outlined),
+        title: Text(AppStrings.includeRelationshipHistoryQuestion),
+        content: Text(AppStrings.includeRelationshipHistoryHint),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(AppStrings.doNotIncludeInReport),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(AppStrings.includeInReport),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _prepareAndCopyReport(
     BuildContext context,
     UserSettings settings,
     List<List<DailyLog>> logs,
   ) async {
+    final includeRelationshipHistory = await _chooseRelationshipHistory(
+      context,
+    );
+    if (!context.mounted || includeRelationshipHistory == null) return;
+    await _copyReportToClipboard(
+      context,
+      settings,
+      logs,
+      includeRelationshipHistory: includeRelationshipHistory,
+    );
+  }
+
+  Future<void> _prepareAndDownloadPdf(
+    BuildContext context,
+    UserSettings settings,
+    List<List<DailyLog>> logs,
+  ) async {
+    final includeRelationshipHistory = await _chooseRelationshipHistory(
+      context,
+    );
+    if (!context.mounted || includeRelationshipHistory == null) return;
+    await _generateAndDownloadPdf(
+      context,
+      settings,
+      logs,
+      includeRelationshipHistory: includeRelationshipHistory,
+    );
+  }
+
+  Future<void> _copyReportToClipboard(
+    BuildContext context,
+    UserSettings settings,
+    List<List<DailyLog>> logs, {
+    required bool includeRelationshipHistory,
+  }) async {
     final sb = StringBuffer();
     sb.writeln('==================================');
     sb.writeln(AppStrings.personalHealthReport);
@@ -798,10 +869,19 @@ class DoctorReportView extends StatelessWidget {
     }
     sb.writeln('');
 
-    sb.writeln('3. ${AppStrings.dailyHealthLogs.toUpperCase()}');
+    if (includeRelationshipHistory) {
+      sb.writeln('3. ${AppStrings.relationshipHistory.toUpperCase()}');
+      sb.writeln('----------------------------------');
+      sb.writeln(_relationshipHistoryText(logs));
+      sb.writeln('');
+    }
+
+    sb.writeln(
+      '${includeRelationshipHistory ? 4 : 3}. ${AppStrings.dailyHealthLogs.toUpperCase()}',
+    );
     sb.writeln('----------------------------------');
     sb.writeln(
-      '${AppStrings.date} | ${AppStrings.period} | ${AppStrings.nutrition} | ${AppStrings.medicationAndSupplement} | ${AppStrings.mood}',
+      '${AppStrings.date} | ${AppStrings.period} | ${AppStrings.nutrition} | ${AppStrings.medicationsSupplementsAndSkincare} | ${AppStrings.mood}',
     );
     sb.writeln('----------------------------------');
     for (var dayLogs in logs.take(15)) {
@@ -852,11 +932,7 @@ class DoctorReportView extends StatelessWidget {
             .map((log) {
               final timeStr =
                   '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-              final nutritionStr = log.nutritionTags.isNotEmpty
-                  ? log.nutritionTags
-                        .map(AppStrings.localizeStoredValue)
-                        .join(', ')
-                  : '';
+              final nutritionStr = _foodSelectionsText(log);
               final bowelStr = log.bowelActivity.isNotEmpty
                   ? '${AppStrings.bowel}:${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
                   : '';
@@ -873,7 +949,12 @@ class DoctorReportView extends StatelessWidget {
 
       // 3. İlaç & Takviye
       final logsWithMeds = dayLogs
-          .where((l) => l.medications.isNotEmpty || l.supplements.isNotEmpty)
+          .where(
+            (l) =>
+                l.medications.isNotEmpty ||
+                l.supplements.isNotEmpty ||
+                l.skincare.isNotEmpty,
+          )
           .toList();
       final String meds;
       if (logsWithMeds.isEmpty) {
@@ -895,7 +976,11 @@ class DoctorReportView extends StatelessWidget {
                         '${s.name}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
                   )
                   .toList();
-              final all = [...activeMeds, ...activeSups];
+              final all = [
+                ...activeMeds,
+                ...activeSups,
+                ...log.skincare.map((item) => '${AppStrings.skincare}: $item'),
+              ];
               return '$timeStr ${all.join(", ")}';
             })
             .join(' // ');
@@ -949,7 +1034,9 @@ class DoctorReportView extends StatelessWidget {
     }
     sb.writeln('');
 
-    sb.writeln('4. ${AppStrings.savedDoctorNotes.toUpperCase()}');
+    sb.writeln(
+      '${includeRelationshipHistory ? 5 : 4}. ${AppStrings.savedDoctorNotes.toUpperCase()}',
+    );
     sb.writeln('----------------------------------');
     final flatLogs = logs.expand<DailyLog>((dayList) => dayList).toList();
     final logsWithNotes = flatLogs
@@ -991,11 +1078,40 @@ class DoctorReportView extends StatelessWidget {
 
   // ── PDF Üretim ve İndirme Mantığı ──────────────────────────────────
 
+  String _relationshipHistoryText(List<List<DailyLog>> groupedLogs) {
+    final logs = groupedLogs
+        .expand<DailyLog>((items) => items)
+        .where((log) => log.sexualActivity == true);
+    final entries = logs.toList(growable: false);
+    final activityTypes = entries
+        .expand((log) => log.sexualActivityTypes)
+        .where((type) => type != SexualActivityType.none)
+        .map((type) => AppStrings.sexualActivityOptions[type.index])
+        .toSet()
+        .toList(growable: false);
+    final feelings = entries
+        .expand((log) => log.sexualAfterFeelings)
+        .map((feeling) => AppStrings.sexualAfterFeelingOptions[feeling.index])
+        .toSet()
+        .toList(growable: false);
+    final lines = <String>[AppStrings.activityRecordCount(entries.length)];
+    if (activityTypes.isNotEmpty) {
+      lines.add(
+        '${AppStrings.recordedActivityTypes}: ${activityTypes.join(', ')}',
+      );
+    }
+    if (feelings.isNotEmpty) {
+      lines.add('${AppStrings.recordedAfterFeelings}: ${feelings.join(', ')}');
+    }
+    return lines.join('\n');
+  }
+
   Future<void> _generateAndDownloadPdf(
     BuildContext context,
     UserSettings settings,
-    List<List<DailyLog>> logs,
-  ) async {
+    List<List<DailyLog>> logs, {
+    required bool includeRelationshipHistory,
+  }) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1135,6 +1251,22 @@ class DoctorReportView extends StatelessWidget {
                 ),
               pw.SizedBox(height: 16),
 
+              if (includeRelationshipHistory) ...[
+                pw.Text(
+                  AppStrings.relationshipHistory,
+                  style: pw.TextStyle(
+                    fontSize: 13,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  _relationshipHistoryText(logs),
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
+                pw.SizedBox(height: 16),
+              ],
+
               pw.Text(
                 AppStrings.dailyHealthLogs,
                 style: pw.TextStyle(
@@ -1218,12 +1350,20 @@ class DoctorReportView extends StatelessWidget {
       AppStrings.date,
       AppStrings.period,
       AppStrings.nutrition,
-      AppStrings.medicationAndSupplement,
+      AppStrings.medicationsSupplementsAndSkincare,
       AppStrings.mood,
     ];
 
     return pw.TableHelper.fromTextArray(
       headers: headers,
+      columnWidths: const {
+        0: pw.FlexColumnWidth(0.75),
+        1: pw.FlexColumnWidth(1.05),
+        2: pw.FlexColumnWidth(1.5),
+        3: pw.FlexColumnWidth(1.65),
+        4: pw.FlexColumnWidth(1.45),
+      },
+      cellPadding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 5),
       cellAlignment: pw.Alignment.centerLeft,
       headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
       cellStyle: const pw.TextStyle(fontSize: 8),
@@ -1286,11 +1426,7 @@ class DoctorReportView extends StatelessWidget {
               .map((log) {
                 final timeStr =
                     '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
-                final nutritionStr = log.nutritionTags.isNotEmpty
-                    ? log.nutritionTags
-                          .map(AppStrings.localizeStoredValue)
-                          .join(', ')
-                    : '';
+                final nutritionStr = _foodSelectionsText(log);
                 final bowelStr = log.bowelActivity.isNotEmpty
                     ? '${AppStrings.bowel}: ${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
                     : '';
@@ -1307,7 +1443,12 @@ class DoctorReportView extends StatelessWidget {
 
         // 3. İlaç & Takviye
         final logsWithMeds = dayLogs
-            .where((l) => l.medications.isNotEmpty || l.supplements.isNotEmpty)
+            .where(
+              (l) =>
+                  l.medications.isNotEmpty ||
+                  l.supplements.isNotEmpty ||
+                  l.skincare.isNotEmpty,
+            )
             .toList();
         final String ilacText;
         if (logsWithMeds.isEmpty) {
@@ -1329,7 +1470,13 @@ class DoctorReportView extends StatelessWidget {
                           '${s.name}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
                     )
                     .toList();
-                final all = [...activeMeds, ...activeSups];
+                final all = [
+                  ...activeMeds,
+                  ...activeSups,
+                  ...log.skincare.map(
+                    (item) => '${AppStrings.skincare}: $item',
+                  ),
+                ];
                 return '$timeStr ${all.join(", ")}';
               })
               .join('\n----------------\n');

@@ -702,6 +702,16 @@ class _InsightPresentation {
         );
         icon = Icons.medication_liquid_outlined;
         color = AppColors.accent;
+      case PersonalInsightKind.biotinLabInteraction:
+        title = AppStrings.biotinInsightTitle;
+        body = AppStrings.biotinInsightBody;
+        icon = Icons.science_outlined;
+        color = AppColors.warning;
+      case PersonalInsightKind.doctorReportPremiumReady:
+        title = AppStrings.premiumDoctorReportInsightTitle;
+        body = AppStrings.premiumDoctorReportInsightBody;
+        icon = Icons.workspace_premium_outlined;
+        color = AppColors.insightGold;
       case PersonalInsightKind.dischargeBaselineObservation:
         title = AppStrings.insightDischargeBaselineTitle;
         body = AppStrings.insightDischargeBaselineBody(
@@ -754,6 +764,9 @@ class _InsightPresentation {
   }
 
   static String _evidenceText(PersonalInsight insight) {
+    if (insight.kind == PersonalInsightKind.biotinLabInteraction) {
+      return AppStrings.biotinInsightEvidence;
+    }
     if (insight.confidence != null &&
         insight.evidenceUnit == PersonalInsightEvidenceUnit.days) {
       return AppStrings.insightAssociationEvidence(

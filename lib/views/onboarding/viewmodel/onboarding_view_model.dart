@@ -151,6 +151,13 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addChronicDisease(String disease) {
+    final value = disease.trim();
+    if (value.isEmpty || _containsCondition(_chronicDiseases, value)) return;
+    _chronicDiseases = [..._chronicDiseases, value];
+    notifyListeners();
+  }
+
   void setAverageCycleLength(int value) {
     _averageCycleLength = CycleRules.sanitizeCycleLength(value);
     notifyListeners(); // Slider label güncellenmeli
@@ -195,6 +202,19 @@ class OnboardingViewModel extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void addWomenDisease(String disease) {
+    final value = disease.trim();
+    if (value.isEmpty || _containsCondition(_womenDiseases, value)) return;
+    _womenDiseases = [..._womenDiseases, value];
+    notifyListeners();
+  }
+
+  bool _containsCondition(List<String> values, String candidate) => values.any(
+    (value) =>
+        AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
+        candidate.toLowerCase(),
+  );
 
   void addMedication(String name) {
     if (name.isNotEmpty && !_dailyMedications.contains(name)) {

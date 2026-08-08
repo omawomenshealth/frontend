@@ -61,6 +61,8 @@ class AppColors {
 
   // Ilac ve dongu
   static const Color medicationPrimary = Color(0xFF4E88A8);
+  static const Color supplementPrimary = Color(0xFF6A9E78);
+  static const Color skincarePrimary = Color(0xFFB06F88);
   static const Color medicationTaken = Color(0xFF6A9E78);
   static const Color medicationMissed = Color(0xFFC0606E);
   static const Color periodPrimary = Color(0xFFC0606E);

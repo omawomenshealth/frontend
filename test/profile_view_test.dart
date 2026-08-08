@@ -96,7 +96,7 @@ void main() {
     expect(find.byTooltip(AppStrings.medicationAndSupplement), findsNothing);
 
     final medicationsAndReminders = find.text(
-      AppStrings.medicationsAndReminders,
+      AppStrings.medicationsSupplementsAndSkincare,
     );
     await tester.ensureVisible(medicationsAndReminders);
     await tester.tap(medicationsAndReminders);
@@ -108,6 +108,10 @@ void main() {
     );
     expect(
       find.byKey(const ValueKey('profile_supplement_reminders')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('profile_skincare_reminders')),
       findsOneWidget,
     );
     expect(find.byKey(const ValueKey('profile_edit_sheet')), findsOneWidget);
@@ -130,6 +134,33 @@ void main() {
     );
     final decoration = sheet.decoration! as BoxDecoration;
     expect(decoration.color, AppColors.scaffoldBackground);
+    expect(
+      find.byKey(const ValueKey('profile_add_chronic_disease')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('profile_edit_sheet_close')));
+    await tester.pumpAndSettle();
+
+    final womenHealth = find.byTooltip(AppStrings.womenHealth).first;
+    await tester.ensureVisible(womenHealth);
+    await tester.tap(womenHealth);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('profile_add_women_disease')),
+      findsOneWidget,
+    );
+    expect(find.text(AppStrings.womenDiseases), findsWidgets);
+    final womenSheet = find.byKey(const ValueKey('profile_edit_sheet'));
+    for (final hiddenField in [
+      AppStrings.menstrualCycleLength,
+      AppStrings.periodLength,
+      AppStrings.lastPeriodDate,
+    ]) {
+      expect(
+        find.descendant(of: womenSheet, matching: find.text(hiddenField)),
+        findsNothing,
+      );
+    }
     expect(tester.takeException(), isNull);
   });
 }

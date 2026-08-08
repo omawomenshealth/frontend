@@ -4,6 +4,7 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/cycle_rules.dart';
 import '../../../core/shared_widgets/custom_button.dart';
+import '../../../core/shared_widgets/condition_selector.dart';
 import '../../../core/shared_widgets/oma_design_widgets.dart';
 import '../../../core/shared_widgets/lab_results_form.dart';
 import '../../../data/models/user_settings_model.dart';
@@ -368,27 +369,14 @@ class _BasicInfoPage extends StatelessWidget {
 
             // Kronik hastalıklar
             _sectionTitle(AppStrings.chronicDiseases),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: AppStrings.chronicDiseasesList.map((disease) {
-                final isSelected = state.chronicDiseases.any(
-                  (value) => AppStrings.localizeStoredValue(value) == disease,
-                );
-                return FilterChip(
-                  label: Text(disease),
-                  selected: isSelected,
-                  onSelected: (_) => vm.toggleChronicDisease(disease),
-                  selectedColor: AppColors.accent.withValues(alpha: 0.15),
-                  checkmarkColor: AppColors.accent,
-                  labelStyle: TextStyle(
-                    fontSize: 13,
-                    color: isSelected
-                        ? AppColors.accent
-                        : AppColors.textPrimary,
-                  ),
-                );
-              }).toList(),
+            ConditionSelector(
+              catalogItems: AppStrings.chronicDiseasesList,
+              selectedItems: state.chronicDiseases,
+              color: AppColors.accent,
+              addDialogTitle: AppStrings.addCustomChronicDisease,
+              addButtonKey: 'onboarding_add_chronic_disease',
+              onToggle: vm.toggleChronicDisease,
+              onAdd: vm.addChronicDisease,
             ),
             const SizedBox(height: 32),
           ],
@@ -702,29 +690,14 @@ class _WomenDiseasesSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _sectionTitle(AppStrings.womenDiseases),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: AppStrings.womenDiseasesList.map((disease) {
-                final isSelected = diseases.any(
-                  (value) => AppStrings.localizeStoredValue(value) == disease,
-                );
-                return FilterChip(
-                  label: Text(disease),
-                  selected: isSelected,
-                  onSelected: (_) => vm.toggleWomenDisease(disease),
-                  selectedColor: AppColors.periodPrimary.withValues(
-                    alpha: 0.15,
-                  ),
-                  checkmarkColor: AppColors.periodPrimary,
-                  labelStyle: TextStyle(
-                    fontSize: 13,
-                    color: isSelected
-                        ? AppColors.periodPrimary
-                        : AppColors.textPrimary,
-                  ),
-                );
-              }).toList(),
+            ConditionSelector(
+              catalogItems: AppStrings.womenDiseasesList,
+              selectedItems: diseases,
+              color: AppColors.periodPrimary,
+              addDialogTitle: AppStrings.addCustomWomenDisease,
+              addButtonKey: 'onboarding_add_women_disease',
+              onToggle: vm.toggleWomenDisease,
+              onAdd: vm.addWomenDisease,
             ),
           ],
         );

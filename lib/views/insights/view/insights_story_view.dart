@@ -19,7 +19,7 @@ class InsightsView extends StatefulWidget {
 
 class _InsightsViewState extends State<InsightsView>
     with SingleTickerProviderStateMixin {
-  static const _storyDuration = Duration(seconds: 9);
+  static const _storyDuration = Duration(seconds: 10);
 
   final PageController _pageController = PageController();
   late final AnimationController _progressController;
@@ -134,6 +134,7 @@ class _InsightsViewState extends State<InsightsView>
                         itemBuilder: (context, index) {
                           final insight = insights[index];
                           return _InsightStoryPage(
+                            key: ValueKey('insight_story_page_${insight.id}'),
                             insight: insight,
                             presentation: _InsightPresentation.from(insight),
                             accent: accent,
@@ -339,6 +340,7 @@ class _InsightStoryPage extends StatelessWidget {
   final Color accent;
 
   const _InsightStoryPage({
+    super.key,
     required this.insight,
     required this.presentation,
     required this.accent,
@@ -553,6 +555,14 @@ class _InsightStoryPage extends StatelessWidget {
       PersonalInsightKind.medicationSkipSymptomAssociation => [
         AppStrings.medications,
         AppStrings.dailyLog,
+      ],
+      PersonalInsightKind.biotinLabInteraction => [
+        AppStrings.supplements,
+        AppStrings.bloodTests,
+      ],
+      PersonalInsightKind.doctorReportPremiumReady => [
+        AppStrings.dailyLog,
+        AppStrings.doctorReport,
       ],
       PersonalInsightKind.dischargeBaselineObservation ||
       PersonalInsightKind.fertileDischargeSignal ||

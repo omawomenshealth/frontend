@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
@@ -126,78 +125,6 @@ class AuthView extends StatelessWidget {
   }
 
   /// Geliştirici Modu Tıklandığında Giriş Penceresi
-  void _showMockLoginDialog(BuildContext context, AuthViewModel vm) {
-    final emailCtrl = TextEditingController(text: 'testuser@gmail.com');
-    final nameCtrl = TextEditingController(text: AppStrings.testUser);
-
-    showDialog(
-      context: context,
-      barrierDismissible: !vm.isLoading,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(AppStrings.developerTestLogin),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              AppStrings.developerTestDescription,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: nameCtrl,
-              decoration: InputDecoration(
-                labelText: AppStrings.fullName,
-                border: const OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: emailCtrl,
-              decoration: InputDecoration(
-                labelText: AppStrings.email,
-                border: const OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(AppStrings.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              final email = emailCtrl.text.trim();
-              final name = nameCtrl.text.trim();
-              if (email.isNotEmpty && name.isNotEmpty) {
-                await vm.signInSimulated(
-                  context,
-                  email: email,
-                  name: name,
-                  onLoginSuccess: (hasCloudData) {
-                    if (!context.mounted) return;
-                    _continueAfterPrivacyChoice(context, vm, hasCloudData);
-                  },
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(AppStrings.login),
-          ),
-        ],
-      ),
-    );
-  }
-
   Future<void> _continueAfterPrivacyChoice(
     BuildContext context,
     AuthViewModel vm,
@@ -432,20 +359,6 @@ class _AuthActionCard extends StatelessWidget {
             backgroundColor: AppColors.primary,
             textColor: AppColors.primaryDark,
           ),
-          if (kDebugMode) ...[
-            const SizedBox(height: 10),
-            TextButton.icon(
-              onPressed: vm.isLoading
-                  ? null
-                  : () => owner._showMockLoginDialog(context, vm),
-              icon: const Icon(Icons.bug_report_outlined, size: 16),
-              label: Text(AppStrings.developerMode),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.textSecondary,
-                textStyle: const TextStyle(fontSize: 11.5),
-              ),
-            ),
-          ],
         ],
       ),
     );

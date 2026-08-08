@@ -29,6 +29,7 @@ const _userSettingsJsonFields = {
   'womenDiseases',
   'dailyMedications',
   'dailySupplements',
+  'dailySkincare',
   'notificationsEnabled',
 };
 
@@ -66,6 +67,7 @@ class UserSettings {
   // İlaç ve takviye
   final List<String> dailyMedications;
   final List<String> dailySupplements;
+  final List<String> dailySkincare;
 
   final bool notificationsEnabled;
 
@@ -92,6 +94,7 @@ class UserSettings {
     this.womenDiseases = const [],
     this.dailyMedications = const [],
     this.dailySupplements = const [],
+    this.dailySkincare = const [],
     this.notificationsEnabled = true,
   });
 
@@ -120,6 +123,7 @@ class UserSettings {
     List<String>? womenDiseases,
     List<String>? dailyMedications,
     List<String>? dailySupplements,
+    List<String>? dailySkincare,
     bool? notificationsEnabled,
   }) {
     return UserSettings(
@@ -147,6 +151,7 @@ class UserSettings {
       womenDiseases: womenDiseases ?? this.womenDiseases,
       dailyMedications: dailyMedications ?? this.dailyMedications,
       dailySupplements: dailySupplements ?? this.dailySupplements,
+      dailySkincare: dailySkincare ?? this.dailySkincare,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     );
   }
@@ -177,6 +182,7 @@ class UserSettings {
       'womenDiseases': womenDiseases,
       'dailyMedications': dailyMedications,
       'dailySupplements': dailySupplements,
+      'dailySkincare': dailySkincare,
       'notificationsEnabled': notificationsEnabled,
     };
   }
@@ -247,6 +253,9 @@ class UserSettings {
       ),
       dailySupplements: List<String>.from(
         json['dailySupplements'] as List? ?? const [],
+      ),
+      dailySkincare: List<String>.from(
+        json['dailySkincare'] as List? ?? const [],
       ),
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
     );

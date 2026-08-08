@@ -123,25 +123,13 @@ class ProfileView extends StatelessWidget {
                               _mechanics._showBasicInfoSheet(context, profile),
                           onEditMedication: () =>
                               _mechanics._showMedicationSheet(context, profile),
-                          onDoctorReport: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const DoctorReportView(),
-                            ),
-                          ),
+                          onDoctorReport: () => _openDoctorReport(context),
                           onPrivacy: () =>
                               Navigator.of(context).pushNamed('/privacy'),
                           onHelp: () => _showHelpDialog(context),
                         ),
                         const SizedBox(height: 16),
                         _mechanics._buildSyncCard(context, profile),
-                        const SizedBox(height: 16),
-                        _TimeTravelCard(
-                          profile: profile,
-                          onAddDays: (days) =>
-                              _changeVirtualDate(context, profile, days),
-                          onReset: () => _resetVirtualDate(context, profile),
-                        ),
                       ],
                     ),
                   ),
@@ -174,25 +162,6 @@ class ProfileView extends StatelessWidget {
     return normalized + 1;
   }
 
-  Future<void> _changeVirtualDate(
-    BuildContext context,
-    ProfileViewModel profile,
-    int days,
-  ) async {
-    await AppTime.setOffsetDays(AppTime.offsetDays + days);
-    if (!context.mounted) return;
-    await _mechanics._refreshDateDependentData(context, profile);
-  }
-
-  Future<void> _resetVirtualDate(
-    BuildContext context,
-    ProfileViewModel profile,
-  ) async {
-    await AppTime.setOffsetDays(0);
-    if (!context.mounted) return;
-    await _mechanics._refreshDateDependentData(context, profile);
-  }
-
   Future<void> _showHelpDialog(BuildContext context) {
     return showDialog<void>(
       context: context,
@@ -210,6 +179,24 @@ class ProfileView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _openDoctorReport(BuildContext context) async {
+    final premium = context.read<PremiumPurchaseService>();
+    await premium.refreshEntitlement();
+    if (!context.mounted) return;
+    if (!premium.isPremium) {
+      await showPremiumPaywall(
+        context,
+        title: AppStrings.premiumRequired,
+        description: AppStrings.doctorReportPremiumDescription,
+      );
+      if (!context.mounted || !premium.isPremium) return;
+    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const DoctorReportView()),
     );
   }
 }
@@ -1201,7 +1188,9 @@ class _AccountCard extends StatelessWidget {
       if (settings.weight != null) '${settings.weight!.toStringAsFixed(0)} kg',
     ];
     final medicineCount =
-        settings.dailyMedications.length + settings.dailySupplements.length;
+        settings.dailyMedications.length +
+        settings.dailySupplements.length +
+        settings.dailySkincare.length;
 
     return _SurfaceCard(
       child: Column(
@@ -1217,7 +1206,7 @@ class _AccountCard extends StatelessWidget {
           ),
           _AccountRow(
             icon: Icons.notifications_none_rounded,
-            title: AppStrings.medicationsAndReminders,
+            title: AppStrings.medicationsSupplementsAndSkincare,
             subtitle: medicineCount == 0
                 ? AppStrings.noPlanAdded
                 : AppStrings.savedPlans(medicineCount),
@@ -1227,7 +1216,9 @@ class _AccountCard extends StatelessWidget {
           _AccountRow(
             icon: Icons.description_outlined,
             title: AppStrings.doctorReport,
-            subtitle: AppStrings.viewAndShareReport,
+            subtitle: context.watch<PremiumPurchaseService>().isPremium
+                ? AppStrings.viewAndShareReport
+                : AppStrings.premiumRequired,
             accent: accent,
             onTap: onDoctorReport,
           ),
@@ -1336,123 +1327,6 @@ class _AccountRow extends StatelessWidget {
         ),
         if (showDivider) const _SoftDivider(),
       ],
-    );
-  }
-}
-
-class _TimeTravelCard extends StatelessWidget {
-  final ProfileViewModel profile;
-  final ValueChanged<int> onAddDays;
-  final VoidCallback onReset;
-
-  const _TimeTravelCard({
-    required this.profile,
-    required this.onAddDays,
-    required this.onReset,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return _SurfaceCard(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.schedule_rounded,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  AppStrings.timeTravel,
-                  style: const TextStyle(
-                    fontFamily: 'Karla',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const Spacer(),
-                if (AppTime.offsetDays != 0)
-                  TextButton(onPressed: onReset, child: Text(AppStrings.reset)),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${AppStrings.virtualDate}: ${AppTime.now.toDotFormat()} '
-              '(${AppTime.now.turkishWeekday})',
-              style: const TextStyle(
-                fontFamily: 'Karla',
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            if (AppTime.offsetDays != 0) ...[
-              const SizedBox(height: 4),
-              Text(
-                AppStrings.activeOffset(AppTime.offsetDays),
-                style: const TextStyle(
-                  fontFamily: 'Karla',
-                  fontSize: 11,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-            const SizedBox(height: 14),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _TimeTravelButton(
-                  label: '+${AppStrings.dayCount(1)}',
-                  onTap: () => onAddDays(1),
-                ),
-                _TimeTravelButton(
-                  label: '+${AppStrings.dayCount(7)}',
-                  onTap: () => onAddDays(7),
-                ),
-                _TimeTravelButton(
-                  label: '+${AppStrings.dayCount(30)}',
-                  onTap: () => onAddDays(30),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TimeTravelButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _TimeTravelButton({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primary,
-        backgroundColor: AppColors.primary.withValues(alpha: 0.06),
-        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.16)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontFamily: 'Karla',
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
     );
   }
 }

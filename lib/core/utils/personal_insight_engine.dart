@@ -25,10 +25,11 @@ class PersonalInsightEngine {
   }) {
     final snapshots = _buildDailySnapshots(logs);
     final currentTime = now ?? AppTime.now;
-    if (snapshots.isEmpty) return const [];
+    final safetyInsights = _buildSafetyInsights(logs, settings);
+    if (snapshots.isEmpty) return safetyInsights;
 
     final today = currentTime.dateOnly;
-    final insights = <PersonalInsight>[];
+    final insights = <PersonalInsight>[...safetyInsights];
     final associationInsights = const PersonalAssociationEngine().generate(
       logs: logs,
       doseRecords: doseRecords,
@@ -36,6 +37,7 @@ class PersonalInsightEngine {
     );
 
     _addCycleInsights(insights, snapshots, today, settings);
+    _addPremiumReportInsight(insights, snapshots);
     _addFoodObservationInsight(
       insights,
       snapshots,
@@ -54,6 +56,48 @@ class PersonalInsightEngine {
     });
 
     return insights.take(_maxInsights).toList(growable: false);
+  }
+
+  void _addPremiumReportInsight(
+    List<PersonalInsight> insights,
+    List<_DailySnapshot> snapshots,
+  ) {
+    if (snapshots.length < 7) return;
+    insights.add(
+      PersonalInsight(
+        id: 'premium_doctor_report_ready',
+        kind: PersonalInsightKind.doctorReportPremiumReady,
+        priority: 119,
+        evidenceCount: snapshots.length,
+        evidenceUnit: PersonalInsightEvidenceUnit.days,
+      ),
+    );
+  }
+
+  List<PersonalInsight> _buildSafetyInsights(
+    List<DailyLog> logs,
+    UserSettings? settings,
+  ) {
+    final supplementNames = <String>{
+      ...?settings?.dailySupplements,
+      for (final log in logs)
+        for (final supplement in log.supplements) supplement.name,
+    };
+    final usesBiotin = supplementNames.any(
+      (name) => name.trim().toLowerCase().contains('biotin'),
+    );
+    if (!usesBiotin) return const [];
+    return const [
+      PersonalInsight(
+        id: 'safety_biotin_lab_interaction',
+        kind: PersonalInsightKind.biotinLabInteraction,
+        priority: 120,
+        evidenceCount: 1,
+        evidenceUnit: PersonalInsightEvidenceUnit.entries,
+        primaryLabel: 'Biotin',
+        notificationLevel: PersonalInsightNotificationLevel.gentle,
+      ),
+    ];
   }
 
   void _addSexualInsights(

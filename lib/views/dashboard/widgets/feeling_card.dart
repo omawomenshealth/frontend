@@ -9,7 +9,10 @@ class FeelingCard extends StatelessWidget {
   final VoidCallback onNutritionTap;
   final VoidCallback onSymptomTap;
   final VoidCallback onMoodTap;
+  final VoidCallback? onMedicationTap;
+  final VoidCallback? onSkincareTap;
   final bool showPeriod;
+  final Color themeColor;
 
   const FeelingCard({
     super.key,
@@ -17,59 +20,92 @@ class FeelingCard extends StatelessWidget {
     required this.onNutritionTap,
     required this.onSymptomTap,
     required this.onMoodTap,
+    this.onMedicationTap,
+    this.onSkincareTap,
     this.showPeriod = true,
+    this.themeColor = AppColors.primary,
   });
 
   @override
   Widget build(BuildContext context) {
+    final actionBackground =
+        Color.lerp(AppColors.surface, themeColor, 0.15) ?? AppColors.surface;
     final actions = <_QuickAction>[
       if (showPeriod)
         _QuickAction(
           label: AppStrings.period,
           icon: Icons.water_drop_outlined,
-          foreground: AppColors.periodPrimary,
-          background: AppColors.periodLight,
+          foreground: themeColor,
+          background: actionBackground,
           onTap: onPeriodTap,
         ),
       _QuickAction(
+        label: AppStrings.nutrition,
+        icon: Icons.restaurant_menu_rounded,
+        foreground: themeColor,
+        background: actionBackground,
+        onTap: onNutritionTap,
+      ),
+      _QuickAction(
         label: AppStrings.symptom,
         icon: Icons.medical_information_outlined,
-        foreground: AppColors.periodFlow,
-        background: const Color(0xFFF4E4DE),
+        foreground: themeColor,
+        background: actionBackground,
         onTap: onSymptomTap,
       ),
       _QuickAction(
         label: AppStrings.mood,
         icon: Icons.mood_outlined,
-        foreground: AppColors.secondaryDark,
-        background: AppColors.secondaryLight,
+        foreground: themeColor,
+        background: actionBackground,
         onTap: onMoodTap,
       ),
-      _QuickAction(
-        label: AppStrings.nutrition,
-        icon: Icons.restaurant_menu_rounded,
-        foreground: AppColors.primaryDark,
-        background: const Color(0xFFE6EEE0),
-        onTap: onNutritionTap,
-      ),
+      if (onMedicationTap != null)
+        _QuickAction(
+          label: AppStrings.medicationAndSupplement,
+          icon: Icons.medication_outlined,
+          foreground: themeColor,
+          background: actionBackground,
+          onTap: onMedicationTap!,
+        ),
+      if (onSkincareTap != null)
+        _QuickAction(
+          label: AppStrings.skincare,
+          icon: Icons.spa_outlined,
+          foreground: themeColor,
+          background: actionBackground,
+          onTap: onSkincareTap!,
+        ),
     ];
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (var index = 0; index < actions.length; index++) ...[
-          Expanded(child: _QuickActionButton(action: actions[index])),
-          if (index != actions.length - 1) const SizedBox(width: 12),
-        ],
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final visualSize = (constraints.maxWidth / actions.length - 6).clamp(
+          48.0,
+          64.0,
+        );
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final action in actions)
+              Expanded(
+                child: _QuickActionButton(
+                  action: action,
+                  visualSize: visualSize,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
 
 class _QuickActionButton extends StatefulWidget {
   final _QuickAction action;
+  final double visualSize;
 
-  const _QuickActionButton({required this.action});
+  const _QuickActionButton({required this.action, required this.visualSize});
 
   @override
   State<_QuickActionButton> createState() => _QuickActionButtonState();
@@ -95,8 +131,8 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 130),
-                width: 64,
-                height: 64,
+                width: widget.visualSize,
+                height: widget.visualSize,
                 decoration: BoxDecoration(
                   color: _pressed
                       ? Color.lerp(
@@ -116,13 +152,14 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
               const SizedBox(height: 8),
               Text(
                 widget.action.label,
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 10.5,
+                  fontSize: 9.5,
                   fontWeight: FontWeight.w600,
+                  height: 1.15,
                 ),
               ),
             ],

@@ -32,6 +32,8 @@ enum PersonalInsightKind {
   foodSensitivityAssociation,
   medicationAdherence,
   medicationSkipSymptomAssociation,
+  biotinLabInteraction,
+  doctorReportPremiumReady,
   dischargeBaselineObservation,
   fertileDischargeSignal,
   menstrualDischargeContext,

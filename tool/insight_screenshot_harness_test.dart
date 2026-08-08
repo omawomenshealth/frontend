@@ -24,6 +24,7 @@ const _output = '../screenshots/insight-system-2026-08-01';
 const _connectionsOutput = '../screenshots/insight-connections-2026-08-02';
 const _bilingualOutput = '../screenshots/insight-bilingual-2026-08-02';
 const _comprehensiveOutput = '../screenshots/comprehensive-60-2026-08-02';
+const _biotinOutput = '../output/biotin-lab-insight.png';
 const _screenshotRootKey = ValueKey<String>('insight_screenshot_root');
 
 void main() {
@@ -566,6 +567,23 @@ void main() {
       });
     }
   }
+
+  testWidgets('biotin kan testi güvenlik insight ekranı', (tester) async {
+    final storage = await _storageWithSettings(
+      UserSettings(
+        isOnboardingComplete: true,
+        userName: 'Deniz',
+        dailySupplements: const ['Biotin'],
+      ),
+    );
+
+    await _pumpInsights(tester, storage);
+
+    await expectLater(
+      find.byKey(_screenshotRootKey),
+      matchesGoldenFile(_biotinOutput),
+    );
+  });
 
   testWidgets('süre barı yarıya kadar doğal biçimde dolar', (tester) async {
     final storage = await _storageWithSettings(

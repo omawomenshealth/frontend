@@ -80,40 +80,6 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  /// 2. Geliştirici / Simülatör Test Girişi (Mock Login)
-  Future<bool> signInSimulated(
-    BuildContext context, {
-    required String email,
-    required String name,
-    required Function(bool hasCloudData) onLoginSuccess,
-  }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      // Backend'e sahte token ve kullanıcı bilgileri gönder
-      final response = await _api.loginWithGoogle(
-        'mock_google_id_token',
-        email: email,
-        name: name,
-      );
-
-      _isLoading = false;
-      notifyListeners();
-
-      final bool hasCloudData = response['hasCloudData'] as bool? ?? false;
-      _readPrivacyState(response);
-      onLoginSuccess(hasCloudData);
-      return true;
-    } catch (e) {
-      _isLoading = false;
-      _errorMessage = e.toString().replaceAll('Exception: ', '');
-      notifyListeners();
-      return false;
-    }
-  }
-
   void _readPrivacyState(Map<String, dynamic> response) {
     final privacy = response['privacy'];
     if (privacy is Map<String, dynamic>) {

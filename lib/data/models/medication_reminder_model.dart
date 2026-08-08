@@ -41,7 +41,7 @@ const _doseRecordFields = {
   'respondedAt',
 };
 
-enum MedicationPlanItemType { medication, supplement }
+enum MedicationPlanItemType { medication, supplement, skincare }
 
 enum MedicationPlanFrequency { everyDay, selectedWeekdays }
 

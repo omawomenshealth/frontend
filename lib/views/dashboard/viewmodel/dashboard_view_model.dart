@@ -56,26 +56,22 @@ class DashboardViewModel extends ChangeNotifier {
         matchingLog = log;
         break;
       }
+      // Birleşik hızlı işlem, eski sürümlerde ayrı kaydedilmiş takviyeyi de açar.
+      if (section == DailyLogObservedSection.medication &&
+          log.observedSections.contains(DailyLogObservedSection.supplement) &&
+          log.supplements.isNotEmpty) {
+        matchingLog = log;
+        break;
+      }
+      // Eski sürümlerde takviyeler ilaç bölümü altında tutuluyordu.
+      if (section == DailyLogObservedSection.supplement &&
+          log.observedSections.contains(DailyLogObservedSection.medication) &&
+          log.supplements.isNotEmpty) {
+        matchingLog = log;
+        break;
+      }
     }
     if (matchingLog != null) {
-      if (section == DailyLogObservedSection.nutrition &&
-          matchingLog.medications.isEmpty &&
-          matchingLog.supplements.isEmpty) {
-        for (final log in logs) {
-          if (log.observedSections.contains(
-            DailyLogObservedSection.medication,
-          )) {
-            return matchingLog.copyWith(
-              medications: log.medications,
-              supplements: log.supplements,
-              observedSections: {
-                ...matchingLog.observedSections,
-                DailyLogObservedSection.medication,
-              },
-            );
-          }
-        }
-      }
       return matchingLog;
     }
     final initialDate = targetDate.isToday ? AppTime.now : targetDate.dateOnly;
