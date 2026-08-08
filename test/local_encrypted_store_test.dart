@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/lab_result_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
@@ -52,7 +54,7 @@ void main() {
         ),
       );
       await storage.saveDailyLog(
-        DailyLog(date: DateTime(2026, 7, 24, 12), notes: 'Gizli günlük notu'),
+        DailyLog(date: DateTime(2026, 7, 24, 12), mood: 'Gizli ruh hali'),
       );
 
       final preferences = await SharedPreferences.getInstance();
@@ -72,6 +74,74 @@ void main() {
         expect(raw, isNot(contains('header.secret.signature')), reason: key);
         expect(raw, isNot(contains('2026-07-24')), reason: key);
       }
+    },
+  );
+
+  test(
+    'açılışta eski günlük alanlarını şifreli kayıttan kalıcı olarak temizler',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final preferences = await SharedPreferences.getInstance();
+      final keyStore = MemoryLocalKeyStore();
+      bool isDailyLogKey(String key) => key.startsWith('daily_log_');
+      final seedStore = LocalEncryptedStore(
+        preferences,
+        keyStore,
+        isDailyLogKey,
+      );
+      await seedStore.init();
+
+      await seedStore.setStringList('daily_log_dates', const [
+        '2026-07-24',
+        '2026-07-25',
+      ]);
+      await seedStore.setString(
+        'daily_log_2026-07-24',
+        jsonEncode({
+          'date': DateTime(2026, 7, 24, 12).toIso8601String(),
+          'mood': 'İyi',
+          'sleepDurationMinutes': 480,
+          'sleepQuality': 5,
+          'stressLevel': 1,
+          'energyLevel': 5,
+          'notes': 'Eski not',
+          'observedSections': ['wellbeing'],
+        }),
+      );
+      await seedStore.setString(
+        'daily_log_2026-07-25',
+        jsonEncode({
+          'date': DateTime(2026, 7, 25, 12).toIso8601String(),
+          'activities': ['Yürüyüş'],
+          'nutritionTags': ['Ev yemeği'],
+          'bowelActivity': ['Normal'],
+          'periodPainLevel': 3,
+          'observedSections': ['period', 'nutrition', 'symptom', 'wellbeing'],
+        }),
+      );
+
+      final storage = LocalStorageService(keyStore: keyStore);
+      await storage.init();
+
+      final logs = storage.loadAllLogs();
+      expect(logs, hasLength(1));
+      expect(logs.single.mood, 'İyi');
+
+      final verifier = LocalEncryptedStore(
+        preferences,
+        keyStore,
+        isDailyLogKey,
+      );
+      await verifier.init();
+      final rewritten = Map<String, dynamic>.from(
+        jsonDecode(verifier.getString('daily_log_2026-07-24')!) as Map,
+      );
+      expect(
+        rewritten.keys.where(DailyLog.retiredJsonFields.contains),
+        isEmpty,
+      );
+      expect(verifier.getString('daily_log_2026-07-25'), isNull);
+      expect(verifier.getStringList('daily_log_dates'), ['2026-07-24']);
     },
   );
 

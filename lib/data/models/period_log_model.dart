@@ -67,6 +67,23 @@ const _dailyLogJsonFields = {
   'observedSections',
 };
 
+/// Önceki sürümlerde toplanan ancak güncel giriş ekranlarında karşılığı
+/// bulunmayan alanlar. Eski yedekleri bozmayacak şekilde okunur, fakat yeni
+/// modele aktarılmaz ve tekrar yazılmaz.
+const _retiredDailyLogJsonFields = {
+  'activities',
+  'nutritionTags',
+  'nutritionNotes',
+  'moodNote',
+  'sleepDurationMinutes',
+  'sleepQuality',
+  'stressLevel',
+  'energyLevel',
+  'bowelActivity',
+  'periodPainLevel',
+  'notes',
+};
+
 /// Kullanıcının günlük kayıt sırasında gerçekten gözden geçirip kaydettiği
 /// bölümler. Boş bırakılan alan ile "yok" yanıtını ayırmak için kullanılır.
 enum DailyLogObservedSection {
@@ -203,20 +220,17 @@ class MedicationEntry {
 
 /// Günlük kayıt modeli — tüm wellness modüllerini birleşik tutar.
 class DailyLog {
+  static const retiredJsonFields = _retiredDailyLogJsonFields;
+
   final DateTime date;
   final bool hasExplicitTime;
 
-  // ── Hareket Durumu ───────────────────────────────────────
-  final List<String> activities; // Fitness, Yürüyüş, vb.
-
   // ── Beslenme ─────────────────────────────────────────────
-  final List<String> nutritionTags; // Tuzlu, Paketli, vb.
   final List<String> mealTypes;
   final Map<String, String> mealQualities;
   final Map<String, List<String>> mealFoodGroups;
   final Map<String, List<String>> mealPostFeelings;
   final List<String> cravings;
-  final String? nutritionNotes;
   final int? waterIntakeMl;
   final int? caffeineServings;
 
@@ -232,13 +246,8 @@ class DailyLog {
   // ── Ruh Hali ─────────────────────────────────────────────
   final String? mood; // Mutlu, Huzurlu, İyi, Normal, Kötü, vb.
   final String? moodEmoji; // 😊, 😌, 🙂, vb.
-  final String? moodNote;
   final List<String> moodCompanions;
   final List<String> moodPlaces;
-  final int? sleepDurationMinutes;
-  final int? sleepQuality;
-  final int? stressLevel;
-  final int? energyLevel;
   final bool? dreamRemembered;
   final String? dreamNote;
 
@@ -247,16 +256,12 @@ class DailyLog {
   final Set<SexualActivityType> sexualActivityTypes;
   final Set<SexualAfterFeeling> sexualAfterFeelings;
 
-  // ── Bağırsak Aktivitesi ──────────────────────────────────
-  final List<String> bowelActivity; // Normal, Kabızlık, İshal, vb.
-
   // ── Hisler & Ağrılar ────────────────────────────────────
   final List<String> symptoms;
   final Map<String, int> symptomSeverities;
 
   // ── Regl (Kadınlar için) ─────────────────────────────────
   final String? flowIntensity; // Yok, Lekelenme, Hafif, Orta, Yoğun
-  final int? periodPainLevel; // 0-5
 
   // ── Vajinal Akıntı / Servikal Mukus ─────────────────────
   final bool? vaginalDischargePresent;
@@ -265,23 +270,17 @@ class DailyLog {
   final VaginalDischargeAmount? vaginalDischargeAmount;
   final Set<VaginalDischargeSymptom> vaginalDischargeSymptoms;
 
-  // ── Genel Notlar ─────────────────────────────────────────
-  final String? notes;
-
   /// Bu kayıtta kullanıcı tarafından gözlemlenen/doldurulan sekmeler.
   final Set<DailyLogObservedSection> observedSections;
 
   DailyLog({
     required this.date,
     this.hasExplicitTime = true,
-    this.activities = const [],
-    this.nutritionTags = const [],
     this.mealTypes = const [],
     Map<String, String> mealQualities = const {},
     Map<String, List<String>> mealFoodGroups = const {},
     Map<String, List<String>> mealPostFeelings = const {},
     this.cravings = const [],
-    this.nutritionNotes,
     this.waterIntakeMl,
     this.caffeineServings,
     this.supplements = const [],
@@ -289,38 +288,23 @@ class DailyLog {
     this.skincare = const [],
     this.mood,
     this.moodEmoji,
-    this.moodNote,
     this.moodCompanions = const [],
     this.moodPlaces = const [],
-    this.sleepDurationMinutes,
-    this.sleepQuality,
-    this.stressLevel,
-    this.energyLevel,
     this.dreamRemembered,
     this.dreamNote,
     this.sexualActivity,
     Set<SexualActivityType> sexualActivityTypes = const {},
     Set<SexualAfterFeeling> sexualAfterFeelings = const {},
-    this.bowelActivity = const [],
     this.symptoms = const [],
     Map<String, int> symptomSeverities = const {},
     this.flowIntensity,
-    this.periodPainLevel,
     this.vaginalDischargePresent,
     this.vaginalDischargeColor,
     this.vaginalDischargeConsistency,
     this.vaginalDischargeAmount,
     Set<VaginalDischargeSymptom> vaginalDischargeSymptoms = const {},
-    this.notes,
     Set<DailyLogObservedSection> observedSections = const {},
   }) : assert(
-         sleepDurationMinutes == null ||
-             sleepDurationMinutes >= 0 && sleepDurationMinutes <= 1440,
-       ),
-       assert(sleepQuality == null || sleepQuality >= 1 && sleepQuality <= 5),
-       assert(stressLevel == null || stressLevel >= 1 && stressLevel <= 5),
-       assert(energyLevel == null || energyLevel >= 1 && energyLevel <= 5),
-       assert(
          symptomSeverities.values.every(
            (severity) => severity >= 1 && severity <= 3,
          ),
@@ -375,14 +359,11 @@ class DailyLog {
   DailyLog copyWith({
     DateTime? date,
     bool? hasExplicitTime,
-    List<String>? activities,
-    List<String>? nutritionTags,
     List<String>? mealTypes,
     Map<String, String>? mealQualities,
     Map<String, List<String>>? mealFoodGroups,
     Map<String, List<String>>? mealPostFeelings,
     List<String>? cravings,
-    String? nutritionNotes,
     int? waterIntakeMl,
     bool clearWaterIntake = false,
     int? caffeineServings,
@@ -392,17 +373,8 @@ class DailyLog {
     List<String>? skincare,
     String? mood,
     String? moodEmoji,
-    String? moodNote,
     List<String>? moodCompanions,
     List<String>? moodPlaces,
-    int? sleepDurationMinutes,
-    bool clearSleepDuration = false,
-    int? sleepQuality,
-    bool clearSleepQuality = false,
-    int? stressLevel,
-    bool clearStressLevel = false,
-    int? energyLevel,
-    bool clearEnergyLevel = false,
     bool? dreamRemembered,
     bool clearDreamRemembered = false,
     String? dreamNote,
@@ -411,13 +383,10 @@ class DailyLog {
     bool clearSexualActivity = false,
     Set<SexualActivityType>? sexualActivityTypes,
     Set<SexualAfterFeeling>? sexualAfterFeelings,
-    List<String>? bowelActivity,
     List<String>? symptoms,
     Map<String, int>? symptomSeverities,
     String? flowIntensity,
     bool clearFlowIntensity = false,
-    int? periodPainLevel,
-    bool clearPeriodPainLevel = false,
     bool? vaginalDischargePresent,
     bool clearVaginalDischargePresent = false,
     VaginalDischargeColor? vaginalDischargeColor,
@@ -427,20 +396,16 @@ class DailyLog {
     VaginalDischargeAmount? vaginalDischargeAmount,
     bool clearVaginalDischargeAmount = false,
     Set<VaginalDischargeSymptom>? vaginalDischargeSymptoms,
-    String? notes,
     Set<DailyLogObservedSection>? observedSections,
   }) {
     return DailyLog(
       date: date ?? this.date,
       hasExplicitTime: hasExplicitTime ?? this.hasExplicitTime,
-      activities: activities ?? this.activities,
-      nutritionTags: nutritionTags ?? this.nutritionTags,
       mealTypes: mealTypes ?? this.mealTypes,
       mealQualities: mealQualities ?? this.mealQualities,
       mealFoodGroups: mealFoodGroups ?? this.mealFoodGroups,
       mealPostFeelings: mealPostFeelings ?? this.mealPostFeelings,
       cravings: cravings ?? this.cravings,
-      nutritionNotes: nutritionNotes ?? this.nutritionNotes,
       waterIntakeMl: clearWaterIntake
           ? null
           : waterIntakeMl ?? this.waterIntakeMl,
@@ -452,17 +417,8 @@ class DailyLog {
       skincare: skincare ?? this.skincare,
       mood: mood ?? this.mood,
       moodEmoji: moodEmoji ?? this.moodEmoji,
-      moodNote: moodNote ?? this.moodNote,
       moodCompanions: moodCompanions ?? this.moodCompanions,
       moodPlaces: moodPlaces ?? this.moodPlaces,
-      sleepDurationMinutes: clearSleepDuration
-          ? null
-          : sleepDurationMinutes ?? this.sleepDurationMinutes,
-      sleepQuality: clearSleepQuality
-          ? null
-          : sleepQuality ?? this.sleepQuality,
-      stressLevel: clearStressLevel ? null : stressLevel ?? this.stressLevel,
-      energyLevel: clearEnergyLevel ? null : energyLevel ?? this.energyLevel,
       dreamRemembered: clearDreamRemembered
           ? null
           : dreamRemembered ?? this.dreamRemembered,
@@ -474,15 +430,11 @@ class DailyLog {
       sexualAfterFeelings: clearSexualActivity || sexualActivity == false
           ? const {}
           : sexualAfterFeelings ?? this.sexualAfterFeelings,
-      bowelActivity: bowelActivity ?? this.bowelActivity,
       symptoms: symptoms ?? this.symptoms,
       symptomSeverities: symptomSeverities ?? this.symptomSeverities,
       flowIntensity: clearFlowIntensity
           ? null
           : flowIntensity ?? this.flowIntensity,
-      periodPainLevel: clearPeriodPainLevel
-          ? null
-          : periodPainLevel ?? this.periodPainLevel,
       vaginalDischargePresent: clearVaginalDischargePresent
           ? null
           : vaginalDischargePresent ?? this.vaginalDischargePresent,
@@ -497,64 +449,49 @@ class DailyLog {
           : vaginalDischargeAmount ?? this.vaginalDischargeAmount,
       vaginalDischargeSymptoms:
           vaginalDischargeSymptoms ?? this.vaginalDischargeSymptoms,
-      notes: notes ?? this.notes,
       observedSections: observedSections ?? this.observedSections,
     );
   }
 
   /// Kayıt dolu mu? (en az bir alan girilmiş mi)
   bool get hasData {
-    return activities.isNotEmpty ||
-        nutritionTags.isNotEmpty ||
-        mealTypes.isNotEmpty ||
+    return mealTypes.isNotEmpty ||
         mealQualities.isNotEmpty ||
         mealFoodGroups.isNotEmpty ||
         mealPostFeelings.isNotEmpty ||
         cravings.isNotEmpty ||
-        (nutritionNotes?.isNotEmpty ?? false) ||
         waterIntakeMl != null ||
         caffeineServings != null ||
         supplements.isNotEmpty ||
         medications.isNotEmpty ||
         skincare.isNotEmpty ||
         mood != null ||
-        (moodNote?.isNotEmpty ?? false) ||
         moodCompanions.isNotEmpty ||
         moodPlaces.isNotEmpty ||
-        sleepDurationMinutes != null ||
-        sleepQuality != null ||
-        stressLevel != null ||
-        energyLevel != null ||
         dreamRemembered != null ||
         (dreamNote?.isNotEmpty ?? false) ||
         sexualActivity != null ||
         sexualActivityTypes.isNotEmpty ||
         sexualAfterFeelings.isNotEmpty ||
-        bowelActivity.isNotEmpty ||
         symptoms.isNotEmpty ||
         symptomSeverities.isNotEmpty ||
         flowIntensity != null ||
-        periodPainLevel != null ||
         vaginalDischargePresent != null ||
         vaginalDischargeColor != null ||
         vaginalDischargeConsistency != null ||
         vaginalDischargeAmount != null ||
         vaginalDischargeSymptoms.isNotEmpty ||
-        notes != null ||
         observedSections.isNotEmpty;
   }
 
   Map<String, dynamic> toJson() => {
     'date': date.toIso8601String(),
     'hasExplicitTime': hasExplicitTime,
-    'activities': activities,
-    'nutritionTags': nutritionTags,
     'mealTypes': mealTypes,
     'mealQualities': mealQualities,
     'mealFoodGroups': mealFoodGroups,
     'mealPostFeelings': mealPostFeelings,
     'cravings': cravings,
-    'nutritionNotes': nutritionNotes,
     'waterIntakeMl': waterIntakeMl,
     'caffeineServings': caffeineServings,
     'supplements': supplements.map((e) => e.toJson()).toList(),
@@ -562,13 +499,8 @@ class DailyLog {
     'skincare': skincare,
     'mood': mood,
     'moodEmoji': moodEmoji,
-    'moodNote': moodNote,
     'moodCompanions': moodCompanions,
     'moodPlaces': moodPlaces,
-    'sleepDurationMinutes': sleepDurationMinutes,
-    'sleepQuality': sleepQuality,
-    'stressLevel': stressLevel,
-    'energyLevel': energyLevel,
     'dreamRemembered': dreamRemembered,
     'dreamNote': dreamNote,
     'sexualActivity': sexualActivity,
@@ -578,11 +510,9 @@ class DailyLog {
     'sexualAfterFeelings': sexualAfterFeelings
         .map((feeling) => feeling.name)
         .toList(),
-    'bowelActivity': bowelActivity,
     'symptoms': symptoms,
     'symptomSeverities': symptomSeverities,
     'flowIntensity': flowIntensity,
-    'periodPainLevel': periodPainLevel,
     'vaginalDischargePresent': vaginalDischargePresent,
     'vaginalDischargeColor': vaginalDischargeColor?.name,
     'vaginalDischargeConsistency': vaginalDischargeConsistency?.name,
@@ -590,7 +520,6 @@ class DailyLog {
     'vaginalDischargeSymptoms': vaginalDischargeSymptoms
         .map((symptom) => symptom.name)
         .toList(),
-    'notes': notes,
     'observedSections': observedSections
         .map((section) => section.name)
         .toList(),
@@ -601,14 +530,11 @@ class DailyLog {
     return DailyLog(
       date: DateTime.parse(json['date'] as String),
       hasExplicitTime: json['hasExplicitTime'] as bool? ?? true,
-      activities: List<String>.from(json['activities'] ?? []),
-      nutritionTags: List<String>.from(json['nutritionTags'] ?? []),
       mealTypes: List<String>.from(json['mealTypes'] ?? []),
       mealQualities: _readStringMap(json, 'mealQualities'),
       mealFoodGroups: _readStringListMap(json, 'mealFoodGroups'),
       mealPostFeelings: _readStringListMap(json, 'mealPostFeelings'),
       cravings: List<String>.from(json['cravings'] ?? []),
-      nutritionNotes: json['nutritionNotes'] as String?,
       waterIntakeMl: _readOptionalInt(
         json,
         'waterIntakeMl',
@@ -634,43 +560,16 @@ class DailyLog {
       skincare: List<String>.from(json['skincare'] ?? const []),
       mood: json['mood'] as String?,
       moodEmoji: json['moodEmoji'] as String?,
-      moodNote: json['moodNote'] as String?,
       moodCompanions: List<String>.from(json['moodCompanions'] ?? []),
       moodPlaces: List<String>.from(json['moodPlaces'] ?? []),
-      sleepDurationMinutes: _readOptionalInt(
-        json,
-        'sleepDurationMinutes',
-        minimum: 0,
-        maximum: 1440,
-      ),
-      sleepQuality: _readOptionalInt(
-        json,
-        'sleepQuality',
-        minimum: 1,
-        maximum: 5,
-      ),
-      stressLevel: _readOptionalInt(
-        json,
-        'stressLevel',
-        minimum: 1,
-        maximum: 5,
-      ),
-      energyLevel: _readOptionalInt(
-        json,
-        'energyLevel',
-        minimum: 1,
-        maximum: 5,
-      ),
       dreamRemembered: json['dreamRemembered'] as bool?,
       dreamNote: json['dreamNote'] as String?,
       sexualActivity: json['sexualActivity'] as bool?,
       sexualActivityTypes: _readSexualActivityTypes(json),
       sexualAfterFeelings: _readSexualAfterFeelings(json),
-      bowelActivity: List<String>.from(json['bowelActivity'] ?? []),
       symptoms: List<String>.from(json['symptoms'] ?? []),
       symptomSeverities: _readSymptomSeverities(json),
       flowIntensity: json['flowIntensity'] as String?,
-      periodPainLevel: json['periodPainLevel'] as int?,
       vaginalDischargePresent: json['vaginalDischargePresent'] as bool?,
       vaginalDischargeColor: _readOptionalEnum(
         json,
@@ -694,7 +593,6 @@ class DailyLog {
                     VaginalDischargeSymptom.values.byName(value as String),
               )
               .toSet(),
-      notes: json['notes'] as String?,
       observedSections: (json['observedSections'] as List<dynamic>? ?? const [])
           .map(
             (value) => DailyLogObservedSection.values.byName(value as String),
@@ -986,8 +884,6 @@ class DailyLog {
     return DailyLog(
       date: date, // Timestamp korunur — her kayıt kendi zamanıyla ayrıdır
       hasExplicitTime: hasExplicitTime,
-      activities: (activities + other.activities).toSet().toList(),
-      nutritionTags: (nutritionTags + other.nutritionTags).toSet().toList(),
       mealTypes: (mealTypes + other.mealTypes).toSet().toList(),
       mealQualities: {...other.mealQualities, ...mealQualities},
       mealFoodGroups: _mergeStringListMaps(
@@ -999,9 +895,6 @@ class DailyLog {
         mealPostFeelings,
       ),
       cravings: (cravings + other.cravings).toSet().toList(),
-      nutritionNotes: (nutritionNotes != null && nutritionNotes!.isNotEmpty)
-          ? nutritionNotes
-          : other.nutritionNotes,
       waterIntakeMl: waterIntakeMl ?? other.waterIntakeMl,
       caffeineServings: caffeineServings ?? other.caffeineServings,
       supplements: mergeMeds(supplements, other.supplements),
@@ -1009,15 +902,8 @@ class DailyLog {
       skincare: (skincare + other.skincare).toSet().toList(),
       mood: mood ?? other.mood,
       moodEmoji: moodEmoji ?? other.moodEmoji,
-      moodNote: (moodNote != null && moodNote!.isNotEmpty)
-          ? moodNote
-          : other.moodNote,
       moodCompanions: (moodCompanions + other.moodCompanions).toSet().toList(),
       moodPlaces: (moodPlaces + other.moodPlaces).toSet().toList(),
-      sleepDurationMinutes: sleepDurationMinutes ?? other.sleepDurationMinutes,
-      sleepQuality: sleepQuality ?? other.sleepQuality,
-      stressLevel: stressLevel ?? other.stressLevel,
-      energyLevel: energyLevel ?? other.energyLevel,
       dreamRemembered: dreamRemembered ?? other.dreamRemembered,
       dreamNote: (dreamNote?.isNotEmpty ?? false) ? dreamNote : other.dreamNote,
       sexualActivity: mergedSexualActivity,
@@ -1025,11 +911,9 @@ class DailyLog {
       sexualAfterFeelings: mergedSexualActivity == true
           ? {...other.sexualAfterFeelings, ...sexualAfterFeelings}
           : const {},
-      bowelActivity: (bowelActivity + other.bowelActivity).toSet().toList(),
       symptoms: (symptoms + other.symptoms).toSet().toList(),
       symptomSeverities: {...other.symptomSeverities, ...symptomSeverities},
       flowIntensity: flowIntensity ?? other.flowIntensity,
-      periodPainLevel: periodPainLevel ?? other.periodPainLevel,
       vaginalDischargePresent: mergedDischargePresent,
       vaginalDischargeColor: mergeDischargeDetails
           ? vaginalDischargeColor ??
@@ -1049,7 +933,6 @@ class DailyLog {
               if (otherHasDischarge) ...other.vaginalDischargeSymptoms,
             }
           : const {},
-      notes: (notes != null && notes!.isNotEmpty) ? notes : other.notes,
       observedSections: {...observedSections, ...other.observedSections},
     );
   }

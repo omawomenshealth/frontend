@@ -1,6 +1,7 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/constants/color_constants.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
+import 'package:app_proje_a/core/utils/date_extensions.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
@@ -77,6 +78,73 @@ void main() {
       contains(DailyLogObservedSection.period),
     );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Kayıtlı adet günü ekrandan onayla geri alınabilir', (
+    tester,
+  ) async {
+    final entryDate = DateTime.now();
+    final harness = await _pumpLogSheet(
+      tester,
+      initialIndex: 0,
+      initialLog: DailyLog(
+        date: entryDate,
+        flowIntensity: 'Orta',
+        observedSections: const {DailyLogObservedSection.period},
+      ),
+    );
+
+    final deleteButton = find.byKey(const ValueKey('delete_period_for_day'));
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -520));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(deleteButton);
+    await tester.pumpAndSettle();
+    await tester.tap(deleteButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.deletePeriodConfirmationTitle), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, AppStrings.delete));
+    await tester.pumpAndSettle();
+
+    expect(harness.deletedPeriodDate?.dateOnly, entryDate.dateOnly);
+    expect(find.text(AppStrings.periodEntryDeleted), findsOneWidget);
+  });
+
+  test('Adet kaydını silmek aynı günün diğer verilerini korur', () async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await storage.init();
+    final today = DateTime.now().dateOnly;
+    await storage.saveSettings(
+      UserSettings(isOnboardingComplete: true, lastPeriodDate: today),
+    );
+    await storage.saveDailyLog(
+      DailyLog(
+        date: today.add(const Duration(hours: 8)),
+        flowIntensity: 'Orta',
+        symptoms: const ['Kramp'],
+        symptomSeverities: const {'Kramp': 2},
+        observedSections: const {DailyLogObservedSection.period},
+      ),
+    );
+    await storage.saveDailyLog(
+      DailyLog(
+        date: today.add(const Duration(hours: 12)),
+        mealTypes: const ['Öğle Yemeği'],
+        mealFoodGroups: const {
+          'Öğle Yemeği': ['Sebze'],
+        },
+        observedSections: const {DailyLogObservedSection.nutrition},
+      ),
+    );
+
+    expect(await storage.deletePeriodLogsForDate(today), isTrue);
+
+    final remaining = storage.loadLogsForDate(today);
+    expect(remaining, hasLength(1));
+    expect(remaining.single.mealTypes, isNotEmpty);
+    expect(remaining.single.flowIntensity, isNull);
+    expect(storage.loadSettings()!.lastPeriodDate, isNull);
   });
 
   testWidgets('Adet ekranındaki artı kayıt onayıyla belirti ekranını açar', (
@@ -680,6 +748,9 @@ void main() {
     expect(find.text(AppStrings.supplementQuestion), findsOneWidget);
     expect(find.text(AppStrings.medicationTime), findsNothing);
 
+    await tester.tap(find.widgetWithText(FilterChip, 'Test ilacı'));
+    await tester.pumpAndSettle();
+
     tester
         .widget<InkWell>(
           find.byKey(const ValueKey('medication_entry_medication:test ilacı')),
@@ -716,8 +787,6 @@ void main() {
           .onTap!();
       await tester.pumpAndSettle();
     }
-    final thirdDose = find.byKey(const ValueKey('dose_circle_Test ilacı_2'));
-    tester.widget<InkWell>(thirdDose).onTap!();
     await tester.tap(find.text(AppStrings.saveMedicationAndSupplement));
     await tester.pumpAndSettle();
 
@@ -731,14 +800,44 @@ void main() {
       }),
     );
     expect(entry.doseCount, 3);
-    expect(entry.takenDoseCount, 3);
+    expect(entry.takenDoseCount, 1);
     expect(entry.dosage, AppStrings.dosageCount(3));
     expect(entry.stomachState, AppStrings.stomachStates.first);
-    expect(entry.taken, isTrue);
+    expect(entry.taken, isFalse);
     expect(
       harness.savedLog!.observedSections,
       contains(DailyLogObservedSection.medication),
     );
+  });
+
+  testWidgets('İlaç ve takviye seçimi ilk dozu otomatik alınmış kaydeder', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(
+      tester,
+      initialIndex: 4,
+      settings: UserSettings(
+        isOnboardingComplete: true,
+        userName: 'Test',
+        dailyMedications: const ['Tek doz ilaç'],
+        dailySupplements: const ['Tek doz takviye'],
+      ),
+    );
+
+    await tester.tap(find.widgetWithText(FilterChip, 'Tek doz ilaç'));
+    await tester.pumpAndSettle();
+    final supplement = find.widgetWithText(FilterChip, 'Tek doz takviye');
+    await tester.ensureVisible(supplement);
+    await tester.pumpAndSettle();
+    await tester.tap(supplement);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.saveMedicationAndSupplement));
+    await tester.pumpAndSettle();
+
+    expect(harness.savedLog!.medications.single.takenDoseCount, 1);
+    expect(harness.savedLog!.medications.single.doseCount, 1);
+    expect(harness.savedLog!.supplements.single.takenDoseCount, 1);
+    expect(harness.savedLog!.supplements.single.doseCount, 1);
   });
 
   testWidgets('Birden fazla ilaç ve takviye kompakt satırlarda açılır', (
@@ -755,6 +854,14 @@ void main() {
         dailySupplements: const ['Takviye A', 'Takviye B'],
       ),
     );
+
+    for (final item in ['İlaç A', 'İlaç B', 'Takviye A', 'Takviye B']) {
+      final chip = find.widgetWithText(FilterChip, item);
+      await tester.ensureVisible(chip);
+      await tester.pumpAndSettle();
+      await tester.tap(chip);
+      await tester.pumpAndSettle();
+    }
 
     expect(find.text('İlaç A'), findsWidgets);
     expect(find.text('İlaç B'), findsWidgets);
@@ -779,6 +886,100 @@ void main() {
     await tester.tap(medicationB);
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.medicationTime.toUpperCase()), findsOneWidget);
+  });
+
+  testWidgets('kayıtlı ilaç ve takviyeler seçim alanlarının üstünde görünür', (
+    tester,
+  ) async {
+    await _pumpLogSheet(
+      tester,
+      initialIndex: 4,
+      initialLog: DailyLog(
+        date: DateTime.now(),
+        medications: [
+          MedicationEntry(
+            name: 'Göz damlası',
+            times: const {'Sabah'},
+            stomachState: 'Aç',
+            takenDoseCount: 1,
+          ),
+        ],
+        supplements: [
+          MedicationEntry(
+            name: 'D vitamini',
+            times: const {'Sabah'},
+            stomachState: 'Aç',
+            takenDoseCount: 1,
+          ),
+        ],
+      ),
+    );
+
+    final medication = find.byKey(
+      const ValueKey('medication_entry_medication:göz damlası'),
+    );
+    final supplement = find.byKey(
+      const ValueKey('medication_entry_supplement:d vitamini'),
+    );
+    final medicationQuestion = find.text(AppStrings.medicationQuestion);
+
+    expect(medication, findsOneWidget);
+    expect(supplement, findsOneWidget);
+    expect(
+      tester.getTopLeft(medication).dy,
+      lessThan(tester.getTopLeft(medicationQuestion).dy),
+    );
+    expect(
+      tester.getTopLeft(supplement).dy,
+      lessThan(tester.getTopLeft(medicationQuestion).dy),
+    );
+  });
+
+  testWidgets('ilaç için ek saat yeni dozu alınmış saymadan kaydedilir', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(
+      tester,
+      initialIndex: 4,
+      settings: UserSettings(
+        isOnboardingComplete: true,
+        dailyMedications: const ['Test ilacı'],
+      ),
+    );
+
+    await tester.tap(find.widgetWithText(FilterChip, 'Test ilacı'));
+    await tester.pumpAndSettle();
+    final entry = find.byKey(
+      const ValueKey('medication_entry_medication:test ilacı'),
+    );
+    await tester.ensureVisible(entry);
+    await tester.tap(entry);
+    await tester.pumpAndSettle();
+
+    final addTime = find.byKey(
+      const ValueKey('add_medication_time_medication:test ilacı'),
+    );
+    await tester.ensureVisible(addTime);
+    await tester.tap(addTime);
+    await tester.pumpAndSettle();
+    final pickerContext = tester.element(find.byType(TimePickerDialog));
+    final okLabel = MaterialLocalizations.of(pickerContext).okButtonLabel;
+    await tester.tap(find.text(okLabel));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(
+        const ValueKey('medication_custom_time_medication:test ilacı_15:00'),
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.text(AppStrings.saveMedicationAndSupplement));
+    await tester.pumpAndSettle();
+
+    final saved = harness.savedLog!.medications.single;
+    expect(saved.times, contains('15:00'));
+    expect(saved.doseCount, 2);
+    expect(saved.takenDoseCount, 1);
   });
 
   testWidgets('İlaçta artı yoktur, takviyedeki artı kalıcı ekler', (
@@ -820,6 +1021,9 @@ void main() {
       ),
     );
 
+    await tester.tap(find.widgetWithText(FilterChip, 'Test ilacı'));
+    await tester.pumpAndSettle();
+
     final reminder = find.byKey(
       const ValueKey('medication_reminder_medication:test ilacı'),
     );
@@ -831,6 +1035,38 @@ void main() {
     );
     expect(itemField.initialValue, 'Test ilacı');
     expect(find.text(AppStrings.reminderEnabled), findsOneWidget);
+  });
+
+  testWidgets('dört ilaç saati hatırlatıcı formuna birlikte aktarılır', (
+    tester,
+  ) async {
+    await _pumpLogSheet(
+      tester,
+      initialIndex: 4,
+      initialLog: DailyLog(
+        date: DateTime.now(),
+        medications: [
+          MedicationEntry(
+            name: 'Dört doz ilaç',
+            times: const {'08:00', '12:00', '18:00', '22:00'},
+            stomachState: 'Tok',
+            doseCount: 4,
+            takenDoseCount: 1,
+          ),
+        ],
+      ),
+    );
+
+    final reminder = find.byKey(
+      const ValueKey('medication_reminder_medication:dört doz ilaç'),
+    );
+    tester.widget<IconButton>(reminder).onPressed!();
+    await tester.pumpAndSettle();
+
+    for (var index = 0; index < 4; index++) {
+      expect(find.byKey(ValueKey('reminder_time_slot_$index')), findsOneWidget);
+    }
+    expect(find.text(AppStrings.dosageCount(4)), findsOneWidget);
   });
 
   testWidgets('Birleşik sayfadan hatırlatıcı formuna ulaşılır', (tester) async {
@@ -904,10 +1140,6 @@ void main() {
     await tester.tap(find.text(AppStrings.save));
     await tester.pumpAndSettle();
 
-    expect(harness.savedLog!.sleepDurationMinutes, isNull);
-    expect(harness.savedLog!.sleepQuality, isNull);
-    expect(harness.savedLog!.stressLevel, isNull);
-    expect(harness.savedLog!.energyLevel, isNull);
     expect(
       harness.savedLog!.symptoms,
       contains(AppStrings.symptomEnergyOptions.first),
@@ -932,7 +1164,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(harness.savedLog!.caffeineServings, 1);
-    expect(harness.savedLog!.bowelActivity, isEmpty);
   });
 
   test('Yeni sade kayit alanlari JSON yedeginde kaybolmaz', () {
@@ -1047,6 +1278,10 @@ Future<_LogHarness> _pumpLogSheet(
                         harness.savedLog = log;
                         return true;
                       },
+                      onDeletePeriod: (date) async {
+                        harness.deletedPeriodDate = date;
+                        return true;
+                      },
                     ),
                   );
                 },
@@ -1066,6 +1301,7 @@ Future<_LogHarness> _pumpLogSheet(
 class _LogHarness {
   final LocalStorageService storage;
   DailyLog? savedLog;
+  DateTime? deletedPeriodDate;
   int settingsChangeCount = 0;
 
   _LogHarness(this.storage);

@@ -2,20 +2,25 @@
 
 ## Sunucu bağlantısı
 
-Yerel sunucu adresi geliştirme sırasında `OMA_API_BASE_URL` dart-define değeriyle
-ayarlanır. Değer verilmezse Android emülatörde varsayılan
-`http://10.0.2.2:3000`, diğer geliştirme hedeflerinde localhost kullanılır.
+Yerel sunucu adresi proje kökündeki `.env` dosyasındaki `OMA_API_BASE_URL`
+değeriyle ayarlanır. İlk kurulumda örnek dosyayı kopyalayıp adresi çalıştırılan
+ortama göre düzenleyin:
 
 ```powershell
-flutter run --dart-define=OMA_API_BASE_URL=http://192.168.1.13:3000
+Copy-Item .env.example .env
+flutter run
 ```
 
 Release derlemelerinde HTTPS zorunludur; boş veya HTTP adresle uygulama güvenli
 biçimde açılışı reddeder:
 
-```powershell
-flutter build appbundle --release --dart-define=OMA_API_BASE_URL=https://api.example.com
+```dotenv
+OMA_API_BASE_URL=https://api.example.com
 ```
+
+`.env` Flutter paketine asset olarak eklenir ve gizli değildir. Bu dosyada
+yalnızca API adresi ve mağaza ürün kimliği gibi herkese açık yapılandırmalar
+tutulmalı; API anahtarı, parola veya sunucu sırrı tutulmamalıdır.
 
 ## Telefonda veri şifreleme
 
@@ -44,10 +49,11 @@ sunucu entitlement kontrolünden sonra gönderilir.
 
 ## Google Play premium
 
-Uygulamanın varsayılan abonelik kimliği `oma_premium_monthly` değeridir:
+Abonelik kimliği de `.env` içindeki
+`GOOGLE_PLAY_PREMIUM_PRODUCT_ID` değeriyle ayarlanır:
 
-```powershell
-flutter run --release --dart-define=GOOGLE_PLAY_PREMIUM_PRODUCT_ID=oma_premium_monthly
+```dotenv
+GOOGLE_PLAY_PREMIUM_PRODUCT_ID=oma_premium_monthly
 ```
 
 Bu değer Play Console'daki subscription product ID ve sunucudaki

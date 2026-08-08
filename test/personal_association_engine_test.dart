@@ -12,12 +12,13 @@ void main() {
   test('gözlemlenen günlük bölümleri JSON içinde korunur', () {
     final original = DailyLog(
       date: DateTime(2026, 1, 1),
-      sleepDurationMinutes: 450,
-      sleepQuality: 4,
-      stressLevel: 2,
-      energyLevel: 4,
       waterIntakeMl: 2250,
       caffeineServings: 1,
+      mood: 'İyi',
+      moodCompanions: const ['Arkadaş'],
+      moodPlaces: const ['Ev'],
+      dreamRemembered: true,
+      dreamNote: 'Deniz gördüm.',
       vaginalDischargePresent: true,
       vaginalDischargeColor: VaginalDischargeColor.clear,
       vaginalDischargeConsistency: VaginalDischargeConsistency.stretchyEggWhite,
@@ -38,12 +39,10 @@ void main() {
         DailyLogObservedSection.wellbeing,
       }),
     );
-    expect(restored.sleepDurationMinutes, 450);
-    expect(restored.sleepQuality, 4);
-    expect(restored.stressLevel, 2);
-    expect(restored.energyLevel, 4);
     expect(restored.waterIntakeMl, 2250);
     expect(restored.caffeineServings, 1);
+    expect(restored.mood, 'İyi');
+    expect(restored.moodCompanions, contains('Arkadaş'));
     expect(restored.vaginalDischargePresent, isTrue);
     expect(restored.vaginalDischargeColor, VaginalDischargeColor.clear);
     expect(
@@ -58,13 +57,15 @@ void main() {
     expect(restored.hasData, isTrue);
   });
 
-  test('buluttan gelen geçersiz metrik değerini reddeder', () {
+  test('eski metrikleri yok sayar, geçersiz aktif değerleri reddeder', () {
+    final restored = DailyLog.fromJson({
+      'date': DateTime(2026, 1, 1).toIso8601String(),
+      'sleepQuality': 6,
+      'energyLevel': 9,
+    });
     expect(
-      () => DailyLog.fromJson({
-        'date': DateTime(2026, 1, 1).toIso8601String(),
-        'sleepQuality': 6,
-      }),
-      throwsFormatException,
+      restored.toJson().keys.where(DailyLog.retiredJsonFields.contains),
+      isEmpty,
     );
     expect(
       () => DailyLog.fromJson({
@@ -414,11 +415,11 @@ void main() {
     final logs = List.generate(84, (day) {
       final dayInCycle = day % 28;
       final isLuteal = dayInCycle >= 17;
-      return DailyLog(
-        date: start.add(Duration(days: day)),
-        energyLevel: isLuteal ? 2 : 4,
-        observedSections: const {DailyLogObservedSection.wellbeing},
-      );
+      return DailyLog.fromJson({
+        'date': start.add(Duration(days: day)).toIso8601String(),
+        'energyLevel': isLuteal ? 2 : 4,
+        'observedSections': ['wellbeing'],
+      });
     });
 
     final insights = engine.generate(
@@ -441,11 +442,11 @@ void main() {
   test('döngü sinyali uygun değilse faz-ruh hali bağlantısını bastırır', () {
     final start = DateTime(2026, 1, 1);
     final logs = List.generate(56, (day) {
-      return DailyLog(
-        date: start.add(Duration(days: day)),
-        mood: day % 28 >= 5 && day % 28 <= 11 ? 'Mutlu' : 'Yorgun',
-        energyLevel: day % 28 >= 17 ? 2 : 4,
-      );
+      return DailyLog.fromJson({
+        'date': start.add(Duration(days: day)).toIso8601String(),
+        'mood': day % 28 >= 5 && day % 28 <= 11 ? 'Mutlu' : 'Yorgun',
+        'energyLevel': day % 28 >= 17 ? 2 : 4,
+      });
     });
 
     final insights = engine.generate(
@@ -470,14 +471,18 @@ void main() {
     final logs = <DailyLog>[];
     for (var day = 0; day < 20; day++) {
       logs.add(
-        DailyLog(
-          date: DateTime(2026, 5, 1).add(Duration(days: day)),
-          activities: day < 10 ? const ['Yürüyüş'] : const [],
-          symptoms: day == 5 || day >= 10 && day < 18
-              ? const ['Baş ağrısı']
-              : const [],
-          observedSections: const {DailyLogObservedSection.wellbeing},
-        ),
+        DailyLog.fromJson({
+          'date': DateTime(
+            2026,
+            5,
+            1,
+          ).add(Duration(days: day)).toIso8601String(),
+          'activities': day < 10 ? ['Yürüyüş'] : <String>[],
+          'symptoms': day == 5 || day >= 10 && day < 18
+              ? ['Baş ağrısı']
+              : <String>[],
+          'observedSections': ['wellbeing'],
+        }),
       );
     }
 
@@ -496,12 +501,16 @@ void main() {
     final logs = <DailyLog>[];
     for (var day = 0; day < 20; day++) {
       logs.add(
-        DailyLog(
-          date: DateTime(2026, 5, 1).add(Duration(days: day)),
-          stressLevel: day < 10 ? 5 : 1,
-          symptoms: day < 8 || day == 15 ? const ['Baş ağrısı'] : const [],
-          observedSections: const {DailyLogObservedSection.wellbeing},
-        ),
+        DailyLog.fromJson({
+          'date': DateTime(
+            2026,
+            5,
+            1,
+          ).add(Duration(days: day)).toIso8601String(),
+          'stressLevel': day < 10 ? 5 : 1,
+          'symptoms': day < 8 || day == 15 ? ['Baş ağrısı'] : <String>[],
+          'observedSections': ['wellbeing'],
+        }),
       );
     }
 
@@ -517,15 +526,12 @@ void main() {
 
   test('arayüzde olmayan eski beslenme etiketini analiz etmez', () {
     final logs = List.generate(12, (day) {
-      return DailyLog(
-        date: DateTime(2026, 3, 1).add(Duration(days: day)),
-        nutritionTags: day < 3 ? const ['Tuzlu'] : const [],
-        symptoms: day == 0 || day == 1 ? const ['Şişkinlik'] : const [],
-        observedSections: const {
-          DailyLogObservedSection.nutrition,
-          DailyLogObservedSection.wellbeing,
-        },
-      );
+      return DailyLog.fromJson({
+        'date': DateTime(2026, 3, 1).add(Duration(days: day)).toIso8601String(),
+        'nutritionTags': day < 3 ? ['Tuzlu'] : <String>[],
+        'symptoms': day == 0 || day == 1 ? ['Şişkinlik'] : <String>[],
+        'observedSections': ['nutrition', 'wellbeing'],
+      });
     });
 
     expect(engine.generate(logs: logs), isEmpty);

@@ -210,10 +210,10 @@ void main() {
       final start = DateTime(2026, 1, 1);
       final logs = List.generate(84, (day) {
         final dayInCycle = day % 28;
-        return DailyLog(
-          date: start.add(Duration(days: day)),
-          energyLevel: dayInCycle >= 17 ? 2 : 4,
-        );
+        return DailyLog.fromJson({
+          'date': start.add(Duration(days: day)).toIso8601String(),
+          'energyLevel': dayInCycle >= 17 ? 2 : 4,
+        });
       });
 
       final insights = engine.generate(
@@ -336,11 +336,11 @@ void main() {
     final insights = engine.generate(
       List.generate(
         9,
-        (day) => DailyLog(
-          date: DateTime(2026, 7, day + 1),
-          bowelActivity: day < 3 ? const ['Normal'] : const [],
-          mood: 'İyi',
-        ),
+        (day) => DailyLog.fromJson({
+          'date': DateTime(2026, 7, day + 1).toIso8601String(),
+          'bowelActivity': day < 3 ? ['Normal'] : <String>[],
+          'mood': 'İyi',
+        }),
       ),
       now: DateTime(2026, 7, 10),
     );

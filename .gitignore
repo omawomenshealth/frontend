@@ -12,6 +12,11 @@
 .swiftpm/
 migrate_working_dir/
 
+# Local public runtime configuration. Never put real secrets in Flutter assets.
+.env
+.env.*
+!.env.example
+
 # IntelliJ related
 *.iml
 *.ipr

@@ -195,9 +195,7 @@ class DashboardView extends StatelessWidget {
   void _openInsight(BuildContext context, PersonalInsight insight) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => InsightsView(initialInsightId: insight.id),
-      ),
+      MaterialPageRoute(builder: (_) => InsightsView(initialInsight: insight)),
     );
   }
 
@@ -260,6 +258,13 @@ class DashboardView extends StatelessWidget {
           final success = log.flowIntensity != null
               ? await vm.recordPeriodAndRecalculate(log)
               : await vm.saveLog(log);
+          if (success && context.mounted) {
+            await context.read<CalendarViewModel>().loadData();
+          }
+          return success;
+        },
+        onDeletePeriod: (date) async {
+          final success = await vm.deletePeriodForDate(date);
           if (success && context.mounted) {
             await context.read<CalendarViewModel>().loadData();
           }
@@ -480,13 +485,16 @@ class _PersonalInsightsPreview extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             itemCount: vm.personalInsights.length,
             separatorBuilder: (_, _) => const SizedBox(width: 12),
-            itemBuilder: (context, index) => SizedBox(
-              width: 300,
-              child: PersonalInsightCard(
-                insight: vm.personalInsights[index],
-                onTap: () => onInsightTap(vm.personalInsights[index]),
-              ),
-            ),
+            itemBuilder: (context, index) {
+              final insight = vm.personalInsights[index];
+              return SizedBox(
+                width: 300,
+                child: PersonalInsightCard(
+                  insight: insight,
+                  onTap: () => onInsightTap(insight),
+                ),
+              );
+            },
           ),
         ),
       ],

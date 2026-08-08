@@ -805,6 +805,11 @@ Future<void> _showDailyLogEditor(
         if (success) await calendarVm.loadData();
         return success;
       },
+      onDeletePeriod: (date) async {
+        final success = await dashboardVm.deletePeriodForDate(date);
+        if (success) await calendarVm.loadData();
+        return success;
+      },
     ),
   );
 }
@@ -1106,46 +1111,10 @@ class _DailyLogDetails extends StatelessWidget {
           : value.moodPlaces.map(AppStrings.localizeStoredValue).join(', '),
     );
     add(
-      AppStrings.sleepDuration,
-      value.sleepDurationMinutes == null
-          ? null
-          : AppStrings.hoursMinutes(value.sleepDurationMinutes!),
-    );
-    add(
-      AppStrings.sleepQuality,
-      value.sleepQuality == null
-          ? null
-          : AppStrings.levelOutOfFive(value.sleepQuality!),
-    );
-    add(
-      AppStrings.stressLevel,
-      value.stressLevel == null
-          ? null
-          : AppStrings.levelOutOfFive(value.stressLevel!),
-    );
-    add(
-      AppStrings.energyLevel,
-      value.energyLevel == null
-          ? null
-          : AppStrings.levelOutOfFive(value.energyLevel!),
-    );
-    add(
       AppStrings.dreamQuestion,
       value.dreamRemembered == null && (value.dreamNote?.isEmpty ?? true)
           ? null
           : DailyLogFormatters.dream(value),
-    );
-    add(
-      AppStrings.activity,
-      value.activities.isEmpty
-          ? null
-          : value.activities.map(AppStrings.localizeStoredValue).join(', '),
-    );
-    add(
-      AppStrings.nutrition,
-      value.nutritionTags.isEmpty
-          ? null
-          : value.nutritionTags.map(AppStrings.localizeStoredValue).join(', '),
     );
     add(
       AppStrings.mealsToday,
@@ -1220,12 +1189,6 @@ class _DailyLogDetails extends StatelessWidget {
                 .join(', '),
     );
     add(
-      AppStrings.bowel,
-      value.bowelActivity.isEmpty
-          ? null
-          : value.bowelActivity.map(AppStrings.localizeStoredValue).join(', '),
-    );
-    add(
       AppStrings.symptom,
       value.symptoms.isEmpty
           ? null
@@ -1259,7 +1222,6 @@ class _DailyLogDetails extends StatelessWidget {
           ? null
           : DailyLogFormatters.sexualActivity(value),
     );
-    add(AppStrings.notes, value.notes);
     return result;
   }
 }

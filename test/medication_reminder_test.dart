@@ -134,6 +134,26 @@ void main() {
     );
   });
 
+  test('günde dört bildirim saati dört ayrı doz üretir', () {
+    final doses = MedicationScheduleCalculator.between(
+      plans: [
+        plan(
+          times: const [
+            ReminderClockTime(hour: 6, minute: 0),
+            ReminderClockTime(hour: 12, minute: 0),
+            ReminderClockTime(hour: 18, minute: 0),
+            ReminderClockTime(hour: 23, minute: 30),
+          ],
+        ),
+      ],
+      from: DateTime(2026, 7, 20),
+      through: DateTime(2026, 7, 20, 23, 59),
+    );
+
+    expect(doses, hasLength(4));
+    expect(doses.last.scheduledAt, DateTime(2026, 7, 20, 23, 30));
+  });
+
   test('planlanan doz ve yanıtı yerel depoda kalıcı tutulur', () async {
     SharedPreferences.setMockInitialValues({});
     final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
@@ -242,6 +262,15 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('reminder_dose_increment')));
     await tester.pump();
     expect(find.text(AppStrings.dosageCount(3)), findsOneWidget);
+
+    final addTime = find.byKey(const ValueKey('reminder_add_time'));
+    await tester.ensureVisible(addTime);
+    for (var index = 0; index < 3; index++) {
+      await tester.tap(addTime);
+      await tester.pump();
+    }
+    expect(find.byKey(const ValueKey('reminder_time_slot_3')), findsOneWidget);
+    expect(find.text(AppStrings.dosageCount(4)), findsOneWidget);
   });
 
   testWidgets('kapatılan planın bugünkü eski dozu ana sayfada gösterilmez', (

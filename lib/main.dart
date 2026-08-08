@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'core/config/app_environment.dart';
 import 'core/constants/app_strings.dart';
 import 'core/constants/color_constants.dart';
 import 'core/theme/app_theme.dart';
@@ -33,13 +34,13 @@ import 'views/profile/viewmodel/profile_view_model.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  const configuredApiUrl = String.fromEnvironment('OMA_API_BASE_URL');
+  await AppEnvironment.load();
+  final configuredApiUrl = AppEnvironment.apiBaseUrl;
   if (kReleaseMode && !configuredApiUrl.startsWith('https://')) {
     throw StateError(
-      'Release builds require an HTTPS OMA_API_BASE_URL dart-define.',
+      'Release builds require an HTTPS OMA_API_BASE_URL in .env.',
     );
   }
-  ApiService.customBaseUrl = configuredApiUrl;
 
   await Future.wait([
     initializeDateFormatting('tr_TR', null),

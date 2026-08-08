@@ -654,7 +654,6 @@ class PersonalAssociationEngine {
         }
         symptoms.addAll(log.symptoms.map(_canonical));
         cravings.addAll(log.cravings.map(_canonical));
-        bowelActivities.addAll(log.bowelActivity.map(_canonical));
         moodCompanions.addAll(log.moodCompanions.map(_canonical));
         moodPlaces.addAll(log.moodPlaces.map(_canonical));
         final bowelSymptomSignals = log.symptoms
@@ -687,7 +686,6 @@ class PersonalAssociationEngine {
             log.moodPlaces.isNotEmpty;
         bowelObserved =
             bowelObserved ||
-            log.bowelActivity.isNotEmpty ||
             log.observedSections.contains(DailyLogObservedSection.symptom);
       }
 

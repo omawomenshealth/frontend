@@ -3,16 +3,14 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import '../../core/config/app_environment.dart';
 import '../../core/constants/app_strings.dart';
 import 'api_service.dart';
 import 'local_storage_service.dart';
 
 /// Google Play satın alma akışını yönetir; erişim kararını yalnızca backend'den alır.
 class PremiumPurchaseService extends ChangeNotifier {
-  static const String productId = String.fromEnvironment(
-    'GOOGLE_PLAY_PREMIUM_PRODUCT_ID',
-    defaultValue: 'oma_premium_monthly',
-  );
+  static String get productId => AppEnvironment.googlePlayPremiumProductId;
 
   final LocalStorageService _storage;
   final ApiService _api;

@@ -294,7 +294,8 @@ void main() {
     await tester.pump(const Duration(milliseconds: 450));
 
     final openedDetail = tester.widget<InsightsView>(find.byType(InsightsView));
-    expect(openedDetail.initialInsightId, tappedInsight.id);
+    expect(openedDetail.initialInsight?.id, tappedInsight.id);
+    expect(openedDetail.initialInsight, same(tappedInsight));
     expect(
       find
           .byKey(PageStorageKey<String>('insight_story_${tappedInsight.id}'))

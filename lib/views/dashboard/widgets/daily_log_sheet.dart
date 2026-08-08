@@ -17,6 +17,7 @@ class DailyLogSheet extends StatefulWidget {
   final DailyLog initialLog;
   final UserSettings settings;
   final Future<bool> Function(DailyLog) onSave;
+  final Future<bool> Function(DateTime)? onDeletePeriod;
   final Future<void> Function()? onSettingsChanged;
   final int initialTabIndex;
   final bool isSingleTab;
@@ -27,6 +28,7 @@ class DailyLogSheet extends StatefulWidget {
     required this.initialLog,
     required this.settings,
     required this.onSave,
+    this.onDeletePeriod,
     this.onSettingsChanged,
     this.initialTabIndex = 0,
     this.isSingleTab = false,
@@ -160,20 +162,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     }
     _dreamNoteController.text = _log.dreamNote ?? '';
 
-    _medications = _initialMedicationEntries(
-      _log.medications,
-      {
-        ...widget.settings.dailyMedications,
-        ...context.read<LocalStorageService>().getCustomMedications(),
-      }.toList(),
-    );
-    _supplements = _initialMedicationEntries(
-      _log.supplements,
-      {
-        ...widget.settings.dailySupplements,
-        ...context.read<LocalStorageService>().getCustomSupplements(),
-      }.toList(),
-    );
+    _medications = _initialMedicationEntries(_log.medications);
+    _supplements = _initialMedicationEntries(_log.supplements);
     _skincare = {
       ..._log.skincare,
       ...widget.settings.dailySkincare,
@@ -236,28 +226,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return result;
   }
 
-  List<MedicationEntry> _initialMedicationEntries(
-    List<MedicationEntry> saved,
-    List<String> configuredNames,
-  ) {
+  List<MedicationEntry> _initialMedicationEntries(List<MedicationEntry> saved) {
     final entries = <String, MedicationEntry>{};
     for (final entry in saved) {
       entries[entry.name] = entry.copyWith(
         times: entry.times.map(AppStrings.localizeStoredValue).toSet(),
         stomachState: AppStrings.localizeStoredValue(entry.stomachState),
-      );
-    }
-    for (final rawName in configuredNames) {
-      final name = rawName.trim();
-      if (name.isEmpty) continue;
-      entries.putIfAbsent(
-        name,
-        () => MedicationEntry(
-          name: name,
-          times: {AppStrings.medicationTimes.first},
-          stomachState: AppStrings.stomachStates.first,
-          doseCount: 1,
-        ),
       );
     }
     return entries.values.toList();
@@ -395,7 +369,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   Widget _buildIntro({
     required String title,
-    required String subtitle,
+    String? subtitle,
     bool centered = false,
   }) {
     return Column(
@@ -414,16 +388,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 10),
-        Text(
-          subtitle,
-          textAlign: centered ? TextAlign.center : TextAlign.left,
-          style: const TextStyle(
-            fontSize: 12,
-            height: 1.45,
-            color: AppColors.textSecondary,
+        if (subtitle != null) ...[
+          const SizedBox(height: 10),
+          Text(
+            subtitle,
+            textAlign: centered ? TextAlign.center : TextAlign.left,
+            style: const TextStyle(
+              fontSize: 12,
+              height: 1.45,
+              color: AppColors.textSecondary,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -536,6 +512,32 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ],
           ),
         ),
+        if (widget.onDeletePeriod != null &&
+            (_log.flowIntensity != null ||
+                _log.observedSections.contains(
+                  DailyLogObservedSection.period,
+                ))) ...[
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              key: const ValueKey('delete_period_for_day'),
+              onPressed: _isSaving ? null : _confirmDeletePeriod,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.periodPrimary,
+                side: BorderSide(
+                  color: AppColors.periodPrimary.withValues(alpha: 0.55),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+              ),
+              icon: const Icon(Icons.delete_outline_rounded, size: 19),
+              label: Text(
+                AppStrings.deletePeriodForDay(_log.date.isToday),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -788,10 +790,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildIntro(
-          title: AppStrings.medicationQuestion,
-          subtitle: AppStrings.medicationPageHint,
-        ),
+        _buildIntro(title: AppStrings.medicationQuestion),
         const SizedBox(height: 20),
         TrackingCatalogSelector(
           searchHint: AppStrings.searchMedications,
@@ -810,16 +809,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             _tone,
           ),
         ),
-        if (_medications.isNotEmpty) ...[
-          const SizedBox(height: 22),
-          _buildMedicationGroup(
-            title: AppStrings.medications,
-            entries: _medications,
-            icon: Icons.medication_outlined,
-            groupKey: MedicationPlanItemType.medication.name,
-            itemType: MedicationPlanItemType.medication,
-          ),
-        ],
       ],
     );
   }
@@ -828,6 +817,29 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (_medications.isNotEmpty || _supplements.isNotEmpty) ...[
+          if (_medications.isNotEmpty)
+            _buildMedicationGroup(
+              title: AppStrings.medications,
+              entries: _medications,
+              icon: Icons.medication_outlined,
+              groupKey: MedicationPlanItemType.medication.name,
+              itemType: MedicationPlanItemType.medication,
+            ),
+          if (_medications.isNotEmpty && _supplements.isNotEmpty)
+            const SizedBox(height: 16),
+          if (_supplements.isNotEmpty)
+            _buildMedicationGroup(
+              title: AppStrings.supplements,
+              entries: _supplements,
+              icon: Icons.vaccines_outlined,
+              groupKey: MedicationPlanItemType.supplement.name,
+              itemType: MedicationPlanItemType.supplement,
+            ),
+          const SizedBox(height: 24),
+          Divider(color: _tone.withValues(alpha: 0.24)),
+          const SizedBox(height: 24),
+        ],
         _buildMedicationCatalogPage(),
         const SizedBox(height: 30),
         Divider(color: _tone.withValues(alpha: 0.24)),
@@ -853,9 +865,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             AppStrings.supplementRoutine: AppStrings.supplementCatalog,
           },
           selected: selected,
-          customItems: context
-              .read<LocalStorageService>()
-              .getCustomSupplements(),
+          customItems: {
+            ...widget.settings.dailySupplements,
+            ...context.read<LocalStorageService>().getCustomSupplements(),
+          }.toList(),
           color: _tone,
           icon: Icons.vaccines_outlined,
           showSmartSearchHint: false,
@@ -868,16 +881,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             _tone,
           ),
         ),
-        if (_supplements.isNotEmpty) ...[
-          const SizedBox(height: 22),
-          _buildMedicationGroup(
-            title: AppStrings.supplements,
-            entries: _supplements,
-            icon: Icons.vaccines_outlined,
-            groupKey: MedicationPlanItemType.supplement.name,
-            itemType: MedicationPlanItemType.supplement,
-          ),
-        ],
       ],
     );
   }
@@ -925,6 +928,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             name: item,
             times: {AppStrings.medicationTimes.first},
             stomachState: AppStrings.stomachStates.first,
+            takenDoseCount: 1,
           ),
         );
       }
@@ -1896,6 +1900,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           times: {AppStrings.medicationTimes.first},
           stomachState: AppStrings.stomachStates.first,
           doseCount: 1,
+          takenDoseCount: 1,
         ),
       );
       _medicationSectionExpanded = true;
@@ -2001,6 +2006,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     required ValueChanged<MedicationEntry> onChanged,
   }) {
     final expanded = _expandedMedicationEntry == entryKey;
+    final customTimes =
+        entry.times
+            .where((time) => !AppStrings.medicationTimes.contains(time))
+            .toList()
+          ..sort();
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
@@ -2171,6 +2181,45 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         ),
                     ],
                   ),
+                  if (customTimes.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 7,
+                      runSpacing: 7,
+                      children: [
+                        for (final time in customTimes)
+                          InputChip(
+                            key: ValueKey(
+                              'medication_custom_time_${entryKey}_$time',
+                            ),
+                            label: Text(time),
+                            selected: true,
+                            selectedColor: _tone.withValues(alpha: 0.12),
+                            side: BorderSide(
+                              color: _tone.withValues(alpha: 0.48),
+                            ),
+                            deleteIconColor: _tone,
+                            onDeleted: entry.times.length > 1
+                                ? () {
+                                    final times = {...entry.times}
+                                      ..remove(time);
+                                    onChanged(entry.copyWith(times: times));
+                                  }
+                                : null,
+                          ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 4),
+                  TextButton.icon(
+                    key: ValueKey('add_medication_time_$entryKey'),
+                    onPressed: entry.times.length < 12
+                        ? () => _addMedicationClockTime(entry, onChanged)
+                        : null,
+                    icon: const Icon(Icons.add_alarm_rounded, size: 18),
+                    label: Text(AppStrings.addTime),
+                    style: TextButton.styleFrom(foregroundColor: _tone),
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -2211,9 +2260,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         color: _tone,
                         filled: true,
                         enabled: entry.doseCount < 12,
-                        onTap: () => onChanged(
-                          entry.copyWith(doseCount: entry.doseCount + 1),
-                        ),
+                        onTap: () {
+                          final nextDoseCount = entry.doseCount + 1;
+                          onChanged(
+                            entry.copyWith(
+                              doseCount: nextDoseCount,
+                              takenDoseCount: entry.takenDoseCount,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -2300,11 +2355,72 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     );
   }
 
+  Future<void> _addMedicationClockTime(
+    MedicationEntry entry,
+    ValueChanged<MedicationEntry> onChanged,
+  ) async {
+    final initialTime = _suggestMedicationClockTime(entry.times);
+    final selected = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+    );
+    if (selected == null || !mounted) return;
+
+    final value = _clockTimeValue(selected);
+    final times = {...entry.times, value};
+    final nextDoseCount = entry.doseCount < times.length
+        ? times.length
+        : entry.doseCount;
+    onChanged(
+      entry.copyWith(
+        times: times,
+        doseCount: nextDoseCount,
+        takenDoseCount: entry.takenDoseCount,
+      ),
+    );
+  }
+
+  TimeOfDay _suggestMedicationClockTime(Set<String> times) {
+    final parsed = times
+        .map(_reminderTimeForMedicationValue)
+        .whereType<TimeOfDay>()
+        .toList();
+    if (parsed.isEmpty) return const TimeOfDay(hour: 9, minute: 0);
+    final last = parsed.last;
+    return TimeOfDay(hour: (last.hour + 6) % 24, minute: last.minute);
+  }
+
+  TimeOfDay? _parseClockTime(String value) {
+    final match = RegExp(r'^(\d{1,2}):(\d{2})$').firstMatch(value);
+    if (match == null) return null;
+    final hour = int.tryParse(match.group(1)!);
+    final minute = int.tryParse(match.group(2)!);
+    if (hour == null || minute == null || hour > 23 || minute > 59) {
+      return null;
+    }
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  String _clockTimeValue(TimeOfDay value) =>
+      '${value.hour.toString().padLeft(2, '0')}:'
+      '${value.minute.toString().padLeft(2, '0')}';
+
   Future<void> _openItemReminder({
     required MedicationEntry entry,
     required MedicationPlanItemType itemType,
   }) async {
     final baseTheme = Theme.of(context);
+    final initialReminderTimes = <TimeOfDay>[];
+    for (final value in entry.times) {
+      final parsed = _reminderTimeForMedicationValue(value);
+      if (parsed == null ||
+          initialReminderTimes.any(
+            (time) => time.hour == parsed.hour && time.minute == parsed.minute,
+          )) {
+        continue;
+      }
+      initialReminderTimes.add(parsed);
+    }
     final plan = await showModalBottomSheet<MedicationReminderPlan>(
       context: context,
       isScrollControlled: true,
@@ -2319,6 +2435,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           availableItems: [entry.name],
           initialItemName: entry.name,
           initialDosage: entry.dosage,
+          initialTimes: initialReminderTimes,
         ),
       ),
     );
@@ -2333,6 +2450,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  TimeOfDay? _reminderTimeForMedicationValue(String value) {
+    final parsed = _parseClockTime(value);
+    if (parsed != null) return parsed;
+    final index = AppStrings.medicationTimes.indexOf(value);
+    return switch (index) {
+      0 => const TimeOfDay(hour: 9, minute: 0),
+      1 => const TimeOfDay(hour: 13, minute: 0),
+      2 => const TimeOfDay(hour: 20, minute: 0),
+      _ => null,
+    };
   }
 
   Widget _buildMoodPage() {
@@ -2900,6 +3029,60 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       return;
     }
     await _saveLog();
+  }
+
+  Future<void> _confirmDeletePeriod() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(AppStrings.deletePeriodConfirmationTitle),
+        content: Text(AppStrings.deletePeriodConfirmationBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.periodPrimary,
+            ),
+            child: Text(AppStrings.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isSaving = true);
+    var success = false;
+    try {
+      success = await widget.onDeletePeriod!.call(_log.date);
+    } catch (_) {
+      success = false;
+    }
+    if (!mounted) return;
+    setState(() => _isSaving = false);
+
+    final messenger = ScaffoldMessenger.of(context);
+    if (success) {
+      Navigator.pop(context);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.periodEntryDeleted),
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.periodDeleteFailed),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   Future<void> _promptSavePeriodAndOpenSymptoms() async {

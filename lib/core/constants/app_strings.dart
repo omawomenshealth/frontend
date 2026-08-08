@@ -4300,9 +4300,6 @@ class AppStrings {
   static String get medicationQuestion => isTurkish
       ? 'Bugün hangi ilaçları kullandın?'
       : 'Which medications did you take today?';
-  static String get medicationPageHint => isTurkish
-      ? 'Kategori seç veya akıllı aramayla kullandığın ilacı bul.'
-      : 'Choose a category or use smart search to find your medication.';
   static String get supplementQuestion => isTurkish
       ? 'Bugün hangi takviyeleri kullandın?'
       : 'Which supplements did you take today?';
@@ -4327,6 +4324,8 @@ class AppStrings {
       isTurkish ? 'Kronik hastalık ekle' : 'Add a chronic condition';
   static String get conditionName =>
       isTurkish ? 'Hastalık adı' : 'Condition name';
+  static String pdfPageNumber(int current, int total) =>
+      isTurkish ? 'Sayfa $current / $total' : 'Page $current / $total';
   static String get medicationsSupplementsAndSkincare => isTurkish
       ? 'İlaç, takviye ve cilt bakımı'
       : 'Medication, supplements and skincare';
@@ -4338,6 +4337,19 @@ class AppStrings {
       ? 'İlaç ve takviyeyi kaydet'
       : 'Save medication and supplements';
   static String get periodLogAction => isTurkish ? 'Adet gir' : 'Log period';
+  static String deletePeriodForDay(bool isToday) => isTurkish
+      ? (isToday ? 'Bugünün adet kaydını sil' : 'Bu günün adet kaydını sil')
+      : (isToday ? "Delete today's period entry" : 'Delete period entry');
+  static String get deletePeriodConfirmationTitle =>
+      isTurkish ? 'Adet kaydı silinsin mi?' : 'Delete period entry?';
+  static String get deletePeriodConfirmationBody => isTurkish
+      ? 'Bu güne ait adet bilgisi kaldırılacak. Diğer günlük kayıtların korunacak.'
+      : 'Period information for this day will be removed. Your other daily entries will be kept.';
+  static String get periodEntryDeleted =>
+      isTurkish ? 'Adet kaydı silindi.' : 'Period entry deleted.';
+  static String get periodDeleteFailed => isTurkish
+      ? 'Adet kaydı silinemedi. Lütfen tekrar dene.'
+      : 'The period entry could not be deleted. Please try again.';
   static String get premiumRequired =>
       isTurkish ? 'Premium gerekli' : 'Premium required';
   static String get doctorReportPremiumDescription => isTurkish

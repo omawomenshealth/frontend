@@ -195,6 +195,14 @@ void main() {
     );
     expect(find.text(AppStrings.saveMedicationAndSupplement), findsOneWidget);
 
+    await tester.tap(find.widgetWithText(FilterChip, 'Ağrı kesici'));
+    await tester.pumpAndSettle();
+    final biotin = find.widgetWithText(FilterChip, 'Biotin');
+    await tester.ensureVisible(biotin);
+    await tester.pumpAndSettle();
+    await tester.tap(biotin);
+    await tester.pumpAndSettle();
+
     await tester.tap(
       find.widgetWithText(FilledButton, AppStrings.saveMedicationAndSupplement),
     );

@@ -2,12 +2,10 @@ import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('tum gunluk veri alanlari JSON yedeginde kaybolmadan geri okunur', () {
+  test('aktif günlük veri alanları JSON yedeğinde kaybolmadan geri okunur', () {
     final original = DailyLog(
       date: DateTime(2026, 7, 28, 14, 15),
       hasExplicitTime: false,
-      activities: const ['Yürüyüş'],
-      nutritionTags: const ['Ev yemeği'],
       mealTypes: const ['Kahvaltı'],
       mealQualities: const {'Kahvaltı': 'Dengeli'},
       mealFoodGroups: const {
@@ -17,7 +15,6 @@ void main() {
         'Kahvaltı': ['Enerjik', 'Şişkin'],
       },
       cravings: const ['Tatlı'],
-      nutritionNotes: 'Not',
       waterIntakeMl: 1750,
       caffeineServings: 2,
       supplements: [
@@ -40,13 +37,8 @@ void main() {
       ],
       mood: 'İyi',
       moodEmoji: '🙂',
-      moodNote: 'Sakin',
       moodCompanions: const ['Arkadaş'],
       moodPlaces: const ['Ev'],
-      sleepDurationMinutes: 450,
-      sleepQuality: 4,
-      stressLevel: 2,
-      energyLevel: 4,
       dreamRemembered: true,
       dreamNote: 'Deniz kenarında yürüyordum.',
       sexualActivity: true,
@@ -58,17 +50,14 @@ void main() {
         SexualAfterFeeling.comfortable,
         SexualAfterFeeling.connected,
       },
-      bowelActivity: const ['Normal'],
       symptoms: const ['Kramp'],
       symptomSeverities: const {'Kramp': 2},
       flowIntensity: 'Orta',
-      periodPainLevel: 3,
       vaginalDischargePresent: true,
       vaginalDischargeColor: VaginalDischargeColor.clear,
       vaginalDischargeConsistency: VaginalDischargeConsistency.stretchyEggWhite,
       vaginalDischargeAmount: VaginalDischargeAmount.moderate,
       vaginalDischargeSymptoms: const {VaginalDischargeSymptom.pelvicPain},
-      notes: 'Genel not',
       observedSections: const {
         DailyLogObservedSection.period,
         DailyLogObservedSection.nutrition,
@@ -81,6 +70,38 @@ void main() {
     final restored = DailyLog.fromJson(original.toJson());
 
     expect(restored.toJson(), original.toJson());
+  });
+
+  test('eski günlük alanları okunur ancak yeniden kaydedilmez', () {
+    final legacyJson = <String, dynamic>{
+      'date': DateTime(2026, 7, 28, 14, 15).toIso8601String(),
+      'mood': 'İyi',
+      'activities': ['Yürüyüş'],
+      'nutritionTags': ['Ev yemeği'],
+      'nutritionNotes': 'Eski beslenme notu',
+      'moodNote': 'Eski ruh hali notu',
+      'sleepDurationMinutes': 480,
+      'sleepQuality': 5,
+      'stressLevel': 1,
+      'energyLevel': 5,
+      'bowelActivity': ['Normal'],
+      'periodPainLevel': 3,
+      'notes': 'Eski genel not',
+    };
+
+    final restored = DailyLog.fromJson(legacyJson);
+    final rewritten = restored.toJson();
+
+    expect(restored.mood, 'İyi');
+    expect(rewritten.keys.where(DailyLog.retiredJsonFields.contains), isEmpty);
+    expect(
+      DailyLog.fromJson({
+        'date': DateTime(2026, 7, 28).toIso8601String(),
+        'sleepDurationMinutes': 480,
+        'energyLevel': 5,
+      }).hasData,
+      isFalse,
+    );
   });
 
   test('korunmalı ve korunmasız JSON seçimi birlikte kabul edilmez', () {

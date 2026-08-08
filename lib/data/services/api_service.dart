@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
+import '../../core/config/app_environment.dart';
 import '../../core/constants/app_strings.dart';
 import 'local_storage_service.dart';
 
@@ -21,18 +21,9 @@ class ApiService {
   final LocalStorageService _storage;
   Future<bool>? _refreshInFlight;
 
-  static String customBaseUrl = '';
-
   ApiService(this._storage);
 
-  String get baseUrl {
-    if (customBaseUrl.isNotEmpty) return customBaseUrl;
-    if (kIsWeb) return 'http://localhost:3000';
-    // Gerçek cihaz için Wi-Fi IP, emülatör için 10.0.2.2 kullanılır
-    return Platform.isAndroid
-        ? 'http://192.168.1.16:3000'
-        : 'http://localhost:3000';
-  }
+  String get baseUrl => AppEnvironment.apiBaseUrl;
 
   Map<String, String> _getHeaders() {
     final token = _storage.authToken;

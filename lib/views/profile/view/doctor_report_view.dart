@@ -14,6 +14,8 @@ import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 
+part 'doctor_report_pdf_builder.dart';
+
 /// Doktor bilgilendirme raporu ekranı.
 class DoctorReportView extends StatelessWidget {
   const DoctorReportView({super.key});
@@ -236,15 +238,6 @@ class DoctorReportView extends StatelessWidget {
                 )
               else
                 _buildLogsTable(allLogs.take(15).toList()),
-
-              const SizedBox(height: 24),
-
-              // ── BÖLÜM 4: NOTLAR ─────────────────────────────────────
-              _sectionHeader('📝 ${AppStrings.savedDoctorNotes}'),
-              const SizedBox(height: 8),
-              _buildNotesSection(
-                allLogs.expand<DailyLog>((dayList) => dayList).toList(),
-              ),
             ],
           ),
         ),
@@ -300,22 +293,13 @@ class DoctorReportView extends StatelessWidget {
       if (log.moodPlaces.isNotEmpty)
         '${AppStrings.moodWhere}: '
             '${log.moodPlaces.map(AppStrings.localizeStoredValue).join(', ')}',
-      if (log.sleepDurationMinutes != null)
-        '${AppStrings.sleepDuration}: ${AppStrings.hoursMinutes(log.sleepDurationMinutes!)}',
-      if (log.sleepQuality != null)
-        '${AppStrings.sleepQuality}: ${AppStrings.levelOutOfFive(log.sleepQuality!)}',
       if (log.dreamRemembered != null || (log.dreamNote?.isNotEmpty ?? false))
         '${AppStrings.dreamQuestion}: ${DailyLogFormatters.dream(log)}',
-      if (log.stressLevel != null)
-        '${AppStrings.stressLevel}: ${AppStrings.levelOutOfFive(log.stressLevel!)}',
-      if (log.energyLevel != null)
-        '${AppStrings.energyLevel}: ${AppStrings.levelOutOfFive(log.energyLevel!)}',
     ].join(', ');
   }
 
   String _foodSelectionsText(DailyLog log) {
     final parts = <String>[
-      ...log.nutritionTags.map(AppStrings.localizeStoredValue),
       for (final entry in log.mealFoodGroups.entries)
         if (entry.value.isNotEmpty)
           '${AppStrings.localizeStoredValue(entry.key)}: '
@@ -339,8 +323,6 @@ class DoctorReportView extends StatelessWidget {
       if (log.flowIntensity != null)
         '${AppStrings.bleeding} '
             '(${AppStrings.localizeStoredValue(log.flowIntensity!)})',
-      if (log.periodPainLevel != null)
-        '${AppStrings.periodPain}: ${log.periodPainLevel}/5',
       if (log.vaginalDischargePresent != null)
         '${AppStrings.vaginalDischarge}: '
             '${DailyLogFormatters.vaginalDischarge(log)}',
@@ -463,7 +445,6 @@ class DoctorReportView extends StatelessWidget {
                   .where(
                     (l) =>
                         l.flowIntensity != null ||
-                        l.periodPainLevel != null ||
                         l.vaginalDischargePresent != null,
                   )
                   .toList();
@@ -487,13 +468,11 @@ class DoctorReportView extends StatelessWidget {
               final logsWithNutrition = dayLogs
                   .where(
                     (l) =>
-                        l.nutritionTags.isNotEmpty ||
                         l.mealTypes.isNotEmpty ||
                         l.mealQualities.isNotEmpty ||
                         l.mealFoodGroups.isNotEmpty ||
                         l.mealPostFeelings.isNotEmpty ||
                         l.cravings.isNotEmpty ||
-                        l.bowelActivity.isNotEmpty ||
                         l.waterIntakeMl != null ||
                         l.caffeineServings != null,
                   )
@@ -507,13 +486,9 @@ class DoctorReportView extends StatelessWidget {
                       final timeStr =
                           '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
                       final nutritionStr = _foodSelectionsText(log);
-                      final bowelStr = log.bowelActivity.isNotEmpty
-                          ? '${AppStrings.bowel}: ${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
-                          : '';
                       final metricsStr = _nutritionMetricsText(log);
                       final items = [
                         if (nutritionStr.isNotEmpty) nutritionStr,
-                        if (bowelStr.isNotEmpty) bowelStr,
                         if (metricsStr.isNotEmpty) metricsStr,
                       ];
                       return '$timeStr ${items.join("\n")}';
@@ -571,12 +546,7 @@ class DoctorReportView extends StatelessWidget {
                         l.moodCompanions.isNotEmpty ||
                         l.moodPlaces.isNotEmpty ||
                         l.dreamRemembered != null ||
-                        (l.dreamNote?.isNotEmpty ?? false) ||
-                        l.sleepDurationMinutes != null ||
-                        l.sleepQuality != null ||
-                        l.stressLevel != null ||
-                        l.energyLevel != null ||
-                        (l.notes != null && l.notes!.isNotEmpty),
+                        (l.dreamNote?.isNotEmpty ?? false),
                   )
                   .toList();
               final String moodText;
@@ -591,16 +561,11 @@ class DoctorReportView extends StatelessWidget {
                           ? '${log.moodEmoji ?? ""} ${AppStrings.localizeStoredValue(log.mood!)}'
                           : '';
                       final painStr = _symptomsText(log);
-                      final notesStr =
-                          (log.notes != null && log.notes!.isNotEmpty)
-                          ? '${AppStrings.notes}: ${log.notes}'
-                          : '';
                       final metricsStr = _wellbeingMetricsText(log);
                       final items = [
                         if (moodStr.isNotEmpty) moodStr,
                         if (painStr.isNotEmpty) painStr,
                         if (metricsStr.isNotEmpty) metricsStr,
-                        if (notesStr.isNotEmpty) notesStr,
                       ];
                       return '$timeStr ${items.join("\n")}';
                     })
@@ -672,73 +637,6 @@ class DoctorReportView extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildNotesSection(List<DailyLog> logs) {
-    final logsWithNotes = logs
-        .where(
-          (l) =>
-              (l.notes != null && l.notes!.isNotEmpty) ||
-              (l.moodNote != null && l.moodNote!.isNotEmpty),
-        )
-        .toList();
-
-    if (logsWithNotes.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Text(
-          AppStrings.noSavedNotes,
-          style: const TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 12,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      );
-    }
-
-    return Column(
-      children: logsWithNotes.take(10).map((log) {
-        return Container(
-          width: double.infinity,
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.scaffoldBackground.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                log.date.toDotFormat(),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 11,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(height: 4),
-              if (log.notes != null && log.notes!.isNotEmpty)
-                Text(
-                  '📝 ${AppStrings.generalNote}: ${log.notes}',
-                  style: const TextStyle(fontSize: 12),
-                ),
-              if (log.moodNote != null && log.moodNote!.isNotEmpty) ...[
-                const SizedBox(height: 2),
-                Text(
-                  '🌟 ${AppStrings.moodNote}: ${log.moodNote}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        );
-      }).toList(),
     );
   }
 
@@ -890,10 +788,7 @@ class DoctorReportView extends StatelessWidget {
       // 1. Adet
       final logsWithPeriod = dayLogs
           .where(
-            (l) =>
-                l.flowIntensity != null ||
-                l.periodPainLevel != null ||
-                l.vaginalDischargePresent != null,
+            (l) => l.flowIntensity != null || l.vaginalDischargePresent != null,
           )
           .toList();
       final String bleeding;
@@ -913,13 +808,11 @@ class DoctorReportView extends StatelessWidget {
       final logsWithNutrition = dayLogs
           .where(
             (l) =>
-                l.nutritionTags.isNotEmpty ||
                 l.mealTypes.isNotEmpty ||
                 l.mealQualities.isNotEmpty ||
                 l.mealFoodGroups.isNotEmpty ||
                 l.mealPostFeelings.isNotEmpty ||
                 l.cravings.isNotEmpty ||
-                l.bowelActivity.isNotEmpty ||
                 l.waterIntakeMl != null ||
                 l.caffeineServings != null,
           )
@@ -933,13 +826,9 @@ class DoctorReportView extends StatelessWidget {
               final timeStr =
                   '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
               final nutritionStr = _foodSelectionsText(log);
-              final bowelStr = log.bowelActivity.isNotEmpty
-                  ? '${AppStrings.bowel}:${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
-                  : '';
               final metricsStr = _nutritionMetricsText(log);
               final items = [
                 if (nutritionStr.isNotEmpty) nutritionStr,
-                if (bowelStr.isNotEmpty) bowelStr,
                 if (metricsStr.isNotEmpty) metricsStr,
               ];
               return '$timeStr ${items.join(" ")}';
@@ -995,12 +884,7 @@ class DoctorReportView extends StatelessWidget {
                 l.moodCompanions.isNotEmpty ||
                 l.moodPlaces.isNotEmpty ||
                 l.dreamRemembered != null ||
-                (l.dreamNote?.isNotEmpty ?? false) ||
-                l.sleepDurationMinutes != null ||
-                l.sleepQuality != null ||
-                l.stressLevel != null ||
-                l.energyLevel != null ||
-                (l.notes != null && l.notes!.isNotEmpty),
+                (l.dreamNote?.isNotEmpty ?? false),
           )
           .toList();
       final String moodText;
@@ -1015,15 +899,11 @@ class DoctorReportView extends StatelessWidget {
                   ? '${log.moodEmoji ?? ""} ${AppStrings.localizeStoredValue(log.mood!)}'
                   : '';
               final painStr = _symptomsText(log);
-              final notesStr = (log.notes != null && log.notes!.isNotEmpty)
-                  ? '${AppStrings.notes}:${log.notes}'
-                  : '';
               final metricsStr = _wellbeingMetricsText(log);
               final items = [
                 if (moodStr.isNotEmpty) moodStr,
                 if (painStr.isNotEmpty) painStr,
                 if (metricsStr.isNotEmpty) metricsStr,
-                if (notesStr.isNotEmpty) notesStr,
               ];
               return '$timeStr ${items.join(" ")}';
             })
@@ -1033,32 +913,6 @@ class DoctorReportView extends StatelessWidget {
       sb.writeln('$date | $bleeding | $beslenme | $meds | $moodText');
     }
     sb.writeln('');
-
-    sb.writeln(
-      '${includeRelationshipHistory ? 5 : 4}. ${AppStrings.savedDoctorNotes.toUpperCase()}',
-    );
-    sb.writeln('----------------------------------');
-    final flatLogs = logs.expand<DailyLog>((dayList) => dayList).toList();
-    final logsWithNotes = flatLogs
-        .where(
-          (l) =>
-              (l.notes != null && l.notes!.isNotEmpty) ||
-              (l.moodNote != null && l.moodNote!.isNotEmpty),
-        )
-        .toList();
-    if (logsWithNotes.isEmpty) {
-      sb.writeln(AppStrings.noSavedNotes);
-    } else {
-      for (var log in logsWithNotes.take(10)) {
-        sb.writeln('[${log.date.toDotFormat()}]');
-        if (log.notes != null && log.notes!.isNotEmpty) {
-          sb.writeln('- ${AppStrings.generalNote}: ${log.notes}');
-        }
-        if (log.moodNote != null && log.moodNote!.isNotEmpty) {
-          sb.writeln('- ${AppStrings.moodNote}: ${log.moodNote}');
-        }
-      }
-    }
 
     await Clipboard.setData(ClipboardData(text: sb.toString()));
 
@@ -1119,192 +973,16 @@ class DoctorReportView extends StatelessWidget {
     );
 
     try {
-      final pdf = pw.Document();
-
-      final regularFont = await PdfGoogleFonts.robotoRegular();
-      final boldFont = await PdfGoogleFonts.robotoBold();
-
-      pdf.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.all(32),
-          theme: pw.ThemeData.withFont(base: regularFont, bold: boldFont),
-          build: (pw.Context context) {
-            return [
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        AppStrings.personalHealthReport,
-                        style: pw.TextStyle(
-                          fontSize: 18,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColor.fromHex('#9CAB84'),
-                        ),
-                      ),
-                      pw.SizedBox(height: 4),
-                      pw.Text(
-                        AppStrings.reportDateLine(AppTime.now.toDotFormat()),
-                        style: const pw.TextStyle(
-                          fontSize: 10,
-                          color: PdfColors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  pw.Text(
-                    AppStrings.medicalSummary,
-                    style: pw.TextStyle(
-                      fontSize: 12,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.grey700,
-                    ),
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 12),
-              pw.Divider(thickness: 1.5, color: PdfColors.grey300),
-              pw.SizedBox(height: 16),
-
-              pw.Text(
-                AppStrings.userBasicInformation,
-                style: pw.TextStyle(
-                  fontSize: 13,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 8),
-              _pdfInfoRow(
-                AppStrings.nickname,
-                settings.userName.isNotEmpty
-                    ? settings.userName
-                    : AppStrings.notSpecified,
-              ),
-              _pdfInfoRow(
-                AppStrings.age,
-                settings.age?.toString() ?? AppStrings.notSpecified,
-              ),
-              _pdfInfoRow(
-                AppStrings.weightHeight,
-                '${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm',
-              ),
-              _pdfInfoRow(
-                AppStrings.smoking,
-                settings.isSmoker ? AppStrings.yes : AppStrings.no,
-              ),
-              _pdfInfoRow(
-                AppStrings.chronicDiseases,
-                settings.chronicDiseases.isNotEmpty
-                    ? settings.chronicDiseases
-                          .map(AppStrings.localizeStoredValue)
-                          .join(', ')
-                    : AppStrings.noConditions,
-              ),
-              if (_hasLaboratoryResults(settings))
-                _pdfInfoRow(
-                  AppStrings.lastBloodValues,
-                  _formatLaboratoryResults(settings),
-                ),
-              pw.SizedBox(height: 16),
-
-              pw.Text(
-                AppStrings.womenHealthSummary,
-                style: pw.TextStyle(
-                  fontSize: 13,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 8),
-              _pdfInfoRow(
-                AppStrings.averageCycleLength,
-                AppStrings.dayCount(settings.averageCycleLength),
-              ),
-              _pdfInfoRow(
-                AppStrings.averagePeriodLength,
-                AppStrings.dayCount(settings.averagePeriodLength),
-              ),
-              _pdfInfoRow(
-                AppStrings.lastPeriodDate,
-                settings.lastPeriodDate != null
-                    ? settings.lastPeriodDate!.toDotFormat()
-                    : AppStrings.notSpecified,
-              ),
-              _pdfInfoRow(
-                AppStrings.menopauseStatus,
-                _menopauseLabel(settings.menopauseStatus),
-              ),
-              if (settings.birthControlMethod != null &&
-                  settings.birthControlMethod!.isNotEmpty)
-                _pdfInfoRow(
-                  AppStrings.birthControl,
-                  AppStrings.localizeStoredValue(settings.birthControlMethod!),
-                ),
-              if (settings.womenDiseases.isNotEmpty)
-                _pdfInfoRow(
-                  AppStrings.gynecologicalDiseases,
-                  settings.womenDiseases
-                      .map(AppStrings.localizeStoredValue)
-                      .join(', '),
-                ),
-              pw.SizedBox(height: 16),
-
-              if (includeRelationshipHistory) ...[
-                pw.Text(
-                  AppStrings.relationshipHistory,
-                  style: pw.TextStyle(
-                    fontSize: 13,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-                pw.SizedBox(height: 8),
-                pw.Text(
-                  _relationshipHistoryText(logs),
-                  style: const pw.TextStyle(fontSize: 10),
-                ),
-                pw.SizedBox(height: 16),
-              ],
-
-              pw.Text(
-                AppStrings.dailyHealthLogs,
-                style: pw.TextStyle(
-                  fontSize: 13,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 8),
-              if (logs.isEmpty)
-                pw.Text(
-                  AppStrings.noHealthLogs,
-                  style: const pw.TextStyle(fontSize: 10),
-                )
-              else
-                _buildPdfTable(logs.take(15).toList()),
-
-              pw.SizedBox(height: 16),
-
-              pw.Text(
-                AppStrings.savedDoctorNotes,
-                style: pw.TextStyle(
-                  fontSize: 13,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 8),
-              _buildPdfNotesSection(
-                logs.expand<DailyLog>((dayList) => dayList).take(10).toList(),
-              ),
-            ];
-          },
-        ),
+      final bytes = await const DoctorReportPdfBuilder().build(
+        settings: settings,
+        logs: logs.expand<DailyLog>((dayLogs) => dayLogs).toList(),
+        includeRelationshipHistory: includeRelationshipHistory,
       );
 
       if (context.mounted) Navigator.pop(context);
 
       await Printing.layoutPdf(
-        onLayout: (PdfPageFormat format) async => pdf.save(),
+        onLayout: (PdfPageFormat format) async => bytes,
         name:
             '${AppStrings.reportFileName}_${settings.userName.replaceAll(' ', '_')}.pdf',
       );
@@ -1385,9 +1063,7 @@ class DoctorReportView extends StatelessWidget {
         final logsWithPeriod = dayLogs
             .where(
               (l) =>
-                  l.flowIntensity != null ||
-                  l.periodPainLevel != null ||
-                  l.vaginalDischargePresent != null,
+                  l.flowIntensity != null || l.vaginalDischargePresent != null,
             )
             .toList();
         final String adetText;
@@ -1407,13 +1083,11 @@ class DoctorReportView extends StatelessWidget {
         final logsWithNutrition = dayLogs
             .where(
               (l) =>
-                  l.nutritionTags.isNotEmpty ||
                   l.mealTypes.isNotEmpty ||
                   l.mealQualities.isNotEmpty ||
                   l.mealFoodGroups.isNotEmpty ||
                   l.mealPostFeelings.isNotEmpty ||
                   l.cravings.isNotEmpty ||
-                  l.bowelActivity.isNotEmpty ||
                   l.waterIntakeMl != null ||
                   l.caffeineServings != null,
             )
@@ -1427,13 +1101,9 @@ class DoctorReportView extends StatelessWidget {
                 final timeStr =
                     '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
                 final nutritionStr = _foodSelectionsText(log);
-                final bowelStr = log.bowelActivity.isNotEmpty
-                    ? '${AppStrings.bowel}: ${log.bowelActivity.map(AppStrings.localizeStoredValue).join(', ')}'
-                    : '';
                 final metricsStr = _nutritionMetricsText(log);
                 final items = [
                   if (nutritionStr.isNotEmpty) nutritionStr,
-                  if (bowelStr.isNotEmpty) bowelStr,
                   if (metricsStr.isNotEmpty) metricsStr,
                 ];
                 return '$timeStr ${items.join("\n")}';
@@ -1491,12 +1161,7 @@ class DoctorReportView extends StatelessWidget {
                   l.moodCompanions.isNotEmpty ||
                   l.moodPlaces.isNotEmpty ||
                   l.dreamRemembered != null ||
-                  (l.dreamNote?.isNotEmpty ?? false) ||
-                  l.sleepDurationMinutes != null ||
-                  l.sleepQuality != null ||
-                  l.stressLevel != null ||
-                  l.energyLevel != null ||
-                  (l.notes != null && l.notes!.isNotEmpty),
+                  (l.dreamNote?.isNotEmpty ?? false),
             )
             .toList();
         final String moodText;
@@ -1508,18 +1173,14 @@ class DoctorReportView extends StatelessWidget {
                 final timeStr =
                     '(${log.date.hour.toString().padLeft(2, "0")}:${log.date.minute.toString().padLeft(2, "0")})';
                 final moodStr = log.mood != null
-                    ? '${log.moodEmoji ?? ""} ${AppStrings.localizeStoredValue(log.mood!)}'
+                    ? AppStrings.localizeStoredValue(log.mood!)
                     : '';
                 final painStr = _symptomsText(log);
-                final notesStr = (log.notes != null && log.notes!.isNotEmpty)
-                    ? '${AppStrings.notes}: ${log.notes}'
-                    : '';
                 final metricsStr = _wellbeingMetricsText(log);
                 final items = [
                   if (moodStr.isNotEmpty) moodStr,
                   if (painStr.isNotEmpty) painStr,
                   if (metricsStr.isNotEmpty) metricsStr,
-                  if (notesStr.isNotEmpty) notesStr,
                 ];
                 return '$timeStr ${items.join("\n")}';
               })
@@ -1527,64 +1188,6 @@ class DoctorReportView extends StatelessWidget {
         }
 
         return [dateStr, adetText, beslenmeText, ilacText, moodText];
-      }).toList(),
-    );
-  }
-
-  pw.Widget _buildPdfNotesSection(List<DailyLog> logs) {
-    final logsWithNotes = logs
-        .where(
-          (l) =>
-              (l.notes != null && l.notes!.isNotEmpty) ||
-              (l.moodNote != null && l.moodNote!.isNotEmpty),
-        )
-        .toList();
-
-    if (logsWithNotes.isEmpty) {
-      return pw.Text(
-        AppStrings.noSavedNotes,
-        style: const pw.TextStyle(fontSize: 9, fontStyle: pw.FontStyle.italic),
-      );
-    }
-
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: logsWithNotes.map((log) {
-        return pw.Container(
-          width: double.infinity,
-          margin: const pw.EdgeInsets.only(bottom: 4),
-          padding: const pw.EdgeInsets.all(6),
-          decoration: const pw.BoxDecoration(
-            color: PdfColors.grey100,
-            borderRadius: pw.BorderRadius.all(pw.Radius.circular(4)),
-          ),
-          child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(
-                log.date.toDotFormat(),
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 9,
-                ),
-              ),
-              pw.SizedBox(height: 2),
-              if (log.notes != null && log.notes!.isNotEmpty)
-                pw.Text(
-                  '${AppStrings.generalNote}: ${log.notes}',
-                  style: const pw.TextStyle(fontSize: 9),
-                ),
-              if (log.moodNote != null && log.moodNote!.isNotEmpty)
-                pw.Text(
-                  '${AppStrings.moodNote}: ${log.moodNote}',
-                  style: const pw.TextStyle(
-                    fontSize: 9,
-                    fontStyle: pw.FontStyle.italic,
-                  ),
-                ),
-            ],
-          ),
-        );
       }).toList(),
     );
   }

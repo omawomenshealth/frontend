@@ -202,7 +202,7 @@ class MedicationReminderPlan {
         final rightMinutes = right.hour * 60 + right.minute;
         return leftMinutes.compareTo(rightMinutes);
       });
-    return sorted.take(3).toList(growable: false);
+    return sorted.take(12).toList(growable: false);
   }
 }
 

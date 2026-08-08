@@ -118,6 +118,7 @@ class UserSettings {
     int? averageCycleLength,
     int? averagePeriodLength,
     DateTime? lastPeriodDate,
+    bool clearLastPeriodDate = false,
     MenopauseStatus? menopauseStatus,
     String? birthControlMethod,
     List<String>? womenDiseases,
@@ -145,7 +146,9 @@ class UserSettings {
       chronicDiseases: chronicDiseases ?? this.chronicDiseases,
       averageCycleLength: averageCycleLength ?? this.averageCycleLength,
       averagePeriodLength: averagePeriodLength ?? this.averagePeriodLength,
-      lastPeriodDate: lastPeriodDate ?? this.lastPeriodDate,
+      lastPeriodDate: clearLastPeriodDate
+          ? null
+          : lastPeriodDate ?? this.lastPeriodDate,
       menopauseStatus: menopauseStatus ?? this.menopauseStatus,
       birthControlMethod: birthControlMethod ?? this.birthControlMethod,
       womenDiseases: womenDiseases ?? this.womenDiseases,

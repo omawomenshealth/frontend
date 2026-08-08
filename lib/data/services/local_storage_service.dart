@@ -85,7 +85,101 @@ class LocalStorageService {
       _isProtectedKey,
     );
     await _encryptedStore!.init();
+    await _migrateRetiredDailyLogFields();
   }
+
+  Future<void> _migrateRetiredDailyLogFields() async {
+    final dates = _getDatesSet();
+    var datesChanged = false;
+    for (final keyStr in dates.toList()) {
+      final storageKey = '$_logPrefix$keyStr';
+      final raw = _p.getString(storageKey);
+      if (raw == null) continue;
+      try {
+        final json = jsonDecode(raw) as Map<String, dynamic>;
+        if (!json.keys.any(DailyLog.retiredJsonFields.contains)) continue;
+
+        var log = DailyLog.fromJson(json);
+        final sections = {...log.observedSections};
+        if (!_hasActiveWellbeingData(log) &&
+            _hasRetiredValue(json, const {
+              'activities',
+              'moodNote',
+              'sleepDurationMinutes',
+              'sleepQuality',
+              'stressLevel',
+              'energyLevel',
+            })) {
+          sections.remove(DailyLogObservedSection.wellbeing);
+        }
+        if (!_hasActiveNutritionData(log) &&
+            _hasRetiredValue(json, const {'nutritionTags', 'nutritionNotes'})) {
+          sections.remove(DailyLogObservedSection.nutrition);
+        }
+        if (!_hasActiveSymptomData(log) &&
+            _hasRetiredValue(json, const {'bowelActivity'})) {
+          sections.remove(DailyLogObservedSection.symptom);
+        }
+        if (log.flowIntensity == null &&
+            _hasRetiredValue(json, const {'periodPainLevel'})) {
+          sections.remove(DailyLogObservedSection.period);
+        }
+        log = log.copyWith(observedSections: sections);
+
+        final hasActivePayload = log
+            .copyWith(observedSections: const <DailyLogObservedSection>{})
+            .hasData;
+        if (hasActivePayload) {
+          await _p.setString(storageKey, log.toJsonString());
+        } else if (await _p.remove(storageKey)) {
+          dates.remove(keyStr);
+          datesChanged = true;
+        }
+      } catch (_) {
+        // Bozuk veya gelecekteki bir kayıt burada veri kaybına uğratılmaz.
+      }
+    }
+    if (datesChanged) await _p.setStringList(_logDatesKey, dates.toList());
+  }
+
+  bool _hasRetiredValue(Map<String, dynamic> json, Set<String> fields) {
+    for (final field in fields) {
+      final value = json[field];
+      if (value == null) continue;
+      if (value is String && value.trim().isEmpty) continue;
+      if (value is Iterable && value.isEmpty) continue;
+      if (value is Map && value.isEmpty) continue;
+      return true;
+    }
+    return false;
+  }
+
+  bool _hasActiveWellbeingData(DailyLog log) =>
+      log.mood != null ||
+      log.moodCompanions.isNotEmpty ||
+      log.moodPlaces.isNotEmpty;
+
+  bool _hasActiveNutritionData(DailyLog log) =>
+      log.mealTypes.isNotEmpty ||
+      log.mealQualities.isNotEmpty ||
+      log.mealFoodGroups.isNotEmpty ||
+      log.mealPostFeelings.isNotEmpty ||
+      log.cravings.isNotEmpty ||
+      log.waterIntakeMl != null ||
+      log.caffeineServings != null;
+
+  bool _hasActiveSymptomData(DailyLog log) =>
+      log.symptoms.isNotEmpty ||
+      log.sexualActivity != null ||
+      log.sexualActivityTypes.isNotEmpty ||
+      log.sexualAfterFeelings.isNotEmpty ||
+      log.dreamRemembered != null ||
+      (log.dreamNote?.isNotEmpty ?? false) ||
+      log.vaginalDischargePresent != null ||
+      log.vaginalDischargeColor != null ||
+      log.vaginalDischargeConsistency != null ||
+      log.vaginalDischargeAmount != null ||
+      log.vaginalDischargeSymptoms.isNotEmpty;
 
   LocalEncryptedStore get _p {
     if (_encryptedStore == null) {
@@ -199,6 +293,75 @@ class LocalStorageService {
 
       // SİHİRLİ DOKUNUŞ: Veri silindiğinde de istatistikleri güncelle
       await refreshCycleStatistics();
+    }
+    return allSuccess;
+  }
+
+  /// Belirli bir günün yalnızca adet kaydını kaldırır.
+  ///
+  /// Aynı zaman damgasında beslenme, ilaç veya ruh hâli gibi başka bölümler de
+  /// varsa bunlar korunur. Yalnızca adet ekranından girilmiş belirtiler ise
+  /// adet kaydıyla birlikte kaldırılır.
+  Future<bool> deletePeriodLogsForDate(DateTime date) async {
+    final dateStr = date.toStorageKey();
+    final dates = _getDatesSet();
+    final matchingKeys = dates.where((key) => key.startsWith(dateStr)).toList();
+    var allSuccess = true;
+    var changed = false;
+
+    for (final keyStr in matchingKeys) {
+      final storageKey = '$_logPrefix$keyStr';
+      final raw = _p.getString(storageKey);
+      if (raw == null) continue;
+
+      late final DailyLog log;
+      try {
+        log = DailyLog.fromJsonString(raw);
+      } catch (_) {
+        continue;
+      }
+      final hasPeriodData =
+          log.flowIntensity != null ||
+          log.observedSections.contains(DailyLogObservedSection.period);
+      if (!hasPeriodData) continue;
+
+      final remainingSections = {...log.observedSections}
+        ..remove(DailyLogObservedSection.period);
+      final keepSymptoms = remainingSections.contains(
+        DailyLogObservedSection.symptom,
+      );
+      final cleaned = log.copyWith(
+        clearFlowIntensity: true,
+        symptoms: keepSymptoms ? log.symptoms : const [],
+        symptomSeverities: keepSymptoms ? log.symptomSeverities : const {},
+        observedSections: remainingSections,
+      );
+
+      final success = cleaned.hasData
+          ? await _p.setString(storageKey, cleaned.toJsonString())
+          : await _p.remove(storageKey);
+      if (!success) {
+        allSuccess = false;
+        continue;
+      }
+      changed = true;
+      if (!cleaned.hasData) dates.remove(keyStr);
+    }
+
+    if (!changed) return allSuccess;
+    if (!await _p.setStringList(_logDatesKey, dates.toList())) {
+      allSuccess = false;
+    }
+    await refreshCycleStatistics();
+
+    if (loadAllLogs().every((log) => log.flowIntensity == null)) {
+      final settings = loadSettings();
+      if (settings?.lastPeriodDate != null) {
+        final cleared = await saveSettings(
+          settings!.copyWith(clearLastPeriodDate: true),
+        );
+        if (!cleared) allSuccess = false;
+      }
     }
     return allSuccess;
   }

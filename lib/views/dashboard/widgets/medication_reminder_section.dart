@@ -575,6 +575,7 @@ class MedicationReminderFormSheet extends StatefulWidget {
   final MedicationReminderPlan? existing;
   final String? initialItemName;
   final String? initialDosage;
+  final List<TimeOfDay> initialTimes;
 
   const MedicationReminderFormSheet({
     super.key,
@@ -583,6 +584,7 @@ class MedicationReminderFormSheet extends StatefulWidget {
     this.existing,
     this.initialItemName,
     this.initialDosage,
+    this.initialTimes = const [],
   });
 
   @override
@@ -634,17 +636,25 @@ class _MedicationReminderFormSheetState
     final initialDosage = widget.initialDosage?.trim();
     _doseCount = _doseCountFromText(existing?.dosage ?? initialDosage);
 
-    _times = List<TimeOfDay?>.filled(3, null);
-    if (existing == null) {
+    _times = List<TimeOfDay?>.filled(3, null, growable: true);
+    final initialTimes = existing == null
+        ? widget.initialTimes
+        : existing.times
+              .map((clock) => TimeOfDay(hour: clock.hour, minute: clock.minute))
+              .toList();
+    if (initialTimes.isEmpty) {
       _times[0] = const TimeOfDay(hour: 9, minute: 0);
     } else {
-      for (final clock in existing.times) {
-        var slot = _slotForHour(clock.hour);
+      for (final time in initialTimes) {
+        var slot = _slotForHour(time.hour);
         if (_times[slot] != null) {
           slot = _times.indexWhere((value) => value == null);
         }
-        if (slot == -1) break;
-        _times[slot] = TimeOfDay(hour: clock.hour, minute: clock.minute);
+        if (slot == -1) {
+          if (_times.length < 12) _times.add(time);
+        } else {
+          _times[slot] = time;
+        }
       }
     }
     _frequency = existing?.frequency ?? MedicationPlanFrequency.everyDay;
@@ -777,6 +787,18 @@ class _MedicationReminderFormSheetState
                 _buildTimeSlot(index),
                 if (index != _times.length - 1) const SizedBox(height: 8),
               ],
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: OutlinedButton.icon(
+                  key: const ValueKey('reminder_add_time'),
+                  onPressed: _times.length < 12 || _times.contains(null)
+                      ? _addReminderTime
+                      : null,
+                  icon: const Icon(Icons.add_alarm_rounded, size: 18),
+                  label: Text(AppStrings.addTime),
+                ),
+              ),
               const SizedBox(height: 12),
               DropdownButtonFormField<MedicationPlanFrequency>(
                 initialValue: _frequency,
@@ -903,7 +925,9 @@ class _MedicationReminderFormSheetState
           const SizedBox(width: 9),
           Expanded(
             child: Text(
-              AppStrings.medicationTimes[index],
+              index < AppStrings.medicationTimes.length
+                  ? AppStrings.medicationTimes[index]
+                  : '${AppStrings.medicationTime} ${index + 1}',
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -917,13 +941,21 @@ class _MedicationReminderFormSheetState
               onPressed: () => _pickTime(index),
               child: Text(value.format(context)),
             ),
-          Switch(
-            key: ValueKey('reminder_time_toggle_$index'),
-            value: value != null,
-            onChanged: (enabled) => setState(() {
-              _times[index] = enabled ? _defaultTimeForSlot(index) : null;
-            }),
-          ),
+          if (index < AppStrings.medicationTimes.length)
+            Switch(
+              key: ValueKey('reminder_time_toggle_$index'),
+              value: value != null,
+              onChanged: (enabled) => setState(() {
+                _times[index] = enabled ? _defaultTimeForSlot(index) : null;
+              }),
+            )
+          else
+            IconButton(
+              key: ValueKey('reminder_time_remove_$index'),
+              tooltip: AppStrings.delete,
+              onPressed: () => setState(() => _times.removeAt(index)),
+              icon: const Icon(Icons.close_rounded),
+            ),
         ],
       ),
     );
@@ -935,6 +967,35 @@ class _MedicationReminderFormSheetState
       initialTime: _times[index] ?? _defaultTimeForSlot(index),
     );
     if (value != null && mounted) setState(() => _times[index] = value);
+  }
+
+  void _addReminderTime() {
+    setState(() {
+      final emptySlot = _times.indexWhere((value) => value == null);
+      if (emptySlot >= 0) {
+        _times[emptySlot] = _defaultTimeForSlot(emptySlot);
+      } else if (_times.length < 12) {
+        _times.add(_nextReminderTime());
+      }
+      final activeTimeCount = _times.whereType<TimeOfDay>().length;
+      if (_doseCount < activeTimeCount) _doseCount = activeTimeCount;
+    });
+  }
+
+  TimeOfDay _nextReminderTime() {
+    final active = _times.whereType<TimeOfDay>().toList();
+    if (active.isEmpty) return const TimeOfDay(hour: 9, minute: 0);
+    var minutes = (active.last.hour * 60 + active.last.minute + 360) % 1440;
+    for (var attempt = 0; attempt < 24; attempt++) {
+      final candidate = TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60);
+      final duplicate = active.any(
+        (time) =>
+            time.hour == candidate.hour && time.minute == candidate.minute,
+      );
+      if (!duplicate) return candidate;
+      minutes = (minutes + 60) % 1440;
+    }
+    return const TimeOfDay(hour: 0, minute: 0);
   }
 
   Future<void> _pickDate({required bool isStart}) async {

@@ -262,6 +262,16 @@ class DashboardViewModel extends ChangeNotifier {
     return saveLog(log);
   }
 
+  /// Seçilen günün adet kaydını, aynı güne ait diğer günlük verileri koruyarak
+  /// kaldırır ve döngü hesaplarını yeniler.
+  Future<bool> deletePeriodForDate(DateTime date) async {
+    final success = await _storage.deletePeriodLogsForDate(date);
+    if (!success) return false;
+    await _syncStateAfterSave(date);
+    notifyListeners();
+    return true;
+  }
+
   /// Mood güncelle (en son kaydı günceller veya yenisini oluşturur).
   Future<void> updateMood(String mood, String emoji) async {
     final log = (latestLog ?? DailyLog.empty(AppTime.now)).copyWith(
@@ -301,10 +311,8 @@ class DashboardViewModel extends ChangeNotifier {
 
     // Tüm günün loglarını birleştirerek doluluk kontrolü
     bool hasMood = _todayLogs.any((l) => l.mood != null);
-    bool hasActivity = _todayLogs.any((l) => l.activities.isNotEmpty);
     bool hasNutrition = _todayLogs.any(
       (l) =>
-          l.nutritionTags.isNotEmpty ||
           l.mealTypes.isNotEmpty ||
           l.mealQualities.isNotEmpty ||
           l.mealFoodGroups.isNotEmpty ||
@@ -312,14 +320,11 @@ class DashboardViewModel extends ChangeNotifier {
           l.cravings.isNotEmpty ||
           l.waterIntakeMl != null,
     );
-    bool hasBowel = _todayLogs.any((l) => l.bowelActivity.isNotEmpty);
 
     int filled = 0;
-    int total = 4;
+    int total = 2;
     if (hasMood) filled++;
-    if (hasActivity) filled++;
     if (hasNutrition) filled++;
-    if (hasBowel) filled++;
 
     return filled / total;
   }

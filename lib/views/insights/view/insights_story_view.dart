@@ -4,13 +4,13 @@ part of 'insights_view.dart';
 class InsightsView extends StatefulWidget {
   final VoidCallback? onClose;
   final bool isActive;
-  final String? initialInsightId;
+  final PersonalInsight? initialInsight;
 
   const InsightsView({
     super.key,
     this.onClose,
     this.isActive = true,
-    this.initialInsightId,
+    this.initialInsight,
   });
 
   @override
@@ -45,7 +45,7 @@ class _InsightsViewState extends State<InsightsView>
   @override
   void didUpdateWidget(covariant InsightsView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initialInsightId != widget.initialInsightId) {
+    if (oldWidget.initialInsight?.id != widget.initialInsight?.id) {
       _index = 0;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || !_pageController.hasClients) return;
@@ -166,16 +166,16 @@ class _InsightsViewState extends State<InsightsView>
   }
 
   List<PersonalInsight> _orderedInsights(List<PersonalInsight> insights) {
-    final requestedId = widget.initialInsightId;
-    if (requestedId == null || insights.length < 2) return insights;
+    final requested = widget.initialInsight;
+    if (requested == null) return insights;
 
     final startIndex = insights.indexWhere(
-      (insight) => insight.id == requestedId,
+      (insight) => insight.id == requested.id,
     );
-    if (startIndex <= 0) return insights;
-
+    if (startIndex < 0) return [requested, ...insights];
     return [
-      ...insights.sublist(startIndex),
+      requested,
+      ...insights.sublist(startIndex + 1),
       ...insights.sublist(0, startIndex),
     ];
   }
