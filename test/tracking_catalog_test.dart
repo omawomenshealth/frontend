@@ -19,6 +19,13 @@ void main() {
     await AppStrings.delegate.load(const Locale('tr'));
   });
 
+  test('sarı kantaron takviye kataloğunda loglanabilir', () async {
+    expect(AppStrings.supplementCatalog, contains('Sarı kantaron'));
+
+    await AppStrings.delegate.load(const Locale('en'));
+    expect(AppStrings.supplementCatalog, contains("St. John's wort"));
+  });
+
   testWidgets('ana sayfa adet disinda tam bes hizli kayit gosterir', (
     tester,
   ) async {
