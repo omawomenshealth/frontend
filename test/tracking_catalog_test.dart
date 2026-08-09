@@ -26,6 +26,35 @@ void main() {
     expect(AppStrings.supplementCatalog, contains("St. John's wort"));
   });
 
+  test('bitkisel ve bağışıklık takviyeleri katalogda loglanabilir', () async {
+    expect(
+      AppStrings.supplementCatalog,
+      containsAll(const [
+        'Andrographis',
+        'Astragalus (geven kökü)',
+        'Ekinezya',
+        'Ginseng (Panax ginseng)',
+        'Güney Afrika sardunyası (Pelargonium sidoides)',
+        'Kara mürver (Sambucus nigra)',
+        'Kedi pençesi (Uncaria tomentosa)',
+        'Sarımsak ekstresi',
+        'Sibirya ginsengi (Eleuthero)',
+        'Yeşil çay ekstresi',
+        'Beta-glukan',
+        'Propolis',
+        'Reishi, shiitake ve maitake mantarları',
+      ]),
+    );
+
+    await AppStrings.delegate.load(const Locale('en'));
+    expect(AppStrings.supplementCatalog, contains('Echinacea'));
+    expect(AppStrings.supplementCatalog, contains('Beta-glucan'));
+    expect(
+      AppStrings.supplementCatalog,
+      contains('Reishi, shiitake and maitake mushrooms'),
+    );
+  });
+
   testWidgets('ana sayfa adet disinda tam bes hizli kayit gosterir', (
     tester,
   ) async {
