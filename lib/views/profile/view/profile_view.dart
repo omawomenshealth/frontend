@@ -762,7 +762,9 @@ class _ProfileMechanics extends StatelessWidget {
               ...storage.getCustomSupplements(),
             }.toList();
             final skincareNames = {
-              ...AppStrings.skincareCatalog,
+              ...AppStrings.skincareCatalog.values.expand(
+                (ingredients) => ingredients,
+              ),
               ...vm.settings.dailySkincare,
               ...storage.getCustomSkincare(),
             }.toList();

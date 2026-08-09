@@ -896,7 +896,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 20),
         TrackingCatalogSelector(
           searchHint: AppStrings.searchSkincare,
-          categories: {AppStrings.skincareRoutine: AppStrings.skincareCatalog},
+          categories: AppStrings.skincareCatalog,
           selected: _skincare,
           customItems: context.read<LocalStorageService>().getCustomSkincare(),
           color: _tone,

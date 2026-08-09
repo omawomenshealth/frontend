@@ -82,9 +82,7 @@ void main() {
         SingleChildScrollView(
           child: TrackingCatalogSelector(
             searchHint: AppStrings.searchSkincare,
-            categories: {
-              AppStrings.skincareRoutine: AppStrings.skincareCatalog,
-            },
+            categories: AppStrings.skincareCatalog,
             selected: <String>{},
             color: AppColors.skincarePrimary,
             icon: Icons.spa_outlined,

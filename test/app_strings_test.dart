@@ -88,6 +88,19 @@ void main() {
     expect(AppStrings.symptomSkinHairOptions, contains('Yağlı cilt'));
     expect(AppStrings.symptomEnergyOptions, contains('Enerjik'));
     expect(AppStrings.symptomDigestionOptions, contains('Midem iyi'));
+    expect(AppStrings.skincareCatalog.keys, [
+      'Akne, Yağlanma ve Gözenek',
+      'Eksfoliasyon ve Doku',
+      'Hassasiyet ve Yatıştırma',
+      'Leke ve Ton Eşitsizliği',
+      'Nemlendirme ve Bariyer',
+      'Yaşlanma Karşıtı ve Antioksidan',
+    ]);
+    final skincareIngredients = AppStrings.skincareCatalog.values
+        .expand((ingredients) => ingredients)
+        .toList();
+    expect(skincareIngredients, hasLength(34));
+    expect(skincareIngredients.toSet(), hasLength(34));
     expect(
       AppStrings.insightMoodCyclePhaseBody(
         mood: 'Mutlu',
