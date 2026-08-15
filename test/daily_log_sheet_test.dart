@@ -1035,6 +1035,20 @@ void main() {
     );
     expect(itemField.initialValue, 'Test ilacı');
     expect(find.text(AppStrings.reminderEnabled), findsOneWidget);
+    expect(find.text(AppStrings.usageDurationQuestion), findsOneWidget);
+
+    final longTermChip = find.byKey(
+      const ValueKey('reminder_duration_long_term'),
+    );
+    expect(tester.widget<ChoiceChip>(longTermChip).selected, isTrue);
+
+    final sevenDayChip = find.byKey(const ValueKey('reminder_duration_7'));
+    await tester.ensureVisible(sevenDayChip);
+    await tester.tap(sevenDayChip);
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<ChoiceChip>(sevenDayChip).selected, isTrue);
+    expect(tester.widget<ChoiceChip>(longTermChip).selected, isFalse);
   });
 
   testWidgets('dört ilaç saati hatırlatıcı formuna birlikte aktarılır', (

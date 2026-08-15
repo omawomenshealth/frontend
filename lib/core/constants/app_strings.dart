@@ -619,6 +619,10 @@ enum _TextKey {
   startDate,
   endDate,
   noEndDate,
+  usageDurationQuestion,
+  longTermUsage,
+  durationDays,
+  customEndDate,
   reminderEnabled,
   notificationPermissionDenied,
   reminderSaved,
@@ -1437,6 +1441,10 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.startDate: 'Başlangıç tarihi',
   _TextKey.endDate: 'Bitiş tarihi',
   _TextKey.noEndDate: 'Bitiş tarihi yok',
+  _TextKey.usageDurationQuestion: 'Bu plan ne kadar sürecek?',
+  _TextKey.longTermUsage: 'Uzun süreli / bitiş yok',
+  _TextKey.durationDays: '{count} gün',
+  _TextKey.customEndDate: 'Özel bitiş tarihi',
   _TextKey.reminderEnabled: 'Hatırlatıcı açık',
   _TextKey.notificationPermissionDenied:
       'Plan kaydedildi ancak bildirim izni verilmedi. Telefon ayarlarından OMA bildirimlerini açabilirsin.',
@@ -2219,6 +2227,10 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.startDate: 'Start date',
   _TextKey.endDate: 'End date',
   _TextKey.noEndDate: 'No end date',
+  _TextKey.usageDurationQuestion: 'How long will this plan last?',
+  _TextKey.longTermUsage: 'Long term / no end date',
+  _TextKey.durationDays: '{count} days',
+  _TextKey.customEndDate: 'Custom end date',
   _TextKey.reminderEnabled: 'Reminder enabled',
   _TextKey.notificationPermissionDenied:
       'The plan was saved, but notification permission was not granted. You can enable OMA notifications in your phone settings.',
@@ -4187,6 +4199,12 @@ class AppStrings {
   static String get startDate => _text(_TextKey.startDate);
   static String get endDate => _text(_TextKey.endDate);
   static String get noEndDate => _text(_TextKey.noEndDate);
+  static String get usageDurationQuestion =>
+      _text(_TextKey.usageDurationQuestion);
+  static String get longTermUsage => _text(_TextKey.longTermUsage);
+  static String durationDays(int count) =>
+      _format(_TextKey.durationDays, {'count': count});
+  static String get customEndDate => _text(_TextKey.customEndDate);
   static String get reminderEnabled => _text(_TextKey.reminderEnabled);
   static String get notificationPermissionDenied =>
       _text(_TextKey.notificationPermissionDenied);

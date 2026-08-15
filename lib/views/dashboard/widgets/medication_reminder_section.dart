@@ -594,6 +594,8 @@ class MedicationReminderFormSheet extends StatefulWidget {
 
 class _MedicationReminderFormSheetState
     extends State<MedicationReminderFormSheet> {
+  static const _durationPresets = <int>[3, 5, 7, 10, 14];
+
   final _formKey = GlobalKey<FormState>();
   final _customItemController = TextEditingController();
 
@@ -839,6 +841,43 @@ class _MedicationReminderFormSheetState
                 ),
               ],
               const SizedBox(height: 12),
+              Text(
+                AppStrings.usageDurationQuestion,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 7,
+                runSpacing: 7,
+                children: [
+                  ChoiceChip(
+                    key: const ValueKey('reminder_duration_long_term'),
+                    label: Text(AppStrings.longTermUsage),
+                    selected: _endDate == null,
+                    onSelected: (_) => _setUsageDuration(null),
+                  ),
+                  for (final days in _durationPresets)
+                    ChoiceChip(
+                      key: ValueKey('reminder_duration_$days'),
+                      label: Text(AppStrings.durationDays(days)),
+                      selected: _usageDurationDays == days,
+                      onSelected: (_) => _setUsageDuration(days),
+                    ),
+                  ChoiceChip(
+                    key: const ValueKey('reminder_duration_custom'),
+                    label: Text(AppStrings.customEndDate),
+                    selected:
+                        _endDate != null &&
+                        !_durationPresets.contains(_usageDurationDays),
+                    onSelected: (_) => _pickDate(isStart: false),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
@@ -1008,13 +1047,32 @@ class _MedicationReminderFormSheetState
       lastDate: DateTime(today.year + 10),
     );
     if (value == null || !mounted) return;
+    final presetDuration = _durationPresets.contains(_usageDurationDays)
+        ? _usageDurationDays
+        : null;
     setState(() {
       if (isStart) {
         _startDate = value;
-        if (_endDate?.isBefore(value) ?? false) _endDate = null;
+        if (presetDuration != null) {
+          _endDate = value.add(Duration(days: presetDuration - 1));
+        } else if (_endDate?.isBefore(value) ?? false) {
+          _endDate = null;
+        }
       } else {
         _endDate = value;
       }
+    });
+  }
+
+  int? get _usageDurationDays {
+    final endDate = _endDate;
+    if (endDate == null) return null;
+    return endDate.difference(_startDate).inDays + 1;
+  }
+
+  void _setUsageDuration(int? days) {
+    setState(() {
+      _endDate = days == null ? null : _startDate.add(Duration(days: days - 1));
     });
   }
 
