@@ -528,9 +528,13 @@ class LocalStorageService {
           cycleLengths.add(diff);
         }
       }
-      if (cycleLengths.isNotEmpty) {
+      final cycleLengthsForAverage = CycleRules.excludeCycleLengthOutliers(
+        cycleLengths,
+      );
+      if (cycleLengthsForAverage.isNotEmpty) {
         finalCycleLength =
-            (cycleLengths.reduce((a, b) => a + b) / cycleLengths.length)
+            (cycleLengthsForAverage.reduce((a, b) => a + b) /
+                    cycleLengthsForAverage.length)
                 .round();
       }
     }
@@ -567,17 +571,21 @@ class LocalStorageService {
           .where(CycleRules.isUsablePeriodLength)
           .toList();
 
-      // Son 10 regl süresinin ortalamasını al
+      // Son 10 tamamlanmış regl süresini al. Kullanıcının tipik
+      // süresinden belirgin biçimde sapan tekil kayıtlar tahmini kaydırmasın.
       final recentDurationsLimited =
           recentDurations.length > CycleRules.recentSampleSize
           ? recentDurations.sublist(
               recentDurations.length - CycleRules.recentSampleSize,
             )
           : recentDurations;
+      final durationsForAverage = CycleRules.excludePeriodLengthOutliers(
+        recentDurationsLimited,
+      );
 
-      if (recentDurationsLimited.isNotEmpty) {
-        final totalPeriodDays = recentDurationsLimited.reduce((a, b) => a + b);
-        finalPeriodLength = (totalPeriodDays / recentDurationsLimited.length)
+      if (durationsForAverage.isNotEmpty) {
+        final totalPeriodDays = durationsForAverage.reduce((a, b) => a + b);
+        finalPeriodLength = (totalPeriodDays / durationsForAverage.length)
             .round();
       }
     }

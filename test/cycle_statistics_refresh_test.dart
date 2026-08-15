@@ -113,6 +113,30 @@ void main() {
     expect(refreshed.averagePeriodLength, 4);
   });
 
+  test('adet süresi ortalamasında uç değeri hesaba katmaz', () async {
+    final firstPeriodStart = AppTime.now.dateOnly.subtract(
+      const Duration(days: 120),
+    );
+    const durations = [5, 5, 5, 14];
+
+    for (var period = 0; period < durations.length; period++) {
+      final periodStart = firstPeriodStart.add(Duration(days: period * 28));
+      for (var day = 0; day < durations[period]; day++) {
+        await storage.saveDailyLog(
+          DailyLog(
+            date: periodStart.add(Duration(days: day, hours: 9)),
+            flowIntensity: 'Orta',
+            observedSections: const {DailyLogObservedSection.period},
+          ),
+        );
+      }
+    }
+
+    final refreshed = await storage.refreshCycleStatistics();
+
+    expect(refreshed!.averagePeriodLength, 5);
+  });
+
   test('ardisik kanama kayitlari tek adet sayilir', () async {
     final firstStart = DateTime(2026, 5, 1);
     for (var day = 0; day < 3; day++) {

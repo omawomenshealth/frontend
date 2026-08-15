@@ -80,6 +80,18 @@ void main() {
     expect(settings.averagePeriodLength, CycleRules.minPeriodLength);
   });
 
+  test('döngü uzunluğu ortalamasında uç değerleri ayıklar', () {
+    final filtered = CycleRules.excludeCycleLengthOutliers([
+      20,
+      28,
+      28,
+      35,
+      27,
+    ]);
+
+    expect(filtered, [28, 28, 27]);
+  });
+
   test('dongu halkasi fazlari 28 gunluk donguye orantili hesaplanir', () {
     final calculator = PeriodCalculator(
       lastPeriodDate: AppTime.now.dateOnly,
