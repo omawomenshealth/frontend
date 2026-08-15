@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
@@ -18,6 +19,7 @@ class ApiException implements Exception {
 
 /// Express Backend ile iletişim kuran API servis sınıfı.
 class ApiService {
+  static const _requestTimeout = Duration(seconds: 30);
   final LocalStorageService _storage;
   Future<bool>? _refreshInFlight;
 
@@ -34,14 +36,40 @@ class ApiService {
     };
   }
 
+  static bool _isAccessToken(String value) =>
+      value.length <= 16 * 1024 &&
+      RegExp(
+        r'^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$',
+      ).hasMatch(value);
+
+  static bool _isRefreshToken(String value) =>
+      RegExp(r'^[A-Za-z0-9_-]{64}$').hasMatch(value);
+
+  Future<void> _clearStoredAuth() async {
+    final removals = <Future<bool> Function()>[
+      () => _storage.setAuthToken(null),
+      () => _storage.setAuthRefreshToken(null),
+      () => _storage.setAuthEmail(null),
+      () => _storage.setAuthName(null),
+      () => _storage.setAuthGoogleId(null),
+    ];
+    for (final remove in removals) {
+      try {
+        await remove();
+      } catch (_) {
+        // Best effort: callers must still treat the session as invalid.
+      }
+    }
+  }
+
   Future<http.Response> _authorizedRequest(
     Future<http.Response> Function(Map<String, String> headers) send,
   ) async {
-    var response = await send(_getHeaders());
+    var response = await send(_getHeaders()).timeout(_requestTimeout);
     if (response.statusCode == 401 &&
         _storage.authRefreshToken != null &&
         await _refreshSession()) {
-      response = await send(_getHeaders());
+      response = await send(_getHeaders()).timeout(_requestTimeout);
     }
     return response;
   }
@@ -63,27 +91,41 @@ class ApiService {
     final refreshToken = _storage.authRefreshToken;
     if (refreshToken == null) return false;
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/refresh'),
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Accept-Language': AppStrings.languageCode,
-        },
-        body: jsonEncode({'refreshToken': refreshToken}),
-      );
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/api/auth/refresh'),
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8',
+              'Accept-Language': AppStrings.languageCode,
+            },
+            body: jsonEncode({'refreshToken': refreshToken}),
+          )
+          .timeout(_requestTimeout);
       if (response.statusCode != 200) {
         if (response.statusCode == 401) {
-          await _storage.setAuthToken(null);
-          await _storage.setAuthRefreshToken(null);
+          await _clearStoredAuth();
         }
         return false;
       }
       final data = _decodeObject(response);
       final token = data['token'];
       final rotatedRefreshToken = data['refreshToken'];
-      if (token is! String || rotatedRefreshToken is! String) return false;
-      return await _storage.setAuthToken(token) &&
-          await _storage.setAuthRefreshToken(rotatedRefreshToken);
+      if (token is! String ||
+          !_isAccessToken(token) ||
+          rotatedRefreshToken is! String ||
+          !_isRefreshToken(rotatedRefreshToken)) {
+        await _clearStoredAuth();
+        return false;
+      }
+      if (!await _storage.setAuthRefreshToken(rotatedRefreshToken)) {
+        await _clearStoredAuth();
+        return false;
+      }
+      if (!await _storage.setAuthToken(token)) {
+        await _clearStoredAuth();
+        return false;
+      }
+      return true;
     } catch (error) {
       debugPrint('Oturum yenileme hatası: $error');
       return false;
@@ -107,35 +149,64 @@ class ApiService {
     final url = Uri.parse('$baseUrl/api/auth/google');
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept-Language': AppStrings.languageCode,
-        },
-        body: jsonEncode({'idToken': idToken, 'email': ?email, 'name': ?name}),
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept-Language': AppStrings.languageCode,
+            },
+            body: jsonEncode({
+              'idToken': idToken,
+              'email': ?email,
+              'name': ?name,
+            }),
+          )
+          .timeout(_requestTimeout);
 
       if (response.statusCode == 200) {
-        final data =
-            jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+        final data = _decodeObject(response);
 
         // Token ve kullanıcı bilgilerini kaydet
-        final token = data['token'] as String;
-        final refreshToken = data['refreshToken'] as String;
-        final userMap = data['user'] as Map<String, dynamic>;
-        final userEmail = userMap['email'] as String;
-        final userName = userMap['name'] as String;
-        final userGoogleId = userMap['googleId'] as String?;
-
-        await _storage.setAuthToken(token);
-        await _storage.setAuthRefreshToken(refreshToken);
-        await _storage.setAuthEmail(userEmail);
-        await _storage.setAuthName(userName);
-        if (userGoogleId != null) {
-          await _storage.setAuthGoogleId(userGoogleId);
+        final token = data['token'];
+        final refreshToken = data['refreshToken'];
+        final rawUser = data['user'];
+        if (token is! String ||
+            !_isAccessToken(token) ||
+            refreshToken is! String ||
+            !_isRefreshToken(refreshToken) ||
+            rawUser is! Map) {
+          throw ApiException(AppStrings.invalidServerResponse);
+        }
+        final userMap = Map<String, dynamic>.from(rawUser);
+        final userEmail = userMap['email'];
+        final userName = userMap['name'];
+        final userGoogleId = userMap['googleId'];
+        if (userEmail is! String ||
+            userEmail.length > 254 ||
+            !userEmail.contains('@') ||
+            userName is! String ||
+            userName.length > 200 ||
+            userGoogleId is! String ||
+            !RegExp(r'^[a-f0-9]{64}$').hasMatch(userGoogleId)) {
+          throw ApiException(AppStrings.invalidServerResponse);
         }
 
+        final refreshStored = await _storage.setAuthRefreshToken(refreshToken);
+        final tokenStored = refreshStored && await _storage.setAuthToken(token);
+        final emailStored =
+            tokenStored && await _storage.setAuthEmail(userEmail);
+        final nameStored = emailStored && await _storage.setAuthName(userName);
+        final userIdStored =
+            nameStored && await _storage.setAuthGoogleId(userGoogleId);
+        if (!refreshStored ||
+            !tokenStored ||
+            !emailStored ||
+            !nameStored ||
+            !userIdStored) {
+          await _clearStoredAuth();
+          throw StateError('Oturum bilgileri güvenli depoya yazılamadı.');
+        }
         return data;
       } else {
         final errorBody = jsonDecode(utf8.decode(response.bodyBytes));
@@ -431,14 +502,16 @@ class ApiService {
     final refreshToken = _storage.authRefreshToken;
     if (refreshToken == null) return;
     try {
-      await http.post(
-        Uri.parse('$baseUrl/api/auth/logout'),
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Accept-Language': AppStrings.languageCode,
-        },
-        body: jsonEncode({'refreshToken': refreshToken}),
-      );
+      await http
+          .post(
+            Uri.parse('$baseUrl/api/auth/logout'),
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8',
+              'Accept-Language': AppStrings.languageCode,
+            },
+            body: jsonEncode({'refreshToken': refreshToken}),
+          )
+          .timeout(_requestTimeout);
     } catch (_) {
       // Yerel çıkış ağdan bağımsız tamamlanmalıdır.
     }

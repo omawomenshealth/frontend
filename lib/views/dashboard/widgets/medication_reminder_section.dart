@@ -594,7 +594,8 @@ class MedicationReminderFormSheet extends StatefulWidget {
 
 class _MedicationReminderFormSheetState
     extends State<MedicationReminderFormSheet> {
-  static const _durationPresets = <int>[3, 5, 7, 10, 14];
+  static const _medicationDurationPresets = <int>[3, 5, 7, 10, 14];
+  static const _routineDurationPresets = <int>[30, 60, 90];
 
   final _formKey = GlobalKey<FormState>();
   final _customItemController = TextEditingController();
@@ -608,6 +609,15 @@ class _MedicationReminderFormSheetState
   late DateTime _startDate;
   DateTime? _endDate;
   late bool _enabled;
+
+  List<int> get _durationPresets =>
+      widget.itemType == MedicationPlanItemType.medication
+      ? _medicationDurationPresets
+      : _routineDurationPresets;
+
+  bool get _isRoutineItem =>
+      widget.itemType == MedicationPlanItemType.supplement ||
+      widget.itemType == MedicationPlanItemType.skincare;
 
   @override
   void initState() {
@@ -811,11 +821,19 @@ class _MedicationReminderFormSheetState
                 items: [
                   DropdownMenuItem(
                     value: MedicationPlanFrequency.everyDay,
-                    child: Text(AppStrings.everyDay),
+                    child: Text(
+                      _isRoutineItem
+                          ? AppStrings.remindEveryDay
+                          : AppStrings.everyDay,
+                    ),
                   ),
                   DropdownMenuItem(
                     value: MedicationPlanFrequency.selectedWeekdays,
-                    child: Text(AppStrings.selectedDays),
+                    child: Text(
+                      _isRoutineItem
+                          ? AppStrings.remindOnSelectedDays
+                          : AppStrings.selectedDays,
+                    ),
                   ),
                 ],
                 onChanged: (value) => setState(() => _frequency = value!),
@@ -856,7 +874,11 @@ class _MedicationReminderFormSheetState
                 children: [
                   ChoiceChip(
                     key: const ValueKey('reminder_duration_long_term'),
-                    label: Text(AppStrings.longTermUsage),
+                    label: Text(
+                      _isRoutineItem
+                          ? AppStrings.ongoingRoutine
+                          : AppStrings.longTermUsage,
+                    ),
                     selected: _endDate == null,
                     onSelected: (_) => _setUsageDuration(null),
                   ),

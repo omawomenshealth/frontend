@@ -803,6 +803,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           showSmartSearchHint: false,
           onToggle: (item) =>
               _toggleMedicationItem(item, entries: _medications),
+          onAdd: _addCatalogMedication,
           onReminder: () => _showReminderManagerForType(
             MedicationPlanItemType.medication,
             selected.toList(),
@@ -935,6 +936,32 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     });
   }
 
+  Future<void> _offerMedicationUsagePlan(MedicationEntry entry) async {
+    final shouldPlan = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(AppStrings.medicationUsagePlanQuestion),
+        content: Text(AppStrings.medicationUsagePlanHint),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(AppStrings.skip),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.event_available_outlined),
+            label: Text(AppStrings.setUsagePlan),
+          ),
+        ],
+      ),
+    );
+    if (shouldPlan != true || !mounted) return;
+    await _openItemReminder(
+      entry: entry,
+      itemType: MedicationPlanItemType.medication,
+    );
+  }
+
   Future<String?> _promptCustomCatalogItem(String title) {
     var value = '';
     return showDialog<String>(
@@ -958,6 +985,26 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _addCatalogMedication() async {
+    final name = await _promptCustomCatalogItem(AppStrings.newMedication);
+    if (!mounted || name == null || name.isEmpty) return;
+    final storage = context.read<LocalStorageService>();
+    await storage.saveCustomMedication(name);
+    final settings = storage.loadSettings() ?? widget.settings;
+    await storage.saveSettings(
+      settings.copyWith(
+        dailyMedications: {...settings.dailyMedications, name}.toList(),
+      ),
+    );
+    if (!mounted) return;
+    _toggleMedicationItem(name, entries: _medications);
+    await widget.onSettingsChanged?.call();
+    if (!mounted) return;
+    await _offerMedicationUsagePlan(
+      _medications.firstWhere((entry) => entry.name == name),
     );
   }
 
@@ -1905,6 +1952,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       );
       _medicationSectionExpanded = true;
     });
+    if (medication && mounted) {
+      await _offerMedicationUsagePlan(entries.last);
+    }
   }
 
   Future<void> _openReminderManager() async {

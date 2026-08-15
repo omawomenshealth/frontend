@@ -117,6 +117,9 @@ class PremiumPurchaseService extends ChangeNotifier {
     notifyListeners();
     try {
       final accountId = _storage.authGoogleId;
+      if (accountId == null || !RegExp(r'^[a-f0-9]{64}$').hasMatch(accountId)) {
+        throw StateError('Premium hesap eşleştirme kimliği geçersiz.');
+      }
       final purchaseParam = PurchaseParam(
         productDetails: _product!,
         applicationUserName: accountId,
@@ -147,7 +150,11 @@ class PremiumPurchaseService extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _store.restorePurchases();
+      final accountId = _storage.authGoogleId;
+      if (accountId == null || !RegExp(r'^[a-f0-9]{64}$').hasMatch(accountId)) {
+        throw StateError('Premium hesap eşleştirme kimliği geçersiz.');
+      }
+      await _store.restorePurchases(applicationUserName: accountId);
       _message = AppStrings.checkingPurchases;
     } catch (error) {
       _message = AppStrings.restoreFailed(error);

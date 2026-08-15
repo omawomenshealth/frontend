@@ -982,14 +982,38 @@ void main() {
     expect(saved.takenDoseCount, 1);
   });
 
-  testWidgets('İlaçta artı yoktur, takviyedeki artı kalıcı ekler', (
-    tester,
-  ) async {
+  testWidgets('Yeni ilaç eklenince kullanım süresi sorulur', (tester) async {
     final harness = await _pumpLogSheet(tester, initialIndex: 4);
 
     final add = find.byKey(const ValueKey('tracking_catalog_add'));
-    expect(add, findsOneWidget);
-    tester.widget<OutlinedButton>(add).onPressed!();
+    expect(add, findsNWidgets(2));
+    tester.widget<OutlinedButton>(add.first).onPressed!();
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).last, 'Yeni ilaç');
+    await tester.tap(find.text(AppStrings.add).last);
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.medicationUsagePlanQuestion), findsOneWidget);
+    expect(
+      harness.storage.loadSettings()!.dailyMedications,
+      contains('Yeni ilaç'),
+    );
+    expect(harness.settingsChangeCount, 1);
+
+    await tester.tap(find.text(AppStrings.setUsagePlan));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('reminder_duration_7')), findsOneWidget);
+    expect(find.byKey(const ValueKey('reminder_duration_30')), findsNothing);
+  });
+
+  testWidgets('İlaç ve takviyedeki artı kalıcı öğe ekler', (tester) async {
+    final harness = await _pumpLogSheet(tester, initialIndex: 4);
+
+    final add = find.byKey(const ValueKey('tracking_catalog_add'));
+    expect(add, findsNWidgets(2));
+    tester.widget<OutlinedButton>(add.last).onPressed!();
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField).last, 'Yeni takviye');

@@ -449,7 +449,11 @@ class PersonalAssociationEngine {
     Map<DateTime, _ObservedDay> days,
     List<MedicationDoseRecord> records,
   ) {
-    final explicitResponses = records.where((record) => record.status != null);
+    final explicitResponses = records.where(
+      (record) =>
+          record.itemType == MedicationPlanItemType.medication &&
+          record.status != null,
+    );
     final itemNames = explicitResponses
         .map((record) => record.itemName)
         .toSet();

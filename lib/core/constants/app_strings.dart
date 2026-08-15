@@ -4333,6 +4333,20 @@ class AppStrings {
       isTurkish ? 'Yeni içerik ekle' : 'Add a new ingredient';
   static String get createReminderShort =>
       isTurkish ? 'Hatırlatıcı oluştur' : 'Create reminder';
+  static String get remindEveryDay =>
+      isTurkish ? 'Her gün hatırlat' : 'Remind every day';
+  static String get remindOnSelectedDays =>
+      isTurkish ? 'Seçili günlerde hatırlat' : 'Remind on selected days';
+  static String get ongoingRoutine =>
+      isTurkish ? 'Sürekli / bitiş yok' : 'Ongoing / no end date';
+  static String get medicationUsagePlanQuestion => isTurkish
+      ? 'Bu ilacı ne kadar süre kullanacaksın?'
+      : 'How long will you use this medication?';
+  static String get medicationUsagePlanHint => isTurkish
+      ? 'Kısa kür veya uzun süreli kullanım planını şimdi belirleyebilirsin. Hatırlatıcı isteğe bağlıdır.'
+      : 'You can set a short-course or long-term usage plan now. Reminders are optional.';
+  static String get setUsagePlan =>
+      isTurkish ? 'Kullanım planını belirle' : 'Set usage plan';
   static String get savedForLater => isTurkish
       ? 'Kaydedildi; sonraki girişlerde yeniden seçebilirsin.'
       : 'Saved and available for future entries.';

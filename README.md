@@ -68,6 +68,19 @@ Gerçek satın alma testi için imzalı Android App Bundle'ı Internal testing
 kanalına yükleyin ve test hesabını license tester olarak ekleyin. Mağaza dışından
 kurulan yerel APK ürün ayrıntılarını göstermeyebilir.
 
+Release derlemesi debug anahtarıyla imzalanmaz. Özel upload keystore'unu
+`android/` altında tutup Git'e eklemeden `android/key.properties` oluşturun:
+
+```properties
+storeFile=upload-keystore.jks
+storePassword=<güçlü-parola>
+keyAlias=upload
+keyPassword=<güçlü-parola>
+```
+
+Bu dosya veya keystore eksikse release derlemesi güvenli biçimde durur. Anahtarı
+ve parolaları CI secret kasasında yedekleyin; repoya eklemeyin.
+
 Sunucu ve Google Play servis hesabı kurulumu için `../Server/README.md` dosyasına
 bakın.
 

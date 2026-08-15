@@ -273,6 +273,48 @@ void main() {
     expect(find.text(AppStrings.dosageCount(4)), findsOneWidget);
   });
 
+  testWidgets(
+    'takviye ve cilt bakımında uzun rutin süreleri ile günlük hatırlatma gösterilir',
+    (tester) async {
+      await AppStrings.delegate.load(const Locale('tr', 'TR'));
+
+      Future<void> pumpForm(
+        MedicationPlanItemType itemType,
+        String itemName,
+      ) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: MedicationReminderFormSheet(
+                itemType: itemType,
+                availableItems: [itemName],
+                initialItemName: itemName,
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+      }
+
+      for (final itemType in [
+        MedicationPlanItemType.supplement,
+        MedicationPlanItemType.skincare,
+      ]) {
+        await pumpForm(itemType, itemType.name);
+
+        expect(find.text(AppStrings.remindEveryDay), findsOneWidget);
+        expect(find.text(AppStrings.ongoingRoutine), findsOneWidget);
+        for (final days in [30, 60, 90]) {
+          expect(
+            find.byKey(ValueKey('reminder_duration_$days')),
+            findsOneWidget,
+          );
+        }
+        expect(find.byKey(const ValueKey('reminder_duration_7')), findsNothing);
+      }
+    },
+  );
+
   testWidgets('kapatılan planın bugünkü eski dozu ana sayfada gösterilmez', (
     tester,
   ) async {

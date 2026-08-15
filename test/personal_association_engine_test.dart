@@ -589,6 +589,54 @@ void main() {
     expect(association.withoutTotal, 10);
   });
 
+  test('takviye ve cilt bakımı atlamalarını ilaç insightına katmaz', () {
+    final start = DateTime(2026, 4, 1);
+    final logs = List.generate(
+      21,
+      (day) => DailyLog(
+        date: start.add(Duration(days: day)),
+        symptoms: day >= 1 && day <= 8 || day == 20
+            ? const ['Baş ağrısı']
+            : const [],
+        observedSections: const {DailyLogObservedSection.symptom},
+      ),
+    );
+
+    for (final itemType in [
+      MedicationPlanItemType.supplement,
+      MedicationPlanItemType.skincare,
+    ]) {
+      final records = List.generate(20, (day) {
+        final scheduledAt = start.add(Duration(days: day, hours: 9));
+        return MedicationDoseRecord(
+          id: '${itemType.name}-$day',
+          planId: '${itemType.name}-plan',
+          itemType: itemType,
+          itemName: itemType.name,
+          dosage: '1 Adet',
+          scheduledAt: scheduledAt,
+          notificationScheduled: true,
+          notificationScheduledAt: scheduledAt,
+          status: day < 10
+              ? MedicationDoseResponseStatus.skipped
+              : MedicationDoseResponseStatus.taken,
+          respondedAt: scheduledAt,
+        );
+      });
+
+      expect(
+        engine
+            .generate(logs: logs, doseRecords: records)
+            .where(
+              (insight) =>
+                  insight.kind ==
+                  PersonalInsightKind.medicationSkipSymptomAssociation,
+            ),
+        isEmpty,
+      );
+    }
+  });
+
   test(
     'ruh hali ile belirtiyi iki gözlemlenmiş sekme arasında karşılaştırır',
     () {

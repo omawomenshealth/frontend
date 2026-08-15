@@ -24,7 +24,7 @@ final class FlutterSecureLocalKeyStore implements LocalKeyStore {
       storageNamespace: 'oma_local_vault',
     ),
     iOptions: IOSOptions(
-      accessibility: KeychainAccessibility.first_unlock_this_device,
+      accessibility: KeychainAccessibility.unlocked_this_device,
       synchronizable: false,
       accountName: 'oma_local_vault',
     ),
