@@ -12,6 +12,7 @@ import 'core/constants/app_strings.dart';
 import 'core/constants/color_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/app_time.dart';
+import 'application/cycle_prediction/cycle_prediction_coordinator.dart';
 import 'data/services/local_storage_service.dart';
 import 'data/services/notification_service.dart';
 import 'data/services/api_service.dart';
@@ -93,10 +94,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final _navigatorKey = GlobalKey<NavigatorState>();
   final _homeShellKey = GlobalKey<_HomeShellState>();
   StreamSubscription<String>? _insightNotificationSubscription;
+  late final CyclePredictionCoordinator _cyclePredictions;
 
   @override
   void initState() {
     super.initState();
+    _cyclePredictions = CyclePredictionCoordinator(widget.storage);
     WidgetsBinding.instance.addObserver(this);
     _insightNotificationSubscription = widget
         .notificationService
@@ -108,6 +111,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _insightNotificationSubscription?.cancel();
+    _cyclePredictions.dispose();
     super.dispose();
   }
 
@@ -157,6 +161,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         Provider<NotificationService>.value(value: reminders),
         Provider<ApiService>.value(value: apiService),
         Provider<SyncService>.value(value: syncService),
+        ChangeNotifierProvider<CyclePredictionCoordinator>.value(
+          value: _cyclePredictions,
+        ),
         ChangeNotifierProvider(
           create: (_) =>
               PremiumPurchaseService(widget.storage, apiService)..initialize(),
@@ -168,13 +175,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) => OnboardingViewModel(widget.storage, syncService),
         ),
         ChangeNotifierProvider(
-          create: (_) => DashboardViewModel(widget.storage, reminders),
+          create: (_) =>
+              DashboardViewModel(widget.storage, reminders, _cyclePredictions),
         ),
         ChangeNotifierProvider(
           create: (_) => InsightsViewModel(widget.storage),
         ),
         ChangeNotifierProvider(
-          create: (_) => CalendarViewModel(widget.storage),
+          create: (_) => CalendarViewModel(widget.storage, _cyclePredictions),
         ),
         ChangeNotifierProvider(
           create: (_) => ProfileViewModel(

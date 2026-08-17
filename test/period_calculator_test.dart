@@ -3,6 +3,7 @@ import 'package:app_proje_a/core/utils/cycle_rules.dart';
 import 'package:app_proje_a/core/utils/date_extensions.dart';
 import 'package:app_proje_a/core/utils/period_calculator.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -114,5 +115,48 @@ void main() {
     );
 
     expect(calculator.phaseDayCounts, [7, 12, 5, 11]);
+  });
+
+  test('olasılıksal tarih eski modulo sıçramasının önüne geçer', () {
+    final today = AppTime.now.dateOnly;
+    final predicted = today.add(const Duration(days: 3));
+    final calculator = PeriodCalculator(
+      lastPeriodDate: today.subtract(const Duration(days: 28)),
+      cycleLength: 28,
+      periodLength: 5,
+      predictedNextPeriodDate: predicted,
+      predictedStartWindow: DateTimeRange(
+        start: today,
+        end: today.add(const Duration(days: 6)),
+      ),
+    );
+
+    expect(calculator.nextPeriodDate, predicted);
+    expect(calculator.daysUntilNextPeriod, 3);
+    expect(calculator.isInPeriod(today), isFalse);
+    expect(calculator.isInPeriod(predicted), isTrue);
+    expect(calculator.isInPeriodPredictionWindow(today), isTrue);
+  });
+
+  test('profil uygun değilse takvim ovulasyon tahmini gösterilmez', () {
+    final today = AppTime.now.dateOnly;
+    final calculator = PeriodCalculator(
+      lastPeriodDate: today,
+      cycleLength: 28,
+      periodLength: 5,
+      predictedNextPeriodDate: today.add(const Duration(days: 28)),
+      allowCalendarOvulationEstimates: false,
+    );
+
+    expect(
+      calculator.isInEstimatedOvulationWindow(
+        today.add(const Duration(days: 14)),
+      ),
+      isFalse,
+    );
+    expect(
+      calculator.isInFertileWindow(today.add(const Duration(days: 12))),
+      isFalse,
+    );
   });
 }

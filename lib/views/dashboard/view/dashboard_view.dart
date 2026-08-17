@@ -9,6 +9,7 @@ import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/personal_insight_model.dart';
+import '../../../domain/cycle/models/cycle_prediction.dart';
 import '../../calendar/view/calendar_view.dart' as cal;
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../../insights/view/insights_view.dart';
@@ -46,7 +47,7 @@ class DashboardView extends StatelessWidget {
         final cycleDay = _cycleDay(calculator, vm.selectedDate);
         final periodCount = phase == CyclePhase.menstrual
             ? cycleDay
-            : _daysToPeriod(calculator, cycleDay);
+            : _daysToPeriod(calculator, vm.selectedDate, cycleDay);
 
         return Scaffold(
           backgroundColor: Color.lerp(
@@ -98,6 +99,7 @@ class DashboardView extends StatelessWidget {
                       phase: phase,
                       cycleDay: cycleDay,
                       periodCount: periodCount,
+                      forecastSummary: _forecastSummary(vm),
                       onOpenInsights: () => _openInsights(context),
                       onPeriodTap: () => _showDailyLogSheet(
                         context,
@@ -210,12 +212,38 @@ class DashboardView extends StatelessWidget {
     return normalized + 1;
   }
 
-  int _daysToPeriod(PeriodCalculator? calculator, int cycleDay) {
+  int _daysToPeriod(
+    PeriodCalculator? calculator,
+    DateTime selectedDate,
+    int cycleDay,
+  ) {
     if (calculator == null || calculator.cycleLength <= 0) return 0;
+    final forecastDifference = calculator.nextPeriodDate
+        .difference(selectedDate.dateOnly)
+        .inDays;
+    if (forecastDifference >= 0) {
+      return forecastDifference.clamp(0, calculator.cycleLength);
+    }
     return (calculator.cycleLength - cycleDay + 1).clamp(
       0,
       calculator.cycleLength,
     );
+  }
+
+  String? _forecastSummary(DashboardViewModel vm) {
+    final forecast = vm.cycleForecast;
+    if (forecast == null) return null;
+    final start = forecast.p80Window.start;
+    final end = forecast.p80Window.end;
+    final confidence = switch (forecast.confidence) {
+      ForecastConfidence.low => AppStrings.isTurkish ? 'düşük' : 'low',
+      ForecastConfidence.medium => AppStrings.isTurkish ? 'orta' : 'medium',
+      ForecastConfidence.high => AppStrings.isTurkish ? 'yüksek' : 'high',
+    };
+    final range = '${start.day}.${start.month} - ${end.day}.${end.month}';
+    return AppStrings.isTurkish
+        ? 'Regl tahmin aralığı: $range · $confidence güven'
+        : 'Period prediction: $range · $confidence confidence';
   }
 
   void _showDailyLogSheet(

@@ -217,7 +217,10 @@ void main() {
 
     expect(find.text(AppStrings.medicationQuestion), findsOneWidget);
     expect(find.text(AppStrings.supplementQuestion), findsOneWidget);
-    expect(find.byKey(const ValueKey('tracking_catalog_add')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('tracking_catalog_add')),
+      findsNWidgets(2),
+    );
     expect(find.text(AppStrings.smartSearchHint), findsNothing);
     expect(
       tester

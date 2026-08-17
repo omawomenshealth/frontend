@@ -10,6 +10,7 @@ class PhaseHeroCard extends StatefulWidget {
   final CyclePhase phase;
   final int cycleDay;
   final int periodCount;
+  final String? forecastSummary;
   final VoidCallback onOpenInsights;
   final VoidCallback onPeriodTap;
 
@@ -18,6 +19,7 @@ class PhaseHeroCard extends StatefulWidget {
     required this.phase,
     required this.cycleDay,
     required this.periodCount,
+    this.forecastSummary,
     required this.onOpenInsights,
     required this.onPeriodTap,
   });
@@ -68,7 +70,8 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
     return Semantics(
       label:
           '${presentation.phaseLabel}. ${presentation.headline}. '
-          '${presentation.body}',
+          '${presentation.body}'
+          '${widget.forecastSummary == null ? '' : '. ${widget.forecastSummary}'}',
       child: Container(
         width: double.infinity,
         height: 420,
@@ -155,7 +158,33 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 17),
+                  if (widget.forecastSummary != null) ...[
+                    const SizedBox(height: 9),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.date_range_outlined,
+                          size: 14,
+                          color: presentation.color,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            widget.forecastSummary!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: presentation.color,
+                              fontSize: 10.5,
+                              height: 1.25,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 12),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [

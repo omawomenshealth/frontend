@@ -7,6 +7,8 @@ import '../../core/utils/date_extensions.dart';
 import '../../core/utils/app_time.dart';
 import '../../core/utils/cycle_rules.dart';
 import '../../core/constants/app_strings.dart';
+import '../../domain/cycle/models/cycle_prediction.dart';
+import '../../domain/cycle/services/bleeding_episode_builder.dart';
 import 'local_encrypted_store.dart';
 
 /// Sağlık ve oturum verilerini AES-256-GCM şifreli SharedPreferences zarfları
@@ -30,6 +32,7 @@ class LocalStorageService {
   static const String _medicationDoseRecordsKey = 'medication_dose_records';
   static const String _insightNotificationHistoryKey =
       'insight_notification_history';
+  static const String _cycleForecastSnapshotKey = 'cycle_forecast_snapshot_v1';
 
   final LocalKeyStore _keyStore;
   LocalEncryptedStore? _encryptedStore;
@@ -205,6 +208,7 @@ class LocalStorageService {
       key == _medicationReminderPlansKey ||
       key == _medicationDoseRecordsKey ||
       key == _insightNotificationHistoryKey ||
+      key == _cycleForecastSnapshotKey ||
       key.startsWith(_logPrefix);
 
   // ── Kullanıcı Ayarları ─────────────────────────────────
@@ -224,6 +228,18 @@ class LocalStorageService {
       return null;
     }
   }
+
+  /// Türetilmiş tahmin ham sağlık verisinden ayrı, şifreli yerel cache olarak
+  /// saklanır. Buluta senkronize edilmez; history/input hash uyuşmazsa
+  /// coordinator tarafından yeniden hesaplanır.
+  Future<bool> saveCycleForecastSnapshot(String value) =>
+      _p.setString(_cycleForecastSnapshotKey, value);
+
+  String? loadCycleForecastSnapshot() =>
+      _p.getString(_cycleForecastSnapshotKey);
+
+  Future<bool> clearCycleForecastSnapshot() =>
+      _p.remove(_cycleForecastSnapshotKey);
 
   /// Onboarding tamamlandı mı?
   bool get isOnboardingComplete {
@@ -354,7 +370,9 @@ class LocalStorageService {
     }
     await refreshCycleStatistics();
 
-    if (loadAllLogs().every((log) => log.flowIntensity == null)) {
+    if (loadAllLogs().every(
+      (log) => !CycleRules.isMenstrualFlow(log.flowIntensity),
+    )) {
       final settings = loadSettings();
       if (settings?.lastPeriodDate != null) {
         final cleared = await saveSettings(
@@ -476,27 +494,17 @@ class LocalStorageService {
   /// her döngünün başlangıç tarihini döndürür.
   /// Döndürülen liste eskiden yeniye doğru sıralıdır.
   List<DateTime> getPeriodStartDates() {
-    final allLogs = loadAllLogs();
-    final bleedingDays =
-        allLogs
-            .where((log) => log.flowIntensity != null)
-            .map((log) => log.date.dateOnly)
-            .toSet()
-            .toList()
-          ..sort();
+    return _extractBleedingEpisodes().episodes
+        .map((episode) => episode.start)
+        .toList(growable: false);
+  }
 
-    if (bleedingDays.isEmpty) return [];
-
-    // Yeni bir kanama kaydı, önceki kanama gününe bitişik değilse yeni adet
-    // başlangıcıdır; ardışık günlerdeki kayıtlar tek dönem kalır.
-    final periodStarts = <DateTime>[bleedingDays.first];
-    for (var index = 1; index < bleedingDays.length; index++) {
-      if (bleedingDays[index].difference(bleedingDays[index - 1]).inDays > 1) {
-        periodStarts.add(bleedingDays[index]);
-      }
-    }
-
-    return periodStarts;
+  BleedingEpisodeExtraction _extractBleedingEpisodes() {
+    final observations = loadAllLogs().map(
+      (log) =>
+          BleedingObservation(date: log.date, flowIntensity: log.flowIntensity),
+    );
+    return const BleedingEpisodeBuilder().build(observations);
   }
 
   /// Hesaplanan yeni değerleri kullanıcı ayarlarına otomatik yansıtır.
@@ -547,7 +555,7 @@ class LocalStorageService {
       final allLogs = loadAllLogs();
       final bleedingDays =
           allLogs
-              .where((log) => log.flowIntensity != null)
+              .where((log) => CycleRules.isMenstrualFlow(log.flowIntensity))
               .map((log) => log.date.dateOnly)
               .toSet()
               .toList()
@@ -603,40 +611,22 @@ class LocalStorageService {
   /// Döngülerim kartı için detaylı istatistikler.
   /// Önceki döngü süresi, önceki regl süresi, döngü değişkenliği vb.
   CycleInsights? getCycleInsights() {
-    final allLogs = loadAllLogs();
+    final extraction = _extractBleedingEpisodes();
+    final episodes = extraction.episodes;
+    if (episodes.isEmpty) return null;
 
-    // flowIntensity != null olan kayıtları filtrele ve tarihe göre sırala
     final bleedingDays =
-        allLogs
-            .where((log) => log.flowIntensity != null)
-            .map((log) => log.date.dateOnly)
+        episodes
+            .expand((episode) => episode.observedMenstrualDays)
             .toSet()
             .toList()
           ..sort();
-
-    if (bleedingDays.isEmpty) return null;
-
-    // Ardışık kanama günlerini gruplara ayır
-    // Her grup bir regl dönemi
-    final periodGroups = <List<DateTime>>[];
-    var currentGroup = <DateTime>[bleedingDays.first];
-
-    for (int i = 1; i < bleedingDays.length; i++) {
-      final diff = bleedingDays[i].difference(bleedingDays[i - 1]).inDays;
-      if (diff > 1) {
-        periodGroups.add(currentGroup);
-        currentGroup = <DateTime>[bleedingDays[i]];
-      } else {
-        currentGroup.add(bleedingDays[i]);
-      }
-    }
-    periodGroups.add(currentGroup);
-
-    // Regl süreleri (her grubun gün sayısı)
-    final periodDurations = periodGroups.map((g) => g.length).toList();
-
-    // Döngü başlangıç tarihleri (her grubun ilk günü)
-    final periodStarts = periodGroups.map((g) => g.first).toList();
+    final periodDurations = episodes
+        .map((episode) => episode.calendarSpanDays)
+        .toList(growable: false);
+    final periodStarts = episodes
+        .map((episode) => episode.start)
+        .toList(growable: false);
 
     // Döngü süreleri (ardışık başlangıçlar arası fark)
     final cycleLengths = <int>[];

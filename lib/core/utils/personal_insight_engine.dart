@@ -771,7 +771,8 @@ class PersonalInsightEngine {
                 log.mealPostFeelings.isNotEmpty ||
                 log.waterIntakeMl != null ||
                 log.caffeineServings != null;
-            hasBleeding = hasBleeding || log.flowIntensity != null;
+            hasBleeding =
+                hasBleeding || CycleRules.isMenstrualFlow(log.flowIntensity);
           }
 
           return _DailySnapshot(

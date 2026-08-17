@@ -24,6 +24,9 @@ class PeriodCalculator {
   final int cycleLength;
   final int periodLength;
   final DateTime? firstPeriodDate;
+  final DateTime? predictedNextPeriodDate;
+  final DateTimeRange? predictedStartWindow;
+  final bool allowCalendarOvulationEstimates;
 
   /// Gerçekleşmiş loglarda o gün kanama girilmiş mi kontrol eden fonksiyon
   final bool Function(DateTime date)? hasBleedingLog;
@@ -33,11 +36,19 @@ class PeriodCalculator {
     this.cycleLength = CycleRules.defaultCycleLength,
     this.periodLength = CycleRules.defaultPeriodLength,
     this.firstPeriodDate,
+    this.predictedNextPeriodDate,
+    this.predictedStartWindow,
+    this.allowCalendarOvulationEstimates = true,
     this.hasBleedingLog, // UI veya Servisten bu kontrolü paslayacağız
   });
 
   int _dayInCycle(DateTime date) {
-    final diff = date.dateOnly.difference(lastPeriodDate.dateOnly).inDays;
+    final target = date.dateOnly;
+    final prediction = predictedNextPeriodDate?.dateOnly;
+    final anchor = prediction != null && !target.isBefore(prediction)
+        ? prediction
+        : lastPeriodDate.dateOnly;
+    final diff = target.difference(anchor).inDays;
     if (cycleLength <= 0) return 0;
     return ((diff % cycleLength) + cycleLength) % cycleLength;
   }
@@ -48,6 +59,9 @@ class PeriodCalculator {
     final anchor = lastPeriodDate.dateOnly;
     if (cycleLength <= 0) return today;
 
+    final forecast = predictedNextPeriodDate?.dateOnly;
+    if (forecast != null && !forecast.isBefore(today)) return forecast;
+
     // Kullanıcının girdiği başlangıç henüz gelmediyse sıradaki tarih odur.
     if (anchor.isAfter(today)) return anchor;
 
@@ -57,6 +71,12 @@ class PeriodCalculator {
     final daysLeft = cycleLength - dayInCycle;
     return today.add(Duration(days: daysLeft));
   }
+
+  /// Kullanıcıya tek bir kesin tarih yerine gösterilebilecek başlangıç
+  /// aralığı. Olasılıksal forecast yoksa nokta tahminine daralır.
+  DateTimeRange get nextPeriodStartWindow =>
+      predictedStartWindow ??
+      DateTimeRange(start: nextPeriodDate, end: nextPeriodDate);
 
   /// Ovülasyonun gerçekleşebileceği tahmini tarih aralığı.
   DateTimeRange get estimatedOvulationWindow {
@@ -79,7 +99,18 @@ class PeriodCalculator {
   /// Sonraki adet tarihine kaç gün kaldı.
   int get daysUntilNextPeriod {
     final today = AppTime.now.dateOnly;
-    return nextPeriodDate.difference(today).inDays;
+    return nextPeriodDate
+        .difference(today)
+        .inDays
+        .clamp(0, cycleLength)
+        .toInt();
+  }
+
+  bool isInPeriodPredictionWindow(DateTime date) {
+    final target = date.dateOnly;
+    final window = nextPeriodStartWindow;
+    return !target.isBefore(window.start.dateOnly) &&
+        !target.isAfter(window.end.dateOnly);
   }
 
   /// Verilen tarih adet döneminde mi? — O(1) modüler aritmetik
@@ -113,6 +144,10 @@ class PeriodCalculator {
     }
 
     // Bugün ve gelecek için tahmini modele güven.
+    final prediction = predictedNextPeriodDate?.dateOnly;
+    if (prediction != null && targetDate.isBefore(prediction)) {
+      return false;
+    }
     final dayInCycle = _dayInCycle(targetDate);
     return dayInCycle < periodLength;
   }
@@ -130,6 +165,17 @@ class PeriodCalculator {
 
   /// Verilen tarih tahmini ovülasyon aralığında mı?
   bool isInEstimatedOvulationWindow(DateTime date) {
+    if (!allowCalendarOvulationEstimates) return false;
+    final target = date.dateOnly;
+    final today = AppTime.now.dateOnly;
+    final absolute = estimatedOvulationWindow;
+    if (!target.isBefore(today)) {
+      if (!target.isBefore(absolute.start.dateOnly) &&
+          !target.isAfter(absolute.end.dateOnly)) {
+        return true;
+      }
+      if (target.isBefore(nextPeriodDate.dateOnly)) return false;
+    }
     final dayInCycle = _dayInCycle(date);
     return _isInWrappedRange(
       dayInCycle,
@@ -140,6 +186,17 @@ class PeriodCalculator {
 
   /// Verilen tarih tahmini verimli dönemde mi? — O(1) modüler aritmetik
   bool isInFertileWindow(DateTime date) {
+    if (!allowCalendarOvulationEstimates) return false;
+    final target = date.dateOnly;
+    final today = AppTime.now.dateOnly;
+    final absolute = fertileWindow;
+    if (!target.isBefore(today)) {
+      if (!target.isBefore(absolute.start.dateOnly) &&
+          !target.isAfter(absolute.end.dateOnly)) {
+        return true;
+      }
+      if (target.isBefore(nextPeriodDate.dateOnly)) return false;
+    }
     final dayInCycle = _dayInCycle(date);
     return _isInWrappedRange(
       dayInCycle,
@@ -155,6 +212,16 @@ class PeriodCalculator {
     if (isInPeriod(targetDate)) return CyclePhase.menstrual;
     if (isInEstimatedOvulationWindow(targetDate)) {
       return CyclePhase.ovulation;
+    }
+
+    final today = AppTime.now.dateOnly;
+    final predicted = nextPeriodDate.dateOnly;
+    if (!targetDate.isBefore(today) && targetDate.isBefore(predicted)) {
+      final daysToPeriod = predicted.difference(targetDate).inDays;
+      if (daysToPeriod < CycleRules.minLutealLength) {
+        return CyclePhase.luteal;
+      }
+      return CyclePhase.follicular;
     }
 
     final diff = targetDate.difference(lastPeriodDate.dateOnly).inDays;

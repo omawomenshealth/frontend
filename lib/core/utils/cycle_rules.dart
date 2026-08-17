@@ -19,6 +19,10 @@ class CycleRules {
 
   static const int recentSampleSize = 10;
 
+  /// Olasılıksal tahminin çok geç kalan bir döngüde de bir sonraki aya
+  /// sıçramadan günlük olasılık üretebilmesi için kullandığı üst sınır.
+  static const int maxForecastCycleLength = 120;
+
   /// Ovülasyon kesin bir gün olarak bilinemez. Tahmini aralık, bir sonraki
   /// adetten 12-16 gün öncesidir.
   static const int minLutealLength = 12;
@@ -30,6 +34,21 @@ class CycleRules {
 
   static bool isUsablePeriodLength(int value) {
     return value >= minPeriodLength && value <= maxPeriodLength;
+  }
+
+  /// Lekelenme, regl kanamasından ayrı bir gözlemdir ve tek başına yeni bir
+  /// dönem başlangıcı üretmez. Eski İngilizce kayıtlar da desteklenir.
+  static bool isSpottingFlow(String? value) {
+    final normalized = value?.trim().toLowerCase();
+    return normalized == 'lekelenme' || normalized == 'spotting';
+  }
+
+  /// Döngü başlangıcı hesabında kullanılabilecek gerçek menstrual akış.
+  static bool isMenstrualFlow(String? value) {
+    final normalized = value?.trim().toLowerCase();
+    if (normalized == null || normalized.isEmpty) return false;
+    if (isSpottingFlow(normalized)) return false;
+    return normalized != 'yok' && normalized != 'none';
   }
 
   /// Döngü uzunluğu ortalamasını tekil, sıra dışı kayıtların

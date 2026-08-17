@@ -479,6 +479,7 @@ class _CalendarDayCell extends StatelessWidget {
     final isSelected = day.dateOnly == vm.selectedDay.dateOnly;
     final isRecordedPeriod = vm.isLoggedPeriodDay(day);
     final isPredictedPeriod = vm.isPredictedPeriodDay(day);
+    final isPredictionWindow = vm.isPeriodPredictionWindowDay(day);
     final isOvulation = vm.isEstimatedOvulationDay(day);
     final isFertile = vm.isFertileDay(day);
     final hasLog = vm.hasLogForDay(day);
@@ -495,6 +496,12 @@ class _CalendarDayCell extends StatelessWidget {
       dayCircle = CustomPaint(
         painter: const _DashedCirclePainter(AppColors.periodPrimary),
         child: _circle(size: circleSize, textColor: AppColors.periodPrimary),
+      );
+    } else if (isPredictionWindow) {
+      dayCircle = _circle(
+        size: circleSize,
+        color: AppColors.periodLight.withValues(alpha: 0.64),
+        textColor: AppColors.periodPrimary,
       );
     } else if (isOvulation) {
       dayCircle = _circle(
@@ -670,6 +677,12 @@ class _CalendarLegendSheet extends StatelessWidget {
               color: AppColors.periodPrimary,
               label: AppStrings.predictedPeriod,
               dashed: true,
+            ),
+            _LegendRow(
+              color: AppColors.periodLight,
+              label: AppStrings.isTurkish
+                  ? 'Regl başlangıcı tahmin aralığı'
+                  : 'Period start prediction window',
             ),
             _LegendRow(
               color: AppColors.secondary,

@@ -9,16 +9,26 @@ import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../application/cycle_prediction/cycle_prediction_coordinator.dart';
+import '../../../domain/cycle/models/cycle_prediction.dart';
 
 /// Dashboard iş mantığı.
 class DashboardViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
   final NotificationService? _notifications;
+  final CyclePredictionCoordinator _cyclePredictions;
+  final bool _ownsCyclePredictions;
   final PersonalInsightEngine _insightEngine = const PersonalInsightEngine();
 
   static const int _previewInsightLimit = 2;
 
-  DashboardViewModel(this._storage, [this._notifications]) {
+  DashboardViewModel(
+    this._storage, [
+    this._notifications,
+    CyclePredictionCoordinator? cyclePredictions,
+  ]) : _cyclePredictions =
+           cyclePredictions ?? CyclePredictionCoordinator(_storage),
+       _ownsCyclePredictions = cyclePredictions == null {
     loadData();
   }
 
@@ -26,6 +36,7 @@ class DashboardViewModel extends ChangeNotifier {
   List<DailyLog> _todayLogs = [];
   PeriodCalculator? _periodCalculator;
   CycleInsights? _cycleInsights;
+  CycleForecast? _cycleForecast;
   List<PersonalInsight> _personalInsights = const [];
   bool _isLoading = true;
   DateTime _selectedDate = AppTime.now;
@@ -36,6 +47,7 @@ class DashboardViewModel extends ChangeNotifier {
   DailyLog? get latestLog => _todayLogs.isNotEmpty ? _todayLogs.first : null;
   PeriodCalculator? get periodCalculator => _periodCalculator;
   CycleInsights? get cycleInsights => _cycleInsights;
+  CycleForecast? get cycleForecast => _cycleForecast;
   List<PersonalInsight> get personalInsights => _personalInsights;
   bool get isLoading => _isLoading;
   DateTime get selectedDate => _selectedDate;
@@ -116,32 +128,13 @@ class DashboardViewModel extends ChangeNotifier {
 
     // Süreye bağlı istatistikler yalnızca yeni kayıt geldiğinde değil,
     // dönem bittikten sonra ekran tekrar açıldığında da güncellenmelidir.
-    _settings = await _storage.refreshCycleStatistics();
+    await _cyclePredictions.refresh();
+    _settings = _cyclePredictions.effectiveSettings;
     _todayLogs = _storage.loadLogsForDate(_selectedDate);
 
     final allLogs = _storage.loadAllLogs();
     _refreshPersonalInsights(allLogs);
-    _bleedingDays = allLogs
-        .where((log) => log.flowIntensity != null)
-        .map((log) => log.date.dateOnly)
-        .toSet();
-
-    final periodStarts = _storage.getPeriodStartDates();
-    final firstPeriodDate = periodStarts.isNotEmpty ? periodStarts.first : null;
-
-    if (hasPeriodTracking && _settings?.lastPeriodDate != null) {
-      _periodCalculator = PeriodCalculator(
-        lastPeriodDate: _settings!.lastPeriodDate!,
-        cycleLength: _settings!.averageCycleLength,
-        periodLength: _settings!.averagePeriodLength,
-        firstPeriodDate: firstPeriodDate,
-        hasBleedingLog: (date) => _bleedingDays.contains(date.dateOnly),
-      );
-      _cycleInsights = _storage.getCycleInsights();
-    } else {
-      _periodCalculator = null;
-      _cycleInsights = null;
-    }
+    _rebuildCycleState();
 
     _isLoading = false;
     notifyListeners();
@@ -150,24 +143,33 @@ class DashboardViewModel extends ChangeNotifier {
   /// Kayıt işleminden sonra tüm durum ve hesaplamaları senkronize eden yardımcı metot.
   Future<void> _syncStateAfterSave(DateTime dateForLogs) async {
     _todayLogs = _storage.loadLogsForDate(dateForLogs);
-    _settings = _storage.loadSettings();
+    await _cyclePredictions.refresh(force: true);
+    _settings = _cyclePredictions.effectiveSettings;
 
     final allLogs = _storage.loadAllLogs();
     _refreshPersonalInsights(allLogs);
-    _bleedingDays = allLogs
-        .where((log) => log.flowIntensity != null)
-        .map((log) => log.date.dateOnly)
-        .toSet();
+    _rebuildCycleState();
+  }
 
-    final periodStarts = _storage.getPeriodStartDates();
-    final firstPeriodDate = periodStarts.isNotEmpty ? periodStarts.first : null;
-
-    if (hasPeriodTracking && _settings?.lastPeriodDate != null) {
+  void _rebuildCycleState() {
+    _cycleForecast = _cyclePredictions.forecast;
+    _bleedingDays = _cyclePredictions.menstrualBleedingDays;
+    final history = _cyclePredictions.history;
+    final lastPeriodDate =
+        history?.lastPeriodStart ?? _settings?.lastPeriodDate;
+    final forecast = _cycleForecast;
+    if (lastPeriodDate != null && forecast != null) {
       _periodCalculator = PeriodCalculator(
-        lastPeriodDate: _settings!.lastPeriodDate!,
-        cycleLength: _settings!.averageCycleLength,
-        periodLength: _settings!.averagePeriodLength,
-        firstPeriodDate: firstPeriodDate,
+        lastPeriodDate: lastPeriodDate,
+        cycleLength: forecast.expectedCycleLength,
+        periodLength: forecast.expectedPeriodLength,
+        firstPeriodDate: history?.firstPeriodStart,
+        predictedNextPeriodDate: forecast.medianStart,
+        predictedStartWindow: DateTimeRange(
+          start: forecast.p80Window.start,
+          end: forecast.p80Window.end,
+        ),
+        allowCalendarOvulationEstimates: forecast.calendarOvulationEligible,
         hasBleedingLog: (date) => _bleedingDays.contains(date.dateOnly),
       );
       _cycleInsights = _storage.getCycleInsights();
@@ -175,6 +177,12 @@ class DashboardViewModel extends ChangeNotifier {
       _periodCalculator = null;
       _cycleInsights = null;
     }
+  }
+
+  @override
+  void dispose() {
+    if (_ownsCyclePredictions) _cyclePredictions.dispose();
+    super.dispose();
   }
 
   void _refreshPersonalInsights(List<DailyLog> allLogs) {

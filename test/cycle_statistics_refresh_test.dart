@@ -159,4 +159,38 @@ void main() {
       firstStart.add(const Duration(days: 28)),
     ]);
   });
+
+  test(
+    'lekelenme başlangıç sayılmaz ve tek günlük boşluk dönemi bölmez',
+    () async {
+      final firstStart = DateTime(2026, 4, 1);
+      await storage.saveDailyLog(
+        DailyLog(
+          date: firstStart.subtract(const Duration(days: 2)),
+          flowIntensity: 'Lekelenme',
+        ),
+      );
+      await storage.saveDailyLog(
+        DailyLog(date: firstStart, flowIntensity: 'Orta'),
+      );
+      await storage.saveDailyLog(
+        DailyLog(
+          date: firstStart.add(const Duration(days: 2)),
+          flowIntensity: 'Hafif',
+        ),
+      );
+      await storage.saveDailyLog(
+        DailyLog(
+          date: firstStart.add(const Duration(days: 28)),
+          flowIntensity: 'Orta',
+        ),
+      );
+
+      expect(storage.getPeriodStartDates(), [
+        firstStart,
+        firstStart.add(const Duration(days: 28)),
+      ]);
+      expect(storage.getCycleInsights()!.periodDurations.first, 3);
+    },
+  );
 }

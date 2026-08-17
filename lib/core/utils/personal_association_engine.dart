@@ -667,7 +667,8 @@ class PersonalAssociationEngine {
         if (log.mood != null) mood = _canonical(log.mood!);
         waterIntakeMl = log.waterIntakeMl ?? waterIntakeMl;
         caffeineServings = log.caffeineServings ?? caffeineServings;
-        hasBleeding = hasBleeding || log.flowIntensity != null;
+        hasBleeding =
+            hasBleeding || CycleRules.isMenstrualFlow(log.flowIntensity);
 
         nutritionObserved =
             nutritionObserved ||
