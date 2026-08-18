@@ -160,28 +160,6 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    final isTurkish = AppStrings.isTurkish;
-    final notice = isTurkish
-        ? 'Bulut eşitlemesini seçerseniz döngü, belirti, ilaç, takviye, hatırlatma '
-              'planı, aldım/atladım doz yanıtı ve profil ayarları sağlık takibi '
-              'amacıyla işlenir. Cihaza özel bildirim planlama durumu buluta '
-              'gönderilmez. Veriler aktarım sırasında '
-              'TLS, veritabanında kullanıcıya özel AES-256-GCM anahtarıyla '
-              'korunur. Google yalnızca oturum açma ve satın alma doğrulaması '
-              'kapsamında hizmet sağlar. Bulut eşitlemesi isteğe bağlıdır. '
-              'Verilerinizi dışa aktarabilir, rızanızı geri çekebilir veya hesabı '
-              'tamamen silebilirsiniz. Test sürümündeki veri sorumlusu iletişim '
-              'bilgileri üretimden önce tamamlanacaktır.'
-        : 'If you choose cloud sync, cycle, symptom, medication, supplement, '
-              'reminder plan, taken/skipped dose response, and profile settings '
-              'are processed for health tracking. Device-specific notification '
-              'scheduling state is not uploaded. Data is '
-              'protected by TLS in transit and a per-user AES-256-GCM key in the '
-              'database. Google is used only for sign-in and purchase '
-              'verification. Cloud sync is optional. You may export your data, '
-              'withdraw consent, or delete the entire account. Controller '
-              'contact details for this test build must be finalized before '
-              'production.';
 
     return Scaffold(
       appBar: AppBar(title: Text(AppStrings.privacyCenter)),
@@ -201,7 +179,10 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 12),
-                        Text(notice, style: const TextStyle(height: 1.5)),
+                        Text(
+                          AppStrings.cloudSyncPrivacyNotice,
+                          style: const TextStyle(height: 1.5),
+                        ),
                         const SizedBox(height: 12),
                         Text(
                           '${AppStrings.privacyNotice}: $_noticeVersion',

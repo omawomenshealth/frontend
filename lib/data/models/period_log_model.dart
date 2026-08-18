@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../core/constants/app_strings.dart';
+import 'medication_identity_model.dart';
 
 void _rejectUnknownJsonFields(
   Map<String, dynamic> json,
@@ -16,7 +17,7 @@ void _rejectUnknownJsonFields(
 }
 
 const _medicationEntryJsonFields = {
-  'name',
+  ...MedicationIdentity.jsonFields,
   'times',
   'stomachState',
   'doseCount',
@@ -49,6 +50,7 @@ const _dailyLogJsonFields = {
   'stressLevel',
   'energyLevel',
   'dreamRemembered',
+  'dreamType',
   'dreamNote',
   'sexualActivity',
   'sexualActivityTypes',
@@ -150,16 +152,23 @@ enum SexualAfterFeeling {
   pain,
 }
 
+/// Rüyanın kullanıcı tarafından seçilen duygusal türü.
+enum DreamType { good, nightmare }
+
 /// İlaç/Takviye alım kaydı.
 class MedicationEntry {
-  final String name;
+  final String displayName;
+  final String mainGroup;
+  final String? activeIngredient;
   final Set<String> times; // Sabah, Öğle ve Akşam birlikte seçilebilir.
   final String stomachState; // Aç, Tok
   final int doseCount;
   final int takenDoseCount;
 
   MedicationEntry({
-    required this.name,
+    required this.displayName,
+    required this.mainGroup,
+    required this.activeIngredient,
     required Set<String> times,
     required this.stomachState,
     this.doseCount = 1,
@@ -174,7 +183,9 @@ class MedicationEntry {
   bool get taken => takenDoseCount >= doseCount;
 
   MedicationEntry copyWith({
-    String? name,
+    String? displayName,
+    String? mainGroup,
+    String? activeIngredient,
     Set<String>? times,
     String? stomachState,
     int? doseCount,
@@ -186,7 +197,9 @@ class MedicationEntry {
       nextDoseCount,
     );
     return MedicationEntry(
-      name: name ?? this.name,
+      displayName: displayName ?? this.displayName,
+      mainGroup: mainGroup ?? this.mainGroup,
+      activeIngredient: activeIngredient ?? this.activeIngredient,
       times: times ?? this.times,
       stomachState: stomachState ?? this.stomachState,
       doseCount: nextDoseCount,
@@ -195,7 +208,9 @@ class MedicationEntry {
   }
 
   Map<String, dynamic> toJson() => {
-    'name': name,
+    'displayName': displayName,
+    'mainGroup': mainGroup,
+    'activeIngredient': activeIngredient,
     'times': times.toList(),
     'stomachState': stomachState,
     'doseCount': doseCount,
@@ -209,7 +224,9 @@ class MedicationEntry {
       'MedicationEntry',
     );
     return MedicationEntry(
-      name: json['name'] as String,
+      displayName: json['displayName'] as String,
+      mainGroup: json['mainGroup'] as String,
+      activeIngredient: json['activeIngredient'] as String?,
       times: (json['times'] as List<dynamic>).cast<String>().toSet(),
       stomachState: json['stomachState'] as String,
       doseCount: (json['doseCount'] as num).toInt(),
@@ -249,6 +266,7 @@ class DailyLog {
   final List<String> moodCompanions;
   final List<String> moodPlaces;
   final bool? dreamRemembered;
+  final DreamType? dreamType;
   final String? dreamNote;
 
   // ── Cinsel Aktivite ──────────────────────────────────────
@@ -291,6 +309,7 @@ class DailyLog {
     this.moodCompanions = const [],
     this.moodPlaces = const [],
     this.dreamRemembered,
+    this.dreamType,
     this.dreamNote,
     this.sexualActivity,
     Set<SexualActivityType> sexualActivityTypes = const {},
@@ -377,6 +396,8 @@ class DailyLog {
     List<String>? moodPlaces,
     bool? dreamRemembered,
     bool clearDreamRemembered = false,
+    DreamType? dreamType,
+    bool clearDreamType = false,
     String? dreamNote,
     bool clearDreamNote = false,
     bool? sexualActivity,
@@ -422,6 +443,7 @@ class DailyLog {
       dreamRemembered: clearDreamRemembered
           ? null
           : dreamRemembered ?? this.dreamRemembered,
+      dreamType: clearDreamType ? null : dreamType ?? this.dreamType,
       dreamNote: clearDreamNote ? null : dreamNote ?? this.dreamNote,
       sexualActivity: clearSexualActivity
           ? null
@@ -469,6 +491,7 @@ class DailyLog {
         moodCompanions.isNotEmpty ||
         moodPlaces.isNotEmpty ||
         dreamRemembered != null ||
+        dreamType != null ||
         (dreamNote?.isNotEmpty ?? false) ||
         sexualActivity != null ||
         sexualActivityTypes.isNotEmpty ||
@@ -502,6 +525,7 @@ class DailyLog {
     'moodCompanions': moodCompanions,
     'moodPlaces': moodPlaces,
     'dreamRemembered': dreamRemembered,
+    'dreamType': dreamType?.name,
     'dreamNote': dreamNote,
     'sexualActivity': sexualActivity,
     'sexualActivityTypes': sexualActivityTypes
@@ -563,6 +587,7 @@ class DailyLog {
       moodCompanions: List<String>.from(json['moodCompanions'] ?? []),
       moodPlaces: List<String>.from(json['moodPlaces'] ?? []),
       dreamRemembered: json['dreamRemembered'] as bool?,
+      dreamType: _readOptionalEnum(json, 'dreamType', DreamType.values),
       dreamNote: json['dreamNote'] as String?,
       sexualActivity: json['sexualActivity'] as bool?,
       sexualActivityTypes: _readSexualActivityTypes(json),
@@ -825,11 +850,11 @@ class DailyLog {
     ) {
       final Map<String, MedicationEntry> merged = {};
       for (var item in [...listA, ...listB]) {
-        final existing = merged[item.name];
+        final existing = merged[item.displayName];
         if (existing == null) {
-          merged[item.name] = item;
+          merged[item.displayName] = item;
         } else {
-          merged[item.name] = existing.copyWith(
+          merged[item.displayName] = existing.copyWith(
             times: {...item.times, ...existing.times},
             doseCount: existing.doseCount >= item.doseCount
                 ? existing.doseCount
@@ -905,6 +930,7 @@ class DailyLog {
       moodCompanions: (moodCompanions + other.moodCompanions).toSet().toList(),
       moodPlaces: (moodPlaces + other.moodPlaces).toSet().toList(),
       dreamRemembered: dreamRemembered ?? other.dreamRemembered,
+      dreamType: dreamType ?? other.dreamType,
       dreamNote: (dreamNote?.isNotEmpty ?? false) ? dreamNote : other.dreamNote,
       sexualActivity: mergedSexualActivity,
       sexualActivityTypes: mergedSexualActivityTypes,

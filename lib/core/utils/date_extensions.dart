@@ -22,9 +22,7 @@ extension DateTimeExtensions on DateTime {
 
   /// "29.06.2026" formatı
   String toDotFormat() {
-    return DateFormat(
-      AppStrings.isTurkish ? 'dd.MM.yyyy' : 'MM/dd/yyyy',
-    ).format(this);
+    return DateFormat(AppStrings.dateDisplayPattern).format(this);
   }
 
   /// "2026-06-29" formatı (depolama için)

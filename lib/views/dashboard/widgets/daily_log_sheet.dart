@@ -7,11 +7,13 @@ import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
+import '../../../data/models/medication_identity_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/notification_service.dart';
 import 'medication_reminder_section.dart';
 import 'tracking_catalog_selector.dart';
+import '../../articles/widgets/premium_paywall.dart';
 
 class DailyLogSheet extends StatefulWidget {
   final DailyLog initialLog;
@@ -68,6 +70,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   late VaginalDischargeAmount? _vaginalDischargeAmount;
   late Set<VaginalDischargeSymptom> _vaginalDischargeSymptoms;
   late bool? _dreamRemembered;
+  late DreamType? _dreamType;
   final _dreamNoteController = TextEditingController();
 
   late List<MedicationEntry> _medications;
@@ -128,7 +131,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             .map(AppStrings.localizeStoredValue)
             .toSet(),
     };
-    _cravings = _localizedSet(
+    _cravings = _localizedSetPreservingCustom(
       _log.cravings,
       AppStrings.nutritionCravingOptions,
     );
@@ -156,10 +159,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _vaginalDischargeAmount = _log.vaginalDischargeAmount;
     _vaginalDischargeSymptoms = {..._log.vaginalDischargeSymptoms};
     _dreamRemembered = _log.dreamRemembered;
-    if (_dreamRemembered == null &&
-        _dreamTriggerSymptoms.any(_symptoms.contains)) {
-      _dreamRemembered = true;
-    }
+    _dreamType = _log.dreamType;
     _dreamNoteController.text = _log.dreamNote ?? '';
 
     _medications = _initialMedicationEntries(_log.medications);
@@ -229,7 +229,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   List<MedicationEntry> _initialMedicationEntries(List<MedicationEntry> saved) {
     final entries = <String, MedicationEntry>{};
     for (final entry in saved) {
-      entries[entry.name] = entry.copyWith(
+      entries[entry.displayName] = entry.copyWith(
         times: entry.times.map(AppStrings.localizeStoredValue).toSet(),
         stomachState: AppStrings.localizeStoredValue(entry.stomachState),
       );
@@ -660,9 +660,44 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 25),
         _SectionTitle(AppStrings.cravingsQuestion),
         const SizedBox(height: 11),
-        _buildSimpleChoices(
-          options: AppStrings.nutritionCravingOptions,
-          selected: _cravings,
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            _PillChoice(
+              key: const ValueKey('craving_all'),
+              label: AppStrings.nutritionAll,
+              selected:
+                  AppStrings.nutritionCravingOptions.isNotEmpty &&
+                  AppStrings.nutritionCravingOptions.every(_cravings.contains),
+              color: _tone,
+              colorizeIdle: true,
+              onTap: _toggleAllCravings,
+            ),
+            for (final option in {
+              ...AppStrings.nutritionCravingOptions,
+              ..._cravings,
+            })
+              _PillChoice(
+                label: option,
+                selected: _cravings.contains(option),
+                color: _tone,
+                colorizeIdle: true,
+                onTap: () => _toggleChoice(_cravings, option),
+              ),
+            Tooltip(
+              message: AppStrings.addAnotherCraving,
+              child: _RoundButton(
+                key: const ValueKey('add_craving'),
+                icon: Icons.add_rounded,
+                color: _tone,
+                filled: true,
+                enabled: true,
+                onTap: _addCustomCraving,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 25),
         _buildCaffeineCard(),
@@ -786,7 +821,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Widget _buildMedicationCatalogPage() {
-    final selected = _medications.map((entry) => entry.name).toSet();
+    final selected = _medications.map((entry) => entry.displayName).toSet();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -796,13 +831,20 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           searchHint: AppStrings.searchMedications,
           categories: AppStrings.medicationCatalog,
           hiddenAliases: AppStrings.hiddenMedicationSearchAliases,
+          itemDetails: AppStrings.medicationActiveIngredients,
           selected: selected,
-          customItems: widget.settings.dailyMedications,
+          customItems: widget.settings.dailyMedications
+              .map((medication) => medication.displayName)
+              .toList(),
           color: _tone,
           icon: Icons.medication_outlined,
           showSmartSearchHint: false,
+          groupCategoriesInContainer: true,
+          categoryGroupTitle: AppStrings.medicationCategories,
           onToggle: (item) =>
               _toggleMedicationItem(item, entries: _medications),
+          onItemSelected: (item, detail) =>
+              _selectMedicationIngredient(item, detail),
           onAdd: _addCatalogMedication,
           onReminder: () => _showReminderManagerForType(
             MedicationPlanItemType.medication,
@@ -851,7 +893,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Widget _buildSupplementCatalogPage() {
-    final selected = _supplements.map((entry) => entry.name).toSet();
+    final selected = _supplements.map((entry) => entry.displayName).toSet();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -920,19 +962,37 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     required List<MedicationEntry> entries,
   }) {
     setState(() {
-      final index = entries.indexWhere((entry) => entry.name == item);
+      final index = entries.indexWhere((entry) => entry.displayName == item);
       if (index >= 0) {
         entries.removeAt(index);
       } else {
         entries.add(
           MedicationEntry(
-            name: item,
+            displayName: item,
+            mainGroup: item,
+            activeIngredient: null,
             times: {AppStrings.medicationTimes.first},
             stomachState: AppStrings.stomachStates.first,
             takenDoseCount: 1,
           ),
         );
       }
+    });
+  }
+
+  void _selectMedicationIngredient(String group, String? ingredient) {
+    setState(() {
+      _medications.removeWhere((entry) => entry.mainGroup == group);
+      _medications.add(
+        MedicationEntry(
+          displayName: ingredient == null ? group : '$group - $ingredient',
+          mainGroup: group,
+          activeIngredient: ingredient,
+          times: {AppStrings.medicationTimes.first},
+          stomachState: AppStrings.stomachStates.first,
+          takenDoseCount: 1,
+        ),
+      );
     });
   }
 
@@ -992,11 +1052,16 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final name = await _promptCustomCatalogItem(AppStrings.newMedication);
     if (!mounted || name == null || name.isEmpty) return;
     final storage = context.read<LocalStorageService>();
-    await storage.saveCustomMedication(name);
+    final medication = MedicationIdentity(
+      displayName: name,
+      mainGroup: name,
+      activeIngredient: null,
+    );
+    await storage.saveCustomMedication(medication);
     final settings = storage.loadSettings() ?? widget.settings;
     await storage.saveSettings(
       settings.copyWith(
-        dailyMedications: {...settings.dailyMedications, name}.toList(),
+        dailyMedications: {...settings.dailyMedications, medication}.toList(),
       ),
     );
     if (!mounted) return;
@@ -1004,7 +1069,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     await widget.onSettingsChanged?.call();
     if (!mounted) return;
     await _offerMedicationUsagePlan(
-      _medications.firstWhere((entry) => entry.name == name),
+      _medications.firstWhere((entry) => entry.displayName == name),
     );
   }
 
@@ -1053,6 +1118,16 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     List<String> items,
     Color color,
   ) async {
+    final itemIdentities = itemType == MedicationPlanItemType.medication
+        ? <String, MedicationIdentity>{
+            for (final entry in _medications)
+              entry.displayName: MedicationIdentity(
+                displayName: entry.displayName,
+                mainGroup: entry.mainGroup,
+                activeIngredient: entry.activeIngredient,
+              ),
+          }
+        : const <String, MedicationIdentity>{};
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -1071,6 +1146,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           child: MedicationReminderSection(
             itemType: itemType,
             availableItems: items,
+            itemIdentities: itemIdentities,
             color: color,
           ),
         ),
@@ -1136,6 +1212,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         )
         .toList(growable: false);
     final groupTone = _tone;
+    final dreamLabel = AppStrings.hadADream;
+    final showDreamTile =
+        group.showsDreamRecorder &&
+        (query.isEmpty || dreamLabel.toLowerCase().contains(query));
 
     return Container(
       key: ValueKey('symptom_group_${group.title}'),
@@ -1172,76 +1252,205 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         ),
                       ),
                     ),
+                  if (showDreamTile)
+                    SizedBox(
+                      width: tileWidth,
+                      child: _DreamRecorderTile(
+                        key: const ValueKey('dream_remembered_button'),
+                        label: dreamLabel,
+                        selected:
+                            _dreamRemembered == true &&
+                            _dreamNoteController.text.trim().isNotEmpty,
+                        color: groupTone,
+                        onTap: _openDreamRecorderSheet,
+                      ),
+                    ),
                 ],
               );
             },
           ),
-          if (group.showsDreamRecorder && _showsDreamRecorder) ...[
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Divider(height: 1, color: AppColors.outline),
-            ),
-            _buildDreamRecorder(),
-          ],
         ],
       ),
     );
   }
 
-  bool get _showsDreamRecorder =>
-      _dreamRemembered == true || _dreamTriggerSymptoms.any(_symptoms.contains);
-
-  Set<String> get _dreamTriggerSymptoms =>
-      AppStrings.symptomSleepOptions.skip(6).take(2).toSet();
-
-  Widget _buildDreamRecorder() {
-    return Container(
-      key: const ValueKey('dream_card'),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.scaffoldBackground,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _tone.withValues(alpha: 0.32)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.dreamNoteQuestion,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+  Future<void> _openDreamRecorderSheet() async {
+    final originalNote = _dreamNoteController.text;
+    var selectedType = _dreamType;
+    final result = await showModalBottomSheet<_DreamDraft>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) {
+          final canSave =
+              selectedType != null &&
+              _dreamNoteController.text.trim().isNotEmpty;
+          return Container(
+            decoration: const BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            key: const ValueKey('dream_note_field'),
-            controller: _dreamNoteController,
-            minLines: 2,
-            maxLines: 4,
-            maxLength: 1000,
-            decoration: InputDecoration(
-              hintText: AppStrings.dreamNoteHint,
-              filled: true,
-              fillColor: AppColors.surface,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: _tone.withValues(alpha: 0.42)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: _tone.withValues(alpha: 0.42)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: _tone, width: 1.6),
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  10,
+                  20,
+                  20 + MediaQuery.viewInsetsOf(sheetContext).bottom,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 42,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppColors.outline,
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: _tone.withValues(alpha: 0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.nights_stay_outlined,
+                            color: _tone,
+                            size: 21,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            AppStrings.saveYourDream,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      AppStrings.dreamTypeQuestion,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _TrackingChoiceTile(
+                            key: const ValueKey('dream_type_good'),
+                            label: AppStrings.goodDream,
+                            icon: Icons.auto_awesome_rounded,
+                            selected: selectedType == DreamType.good,
+                            color: AppColors.success,
+                            onTap: () => setSheetState(
+                              () => selectedType = DreamType.good,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _TrackingChoiceTile(
+                            key: const ValueKey('dream_type_nightmare'),
+                            label: AppStrings.nightmare,
+                            icon: Icons.dark_mode_outlined,
+                            selected: selectedType == DreamType.nightmare,
+                            color: AppColors.secondary,
+                            onTap: () => setSheetState(
+                              () => selectedType = DreamType.nightmare,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      key: const ValueKey('dream_note_field'),
+                      controller: _dreamNoteController,
+                      minLines: 3,
+                      maxLines: 6,
+                      maxLength: 1000,
+                      onChanged: (_) => setSheetState(() {}),
+                      decoration: InputDecoration(
+                        hintText: AppStrings.dreamNoteHint,
+                        filled: true,
+                        fillColor: AppColors.scaffoldBackground,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide(
+                            color: _tone.withValues(alpha: 0.36),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide(
+                            color: _tone.withValues(alpha: 0.36),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide(color: _tone, width: 1.6),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        key: const ValueKey('dream_sheet_save'),
+                        onPressed: canSave
+                            ? () => Navigator.pop(
+                                sheetContext,
+                                _DreamDraft(
+                                  type: selectedType!,
+                                  note: _dreamNoteController.text.trim(),
+                                ),
+                              )
+                            : null,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: _tone,
+                          minimumSize: const Size.fromHeight(50),
+                        ),
+                        child: Text(AppStrings.save),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
+    if (!mounted) return;
+    if (result == null) {
+      _dreamNoteController.text = originalNote;
+      return;
+    }
+    setState(() {
+      _dreamRemembered = true;
+      _dreamType = result.type;
+      _dreamNoteController.text = result.note;
+    });
   }
 
   Widget _buildSexualActivityCard() {
@@ -1614,7 +1823,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       _SymptomGroup(
         title: AppStrings.symptomSleep,
         showsDreamRecorder: true,
-        items: items(AppStrings.symptomSleepOptions, [
+        items: items(AppStrings.symptomSleepOptions.take(6).toList(), [
           Icons.dark_mode_outlined,
         ]),
       ),
@@ -1638,14 +1847,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       } else {
         _symptoms.add(label);
         _symptomSeverities[label] = 2;
-      }
-      if (_dreamTriggerSymptoms.contains(label)) {
-        if (_dreamTriggerSymptoms.any(_symptoms.contains)) {
-          _dreamRemembered = true;
-        } else {
-          _dreamRemembered = null;
-          _dreamNoteController.clear();
-        }
       }
     });
   }
@@ -1917,17 +2118,22 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
     final entries = medication ? _medications : _supplements;
     final alreadyExists = entries.any(
-      (entry) => entry.name.toLowerCase() == name.toLowerCase(),
+      (entry) => entry.displayName.toLowerCase() == name.toLowerCase(),
     );
     if (alreadyExists) return;
 
     final storage = context.read<LocalStorageService>();
     final settings = storage.loadSettings() ?? widget.settings;
     if (medication) {
-      await storage.saveCustomMedication(name);
+      final identity = MedicationIdentity(
+        displayName: name,
+        mainGroup: name,
+        activeIngredient: null,
+      );
+      await storage.saveCustomMedication(identity);
       await storage.saveSettings(
         settings.copyWith(
-          dailyMedications: {...settings.dailyMedications, name}.toList(),
+          dailyMedications: {...settings.dailyMedications, identity}.toList(),
         ),
       );
     } else {
@@ -1943,7 +2149,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     setState(() {
       entries.add(
         MedicationEntry(
-          name: name,
+          displayName: name,
+          mainGroup: name,
+          activeIngredient: null,
           times: {AppStrings.medicationTimes.first},
           stomachState: AppStrings.stomachStates.first,
           doseCount: 1,
@@ -1959,15 +2167,23 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   Future<void> _openReminderManager() async {
     final storage = context.read<LocalStorageService>();
-    final medicationNames = {
-      ...widget.settings.dailyMedications,
-      ...storage.getCustomMedications(),
-      ..._medications.map((entry) => entry.name),
-    }.toList();
+    final medicationIdentities = <String, MedicationIdentity>{
+      for (final medication in widget.settings.dailyMedications)
+        medication.displayName: medication,
+      for (final medication in storage.getCustomMedicationIdentities())
+        medication.displayName: medication,
+      for (final entry in _medications)
+        entry.displayName: MedicationIdentity(
+          displayName: entry.displayName,
+          mainGroup: entry.mainGroup,
+          activeIngredient: entry.activeIngredient,
+        ),
+    };
+    final medicationNames = medicationIdentities.keys.toList();
     final supplementNames = {
       ...widget.settings.dailySupplements,
       ...storage.getCustomSupplements(),
-      ..._supplements.map((entry) => entry.name),
+      ..._supplements.map((entry) => entry.displayName),
     }.toList();
 
     await showModalBottomSheet<void>(
@@ -1997,6 +2213,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               MedicationReminderSection(
                 itemType: MedicationPlanItemType.medication,
                 availableItems: medicationNames,
+                itemIdentities: medicationIdentities,
                 color: _tone,
               ),
               const SizedBox(height: 24),
@@ -2038,7 +2255,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           _buildMedicationEntryCard(
             entry: entries[index],
             icon: icon,
-            entryKey: '$groupKey:${entries[index].name.toLowerCase()}',
+            entryKey: '$groupKey:${entries[index].displayName.toLowerCase()}',
             itemType: itemType,
             onChanged: (updated) => setState(() => entries[index] = updated),
           ),
@@ -2105,7 +2322,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  entry.name,
+                                  entry.displayName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -2370,7 +2587,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           Tooltip(
             message: AppStrings.dosageCount(index + 1),
             child: InkWell(
-              key: ValueKey('dose_circle_${entry.name}_$index'),
+              key: ValueKey('dose_circle_${entry.displayName}_$index'),
               customBorder: const CircleBorder(),
               onTap: () {
                 final next = index < entry.takenDoseCount ? index : index + 1;
@@ -2482,8 +2699,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ),
         child: MedicationReminderFormSheet(
           itemType: itemType,
-          availableItems: [entry.name],
-          initialItemName: entry.name,
+          availableItems: [entry.displayName],
+          itemIdentities: {
+            entry.displayName: MedicationIdentity(
+              displayName: entry.displayName,
+              mainGroup: entry.mainGroup,
+              activeIngredient: entry.activeIngredient,
+            ),
+          },
+          initialItemName: entry.displayName,
           initialDosage: entry.dosage,
           initialTimes: initialReminderTimes,
         ),
@@ -2764,26 +2988,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     setState(() {
       (companion ? _moodCompanions : _moodPlaces).add(value);
     });
-  }
-
-  Widget _buildSimpleChoices({
-    required List<String> options,
-    required Set<String> selected,
-  }) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final entry in options.asMap().entries)
-          _PillChoice(
-            label: entry.value,
-            selected: selected.contains(entry.value),
-            color: _tone,
-            colorizeIdle: true,
-            onTap: () => _toggleChoice(selected, entry.value),
-          ),
-      ],
-    );
   }
 
   void _toggleChoice(Set<String> values, String value) {
@@ -3231,6 +3435,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             : const {},
         dreamRemembered: _dreamRemembered,
         clearDreamRemembered: _dreamRemembered == null,
+        dreamType: _dreamType,
+        clearDreamType: _dreamRemembered != true || _dreamType == null,
         dreamNote: _dreamNoteController.text.trim().isEmpty
             ? null
             : _dreamNoteController.text.trim(),
@@ -3332,8 +3538,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
     if (success) {
       _log = preparedLog;
+      if (_logType == 4) {
+        await _persistStructuredMedicationSelections();
+        if (!mounted) return true;
+      }
       final messenger = ScaffoldMessenger.of(context);
-      if (closeSheet) Navigator.pop(context);
       messenger.showSnackBar(
         SnackBar(
           content: Text(AppStrings.saved),
@@ -3341,6 +3550,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+      final savedDream =
+          _logType == 2 &&
+          _dreamRemembered == true &&
+          _dreamNoteController.text.trim().isNotEmpty;
+      if (savedDream) {
+        await _showDreamPremiumOffer();
+        if (!mounted) return true;
+      }
+      if (closeSheet) Navigator.pop(context);
       return true;
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -3351,6 +3569,131 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ),
       );
       return false;
+    }
+  }
+
+  Future<void> _persistStructuredMedicationSelections() async {
+    if (_medications.isEmpty) return;
+    final structuredMedications = _medications.map(
+      (entry) => MedicationIdentity(
+        displayName: entry.displayName,
+        mainGroup: entry.mainGroup,
+        activeIngredient: entry.activeIngredient,
+      ),
+    );
+    final storage = context.read<LocalStorageService>();
+    final settings = storage.loadSettings() ?? widget.settings;
+    await storage.saveSettings(
+      settings.copyWith(
+        dailyMedications: {
+          ...settings.dailyMedications,
+          ...structuredMedications,
+        }.toList(),
+      ),
+    );
+    await widget.onSettingsChanged?.call();
+  }
+
+  void _toggleAllCravings() {
+    setState(() {
+      final options = AppStrings.nutritionCravingOptions;
+      if (options.every(_cravings.contains)) {
+        _cravings.removeAll(options);
+      } else {
+        _cravings.addAll(options);
+      }
+    });
+  }
+
+  Future<void> _addCustomCraving() async {
+    final value = await _promptCustomCatalogItem(
+      AppStrings.customCravingQuestion,
+    );
+    if (!mounted || value == null || value.isEmpty) return;
+    setState(() => _cravings.add(value));
+  }
+
+  Future<void> _showDreamPremiumOffer() async {
+    var openPaywall = false;
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => Container(
+        padding: EdgeInsets.fromLTRB(
+          24,
+          14,
+          24,
+          22 + MediaQuery.viewPaddingOf(sheetContext).bottom,
+        ),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 42,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.outline,
+                borderRadius: BorderRadius.circular(99),
+              ),
+            ),
+            const SizedBox(height: 18),
+            const Icon(
+              Icons.auto_awesome_rounded,
+              color: AppColors.secondary,
+              size: 36,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              AppStrings.dreamSaved,
+              style: const TextStyle(
+                fontFamily: 'CormorantGaramond',
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              AppStrings.dreamPremiumOffer,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () {
+                  openPaywall = true;
+                  Navigator.pop(sheetContext);
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.secondary,
+                ),
+                icon: const Icon(Icons.workspace_premium_rounded),
+                label: Text(AppStrings.explorePremium),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(sheetContext),
+              child: Text(AppStrings.notNow),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (openPaywall && mounted) {
+      await showPremiumPaywall(
+        context,
+        title: AppStrings.exploreDreamInterpretation,
+        description: AppStrings.dreamPremiumDescription,
+      );
     }
   }
 
@@ -3596,6 +3939,13 @@ class _StepSelector extends StatelessWidget {
   }
 }
 
+class _DreamDraft {
+  final DreamType type;
+  final String note;
+
+  const _DreamDraft({required this.type, required this.note});
+}
+
 class _SymptomGroup {
   final String title;
   final List<_SymptomItem> items;
@@ -3618,6 +3968,85 @@ class _SymptomItem {
     required this.icon,
     required this.color,
   });
+}
+
+class _DreamRecorderTile extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _DreamRecorderTile({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
+      height: 60,
+      decoration: BoxDecoration(
+        color: selected
+            ? color.withValues(alpha: 0.18)
+            : Color.lerp(AppColors.surface, color, 0.075),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: selected ? color : color.withValues(alpha: 0.62),
+          width: selected ? 1.6 : 1.15,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(5, 4, 8, 4),
+            child: Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: selected ? 0.15 : 0.09),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.nights_stay_outlined,
+                    color: color,
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 7),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 2,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                Icon(
+                  selected
+                      ? Icons.check_circle_rounded
+                      : Icons.chevron_right_rounded,
+                  color: color,
+                  size: 17,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _SymptomTile extends StatelessWidget {

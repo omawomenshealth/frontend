@@ -224,8 +224,10 @@ class ApiService {
   Future<bool> uploadSync({
     required Map<String, dynamic> settings,
     required List<Map<String, dynamic>> logs,
-    required List<String> customMedications,
+    required List<Map<String, dynamic>> customMedications,
     required List<String> customSupplements,
+    required List<String> customFoods,
+    required List<String> customSkincare,
     required List<Map<String, dynamic>> medicationReminderPlans,
     required List<Map<String, dynamic>> medicationDoseRecords,
     bool replaceExisting = true,
@@ -242,8 +244,8 @@ class ApiService {
             'logs': logs,
             'customMedications': customMedications,
             'customSupplements': customSupplements,
-            'customFoods': _storage.getCustomFoods(),
-            'customSkincare': _storage.getCustomSkincare(),
+            'customFoods': customFoods,
+            'customSkincare': customSkincare,
             'medicationReminderPlans': medicationReminderPlans,
             'medicationDoseRecords': medicationDoseRecords,
             'replaceExisting': replaceExisting,
@@ -252,8 +254,6 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        // Son yedekleme zamanını kaydet
-        await _storage.setLastSyncTime(DateTime.now().toIso8601String());
         return true;
       } else {
         final errorBody = jsonDecode(utf8.decode(response.bodyBytes));
@@ -268,7 +268,11 @@ class ApiService {
   }
 
   /// Buluttaki yedeklenmiş verileri indir (Download).
-  Future<Map<String, dynamic>?> downloadSync() async {
+  ///
+  /// Bağlantı/sunucu hatası ile boş bulut hesabını birbirinden ayırmak için
+  /// hata durumunda `null` döndürmez; hatayı çağırana iletir. Sunucu, hesabın
+  /// henüz yedeği yoksa `settings: null` içeren geçerli bir nesne döndürür.
+  Future<Map<String, dynamic>> downloadSync() async {
     final url = Uri.parse('$baseUrl/api/sync/download');
 
     try {
@@ -276,19 +280,18 @@ class ApiService {
         (headers) => http.get(url, headers: headers),
       );
 
+      final data = _decodeObject(response);
       if (response.statusCode == 200) {
-        final data =
-            jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
         return data;
       } else {
-        final errorBody = jsonDecode(utf8.decode(response.bodyBytes));
-        throw Exception(
-          errorBody['error'] ?? AppStrings.downloadError(response.statusCode),
+        throw ApiException(
+          data['error']?.toString() ??
+              AppStrings.downloadError(response.statusCode),
         );
       }
     } catch (e) {
       debugPrint('Senkronizasyon indirme hatası: $e');
-      return null;
+      rethrow;
     }
   }
 

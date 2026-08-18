@@ -28,7 +28,7 @@ void main() {
       await first.init();
 
       expect(first.authToken, isNull);
-      expect(first.getCustomMedications(), isEmpty);
+      expect(first.getCustomMedicationIdentities(), isEmpty);
       expect(first.virtualDaysOffset, 0);
       final preferences = await SharedPreferences.getInstance();
       expect(preferences.get('auth_token'), isNull);

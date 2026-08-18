@@ -34,6 +34,11 @@ class AuthView extends StatelessWidget {
                 right: -82,
                 child: _AuthGlow(size: 230, color: AppColors.secondaryLight),
               ),
+              const Positioned(
+                bottom: 118,
+                left: -66,
+                child: _AuthGlow(size: 126, color: Color(0x339A762B)),
+              ),
               SafeArea(
                 child: CustomScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -410,7 +415,7 @@ class _AuthGlow extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.72),
+          color: color.withValues(alpha: color.a * 0.72),
           shape: BoxShape.circle,
         ),
       ),

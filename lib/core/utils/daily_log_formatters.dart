@@ -44,7 +44,13 @@ class DailyLogFormatters {
     if (log.dreamRemembered == false) return AppStrings.no;
     if (log.dreamRemembered != true) return AppStrings.notSpecified;
     final note = log.dreamNote?.trim();
-    return note == null || note.isEmpty ? AppStrings.yes : note;
+    final type = switch (log.dreamType) {
+      DreamType.good => AppStrings.goodDream,
+      DreamType.nightmare => AppStrings.nightmare,
+      null => null,
+    };
+    if (note == null || note.isEmpty) return type ?? AppStrings.yes;
+    return type == null ? note : '$type • $note';
   }
 
   static String sexualActivity(DailyLog log) {

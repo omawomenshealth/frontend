@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/data/models/lab_result_model.dart';
+import 'package:app_proje_a/data/models/medication_identity_model.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/views/profile/view/doctor_report_view.dart';
@@ -31,7 +32,13 @@ void main() {
       lastPeriodDate: DateTime(2026, 8, 1),
       birthControlMethod: 'Kondom',
       womenDiseases: const ['Endometriozis'],
-      dailyMedications: const ['Parasetamol'],
+      dailyMedications: const [
+        MedicationIdentity(
+          displayName: 'Ağrı kesici - Parasetamol',
+          mainGroup: 'Ağrı kesici',
+          activeIngredient: 'Parasetamol',
+        ),
+      ],
       dailySupplements: const ['Magnezyum', 'Biotin'],
       dailySkincare: const ['Niasinamid', 'Retinol'],
       labResults: const {
@@ -55,7 +62,9 @@ void main() {
         caffeineServings: 1,
         medications: [
           MedicationEntry(
-            name: 'Parasetamol',
+            displayName: 'Ağrı kesici - Parasetamol',
+            mainGroup: 'Ağrı kesici',
+            activeIngredient: 'Parasetamol',
             times: const {'Sabah'},
             stomachState: 'Tok',
             takenDoseCount: 1,
@@ -63,7 +72,9 @@ void main() {
         ],
         supplements: [
           MedicationEntry(
-            name: 'Magnezyum',
+            displayName: 'Magnezyum',
+            mainGroup: 'Magnezyum',
+            activeIngredient: null,
             times: const {'Akşam'},
             stomachState: 'Tok',
             takenDoseCount: 1,
@@ -75,6 +86,7 @@ void main() {
         moodCompanions: const ['Aile'],
         moodPlaces: const ['Ev'],
         dreamRemembered: true,
+        dreamType: DreamType.good,
         dreamNote: 'Deniz kenarında yürüyordum.',
         symptoms: const ['Karın ağrısı', 'Şişkinlik'],
         symptomSeverities: const {'Karın ağrısı': 2, 'Şişkinlik': 1},
@@ -88,7 +100,9 @@ void main() {
         },
         supplements: [
           MedicationEntry(
-            name: 'Biotin',
+            displayName: 'Biotin',
+            mainGroup: 'Biotin',
+            activeIngredient: null,
             times: const {'Akşam'},
             stomachState: 'Tok',
             takenDoseCount: 1,

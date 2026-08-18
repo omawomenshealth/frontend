@@ -454,15 +454,15 @@ class PersonalAssociationEngine {
           record.itemType == MedicationPlanItemType.medication &&
           record.status != null,
     );
-    final itemNames = explicitResponses
-        .map((record) => record.itemName)
+    final displayNames = explicitResponses
+        .map((record) => record.displayName)
         .toSet();
     final symptomLabels = _allLabels(days.values.map((day) => day.symptoms));
 
-    for (final itemName in itemNames) {
+    for (final displayName in displayNames) {
       final responseByDate = <DateTime, bool>{};
       for (final record in explicitResponses.where(
-        (record) => record.itemName == itemName,
+        (record) => record.displayName == displayName,
       )) {
         final date = record.scheduledAt.dateOnly;
         final skipped = record.status == MedicationDoseResponseStatus.skipped;
@@ -474,7 +474,7 @@ class PersonalAssociationEngine {
           candidates: candidates,
           days: days,
           kind: PersonalInsightKind.medicationSkipSymptomAssociation,
-          primaryLabel: itemName,
+          primaryLabel: displayName,
           secondaryLabel: symptom,
           lagDays: 1,
           exposureObserved: (day) => responseByDate.containsKey(day.date),

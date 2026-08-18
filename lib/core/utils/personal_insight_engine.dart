@@ -81,7 +81,7 @@ class PersonalInsightEngine {
     final supplementNames = <String>{
       ...?settings?.dailySupplements,
       for (final log in logs)
-        for (final supplement in log.supplements) supplement.name,
+        for (final supplement in log.supplements) supplement.displayName,
     };
     final usesBiotin = supplementNames.any(
       (name) => name.trim().toLowerCase().contains('biotin'),

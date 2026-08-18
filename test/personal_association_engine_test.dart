@@ -18,6 +18,7 @@ void main() {
       moodCompanions: const ['Arkadaş'],
       moodPlaces: const ['Ev'],
       dreamRemembered: true,
+      dreamType: DreamType.good,
       dreamNote: 'Deniz gördüm.',
       vaginalDischargePresent: true,
       vaginalDischargeColor: VaginalDischargeColor.clear,
@@ -559,7 +560,9 @@ void main() {
             id: 'dose-$day',
             planId: 'plan-1',
             itemType: MedicationPlanItemType.medication,
-            itemName: 'Test ilacı',
+            displayName: 'Ağrı kesici - Parasetamol',
+            mainGroup: 'Ağrı kesici',
+            activeIngredient: 'Parasetamol',
             dosage: '1 Adet',
             scheduledAt: scheduledAt,
             notificationScheduled: true,
@@ -581,7 +584,7 @@ void main() {
           insight.kind == PersonalInsightKind.medicationSkipSymptomAssociation,
     );
 
-    expect(association.primaryLabel, 'Test ilacı');
+    expect(association.primaryLabel, 'Ağrı kesici - Parasetamol');
     expect(association.secondaryLabel, 'Baş ağrısı');
     expect(association.withEventCount, 8);
     expect(association.withTotal, 10);
@@ -612,7 +615,9 @@ void main() {
           id: '${itemType.name}-$day',
           planId: '${itemType.name}-plan',
           itemType: itemType,
-          itemName: itemType.name,
+          displayName: itemType.name,
+          mainGroup: itemType.name,
+          activeIngredient: null,
           dosage: '1 Adet',
           scheduledAt: scheduledAt,
           notificationScheduled: true,

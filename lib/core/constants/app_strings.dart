@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 ///
 /// Yeni bir metin eklerken:
 /// 1. Buraya anlamlı bir anahtar ekleyin.
-/// 2. [_turkishTexts] ve [_englishTexts] kataloglarına karşılığını yazın.
+/// 2. Desteklenen bütün dil kataloglarına karşılığını yazın.
 /// 3. [AppStrings] içinde anahtarı kullanan bir getter ekleyin.
 enum _TextKey {
   appName,
@@ -37,6 +37,7 @@ enum _TextKey {
   insightPeriodSymptomBody,
   insightPeriodDurationReviewTitle,
   insightPeriodDurationReviewBody,
+  insightPeriodDurationComparison,
   insightFrequentMoodTitle,
   insightFrequentMoodBody,
   insightRecurringSymptomTitle,
@@ -654,6 +655,153 @@ enum _TextKey {
   reminderDeliveryNote,
   responseSaved,
   emptyMedicationList,
+  searchFoods,
+  searchMedications,
+  searchSupplements,
+  searchSkincare,
+  smartSearchHint,
+  noSearchResults,
+  addSnack,
+  snackNumber,
+  customFoods,
+  medicationCategories,
+  supplementRoutine,
+  skincare,
+  skincareRoutine,
+  skincareQuestion,
+  skincareHint,
+  medicationQuestion,
+  supplementQuestion,
+  supplementPageHint,
+  addCustomFood,
+  addFood,
+  addCustomSupplement,
+  addCustomSkincare,
+  createReminderShort,
+  remindEveryDay,
+  remindOnSelectedDays,
+  ongoingRoutine,
+  medicationUsagePlanQuestion,
+  medicationUsagePlanHint,
+  setUsagePlan,
+  savedForLater,
+  addCustomWomenDisease,
+  addCustomChronicDisease,
+  conditionName,
+  pdfPageNumber,
+  medicationsSupplementsAndSkincare,
+  saveSkincare,
+  saveSupplement,
+  saveMedicationAndSupplement,
+  periodLogAction,
+  deleteTodayPeriod,
+  deleteDayPeriod,
+  deletePeriodConfirmationTitle,
+  deletePeriodConfirmationBody,
+  periodEntryDeleted,
+  periodDeleteFailed,
+  premiumRequired,
+  doctorReportPremiumDescription,
+  includeRelationshipHistoryQuestion,
+  includeRelationshipHistoryHint,
+  includeInReport,
+  doNotIncludeInReport,
+  relationshipHistory,
+  activityRecordCount,
+  recordedActivityTypes,
+  recordedAfterFeelings,
+  premiumDoctorReportInsightTitle,
+  premiumDoctorReportInsightBody,
+  biotinInsightTitle,
+  biotinInsightBody,
+  biotinInsightEvidence,
+  bloodTests,
+  yearsSmokingOne,
+  yearsSmokingMany,
+  phaseAfterDays,
+  selectBirthDate,
+  bloodResults,
+  conditions,
+  searchConditions,
+  addCondition,
+  addBirthControlMethod,
+  meetYouTitle,
+  meetYouSubtitle,
+  nameAddressHint,
+  birthDateInputHint,
+  chooseFromCalendar,
+  birthDateManualEntryHint,
+  basicHealthInformationTitle,
+  basicHealthInformationSubtitle,
+  smokingUsage,
+  centimeterUnit,
+  kilogramUnit,
+  detailedHealthInformationTitle,
+  detailedHealthInformationSubtitle,
+  bloodResultsDescription,
+  noBloodResultsAdded,
+  bloodResultsAddedOne,
+  bloodResultsAddedMany,
+  searchBloodTests,
+  knownConditionQuestion,
+  combinedConditionsDescription,
+  noConditionSelected,
+  cycleInformation,
+  laboratoryResults,
+  editLaboratoryResults,
+  emptyLaboratoryResultsHint,
+  laboratoryEntryDisclaimer,
+  searchLaboratoryValue,
+  noTestDateSelected,
+  testDetails,
+  clearTestDate,
+  fastingSampleQuestion,
+  doNotKnow,
+  value,
+  laboratoryValuesEnteredOne,
+  laboratoryValuesEnteredMany,
+  fasting,
+  nonFasting,
+  testDate,
+  fastingSample,
+  periodStartPredictionWindow,
+  forecastConfidenceLow,
+  forecastConfidenceMedium,
+  forecastConfidenceHigh,
+  periodPredictionSummary,
+  dateDisplayPattern,
+  dateTimeDisplayPattern,
+  cloudSyncPrivacyNotice,
+  nutritionAll,
+  addAnotherCraving,
+  customCravingQuestion,
+  hadADream,
+  saveYourDream,
+  dreamTypeQuestion,
+  goodDream,
+  nightmare,
+  dreamSaved,
+  dreamPremiumOffer,
+  explorePremium,
+  notNow,
+  exploreDreamInterpretation,
+  dreamPremiumDescription,
+  myDreams,
+  privateDreamJournalDescription,
+  nightmaresVisible,
+  nightmaresHiddenOne,
+  nightmaresHiddenMany,
+  hideNightmares,
+  showNightmares,
+  nightmaresCurrentlyHidden,
+  noDreamSavedYet,
+  noDreamRecords,
+  dreamRecordCountOne,
+  dreamRecordCountMany,
+  catalogCategoryCountOne,
+  catalogCategoryCountMany,
+  activeIngredientOptional,
+  fiveMore,
   reportFileName,
 }
 
@@ -697,11 +845,12 @@ enum _ListKey {
   articleTopics,
   defaultMedications,
   defaultSupplements,
+  calendarWeekdayInitials,
 }
 
 /// Türkçe sabit metin kataloğu.
 const Map<_TextKey, String> _turkishTexts = {
-  _TextKey.appName: 'OMA',
+  _TextKey.appName: 'Oma',
   _TextKey.appSlogan: 'Sağlığınızı günlük takip edin',
   _TextKey.home: 'Ana Sayfa',
   _TextKey.insights: 'İçgörüler',
@@ -744,6 +893,8 @@ const Map<_TextKey, String> _turkishTexts = {
       'Kanama süresindeki değişikliği takip edelim',
   _TextKey.insightPeriodDurationReviewBody:
       'Son tamamlanan kanama kaydın {duration} gün sürdü{comparison}. Tek kayıt nedenini göstermez; süre senin için olağandışıysa, 7 günü aşıyorsa veya tekrar ederse sağlık profesyoneline danış.',
+  _TextKey.insightPeriodDurationComparison:
+      '; önceki tamamlanmış kayıtlarının ortancası {comparison} gündü',
   _TextKey.insightFrequentMoodTitle: 'En sık kaydettiğin his',
   _TextKey.insightFrequentMoodBody:
       '{label}, ruh hâli girdiğin {total} günün {count} tanesinde yer aldı.',
@@ -1097,7 +1248,8 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.symptomDigestion: 'Sindirim',
   _TextKey.dreamQuestion: 'Rüya gördün mü?',
   _TextKey.dreamNoteQuestion: 'Rüyanı kaydetmek ister misin?',
-  _TextKey.dreamNoteHint: 'Hatırladığın kadarıyla rüyanı yazabilirsin',
+  _TextKey.dreamNoteHint:
+      'Kendin için rüyalarını kaydedebilirsin; özel bilgilerinin hiçbirini okumaz ve senden izinsiz işlemeyiz.',
   _TextKey.moodBehindQuestion: '{mood} hissetmenin ardında ne var?',
   _TextKey.moodContextHint:
       'Biraz bağlam, OMA’nın örüntülerini anlamasına yardımcı olur. Uyanların tümünü seç.',
@@ -1484,12 +1636,185 @@ const Map<_TextKey, String> _turkishTexts = {
       'OMA bildirimi cihazda planlar. Telefon sistemi bildirimin ekranda gösterildiğini doğrulamadığı için “alındı” yalnızca sen yanıt verdiğinde kaydedilir. İzin ve pil ayarları bildirim saatini etkileyebilir.',
   _TextKey.responseSaved: 'Doz yanıtı kaydedildi.',
   _TextKey.emptyMedicationList: 'Henüz eklenmemiş',
+  _TextKey.searchFoods: 'Yiyecek veya kategori ara',
+  _TextKey.searchMedications: 'İlaç veya etken madde ara',
+  _TextKey.searchSupplements: 'Takviye ara',
+  _TextKey.searchSkincare: 'İçerik ara',
+  _TextKey.smartSearchHint:
+      'Yazdığın ürün görünmese bile doğru kategori bulunur.',
+  _TextKey.noSearchResults: 'Eşleşen bir sonuç bulunamadı.',
+  _TextKey.addSnack: 'Yeni atıştırmalık ekle',
+  _TextKey.snackNumber: 'Atıştırmalık {number}',
+  _TextKey.customFoods: 'Kaydettiklerin',
+  _TextKey.medicationCategories: 'İlaç kategorileri',
+  _TextKey.supplementRoutine: 'Takviye rutinin',
+  _TextKey.skincare: 'Cilt bakımı',
+  _TextKey.skincareRoutine: 'Cilt bakım rutinin',
+  _TextKey.skincareQuestion: 'Bugün hangi aktif içerikleri kullandın?',
+  _TextKey.skincareHint:
+      'Ürün adı yerine içerikleri seç; OMA zamanla cildindeki örüntüleri takip etsin.',
+  _TextKey.medicationQuestion: 'Bugün hangi ilaçları kullandın?',
+  _TextKey.supplementQuestion: 'Bugün hangi takviyeleri kullandın?',
+  _TextKey.supplementPageHint:
+      'Sık kullanılanlardan seçebilir veya kendi takviyeni ekleyebilirsin.',
+  _TextKey.addCustomFood: 'Yeni yiyecek ekle',
+  _TextKey.addFood: 'Yemek ekle',
+  _TextKey.addCustomSupplement: 'Yeni takviye ekle',
+  _TextKey.addCustomSkincare: 'Yeni içerik ekle',
+  _TextKey.createReminderShort: 'Hatırlatıcı oluştur',
+  _TextKey.remindEveryDay: 'Her gün hatırlat',
+  _TextKey.remindOnSelectedDays: 'Seçili günlerde hatırlat',
+  _TextKey.ongoingRoutine: 'Sürekli / bitiş yok',
+  _TextKey.medicationUsagePlanQuestion: 'Bu ilacı ne kadar süre kullanacaksın?',
+  _TextKey.medicationUsagePlanHint:
+      'Kısa kür veya uzun süreli kullanım planını şimdi belirleyebilirsin. Hatırlatıcı isteğe bağlıdır.',
+  _TextKey.setUsagePlan: 'Kullanım planını belirle',
+  _TextKey.savedForLater:
+      'Kaydedildi; sonraki girişlerde yeniden seçebilirsin.',
+  _TextKey.addCustomWomenDisease: 'Kadın hastalığı ekle',
+  _TextKey.addCustomChronicDisease: 'Kronik hastalık ekle',
+  _TextKey.conditionName: 'Hastalık adı',
+  _TextKey.pdfPageNumber: 'Sayfa {current} / {total}',
+  _TextKey.medicationsSupplementsAndSkincare: 'İlaç, takviye ve cilt bakımı',
+  _TextKey.saveSkincare: 'Cilt bakımını kaydet',
+  _TextKey.saveSupplement: 'Takviyeyi kaydet',
+  _TextKey.saveMedicationAndSupplement: 'İlaç ve takviyeyi kaydet',
+  _TextKey.periodLogAction: 'Adet gir',
+  _TextKey.deleteTodayPeriod: 'Bugünün adet kaydını sil',
+  _TextKey.deleteDayPeriod: 'Bu günün adet kaydını sil',
+  _TextKey.deletePeriodConfirmationTitle: 'Adet kaydı silinsin mi?',
+  _TextKey.deletePeriodConfirmationBody:
+      'Bu güne ait adet bilgisi kaldırılacak. Diğer günlük kayıtların korunacak.',
+  _TextKey.periodEntryDeleted: 'Adet kaydı silindi.',
+  _TextKey.periodDeleteFailed: 'Adet kaydı silinemedi. Lütfen tekrar dene.',
+  _TextKey.premiumRequired: 'Premium gerekli',
+  _TextKey.doctorReportPremiumDescription:
+      'Doktor raporunu oluşturmak ve PDF olarak paylaşmak için OMA Premium gerekir.',
+  _TextKey.includeRelationshipHistoryQuestion:
+      'İlişki geçmişini rapora eklemek ister misin?',
+  _TextKey.includeRelationshipHistoryHint:
+      'Cinsel aktivite ve sonrasındaki hisler yalnızca onay verirsen raporda görünür.',
+  _TextKey.includeInReport: 'Rapora ekle',
+  _TextKey.doNotIncludeInReport: 'Dahil etme',
+  _TextKey.relationshipHistory: 'İlişki geçmişi',
+  _TextKey.activityRecordCount: 'Kaydedilen aktivite: {count}',
+  _TextKey.recordedActivityTypes: 'Aktivite türleri',
+  _TextKey.recordedAfterFeelings: 'Aktivite sonrası hisler',
+  _TextKey.premiumDoctorReportInsightTitle:
+      'Kayıtların doktor görüşmesine hazır',
+  _TextKey.premiumDoctorReportInsightBody:
+      'Düzenli girişlerin anlamlı bir özet oluşturdu. OMA Premium ile doktor raporunu PDF olarak hazırlayabilirsin.',
+  _TextKey.biotinInsightTitle:
+      'Biotin bazı kan testi sonuçlarını etkileyebilir',
+  _TextKey.biotinInsightBody:
+      'Bu bilinen bir laboratuvar etkileşimidir; tek başına vücudunda bir sorun olduğu anlamına gelmez. Özellikle tiroid kan testleri için biotini en az 2 gün önce bırakman önerilir. Süre teste ve doza göre değişebileceği için kullandığın ürünü sağlık profesyoneline veya laboratuvara söyle ve onların talimatını izle.',
+  _TextKey.biotinInsightEvidence: 'Takviye rutininde Biotin var',
+  _TextKey.bloodTests: 'Kan testleri',
+  _TextKey.yearsSmokingOne: '{years} yıl',
+  _TextKey.yearsSmokingMany: '{years} yıl',
+  _TextKey.phaseAfterDays: '{days} gün sonra {phase}',
+  _TextKey.selectBirthDate: 'Doğum tarihini seç',
+  _TextKey.bloodResults: 'Kan değerleri',
+  _TextKey.conditions: 'Hastalıklar',
+  _TextKey.searchConditions: 'Hastalık ara',
+  _TextKey.addCondition: 'Hastalık ekle',
+  _TextKey.addBirthControlMethod: 'Doğum kontrol yöntemi ekle',
+  _TextKey.meetYouTitle: 'Sizi Tanıyalım',
+  _TextKey.meetYouSubtitle: 'Sana daha kişisel bir deneyim sunabilmemiz için.',
+  _TextKey.nameAddressHint: 'Sana hitap edebilmemiz için',
+  _TextKey.birthDateInputHint: 'gg/aa/yyyy',
+  _TextKey.chooseFromCalendar: 'Takvimden seç',
+  _TextKey.birthDateManualEntryHint:
+      'Takvimden seçebilir veya elle yazabilirsin.',
+  _TextKey.basicHealthInformationTitle: 'Temel Sağlık Bilgileri',
+  _TextKey.basicHealthInformationSubtitle:
+      'Sana özel önerilerimiz için bu bilgilere ihtiyacımız var.',
+  _TextKey.smokingUsage: 'Sigara kullanımı',
+  _TextKey.centimeterUnit: 'cm',
+  _TextKey.kilogramUnit: 'kg',
+  _TextKey.detailedHealthInformationTitle: 'Detaylı Sağlık Bilgileri',
+  _TextKey.detailedHealthInformationSubtitle:
+      'İstersen bu alanları şimdi doldurabilir, daha sonra profilden güncelleyebilirsin.',
+  _TextKey.bloodResultsDescription:
+      'Kan sonuçlarını ad veya kısaltmayla arayarak ekleyebilirsin. Tüm alanlar isteğe bağlıdır.',
+  _TextKey.noBloodResultsAdded: 'Henüz değer eklenmedi',
+  _TextKey.bloodResultsAddedOne: '{count} değer eklendi',
+  _TextKey.bloodResultsAddedMany: '{count} değer eklendi',
+  _TextKey.searchBloodTests: 'Kan değeri ara',
+  _TextKey.knownConditionQuestion:
+      'Bilmemizi istediğiniz bir hastalığınız var mı?',
+  _TextKey.combinedConditionsDescription:
+      'Kadın hastalıkları ve kronik hastalıkları tek listeden arayabilirsin.',
+  _TextKey.noConditionSelected: 'Herhangi bir hastalık seçilmedi',
+  _TextKey.cycleInformation: 'Döngü bilgileri',
+  _TextKey.laboratoryResults: 'Laboratuvar değerleri',
+  _TextKey.editLaboratoryResults: 'Laboratuvar değerlerini düzenle',
+  _TextKey.emptyLaboratoryResultsHint:
+      'Sonuç eklemek için dokunun. Tüm alanlar isteğe bağlıdır.',
+  _TextKey.laboratoryEntryDisclaimer:
+      'Raporunuzdaki değeri ve birimi aynen seçin. Tüm alanlar isteğe bağlıdır; sonuçların yorumu için raporu düzenleyen laboratuvarın referans aralığını kullanın.',
+  _TextKey.searchLaboratoryValue: 'Kan değeri veya kısaltma ara',
+  _TextKey.noTestDateSelected: 'Tarih seçilmedi',
+  _TextKey.testDetails: 'Ölçüm bilgileri',
+  _TextKey.clearTestDate: 'Tarihi temizle',
+  _TextKey.fastingSampleQuestion: 'Kan açken mi verildi?',
+  _TextKey.doNotKnow: 'Bilmiyorum',
+  _TextKey.value: 'Değer',
+  _TextKey.laboratoryValuesEnteredOne: '{count} değer girildi',
+  _TextKey.laboratoryValuesEnteredMany: '{count} değer girildi',
+  _TextKey.fasting: 'Açlık',
+  _TextKey.nonFasting: 'Tokluk',
+  _TextKey.testDate: 'Test tarihi',
+  _TextKey.fastingSample: 'Açlık numunesi',
+  _TextKey.periodStartPredictionWindow: 'Regl başlangıcı tahmin aralığı',
+  _TextKey.forecastConfidenceLow: 'düşük',
+  _TextKey.forecastConfidenceMedium: 'orta',
+  _TextKey.forecastConfidenceHigh: 'yüksek',
+  _TextKey.periodPredictionSummary:
+      'Regl tahmin aralığı: {range} · {confidence} güven',
+  _TextKey.dateDisplayPattern: 'dd.MM.yyyy',
+  _TextKey.dateTimeDisplayPattern: 'dd.MM.yyyy HH:mm',
+  _TextKey.cloudSyncPrivacyNotice:
+      'Bulut eşitlemesini seçerseniz döngü, belirti, ilaç, takviye, hatırlatma planı, aldım/atladım doz yanıtı ve profil ayarları sağlık takibi amacıyla işlenir. Cihaza özel bildirim planlama durumu buluta gönderilmez. Veriler aktarım sırasında TLS, veritabanında kullanıcıya özel AES-256-GCM anahtarıyla korunur. Google yalnızca oturum açma ve satın alma doğrulaması kapsamında hizmet sağlar. Bulut eşitlemesi isteğe bağlıdır. Verilerinizi dışa aktarabilir, rızanızı geri çekebilir veya hesabı tamamen silebilirsiniz. Test sürümündeki veri sorumlusu iletişim bilgileri üretimden önce tamamlanacaktır.',
+  _TextKey.nutritionAll: 'Hepsi',
+  _TextKey.addAnotherCraving: 'Başka bir istek ekle',
+  _TextKey.customCravingQuestion: 'Canın ne çekti?',
+  _TextKey.hadADream: 'Rüya gördüm',
+  _TextKey.saveYourDream: 'Rüyanı kaydet',
+  _TextKey.dreamTypeQuestion: 'Nasıl bir rüyaydı?',
+  _TextKey.goodDream: 'İyi rüya',
+  _TextKey.nightmare: 'Kabus',
+  _TextKey.dreamSaved: 'Rüyan kaydedildi',
+  _TextKey.dreamPremiumOffer:
+      'Rüya tabiri özelliği için Premium paketimize göz atabilirsin.',
+  _TextKey.explorePremium: 'Premium pakete göz at',
+  _TextKey.notNow: 'Şimdi değil',
+  _TextKey.exploreDreamInterpretation: 'Rüya tabirini keşfet',
+  _TextKey.dreamPremiumDescription:
+      'Rüyalarını kaydetmeye devam et; Premium ile rüya tabiri özelliklerine eriş.',
+  _TextKey.myDreams: 'Rüyalarım',
+  _TextKey.privateDreamJournalDescription:
+      'Burası senin özel rüya günlüğün. Rüyaların iznin olmadan okunmaz veya işlenmez.',
+  _TextKey.nightmaresVisible: 'Kabuslar görünür',
+  _TextKey.nightmaresHiddenOne: '{count} kabus gizli',
+  _TextKey.nightmaresHiddenMany: '{count} kabus gizli',
+  _TextKey.hideNightmares: 'Kabusları gizle',
+  _TextKey.showNightmares: 'Kabusları göster',
+  _TextKey.nightmaresCurrentlyHidden: 'Kabusların şu anda gizli.',
+  _TextKey.noDreamSavedYet: 'Henüz kaydedilmiş bir rüyan yok.',
+  _TextKey.noDreamRecords: 'Henüz rüya kaydı yok',
+  _TextKey.dreamRecordCountOne: '{count} rüya kaydı',
+  _TextKey.dreamRecordCountMany: '{count} rüya kaydı',
+  _TextKey.catalogCategoryCountOne: '{count} kategori',
+  _TextKey.catalogCategoryCountMany: '{count} kategori',
+  _TextKey.activeIngredientOptional: 'Etken madde (isteğe bağlı)',
+  _TextKey.fiveMore: '5 daha',
   _TextKey.reportFileName: 'oma_saglik_raporu',
 };
 
 /// English constant text catalog.
 const Map<_TextKey, String> _englishTexts = {
-  _TextKey.appName: 'OMA',
+  _TextKey.appName: 'Oma',
   _TextKey.appSlogan: 'Track your health every day',
   _TextKey.home: 'Home',
   _TextKey.insights: 'Insights',
@@ -1532,6 +1857,8 @@ const Map<_TextKey, String> _englishTexts = {
       'Let’s follow this bleeding-duration change',
   _TextKey.insightPeriodDurationReviewBody:
       'Your latest completed bleeding record lasted {duration} days{comparison}. One record cannot show the reason; contact a healthcare professional if this is unusual for you, lasts longer than 7 days, or repeats.',
+  _TextKey.insightPeriodDurationComparison:
+      '; the median of your earlier completed records was {comparison} days',
   _TextKey.insightFrequentMoodTitle: 'Your most logged feeling',
   _TextKey.insightFrequentMoodBody:
       '{label} appeared on {count} of the {total} days when you logged a mood.',
@@ -1884,7 +2211,8 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.symptomDigestion: 'Digestion',
   _TextKey.dreamQuestion: 'Did you dream?',
   _TextKey.dreamNoteQuestion: 'Would you like to record your dream?',
-  _TextKey.dreamNoteHint: 'Write down as much of your dream as you remember',
+  _TextKey.dreamNoteHint:
+      'Save your dreams for yourself. We do not read or process your private information without permission.',
   _TextKey.moodBehindQuestion: 'What’s behind feeling {mood}?',
   _TextKey.moodContextHint:
       'A little context helps OMA understand your patterns. Choose all that apply.',
@@ -2270,6 +2598,178 @@ const Map<_TextKey, String> _englishTexts = {
       'OMA schedules the notification on your device. Because the phone cannot confirm that it was displayed, “taken” is recorded only when you respond. Permission and battery settings may affect delivery time.',
   _TextKey.responseSaved: 'Dose response saved.',
   _TextKey.emptyMedicationList: 'Nothing added yet',
+  _TextKey.searchFoods: 'Search foods or categories',
+  _TextKey.searchMedications: 'Search medications or ingredients',
+  _TextKey.searchSupplements: 'Search supplements',
+  _TextKey.searchSkincare: 'Search ingredients',
+  _TextKey.smartSearchHint:
+      'Smart search finds the right category even when the product is hidden.',
+  _TextKey.noSearchResults: 'No matching result found.',
+  _TextKey.addSnack: 'Add another snack',
+  _TextKey.snackNumber: 'Snack {number}',
+  _TextKey.customFoods: 'Your saved foods',
+  _TextKey.medicationCategories: 'Medication categories',
+  _TextKey.supplementRoutine: 'Your supplement routine',
+  _TextKey.skincare: 'Skincare',
+  _TextKey.skincareRoutine: 'Your skincare routine',
+  _TextKey.skincareQuestion: 'Which active ingredients did you use today?',
+  _TextKey.skincareHint:
+      'Choose ingredients instead of product names so OMA can track patterns over time.',
+  _TextKey.medicationQuestion: 'Which medications did you take today?',
+  _TextKey.supplementQuestion: 'Which supplements did you take today?',
+  _TextKey.supplementPageHint: 'Choose a common supplement or add your own.',
+  _TextKey.addCustomFood: 'Add a new food',
+  _TextKey.addFood: 'Add food',
+  _TextKey.addCustomSupplement: 'Add a new supplement',
+  _TextKey.addCustomSkincare: 'Add a new ingredient',
+  _TextKey.createReminderShort: 'Create reminder',
+  _TextKey.remindEveryDay: 'Remind every day',
+  _TextKey.remindOnSelectedDays: 'Remind on selected days',
+  _TextKey.ongoingRoutine: 'Ongoing / no end date',
+  _TextKey.medicationUsagePlanQuestion:
+      'How long will you use this medication?',
+  _TextKey.medicationUsagePlanHint:
+      'You can set a short-course or long-term usage plan now. Reminders are optional.',
+  _TextKey.setUsagePlan: 'Set usage plan',
+  _TextKey.savedForLater: 'Saved and available for future entries.',
+  _TextKey.addCustomWomenDisease: 'Add a gynecological condition',
+  _TextKey.addCustomChronicDisease: 'Add a chronic condition',
+  _TextKey.conditionName: 'Condition name',
+  _TextKey.pdfPageNumber: 'Page {current} / {total}',
+  _TextKey.medicationsSupplementsAndSkincare:
+      'Medication, supplements and skincare',
+  _TextKey.saveSkincare: 'Save skincare',
+  _TextKey.saveSupplement: 'Save supplement',
+  _TextKey.saveMedicationAndSupplement: 'Save medication and supplements',
+  _TextKey.periodLogAction: 'Log period',
+  _TextKey.deleteTodayPeriod: "Delete today's period entry",
+  _TextKey.deleteDayPeriod: 'Delete period entry',
+  _TextKey.deletePeriodConfirmationTitle: 'Delete period entry?',
+  _TextKey.deletePeriodConfirmationBody:
+      'Period information for this day will be removed. Your other daily entries will be kept.',
+  _TextKey.periodEntryDeleted: 'Period entry deleted.',
+  _TextKey.periodDeleteFailed:
+      'The period entry could not be deleted. Please try again.',
+  _TextKey.premiumRequired: 'Premium required',
+  _TextKey.doctorReportPremiumDescription:
+      'OMA Premium is required to create and share your doctor report as a PDF.',
+  _TextKey.includeRelationshipHistoryQuestion:
+      'Would you like to include relationship history in the report?',
+  _TextKey.includeRelationshipHistoryHint:
+      'Sexual activity and after-feelings appear only when you approve.',
+  _TextKey.includeInReport: 'Include in report',
+  _TextKey.doNotIncludeInReport: 'Do not include',
+  _TextKey.relationshipHistory: 'Relationship history',
+  _TextKey.activityRecordCount: 'Recorded activities: {count}',
+  _TextKey.recordedActivityTypes: 'Activity types',
+  _TextKey.recordedAfterFeelings: 'After-activity feelings',
+  _TextKey.premiumDoctorReportInsightTitle:
+      'Your records are ready for a doctor visit',
+  _TextKey.premiumDoctorReportInsightBody:
+      'Your regular entries now form a useful summary. With OMA Premium, you can prepare a PDF doctor report.',
+  _TextKey.biotinInsightTitle: 'Biotin may affect some blood test results',
+  _TextKey.biotinInsightBody:
+      'This is a known laboratory interaction and does not by itself mean that something is wrong in your body. For thyroid blood tests, stopping biotin at least 2 days beforehand is recommended. Because timing can vary by test and dose, tell your clinician or laboratory which product you use and follow their instructions.',
+  _TextKey.biotinInsightEvidence: 'Biotin is in your supplement routine',
+  _TextKey.bloodTests: 'Blood tests',
+  _TextKey.yearsSmokingOne: '{years} year',
+  _TextKey.yearsSmokingMany: '{years} years',
+  _TextKey.phaseAfterDays: '{phase} in {days} days',
+  _TextKey.selectBirthDate: 'Select birth date',
+  _TextKey.bloodResults: 'Blood results',
+  _TextKey.conditions: 'Conditions',
+  _TextKey.searchConditions: 'Search conditions',
+  _TextKey.addCondition: 'Add a condition',
+  _TextKey.addBirthControlMethod: 'Add a birth control method',
+  _TextKey.meetYouTitle: 'Let’s Get to Know You',
+  _TextKey.meetYouSubtitle: 'So we can make your experience more personal.',
+  _TextKey.nameAddressHint: 'So we know how to address you',
+  _TextKey.birthDateInputHint: 'dd/mm/yyyy',
+  _TextKey.chooseFromCalendar: 'Choose from calendar',
+  _TextKey.birthDateManualEntryHint:
+      'Choose from the calendar or type it manually.',
+  _TextKey.basicHealthInformationTitle: 'Basic Health Information',
+  _TextKey.basicHealthInformationSubtitle:
+      'We need this information for recommendations tailored to you.',
+  _TextKey.smokingUsage: 'Smoking status',
+  _TextKey.centimeterUnit: 'cm',
+  _TextKey.kilogramUnit: 'kg',
+  _TextKey.detailedHealthInformationTitle: 'Detailed Health Information',
+  _TextKey.detailedHealthInformationSubtitle:
+      'You can complete these optional details now or update them later.',
+  _TextKey.bloodResultsDescription:
+      'Search by test name or abbreviation. Every field is optional.',
+  _TextKey.noBloodResultsAdded: 'No results added yet',
+  _TextKey.bloodResultsAddedOne: '{count} result added',
+  _TextKey.bloodResultsAddedMany: '{count} results added',
+  _TextKey.searchBloodTests: 'Search blood tests',
+  _TextKey.knownConditionQuestion:
+      'Is there a condition you would like us to know about?',
+  _TextKey.combinedConditionsDescription:
+      'Search all conditions in one combined list.',
+  _TextKey.noConditionSelected: 'No condition selected',
+  _TextKey.cycleInformation: 'Cycle information',
+  _TextKey.laboratoryResults: 'Laboratory results',
+  _TextKey.editLaboratoryResults: 'Edit laboratory results',
+  _TextKey.emptyLaboratoryResultsHint:
+      'Tap to add results. Every field is optional.',
+  _TextKey.laboratoryEntryDisclaimer:
+      'Enter the value and choose the unit exactly as shown on your report. Every field is optional; use the issuing laboratory’s reference range for interpretation.',
+  _TextKey.searchLaboratoryValue: 'Search test or abbreviation',
+  _TextKey.noTestDateSelected: 'No date selected',
+  _TextKey.testDetails: 'Test details',
+  _TextKey.clearTestDate: 'Clear date',
+  _TextKey.fastingSampleQuestion: 'Was the sample fasting?',
+  _TextKey.doNotKnow: 'Unknown',
+  _TextKey.value: 'Value',
+  _TextKey.laboratoryValuesEnteredOne: '{count} value entered',
+  _TextKey.laboratoryValuesEnteredMany: '{count} values entered',
+  _TextKey.fasting: 'Fasting',
+  _TextKey.nonFasting: 'Non-fasting',
+  _TextKey.testDate: 'Test date',
+  _TextKey.fastingSample: 'Fasting sample',
+  _TextKey.periodStartPredictionWindow: 'Period start prediction window',
+  _TextKey.forecastConfidenceLow: 'low',
+  _TextKey.forecastConfidenceMedium: 'medium',
+  _TextKey.forecastConfidenceHigh: 'high',
+  _TextKey.periodPredictionSummary:
+      'Period prediction: {range} · {confidence} confidence',
+  _TextKey.dateDisplayPattern: 'MM/dd/yyyy',
+  _TextKey.dateTimeDisplayPattern: 'MM/dd/yyyy h:mm a',
+  _TextKey.cloudSyncPrivacyNotice:
+      'If you choose cloud sync, cycle, symptom, medication, supplement, reminder plan, taken/skipped dose response, and profile settings are processed for health tracking. Device-specific notification scheduling state is not uploaded. Data is protected by TLS in transit and a per-user AES-256-GCM key in the database. Google is used only for sign-in and purchase verification. Cloud sync is optional. You may export your data, withdraw consent, or delete the entire account. Controller contact details for this test build must be finalized before production.',
+  _TextKey.nutritionAll: 'All',
+  _TextKey.addAnotherCraving: 'Add another craving',
+  _TextKey.customCravingQuestion: 'What are you craving?',
+  _TextKey.hadADream: 'I had a dream',
+  _TextKey.saveYourDream: 'Save your dream',
+  _TextKey.dreamTypeQuestion: 'What kind of dream was it?',
+  _TextKey.goodDream: 'Good dream',
+  _TextKey.nightmare: 'Nightmare',
+  _TextKey.dreamSaved: 'Your dream was saved',
+  _TextKey.dreamPremiumOffer: 'Explore Premium for dream interpretation.',
+  _TextKey.explorePremium: 'Explore Premium',
+  _TextKey.notNow: 'Not now',
+  _TextKey.exploreDreamInterpretation: 'Explore dreams',
+  _TextKey.dreamPremiumDescription:
+      'Keep your dream journal and unlock dream interpretation with Premium.',
+  _TextKey.myDreams: 'My dreams',
+  _TextKey.privateDreamJournalDescription:
+      'This is your private dream journal. Your dreams are not read or processed without permission.',
+  _TextKey.nightmaresVisible: 'Nightmares are visible',
+  _TextKey.nightmaresHiddenOne: '{count} nightmare hidden',
+  _TextKey.nightmaresHiddenMany: '{count} nightmares hidden',
+  _TextKey.hideNightmares: 'Hide nightmares',
+  _TextKey.showNightmares: 'Show nightmares',
+  _TextKey.nightmaresCurrentlyHidden: 'Your nightmares are currently hidden.',
+  _TextKey.noDreamSavedYet: 'You have not saved a dream yet.',
+  _TextKey.noDreamRecords: 'No dreams saved yet',
+  _TextKey.dreamRecordCountOne: '{count} saved dream',
+  _TextKey.dreamRecordCountMany: '{count} saved dreams',
+  _TextKey.catalogCategoryCountOne: '{count} category',
+  _TextKey.catalogCategoryCountMany: '{count} categories',
+  _TextKey.activeIngredientOptional: 'Active ingredient (optional)',
+  _TextKey.fiveMore: '5 more',
   _TextKey.reportFileName: 'oma_health_report',
 };
 
@@ -2566,6 +3066,7 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'C Vitamini',
     'Çinko',
   ],
+  _ListKey.calendarWeekdayInitials: ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'],
 };
 
 const Map<_ListKey, List<String>> _englishLists = {
@@ -2856,13 +3357,16 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Vitamin C',
     'Zinc',
   ],
+  _ListKey.calendarWeekdayInitials: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
 };
 
 /// Uygulamanın merkezi ve genişletilebilir yerelleştirme erişimi.
 ///
-/// Tüm çeviriler yukarıdaki sabit kataloglarda tutulur. Yeni bir dil eklemek
-/// için o dile ait iki sabit katalog ekleyin, [_textCatalogs],
-/// [_listCatalogs] ve [supportedLocales] içine dili kaydedin.
+/// Tüm çeviriler yukarıdaki sabit kataloglarda tutulur. Örneğin Almanca
+/// eklemek için `_germanTexts` ve `_germanLists` kataloglarını oluşturun;
+/// kategori kataloglarının Almanca karşılıklarını hazırlayın; ardından `de`
+/// anahtarını aşağıdaki katalog kayıtlarına ve [supportedLocales] listesine
+/// ekleyin. Getter veya ekran kodunda dil koşulu yazılması gerekmez.
 class AppStrings {
   AppStrings._();
 
@@ -2898,10 +3402,48 @@ class AppStrings {
     'en': _englishLists,
   };
 
+  static const Map<String, Map<String, List<String>>> _nutritionCatalogs = {
+    'tr': _nutritionCatalogTr,
+    'en': _nutritionCatalogEn,
+  };
+  static const Map<String, Map<String, List<String>>> _medicationCatalogs = {
+    'tr': _medicationCatalogTr,
+    'en': _medicationCatalogEn,
+  };
+  static const Map<String, Map<String, List<String>>>
+  _medicationActiveIngredientCatalogs = {
+    'tr': _medicationActiveIngredientsTr,
+    'en': _medicationActiveIngredientsEn,
+  };
+  static const Map<String, List<String>> _supplementCatalogs = {
+    'tr': _supplementCatalogTr,
+    'en': _supplementCatalogEn,
+  };
+  static const Map<String, Map<String, List<String>>> _skincareCatalogs = {
+    'tr': _skincareCatalogTr,
+    'en': _skincareCatalogEn,
+  };
+  static const Map<String, Map<String, List<String>>> _foodAliasCatalogs = {
+    'tr': _hiddenFoodAliasesTr,
+    'en': _hiddenFoodAliasesEn,
+  };
+  static const Map<String, Map<String, List<String>>> _medicationAliasCatalogs =
+      {'tr': _hiddenMedicationAliasesTr, 'en': _hiddenMedicationAliasesEn};
+
   static String _languageCode = fallbackLocale.languageCode;
 
   static String get languageCode => _languageCode;
-  static String get localeName => _languageCode == 'tr' ? 'tr_TR' : 'en_US';
+  static String get localeName {
+    final locale = supportedLocales.firstWhere(
+      (candidate) => candidate.languageCode == _languageCode,
+      orElse: () => fallbackLocale,
+    );
+    final countryCode = locale.countryCode;
+    return countryCode == null
+        ? locale.languageCode
+        : '${locale.languageCode}_$countryCode';
+  }
+
   static bool get isTurkish => _languageCode == 'tr';
 
   /// Bu çağrı widget'ı dil değişikliklerine bağımlı hale getirir.
@@ -3123,10 +3665,9 @@ class AppStrings {
     'duration': duration,
     'comparison': comparison == null
         ? ''
-        : (isTurkish
-              ? '; önceki tamamlanmış kayıtlarının ortancası $comparison gündü'
-              : '; the median of your earlier completed records was '
-                    '$comparison days'),
+        : _format(_TextKey.insightPeriodDurationComparison, {
+            'comparison': comparison,
+          }),
   });
   static String get insightFrequentMoodTitle =>
       _text(_TextKey.insightFrequentMoodTitle);
@@ -3975,9 +4516,8 @@ class AppStrings {
   static String get recordedPeriod => _text(_TextKey.recordedPeriod);
   static String get predictedPeriod => _text(_TextKey.predictedPeriod);
   static String get fertileDays => _text(_TextKey.fertileDays);
-  static List<String> get calendarWeekdayInitials => isTurkish
-      ? const ['P', 'S', 'Ç', 'P', 'C', 'C', 'P']
-      : const ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  static List<String> get calendarWeekdayInitials =>
+      _list(_ListKey.calendarWeekdayInitials);
   static String get noLogsForDay => _text(_TextKey.noLogsForDay);
   static String get viewDetails => _text(_TextKey.viewDetails);
   static String get period => _text(_TextKey.period);
@@ -4282,158 +4822,236 @@ class AppStrings {
       _list(_ListKey.nutritionCravingOptions);
   static List<String> get nutritionFoodGroupOptions =>
       _list(_ListKey.nutritionFoodGroups);
-  static String get searchFoods =>
-      isTurkish ? 'Yiyecek veya kategori ara' : 'Search foods or categories';
-  static String get searchMedications => isTurkish
-      ? 'İlaç veya etken madde ara'
-      : 'Search medications or ingredients';
-  static String get searchSupplements =>
-      isTurkish ? 'Takviye ara' : 'Search supplements';
-  static String get searchSkincare =>
-      isTurkish ? 'İçerik ara' : 'Search ingredients';
-  static String get smartSearchHint => isTurkish
-      ? 'Yazdığın ürün görünmese bile doğru kategori bulunur.'
-      : 'Smart search finds the right category even when the product is hidden.';
-  static String get noSearchResults =>
-      isTurkish ? 'Eşleşen bir sonuç bulunamadı.' : 'No matching result found.';
-  static String get addSnack =>
-      isTurkish ? 'Yeni atıştırmalık ekle' : 'Add another snack';
+  static String get searchFoods => _text(_TextKey.searchFoods);
+  static String get searchMedications => _text(_TextKey.searchMedications);
+  static String get searchSupplements => _text(_TextKey.searchSupplements);
+  static String get searchSkincare => _text(_TextKey.searchSkincare);
+  static String get smartSearchHint => _text(_TextKey.smartSearchHint);
+  static String get noSearchResults => _text(_TextKey.noSearchResults);
+  static String get addSnack => _text(_TextKey.addSnack);
   static String snackNumber(int number) =>
-      isTurkish ? 'Atıştırmalık $number' : 'Snack $number';
-  static String get customFoods =>
-      isTurkish ? 'Kaydettiklerin' : 'Your saved foods';
+      _format(_TextKey.snackNumber, {'number': number});
+  static String get customFoods => _text(_TextKey.customFoods);
   static String get medicationCategories =>
-      isTurkish ? 'İlaç kategorileri' : 'Medication categories';
-  static String get supplementRoutine =>
-      isTurkish ? 'Takviye rutinin' : 'Your supplement routine';
-  static String get skincare => isTurkish ? 'Cilt bakımı' : 'Skincare';
-  static String get skincareRoutine =>
-      isTurkish ? 'Cilt bakım rutinin' : 'Your skincare routine';
-  static String get skincareQuestion => isTurkish
-      ? 'Bugün hangi aktif içerikleri kullandın?'
-      : 'Which active ingredients did you use today?';
-  static String get skincareHint => isTurkish
-      ? 'Ürün adı yerine içerikleri seç; OMA zamanla cildindeki örüntüleri takip etsin.'
-      : 'Choose ingredients instead of product names so OMA can track patterns over time.';
-  static String get medicationQuestion => isTurkish
-      ? 'Bugün hangi ilaçları kullandın?'
-      : 'Which medications did you take today?';
-  static String get supplementQuestion => isTurkish
-      ? 'Bugün hangi takviyeleri kullandın?'
-      : 'Which supplements did you take today?';
-  static String get supplementPageHint => isTurkish
-      ? 'Sık kullanılanlardan seçebilir veya kendi takviyeni ekleyebilirsin.'
-      : 'Choose a common supplement or add your own.';
-  static String get addCustomFood =>
-      isTurkish ? 'Yeni yiyecek ekle' : 'Add a new food';
-  static String get addFood => isTurkish ? 'Yemek ekle' : 'Add food';
-  static String get addCustomSupplement =>
-      isTurkish ? 'Yeni takviye ekle' : 'Add a new supplement';
-  static String get addCustomSkincare =>
-      isTurkish ? 'Yeni içerik ekle' : 'Add a new ingredient';
-  static String get createReminderShort =>
-      isTurkish ? 'Hatırlatıcı oluştur' : 'Create reminder';
-  static String get remindEveryDay =>
-      isTurkish ? 'Her gün hatırlat' : 'Remind every day';
+      _text(_TextKey.medicationCategories);
+  static String get supplementRoutine => _text(_TextKey.supplementRoutine);
+  static String get skincare => _text(_TextKey.skincare);
+  static String get skincareRoutine => _text(_TextKey.skincareRoutine);
+  static String get skincareQuestion => _text(_TextKey.skincareQuestion);
+  static String get skincareHint => _text(_TextKey.skincareHint);
+  static String get medicationQuestion => _text(_TextKey.medicationQuestion);
+  static String get supplementQuestion => _text(_TextKey.supplementQuestion);
+  static String get supplementPageHint => _text(_TextKey.supplementPageHint);
+  static String get addCustomFood => _text(_TextKey.addCustomFood);
+  static String get addFood => _text(_TextKey.addFood);
+  static String get addCustomSupplement => _text(_TextKey.addCustomSupplement);
+  static String get addCustomSkincare => _text(_TextKey.addCustomSkincare);
+  static String get createReminderShort => _text(_TextKey.createReminderShort);
+  static String get remindEveryDay => _text(_TextKey.remindEveryDay);
   static String get remindOnSelectedDays =>
-      isTurkish ? 'Seçili günlerde hatırlat' : 'Remind on selected days';
-  static String get ongoingRoutine =>
-      isTurkish ? 'Sürekli / bitiş yok' : 'Ongoing / no end date';
-  static String get medicationUsagePlanQuestion => isTurkish
-      ? 'Bu ilacı ne kadar süre kullanacaksın?'
-      : 'How long will you use this medication?';
-  static String get medicationUsagePlanHint => isTurkish
-      ? 'Kısa kür veya uzun süreli kullanım planını şimdi belirleyebilirsin. Hatırlatıcı isteğe bağlıdır.'
-      : 'You can set a short-course or long-term usage plan now. Reminders are optional.';
-  static String get setUsagePlan =>
-      isTurkish ? 'Kullanım planını belirle' : 'Set usage plan';
-  static String get savedForLater => isTurkish
-      ? 'Kaydedildi; sonraki girişlerde yeniden seçebilirsin.'
-      : 'Saved and available for future entries.';
+      _text(_TextKey.remindOnSelectedDays);
+  static String get ongoingRoutine => _text(_TextKey.ongoingRoutine);
+  static String get medicationUsagePlanQuestion =>
+      _text(_TextKey.medicationUsagePlanQuestion);
+  static String get medicationUsagePlanHint =>
+      _text(_TextKey.medicationUsagePlanHint);
+  static String get setUsagePlan => _text(_TextKey.setUsagePlan);
+  static String get savedForLater => _text(_TextKey.savedForLater);
   static String get addCustomWomenDisease =>
-      isTurkish ? 'Kadın hastalığı ekle' : 'Add a gynecological condition';
+      _text(_TextKey.addCustomWomenDisease);
   static String get addCustomChronicDisease =>
-      isTurkish ? 'Kronik hastalık ekle' : 'Add a chronic condition';
-  static String get conditionName =>
-      isTurkish ? 'Hastalık adı' : 'Condition name';
+      _text(_TextKey.addCustomChronicDisease);
+  static String get conditionName => _text(_TextKey.conditionName);
   static String pdfPageNumber(int current, int total) =>
-      isTurkish ? 'Sayfa $current / $total' : 'Page $current / $total';
-  static String get medicationsSupplementsAndSkincare => isTurkish
-      ? 'İlaç, takviye ve cilt bakımı'
-      : 'Medication, supplements and skincare';
-  static String get saveSkincare =>
-      isTurkish ? 'Cilt bakımını kaydet' : 'Save skincare';
-  static String get saveSupplement =>
-      isTurkish ? 'Takviyeyi kaydet' : 'Save supplement';
-  static String get saveMedicationAndSupplement => isTurkish
-      ? 'İlaç ve takviyeyi kaydet'
-      : 'Save medication and supplements';
-  static String get periodLogAction => isTurkish ? 'Adet gir' : 'Log period';
-  static String deletePeriodForDay(bool isToday) => isTurkish
-      ? (isToday ? 'Bugünün adet kaydını sil' : 'Bu günün adet kaydını sil')
-      : (isToday ? "Delete today's period entry" : 'Delete period entry');
+      _format(_TextKey.pdfPageNumber, {'current': current, 'total': total});
+  static String get medicationsSupplementsAndSkincare =>
+      _text(_TextKey.medicationsSupplementsAndSkincare);
+  static String get saveSkincare => _text(_TextKey.saveSkincare);
+  static String get saveSupplement => _text(_TextKey.saveSupplement);
+  static String get saveMedicationAndSupplement =>
+      _text(_TextKey.saveMedicationAndSupplement);
+  static String get periodLogAction => _text(_TextKey.periodLogAction);
+  static String deletePeriodForDay(bool isToday) =>
+      _text(isToday ? _TextKey.deleteTodayPeriod : _TextKey.deleteDayPeriod);
   static String get deletePeriodConfirmationTitle =>
-      isTurkish ? 'Adet kaydı silinsin mi?' : 'Delete period entry?';
-  static String get deletePeriodConfirmationBody => isTurkish
-      ? 'Bu güne ait adet bilgisi kaldırılacak. Diğer günlük kayıtların korunacak.'
-      : 'Period information for this day will be removed. Your other daily entries will be kept.';
-  static String get periodEntryDeleted =>
-      isTurkish ? 'Adet kaydı silindi.' : 'Period entry deleted.';
-  static String get periodDeleteFailed => isTurkish
-      ? 'Adet kaydı silinemedi. Lütfen tekrar dene.'
-      : 'The period entry could not be deleted. Please try again.';
-  static String get premiumRequired =>
-      isTurkish ? 'Premium gerekli' : 'Premium required';
-  static String get doctorReportPremiumDescription => isTurkish
-      ? 'Doktor raporunu oluşturmak ve PDF olarak paylaşmak için OMA Premium gerekir.'
-      : 'OMA Premium is required to create and share your doctor report as a PDF.';
-  static String get includeRelationshipHistoryQuestion => isTurkish
-      ? 'İlişki geçmişini rapora eklemek ister misin?'
-      : 'Would you like to include relationship history in the report?';
-  static String get includeRelationshipHistoryHint => isTurkish
-      ? 'Cinsel aktivite ve sonrasındaki hisler yalnızca onay verirsen raporda görünür.'
-      : 'Sexual activity and after-feelings appear only when you approve.';
-  static String get includeInReport =>
-      isTurkish ? 'Rapora ekle' : 'Include in report';
+      _text(_TextKey.deletePeriodConfirmationTitle);
+  static String get deletePeriodConfirmationBody =>
+      _text(_TextKey.deletePeriodConfirmationBody);
+  static String get periodEntryDeleted => _text(_TextKey.periodEntryDeleted);
+  static String get periodDeleteFailed => _text(_TextKey.periodDeleteFailed);
+  static String get premiumRequired => _text(_TextKey.premiumRequired);
+  static String get doctorReportPremiumDescription =>
+      _text(_TextKey.doctorReportPremiumDescription);
+  static String get includeRelationshipHistoryQuestion =>
+      _text(_TextKey.includeRelationshipHistoryQuestion);
+  static String get includeRelationshipHistoryHint =>
+      _text(_TextKey.includeRelationshipHistoryHint);
+  static String get includeInReport => _text(_TextKey.includeInReport);
   static String get doNotIncludeInReport =>
-      isTurkish ? 'Dahil etme' : 'Do not include';
-  static String get relationshipHistory =>
-      isTurkish ? 'İlişki geçmişi' : 'Relationship history';
+      _text(_TextKey.doNotIncludeInReport);
+  static String get relationshipHistory => _text(_TextKey.relationshipHistory);
   static String activityRecordCount(int count) =>
-      isTurkish ? 'Kaydedilen aktivite: $count' : 'Recorded activities: $count';
+      _format(_TextKey.activityRecordCount, {'count': count});
   static String get recordedActivityTypes =>
-      isTurkish ? 'Aktivite türleri' : 'Activity types';
+      _text(_TextKey.recordedActivityTypes);
   static String get recordedAfterFeelings =>
-      isTurkish ? 'Aktivite sonrası hisler' : 'After-activity feelings';
-  static String get premiumDoctorReportInsightTitle => isTurkish
-      ? 'Kayıtların doktor görüşmesine hazır'
-      : 'Your records are ready for a doctor visit';
-  static String get premiumDoctorReportInsightBody => isTurkish
-      ? 'Düzenli girişlerin anlamlı bir özet oluşturdu. OMA Premium ile doktor raporunu PDF olarak hazırlayabilirsin.'
-      : 'Your regular entries now form a useful summary. With OMA Premium, you can prepare a PDF doctor report.';
-  static String get biotinInsightTitle => isTurkish
-      ? 'Biotin bazı kan testi sonuçlarını etkileyebilir'
-      : 'Biotin may affect some blood test results';
-  static String get biotinInsightBody => isTurkish
-      ? 'Bu bilinen bir laboratuvar etkileşimidir; tek başına vücudunda bir sorun olduğu anlamına gelmez. Özellikle tiroid kan testleri için biotini en az 2 gün önce bırakman önerilir. Süre teste ve doza göre değişebileceği için kullandığın ürünü sağlık profesyoneline veya laboratuvara söyle ve onların talimatını izle.'
-      : 'This is a known laboratory interaction and does not by itself mean that something is wrong in your body. For thyroid blood tests, stopping biotin at least 2 days beforehand is recommended. Because timing can vary by test and dose, tell your clinician or laboratory which product you use and follow their instructions.';
-  static String get biotinInsightEvidence => isTurkish
-      ? 'Takviye rutininde Biotin var'
-      : 'Biotin is in your supplement routine';
-  static String get bloodTests => isTurkish ? 'Kan testleri' : 'Blood tests';
+      _text(_TextKey.recordedAfterFeelings);
+  static String get premiumDoctorReportInsightTitle =>
+      _text(_TextKey.premiumDoctorReportInsightTitle);
+  static String get premiumDoctorReportInsightBody =>
+      _text(_TextKey.premiumDoctorReportInsightBody);
+  static String get biotinInsightTitle => _text(_TextKey.biotinInsightTitle);
+  static String get biotinInsightBody => _text(_TextKey.biotinInsightBody);
+  static String get biotinInsightEvidence =>
+      _text(_TextKey.biotinInsightEvidence);
+  static String get bloodTests => _text(_TextKey.bloodTests);
+
+  // Onboarding, health details, nutrition, dreams and medication catalog.
+  // User-visible copy introduced by these flows is centralized here so views
+  // only describe layout and behavior.
+  static String get selectBirthDate => _text(_TextKey.selectBirthDate);
+  static String get bloodResults => _text(_TextKey.bloodResults);
+  static String get conditions => _text(_TextKey.conditions);
+  static String get searchConditions => _text(_TextKey.searchConditions);
+  static String get addCondition => _text(_TextKey.addCondition);
+  static String get addBirthControlMethod =>
+      _text(_TextKey.addBirthControlMethod);
+  static String get meetYouTitle => _text(_TextKey.meetYouTitle);
+  static String get meetYouSubtitle => _text(_TextKey.meetYouSubtitle);
+  static String get nameAddressHint => _text(_TextKey.nameAddressHint);
+  static String get birthDateInputHint => _text(_TextKey.birthDateInputHint);
+  static String get chooseFromCalendar => _text(_TextKey.chooseFromCalendar);
+  static String get birthDateManualEntryHint =>
+      _text(_TextKey.birthDateManualEntryHint);
+  static String get basicHealthInformationTitle =>
+      _text(_TextKey.basicHealthInformationTitle);
+  static String get basicHealthInformationSubtitle =>
+      _text(_TextKey.basicHealthInformationSubtitle);
+  static String get smokingUsage => _text(_TextKey.smokingUsage);
+  static String get centimeterUnit => _text(_TextKey.centimeterUnit);
+  static String get kilogramUnit => _text(_TextKey.kilogramUnit);
+  static String get detailedHealthInformationTitle =>
+      _text(_TextKey.detailedHealthInformationTitle);
+  static String get detailedHealthInformationSubtitle =>
+      _text(_TextKey.detailedHealthInformationSubtitle);
+  static String get bloodResultsDescription =>
+      _text(_TextKey.bloodResultsDescription);
+  static String get noBloodResultsAdded => _text(_TextKey.noBloodResultsAdded);
+  static String bloodResultsAdded(int count) => _format(
+    count == 1 ? _TextKey.bloodResultsAddedOne : _TextKey.bloodResultsAddedMany,
+    {'count': count},
+  );
+  static String get searchBloodTests => _text(_TextKey.searchBloodTests);
+  static String get knownConditionQuestion =>
+      _text(_TextKey.knownConditionQuestion);
+  static String get combinedConditionsDescription =>
+      _text(_TextKey.combinedConditionsDescription);
+  static String get noConditionSelected => _text(_TextKey.noConditionSelected);
+  static String get cycleInformation => _text(_TextKey.cycleInformation);
+  static String get laboratoryResults => _text(_TextKey.laboratoryResults);
+  static String get editLaboratoryResults =>
+      _text(_TextKey.editLaboratoryResults);
+  static String get emptyLaboratoryResultsHint =>
+      _text(_TextKey.emptyLaboratoryResultsHint);
+  static String get laboratoryEntryDisclaimer =>
+      _text(_TextKey.laboratoryEntryDisclaimer);
+  static String get searchLaboratoryValue =>
+      _text(_TextKey.searchLaboratoryValue);
+  static String get noTestDateSelected => _text(_TextKey.noTestDateSelected);
+  static String get testDetails => _text(_TextKey.testDetails);
+  static String get clearTestDate => _text(_TextKey.clearTestDate);
+  static String get fastingSampleQuestion =>
+      _text(_TextKey.fastingSampleQuestion);
+  static String get doNotKnow => _text(_TextKey.doNotKnow);
+  static String get value => _text(_TextKey.value);
+  static String laboratoryValuesEntered(int count) => _format(
+    count == 1
+        ? _TextKey.laboratoryValuesEnteredOne
+        : _TextKey.laboratoryValuesEnteredMany,
+    {'count': count},
+  );
+  static String get fasting => _text(_TextKey.fasting);
+  static String get nonFasting => _text(_TextKey.nonFasting);
+  static String get testDate => _text(_TextKey.testDate);
+  static String get fastingSample => _text(_TextKey.fastingSample);
+  static String get periodStartPredictionWindow =>
+      _text(_TextKey.periodStartPredictionWindow);
+  static String get forecastConfidenceLow =>
+      _text(_TextKey.forecastConfidenceLow);
+  static String get forecastConfidenceMedium =>
+      _text(_TextKey.forecastConfidenceMedium);
+  static String get forecastConfidenceHigh =>
+      _text(_TextKey.forecastConfidenceHigh);
+  static String periodPredictionSummary(String range, String confidence) =>
+      _format(_TextKey.periodPredictionSummary, {
+        'range': range,
+        'confidence': confidence,
+      });
+  static String get dateDisplayPattern => _text(_TextKey.dateDisplayPattern);
+  static String get dateTimeDisplayPattern =>
+      _text(_TextKey.dateTimeDisplayPattern);
+  static String get cloudSyncPrivacyNotice =>
+      _text(_TextKey.cloudSyncPrivacyNotice);
+  static String get nutritionAll => _text(_TextKey.nutritionAll);
+  static String get addAnotherCraving => _text(_TextKey.addAnotherCraving);
+  static String get customCravingQuestion =>
+      _text(_TextKey.customCravingQuestion);
+  static String get hadADream => _text(_TextKey.hadADream);
+  static String get saveYourDream => _text(_TextKey.saveYourDream);
+  static String get dreamTypeQuestion => _text(_TextKey.dreamTypeQuestion);
+  static String get goodDream => _text(_TextKey.goodDream);
+  static String get nightmare => _text(_TextKey.nightmare);
+  static String get dreamSaved => _text(_TextKey.dreamSaved);
+  static String get dreamPremiumOffer => _text(_TextKey.dreamPremiumOffer);
+  static String get explorePremium => _text(_TextKey.explorePremium);
+  static String get notNow => _text(_TextKey.notNow);
+  static String get exploreDreamInterpretation =>
+      _text(_TextKey.exploreDreamInterpretation);
+  static String get dreamPremiumDescription =>
+      _text(_TextKey.dreamPremiumDescription);
+  static String get myDreams => _text(_TextKey.myDreams);
+  static String get privateDreamJournalDescription =>
+      _text(_TextKey.privateDreamJournalDescription);
+  static String get nightmaresVisible => _text(_TextKey.nightmaresVisible);
+  static String nightmaresHidden(int count) => _format(
+    count == 1 ? _TextKey.nightmaresHiddenOne : _TextKey.nightmaresHiddenMany,
+    {'count': count},
+  );
+  static String get hideNightmares => _text(_TextKey.hideNightmares);
+  static String get showNightmares => _text(_TextKey.showNightmares);
+  static String get nightmaresCurrentlyHidden =>
+      _text(_TextKey.nightmaresCurrentlyHidden);
+  static String get noDreamSavedYet => _text(_TextKey.noDreamSavedYet);
+  static String get noDreamRecords => _text(_TextKey.noDreamRecords);
+  static String dreamRecordCount(int count) => _format(
+    count == 1 ? _TextKey.dreamRecordCountOne : _TextKey.dreamRecordCountMany,
+    {'count': count},
+  );
+  static String catalogCategoryCount(int count) => _format(
+    count == 1
+        ? _TextKey.catalogCategoryCountOne
+        : _TextKey.catalogCategoryCountMany,
+    {'count': count},
+  );
+  static String get activeIngredientOptional =>
+      _text(_TextKey.activeIngredientOptional);
+  static String get fiveMore => _text(_TextKey.fiveMore);
 
   static Map<String, List<String>> get nutritionCatalog =>
-      isTurkish ? _nutritionCatalogTr : _nutritionCatalogEn;
+      _nutritionCatalogs[_languageCode] ?? _nutritionCatalogEn;
   static Map<String, List<String>> get medicationCatalog =>
-      isTurkish ? _medicationCatalogTr : _medicationCatalogEn;
+      _medicationCatalogs[_languageCode] ?? _medicationCatalogEn;
+  static Map<String, List<String>> get medicationActiveIngredients =>
+      _medicationActiveIngredientCatalogs[_languageCode] ??
+      _medicationActiveIngredientsEn;
   static List<String> get supplementCatalog =>
-      isTurkish ? _supplementCatalogTr : _supplementCatalogEn;
+      _supplementCatalogs[_languageCode] ?? _supplementCatalogEn;
   static Map<String, List<String>> get skincareCatalog =>
-      isTurkish ? _skincareCatalogTr : _skincareCatalogEn;
-  static Map<String, String> get hiddenFoodSearchAliases =>
-      isTurkish ? _hiddenFoodAliasesTr : _hiddenFoodAliasesEn;
-  static Map<String, String> get hiddenMedicationSearchAliases =>
-      isTurkish ? _hiddenMedicationAliasesTr : _hiddenMedicationAliasesEn;
+      _skincareCatalogs[_languageCode] ?? _skincareCatalogEn;
+  static Map<String, List<String>> get hiddenFoodSearchAliases =>
+      _foodAliasCatalogs[_languageCode] ?? _hiddenFoodAliasesEn;
+  static Map<String, List<String>> get hiddenMedicationSearchAliases =>
+      _medicationAliasCatalogs[_languageCode] ?? _hiddenMedicationAliasesEn;
   static List<String> get postMealFeelingOptions =>
       _list(_ListKey.postMealFeelings);
   static List<String> get periodSymptomOptions =>
@@ -4572,11 +5190,13 @@ class AppStrings {
   static String dayCount(int count) =>
       '$count ${count == 1 ? _text(_TextKey.day) : _text(_TextKey.days)}';
 
-  static String yearsSmoking(int years) =>
-      isTurkish ? '$years yıl' : '$years ${years == 1 ? 'year' : 'years'}';
+  static String yearsSmoking(int years) => _format(
+    years == 1 ? _TextKey.yearsSmokingOne : _TextKey.yearsSmokingMany,
+    {'years': years},
+  );
 
   static String phaseAfterDays(int days, String phase) =>
-      isTurkish ? '$days gün sonra $phase' : '$phase in ${dayCount(days)}';
+      _format(_TextKey.phaseAfterDays, {'days': days, 'phase': phase});
 
   static String percentCompleted(int percent) => '$percent% $completed';
 
@@ -4637,11 +5257,15 @@ const Map<String, List<String>> _nutritionCatalogTr = {
     'Simit',
   ],
   'Glutensiz tahıllar ve nişastalı gıdalar': [
+    'Basmati pirinç',
+    'Beyaz pirinç',
+    'Esmer pirinç',
     'Karabuğday',
     'Kinoa',
     'Mısır',
     'Patates',
     'Pirinç',
+    'Pirinç pilavı',
   ],
   'Kafeinli içecekler': [
     'Enerji içeceği',
@@ -4681,8 +5305,10 @@ const Map<String, List<String>> _nutritionCatalogTr = {
     'Şekerleme',
   ],
   'Yağlar ve kızartılmış gıdalar': [
+    'Çıtır tavuk',
     'Kızarmış hamur',
     'Kızarmış tavuk',
+    'Nugget',
     'Patates kızartması',
     'Tereyağı',
     'Zeytinyağı',
@@ -4744,11 +5370,15 @@ const Map<String, List<String>> _nutritionCatalogEn = {
     'Bagel',
   ],
   'Gluten-free grains and starches': [
+    'Basmati rice',
+    'Brown rice',
     'Buckwheat',
     'Quinoa',
     'Corn',
     'Potato',
     'Rice',
+    'Rice pilaf',
+    'White rice',
   ],
   'Caffeinated drinks': [
     'Energy drink',
@@ -4788,6 +5418,8 @@ const Map<String, List<String>> _nutritionCatalogEn = {
     'Candy',
   ],
   'Fats and fried foods': [
+    'Chicken nuggets',
+    'Crispy chicken',
     'Fried dough',
     'Fried chicken',
     'French fries',
@@ -4997,6 +5629,695 @@ const Map<String, List<String>> _medicationCatalogEn = {
   ],
 };
 
+/// Etken maddeler grup içinde yaygın kullanım sırasına göre gösterilir.
+/// Liste yalnızca seçim kolaylığı sağlar; reçete veya doz önerisi değildir.
+const Map<String, List<String>> _medicationActiveIngredientsTr = {
+  'Ağrı kesici': [
+    'Parasetamol',
+    'İbuprofen',
+    'Deksketoprofen',
+    'Naproksen',
+    'Diklofenak',
+    'Asetilsalisilik asit',
+    'Flurbiprofen',
+    'Metamizol sodyum',
+    'Ketoprofen',
+    'Meloksikam',
+    'Selekoksib',
+    'Etorikoksib',
+    'Tramadol',
+    'Kodein',
+    'Morfin',
+  ],
+  'Ateş düşürücü': [
+    'Parasetamol',
+    'İbuprofen',
+    'Asetilsalisilik asit',
+    'Metamizol sodyum',
+  ],
+  'Antiinflamatuvar': [
+    'İbuprofen',
+    'Naproksen',
+    'Diklofenak',
+    'Deksketoprofen',
+    'Flurbiprofen',
+    'Meloksikam',
+    'Selekoksib',
+    'Etorikoksib',
+    'İndometazin',
+    'Piroksikam',
+  ],
+  'Kas gevşetici': [
+    'Tiyokolşikosid',
+    'Tizanidin',
+    'Baklofen',
+    'Metokarbamol',
+    'Siklobenzaprin',
+  ],
+  'Migren ilacı': [
+    'Sumatriptan',
+    'Rizatriptan',
+    'Zolmitriptan',
+    'Eletriptan',
+    'Naratriptan',
+    'Ergotamin',
+    'Ubrogepant',
+    'Rimegepant',
+  ],
+  'Antibiyotik': [
+    'Amoksisilin',
+    'Amoksisilin + klavulanik asit',
+    'Azitromisin',
+    'Sefuroksim',
+    'Siprofloksasin',
+    'Klaritromisin',
+    'Doksisiklin',
+    'Sefiksim',
+    'Metronidazol',
+    'Fosfomisin',
+    'Nitrofurantoin',
+    'Klindamisin',
+    'Levofloksasin',
+    'Trimetoprim + sülfametoksazol',
+    'Penisilin V',
+  ],
+  'Antiviral': [
+    'Asiklovir',
+    'Valasiklovir',
+    'Oseltamivir',
+    'Entekavir',
+    'Tenofovir',
+  ],
+  'Antifungal': [
+    'Flukonazol',
+    'Klotrimazol',
+    'Terbinafin',
+    'Ketokonazol',
+    'İtrakonazol',
+    'Nistatin',
+  ],
+  'Antiparaziter': [
+    'Albendazol',
+    'Mebendazol',
+    'Metronidazol',
+    'İvermektin',
+    'Pirantel pamoat',
+  ],
+  'Alerji ilacı / antihistaminik': [
+    'Setirizin',
+    'Loratadin',
+    'Desloratadin',
+    'Feksofenadin',
+    'Levocetirizin',
+    'Bilastin',
+    'Rupatadin',
+    'Klorfeniramin',
+    'Hidroksizin',
+    'Difenhidramin',
+  ],
+  'Astım ilacı': [
+    'Salbutamol',
+    'Budesonid',
+    'Formoterol',
+    'Flutikazon',
+    'Montelukast',
+    'İpratropium',
+    'Tiotropium',
+    'Salmeterol',
+  ],
+  'Öksürük ilacı': [
+    'Dekstrometorfan',
+    'Butamirat',
+    'Asetilsistein',
+    'Ambroksol',
+    'Guaifenesin',
+  ],
+  'Burun açıcı': [
+    'Psödoefedrin',
+    'Oksimetazolin',
+    'Ksilometazolin',
+    'Fenilefrin',
+  ],
+  'Soğuk algınlığı / grip ilacı': [
+    'Parasetamol',
+    'İbuprofen',
+    'Psödoefedrin',
+    'Dekstrometorfan',
+    'Klorfeniramin',
+    'Fenilefrin',
+  ],
+  'Mide koruyucu / reflü ilacı': [
+    'Pantoprazol',
+    'Esomeprazol',
+    'Omeprazol',
+    'Lansoprazol',
+    'Rabeprazol',
+    'Famotidin',
+  ],
+  'Antiasit': [
+    'Kalsiyum karbonat',
+    'Magnezyum hidroksit',
+    'Alüminyum hidroksit',
+    'Sodyum aljinat',
+  ],
+  'Bulantı / kusma ilacı': [
+    'Metoklopramid',
+    'Ondansetron',
+    'Domperidon',
+    'Dimenhidrinat',
+    'Granisetron',
+  ],
+  'Gaz / şişkinlik ilacı': ['Simetikon', 'Dimetikon', 'Aktif kömür'],
+  'Bağırsak spazmı ilacı': [
+    'Hiyosin-N-butilbromür',
+    'Mebeverin',
+    'Trimebutin',
+    'Otilonyum bromür',
+  ],
+  'İshal ilacı': [
+    'Loperamid',
+    'Diosmektit',
+    'Bizmut subsalisilat',
+    'Rasekadotril',
+  ],
+  'Kabızlık ilacı / laksatif': [
+    'Laktüloz',
+    'Polietilen glikol',
+    'Bisakodil',
+    'Sennozit',
+    'Gliserol',
+  ],
+  'Tansiyon ilacı': [
+    'Amlodipin',
+    'Ramipril',
+    'Valsartan',
+    'Losartan',
+    'Perindopril',
+    'Metoprolol',
+    'Nebivolol',
+    'Kandesartan',
+    'Lisinopril',
+    'Diltiazem',
+    'Verapamil',
+    'Hidroklorotiyazid',
+    'İndapamid',
+    'Spironolakton',
+    'Doksazosin',
+  ],
+  'Kolesterol ilacı': [
+    'Atorvastatin',
+    'Rosuvastatin',
+    'Simvastatin',
+    'Ezetimib',
+    'Fenofibrat',
+    'Pravastatin',
+  ],
+  'Kan sulandırıcı': [
+    'Apiksaban',
+    'Rivaroksaban',
+    'Varfarin',
+    'Dabigatran',
+    'Enoksaparin',
+    'Heparin',
+  ],
+  'Antiplatelet': [
+    'Asetilsalisilik asit',
+    'Klopidogrel',
+    'Tikagrelor',
+    'Prasugrel',
+  ],
+  'Kalp ritmi ilacı': [
+    'Metoprolol',
+    'Bisoprolol',
+    'Amiodaron',
+    'Diltiazem',
+    'Verapamil',
+    'Propafenon',
+  ],
+  'Kalp yetmezliği ilacı': [
+    'Bisoprolol',
+    'Metoprolol',
+    'Ramipril',
+    'Sacubitril + valsartan',
+    'Spironolakton',
+    'Dapagliflozin',
+    'Furosemid',
+  ],
+  'İdrar söktürücü / diüretik': [
+    'Furosemid',
+    'Hidroklorotiyazid',
+    'Spironolakton',
+    'İndapamid',
+    'Torasemid',
+  ],
+  'Diyabet ilacı': [
+    'Metformin',
+    'Empagliflozin',
+    'Dapagliflozin',
+    'Sitagliptin',
+    'Gliklazid',
+    'Glimepirid',
+    'Semaglutid',
+    'Dulaglutid',
+    'Liraglutid',
+    'Pioglitazon',
+  ],
+  'İnsülin': [
+    'İnsülin glarjin',
+    'İnsülin aspart',
+    'İnsülin lispro',
+    'İnsan insülini',
+    'İnsülin degludek',
+    'İnsülin detemir',
+  ],
+  'Tiroid ilacı': [
+    'Levotiroksin',
+    'Metimazol',
+    'Propiltiyourasil',
+    'Liotironin',
+  ],
+  'Kortizon / kortikosteroid': [
+    'Prednizolon',
+    'Metilprednizolon',
+    'Deksametazon',
+    'Hidrokortizon',
+    'Betametazon',
+  ],
+  'Doğum kontrol hapı': [
+    'Etinilestradiol + drospirenon',
+    'Etinilestradiol + levonorgestrel',
+    'Etinilestradiol + desogestrel',
+    'Etinilestradiol + gestoden',
+    'Drospirenon',
+    'Desogestrel',
+  ],
+  'Diğer hormonal doğum kontrol yöntemleri': [
+    'Levonorgestrel',
+    'Etonogestrel',
+    'Medroksiprogesteron asetat',
+    'Etinilestradiol + etonogestrel',
+  ],
+  'Menopoz hormon tedavisi': [
+    'Estradiol',
+    'Progesteron',
+    'Estradiol + didrogesteron',
+    'Konjuge östrojen',
+  ],
+  'Vajinal enfeksiyon ilacı': [
+    'Klotrimazol',
+    'Metronidazol',
+    'Flukonazol',
+    'Mikonazol',
+    'Nistatin',
+  ],
+  'Adet / regl şikâyetleri için kullanılan ilaçlar': [
+    'İbuprofen',
+    'Naproksen',
+    'Mefenamik asit',
+    'Traneksamik asit',
+    'Parasetamol',
+  ],
+  'Doğurganlık / fertilite ilaçları': [
+    'Klomifen',
+    'Letrozol',
+    'Follitropin alfa',
+    'Menotropin',
+    'Koriyonik gonadotropin',
+    'Progesteron',
+  ],
+  'Antidepresan': [
+    'Sertralin',
+    'Essitalopram',
+    'Fluoksetin',
+    'Venlafaksin',
+    'Duloksetin',
+    'Paroksetin',
+    'Sitalopram',
+    'Mirtazapin',
+    'Bupropion',
+    'Amitriptilin',
+    'Klomipramin',
+  ],
+  'Anksiyete ilacı': [
+    'Buspiron',
+    'Hidroksizin',
+    'Pregabalin',
+    'Alprazolam',
+    'Lorazepam',
+    'Diazepam',
+  ],
+  'Sakinleştirici': [
+    'Diazepam',
+    'Alprazolam',
+    'Lorazepam',
+    'Klonazepam',
+    'Hidroksizin',
+  ],
+  'Uyku ilacı': ['Melatonin', 'Zolpidem', 'Zopiklon', 'Doksilamin', 'Trazodon'],
+  'Duygudurum düzenleyici': [
+    'Lityum',
+    'Valproat',
+    'Lamotrijin',
+    'Karbamazepin',
+  ],
+  'Antipsikotik': [
+    'Ketiapin',
+    'Risperidon',
+    'Olanzapin',
+    'Aripiprazol',
+    'Haloperidol',
+    'Klozapin',
+  ],
+  'Epilepsi / nöbet ilacı': [
+    'Levetirasetam',
+    'Valproat',
+    'Lamotrijin',
+    'Karbamazepin',
+    'Topiramat',
+    'Okskarbazepin',
+    'Lakozamid',
+  ],
+  'DEHB ilacı': [
+    'Metilfenidat',
+    'Atomoksetin',
+    'Lisdeksamfetamin',
+    'Guanfasin',
+  ],
+  'Parkinson ilacı': [
+    'Levodopa + benserazid',
+    'Levodopa + karbidopa',
+    'Pramipeksol',
+    'Ropinirol',
+    'Rasajilin',
+  ],
+  'Demans ilacı': ['Donepezil', 'Memantin', 'Rivastigmin', 'Galantamin'],
+  'Nöropatik ağrı ilacı': [
+    'Pregabalin',
+    'Gabapentin',
+    'Duloksetin',
+    'Amitriptilin',
+    'Karbamazepin',
+  ],
+  'Romatizma ilacı': [
+    'Metotreksat',
+    'Hidroksiklorokin',
+    'Sülfasalazin',
+    'Leflunomid',
+  ],
+  'Osteoporoz ilacı': [
+    'Alendronat',
+    'Risedronat',
+    'Denosumab',
+    'Zoledronik asit',
+    'Teriparatid',
+  ],
+  'Gut ilacı': ['Allopurinol', 'Kolşisin', 'Febuksostat', 'Probenesid'],
+  'Bağışıklık baskılayıcı': [
+    'Azatioprin',
+    'Siklosporin',
+    'Takrolimus',
+    'Mikofenolat mofetil',
+    'Metotreksat',
+  ],
+  'Biyolojik ilaçlar': [
+    'Adalimumab',
+    'Etanersept',
+    'İnfliksimab',
+    'Ustekinumab',
+    'Sekukinumab',
+    'Rituksimab',
+  ],
+  'Akne ilacı': [
+    'Adapalen',
+    'Benzoil peroksit',
+    'İzotretinoin',
+    'Tretinoin',
+    'Klindamisin',
+    'Azelaik asit',
+  ],
+  'Egzama / dermatit ilacı': [
+    'Hidrokortizon',
+    'Mometazon',
+    'Takrolimus',
+    'Pimekrolimus',
+    'Betametazon',
+  ],
+  'Antifungal krem': [
+    'Klotrimazol',
+    'Terbinafin',
+    'Ketokonazol',
+    'Mikonazol',
+    'Siklopiroks',
+  ],
+  'Kortizonlu krem': [
+    'Hidrokortizon',
+    'Mometazon',
+    'Betametazon',
+    'Klobetazol',
+  ],
+  'Göz damlası': [
+    'Suni gözyaşı',
+    'Olopatadin',
+    'Timolol',
+    'Latanoprost',
+    'Moksifloksasin',
+  ],
+  'Kulak damlası': ['Siprofloksasin', 'Ofloksasin', 'Gliserol', 'Lidokain'],
+  'Ağız / boğaz ilacı': [
+    'Benzidamin',
+    'Klorheksidin',
+    'Flurbiprofen',
+    'Lidokain',
+  ],
+  'Lokal antiseptik': [
+    'Povidon iyot',
+    'Klorheksidin',
+    'Hidrojen peroksit',
+    'Oktenidin',
+  ],
+};
+
+const Map<String, List<String>> _medicationActiveIngredientsEn = {
+  'Pain reliever': [
+    'Paracetamol / acetaminophen',
+    'Ibuprofen',
+    'Dexketoprofen',
+    'Naproxen',
+    'Diclofenac',
+    'Aspirin',
+    'Flurbiprofen',
+    'Metamizole',
+    'Ketoprofen',
+    'Meloxicam',
+    'Celecoxib',
+    'Etoricoxib',
+    'Tramadol',
+    'Codeine',
+    'Morphine',
+  ],
+  'Fever reducer': [
+    'Paracetamol / acetaminophen',
+    'Ibuprofen',
+    'Aspirin',
+    'Metamizole',
+  ],
+  'Anti-inflammatory': [
+    'Ibuprofen',
+    'Naproxen',
+    'Diclofenac',
+    'Dexketoprofen',
+    'Meloxicam',
+    'Celecoxib',
+    'Etoricoxib',
+  ],
+  'Muscle relaxant': [
+    'Thiocolchicoside',
+    'Tizanidine',
+    'Baclofen',
+    'Methocarbamol',
+    'Cyclobenzaprine',
+  ],
+  'Migraine medication': [
+    'Sumatriptan',
+    'Rizatriptan',
+    'Zolmitriptan',
+    'Eletriptan',
+    'Naratriptan',
+    'Ubrogepant',
+    'Rimegepant',
+  ],
+  'Antibiotic': [
+    'Amoxicillin',
+    'Amoxicillin + clavulanic acid',
+    'Azithromycin',
+    'Cefuroxime',
+    'Ciprofloxacin',
+    'Clarithromycin',
+    'Doxycycline',
+    'Cefixime',
+    'Metronidazole',
+    'Fosfomycin',
+    'Nitrofurantoin',
+    'Clindamycin',
+    'Levofloxacin',
+    'Trimethoprim + sulfamethoxazole',
+    'Penicillin V',
+  ],
+  'Antiviral': ['Acyclovir', 'Valacyclovir', 'Oseltamivir', 'Entecavir'],
+  'Antifungal': [
+    'Fluconazole',
+    'Clotrimazole',
+    'Terbinafine',
+    'Ketoconazole',
+    'Itraconazole',
+    'Nystatin',
+  ],
+  'Allergy medicine / antihistamine': [
+    'Cetirizine',
+    'Loratadine',
+    'Desloratadine',
+    'Fexofenadine',
+    'Levocetirizine',
+    'Bilastine',
+    'Hydroxyzine',
+    'Diphenhydramine',
+  ],
+  'Asthma medication': [
+    'Salbutamol / albuterol',
+    'Budesonide',
+    'Formoterol',
+    'Fluticasone',
+    'Montelukast',
+    'Ipratropium',
+    'Tiotropium',
+  ],
+  'Acid reflux medicine': [
+    'Pantoprazole',
+    'Esomeprazole',
+    'Omeprazole',
+    'Lansoprazole',
+    'Rabeprazole',
+    'Famotidine',
+  ],
+  'Nausea / vomiting medicine': [
+    'Metoclopramide',
+    'Ondansetron',
+    'Domperidone',
+    'Dimenhydrinate',
+  ],
+  'Blood pressure medicine': [
+    'Amlodipine',
+    'Ramipril',
+    'Valsartan',
+    'Losartan',
+    'Perindopril',
+    'Metoprolol',
+    'Nebivolol',
+    'Candesartan',
+    'Lisinopril',
+    'Diltiazem',
+    'Verapamil',
+    'Hydrochlorothiazide',
+    'Indapamide',
+    'Spironolactone',
+    'Doxazosin',
+  ],
+  'Cholesterol medicine': [
+    'Atorvastatin',
+    'Rosuvastatin',
+    'Simvastatin',
+    'Ezetimibe',
+    'Fenofibrate',
+  ],
+  'Blood thinner': [
+    'Apixaban',
+    'Rivaroxaban',
+    'Warfarin',
+    'Dabigatran',
+    'Enoxaparin',
+  ],
+  'Diabetes medication': [
+    'Metformin',
+    'Empagliflozin',
+    'Dapagliflozin',
+    'Sitagliptin',
+    'Gliclazide',
+    'Glimepiride',
+    'Semaglutide',
+    'Dulaglutide',
+    'Liraglutide',
+  ],
+  'Insulin': [
+    'Insulin glargine',
+    'Insulin aspart',
+    'Insulin lispro',
+    'Human insulin',
+    'Insulin degludec',
+  ],
+  'Thyroid medication': [
+    'Levothyroxine',
+    'Methimazole',
+    'Propylthiouracil',
+    'Liothyronine',
+  ],
+  'Birth control pill': [
+    'Ethinylestradiol + drospirenone',
+    'Ethinylestradiol + levonorgestrel',
+    'Ethinylestradiol + desogestrel',
+    'Ethinylestradiol + gestodene',
+    'Drospirenone',
+    'Desogestrel',
+  ],
+  'Antidepressant': [
+    'Sertraline',
+    'Escitalopram',
+    'Fluoxetine',
+    'Venlafaxine',
+    'Duloxetine',
+    'Paroxetine',
+    'Citalopram',
+    'Mirtazapine',
+    'Bupropion',
+    'Amitriptyline',
+  ],
+  'Anxiety medication': [
+    'Buspirone',
+    'Hydroxyzine',
+    'Pregabalin',
+    'Alprazolam',
+    'Lorazepam',
+    'Diazepam',
+  ],
+  'Sleep medication': [
+    'Melatonin',
+    'Zolpidem',
+    'Zopiclone',
+    'Doxylamine',
+    'Trazodone',
+  ],
+  'ADHD medication': [
+    'Methylphenidate',
+    'Atomoxetine',
+    'Lisdexamfetamine',
+    'Guanfacine',
+  ],
+  'Neuropathic pain medication': [
+    'Pregabalin',
+    'Gabapentin',
+    'Duloxetine',
+    'Amitriptyline',
+    'Carbamazepine',
+  ],
+  'Acne medication': [
+    'Adapalene',
+    'Benzoyl peroxide',
+    'Isotretinoin',
+    'Tretinoin',
+    'Clindamycin',
+    'Azelaic acid',
+  ],
+};
+
 const List<String> _supplementCatalogTr = [
   'Magnezyum',
   'D vitamini',
@@ -5173,75 +6494,144 @@ const Map<String, List<String>> _skincareCatalogEn = {
   ],
 };
 
-const Map<String, String> _hiddenFoodAliasesTr = {
-  'nugget': 'Et ve kümes hayvanları',
-  'tavuk nugget': 'Et ve kümes hayvanları',
-  'sosis': 'Fermente, salamura, tütsülenmiş ve işlenmiş gıdalar',
-  'pastırma': 'Fermente, salamura, tütsülenmiş ve işlenmiş gıdalar',
-  'lahmacun': 'Karma yemekler ve hazır öğünler',
-  'kebap': 'Karma yemekler ve hazır öğünler',
-  'tost': 'Gluten içeren tahıllar ve hamur işleri',
-  'kruvasan': 'Gluten içeren tahıllar ve hamur işleri',
-  'yulaf': 'Gluten içeren tahıllar ve hamur işleri',
-  'ayran': 'Süt ürünleri ve peynirler',
-  'mozzarella': 'Süt ürünleri ve peynirler',
-  'avokado': 'Meyveler',
-  'kuru üzüm': 'Meyveler',
+const Map<String, List<String>> _hiddenFoodAliasesTr = {
+  'nugget': ['Yağlar ve kızartılmış gıdalar', 'Et ve kümes hayvanları'],
+  'tavuk nugget': ['Yağlar ve kızartılmış gıdalar', 'Et ve kümes hayvanları'],
+  'çıtır tavuk': ['Yağlar ve kızartılmış gıdalar', 'Et ve kümes hayvanları'],
+  'şinitzel': ['Yağlar ve kızartılmış gıdalar', 'Et ve kümes hayvanları'],
+  'sosis': [
+    'Fermente, salamura, tütsülenmiş ve işlenmiş gıdalar',
+    'Et ve kümes hayvanları',
+  ],
+  'pastırma': ['Fermente, salamura, tütsülenmiş ve işlenmiş gıdalar'],
+  'lahmacun': [
+    'Karma yemekler ve hazır öğünler',
+    'Gluten içeren tahıllar ve hamur işleri',
+  ],
+  'kebap': ['Karma yemekler ve hazır öğünler', 'Et ve kümes hayvanları'],
+  'tost': [
+    'Gluten içeren tahıllar ve hamur işleri',
+    'Süt ürünleri ve peynirler',
+  ],
+  'kruvasan': ['Gluten içeren tahıllar ve hamur işleri'],
+  'yulaf': [
+    'Gluten içeren tahıllar ve hamur işleri',
+    'Glutensiz tahıllar ve nişastalı gıdalar',
+  ],
+  'pilav': ['Glutensiz tahıllar ve nişastalı gıdalar'],
+  'pirinç': ['Glutensiz tahıllar ve nişastalı gıdalar'],
+  'risotto': [
+    'Glutensiz tahıllar ve nişastalı gıdalar',
+    'Karma yemekler ve hazır öğünler',
+  ],
+  'sushi': [
+    'Glutensiz tahıllar ve nişastalı gıdalar',
+    'Balık ve deniz ürünleri',
+  ],
+  'ayran': ['Süt ürünleri ve peynirler'],
+  'mozzarella': ['Süt ürünleri ve peynirler'],
+  'avokado': ['Meyveler', 'Yağlar ve kızartılmış gıdalar'],
+  'kuru üzüm': ['Meyveler'],
+  'falafel': ['Baklagiller', 'Yağlar ve kızartılmış gıdalar'],
+  'humus': ['Baklagiller', 'Yağlar ve kızartılmış gıdalar'],
+  'milkshake': ['Süt ürünleri ve peynirler', 'Tatlılar ve şekerli gıdalar'],
+  'cheesecake': ['Süt ürünleri ve peynirler', 'Tatlılar ve şekerli gıdalar'],
 };
 
-const Map<String, String> _hiddenFoodAliasesEn = {
-  'nugget': 'Meat and poultry',
-  'chicken nugget': 'Meat and poultry',
-  'sausage': 'Fermented, pickled, smoked and processed foods',
-  'bacon': 'Fermented, pickled, smoked and processed foods',
-  'kebab': 'Mixed dishes and ready meals',
-  'toast': 'Gluten grains and baked foods',
-  'croissant': 'Gluten grains and baked foods',
-  'oats': 'Gluten grains and baked foods',
-  'avocado': 'Fruits',
+const Map<String, List<String>> _hiddenFoodAliasesEn = {
+  'nugget': ['Fats and fried foods', 'Meat and poultry'],
+  'chicken nugget': ['Fats and fried foods', 'Meat and poultry'],
+  'crispy chicken': ['Fats and fried foods', 'Meat and poultry'],
+  'schnitzel': ['Fats and fried foods', 'Meat and poultry'],
+  'sausage': [
+    'Fermented, pickled, smoked and processed foods',
+    'Meat and poultry',
+  ],
+  'bacon': ['Fermented, pickled, smoked and processed foods'],
+  'kebab': ['Mixed dishes and ready meals', 'Meat and poultry'],
+  'toast': ['Gluten grains and baked foods', 'Dairy and cheese'],
+  'croissant': ['Gluten grains and baked foods'],
+  'oats': ['Gluten grains and baked foods', 'Gluten-free grains and starches'],
+  'pilaf': ['Gluten-free grains and starches'],
+  'rice': ['Gluten-free grains and starches'],
+  'risotto': [
+    'Gluten-free grains and starches',
+    'Mixed dishes and ready meals',
+  ],
+  'sushi': ['Gluten-free grains and starches', 'Fish and seafood'],
+  'avocado': ['Fruits', 'Fats and fried foods'],
+  'falafel': ['Legumes', 'Fats and fried foods'],
+  'hummus': ['Legumes', 'Fats and fried foods'],
+  'milkshake': ['Dairy and cheese', 'Desserts and sugary foods'],
 };
 
-const Map<String, String> _hiddenMedicationAliasesTr = {
-  'parol': 'Ağrı, Ateş ve Kas',
-  'minoset': 'Ağrı, Ateş ve Kas',
-  'majezik': 'Ağrı, Ateş ve Kas',
-  'arveles': 'Ağrı, Ateş ve Kas',
-  'augmentin': 'Enfeksiyon',
-  'amoklavin': 'Enfeksiyon',
-  'ventolin': 'Alerji ve Solunum',
-  'aerius': 'Alerji ve Solunum',
-  'nexium': 'Mide ve Bağırsak',
-  'lansor': 'Mide ve Bağırsak',
-  'beloc': 'Kalp, Tansiyon ve Dolaşım',
-  'norvasc': 'Kalp, Tansiyon ve Dolaşım',
-  'glifor': 'Diyabet ve Metabolizma',
-  'metformin': 'Diyabet ve Metabolizma',
-  'euthyrox': 'Hormonlar ve Tiroid',
-  'yasmin': 'Kadın Sağlığı ve Üreme',
-  'lustral': 'Ruh Sağlığı',
-  'prozac': 'Ruh Sağlığı',
-  'concerta': 'Sinir Sistemi',
-  'ritalin': 'Sinir Sistemi',
-  'lyrica': 'Sinir Sistemi',
-  'roaccutane': 'Cilt ve Saç',
+const Map<String, List<String>> _hiddenMedicationAliasesTr = {
+  'parol': ['Ağrı, Ateş ve Kas'],
+  'parasetamol': ['Ağrı, Ateş ve Kas'],
+  'minoset': ['Ağrı, Ateş ve Kas'],
+  'majezik': ['Ağrı, Ateş ve Kas'],
+  'flurbiprofen': ['Ağrı, Ateş ve Kas'],
+  'arveles': ['Ağrı, Ateş ve Kas'],
+  'deksketoprofen': ['Ağrı, Ateş ve Kas'],
+  'augmentin': ['Enfeksiyon'],
+  'amoklavin': ['Enfeksiyon'],
+  'amoksisilin': ['Enfeksiyon'],
+  'ventolin': ['Alerji ve Solunum'],
+  'salbutamol': ['Alerji ve Solunum'],
+  'aerius': ['Alerji ve Solunum'],
+  'desloratadin': ['Alerji ve Solunum'],
+  'nexium': ['Mide ve Bağırsak'],
+  'esomeprazol': ['Mide ve Bağırsak'],
+  'lansor': ['Mide ve Bağırsak'],
+  'beloc': ['Kalp, Tansiyon ve Dolaşım'],
+  'metoprolol': ['Kalp, Tansiyon ve Dolaşım'],
+  'norvasc': ['Kalp, Tansiyon ve Dolaşım'],
+  'amlodipin': ['Kalp, Tansiyon ve Dolaşım'],
+  'glifor': ['Diyabet ve Metabolizma'],
+  'metformin': ['Diyabet ve Metabolizma'],
+  'euthyrox': ['Hormonlar ve Tiroid'],
+  'levotiroksin': ['Hormonlar ve Tiroid'],
+  'yasmin': ['Kadın Sağlığı ve Üreme'],
+  'drospirenon': ['Kadın Sağlığı ve Üreme'],
+  'lustral': ['Ruh Sağlığı'],
+  'sertralin': ['Ruh Sağlığı'],
+  'prozac': ['Ruh Sağlığı'],
+  'fluoksetin': ['Ruh Sağlığı'],
+  'concerta': ['Sinir Sistemi'],
+  'ritalin': ['Sinir Sistemi'],
+  'metilfenidat': ['Sinir Sistemi'],
+  'lyrica': ['Sinir Sistemi'],
+  'pregabalin': ['Sinir Sistemi'],
+  'roaccutane': ['Cilt ve Saç'],
+  'izotretinoin': ['Cilt ve Saç'],
 };
 
-const Map<String, String> _hiddenMedicationAliasesEn = {
-  'tylenol': 'Pain, Fever and Muscle',
-  'ibuprofen': 'Pain, Fever and Muscle',
-  'augmentin': 'Infection',
-  'amoxicillin': 'Infection',
-  'ventolin': 'Allergy and Respiratory',
-  'claritin': 'Allergy and Respiratory',
-  'nexium': 'Stomach and Bowel',
-  'pepto bismol': 'Stomach and Bowel',
-  'norvasc': 'Heart, Blood Pressure and Circulation',
-  'metformin': 'Diabetes and Metabolism',
-  'synthroid': 'Hormones and Thyroid',
-  'yasmin': "Women's Health and Reproduction",
-  'prozac': 'Mental Health',
-  'ritalin': 'Nervous System',
-  'accutane': 'Skin and Hair',
+const Map<String, List<String>> _hiddenMedicationAliasesEn = {
+  'tylenol': ['Pain, Fever and Muscle'],
+  'acetaminophen': ['Pain, Fever and Muscle'],
+  'paracetamol': ['Pain, Fever and Muscle'],
+  'ibuprofen': ['Pain, Fever and Muscle'],
+  'augmentin': ['Infection'],
+  'amoxicillin': ['Infection'],
+  'ventolin': ['Allergy and Respiratory'],
+  'salbutamol': ['Allergy and Respiratory'],
+  'claritin': ['Allergy and Respiratory'],
+  'loratadine': ['Allergy and Respiratory'],
+  'nexium': ['Stomach and Bowel'],
+  'esomeprazole': ['Stomach and Bowel'],
+  'pepto bismol': ['Stomach and Bowel'],
+  'norvasc': ['Heart, Blood Pressure and Circulation'],
+  'amlodipine': ['Heart, Blood Pressure and Circulation'],
+  'metformin': ['Diabetes and Metabolism'],
+  'synthroid': ['Hormones and Thyroid'],
+  'levothyroxine': ['Hormones and Thyroid'],
+  'yasmin': ["Women's Health and Reproduction"],
+  'prozac': ['Mental Health'],
+  'fluoxetine': ['Mental Health'],
+  'ritalin': ['Nervous System'],
+  'methylphenidate': ['Nervous System'],
+  'accutane': ['Skin and Hair'],
+  'isotretinoin': ['Skin and Hair'],
 };
 
 class _AppStringsDelegate extends LocalizationsDelegate<AppStrings> {

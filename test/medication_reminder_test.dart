@@ -25,7 +25,9 @@ void main() {
     return MedicationReminderPlan(
       id: id,
       itemType: itemType,
-      itemName: 'Test ilacı',
+      displayName: 'Ağrı kesici - Parasetamol',
+      mainGroup: 'Ağrı kesici',
+      activeIngredient: 'Parasetamol',
       dosage: '1 Adet',
       times: times ?? const [ReminderClockTime(hour: 9, minute: 30)],
       frequency: frequency,
@@ -162,7 +164,9 @@ void main() {
 
     expect(await storage.upsertMedicationReminderPlan(reminderPlan), isTrue);
     final storedPlan = storage.loadMedicationReminderPlans().single;
-    expect(storedPlan.itemName, 'Test ilacı');
+    expect(storedPlan.displayName, 'Ağrı kesici - Parasetamol');
+    expect(storedPlan.mainGroup, 'Ağrı kesici');
+    expect(storedPlan.activeIngredient, 'Parasetamol');
     expect(storedPlan.weekdays, containsAll(<int>{1, 2, 3, 4, 5, 6, 7}));
 
     final scheduledAt = DateTime(2026, 7, 20, 9, 30);
@@ -341,7 +345,9 @@ void main() {
         id: MedicationScheduleCalculator.doseId(activePlan.id, scheduledAt),
         planId: activePlan.id,
         itemType: MedicationPlanItemType.medication,
-        itemName: activePlan.itemName,
+        displayName: activePlan.displayName,
+        mainGroup: activePlan.mainGroup,
+        activeIngredient: activePlan.activeIngredient,
         dosage: activePlan.dosage,
         scheduledAt: scheduledAt,
         notificationScheduled: true,

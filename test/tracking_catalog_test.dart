@@ -1,6 +1,7 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/constants/color_constants.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
+import 'package:app_proje_a/data/models/medication_identity_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
@@ -176,8 +177,74 @@ void main() {
     );
     await tester.pump();
 
+    expect(find.text('Yağlar ve kızartılmış gıdalar'), findsOneWidget);
     expect(find.text('Et ve kümes hayvanları'), findsOneWidget);
+    expect(find.text('Nugget'), findsOneWidget);
     expect(find.text('Tavuk'), findsOneWidget);
+  });
+
+  testWidgets('ilaç grubuna basınca etken maddeleri açar ve aramayla bulur', (
+    tester,
+  ) async {
+    String? selectedName;
+    await tester.pumpWidget(
+      _localizedApp(
+        SingleChildScrollView(
+          child: TrackingCatalogSelector(
+            searchHint: AppStrings.searchMedications,
+            categories: const {
+              'Ağrı, Ateş ve Kas': ['Ağrı kesici'],
+            },
+            itemDetails: AppStrings.medicationActiveIngredients,
+            selected: <String>{},
+            color: AppColors.medicationPrimary,
+            icon: Icons.medication_outlined,
+            onToggle: (_) {},
+            onItemSelected: (group, detail) {
+              selectedName = detail == null ? group : '$group - $detail';
+            },
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('catalog_category_Ağrı, Ateş ve Kas')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Parasetamol'), findsNothing);
+    await tester.tap(find.widgetWithText(FilterChip, 'Ağrı kesici'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Parasetamol'), findsOneWidget);
+    expect(find.text('Diklofenak'), findsOneWidget);
+    expect(find.text('Asetilsalisilik asit'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('catalog_item_Ağrı kesici')),
+        matching: find.byIcon(Icons.chevron_right_rounded),
+      ),
+      findsNothing,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('catalog_detail_more_Ağrı kesici')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Asetilsalisilik asit'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const ValueKey('catalog_detail_Ağrı kesici_Parasetamol')),
+    );
+    expect(selectedName, 'Ağrı kesici - Parasetamol');
+
+    await tester.enterText(
+      find.byKey(const ValueKey('tracking_catalog_search')),
+      'parasetamol',
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Ağrı kesici'), findsOneWidget);
+    expect(find.text('Parasetamol'), findsOneWidget);
   });
 
   testWidgets('ilac ve takviye ayni ekranda tek kayitla saklanir', (
@@ -189,7 +256,13 @@ void main() {
     final settings = UserSettings(
       isOnboardingComplete: true,
       userName: 'Test',
-      dailyMedications: const ['Ağrı kesici'],
+      dailyMedications: const [
+        MedicationIdentity(
+          displayName: 'Ağrı kesici',
+          mainGroup: 'Ağrı kesici',
+          activeIngredient: null,
+        ),
+      ],
       dailySupplements: const ['Biotin'],
     );
     await storage.saveSettings(settings);
@@ -217,6 +290,10 @@ void main() {
 
     expect(find.text(AppStrings.medicationQuestion), findsOneWidget);
     expect(find.text(AppStrings.supplementQuestion), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('catalog_category_group')),
+      findsOneWidget,
+    );
     expect(
       find.byKey(const ValueKey('tracking_catalog_add')),
       findsNWidgets(2),
@@ -247,10 +324,13 @@ void main() {
 
     expect(saved, isNotNull);
     expect(
-      saved!.medications.map((entry) => entry.name),
+      saved!.medications.map((entry) => entry.displayName),
       contains('Ağrı kesici'),
     );
-    expect(saved!.supplements.map((entry) => entry.name), contains('Biotin'));
+    expect(
+      saved!.supplements.map((entry) => entry.displayName),
+      contains('Biotin'),
+    );
     expect(
       saved!.observedSections,
       containsAll({
@@ -259,6 +339,65 @@ void main() {
       }),
     );
   });
+
+  testWidgets(
+    'etken maddeli ilaç yapısal alanlarla kaydolur ve yeniden seçilebilir',
+    (tester) async {
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+      await storage.init();
+      final settings = UserSettings(
+        isOnboardingComplete: true,
+        lastPeriodDate: DateTime.now(),
+      );
+      await storage.saveSettings(settings);
+      DailyLog? saved;
+
+      await tester.pumpWidget(
+        Provider<LocalStorageService>.value(
+          value: storage,
+          child: _localizedApp(
+            DailyLogSheet(
+              initialLog: DailyLog.empty(DateTime.now()),
+              settings: settings,
+              initialTabIndex: 4,
+              isSingleTab: true,
+              onSave: (log) async {
+                saved = log;
+                return true;
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const ValueKey('tracking_catalog_search')).first,
+        'parasetamol',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const ValueKey('catalog_detail_Ağrı kesici_Parasetamol')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(
+          FilledButton,
+          AppStrings.saveMedicationAndSupplement,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final savedMedication = saved!.medications.single;
+      expect(savedMedication.displayName, 'Ağrı kesici - Parasetamol');
+      expect(savedMedication.mainGroup, 'Ağrı kesici');
+      expect(savedMedication.activeIngredient, 'Parasetamol');
+      final storedMedication = storage.loadSettings()!.dailyMedications.single;
+      expect(storedMedication.displayName, 'Ağrı kesici - Parasetamol');
+      expect(storedMedication.mainGroup, 'Ağrı kesici');
+      expect(storedMedication.activeIngredient, 'Parasetamol');
+    },
+  );
 
   test(
     'ozel yiyecek ve cilt bakimi daha sonraki kayitlar icin saklanir',

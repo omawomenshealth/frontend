@@ -3,6 +3,7 @@ import 'package:app_proje_a/core/constants/color_constants.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/models/lab_result_model.dart';
+import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
@@ -47,6 +48,14 @@ void main() {
         lastPeriodDate: DateTime.now().subtract(const Duration(days: 13)),
       ),
     );
+    await storage.saveDailyLog(
+      DailyLog(
+        date: DateTime.now(),
+        dreamRemembered: true,
+        dreamType: DreamType.good,
+        dreamNote: 'Uçtuğumu gördüm.',
+      ),
+    );
     final api = ApiService(storage);
     final sync = SyncService(storage, api);
     final notifications = NotificationService();
@@ -85,6 +94,8 @@ void main() {
     expect(find.text('Şu anki modun'), findsOneWidget);
     expect(find.text('Döngü takibim'), findsOneWidget);
     expect(find.text('OMA Premium'), findsOneWidget);
+    expect(find.text('Rüyalarım'), findsOneWidget);
+    expect(find.text('1 rüya kaydı'), findsOneWidget);
     expect(find.text('HbA1c'), findsOneWidget);
     expect(find.text('42 mmol/mol'), findsOneWidget);
     expect(find.text('Ferritin'), findsOneWidget);
@@ -146,11 +157,17 @@ void main() {
     await tester.tap(womenHealth);
     await tester.pumpAndSettle();
     expect(
-      find.byKey(const ValueKey('profile_add_women_disease')),
+      find.byKey(const ValueKey('profile_add_birth_control')),
       findsOneWidget,
     );
-    expect(find.text(AppStrings.womenDiseases), findsWidgets);
     final womenSheet = find.byKey(const ValueKey('profile_edit_sheet'));
+    expect(
+      find.descendant(
+        of: womenSheet,
+        matching: find.text(AppStrings.womenDiseases),
+      ),
+      findsNothing,
+    );
     for (final hiddenField in [
       AppStrings.menstrualCycleLength,
       AppStrings.periodLength,

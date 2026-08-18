@@ -516,13 +516,13 @@ class DoctorReportView extends StatelessWidget {
                       final activeMeds = log.medications
                           .map(
                             (m) =>
-                                '${m.name} (${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
+                                '${m.displayName} (${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
                           )
                           .toList();
                       final activeSups = log.supplements
                           .map(
                             (s) =>
-                                '${s.name} (${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
+                                '${s.displayName} (${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
                           )
                           .toList();
                       final all = [
@@ -856,13 +856,13 @@ class DoctorReportView extends StatelessWidget {
               final activeMeds = log.medications
                   .map(
                     (m) =>
-                        '${m.name}(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
+                        '${m.displayName}(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
                   )
                   .toList();
               final activeSups = log.supplements
                   .map(
                     (s) =>
-                        '${s.name}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
+                        '${s.displayName}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
                   )
                   .toList();
               final all = [
@@ -1131,13 +1131,13 @@ class DoctorReportView extends StatelessWidget {
                 final activeMeds = log.medications
                     .map(
                       (m) =>
-                          '${m.name}(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
+                          '${m.displayName}(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
                     )
                     .toList();
                 final activeSups = log.supplements
                     .map(
                       (s) =>
-                          '${s.name}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
+                          '${s.displayName}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
                     )
                     .toList();
                 final all = [
@@ -1201,17 +1201,13 @@ String _formatLaboratoryResults(UserSettings settings) {
   final lines = <String>[];
   if (settings.labTestDate != null) {
     lines.add(
-      '${AppStrings.isTurkish ? 'Test tarihi' : 'Test date'}: '
+      '${AppStrings.testDate}: '
       '${settings.labTestDate!.toDotFormat()}',
     );
   }
   if (settings.labTestFasting != null) {
-    final fasting = settings.labTestFasting!
-        ? (AppStrings.isTurkish ? 'Evet' : 'Yes')
-        : (AppStrings.isTurkish ? 'Hayır' : 'No');
-    lines.add(
-      '${AppStrings.isTurkish ? 'Açlık numunesi' : 'Fasting sample'}: $fasting',
-    );
+    final fasting = settings.labTestFasting! ? AppStrings.yes : AppStrings.no;
+    lines.add('${AppStrings.fastingSample}: $fasting');
   }
   final structured = LabTestCatalog.formatResults(
     settings.labResults,

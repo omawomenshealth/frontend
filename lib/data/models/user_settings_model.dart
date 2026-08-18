@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../core/utils/cycle_rules.dart';
 import 'lab_result_model.dart';
+import 'medication_identity_model.dart';
 
 /// Menopoz durumu.
 enum MenopauseStatus { none, pre, peri, post }
@@ -65,7 +66,7 @@ class UserSettings {
   final List<String> womenDiseases;
 
   // İlaç ve takviye
-  final List<String> dailyMedications;
+  final List<MedicationIdentity> dailyMedications;
   final List<String> dailySupplements;
   final List<String> dailySkincare;
 
@@ -122,7 +123,7 @@ class UserSettings {
     MenopauseStatus? menopauseStatus,
     String? birthControlMethod,
     List<String>? womenDiseases,
-    List<String>? dailyMedications,
+    List<MedicationIdentity>? dailyMedications,
     List<String>? dailySupplements,
     List<String>? dailySkincare,
     bool? notificationsEnabled,
@@ -183,7 +184,9 @@ class UserSettings {
       'menopauseStatus': menopauseStatus.name,
       'birthControlMethod': birthControlMethod,
       'womenDiseases': womenDiseases,
-      'dailyMedications': dailyMedications,
+      'dailyMedications': dailyMedications
+          .map((medication) => medication.toJson())
+          .toList(),
       'dailySupplements': dailySupplements,
       'dailySkincare': dailySkincare,
       'notificationsEnabled': notificationsEnabled,
@@ -251,9 +254,13 @@ class UserSettings {
       womenDiseases: List<String>.from(
         json['womenDiseases'] as List? ?? const [],
       ),
-      dailyMedications: List<String>.from(
-        json['dailyMedications'] as List? ?? const [],
-      ),
+      dailyMedications: (json['dailyMedications'] as List? ?? const [])
+          .map(
+            (medication) => MedicationIdentity.fromJson(
+              Map<String, dynamic>.from(medication as Map),
+            ),
+          )
+          .toList(),
       dailySupplements: List<String>.from(
         json['dailySupplements'] as List? ?? const [],
       ),

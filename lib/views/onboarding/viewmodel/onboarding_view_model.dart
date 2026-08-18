@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/models/lab_result_model.dart';
+import '../../../data/models/medication_identity_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/sync_service.dart';
 import '../../../core/utils/cycle_rules.dart';
@@ -18,7 +19,7 @@ class OnboardingViewModel extends ChangeNotifier {
   int get currentPage => _currentPage;
 
   // Toplam sayfa sayısı cinsiyete göre değişir
-  int get totalPages => 4;
+  int get totalPages => 3;
 
   // ── Form verileri ─────────────────────────────────────
   String _userName = '';
@@ -27,6 +28,7 @@ class OnboardingViewModel extends ChangeNotifier {
   double? _weight;
   double? _height;
   int? _age;
+  DateTime? _birthDate;
   String _relationshipStatus = AppStrings.relationshipStatusOptions.last;
   bool? _sexuallyActive;
   bool? _wantsChildrenInYear;
@@ -45,7 +47,7 @@ class OnboardingViewModel extends ChangeNotifier {
   List<String> _womenDiseases = [];
 
   // İlaç & Takviye
-  List<String> _dailyMedications = [];
+  List<MedicationIdentity> _dailyMedications = [];
   List<String> _dailySupplements = [];
 
   bool _isSaving = false;
@@ -58,6 +60,7 @@ class OnboardingViewModel extends ChangeNotifier {
   double? get weight => _weight;
   double? get height => _height;
   int? get age => _age;
+  DateTime? get birthDate => _birthDate;
   String get relationshipStatus => _relationshipStatus;
   bool? get sexuallyActive => _sexuallyActive;
   bool? get wantsChildrenInYear => _wantsChildrenInYear;
@@ -72,7 +75,9 @@ class OnboardingViewModel extends ChangeNotifier {
   MenopauseStatus get menopauseStatus => _menopauseStatus;
   String? get birthControlMethod => _birthControlMethod;
   List<String> get womenDiseases => _womenDiseases;
-  List<String> get dailyMedications => _dailyMedications;
+  List<String> get knownDiseases =>
+      {..._chronicDiseases, ..._womenDiseases}.toList(growable: false);
+  List<MedicationIdentity> get dailyMedications => _dailyMedications;
   List<String> get dailySupplements => _dailySupplements;
 
   // ── Setter'lar ────────────────────────────────────────
@@ -109,6 +114,22 @@ class OnboardingViewModel extends ChangeNotifier {
   void setAge(int? value) {
     _age = value;
     // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
+  }
+
+  void setBirthDate(DateTime? value) {
+    _birthDate = value;
+    if (value == null) {
+      _age = null;
+    } else {
+      final today = DateTime.now();
+      var years = today.year - value.year;
+      if (today.month < value.month ||
+          today.month == value.month && today.day < value.day) {
+        years--;
+      }
+      _age = years < 0 ? null : years;
+    }
+    notifyListeners();
   }
 
   void setRelationshipStatus(String value) {
@@ -210,21 +231,46 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleKnownDisease(String disease) {
+    final diseases = List<String>.from(knownDiseases);
+    final existingIndex = diseases.indexWhere(
+      (value) =>
+          AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
+          disease.trim().toLowerCase(),
+    );
+    if (existingIndex >= 0) {
+      diseases.removeAt(existingIndex);
+    } else {
+      diseases.add(disease);
+    }
+    _chronicDiseases = diseases;
+    _womenDiseases = [];
+    notifyListeners();
+  }
+
+  void addKnownDisease(String disease) {
+    final value = disease.trim();
+    if (value.isEmpty || _containsCondition(knownDiseases, value)) return;
+    _chronicDiseases = [...knownDiseases, value];
+    _womenDiseases = [];
+    notifyListeners();
+  }
+
   bool _containsCondition(List<String> values, String candidate) => values.any(
     (value) =>
         AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
         candidate.toLowerCase(),
   );
 
-  void addMedication(String name) {
-    if (name.isNotEmpty && !_dailyMedications.contains(name)) {
-      _dailyMedications = List.from(_dailyMedications)..add(name);
+  void addMedication(MedicationIdentity medication) {
+    if (!_dailyMedications.contains(medication)) {
+      _dailyMedications = List.from(_dailyMedications)..add(medication);
       notifyListeners();
     }
   }
 
-  void removeMedication(String name) {
-    _dailyMedications = List.from(_dailyMedications)..remove(name);
+  void removeMedication(MedicationIdentity medication) {
+    _dailyMedications = List.from(_dailyMedications)..remove(medication);
     notifyListeners();
   }
 
@@ -280,17 +326,17 @@ class OnboardingViewModel extends ChangeNotifier {
       age: _age,
       relationshipStatus: _relationshipStatus,
       sexuallyActive: _sexuallyActive,
-      wantsChildrenInYear: _wantsChildrenInYear,
+      wantsChildrenInYear: null,
       labResults: _labResults,
       labTestDate: _labTestDate,
       labTestFasting: _labTestFasting,
-      chronicDiseases: _chronicDiseases,
+      chronicDiseases: knownDiseases,
       averageCycleLength: _averageCycleLength,
       averagePeriodLength: _averagePeriodLength,
       lastPeriodDate: _lastPeriodDate,
       menopauseStatus: _menopauseStatus,
       birthControlMethod: _birthControlMethod,
-      womenDiseases: _womenDiseases,
+      womenDiseases: const [],
       dailyMedications: _dailyMedications,
       dailySupplements: _dailySupplements,
     );

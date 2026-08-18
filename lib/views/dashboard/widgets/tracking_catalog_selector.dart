@@ -7,7 +7,8 @@ import '../../../core/constants/color_constants.dart';
 class TrackingCatalogSelector extends StatefulWidget {
   final String searchHint;
   final Map<String, List<String>> categories;
-  final Map<String, String> hiddenAliases;
+  final Map<String, List<String>> hiddenAliases;
+  final Map<String, List<String>> itemDetails;
   final Set<String> selected;
   final List<String> customItems;
   final Color color;
@@ -17,7 +18,10 @@ class TrackingCatalogSelector extends StatefulWidget {
   final VoidCallback? onReminder;
   final bool showSmartSearchHint;
   final bool showAddInCategories;
+  final bool groupCategoriesInContainer;
+  final String? categoryGroupTitle;
   final String? addLabel;
+  final void Function(String item, String? detail)? onItemSelected;
 
   const TrackingCatalogSelector({
     super.key,
@@ -28,12 +32,16 @@ class TrackingCatalogSelector extends StatefulWidget {
     required this.icon,
     required this.onToggle,
     this.hiddenAliases = const {},
+    this.itemDetails = const {},
     this.customItems = const [],
     this.onAdd,
     this.onReminder,
     this.showSmartSearchHint = true,
     this.showAddInCategories = false,
+    this.groupCategoriesInContainer = false,
+    this.categoryGroupTitle,
     this.addLabel,
+    this.onItemSelected,
   });
 
   @override
@@ -44,6 +52,9 @@ class TrackingCatalogSelector extends StatefulWidget {
 class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
   final _searchController = TextEditingController();
   final _expanded = <String>{};
+  final _expandedItems = <String>{};
+  final _visibleDetailCounts = <String, int>{};
+  var _categoryGroupExpanded = false;
 
   @override
   void dispose() {
@@ -174,6 +185,8 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
         const SizedBox(height: 18),
         if (categories.isEmpty && savedCustomItems.isEmpty)
           _EmptyResult(color: widget.color)
+        else if (widget.groupCategoriesInContainer && query.isEmpty)
+          _buildCategoryGroup(categories)
         else
           for (final entry in categories.entries) ...[
             _buildCategory(entry, forceExpanded: query.isNotEmpty),
@@ -226,14 +239,20 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
     if (query.isEmpty) return widget.categories;
     final aliasTargets = widget.hiddenAliases.entries
         .where((entry) => _normalize(entry.key).contains(query))
-        .map((entry) => entry.value)
+        .expand((entry) => entry.value)
         .toSet();
     final filtered = <String, List<String>>{};
     for (final entry in widget.categories.entries) {
       final categoryMatches = _normalize(entry.key).contains(query);
       final aliasMatches = aliasTargets.contains(entry.key);
       final matchingItems = entry.value
-          .where((item) => _normalize(item).contains(query))
+          .where(
+            (item) =>
+                _normalize(item).contains(query) ||
+                (widget.itemDetails[item] ?? const <String>[]).any(
+                  (detail) => _normalize(detail).contains(query),
+                ),
+          )
           .toList(growable: false);
       if (categoryMatches || aliasMatches) {
         filtered[entry.key] = entry.value;
@@ -244,11 +263,103 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
     return filtered;
   }
 
+  Widget _buildCategoryGroup(Map<String, List<String>> categories) {
+    return AnimatedContainer(
+      key: const ValueKey('catalog_category_group'),
+      duration: const Duration(milliseconds: 180),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: widget.color.withValues(alpha: 0.34)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              key: const ValueKey('catalog_category_group_toggle'),
+              onTap: () => setState(
+                () => _categoryGroupExpanded = !_categoryGroupExpanded,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 13, 11, 13),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: widget.color.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(widget.icon, size: 19, color: widget.color),
+                    ),
+                    const SizedBox(width: 11),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.categoryGroupTitle ??
+                                AppStrings.medicationCategories,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            AppStrings.catalogCategoryCount(categories.length),
+                            style: const TextStyle(
+                              fontSize: 10.5,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    AnimatedRotation(
+                      turns: _categoryGroupExpanded ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 180),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: widget.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            child: _categoryGroupExpanded
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                    child: Column(
+                      children: [
+                        for (final entry in categories.entries) ...[
+                          _buildCategory(entry, forceExpanded: false),
+                          if (entry.key != categories.keys.last)
+                            const SizedBox(height: 8),
+                        ],
+                      ],
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCategory(
     MapEntry<String, List<String>> entry, {
     required bool forceExpanded,
   }) {
-    final selectedCount = entry.value.where(widget.selected.contains).length;
+    final selectedCount = entry.value.where(_isItemSelected).length;
     final expanded = forceExpanded || _expanded.contains(entry.key);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
@@ -343,21 +454,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                           runSpacing: 7,
                           children: [
                             for (final item in entry.value)
-                              FilterChip(
-                                key: ValueKey('catalog_item_$item'),
-                                label: Text(item),
-                                selected: widget.selected.contains(item),
-                                selectedColor: widget.color.withValues(
-                                  alpha: 0.13,
-                                ),
-                                checkmarkColor: widget.color,
-                                side: BorderSide(
-                                  color: widget.selected.contains(item)
-                                      ? widget.color
-                                      : AppColors.outline,
-                                ),
-                                onSelected: (_) => widget.onToggle(item),
-                              ),
+                              _buildCatalogItem(item),
                           ],
                         ),
                         if (widget.showAddInCategories &&
@@ -382,6 +479,167 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
         ],
       ),
     );
+  }
+
+  Widget _buildCatalogItem(String item) {
+    final details = widget.itemDetails[item] ?? const <String>[];
+    final selected = _isItemSelected(item);
+    final expanded =
+        _expandedItems.contains(item) ||
+        (_normalize(_searchController.text).isNotEmpty &&
+            details.any(
+              (detail) => _normalize(
+                detail,
+              ).contains(_normalize(_searchController.text)),
+            ));
+
+    if (details.isEmpty) {
+      return FilterChip(
+        key: ValueKey('catalog_item_$item'),
+        label: Text(item),
+        selected: selected,
+        selectedColor: widget.color.withValues(alpha: 0.13),
+        checkmarkColor: widget.color,
+        side: BorderSide(color: selected ? widget.color : AppColors.outline),
+        onSelected: (_) => widget.onToggle(item),
+      );
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilterChip(
+              key: ValueKey('catalog_item_$item'),
+              label: Text(item),
+              selected: selected,
+              selectedColor: widget.color.withValues(alpha: 0.13),
+              checkmarkColor: widget.color,
+              side: BorderSide(
+                color: selected ? widget.color : AppColors.outline,
+              ),
+              onSelected: (_) {
+                if (!selected) {
+                  (widget.onItemSelected ?? _defaultItemSelection)(item, null);
+                }
+                setState(() {
+                  if (!_expandedItems.remove(item)) _expandedItems.add(item);
+                  _visibleDetailCounts.putIfAbsent(item, () => 5);
+                });
+              },
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            child: expanded
+                ? _buildItemDetails(item, details)
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemDetails(String item, List<String> details) {
+    final query = _normalize(_searchController.text);
+    final filtered = query.isEmpty
+        ? details
+        : details
+              .where((detail) => _normalize(detail).contains(query))
+              .toList(growable: false);
+    final visibleCount = (_visibleDetailCounts[item] ?? 5).clamp(5, 15);
+    final maximumVisible = details.length.clamp(0, 15);
+    final visible = query.isEmpty
+        ? filtered.take(visibleCount).toList(growable: false)
+        : filtered;
+    final selectedDetail = _selectedDetail(item);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 7, 0, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.activeIngredientOptional,
+            style: TextStyle(
+              color: widget.color,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (final detail in visible)
+                ChoiceChip(
+                  key: ValueKey('catalog_detail_${item}_$detail'),
+                  label: Text(detail),
+                  selected: selectedDetail == detail,
+                  selectedColor: widget.color.withValues(alpha: 0.15),
+                  side: BorderSide(
+                    color: selectedDetail == detail
+                        ? widget.color
+                        : AppColors.outline,
+                  ),
+                  onSelected: (_) =>
+                      (widget.onItemSelected ?? _defaultItemSelection)(
+                        item,
+                        selectedDetail == detail ? null : detail,
+                      ),
+                ),
+              if (query.isEmpty && visible.length < maximumVisible)
+                ActionChip(
+                  key: ValueKey('catalog_detail_more_$item'),
+                  avatar: Icon(
+                    Icons.add_rounded,
+                    size: 17,
+                    color: widget.color,
+                  ),
+                  label: Text(
+                    AppStrings.fiveMore,
+                    style: TextStyle(color: widget.color),
+                  ),
+                  side: BorderSide(color: widget.color.withValues(alpha: 0.42)),
+                  onPressed: () => setState(() {
+                    _visibleDetailCounts[item] = (visibleCount + 5)
+                        .clamp(5, 15)
+                        .toInt();
+                  }),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _isItemSelected(String item) => widget.selected.any(
+    (value) => value == item || value.startsWith('$item - '),
+  );
+
+  String? _selectedDetail(String item) {
+    final prefix = '$item - ';
+    for (final value in widget.selected) {
+      if (value.startsWith(prefix)) return value.substring(prefix.length);
+    }
+    return null;
+  }
+
+  void _defaultItemSelection(String item, String? detail) {
+    final current = widget.selected
+        .where((value) => value == item || value.startsWith('$item - '))
+        .toList(growable: false);
+    for (final value in current) {
+      widget.onToggle(value);
+    }
+    widget.onToggle(detail == null ? item : '$item - $detail');
   }
 
   String _normalize(String value) => value

@@ -266,7 +266,9 @@ void main() {
 
   test('ilaç kutuları gerçek plan olmadan uyum oranı üretmez', () {
     MedicationEntry medication(bool taken) => MedicationEntry(
-      name: 'Test ilacı',
+      displayName: 'Ağrı kesici - Parasetamol',
+      mainGroup: 'Ağrı kesici',
+      activeIngredient: 'Parasetamol',
       times: const {'Sabah'},
       stomachState: 'Tok',
       takenDoseCount: taken ? 1 : 0,
@@ -294,7 +296,9 @@ void main() {
         id: id,
         planId: 'plan-1',
         itemType: MedicationPlanItemType.medication,
-        itemName: 'Test ilacı',
+        displayName: 'Ağrı kesici - Parasetamol',
+        mainGroup: 'Ağrı kesici',
+        activeIngredient: 'Parasetamol',
         dosage: '1 Adet',
         scheduledAt: DateTime(2026, 7, 1, 9),
         notificationScheduled: true,

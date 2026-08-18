@@ -79,15 +79,11 @@ class ProfileView extends StatelessWidget {
                         ),
                         const SizedBox(height: 30),
                         _SectionTitle(
-                          text: AppStrings.isTurkish
-                              ? 'Laboratuvar değerleri'
-                              : 'Laboratory results',
+                          text: AppStrings.laboratoryResults,
                           trailing: _RoundIconButton(
                             icon: Icons.edit_outlined,
                             accent: accent,
-                            tooltip: AppStrings.isTurkish
-                                ? 'Laboratuvar değerlerini düzenle'
-                                : 'Edit laboratory results',
+                            tooltip: AppStrings.editLaboratoryResults,
                             compact: true,
                             onTap: () => _mechanics._showLabResultsSheet(
                               context,
@@ -124,6 +120,12 @@ class ProfileView extends StatelessWidget {
                           onEditMedication: () =>
                               _mechanics._showMedicationSheet(context, profile),
                           onDoctorReport: () => _openDoctorReport(context),
+                          onDreams: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DreamsView(),
+                            ),
+                          ),
                           onPrivacy: () =>
                               Navigator.of(context).pushNamed('/privacy'),
                           onHelp: () => _showHelpDialog(context),
@@ -738,7 +740,6 @@ class _LabResultsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTurkish = AppStrings.isTurkish;
     final availableDefinitions = LabTestCatalog.definitions.where((definition) {
       final result = settings.labResults[definition.id];
       return result != null && result.value.trim().isNotEmpty;
@@ -774,9 +775,7 @@ class _LabResultsCard extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          isTurkish
-                              ? 'Sonuç eklemek için dokunun. Tüm alanlar isteğe bağlıdır.'
-                              : 'Tap to add results. Every field is optional.',
+                          AppStrings.emptyLaboratoryResultsHint,
                           style: const TextStyle(
                             fontFamily: 'Karla',
                             fontSize: 12,
@@ -807,8 +806,8 @@ class _LabResultsCard extends StatelessWidget {
                       _LabMetaChip(
                         icon: Icons.restaurant_outlined,
                         label: settings.labTestFasting!
-                            ? (isTurkish ? 'Açlık' : 'Fasting')
-                            : (isTurkish ? 'Tokluk' : 'Non-fasting'),
+                            ? AppStrings.fasting
+                            : AppStrings.nonFasting,
                         accent: accent,
                       ),
                   ],
@@ -1166,6 +1165,7 @@ class _AccountCard extends StatelessWidget {
   final VoidCallback onEditProfile;
   final VoidCallback onEditMedication;
   final VoidCallback onDoctorReport;
+  final VoidCallback onDreams;
   final VoidCallback onPrivacy;
   final VoidCallback onHelp;
 
@@ -1175,6 +1175,7 @@ class _AccountCard extends StatelessWidget {
     required this.onEditProfile,
     required this.onEditMedication,
     required this.onDoctorReport,
+    required this.onDreams,
     required this.onPrivacy,
     required this.onHelp,
   });
@@ -1191,6 +1192,11 @@ class _AccountCard extends StatelessWidget {
         settings.dailyMedications.length +
         settings.dailySupplements.length +
         settings.dailySkincare.length;
+    final dreamCount = context
+        .read<LocalStorageService>()
+        .loadAllLogs()
+        .where((log) => log.dreamNote?.trim().isNotEmpty ?? false)
+        .length;
 
     return _SurfaceCard(
       child: Column(
@@ -1221,6 +1227,15 @@ class _AccountCard extends StatelessWidget {
                 : AppStrings.premiumRequired,
             accent: accent,
             onTap: onDoctorReport,
+          ),
+          _AccountRow(
+            icon: Icons.nights_stay_outlined,
+            title: AppStrings.myDreams,
+            subtitle: dreamCount == 0
+                ? AppStrings.noDreamRecords
+                : AppStrings.dreamRecordCount(dreamCount),
+            accent: accent,
+            onTap: onDreams,
           ),
           _AccountRow(
             icon: Icons.shield_outlined,

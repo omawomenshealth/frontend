@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/models/lab_result_model.dart';
+import '../../../data/models/medication_identity_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/notification_service.dart';
@@ -34,6 +35,10 @@ class ProfileViewModel extends ChangeNotifier {
   bool get isSyncing => _isSyncing;
   bool get isDeletingAccount => _isDeletingAccount;
   String? get syncError => _syncError;
+  List<String> get knownDiseases => {
+    ..._settings.chronicDiseases,
+    ..._settings.womenDiseases,
+  }.toList(growable: false);
 
   // ── Kimlik Doğrulama & Senkronizasyon ──────────────────
   bool get isLoggedIn => _storage.isUserLoggedIn;
@@ -45,9 +50,7 @@ class ProfileViewModel extends ChangeNotifier {
     if (timeStr == null) return AppStrings.neverSynced;
     try {
       final dt = DateTime.parse(timeStr);
-      return DateFormat(
-        AppStrings.isTurkish ? 'dd.MM.yyyy HH:mm' : 'MM/dd/yyyy h:mm a',
-      ).format(dt);
+      return DateFormat(AppStrings.dateTimeDisplayPattern).format(dt);
     } catch (_) {
       return AppStrings.unknown;
     }
@@ -283,6 +286,35 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleKnownDisease(String disease) {
+    final diseases = List<String>.from(knownDiseases);
+    final existingIndex = diseases.indexWhere(
+      (value) =>
+          AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
+          disease.trim().toLowerCase(),
+    );
+    if (existingIndex >= 0) {
+      diseases.removeAt(existingIndex);
+    } else {
+      diseases.add(disease);
+    }
+    _settings = _settings.copyWith(
+      chronicDiseases: diseases,
+      womenDiseases: const [],
+    );
+    notifyListeners();
+  }
+
+  void addKnownDisease(String disease) {
+    final value = disease.trim();
+    if (value.isEmpty || _containsCondition(knownDiseases, value)) return;
+    _settings = _settings.copyWith(
+      chronicDiseases: [...knownDiseases, value],
+      womenDiseases: const [],
+    );
+    notifyListeners();
+  }
+
   bool _containsCondition(List<String> values, String candidate) => values.any(
     (value) =>
         AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
@@ -291,16 +323,18 @@ class ProfileViewModel extends ChangeNotifier {
 
   // ── İlaç & Takviye ──────────────────────────────────
 
-  void addMedication(String name) {
-    if (name.isNotEmpty && !_settings.dailyMedications.contains(name)) {
-      final meds = List<String>.from(_settings.dailyMedications)..add(name);
+  void addMedication(MedicationIdentity medication) {
+    if (!_settings.dailyMedications.contains(medication)) {
+      final meds = List<MedicationIdentity>.from(_settings.dailyMedications)
+        ..add(medication);
       _settings = _settings.copyWith(dailyMedications: meds);
       notifyListeners();
     }
   }
 
-  void removeMedication(String name) {
-    final meds = List<String>.from(_settings.dailyMedications)..remove(name);
+  void removeMedication(MedicationIdentity medication) {
+    final meds = List<MedicationIdentity>.from(_settings.dailyMedications)
+      ..remove(medication);
     _settings = _settings.copyWith(dailyMedications: meds);
     notifyListeners();
   }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../data/models/medication_identity_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/notification_service.dart';
@@ -188,7 +189,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${dose.itemName} • ${dose.dosage}',
+                  '${dose.displayName} • ${dose.dosage}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -266,6 +267,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
 class MedicationReminderSection extends StatefulWidget {
   final MedicationPlanItemType itemType;
   final List<String> availableItems;
+  final Map<String, MedicationIdentity> itemIdentities;
   final Color color;
   final VoidCallback? onChanged;
 
@@ -273,6 +275,7 @@ class MedicationReminderSection extends StatefulWidget {
     super.key,
     required this.itemType,
     required this.availableItems,
+    this.itemIdentities = const {},
     required this.color,
     this.onChanged,
   });
@@ -320,6 +323,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
         child: MedicationReminderFormSheet(
           itemType: widget.itemType,
           availableItems: widget.availableItems,
+          itemIdentities: widget.itemIdentities,
           existing: existing,
         ),
       ),
@@ -362,7 +366,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(AppStrings.delete),
-        content: Text(AppStrings.reminderDeleteQuestion(plan.itemName)),
+        content: Text(AppStrings.reminderDeleteQuestion(plan.displayName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -515,7 +519,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${plan.itemName} • ${plan.dosage}',
+                  '${plan.displayName} • ${plan.dosage}',
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -572,6 +576,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
 class MedicationReminderFormSheet extends StatefulWidget {
   final MedicationPlanItemType itemType;
   final List<String> availableItems;
+  final Map<String, MedicationIdentity> itemIdentities;
   final MedicationReminderPlan? existing;
   final String? initialItemName;
   final String? initialDosage;
@@ -581,6 +586,7 @@ class MedicationReminderFormSheet extends StatefulWidget {
     super.key,
     required this.itemType,
     required this.availableItems,
+    this.itemIdentities = const {},
     this.existing,
     this.initialItemName,
     this.initialDosage,
@@ -627,8 +633,8 @@ class _MedicationReminderFormSheetState
         .where((item) => item.trim().isNotEmpty)
         .toSet()
         .toList();
-    if (existing != null && !_itemOptions.contains(existing.itemName)) {
-      _itemOptions.add(existing.itemName);
+    if (existing != null && !_itemOptions.contains(existing.displayName)) {
+      _itemOptions.add(existing.displayName);
     }
     final initialItemName = widget.initialItemName?.trim();
     if (existing == null &&
@@ -640,7 +646,7 @@ class _MedicationReminderFormSheetState
     _itemOptions.sort();
     _itemOptions.add(AppStrings.custom);
     _selectedItem =
-        existing?.itemName ??
+        existing?.displayName ??
         (initialItemName?.isNotEmpty ?? false
             ? initialItemName!
             : _itemOptions.first);
@@ -1117,9 +1123,16 @@ class _MedicationReminderFormSheetState
 
     final now = DateTime.now();
     final existing = widget.existing;
-    final itemName = _selectedItem == AppStrings.custom
+    final displayName = _selectedItem == AppStrings.custom
         ? _customItemController.text.trim()
         : _selectedItem;
+    final knownIdentity = widget.itemIdentities[displayName];
+    final mainGroup =
+        existing?.mainGroup ?? knownIdentity?.mainGroup ?? displayName;
+    final activeIngredient =
+        widget.itemType == MedicationPlanItemType.medication
+        ? existing?.activeIngredient ?? knownIdentity?.activeIngredient
+        : null;
     final reminderTimes = selectedTimes
         .map(
           (value) => ReminderClockTime(hour: value.hour, minute: value.minute),
@@ -1128,7 +1141,9 @@ class _MedicationReminderFormSheetState
     final plan = MedicationReminderPlan(
       id: existing?.id ?? 'plan_${now.microsecondsSinceEpoch}',
       itemType: widget.itemType,
-      itemName: itemName,
+      displayName: displayName,
+      mainGroup: mainGroup,
+      activeIngredient: activeIngredient,
       dosage: AppStrings.dosageCount(_doseCount),
       times: reminderTimes,
       frequency: _frequency,

@@ -236,14 +236,12 @@ class DashboardView extends StatelessWidget {
     final start = forecast.p80Window.start;
     final end = forecast.p80Window.end;
     final confidence = switch (forecast.confidence) {
-      ForecastConfidence.low => AppStrings.isTurkish ? 'düşük' : 'low',
-      ForecastConfidence.medium => AppStrings.isTurkish ? 'orta' : 'medium',
-      ForecastConfidence.high => AppStrings.isTurkish ? 'yüksek' : 'high',
+      ForecastConfidence.low => AppStrings.forecastConfidenceLow,
+      ForecastConfidence.medium => AppStrings.forecastConfidenceMedium,
+      ForecastConfidence.high => AppStrings.forecastConfidenceHigh,
     };
     final range = '${start.day}.${start.month} - ${end.day}.${end.month}';
-    return AppStrings.isTurkish
-        ? 'Regl tahmin aralığı: $range · $confidence güven'
-        : 'Period prediction: $range · $confidence confidence';
+    return AppStrings.periodPredictionSummary(range, confidence);
   }
 
   void _showDailyLogSheet(

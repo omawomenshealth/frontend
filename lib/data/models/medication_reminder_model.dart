@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'medication_identity_model.dart';
+
 void _rejectUnknownFields(
   Map<String, dynamic> json,
   Set<String> allowed,
@@ -17,7 +19,7 @@ const _clockFields = {'hour', 'minute'};
 const _planFields = {
   'id',
   'itemType',
-  'itemName',
+  ...MedicationIdentity.jsonFields,
   'dosage',
   'times',
   'frequency',
@@ -32,7 +34,7 @@ const _doseRecordFields = {
   'id',
   'planId',
   'itemType',
-  'itemName',
+  ...MedicationIdentity.jsonFields,
   'dosage',
   'scheduledAt',
   'notificationScheduled',
@@ -71,7 +73,9 @@ class ReminderClockTime {
 class MedicationReminderPlan {
   final String id;
   final MedicationPlanItemType itemType;
-  final String itemName;
+  final String displayName;
+  final String mainGroup;
+  final String? activeIngredient;
   final String dosage;
   final List<ReminderClockTime> times;
   final MedicationPlanFrequency frequency;
@@ -87,7 +91,9 @@ class MedicationReminderPlan {
   MedicationReminderPlan({
     required this.id,
     required this.itemType,
-    required this.itemName,
+    required this.displayName,
+    required this.mainGroup,
+    required this.activeIngredient,
     required this.dosage,
     required List<ReminderClockTime> times,
     required this.frequency,
@@ -115,7 +121,9 @@ class MedicationReminderPlan {
   }
 
   MedicationReminderPlan copyWith({
-    String? itemName,
+    String? displayName,
+    String? mainGroup,
+    String? activeIngredient,
     String? dosage,
     List<ReminderClockTime>? times,
     MedicationPlanFrequency? frequency,
@@ -129,7 +137,9 @@ class MedicationReminderPlan {
     return MedicationReminderPlan(
       id: id,
       itemType: itemType,
-      itemName: itemName ?? this.itemName,
+      displayName: displayName ?? this.displayName,
+      mainGroup: mainGroup ?? this.mainGroup,
+      activeIngredient: activeIngredient ?? this.activeIngredient,
       dosage: dosage ?? this.dosage,
       times: times ?? this.times,
       frequency: frequency ?? this.frequency,
@@ -145,7 +155,9 @@ class MedicationReminderPlan {
   Map<String, dynamic> toJson() => {
     'id': id,
     'itemType': itemType.name,
-    'itemName': itemName,
+    'displayName': displayName,
+    'mainGroup': mainGroup,
+    'activeIngredient': activeIngredient,
     'dosage': dosage,
     'times': times.map((value) => value.toJson()).toList(),
     'frequency': frequency.name,
@@ -164,7 +176,9 @@ class MedicationReminderPlan {
       itemType: MedicationPlanItemType.values.byName(
         json['itemType'] as String,
       ),
-      itemName: json['itemName'] as String,
+      displayName: json['displayName'] as String,
+      mainGroup: json['mainGroup'] as String,
+      activeIngredient: json['activeIngredient'] as String?,
       dosage: json['dosage'] as String,
       times: (json['times'] as List)
           .map(
@@ -216,7 +230,9 @@ class MedicationDoseRecord {
   final String id;
   final String planId;
   final MedicationPlanItemType itemType;
-  final String itemName;
+  final String displayName;
+  final String mainGroup;
+  final String? activeIngredient;
   final String dosage;
   final DateTime scheduledAt;
   final bool notificationScheduled;
@@ -228,7 +244,9 @@ class MedicationDoseRecord {
     required this.id,
     required this.planId,
     required this.itemType,
-    required this.itemName,
+    required this.displayName,
+    required this.mainGroup,
+    required this.activeIngredient,
     required this.dosage,
     required this.scheduledAt,
     required this.notificationScheduled,
@@ -247,7 +265,9 @@ class MedicationDoseRecord {
       id: id,
       planId: planId,
       itemType: itemType,
-      itemName: itemName,
+      displayName: displayName,
+      mainGroup: mainGroup,
+      activeIngredient: activeIngredient,
       dosage: dosage,
       scheduledAt: scheduledAt,
       notificationScheduled:
@@ -268,7 +288,9 @@ class MedicationDoseRecord {
       id: dose.id,
       planId: dose.plan.id,
       itemType: dose.plan.itemType,
-      itemName: dose.plan.itemName,
+      displayName: dose.plan.displayName,
+      mainGroup: dose.plan.mainGroup,
+      activeIngredient: dose.plan.activeIngredient,
       dosage: dose.plan.dosage,
       scheduledAt: dose.scheduledAt,
       notificationScheduled: notificationScheduled,
@@ -282,7 +304,9 @@ class MedicationDoseRecord {
     'id': id,
     'planId': planId,
     'itemType': itemType.name,
-    'itemName': itemName,
+    'displayName': displayName,
+    'mainGroup': mainGroup,
+    'activeIngredient': activeIngredient,
     'dosage': dosage,
     'scheduledAt': scheduledAt.toIso8601String(),
     'notificationScheduled': notificationScheduled,
@@ -299,7 +323,9 @@ class MedicationDoseRecord {
       itemType: MedicationPlanItemType.values.byName(
         json['itemType'] as String,
       ),
-      itemName: json['itemName'] as String,
+      displayName: json['displayName'] as String,
+      mainGroup: json['mainGroup'] as String,
+      activeIngredient: json['activeIngredient'] as String?,
       dosage: json['dosage'] as String,
       scheduledAt: DateTime.parse(json['scheduledAt'] as String),
       notificationScheduled: json['notificationScheduled'] as bool? ?? false,

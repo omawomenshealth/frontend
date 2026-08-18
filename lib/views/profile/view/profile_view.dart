@@ -20,6 +20,7 @@ import '../../dashboard/widgets/medication_reminder_section.dart';
 import '../../articles/widgets/premium_paywall.dart';
 
 import 'doctor_report_view.dart';
+import 'dreams_view.dart';
 
 part 'profile_redesign.dart';
 
@@ -193,7 +194,9 @@ class _ProfileMechanics extends StatelessWidget {
                       if (s.dailyMedications.isNotEmpty)
                         _infoRow(
                           AppStrings.medications,
-                          s.dailyMedications.join(', '),
+                          s.dailyMedications
+                              .map((medication) => medication.displayName)
+                              .join(', '),
                         )
                       else
                         _infoRow(
@@ -499,7 +502,7 @@ class _ProfileMechanics extends StatelessWidget {
                 ],
                 const SizedBox(height: 16),
                 Text(
-                  AppStrings.chronicDiseases,
+                  AppStrings.knownConditionQuestion,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -508,17 +511,20 @@ class _ProfileMechanics extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 ConditionSelector(
-                  catalogItems: AppStrings.chronicDiseasesList,
-                  selectedItems: vm.settings.chronicDiseases,
+                  catalogItems: {
+                    ...AppStrings.chronicDiseasesList,
+                    ...AppStrings.womenDiseasesList,
+                  }.toList(),
+                  selectedItems: vm.knownDiseases,
                   color: AppColors.primary,
-                  addDialogTitle: AppStrings.addCustomChronicDisease,
+                  addDialogTitle: AppStrings.addCondition,
                   addButtonKey: 'profile_add_chronic_disease',
                   onToggle: (disease) {
-                    vm.toggleChronicDisease(disease);
+                    vm.toggleKnownDisease(disease);
                     setSheetState(() {});
                   },
                   onAdd: (disease) {
-                    vm.addChronicDisease(disease);
+                    vm.addKnownDisease(disease);
                     setSheetState(() {});
                   },
                 ),
@@ -545,9 +551,7 @@ class _ProfileMechanics extends StatelessWidget {
       useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _EditSheet(
-        title: AppStrings.isTurkish
-            ? 'Laboratuvar değerleri'
-            : 'Laboratory results',
+        title: AppStrings.laboratoryResults,
         icon: Icons.science_outlined,
         accent: accent,
         onSave: () async {
@@ -656,75 +660,96 @@ class _ProfileMechanics extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children:
-                      [
-                        AppStrings.noBirthControl,
-                        AppStrings.pill,
-                        AppStrings.iud,
-                        AppStrings.condom,
-                        AppStrings.implant,
-                        AppStrings.otherMethod,
-                      ].map((method) {
-                        final isSelected =
-                            AppStrings.localizeStoredValue(
-                              s.birthControlMethod ?? '',
-                            ) ==
-                            method;
-                        return ChoiceChip(
-                          label: Text(method),
-                          selected: isSelected,
-                          onSelected: (_) {
-                            vm.updateBirthControlMethod(method);
-                            setSheetState(() {});
-                          },
-                          backgroundColor: AppColors.surface,
-                          selectedColor: AppColors.periodLight,
-                          side: BorderSide(
-                            color: isSelected
-                                ? AppColors.periodPrimary
-                                : AppColors.outline,
-                          ),
-                          shape: const StadiumBorder(),
-                          labelStyle: TextStyle(
-                            fontSize: 12,
-                            color: isSelected
-                                ? AppColors.periodPrimary
-                                : AppColors.textPrimary,
-                          ),
+                  children: [
+                    ...[
+                      AppStrings.noBirthControl,
+                      AppStrings.pill,
+                      AppStrings.iud,
+                      AppStrings.condom,
+                      AppStrings.implant,
+                    ].map((method) {
+                      final isSelected =
+                          AppStrings.localizeStoredValue(
+                            s.birthControlMethod ?? '',
+                          ) ==
+                          method;
+                      return ChoiceChip(
+                        label: Text(method),
+                        selected: isSelected,
+                        onSelected: (_) {
+                          vm.updateBirthControlMethod(method);
+                          setSheetState(() {});
+                        },
+                        backgroundColor: AppColors.surface,
+                        selectedColor: AppColors.periodLight,
+                        side: BorderSide(
+                          color: isSelected
+                              ? AppColors.periodPrimary
+                              : AppColors.outline,
+                        ),
+                        shape: const StadiumBorder(),
+                        labelStyle: TextStyle(
+                          fontSize: 12,
+                          color: isSelected
+                              ? AppColors.periodPrimary
+                              : AppColors.textPrimary,
+                        ),
+                      );
+                    }),
+                    ActionChip(
+                      key: const ValueKey('profile_add_birth_control'),
+                      avatar: const Icon(
+                        Icons.add_rounded,
+                        size: 17,
+                        color: AppColors.periodPrimary,
+                      ),
+                      label: Text(AppStrings.add),
+                      backgroundColor: AppColors.periodLight,
+                      side: BorderSide(
+                        color: AppColors.periodPrimary.withValues(alpha: 0.45),
+                      ),
+                      onPressed: () async {
+                        final method = await _promptText(
+                          ctx2,
+                          AppStrings.addBirthControlMethod,
                         );
-                      }).toList(),
-                ),
-                const SizedBox(height: 16),
-
-                // Kadın hastalıkları
-                Text(
-                  AppStrings.womenDiseases,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ConditionSelector(
-                  catalogItems: AppStrings.womenDiseasesList,
-                  selectedItems: s.womenDiseases,
-                  color: AppColors.periodPrimary,
-                  addDialogTitle: AppStrings.addCustomWomenDisease,
-                  addButtonKey: 'profile_add_women_disease',
-                  onToggle: (disease) {
-                    vm.toggleWomenDisease(disease);
-                    setSheetState(() {});
-                  },
-                  onAdd: (disease) {
-                    vm.addWomenDisease(disease);
-                    setSheetState(() {});
-                  },
+                        if (method == null || method.isEmpty) return;
+                        vm.updateBirthControlMethod(method);
+                        setSheetState(() {});
+                      },
+                    ),
+                  ],
                 ),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+
+  Future<String?> _promptText(BuildContext context, String title) {
+    var value = '';
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: TextField(
+          autofocus: true,
+          maxLength: 80,
+          onChanged: (text) => value = text,
+          onSubmitted: (text) => Navigator.pop(dialogContext, text.trim()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, value.trim()),
+            child: Text(AppStrings.add),
+          ),
+        ],
       ),
     );
   }
@@ -753,10 +778,13 @@ class _ProfileMechanics extends StatelessWidget {
         child: StatefulBuilder(
           builder: (ctx2, setSheetState) {
             final storage = ctx2.read<LocalStorageService>();
-            final medicationNames = {
-              ...vm.settings.dailyMedications,
-              ...storage.getCustomMedications(),
-            }.toList();
+            final medicationIdentities = {
+              for (final medication in vm.settings.dailyMedications)
+                medication.displayName: medication,
+              for (final medication in storage.getCustomMedicationIdentities())
+                medication.displayName: medication,
+            };
+            final medicationNames = medicationIdentities.keys.toList();
             final supplementNames = {
               ...vm.settings.dailySupplements,
               ...storage.getCustomSupplements(),
@@ -786,7 +814,10 @@ class _ProfileMechanics extends StatelessWidget {
                   runSpacing: 8,
                   children: vm.settings.dailyMedications.map((med) {
                     return Chip(
-                      label: Text(med, style: const TextStyle(fontSize: 12)),
+                      label: Text(
+                        med.displayName,
+                        style: const TextStyle(fontSize: 12),
+                      ),
                       deleteIcon: const Icon(
                         Icons.close,
                         size: 16,
@@ -812,6 +843,7 @@ class _ProfileMechanics extends StatelessWidget {
                   key: const ValueKey('profile_medication_reminders'),
                   itemType: MedicationPlanItemType.medication,
                   availableItems: medicationNames,
+                  itemIdentities: medicationIdentities,
                   color: AppColors.medicationPrimary,
                   onChanged: () => ctx2.read<DashboardViewModel>().loadData(),
                 ),

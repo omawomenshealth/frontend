@@ -680,9 +680,7 @@ class _CalendarLegendSheet extends StatelessWidget {
             ),
             _LegendRow(
               color: AppColors.periodLight,
-              label: AppStrings.isTurkish
-                  ? 'Regl başlangıcı tahmin aralığı'
-                  : 'Period start prediction window',
+              label: AppStrings.periodStartPredictionWindow,
             ),
             _LegendRow(
               color: AppColors.secondary,
@@ -1125,7 +1123,9 @@ class _DailyLogDetails extends StatelessWidget {
     );
     add(
       AppStrings.dreamQuestion,
-      value.dreamRemembered == null && (value.dreamNote?.isEmpty ?? true)
+      value.dreamRemembered == null &&
+              value.dreamType == null &&
+              (value.dreamNote?.isEmpty ?? true)
           ? null
           : DailyLogFormatters.dream(value),
     );
@@ -1178,7 +1178,7 @@ class _DailyLogDetails extends StatelessWidget {
           : value.medications
                 .map(
                   (item) =>
-                      '${item.name} · '
+                      '${item.displayName} · '
                       '${AppStrings.localizeStoredValue(item.time)} · '
                       '${AppStrings.localizeStoredValue(item.dosage)} · '
                       '${AppStrings.localizeStoredValue(item.stomachState)} · '
@@ -1193,7 +1193,7 @@ class _DailyLogDetails extends StatelessWidget {
           : value.supplements
                 .map(
                   (item) =>
-                      '${item.name} · '
+                      '${item.displayName} · '
                       '${AppStrings.localizeStoredValue(item.time)} · '
                       '${AppStrings.localizeStoredValue(item.dosage)} · '
                       '${AppStrings.localizeStoredValue(item.stomachState)} · '

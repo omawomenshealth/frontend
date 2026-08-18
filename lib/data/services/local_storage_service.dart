@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../models/user_settings_model.dart';
 import '../models/period_log_model.dart';
 import '../models/medication_reminder_model.dart';
+import '../models/medication_identity_model.dart';
 import '../../core/utils/date_extensions.dart';
 import '../../core/utils/app_time.dart';
 import '../../core/utils/cycle_rules.dart';
@@ -177,6 +178,7 @@ class LocalStorageService {
       log.sexualActivityTypes.isNotEmpty ||
       log.sexualAfterFeelings.isNotEmpty ||
       log.dreamRemembered != null ||
+      log.dreamType != null ||
       (log.dreamNote?.isNotEmpty ?? false) ||
       log.vaginalDischargePresent != null ||
       log.vaginalDischargeColor != null ||
@@ -276,10 +278,16 @@ class LocalStorageService {
 
       // SİHİRLİ DOKUNUŞ: Yeni eklenen ilaç ve takviyeleri de otomatik kaydet
       for (var entry in logToSave.medications) {
-        await saveCustomMedication(entry.name);
+        await saveCustomMedication(
+          MedicationIdentity(
+            displayName: entry.displayName,
+            mainGroup: entry.mainGroup,
+            activeIngredient: entry.activeIngredient,
+          ),
+        );
       }
       for (var entry in logToSave.supplements) {
-        await saveCustomSupplement(entry.name);
+        await saveCustomSupplement(entry.displayName);
       }
       for (final ingredient in logToSave.skincare) {
         await saveCustomSkincare(ingredient);
@@ -696,16 +704,28 @@ class LocalStorageService {
   // ── Özel İlaç & Takviye Kayıtları ───────────────────────
 
   /// Kayıtlı tüm özel ilaç isimlerini getir.
-  List<String> getCustomMedications() {
-    return _p.getStringList(_allMedsKey) ?? [];
+  List<MedicationIdentity> getCustomMedicationIdentities() {
+    final raw = _p.getString(_allMedsKey);
+    if (raw == null) return [];
+    try {
+      return (jsonDecode(raw) as List)
+          .map(
+            (item) => MedicationIdentity.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   /// Yeni bir özel ilaç kaydet.
-  Future<bool> saveCustomMedication(String name) async {
-    final list = getCustomMedications();
-    if (!list.contains(name)) {
-      final newList = List<String>.from(list)..add(name);
-      return _p.setStringList(_allMedsKey, newList);
+  Future<bool> saveCustomMedication(MedicationIdentity medication) async {
+    final list = getCustomMedicationIdentities();
+    if (!list.contains(medication)) {
+      final newList = List<MedicationIdentity>.from(list)..add(medication);
+      return saveCustomMedications(newList);
     }
     return false;
   }
@@ -726,8 +746,11 @@ class LocalStorageService {
   }
 
   /// Tüm özel ilaçları toplu kaydet.
-  Future<bool> saveCustomMedications(List<String> list) async {
-    return _p.setStringList(_allMedsKey, list);
+  Future<bool> saveCustomMedications(List<MedicationIdentity> list) async {
+    return _p.setString(
+      _allMedsKey,
+      jsonEncode(list.map((medication) => medication.toJson()).toList()),
+    );
   }
 
   /// Tüm özel takviyeleri toplu kaydet.

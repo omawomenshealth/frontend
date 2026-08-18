@@ -31,6 +31,7 @@ class LabResultsForm extends StatefulWidget {
 }
 
 class _LabResultsFormState extends State<LabResultsForm> {
+  final _searchController = TextEditingController();
   late final Map<String, TextEditingController> _controllers;
   late final Map<String, String> _units;
   late Map<String, LabResult> _results;
@@ -66,6 +67,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     for (final controller in _controllers.values) {
       controller.dispose();
     }
@@ -124,9 +126,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  _isTurkish
-                      ? 'Raporunuzdaki değeri ve birimi aynen seçin. Tüm alanlar isteğe bağlıdır; sonuçların yorumu için raporu düzenleyen laboratuvarın referans aralığını kullanın.'
-                      : 'Enter the value and choose the unit exactly as shown on your report. Every field is optional; use the issuing laboratory’s reference range for interpretation.',
+                  AppStrings.laboratoryEntryDisclaimer,
                   style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
@@ -138,32 +138,69 @@ class _LabResultsFormState extends State<LabResultsForm> {
           ),
         ),
         const SizedBox(height: 16),
+        TextField(
+          key: const ValueKey('lab_results_search'),
+          controller: _searchController,
+          onChanged: (_) => setState(() {}),
+          decoration: InputDecoration(
+            hintText: AppStrings.searchLaboratoryValue,
+            prefixIcon: Icon(Icons.search_rounded, color: widget.accent),
+            suffixIcon: _searchController.text.isEmpty
+                ? null
+                : IconButton(
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {});
+                    },
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+          ),
+        ),
+        const SizedBox(height: 12),
         _buildContextFields(context),
         const SizedBox(height: 12),
-        for (final group in LabTestGroup.values) ...[
-          _LabGroupTile(
-            key: ValueKey('lab_group_${group.name}'),
-            title: LabTestCatalog.groupLabel(group, _isTurkish),
-            count: LabTestCatalog.forGroup(
-              group,
-            ).where((definition) => _results.containsKey(definition.id)).length,
-            accent: widget.accent,
-            initiallyExpanded: LabTestCatalog.forGroup(
-              group,
-            ).any((definition) => _results.containsKey(definition.id)),
-            children: LabTestCatalog.forGroup(
-              group,
-            ).map(_buildResultField).toList(),
-          ),
-          const SizedBox(height: 10),
-        ],
+        for (final group in LabTestGroup.values)
+          if (_definitionsForGroup(group).isNotEmpty) ...[
+            _LabGroupTile(
+              key: ValueKey(
+                'lab_group_${group.name}_${_searchController.text.trim()}',
+              ),
+              title: LabTestCatalog.groupLabel(group, _isTurkish),
+              count: LabTestCatalog.forGroup(group)
+                  .where((definition) => _results.containsKey(definition.id))
+                  .length,
+              accent: widget.accent,
+              initiallyExpanded:
+                  _searchController.text.trim().isNotEmpty ||
+                  LabTestCatalog.forGroup(
+                    group,
+                  ).any((definition) => _results.containsKey(definition.id)),
+              children: _definitionsForGroup(
+                group,
+              ).map(_buildResultField).toList(),
+            ),
+            const SizedBox(height: 10),
+          ],
       ],
     );
   }
 
+  List<LabTestDefinition> _definitionsForGroup(LabTestGroup group) {
+    final query = _searchController.text.trim().toLowerCase();
+    final definitions = LabTestCatalog.forGroup(group);
+    if (query.isEmpty) return definitions;
+    return definitions
+        .where(
+          (definition) =>
+              definition.id.toLowerCase().contains(query) ||
+              definition.label(_isTurkish).toLowerCase().contains(query),
+        )
+        .toList(growable: false);
+  }
+
   Widget _buildContextFields(BuildContext context) {
     final dateLabel = _testDate == null
-        ? (_isTurkish ? 'Tarih seçilmedi' : 'No date selected')
+        ? AppStrings.noTestDateSelected
         : MaterialLocalizations.of(context).formatMediumDate(_testDate!);
     return Container(
       padding: const EdgeInsets.all(14),
@@ -176,7 +213,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            _isTurkish ? 'Ölçüm bilgileri' : 'Test details',
+            AppStrings.testDetails,
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -203,7 +240,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
               if (_testDate != null) ...[
                 const SizedBox(width: 6),
                 IconButton(
-                  tooltip: _isTurkish ? 'Tarihi temizle' : 'Clear date',
+                  tooltip: AppStrings.clearTestDate,
                   onPressed: _clearTestDate,
                   icon: const Icon(Icons.close_rounded, size: 19),
                 ),
@@ -212,7 +249,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
           ),
           const SizedBox(height: 8),
           Text(
-            _isTurkish ? 'Kan açken mi verildi?' : 'Was the sample fasting?',
+            AppStrings.fastingSampleQuestion,
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
@@ -223,9 +260,9 @@ class _LabResultsFormState extends State<LabResultsForm> {
             spacing: 7,
             runSpacing: 7,
             children: [
-              _fastingChip(true, _isTurkish ? 'Evet' : 'Yes'),
-              _fastingChip(false, _isTurkish ? 'Hayır' : 'No'),
-              _fastingChip(null, _isTurkish ? 'Bilmiyorum' : 'Unknown'),
+              _fastingChip(true, AppStrings.yes),
+              _fastingChip(false, AppStrings.no),
+              _fastingChip(null, AppStrings.doNotKnow),
             ],
           ),
         ],
@@ -283,7 +320,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
                     setState(() {});
                   },
                   decoration: InputDecoration(
-                    hintText: _isTurkish ? 'Değer' : 'Value',
+                    hintText: AppStrings.value,
                     isDense: true,
                   ),
                 ),
@@ -341,11 +378,11 @@ class _LabGroupTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
+    return Material(
+      color: AppColors.surface,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.outline),
+        side: const BorderSide(color: AppColors.outline),
       ),
       clipBehavior: Clip.antiAlias,
       child: Theme(
@@ -367,9 +404,7 @@ class _LabGroupTile extends StatelessWidget {
           subtitle: count == 0
               ? null
               : Text(
-                  AppStrings.isTurkish
-                      ? '$count değer girildi'
-                      : '$count value${count == 1 ? '' : 's'} entered',
+                  AppStrings.laboratoryValuesEntered(count),
                   style: TextStyle(fontSize: 11, color: accent),
                 ),
           children: children,

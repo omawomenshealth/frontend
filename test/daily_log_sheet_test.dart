@@ -3,6 +3,7 @@ import 'package:app_proje_a/core/constants/color_constants.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/core/utils/date_extensions.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
+import 'package:app_proje_a/data/models/medication_identity_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
@@ -13,6 +14,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+MedicationIdentity _medication(String displayName) => MedicationIdentity(
+  displayName: displayName,
+  mainGroup: displayName,
+  activeIngredient: null,
+);
 
 void main() {
   test('Yerel depolama gelecek tarihli günlük kaydı reddeder', () async {
@@ -50,6 +57,34 @@ void main() {
     );
     expect(reopened.date, existing.date);
     expect(reopened.waterIntakeMl, 500);
+  });
+
+  testWidgets('canın ne çekti alanı hepsini ve özel seçeneği destekler', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(tester, initialIndex: 1);
+    final all = find.byKey(const ValueKey('craving_all'));
+    await tester.ensureVisible(all);
+    await tester.pumpAndSettle();
+    await tester.tap(all);
+    await tester.pumpAndSettle();
+
+    final add = find.byKey(const ValueKey('add_craving'));
+    await tester.ensureVisible(add);
+    await tester.tap(add);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, 'Ekşi elma');
+    await tester.tap(find.widgetWithText(FilledButton, AppStrings.add));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.saveNutrition));
+    await tester.pumpAndSettle();
+
+    expect(
+      harness.savedLog!.cravings,
+      containsAll(AppStrings.nutritionCravingOptions),
+    );
+    expect(harness.savedLog!.cravings, contains('Ekşi elma'));
   });
 
   testWidgets('Adet kayıt ekranı referans tasarımdaki sade akışı kaydeder', (
@@ -698,36 +733,63 @@ void main() {
     );
   });
 
-  testWidgets('Rüya isteğe bağlı notuyla kaydedilir', (tester) async {
+  testWidgets('Rüya türü alt panelden seçilerek notuyla kaydedilir', (
+    tester,
+  ) async {
     final harness = await _pumpLogSheet(tester, initialIndex: 2);
 
-    expect(find.byKey(const ValueKey('dream_card')), findsNothing);
-    final vividDreams = find.text(
-      AppStrings.symptomSleepOptions[AppStrings.symptomSleepOptions.length - 2],
-    );
-    final vividDreamTile = find
-        .ancestor(of: vividDreams, matching: find.byType(InkWell))
-        .first;
-    tester.widget<InkWell>(vividDreamTile).onTap!();
-    await tester.pumpAndSettle();
-
-    final dreamCard = find.byKey(const ValueKey('dream_card'));
-    await tester.ensureVisible(dreamCard);
-    await tester.pumpAndSettle();
-
-    expect(find.text(AppStrings.dreamNoteQuestion), findsOneWidget);
     final sleepCard = find.byKey(
       ValueKey('symptom_group_${AppStrings.symptomSleep}'),
     );
-    expect(find.descendant(of: sleepCard, matching: dreamCard), findsOneWidget);
+    expect(
+      find.descendant(
+        of: sleepCard,
+        matching: find.text(
+          AppStrings.symptomSleepOptions[AppStrings.symptomSleepOptions.length -
+              2],
+        ),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: sleepCard, matching: find.text('Kabus')),
+      findsNothing,
+    );
+
+    final dreamTile = find.byKey(const ValueKey('dream_remembered_button'));
+    final dreamTileTap = find.descendant(
+      of: dreamTile,
+      matching: find.byType(InkWell),
+    );
+    tester.widget<InkWell>(dreamTileTap).onTap!();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nasıl bir rüyaydı?'), findsOneWidget);
+    expect(find.byKey(const ValueKey('dream_type_good')), findsOneWidget);
+    expect(find.byKey(const ValueKey('dream_type_nightmare')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('dream_type_nightmare')));
     final dreamField = find.byKey(const ValueKey('dream_note_field'));
     expect(dreamField, findsOneWidget);
+    expect(find.text(AppStrings.dreamNoteHint), findsOneWidget);
     await tester.enterText(dreamField, 'Deniz kenarında yürüyordum.');
-    await tester.tap(find.text(AppStrings.save));
+    tester.testTextInput.hide();
+    await tester.pumpAndSettle();
+    final dreamSheetSave = find.byKey(const ValueKey('dream_sheet_save'));
+    await tester.ensureVisible(dreamSheetSave);
+    await tester.tap(dreamSheetSave);
+    await tester.pumpAndSettle();
+    expect(dreamSheetSave, findsNothing);
+
+    final saveButton = find.widgetWithText(FilledButton, AppStrings.save);
+    expect(saveButton, findsOneWidget);
+    await tester.tap(saveButton);
     await tester.pumpAndSettle();
 
     expect(harness.savedLog!.dreamRemembered, isTrue);
+    expect(harness.savedLog!.dreamType, DreamType.nightmare);
     expect(harness.savedLog!.dreamNote, 'Deniz kenarında yürüyordum.');
+    expect(find.text('Rüyan kaydedildi'), findsOneWidget);
+    expect(find.text('Premium pakete göz at'), findsOneWidget);
   });
 
   testWidgets('Günlük ilaç alımı saat, doz, aç tok ve durumla kaydedilir', (
@@ -740,7 +802,7 @@ void main() {
         isOnboardingComplete: true,
         userName: 'Test',
         lastPeriodDate: DateTime.now().subtract(const Duration(days: 2)),
-        dailyMedications: const ['Test ilacı'],
+        dailyMedications: [_medication('Test ilacı')],
       ),
     );
 
@@ -791,7 +853,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final entry = harness.savedLog!.medications.single;
-    expect(entry.name, 'Test ilacı');
+    expect(entry.displayName, 'Test ilacı');
     expect(
       entry.times,
       containsAll({
@@ -819,7 +881,7 @@ void main() {
       settings: UserSettings(
         isOnboardingComplete: true,
         userName: 'Test',
-        dailyMedications: const ['Tek doz ilaç'],
+        dailyMedications: [_medication('Tek doz ilaç')],
         dailySupplements: const ['Tek doz takviye'],
       ),
     );
@@ -850,7 +912,7 @@ void main() {
         isOnboardingComplete: true,
         userName: 'Test',
         lastPeriodDate: DateTime.now().subtract(const Duration(days: 2)),
-        dailyMedications: const ['İlaç A', 'İlaç B'],
+        dailyMedications: [_medication('İlaç A'), _medication('İlaç B')],
         dailySupplements: const ['Takviye A', 'Takviye B'],
       ),
     );
@@ -898,7 +960,9 @@ void main() {
         date: DateTime.now(),
         medications: [
           MedicationEntry(
-            name: 'Göz damlası',
+            displayName: 'Göz damlası',
+            mainGroup: 'Göz damlası',
+            activeIngredient: null,
             times: const {'Sabah'},
             stomachState: 'Aç',
             takenDoseCount: 1,
@@ -906,7 +970,9 @@ void main() {
         ],
         supplements: [
           MedicationEntry(
-            name: 'D vitamini',
+            displayName: 'D vitamini',
+            mainGroup: 'D vitamini',
+            activeIngredient: null,
             times: const {'Sabah'},
             stomachState: 'Aç',
             takenDoseCount: 1,
@@ -943,7 +1009,7 @@ void main() {
       initialIndex: 4,
       settings: UserSettings(
         isOnboardingComplete: true,
-        dailyMedications: const ['Test ilacı'],
+        dailyMedications: [_medication('Test ilacı')],
       ),
     );
 
@@ -996,7 +1062,9 @@ void main() {
 
     expect(find.text(AppStrings.medicationUsagePlanQuestion), findsOneWidget);
     expect(
-      harness.storage.loadSettings()!.dailyMedications,
+      harness.storage.loadSettings()!.dailyMedications.map(
+        (medication) => medication.displayName,
+      ),
       contains('Yeni ilaç'),
     );
     expect(harness.settingsChangeCount, 1);
@@ -1028,7 +1096,7 @@ void main() {
     expect(harness.settingsChangeCount, 1);
     await tester.tap(find.text(AppStrings.saveMedicationAndSupplement));
     await tester.pumpAndSettle();
-    expect(harness.savedLog!.supplements.single.name, 'Yeni takviye');
+    expect(harness.savedLog!.supplements.single.displayName, 'Yeni takviye');
   });
 
   testWidgets('İlaç satırındaki alarm seçili ilaçla hatırlatıcıyı açar', (
@@ -1041,7 +1109,7 @@ void main() {
         isOnboardingComplete: true,
         userName: 'Test',
         lastPeriodDate: DateTime.now().subtract(const Duration(days: 2)),
-        dailyMedications: const ['Test ilacı'],
+        dailyMedications: [_medication('Test ilacı')],
       ),
     );
 
@@ -1085,7 +1153,9 @@ void main() {
         date: DateTime.now(),
         medications: [
           MedicationEntry(
-            name: 'Dört doz ilaç',
+            displayName: 'Dört doz ilaç',
+            mainGroup: 'Dört doz ilaç',
+            activeIngredient: null,
             times: const {'08:00', '12:00', '18:00', '22:00'},
             stomachState: 'Tok',
             doseCount: 4,
@@ -1114,7 +1184,7 @@ void main() {
       settings: UserSettings(
         isOnboardingComplete: true,
         userName: 'Test',
-        dailyMedications: const ['Test ilacı'],
+        dailyMedications: [_medication('Test ilacı')],
       ),
     );
 
@@ -1226,6 +1296,7 @@ void main() {
       symptoms: const ['Kramp'],
       symptomSeverities: const {'Kramp': 2},
       dreamRemembered: true,
+      dreamType: DreamType.good,
       dreamNote: 'Uçtuğumu gördüm.',
       flowIntensity: 'Orta',
       observedSections: const {
@@ -1248,6 +1319,7 @@ void main() {
     expect(restored.symptoms, original.symptoms);
     expect(restored.symptomSeverities, original.symptomSeverities);
     expect(restored.dreamRemembered, isTrue);
+    expect(restored.dreamType, DreamType.good);
     expect(restored.dreamNote, original.dreamNote);
     expect(restored.sexualActivityTypes, original.sexualActivityTypes);
     expect(restored.hasExplicitTime, isFalse);

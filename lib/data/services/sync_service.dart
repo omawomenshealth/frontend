@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 
+import '../models/medication_identity_model.dart';
 import '../models/medication_reminder_model.dart';
-import '../models/user_settings_model.dart';
 import '../models/period_log_model.dart';
-import 'local_storage_service.dart';
+import '../models/user_settings_model.dart';
 import 'api_service.dart';
+import 'local_storage_service.dart';
 import 'notification_service.dart';
 
 /// Yerel şifreli kasa verileri ile PostgreSQL bulut veritabanı
@@ -16,451 +17,491 @@ class SyncService {
 
   SyncService(this._storage, this._api, [this._notifications]);
 
-  /// 1. Yerel verileri doğrudan buluta yedekler (Upload/Backup).
+  /// Yerel verilerin tutarlı bir anlık görüntüsünü doğrudan buluta yedekler.
   Future<bool> backupToCloud() async {
     if (!_storage.isUserLoggedIn) return false;
 
     try {
-      // Yerel ayarlar
-      final settings = _storage.loadSettings() ?? UserSettings();
+      final local = _captureLocalSnapshot();
+      if (local.data.settings == null) {
+        debugPrint('Yedekleme iptal edildi: yerel kullanıcı ayarları yok.');
+        return false;
+      }
 
-      // Yerel günlük loglar
-      final logs = _storage.loadAllLogs();
-
-      // Yerel özel ilaç ve takviye listeleri
-      final meds = _storage.getCustomMedications();
-      final sups = _storage.getCustomSupplements();
-      final reminderPlans = _storage.loadMedicationReminderPlans();
-      final doseRecords = _storage.loadMedicationDoseRecords();
-
-      // Sunucuya yükle
-      final success = await _api.uploadSync(
-        settings: settings.toJson(),
-        logs: logs.map((l) => l.toJson()).toList(),
-        customMedications: meds,
-        customSupplements: sups,
-        medicationReminderPlans: reminderPlans
-            .map((plan) => plan.toJson())
-            .toList(),
-        medicationDoseRecords: _doseRecordsForCloud(doseRecords),
-      );
-
-      return success;
-    } catch (e) {
-      debugPrint('Yedekleme hatası: $e');
+      if (!await _upload(local.data)) return false;
+      return _storage.setLastSyncTime(_nowIso());
+    } catch (error) {
+      debugPrint('Yedekleme hatası: $error');
       return false;
     }
   }
 
-  /// 2. Buluttaki tüm verileri indirir ve yerel verilerin üzerine yazar (Download/Restore).
-  /// Bu işlem yerel verileri sıfırlar ancak giriş yapmış kullanıcının tokenını korur.
+  /// Buluttaki tüm verileri indirir ve yerel senkronize verilerin üzerine
+  /// yazar. Bulut verisinin tamamı doğrulanmadan yerel kasaya dokunulmaz.
+  /// Oturum ve yalnızca cihaza ait ayarlar korunur.
   Future<bool> restoreFromCloud() async {
     if (!_storage.isUserLoggedIn) return false;
 
-    final localSnapshot = _captureLocalSnapshot();
+    final local = _captureLocalSnapshot();
     var localReplacementStarted = false;
 
     try {
-      final cloudData = await _api.downloadSync();
-      if (cloudData == null) return false;
-
-      // Bulut verisinin tamamını yerel veriye dokunmadan önce ayrıştır ve
-      // doğrula. Bozuk tek bir kayıt bile varsa mevcut veriler korunur.
-      final rawSettings = cloudData['settings'];
-      final cloudSettings = rawSettings == null
-          ? null
-          : UserSettings.fromJson(
-              Map<String, dynamic>.from(rawSettings as Map),
-            );
-
-      final rawLogs = cloudData['logs'] ?? const [];
-      if (rawLogs is! List) {
-        throw const FormatException('Bulut log listesi geçersiz.');
-      }
-      final cloudLogs = <DailyLog>[];
-      for (final rawLog in rawLogs) {
-        if (rawLog is! Map) {
-          throw const FormatException('Bulut log kaydı geçersiz.');
-        }
-        cloudLogs.add(DailyLog.fromJson(Map<String, dynamic>.from(rawLog)));
-      }
-
-      final cloudMedications = List<String>.from(
-        cloudData['customMedications'] as List? ?? const [],
+      final cloud = _parseCloudData(
+        await _api.downloadSync(),
+        missingFieldsFallback: local.data,
       );
-      final cloudSupplements = List<String>.from(
-        cloudData['customSupplements'] as List? ?? const [],
-      );
-      final cloudFoods = List<String>.from(
-        cloudData['customFoods'] as List? ?? const [],
-      );
-      final cloudSkincare = List<String>.from(
-        cloudData['customSkincare'] as List? ?? const [],
-      );
-      final cloudReminderPlans =
-          cloudData.containsKey('medicationReminderPlans')
-          ? _parseReminderPlans(cloudData['medicationReminderPlans'])
-          : localSnapshot.medicationReminderPlans;
-      final cloudDoseRecords = cloudData.containsKey('medicationDoseRecords')
-          ? _parseDoseRecords(cloudData['medicationDoseRecords'])
-          : localSnapshot.medicationDoseRecords;
+      if (cloud.settings == null) return false;
 
       localReplacementStarted = true;
       await _replaceLocalData(
-        settings: cloudSettings,
-        logs: cloudLogs,
-        customMedications: cloudMedications,
-        customSupplements: cloudSupplements,
-        customFoods: cloudFoods,
-        customSkincare: cloudSkincare,
-        medicationReminderPlans: cloudReminderPlans,
-        medicationDoseRecords: cloudDoseRecords,
-        authToken: localSnapshot.authToken,
-        authRefreshToken: localSnapshot.authRefreshToken,
-        authEmail: localSnapshot.authEmail,
-        authName: localSnapshot.authName,
-        authGoogleId: localSnapshot.authGoogleId,
-        lastSyncTime: DateTime.now().toIso8601String(),
+        data: cloud,
+        deviceState: local,
+        lastSyncTime: _nowIso(),
+        cycleForecastSnapshot: null,
       );
       await _refreshDeviceReminders();
-
       return true;
-    } catch (e) {
-      debugPrint('Geri yükleme hatası: $e');
+    } catch (error) {
+      debugPrint('Geri yükleme hatası: $error');
       if (localReplacementStarted) {
-        try {
-          await _restoreLocalSnapshot(localSnapshot);
-        } catch (rollbackError) {
-          debugPrint('Yerel veri geri alma hatası: $rollbackError');
-        }
+        await _rollbackLocalData(local);
       }
       return false;
     }
+  }
+
+  /// Yerel veriler ile bulut verilerini birleştirir. Çakışmada aynı
+  /// timestamp'e sahip günlükler alan bazında birleştirilir.
+  ///
+  /// Birleştirilmiş veri önce buluta yazılır; yükleme başarısız olursa yerel
+  /// veri hiç değiştirilmez. Böylece yarım kalmış bir senkronizasyon oluşmaz.
+  Future<bool> mergeWithCloud() async {
+    if (!_storage.isUserLoggedIn) return false;
+
+    final local = _captureLocalSnapshot();
+    var localReplacementStarted = false;
+
+    try {
+      final cloud = _parseCloudData(await _api.downloadSync());
+
+      // Sunucu geçerli bir yanıt verdi fakat bu hesap için henüz yedek yok.
+      // Ağ/sunucu hataları downloadSync tarafından istisna olarak iletilir ve
+      // hiçbir zaman bu dala girmez.
+      if (cloud.settings == null) {
+        return backupToCloud();
+      }
+
+      final merged = _mergeData(local.data, cloud);
+
+      // Yerel kasayı değiştirmeden önce bulut yazmasının tamamlandığını doğrula.
+      if (!await _upload(merged)) return false;
+
+      localReplacementStarted = true;
+      await _replaceLocalData(
+        data: merged,
+        deviceState: local,
+        lastSyncTime: _nowIso(),
+        cycleForecastSnapshot: null,
+      );
+      await _refreshDeviceReminders();
+      return true;
+    } catch (error) {
+      debugPrint('Senkronizasyon birleştirme hatası: $error');
+      if (localReplacementStarted) {
+        await _rollbackLocalData(local);
+      }
+      return false;
+    }
+  }
+
+  Future<bool> _upload(_SyncData data) {
+    final settings = data.settings;
+    if (settings == null) return Future<bool>.value(false);
+
+    return _api.uploadSync(
+      settings: settings.toJson(),
+      logs: data.logs.map((log) => log.toJson()).toList(growable: false),
+      customMedications: _medicationPayloadsForCloud(data.customMedications),
+      customSupplements: List<String>.from(data.customSupplements),
+      customFoods: List<String>.from(data.customFoods),
+      customSkincare: List<String>.from(data.customSkincare),
+      medicationReminderPlans: data.medicationReminderPlans
+          .map((plan) => plan.toJson())
+          .toList(growable: false),
+      medicationDoseRecords: _doseRecordsForCloud(data.medicationDoseRecords),
+    );
   }
 
   _LocalSnapshot _captureLocalSnapshot() {
     return _LocalSnapshot(
-      settings: _storage.loadSettings(),
-      logs: _storage.loadAllLogs(),
-      customMedications: _storage.getCustomMedications(),
-      customSupplements: _storage.getCustomSupplements(),
-      customFoods: _storage.getCustomFoods(),
-      customSkincare: _storage.getCustomSkincare(),
-      medicationReminderPlans: _storage.loadMedicationReminderPlans(),
-      medicationDoseRecords: _storage.loadMedicationDoseRecords(),
+      data: _SyncData(
+        settings: _storage.loadSettings(),
+        logs: _storage.loadAllLogs(),
+        customMedications: _storage.getCustomMedicationIdentities(),
+        customSupplements: _storage.getCustomSupplements(),
+        customFoods: _storage.getCustomFoods(),
+        customSkincare: _storage.getCustomSkincare(),
+        medicationReminderPlans: _storage.loadMedicationReminderPlans(),
+        medicationDoseRecords: _storage.loadMedicationDoseRecords(),
+      ),
       authToken: _storage.authToken,
       authRefreshToken: _storage.authRefreshToken,
       authEmail: _storage.authEmail,
       authName: _storage.authName,
       authGoogleId: _storage.authGoogleId,
       lastSyncTime: _storage.lastSyncTime,
+      virtualDaysOffset: _storage.virtualDaysOffset,
+      notifiedInsightIds: _storage.loadNotifiedInsightIds(),
+      cycleForecastSnapshot: _storage.loadCycleForecastSnapshot(),
     );
   }
 
-  Future<void> _restoreLocalSnapshot(_LocalSnapshot snapshot) {
-    return _replaceLocalData(
-      settings: snapshot.settings,
-      logs: snapshot.logs,
-      customMedications: snapshot.customMedications,
-      customSupplements: snapshot.customSupplements,
-      customFoods: snapshot.customFoods,
-      customSkincare: snapshot.customSkincare,
-      medicationReminderPlans: snapshot.medicationReminderPlans,
-      medicationDoseRecords: snapshot.medicationDoseRecords,
-      authToken: snapshot.authToken,
-      authRefreshToken: snapshot.authRefreshToken,
-      authEmail: snapshot.authEmail,
-      authName: snapshot.authName,
-      authGoogleId: snapshot.authGoogleId,
-      lastSyncTime: snapshot.lastSyncTime,
-    );
+  Future<void> _rollbackLocalData(_LocalSnapshot snapshot) async {
+    try {
+      await _replaceLocalData(
+        data: snapshot.data,
+        deviceState: snapshot,
+        lastSyncTime: snapshot.lastSyncTime,
+        cycleForecastSnapshot: snapshot.cycleForecastSnapshot,
+      );
+    } catch (rollbackError) {
+      debugPrint('Yerel veri geri alma hatası: $rollbackError');
+    }
   }
 
   Future<void> _replaceLocalData({
-    required UserSettings? settings,
-    required List<DailyLog> logs,
-    required List<String> customMedications,
-    required List<String> customSupplements,
-    required List<String> customFoods,
-    required List<String> customSkincare,
-    required List<MedicationReminderPlan> medicationReminderPlans,
-    required List<MedicationDoseRecord> medicationDoseRecords,
-    required String? authToken,
-    required String? authRefreshToken,
-    required String? authEmail,
-    required String? authName,
-    required String? authGoogleId,
+    required _SyncData data,
+    required _LocalSnapshot deviceState,
     required String? lastSyncTime,
+    required String? cycleForecastSnapshot,
   }) async {
     void requireSuccess(bool success, String operation) {
-      if (!success) {
-        throw StateError('$operation tamamlanamadı.');
-      }
+      if (!success) throw StateError('$operation tamamlanamadı.');
     }
 
     requireSuccess(await _storage.clearAll(), 'Yerel veri temizleme');
 
-    if (authToken != null) {
+    await _writeOptional(
+      deviceState.authToken,
+      _storage.setAuthToken,
+      'Oturum anahtarı yazma',
+    );
+    await _writeOptional(
+      deviceState.authRefreshToken,
+      _storage.setAuthRefreshToken,
+      'Oturum yenileme anahtarı yazma',
+    );
+    await _writeOptional(
+      deviceState.authEmail,
+      _storage.setAuthEmail,
+      'Oturum e-postası yazma',
+    );
+    await _writeOptional(
+      deviceState.authName,
+      _storage.setAuthName,
+      'Oturum adı yazma',
+    );
+    await _writeOptional(
+      deviceState.authGoogleId,
+      _storage.setAuthGoogleId,
+      'Google kimliği yazma',
+    );
+
+    requireSuccess(
+      await _storage.setVirtualDaysOffset(deviceState.virtualDaysOffset),
+      'Sanal tarih ayarı yazma',
+    );
+    for (final insightId in deviceState.notifiedInsightIds) {
       requireSuccess(
-        await _storage.setAuthToken(authToken),
-        'Oturum anahtarı yazma',
-      );
-    }
-    if (authRefreshToken != null) {
-      requireSuccess(
-        await _storage.setAuthRefreshToken(authRefreshToken),
-        'Oturum yenileme anahtarı yazma',
-      );
-    }
-    if (authEmail != null) {
-      requireSuccess(
-        await _storage.setAuthEmail(authEmail),
-        'Oturum e-postası yazma',
-      );
-    }
-    if (authName != null) {
-      requireSuccess(await _storage.setAuthName(authName), 'Oturum adı yazma');
-    }
-    if (authGoogleId != null) {
-      requireSuccess(
-        await _storage.setAuthGoogleId(authGoogleId),
-        'Google kimliği yazma',
+        await _storage.markInsightNotificationSent(insightId),
+        'Bildirim geçmişi yazma',
       );
     }
 
-    // Ayarları en son yazarak log kayıtlarının geçici/eksik istatistiklerle
-    // buluttan gelen ayarları değiştirmesini önle.
-    for (final log in logs) {
+    // Ayarları en son yazarak günlük kayıtların geçici istatistiklerle bulut
+    // ayarlarını değiştirmesini önle.
+    for (final log in data.logs) {
       requireSuccess(await _storage.saveDailyLog(log), 'Günlük kayıt yazma');
     }
     requireSuccess(
-      await _storage.saveCustomMedications(customMedications),
+      await _storage.saveCustomMedications(data.customMedications),
       'İlaç listesi yazma',
     );
     requireSuccess(
-      await _storage.saveCustomSupplements(customSupplements),
+      await _storage.saveCustomSupplements(data.customSupplements),
       'Takviye listesi yazma',
     );
     requireSuccess(
-      await _storage.saveCustomFoods(customFoods),
+      await _storage.saveCustomFoods(data.customFoods),
       'Yiyecek listesi yazma',
     );
     requireSuccess(
-      await _storage.saveCustomSkincareItems(customSkincare),
+      await _storage.saveCustomSkincareItems(data.customSkincare),
       'Cilt bakımı listesi yazma',
     );
     requireSuccess(
-      await _storage.saveMedicationReminderPlans(medicationReminderPlans),
+      await _storage.saveMedicationReminderPlans(data.medicationReminderPlans),
       'İlaç hatırlatma planlarını yazma',
     );
     requireSuccess(
-      await _storage.saveMedicationDoseRecords(medicationDoseRecords),
+      await _storage.saveMedicationDoseRecords(data.medicationDoseRecords),
       'İlaç doz geçmişini yazma',
     );
-    if (settings != null) {
+    if (data.settings != null) {
       requireSuccess(
-        await _storage.saveSettings(settings),
+        await _storage.saveSettings(data.settings!),
         'Kullanıcı ayarları yazma',
       );
     }
-    if (lastSyncTime != null) {
-      requireSuccess(
-        await _storage.setLastSyncTime(lastSyncTime),
-        'Senkronizasyon zamanı yazma',
-      );
+    await _writeOptional(
+      cycleForecastSnapshot,
+      _storage.saveCycleForecastSnapshot,
+      'Döngü tahmini önbelleği yazma',
+    );
+    await _writeOptional(
+      lastSyncTime,
+      _storage.setLastSyncTime,
+      'Senkronizasyon zamanı yazma',
+    );
+  }
+
+  Future<void> _writeOptional(
+    String? value,
+    Future<bool> Function(String) writer,
+    String operation,
+  ) async {
+    if (value == null) return;
+    if (!await writer(value)) {
+      throw StateError('$operation tamamlanamadı.');
     }
   }
 
-  /// 3. Yerel veriler ile bulut verilerini iki yönlü olarak akıllıca birleştirir (Merge).
-  /// Çakışma durumunda aynı tarihli logların verilerini birleştirir.
-  /// Sonuçları hem lokale kaydeder hem de buluta yükler.
-  Future<bool> mergeWithCloud() async {
-    if (!_storage.isUserLoggedIn) return false;
-
-    try {
-      final cloudData = await _api.downloadSync();
-
-      // Eğer bulutta hiç veri yoksa doğrudan yereli buluta yükle
-      if (cloudData == null || cloudData['settings'] == null) {
-        return await backupToCloud();
-      }
-
-      // ── A. İlaç & Takviye Listelerini Birleştir ──
-      final localMeds = _storage.getCustomMedications().toSet();
-      final cloudMeds = List<String>.from(
-        cloudData['customMedications'] ?? [],
-      ).toSet();
-      final mergedMeds = localMeds.union(cloudMeds).toList();
-      await _storage.saveCustomMedications(mergedMeds);
-
-      final localSups = _storage.getCustomSupplements().toSet();
-      final cloudSups = List<String>.from(
-        cloudData['customSupplements'] ?? [],
-      ).toSet();
-      final mergedSups = localSups.union(cloudSups).toList();
-      await _storage.saveCustomSupplements(mergedSups);
-
-      final localFoods = _storage.getCustomFoods().toSet();
-      final cloudFoods = List<String>.from(
-        cloudData['customFoods'] ?? [],
-      ).toSet();
-      final mergedFoods = localFoods.union(cloudFoods).toList();
-      await _storage.saveCustomFoods(mergedFoods);
-
-      final localSkincare = _storage.getCustomSkincare().toSet();
-      final cloudSkincare = List<String>.from(
-        cloudData['customSkincare'] ?? [],
-      ).toSet();
-      final mergedSkincare = localSkincare.union(cloudSkincare).toList();
-      await _storage.saveCustomSkincareItems(mergedSkincare);
-
-      final localPlans = _storage.loadMedicationReminderPlans();
-      final cloudPlans = _parseReminderPlans(
-        cloudData['medicationReminderPlans'],
-      );
-      final mergedPlans = _mergeReminderPlans(localPlans, cloudPlans);
-      await _storage.saveMedicationReminderPlans(mergedPlans);
-
-      final localDoseRecords = _storage.loadMedicationDoseRecords();
-      final cloudDoseRecords = _parseDoseRecords(
-        cloudData['medicationDoseRecords'],
-      );
-      final mergedDoseRecords = _mergeDoseRecords(
-        localDoseRecords,
-        cloudDoseRecords,
-      );
-      await _storage.saveMedicationDoseRecords(mergedDoseRecords);
-
-      // ── B. Ayarları Birleştir ──
-      final localSettings = _storage.loadSettings() ?? UserSettings();
-      final cloudSettings = UserSettings.fromJson(
-        cloudData['settings'] as Map<String, dynamic>,
-      );
-
-      // Akıllı ayar birleştirme (Eksik alanları buluttan doldur, onboarding tamamlandıysa koru)
-      final mergedSettings = localSettings.copyWith(
-        userName: localSettings.userName.isNotEmpty
-            ? localSettings.userName
-            : cloudSettings.userName,
-        isOnboardingComplete:
-            localSettings.isOnboardingComplete ||
-            cloudSettings.isOnboardingComplete,
-        weight: localSettings.weight ?? cloudSettings.weight,
-        height: localSettings.height ?? cloudSettings.height,
-        age: localSettings.age ?? cloudSettings.age,
-        labResults: {...cloudSettings.labResults, ...localSettings.labResults},
-        labTestDate: localSettings.labTestDate ?? cloudSettings.labTestDate,
-        labTestFasting:
-            localSettings.labTestFasting ?? cloudSettings.labTestFasting,
-        relationshipStatus:
-            localSettings.relationshipStatus ??
-            cloudSettings.relationshipStatus,
-        sexuallyActive:
-            localSettings.sexuallyActive ?? cloudSettings.sexuallyActive,
-        wantsChildrenInYear:
-            localSettings.wantsChildrenInYear ??
-            cloudSettings.wantsChildrenInYear,
-        lastPeriodDate:
-            localSettings.lastPeriodDate ?? cloudSettings.lastPeriodDate,
-        birthControlMethod:
-            localSettings.birthControlMethod ??
-            cloudSettings.birthControlMethod,
-        chronicDiseases: (localSettings.chronicDiseases.toSet().union(
-          cloudSettings.chronicDiseases.toSet(),
-        )).toList(),
-        womenDiseases: (localSettings.womenDiseases.toSet().union(
-          cloudSettings.womenDiseases.toSet(),
-        )).toList(),
-        dailyMedications: (localSettings.dailyMedications.toSet().union(
-          cloudSettings.dailyMedications.toSet(),
-        )).toList(),
-        dailySupplements: (localSettings.dailySupplements.toSet().union(
-          cloudSettings.dailySupplements.toSet(),
-        )).toList(),
-        dailySkincare: (localSettings.dailySkincare.toSet().union(
-          cloudSettings.dailySkincare.toSet(),
-        )).toList(),
-      );
-      await _storage.saveSettings(mergedSettings);
-
-      // ── C. Günlük Logları Birleştir ──
-      final localLogs = _storage.loadAllLogs();
-      final cloudLogsRaw = cloudData['logs'] as List? ?? [];
-      final cloudLogs = cloudLogsRaw
-          .map((l) => DailyLog.fromJson(l as Map<String, dynamic>))
-          .toList();
-
-      // Her kayıt kendi timestamp'iyle eşleşir — aynı timestamp ise merge,
-      // farklı timestamp ise ayrı kayıt olarak korunur.
-      final Map<String, DailyLog> mergedLogsMap = {};
-
-      // Önce buluttakileri ekle
-      for (var log in cloudLogs) {
-        mergedLogsMap[log.date.toIso8601String()] = log;
-      }
-
-      // Sonra yereldekileri ekle, çakışma varsa birleştir
-      for (var localLog in localLogs) {
-        final key = localLog.date.toIso8601String();
-        final existingCloudLog = mergedLogsMap[key];
-        if (existingCloudLog != null) {
-          mergedLogsMap[key] = localLog.mergeWith(existingCloudLog);
-        } else {
-          mergedLogsMap[key] = localLog;
-        }
-      }
-
-      // Birleştirilmiş logları yerel depolamaya kaydet
-      for (var log in mergedLogsMap.values) {
-        await _storage.saveDailyLog(log);
-      }
-
-      // ── D. Birleştirilmiş Güncel Durumu Buluta Gönder ──
-      final success = await _api.uploadSync(
-        settings: mergedSettings.toJson(),
-        logs: mergedLogsMap.values.map((l) => l.toJson()).toList(),
-        customMedications: mergedMeds,
-        customSupplements: mergedSups,
-        medicationReminderPlans: mergedPlans
-            .map((plan) => plan.toJson())
-            .toList(),
-        medicationDoseRecords: _doseRecordsForCloud(mergedDoseRecords),
-      );
-      if (success) await _refreshDeviceReminders();
-
-      return success;
-    } catch (e) {
-      debugPrint('Senkronizasyon birleştirme hatası: $e');
-      return false;
+  static _SyncData _parseCloudData(
+    Map<String, dynamic> json, {
+    _SyncData? missingFieldsFallback,
+  }) {
+    T field<T>(String key, T Function(Object?) parser, T fallback) {
+      return json.containsKey(key) ? parser(json[key]) : fallback;
     }
+
+    return _SyncData(
+      settings: _parseSettings(json['settings']),
+      logs: field(
+        'logs',
+        _parseLogs,
+        missingFieldsFallback?.logs ?? const <DailyLog>[],
+      ),
+      customMedications: field(
+        'customMedications',
+        _parseMedicationIdentities,
+        missingFieldsFallback?.customMedications ??
+            const <MedicationIdentity>[],
+      ),
+      customSupplements: field(
+        'customSupplements',
+        (raw) => _parseStringList(raw, 'Bulut takviye listesi'),
+        missingFieldsFallback?.customSupplements ?? const <String>[],
+      ),
+      customFoods: field(
+        'customFoods',
+        (raw) => _parseStringList(raw, 'Bulut yiyecek listesi'),
+        missingFieldsFallback?.customFoods ?? const <String>[],
+      ),
+      customSkincare: field(
+        'customSkincare',
+        (raw) => _parseStringList(raw, 'Bulut cilt bakımı listesi'),
+        missingFieldsFallback?.customSkincare ?? const <String>[],
+      ),
+      medicationReminderPlans: field(
+        'medicationReminderPlans',
+        _parseReminderPlans,
+        missingFieldsFallback?.medicationReminderPlans ??
+            const <MedicationReminderPlan>[],
+      ),
+      medicationDoseRecords: field(
+        'medicationDoseRecords',
+        _parseDoseRecords,
+        missingFieldsFallback?.medicationDoseRecords ??
+            const <MedicationDoseRecord>[],
+      ),
+    );
+  }
+
+  static UserSettings? _parseSettings(Object? raw) {
+    if (raw == null) return null;
+    if (raw is! Map) {
+      throw const FormatException('Bulut kullanıcı ayarları geçersiz.');
+    }
+    return UserSettings.fromJson(Map<String, dynamic>.from(raw));
+  }
+
+  static List<DailyLog> _parseLogs(Object? raw) {
+    if (raw == null) return const <DailyLog>[];
+    if (raw is! List) {
+      throw const FormatException('Bulut log listesi geçersiz.');
+    }
+    return raw
+        .map((item) {
+          if (item is! Map) {
+            throw const FormatException('Bulut log kaydı geçersiz.');
+          }
+          return DailyLog.fromJson(Map<String, dynamic>.from(item));
+        })
+        .toList(growable: false);
+  }
+
+  static List<String> _parseStringList(Object? raw, String fieldName) {
+    if (raw == null) return const <String>[];
+    if (raw is! List || raw.any((item) => item is! String)) {
+      throw FormatException('$fieldName geçersiz.');
+    }
+    return List<String>.unmodifiable(raw.cast<String>());
   }
 
   static List<MedicationReminderPlan> _parseReminderPlans(Object? raw) {
-    if (raw == null) return [];
+    if (raw == null) return const <MedicationReminderPlan>[];
     if (raw is! List) {
       throw const FormatException('Bulut hatırlatma planları geçersiz.');
     }
     return raw
-        .map(
-          (item) => MedicationReminderPlan.fromJson(
-            Map<String, dynamic>.from(item as Map),
-          ),
-        )
-        .toList();
+        .map((item) {
+          if (item is! Map) {
+            throw const FormatException('Bulut hatırlatma planı geçersiz.');
+          }
+          return MedicationReminderPlan.fromJson(
+            Map<String, dynamic>.from(item),
+          );
+        })
+        .toList(growable: false);
+  }
+
+  static List<MedicationIdentity> _parseMedicationIdentities(Object? raw) {
+    if (raw == null) return const <MedicationIdentity>[];
+    if (raw is! List) {
+      throw const FormatException('Bulut ilaç listesi geçersiz.');
+    }
+    return raw
+        .map((item) {
+          if (item is! Map) {
+            throw const FormatException('Bulut ilaç kaydı geçersiz.');
+          }
+          return MedicationIdentity.fromJson(Map<String, dynamic>.from(item));
+        })
+        .toList(growable: false);
   }
 
   static List<MedicationDoseRecord> _parseDoseRecords(Object? raw) {
-    if (raw == null) return [];
+    if (raw == null) return const <MedicationDoseRecord>[];
     if (raw is! List) {
       throw const FormatException('Bulut doz geçmişi geçersiz.');
     }
     return raw
-        .map(
-          (item) => MedicationDoseRecord.fromJson(
-            Map<String, dynamic>.from(item as Map),
-          ),
-        )
-        .toList();
+        .map((item) {
+          if (item is! Map) {
+            throw const FormatException('Bulut doz kaydı geçersiz.');
+          }
+          return MedicationDoseRecord.fromJson(Map<String, dynamic>.from(item));
+        })
+        .toList(growable: false);
+  }
+
+  static _SyncData _mergeData(_SyncData local, _SyncData cloud) {
+    final cloudSettings = cloud.settings!;
+    final localSettings = local.settings;
+    final mergedSettings = localSettings == null
+        ? cloudSettings
+        : _mergeSettings(localSettings, cloudSettings);
+
+    final mergedLogs = <String, DailyLog>{
+      for (final log in cloud.logs) log.date.toIso8601String(): log,
+    };
+    for (final log in local.logs) {
+      final key = log.date.toIso8601String();
+      final cloudLog = mergedLogs[key];
+      mergedLogs[key] = cloudLog == null ? log : log.mergeWith(cloudLog);
+    }
+    final logs = mergedLogs.values.toList(growable: false)
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    return _SyncData(
+      settings: mergedSettings,
+      logs: logs,
+      customMedications: <MedicationIdentity>{
+        ...local.customMedications,
+        ...cloud.customMedications,
+      }.toList(growable: false),
+      customSupplements: _mergeStrings(
+        local.customSupplements,
+        cloud.customSupplements,
+      ),
+      customFoods: _mergeStrings(local.customFoods, cloud.customFoods),
+      customSkincare: _mergeStrings(local.customSkincare, cloud.customSkincare),
+      medicationReminderPlans: _mergeReminderPlans(
+        local.medicationReminderPlans,
+        cloud.medicationReminderPlans,
+      ),
+      medicationDoseRecords: _mergeDoseRecords(
+        local.medicationDoseRecords,
+        cloud.medicationDoseRecords,
+      ),
+    );
+  }
+
+  static UserSettings _mergeSettings(UserSettings local, UserSettings cloud) {
+    // Tamamlanmış profil, yarım kalmış/onboarding aşamasındaki profilden daha
+    // güvenilir kabul edilir. İkisi aynı durumdaysa cihazdaki değer kazanır.
+    // Böylece bool ve varsayılan sayısal alanlar da tek kaynaktan gelir.
+    final preferLocal =
+        local.isOnboardingComplete || !cloud.isOnboardingComplete;
+    final primary = preferLocal ? local : cloud;
+    final secondary = preferLocal ? cloud : local;
+
+    return primary.copyWith(
+      userName: primary.userName.isNotEmpty
+          ? primary.userName
+          : secondary.userName,
+      isOnboardingComplete:
+          local.isOnboardingComplete || cloud.isOnboardingComplete,
+      smokingYears: primary.smokingYears ?? secondary.smokingYears,
+      weight: primary.weight ?? secondary.weight,
+      height: primary.height ?? secondary.height,
+      age: primary.age ?? secondary.age,
+      labResults: {...secondary.labResults, ...primary.labResults},
+      labTestDate: primary.labTestDate ?? secondary.labTestDate,
+      labTestFasting: primary.labTestFasting ?? secondary.labTestFasting,
+      relationshipStatus:
+          primary.relationshipStatus ?? secondary.relationshipStatus,
+      sexuallyActive: primary.sexuallyActive ?? secondary.sexuallyActive,
+      wantsChildrenInYear:
+          primary.wantsChildrenInYear ?? secondary.wantsChildrenInYear,
+      lastPeriodDate: primary.lastPeriodDate ?? secondary.lastPeriodDate,
+      birthControlMethod:
+          primary.birthControlMethod ?? secondary.birthControlMethod,
+      chronicDiseases: _mergeStrings(
+        primary.chronicDiseases,
+        secondary.chronicDiseases,
+      ),
+      womenDiseases: _mergeStrings(
+        primary.womenDiseases,
+        secondary.womenDiseases,
+      ),
+      dailyMedications: <MedicationIdentity>{
+        ...primary.dailyMedications,
+        ...secondary.dailyMedications,
+      }.toList(growable: false),
+      dailySupplements: _mergeStrings(
+        primary.dailySupplements,
+        secondary.dailySupplements,
+      ),
+      dailySkincare: _mergeStrings(
+        primary.dailySkincare,
+        secondary.dailySkincare,
+      ),
+    );
+  }
+
+  static List<String> _mergeStrings(List<String> local, List<String> cloud) {
+    return <String>{...local, ...cloud}.toList(growable: false);
   }
 
   static List<MedicationReminderPlan> _mergeReminderPlans(
@@ -476,9 +517,8 @@ class SyncService {
         merged[plan.id] = plan;
       }
     }
-    final result = merged.values.toList()
+    return merged.values.toList()
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    return result;
   }
 
   static List<MedicationDoseRecord> _mergeDoseRecords(
@@ -491,7 +531,9 @@ class SyncService {
           id: record.id,
           planId: record.planId,
           itemType: record.itemType,
-          itemName: record.itemName,
+          displayName: record.displayName,
+          mainGroup: record.mainGroup,
+          activeIngredient: record.activeIngredient,
           dosage: record.dosage,
           scheduledAt: record.scheduledAt,
           notificationScheduled: false,
@@ -515,7 +557,9 @@ class SyncService {
         id: localRecord.id,
         planId: localRecord.planId,
         itemType: localRecord.itemType,
-        itemName: localRecord.itemName,
+        displayName: localRecord.displayName,
+        mainGroup: localRecord.mainGroup,
+        activeIngredient: localRecord.activeIngredient,
         dosage: localRecord.dosage,
         scheduledAt: localRecord.scheduledAt,
         notificationScheduled: localRecord.notificationScheduled,
@@ -529,58 +573,65 @@ class SyncService {
       );
     }
 
-    final result = merged.values.toList()
+    return merged.values.toList()
       ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
-    return result;
   }
 
   static List<Map<String, dynamic>> _doseRecordsForCloud(
     List<MedicationDoseRecord> records,
   ) {
-    return records.map((record) {
-      final json = record.toJson();
-      json.remove('notificationScheduled');
-      json.remove('notificationScheduledAt');
-      return json;
-    }).toList();
+    return records
+        .map((record) {
+          final json = record.toJson();
+          json.remove('notificationScheduled');
+          json.remove('notificationScheduledAt');
+          return json;
+        })
+        .toList(growable: false);
   }
+
+  static List<Map<String, dynamic>> _medicationPayloadsForCloud(
+    Iterable<MedicationIdentity> medications,
+  ) => <Map<String, dynamic>>[
+    for (final medication in medications) medication.toJson(),
+  ];
 
   Future<void> _refreshDeviceReminders() async {
     final notifications = _notifications;
     if (notifications == null) return;
-    var scheduledDoseIds = <String>{};
+
     try {
+      final plans = _storage.loadMedicationReminderPlans();
       final result = await notifications.rescheduleMedicationReminders(
-        plans: _storage.loadMedicationReminderPlans(),
+        plans: plans,
       );
-      scheduledDoseIds = result.scheduledDoses.map((dose) => dose.id).toSet();
+      await _storage.refreshMedicationDoseRecords(
+        plans: plans,
+        notificationScheduledDoseIds: result.scheduledDoses
+            .map((dose) => dose.id)
+            .toSet(),
+      );
     } catch (error) {
+      // Bildirim planlama cihaz özelliğidir; bulut/veri senkronizasyonunu geri
+      // almaya sebep olmamalıdır. Uygulama sonraki açılışta yeniden dener.
       debugPrint('Eşitlenen hatırlatıcılar zamanlanamadı: $error');
     }
-    await _storage.refreshMedicationDoseRecords(
-      plans: _storage.loadMedicationReminderPlans(),
-      notificationScheduledDoseIds: scheduledDoseIds,
-    );
   }
+
+  static String _nowIso() => DateTime.now().toIso8601String();
 }
 
-class _LocalSnapshot {
+class _SyncData {
   final UserSettings? settings;
   final List<DailyLog> logs;
-  final List<String> customMedications;
+  final List<MedicationIdentity> customMedications;
   final List<String> customSupplements;
   final List<String> customFoods;
   final List<String> customSkincare;
   final List<MedicationReminderPlan> medicationReminderPlans;
   final List<MedicationDoseRecord> medicationDoseRecords;
-  final String? authToken;
-  final String? authRefreshToken;
-  final String? authEmail;
-  final String? authName;
-  final String? authGoogleId;
-  final String? lastSyncTime;
 
-  const _LocalSnapshot({
+  const _SyncData({
     required this.settings,
     required this.logs,
     required this.customMedications,
@@ -589,11 +640,31 @@ class _LocalSnapshot {
     required this.customSkincare,
     required this.medicationReminderPlans,
     required this.medicationDoseRecords,
+  });
+}
+
+class _LocalSnapshot {
+  final _SyncData data;
+  final String? authToken;
+  final String? authRefreshToken;
+  final String? authEmail;
+  final String? authName;
+  final String? authGoogleId;
+  final String? lastSyncTime;
+  final int virtualDaysOffset;
+  final Set<String> notifiedInsightIds;
+  final String? cycleForecastSnapshot;
+
+  const _LocalSnapshot({
+    required this.data,
     required this.authToken,
     required this.authRefreshToken,
     required this.authEmail,
     required this.authName,
     required this.authGoogleId,
     required this.lastSyncTime,
+    required this.virtualDaysOffset,
+    required this.notifiedInsightIds,
+    required this.cycleForecastSnapshot,
   });
 }

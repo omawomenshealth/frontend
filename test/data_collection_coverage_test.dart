@@ -19,7 +19,9 @@ void main() {
       caffeineServings: 2,
       supplements: [
         MedicationEntry(
-          name: 'Demir',
+          displayName: 'Demir',
+          mainGroup: 'Demir',
+          activeIngredient: null,
           times: const {'Sabah', 'Akşam'},
           stomachState: 'Tok',
           doseCount: 3,
@@ -28,7 +30,9 @@ void main() {
       ],
       medications: [
         MedicationEntry(
-          name: 'İlaç',
+          displayName: 'Ağrı kesici - Parasetamol',
+          mainGroup: 'Ağrı kesici',
+          activeIngredient: 'Parasetamol',
           times: const {'Akşam'},
           stomachState: 'Aç',
           doseCount: 2,
@@ -40,6 +44,7 @@ void main() {
       moodCompanions: const ['Arkadaş'],
       moodPlaces: const ['Ev'],
       dreamRemembered: true,
+      dreamType: DreamType.good,
       dreamNote: 'Deniz kenarında yürüyordum.',
       sexualActivity: true,
       sexualActivityTypes: const {
