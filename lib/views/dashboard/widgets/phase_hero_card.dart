@@ -74,7 +74,7 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
           '${widget.forecastSummary == null ? '' : '. ${widget.forecastSummary}'}',
       child: Container(
         width: double.infinity,
-        height: 420,
+        height: 440,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: presentation.softColor,
@@ -118,7 +118,7 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
                   _PhaseBadge(presentation: presentation),
                   const Spacer(),
                   Text(
-                    '${presentation.dayLabel} ${widget.cycleDay} · '
+                    '${presentation.dayLabel}: ${widget.cycleDay} · '
                     '${presentation.fertility}',
                     style: TextStyle(
                       color: presentation.color,
@@ -396,7 +396,7 @@ class _PhasePresentation {
         headline: AppStrings.phaseMenstrualHeadline,
         body: AppStrings.phaseMenstrualBody,
         fertility: AppStrings.phaseMenstrualFertility,
-        dayLabel: AppStrings.dayUnit,
+        dayLabel: AppStrings.cycleDayLabel,
         readLabel: AppStrings.readBodyChanges,
         isPeriod: true,
       ),
@@ -408,7 +408,7 @@ class _PhasePresentation {
         headline: AppStrings.phaseFollicularHeadline,
         body: AppStrings.phaseFollicularBody,
         fertility: AppStrings.phaseFollicularFertility,
-        dayLabel: AppStrings.dayUnit,
+        dayLabel: AppStrings.cycleDayLabel,
         readLabel: AppStrings.readBodyChanges,
         isPeriod: false,
       ),
@@ -420,7 +420,7 @@ class _PhasePresentation {
         headline: AppStrings.phaseOvulationHeadline,
         body: AppStrings.phaseOvulationBody,
         fertility: AppStrings.phaseOvulationFertility,
-        dayLabel: AppStrings.dayUnit,
+        dayLabel: AppStrings.cycleDayLabel,
         readLabel: AppStrings.readBodyChanges,
         isPeriod: false,
       ),
@@ -432,7 +432,7 @@ class _PhasePresentation {
         headline: AppStrings.phaseLutealHeadline,
         body: AppStrings.phaseLutealBody,
         fertility: AppStrings.phaseLutealFertility,
-        dayLabel: AppStrings.dayUnit,
+        dayLabel: AppStrings.cycleDayLabel,
         readLabel: AppStrings.readBodyChanges,
         isPeriod: false,
       ),

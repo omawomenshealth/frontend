@@ -1166,12 +1166,6 @@ class _DailyLogDetails extends StatelessWidget {
           : AppStrings.milliliters(value.waterIntakeMl!),
     );
     add(
-      AppStrings.caffeineIntake,
-      value.caffeineServings == null
-          ? null
-          : AppStrings.servingCount(value.caffeineServings!),
-    );
-    add(
       AppStrings.medications,
       value.medications.isEmpty
           ? null

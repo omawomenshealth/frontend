@@ -280,8 +280,6 @@ class DoctorReportView extends StatelessWidget {
             '${log.cravings.map(AppStrings.localizeStoredValue).join(', ')}',
       if (log.waterIntakeMl != null)
         '${AppStrings.waterIntake}: ${AppStrings.milliliters(log.waterIntakeMl!)}',
-      if (log.caffeineServings != null)
-        '${AppStrings.caffeineIntake}: ${AppStrings.servingCount(log.caffeineServings!)}',
     ].join(', ');
   }
 
@@ -473,8 +471,7 @@ class DoctorReportView extends StatelessWidget {
                         l.mealFoodGroups.isNotEmpty ||
                         l.mealPostFeelings.isNotEmpty ||
                         l.cravings.isNotEmpty ||
-                        l.waterIntakeMl != null ||
-                        l.caffeineServings != null,
+                        l.waterIntakeMl != null,
                   )
                   .toList();
               final String beslenmeText;
@@ -813,8 +810,7 @@ class DoctorReportView extends StatelessWidget {
                 l.mealFoodGroups.isNotEmpty ||
                 l.mealPostFeelings.isNotEmpty ||
                 l.cravings.isNotEmpty ||
-                l.waterIntakeMl != null ||
-                l.caffeineServings != null,
+                l.waterIntakeMl != null,
           )
           .toList();
       final String beslenme;
@@ -1088,8 +1084,7 @@ class DoctorReportView extends StatelessWidget {
                   l.mealFoodGroups.isNotEmpty ||
                   l.mealPostFeelings.isNotEmpty ||
                   l.cravings.isNotEmpty ||
-                  l.waterIntakeMl != null ||
-                  l.caffeineServings != null,
+                  l.waterIntakeMl != null,
             )
             .toList();
         final String beslenmeText;

@@ -13,10 +13,11 @@ void main() {
     final original = DailyLog(
       date: DateTime(2026, 1, 1),
       waterIntakeMl: 2250,
-      caffeineServings: 1,
       mood: 'İyi',
       moodCompanions: const ['Arkadaş'],
       moodPlaces: const ['Ev'],
+      symptoms: const ['Stres'],
+      symptomSeverities: const {'Stres': 3},
       dreamRemembered: true,
       dreamType: DreamType.good,
       dreamNote: 'Deniz gördüm.',
@@ -27,6 +28,7 @@ void main() {
       vaginalDischargeSymptoms: const {VaginalDischargeSymptom.unusualOdor},
       observedSections: const {
         DailyLogObservedSection.nutrition,
+        DailyLogObservedSection.symptom,
         DailyLogObservedSection.wellbeing,
       },
     );
@@ -41,9 +43,10 @@ void main() {
       }),
     );
     expect(restored.waterIntakeMl, 2250);
-    expect(restored.caffeineServings, 1);
     expect(restored.mood, 'İyi');
     expect(restored.moodCompanions, contains('Arkadaş'));
+    expect(restored.symptoms, contains('Stres'));
+    expect(restored.symptomSeverities['Stres'], 3);
     expect(restored.vaginalDischargePresent, isTrue);
     expect(restored.vaginalDischargeColor, VaginalDischargeColor.clear);
     expect(
@@ -58,15 +61,13 @@ void main() {
     expect(restored.hasData, isTrue);
   });
 
-  test('eski metrikleri yok sayar, geçersiz aktif değerleri reddeder', () {
-    final restored = DailyLog.fromJson({
-      'date': DateTime(2026, 1, 1).toIso8601String(),
-      'sleepQuality': 6,
-      'energyLevel': 9,
-    });
+  test('inaktif ve geçersiz aktif günlük değerlerini reddeder', () {
     expect(
-      restored.toJson().keys.where(DailyLog.retiredJsonFields.contains),
-      isEmpty,
+      () => DailyLog.fromJson({
+        'date': DateTime(2026, 1, 1).toIso8601String(),
+        'energyLevel': 4,
+      }),
+      throwsFormatException,
     );
     expect(
       () => DailyLog.fromJson({
@@ -186,6 +187,45 @@ void main() {
       ),
     );
   });
+
+  test(
+    'kafeinli içecek seçimini tek Kafeinli insight sinyaline dönüştürür',
+    () {
+      final logs = _pairedLogs(
+        (date, exposed, event) => DailyLog(
+          date: date,
+          mealTypes: const ['Kahvaltı'],
+          mealFoodGroups: {
+            'Kahvaltı': [exposed ? 'Filtre kahve' : 'Sebze'],
+          },
+          symptoms: event ? const ['Gaz'] : const [],
+          observedSections: const {
+            DailyLogObservedSection.nutrition,
+            DailyLogObservedSection.symptom,
+          },
+        ),
+      );
+
+      final association = engine
+          .generate(logs: logs)
+          .firstWhere(
+            (insight) =>
+                insight.kind == PersonalInsightKind.structuredAssociation &&
+                insight.primaryLabel ==
+                    AppStrings.caffeinatedFoodInsightSignal &&
+                insight.secondaryLabel == 'Gaz' &&
+                insight.lagDays == 0,
+          );
+
+      _expectEightToOnePattern(association);
+      expect(
+        engine
+            .generate(logs: logs)
+            .where((insight) => insight.primaryLabel == 'Filtre kahve'),
+        isEmpty,
+      );
+    },
+  );
 
   test('gluten ve şişkinlik örüntüsünü temkinli hassasiyet içgörüsü yapar', () {
     final logs = <DailyLog>[];
@@ -411,42 +451,12 @@ void main() {
     },
   );
 
-  test('arayüzde olmayan eski enerji alanını insight adayı yapmaz', () {
-    final start = DateTime(2026, 1, 1);
-    final logs = List.generate(84, (day) {
-      final dayInCycle = day % 28;
-      final isLuteal = dayInCycle >= 17;
-      return DailyLog.fromJson({
-        'date': start.add(Duration(days: day)).toIso8601String(),
-        'energyLevel': isLuteal ? 2 : 4,
-        'observedSections': ['wellbeing'],
-      });
-    });
-
-    final insights = engine.generate(
-      logs: logs,
-      settings: UserSettings(
-        lastPeriodDate: start,
-        averageCycleLength: 28,
-        averagePeriodLength: 5,
-      ),
-    );
-    expect(
-      insights.where(
-        (insight) =>
-            insight.kind == PersonalInsightKind.energyCyclePhaseAssociation,
-      ),
-      isEmpty,
-    );
-  });
-
   test('döngü sinyali uygun değilse faz-ruh hali bağlantısını bastırır', () {
     final start = DateTime(2026, 1, 1);
     final logs = List.generate(56, (day) {
       return DailyLog.fromJson({
         'date': start.add(Duration(days: day)).toIso8601String(),
         'mood': day % 28 >= 5 && day % 28 <= 11 ? 'Mutlu' : 'Yorgun',
-        'energyLevel': day % 28 >= 17 ? 2 : 4,
       });
     });
 
@@ -461,81 +471,22 @@ void main() {
     expect(
       insights.where(
         (insight) =>
-            insight.kind == PersonalInsightKind.moodCyclePhaseAssociation ||
-            insight.kind == PersonalInsightKind.energyCyclePhaseAssociation,
+            insight.kind == PersonalInsightKind.moodCyclePhaseAssociation,
       ),
       isEmpty,
     );
   });
 
-  test('arayüzde olmayan eski aktivite alanını insight adayı yapmaz', () {
-    final logs = <DailyLog>[];
-    for (var day = 0; day < 20; day++) {
-      logs.add(
-        DailyLog.fromJson({
-          'date': DateTime(
-            2026,
-            5,
-            1,
-          ).add(Duration(days: day)).toIso8601String(),
-          'activities': day < 10 ? ['Yürüyüş'] : <String>[],
-          'symptoms': day == 5 || day >= 10 && day < 18
-              ? ['Baş ağrısı']
-              : <String>[],
-          'observedSections': ['wellbeing'],
+  test('inaktif günlük alanları insight motoruna ulaşmadan reddedilir', () {
+    for (final field in ['activities', 'stressLevel', 'nutritionTags']) {
+      expect(
+        () => DailyLog.fromJson({
+          'date': DateTime(2026, 3, 1).toIso8601String(),
+          field: field == 'stressLevel' ? 5 : ['Eski değer'],
         }),
+        throwsFormatException,
       );
     }
-
-    final insights = engine.generate(logs: logs);
-    expect(
-      insights.where(
-        (insight) =>
-            insight.kind == PersonalInsightKind.structuredAssociation &&
-            insight.primaryLabel == 'Yürüyüş',
-      ),
-      isEmpty,
-    );
-  });
-
-  test('arayüzde olmayan eski stres alanını insight adayı yapmaz', () {
-    final logs = <DailyLog>[];
-    for (var day = 0; day < 20; day++) {
-      logs.add(
-        DailyLog.fromJson({
-          'date': DateTime(
-            2026,
-            5,
-            1,
-          ).add(Duration(days: day)).toIso8601String(),
-          'stressLevel': day < 10 ? 5 : 1,
-          'symptoms': day < 8 || day == 15 ? ['Baş ağrısı'] : <String>[],
-          'observedSections': ['wellbeing'],
-        }),
-      );
-    }
-
-    final insights = engine.generate(logs: logs);
-    expect(
-      insights.where(
-        (insight) =>
-            insight.primaryLabel == AppStrings.insightFeatureHighStressToken,
-      ),
-      isEmpty,
-    );
-  });
-
-  test('arayüzde olmayan eski beslenme etiketini analiz etmez', () {
-    final logs = List.generate(12, (day) {
-      return DailyLog.fromJson({
-        'date': DateTime(2026, 3, 1).add(Duration(days: day)).toIso8601String(),
-        'nutritionTags': day < 3 ? ['Tuzlu'] : <String>[],
-        'symptoms': day == 0 || day == 1 ? ['Şişkinlik'] : <String>[],
-        'observedSections': ['nutrition', 'wellbeing'],
-      });
-    });
-
-    expect(engine.generate(logs: logs), isEmpty);
   });
 
   test('ilaç atlandı yanıtı ile ertesi gün belirtisini karşılaştırır', () {
@@ -707,12 +658,12 @@ void main() {
     _expectEightToOnePattern(association);
   });
 
-  test('ruh hali ile canın ne çekti seçimini karşılaştırır', () {
+  test('ruh hali ile artıdan eklenen özel aşermeyi karşılaştırır', () {
     final logs = _pairedLogs(
       (date, exposed, event) => DailyLog(
         date: date,
         mood: exposed ? 'İyi' : 'Nötr',
-        cravings: [event ? 'Çikolata' : 'Hiçbiri'],
+        cravings: [event ? 'Gece atıştırması' : 'Hiçbiri'],
         observedSections: const {
           DailyLogObservedSection.wellbeing,
           DailyLogObservedSection.nutrition,
@@ -726,7 +677,7 @@ void main() {
           (insight) =>
               insight.kind == PersonalInsightKind.moodCravingAssociation &&
               insight.primaryLabel == 'İyi' &&
-              insight.secondaryLabel == 'Çikolata',
+              insight.secondaryLabel == 'Gece atıştırması',
         );
 
     _expectEightToOnePattern(association);
@@ -790,7 +741,7 @@ void main() {
       (date, exposed, event) => DailyLog(
         date: date,
         mood: exposed ? 'İyi' : 'Nötr',
-        moodCompanions: event ? const ['Yakın arkadaşım'] : const [],
+        moodCompanions: event ? const ['Yakın arkadaşım'] : const ['Yalnızım'],
         observedSections: const {DailyLogObservedSection.wellbeing},
       ),
     );
@@ -805,6 +756,115 @@ void main() {
         );
 
     _expectEightToOnePattern(association);
+  });
+
+  test('stres bağlantılarını yeterli karşılaştırmadan sonra üretir', () {
+    final logs = _pairedLogs(
+      (date, stressed, event) => DailyLog(
+        date: date,
+        symptoms: stressed ? const ['Stress'] : const ['Everything is fine'],
+        symptomSeverities: stressed ? const {'Stress': 2} : const {},
+        moodCompanions: event ? const ['Yakın arkadaşım'] : const ['Yalnızım'],
+        cravings: [event ? 'Gece atıştırması' : 'Hiçbiri'],
+        mealTypes: const ['Akşam yemeği'],
+        mealFoodGroups: {
+          'Akşam yemeği': [event ? 'Ev yapımı granola' : 'Sebze'],
+        },
+        observedSections: const {
+          DailyLogObservedSection.symptom,
+          DailyLogObservedSection.wellbeing,
+          DailyLogObservedSection.nutrition,
+        },
+      ),
+    );
+
+    final insights = engine.generate(logs: logs);
+    for (final expected in [
+      (PersonalInsightKind.stressCompanionAssociation, 'Yakın arkadaşım'),
+      (PersonalInsightKind.stressCravingAssociation, 'Gece atıştırması'),
+      (PersonalInsightKind.stressFoodAssociation, 'Ev yapımı granola'),
+    ]) {
+      final association = insights.firstWhere(
+        (insight) =>
+            insight.kind == expected.$1 &&
+            insight.primaryLabel == 'Stres' &&
+            insight.secondaryLabel == expected.$2,
+      );
+      _expectEightToOnePattern(association);
+    }
+  });
+
+  test('stres bağlantısını ilk birkaç kayıtta göstermez', () {
+    final logs = List.generate(
+      7,
+      (day) => DailyLog(
+        date: DateTime(2026, 8, 1).add(Duration(days: day)),
+        symptoms: day < 4 ? const ['Stres'] : const ['Her şey yolunda'],
+        moodCompanions: day.isEven ? const ['X kişisi'] : const ['Yalnızım'],
+        cravings: [day.isEven ? 'Tatlı' : 'Hiçbiri'],
+        mealFoodGroups: {
+          'Akşam yemeği': [day.isEven ? 'Gluten' : 'Sebze'],
+        },
+        observedSections: const {
+          DailyLogObservedSection.symptom,
+          DailyLogObservedSection.wellbeing,
+          DailyLogObservedSection.nutrition,
+        },
+      ),
+    );
+
+    expect(
+      engine
+          .generate(logs: logs)
+          .where(
+            (insight) =>
+                insight.kind ==
+                    PersonalInsightKind.stressCompanionAssociation ||
+                insight.kind == PersonalInsightKind.stressCravingAssociation ||
+                insight.kind == PersonalInsightKind.stressFoodAssociation,
+          ),
+      isEmpty,
+    );
+  });
+
+  test('boş kişi alanını stres karşılaştırmasına dahil etmez', () {
+    final logs = _pairedLogs(
+      (date, stressed, event) => DailyLog(
+        date: date,
+        symptoms: stressed ? const ['Stres'] : const ['Her şey yolunda'],
+        moodCompanions: event ? const ['X kişisi'] : const [],
+        observedSections: const {
+          DailyLogObservedSection.symptom,
+          DailyLogObservedSection.wellbeing,
+        },
+      ),
+    );
+
+    expect(
+      engine
+          .generate(logs: logs)
+          .where(
+            (insight) =>
+                insight.kind == PersonalInsightKind.stressCompanionAssociation,
+          ),
+      isEmpty,
+    );
+  });
+
+  test('kişi ile belirti arasında insight üretmez', () {
+    final logs = _pairedLogs(
+      (date, exposed, event) => DailyLog(
+        date: date,
+        moodCompanions: exposed ? const ['X kişisi'] : const ['Y kişisi'],
+        symptoms: event ? const ['Gaz'] : const [],
+        observedSections: const {
+          DailyLogObservedSection.wellbeing,
+          DailyLogObservedSection.symptom,
+        },
+      ),
+    );
+
+    expect(engine.generate(logs: logs), isEmpty);
   });
 }
 

@@ -56,10 +56,14 @@ void main() {
         flowIntensity: 'Orta',
         mealTypes: const ['Kahvaltı'],
         mealFoodGroups: const {
-          'Kahvaltı': ['Yumurta', 'Tam tahıllı ekmek', 'Domates'],
+          'Kahvaltı': [
+            'Yumurta',
+            'Tam tahıllı ekmek',
+            'Domates',
+            'Filtre kahve',
+          ],
         },
         waterIntakeMl: 1800,
-        caffeineServings: 1,
         medications: [
           MedicationEntry(
             displayName: 'Ağrı kesici - Parasetamol',

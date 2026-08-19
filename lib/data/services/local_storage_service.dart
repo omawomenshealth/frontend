@@ -15,6 +15,23 @@ import 'local_encrypted_store.dart';
 /// Sağlık ve oturum verilerini AES-256-GCM şifreli SharedPreferences zarfları
 /// üzerinden okuyan/yazan servis. Yerel anahtar Keystore/Keychain'de tutulur.
 class LocalStorageService {
+  // Yalnızca geçmişteki şifreli cihaz kayıtlarını bir defaya mahsus
+  // dönüştürmek için tutulur; güncel DailyLog/Sync şemasının parçası değildir.
+  static const Set<String> _legacyDailyLogFields = {
+    'activities',
+    'nutritionTags',
+    'nutritionNotes',
+    'moodNote',
+    'sleepDurationMinutes',
+    'sleepQuality',
+    'stressLevel',
+    'energyLevel',
+    'bowelActivity',
+    'periodPainLevel',
+    'notes',
+    'caffeineServings',
+  };
+
   static const String _settingsKey = 'user_settings';
   static const String _logPrefix = 'daily_log_';
   static const String _logDatesKey = 'daily_log_dates';
@@ -90,6 +107,117 @@ class LocalStorageService {
     );
     await _encryptedStore!.init();
     await _migrateRetiredDailyLogFields();
+    await _backfillReusableCustomOptions();
+  }
+
+  /// Eski sürümlerde yalnızca günlük kaydın veya seçili profil alanının içinde
+  /// kalan `+` değerlerini bir defaya mahsus yeniden kullanılabilir kataloğa
+  /// taşır. Varsayılan seçenekler özel kataloglara eklenmez.
+  Future<void> _backfillReusableCustomOptions() async {
+    var settings = loadSettings();
+    if (settings == null) return;
+
+    final customConditions =
+        [...settings.chronicDiseases, ...settings.womenDiseases].where(
+          (value) => !_matchesLocalizedOption(value, [
+            ...AppStrings.chronicDiseasesList,
+            ...AppStrings.womenDiseasesList,
+          ]),
+        );
+    settings = settings.rememberCustomOptions(
+      UserDefinedOptionKind.condition,
+      customConditions,
+    );
+
+    final birthControl = settings.birthControlMethod;
+    if (birthControl != null &&
+        !_matchesLocalizedOption(birthControl, [
+          AppStrings.noBirthControl,
+          AppStrings.pill,
+          AppStrings.iud,
+          AppStrings.condom,
+          AppStrings.implant,
+        ])) {
+      settings = settings.rememberCustomOption(
+        UserDefinedOptionKind.birthControl,
+        birthControl,
+      );
+    }
+
+    final customFoods = <String>[];
+    final customCravings = <String>[];
+    final customCompanions = <String>[];
+    final customPlaces = <String>[];
+    final defaultFoods = AppStrings.nutritionCatalog.values
+        .expand((items) => items)
+        .toList(growable: false);
+    for (final log in loadAllLogs()) {
+      for (final foods in log.mealFoodGroups.values) {
+        customFoods.addAll(
+          foods.where((value) => !_matchesLocalizedOption(value, defaultFoods)),
+        );
+      }
+      customCravings.addAll(
+        log.cravings.where(
+          (value) => !_matchesLocalizedOption(
+            value,
+            AppStrings.nutritionCravingOptions,
+          ),
+        ),
+      );
+      customCompanions.addAll(
+        log.moodCompanions.where(
+          (value) =>
+              !_matchesLocalizedOption(value, AppStrings.moodCompanionOptions),
+        ),
+      );
+      customPlaces.addAll(
+        log.moodPlaces.where(
+          (value) =>
+              !_matchesLocalizedOption(value, AppStrings.moodPlaceOptions),
+        ),
+      );
+    }
+
+    settings = settings
+        .rememberCustomOptions(UserDefinedOptionKind.craving, customCravings)
+        .rememberCustomOptions(
+          UserDefinedOptionKind.moodCompanion,
+          customCompanions,
+        )
+        .rememberCustomOptions(UserDefinedOptionKind.moodPlace, customPlaces);
+    await saveSettings(settings);
+    for (final medication in settings.dailyMedications) {
+      await rememberCustomMedication(medication);
+    }
+    for (final supplement in settings.dailySupplements) {
+      await rememberCustomSupplement(supplement);
+    }
+    for (final ingredient in settings.dailySkincare) {
+      await rememberCustomSkincare(ingredient);
+    }
+    if (customFoods.isNotEmpty) {
+      await saveCustomFoods([...getCustomFoods(), ...customFoods]);
+    }
+    await _canonicalizeStoredLogsForReusableOptions(settings);
+  }
+
+  Future<void> _canonicalizeStoredLogsForReusableOptions(
+    UserSettings settings,
+  ) async {
+    for (final keyStr in _getDatesSet()) {
+      final key = '$_logPrefix$keyStr';
+      final raw = _p.getString(key);
+      if (raw == null) continue;
+      try {
+        final original = DailyLog.fromJsonString(raw);
+        final canonical = _canonicalizeReusableValues(original, settings);
+        final encoded = canonical.toJsonString();
+        if (encoded != raw) await _p.setString(key, encoded);
+      } catch (_) {
+        // Bozuk günlük verileri mevcut güvenli okuma davranışına bırakılır.
+      }
+    }
   }
 
   Future<void> _migrateRetiredDailyLogFields() async {
@@ -101,9 +229,11 @@ class LocalStorageService {
       if (raw == null) continue;
       try {
         final json = jsonDecode(raw) as Map<String, dynamic>;
-        if (!json.keys.any(DailyLog.retiredJsonFields.contains)) continue;
+        if (!json.keys.any(_legacyDailyLogFields.contains)) continue;
 
-        var log = DailyLog.fromJson(json);
+        final activeJson = Map<String, dynamic>.from(json)
+          ..removeWhere((key, _) => _legacyDailyLogFields.contains(key));
+        var log = DailyLog.fromJson(activeJson);
         final sections = {...log.observedSections};
         if (!_hasActiveWellbeingData(log) &&
             _hasRetiredValue(json, const {
@@ -169,8 +299,7 @@ class LocalStorageService {
       log.mealFoodGroups.isNotEmpty ||
       log.mealPostFeelings.isNotEmpty ||
       log.cravings.isNotEmpty ||
-      log.waterIntakeMl != null ||
-      log.caffeineServings != null;
+      log.waterIntakeMl != null;
 
   bool _hasActiveSymptomData(DailyLog log) =>
       log.symptoms.isNotEmpty ||
@@ -185,6 +314,13 @@ class LocalStorageService {
       log.vaginalDischargeConsistency != null ||
       log.vaginalDischargeAmount != null ||
       log.vaginalDischargeSymptoms.isNotEmpty;
+
+  bool _matchesLocalizedOption(String value, Iterable<String> options) {
+    final normalized = _normalizeCustomValue(
+      AppStrings.localizeStoredValue(value),
+    );
+    return options.any((option) => _normalizeCustomValue(option) == normalized);
+  }
 
   LocalEncryptedStore get _p {
     if (_encryptedStore == null) {
@@ -256,16 +392,22 @@ class LocalStorageService {
   Future<bool> saveDailyLog(DailyLog log) async {
     if (log.date.dateOnly.isAfter(AppTime.now.dateOnly)) return false;
 
+    final settings = loadSettings();
+    final canonicalLog = _canonicalizeReusableValues(log, settings);
+
     // Tam timestamp bazlı key: her farklı anın kaydı ayrıdır
-    final keyStr = log.date.toIso8601String();
+    final keyStr = canonicalLog.date.toIso8601String();
     final key = '$_logPrefix$keyStr';
 
-    DailyLog logToSave = log;
+    DailyLog logToSave = canonicalLog;
     final existingJson = _p.getString(key);
     if (existingJson != null) {
       try {
-        final existingLog = DailyLog.fromJsonString(existingJson);
-        logToSave = log.mergeWith(existingLog);
+        final existingLog = _canonicalizeReusableValues(
+          DailyLog.fromJsonString(existingJson),
+          settings,
+        );
+        logToSave = canonicalLog.mergeWith(existingLog);
       } catch (_) {}
     }
 
@@ -292,11 +434,98 @@ class LocalStorageService {
       for (final ingredient in logToSave.skincare) {
         await saveCustomSkincare(ingredient);
       }
+      await _rememberReusableValuesFromLog(logToSave);
 
       // SİHİRLİ DOKUNUŞ: Veri her değiştiğinde istatistikleri arka planda sessizce güncelle
       await refreshCycleStatistics();
     }
     return success;
+  }
+
+  DailyLog _canonicalizeReusableValues(DailyLog log, UserSettings? settings) {
+    if (settings == null) return log;
+    String custom(UserDefinedOptionKind kind, String value) =>
+        settings.canonicalCustomOption(kind, value);
+    String stored(List<String> values, String value) =>
+        _canonicalFrom(values, value);
+
+    final medicationCatalog = getCustomMedicationIdentities();
+    MedicationEntry canonicalMedication(MedicationEntry entry) {
+      final identity = _canonicalMedicationFrom(medicationCatalog, entry);
+      return identity == null
+          ? entry
+          : entry.copyWith(
+              displayName: identity.displayName,
+              mainGroup: identity.mainGroup,
+              activeIngredient: identity.activeIngredient,
+            );
+    }
+
+    return log.copyWith(
+      cravings: _canonicalList(
+        log.cravings,
+        (value) => custom(UserDefinedOptionKind.craving, value),
+      ),
+      moodCompanions: _canonicalList(
+        log.moodCompanions,
+        (value) => custom(UserDefinedOptionKind.moodCompanion, value),
+      ),
+      moodPlaces: _canonicalList(
+        log.moodPlaces,
+        (value) => custom(UserDefinedOptionKind.moodPlace, value),
+      ),
+      mealFoodGroups: {
+        for (final entry in log.mealFoodGroups.entries)
+          entry.key: _canonicalList(
+            entry.value,
+            (value) => stored(getCustomFoods(), value),
+          ),
+      },
+      medications: log.medications.map(canonicalMedication).toList(),
+      supplements: log.supplements
+          .map(
+            (entry) => entry.copyWith(
+              displayName: stored(getCustomSupplements(), entry.displayName),
+            ),
+          )
+          .toList(),
+      skincare: _canonicalList(
+        log.skincare,
+        (value) => stored(getCustomSkincare(), value),
+      ),
+    );
+  }
+
+  Future<void> _rememberReusableValuesFromLog(DailyLog log) async {
+    var settings = loadSettings();
+    if (settings == null) return;
+    settings = settings
+        .rememberCustomOptions(
+          UserDefinedOptionKind.craving,
+          log.cravings.where(
+            (value) => !_matchesLocalizedOption(
+              value,
+              AppStrings.nutritionCravingOptions,
+            ),
+          ),
+        )
+        .rememberCustomOptions(
+          UserDefinedOptionKind.moodCompanion,
+          log.moodCompanions.where(
+            (value) => !_matchesLocalizedOption(
+              value,
+              AppStrings.moodCompanionOptions,
+            ),
+          ),
+        )
+        .rememberCustomOptions(
+          UserDefinedOptionKind.moodPlace,
+          log.moodPlaces.where(
+            (value) =>
+                !_matchesLocalizedOption(value, AppStrings.moodPlaceOptions),
+          ),
+        );
+    await saveSettings(settings);
   }
 
   /// Belirli bir günün TÜM kayıtlarını sil ve istatistikleri otomatik güncelle.
@@ -723,11 +952,40 @@ class LocalStorageService {
   /// Yeni bir özel ilaç kaydet.
   Future<bool> saveCustomMedication(MedicationIdentity medication) async {
     final list = getCustomMedicationIdentities();
-    if (!list.contains(medication)) {
-      final newList = List<MedicationIdentity>.from(list)..add(medication);
-      return saveCustomMedications(newList);
+    if (_canonicalMedicationFromIdentity(list, medication) != null) {
+      return false;
     }
-    return false;
+    final cleanedIngredient = medication.activeIngredient == null
+        ? ''
+        : _cleanCustomValue(medication.activeIngredient!);
+    final normalized = MedicationIdentity(
+      displayName: _cleanCustomValue(medication.displayName),
+      mainGroup: _cleanCustomValue(medication.mainGroup),
+      activeIngredient: cleanedIngredient.isEmpty ? null : cleanedIngredient,
+    );
+    final newList = List<MedicationIdentity>.from(list)..add(normalized);
+    return saveCustomMedications(newList);
+  }
+
+  /// Aynı ilaç daha önce farklı harf büyüklüğü veya boşluklarla eklendiyse ilk
+  /// kimliği döndürür; yoksa kaydeder. Günlük loglarda kararlı kimlik sağlar.
+  Future<MedicationIdentity?> rememberCustomMedication(
+    MedicationIdentity medication,
+  ) async {
+    final list = getCustomMedicationIdentities();
+    final existing = _canonicalMedicationFromIdentity(list, medication);
+    if (existing != null) return existing;
+    final cleanedIngredient = medication.activeIngredient == null
+        ? ''
+        : _cleanCustomValue(medication.activeIngredient!);
+    final normalized = MedicationIdentity(
+      displayName: _cleanCustomValue(medication.displayName),
+      mainGroup: _cleanCustomValue(medication.mainGroup),
+      activeIngredient: cleanedIngredient.isEmpty ? null : cleanedIngredient,
+    );
+    return await saveCustomMedications([...list, normalized])
+        ? normalized
+        : null;
   }
 
   /// Kayıtlı tüm özel takviye isimlerini getir.
@@ -737,13 +995,17 @@ class LocalStorageService {
 
   /// Yeni bir özel takviye kaydet.
   Future<bool> saveCustomSupplement(String name) async {
-    final list = getCustomSupplements();
-    if (!list.contains(name)) {
-      final newList = List<String>.from(list)..add(name);
-      return _p.setStringList(_allSupsKey, newList);
-    }
-    return false;
+    final existing = getCustomSupplements();
+    final remembered = await rememberCustomSupplement(name);
+    return remembered != null &&
+        !existing.any(
+          (value) =>
+              _normalizeCustomValue(value) == _normalizeCustomValue(remembered),
+        );
   }
+
+  Future<String?> rememberCustomSupplement(String name) =>
+      _rememberCustomString(_allSupsKey, name, getCustomSupplements());
 
   /// Tüm özel ilaçları toplu kaydet.
   Future<bool> saveCustomMedications(List<MedicationIdentity> list) async {
@@ -767,6 +1029,9 @@ class LocalStorageService {
   Future<bool> saveCustomFoods(List<String> list) =>
       _p.setStringList(_allFoodsKey, _normalizedUnique(list));
 
+  Future<String?> rememberCustomFood(String name) =>
+      _rememberCustomString(_allFoodsKey, name, getCustomFoods());
+
   /// Kullanıcının + ile eklediği cilt bakım içeriklerini saklar.
   List<String> getCustomSkincare() => _p.getStringList(_allSkincareKey) ?? [];
 
@@ -776,27 +1041,129 @@ class LocalStorageService {
   Future<bool> saveCustomSkincareItems(List<String> list) =>
       _p.setStringList(_allSkincareKey, _normalizedUnique(list));
 
+  Future<String?> rememberCustomSkincare(String name) =>
+      _rememberCustomString(_allSkincareKey, name, getCustomSkincare());
+
+  /// Profil içindeki tekrar kullanılabilir `+` seçeneklerini şifreli ayarlara
+  /// ekler ve ilk kaydedilen kanonik etiketi döndürür.
+  Future<String?> rememberUserDefinedOption(
+    UserDefinedOptionKind kind,
+    String rawValue,
+  ) async {
+    final current = loadSettings();
+    if (current == null) return null;
+    final updated = current.rememberCustomOption(kind, rawValue);
+    final canonical = updated.canonicalCustomOption(kind, rawValue);
+    if (canonical.isEmpty) return null;
+    if (updated.customOptions(kind).length ==
+        current.customOptions(kind).length) {
+      return canonical;
+    }
+    return await saveSettings(updated) ? canonical : null;
+  }
+
   Future<bool> _appendUnique(
     String key,
     String rawName,
     List<String> current,
   ) async {
-    final name = rawName.trim();
+    final name = _cleanCustomValue(rawName);
     if (name.isEmpty ||
-        current.any((value) => value.toLowerCase() == name.toLowerCase())) {
+        current.any(
+          (value) =>
+              _normalizeCustomValue(value) == _normalizeCustomValue(name),
+        )) {
       return false;
     }
     return _p.setStringList(key, [...current, name]);
+  }
+
+  Future<String?> _rememberCustomString(
+    String key,
+    String rawName,
+    List<String> current,
+  ) async {
+    final name = _cleanCustomValue(rawName);
+    if (name.isEmpty) return null;
+    final existing = current.where(
+      (value) => _normalizeCustomValue(value) == _normalizeCustomValue(name),
+    );
+    if (existing.isNotEmpty) return existing.first;
+    return await _p.setStringList(key, [...current, name]) ? name : null;
   }
 
   List<String> _normalizedUnique(Iterable<String> values) {
     final seen = <String>{};
     return [
       for (final value in values)
-        if (value.trim().isNotEmpty && seen.add(value.trim().toLowerCase()))
-          value.trim(),
+        if (_cleanCustomValue(value).isNotEmpty &&
+            seen.add(_normalizeCustomValue(value)))
+          _cleanCustomValue(value),
     ];
   }
+
+  List<String> _canonicalList(
+    Iterable<String> values,
+    String Function(String value) canonicalize,
+  ) {
+    final result = <String>[];
+    final seen = <String>{};
+    for (final value in values) {
+      final canonical = canonicalize(value);
+      if (canonical.isEmpty) continue;
+      if (seen.add(_normalizeCustomValue(canonical))) result.add(canonical);
+    }
+    return result;
+  }
+
+  String _canonicalFrom(Iterable<String> values, String rawValue) {
+    final cleaned = _cleanCustomValue(rawValue);
+    final normalized = _normalizeCustomValue(cleaned);
+    return values.firstWhere(
+      (value) => _normalizeCustomValue(value) == normalized,
+      orElse: () => cleaned,
+    );
+  }
+
+  MedicationIdentity? _canonicalMedicationFrom(
+    Iterable<MedicationIdentity> values,
+    MedicationEntry entry,
+  ) => _canonicalMedicationFromIdentity(
+    values,
+    MedicationIdentity(
+      displayName: entry.displayName,
+      mainGroup: entry.mainGroup,
+      activeIngredient: entry.activeIngredient,
+    ),
+  );
+
+  MedicationIdentity? _canonicalMedicationFromIdentity(
+    Iterable<MedicationIdentity> values,
+    MedicationIdentity candidate,
+  ) {
+    final displayName = _normalizeCustomValue(candidate.displayName);
+    final mainGroup = _normalizeCustomValue(candidate.mainGroup);
+    final activeIngredient = candidate.activeIngredient == null
+        ? null
+        : _normalizeCustomValue(candidate.activeIngredient!);
+    for (final value in values) {
+      if (_normalizeCustomValue(value.displayName) == displayName &&
+          _normalizeCustomValue(value.mainGroup) == mainGroup &&
+          (value.activeIngredient == null
+                  ? null
+                  : _normalizeCustomValue(value.activeIngredient!)) ==
+              activeIngredient) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  String _cleanCustomValue(String value) =>
+      value.trim().replaceAll(RegExp(r'\s+'), ' ');
+
+  String _normalizeCustomValue(String value) =>
+      _cleanCustomValue(value).replaceAll(RegExp('[İIı]'), 'i').toLowerCase();
 
   // ── İlaç & Takviye Hatırlatıcıları ─────────────────────
 

@@ -88,6 +88,30 @@ void main() {
     expect(observation.shouldNotify, isTrue);
   });
 
+  test('kafeinli içeceği erken besin insightında Kafeinli olarak toplar', () {
+    final insights = engine.generate([
+      DailyLog(
+        date: DateTime(2026, 7, 30, 12),
+        mealTypes: const ['Kahvaltı'],
+        mealFoodGroups: const {
+          'Kahvaltı': ['Filtre kahve'],
+        },
+        mealPostFeelings: const {
+          'Kahvaltı': ['Gaz'],
+        },
+        observedSections: const {DailyLogObservedSection.nutrition},
+      ),
+    ], now: DateTime(2026, 7, 30, 13));
+
+    final observation = insightOf(
+      insights,
+      PersonalInsightKind.foodObservationStarted,
+    );
+    expect(observation, isNotNull);
+    expect(observation!.primaryLabel, AppStrings.caffeinatedFoodInsightSignal);
+    expect(observation.secondaryLabel, 'Gaz');
+  });
+
   test('tekrarlayan gluten ve şişkinlik kaydını oluşan örüntü yapar', () {
     final insights = engine.generate([
       for (var day = 28; day <= 30; day++)
@@ -204,36 +228,15 @@ void main() {
     expect(phaseMood.withoutTotal, 63);
   });
 
-  test(
-    'arayüzde olmayan eski enerji alanını ana insight listesine eklemez',
-    () {
-      final start = DateTime(2026, 1, 1);
-      final logs = List.generate(84, (day) {
-        final dayInCycle = day % 28;
-        return DailyLog.fromJson({
-          'date': start.add(Duration(days: day)).toIso8601String(),
-          'energyLevel': dayInCycle >= 17 ? 2 : 4,
-        });
-      });
-
-      final insights = engine.generate(
-        logs,
-        now: DateTime(2026, 3, 26),
-        settings: UserSettings(
-          lastPeriodDate: start,
-          averageCycleLength: 28,
-          averagePeriodLength: 5,
-        ),
-      );
-      expect(
-        insights.where(
-          (insight) =>
-              insight.kind == PersonalInsightKind.energyCyclePhaseAssociation,
-        ),
-        isEmpty,
-      );
-    },
-  );
+  test('arayüzde olmayan eski enerji alanını model reddeder', () {
+    expect(
+      () => DailyLog.fromJson({
+        'date': DateTime(2026, 1, 1).toIso8601String(),
+        'energyLevel': 4,
+      }),
+      throwsFormatException,
+    );
+  });
 
   test('özet yerine yalnızca döngü değişimini insight olarak üretir', () {
     final logs = <DailyLog>[];
@@ -336,20 +339,14 @@ void main() {
     expect(insightOf(insights, PersonalInsightKind.frequentMood), isNull);
   });
 
-  test('dokuz günün üçündeki bağırsak kaydını içgörü yapmaz', () {
-    final insights = engine.generate(
-      List.generate(
-        9,
-        (day) => DailyLog.fromJson({
-          'date': DateTime(2026, 7, day + 1).toIso8601String(),
-          'bowelActivity': day < 3 ? ['Normal'] : <String>[],
-          'mood': 'İyi',
-        }),
-      ),
-      now: DateTime(2026, 7, 10),
+  test('arayüzde olmayan eski bağırsak alanını model reddeder', () {
+    expect(
+      () => DailyLog.fromJson({
+        'date': DateTime(2026, 7, 1).toIso8601String(),
+        'bowelActivity': ['Normal'],
+      }),
+      throwsFormatException,
     );
-
-    expect(insightOf(insights, PersonalInsightKind.frequentBowel), isNull);
   });
 
   test('verimli pencereyle uyumlu akıntı kaydını temkinli kart yapar', () {

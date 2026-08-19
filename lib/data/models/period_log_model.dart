@@ -27,63 +27,34 @@ const _medicationEntryJsonFields = {
 const _dailyLogJsonFields = {
   'date',
   'hasExplicitTime',
-  'activities',
-  'nutritionTags',
   'mealTypes',
   'mealQualities',
   'mealFoodGroups',
   'mealPostFeelings',
   'cravings',
-  'nutritionNotes',
   'waterIntakeMl',
-  'caffeineServings',
   'supplements',
   'medications',
   'skincare',
   'mood',
   'moodEmoji',
-  'moodNote',
   'moodCompanions',
   'moodPlaces',
-  'sleepDurationMinutes',
-  'sleepQuality',
-  'stressLevel',
-  'energyLevel',
   'dreamRemembered',
   'dreamType',
   'dreamNote',
   'sexualActivity',
   'sexualActivityTypes',
   'sexualAfterFeelings',
-  'bowelActivity',
   'symptoms',
   'symptomSeverities',
   'flowIntensity',
-  'periodPainLevel',
   'vaginalDischargePresent',
   'vaginalDischargeColor',
   'vaginalDischargeConsistency',
   'vaginalDischargeAmount',
   'vaginalDischargeSymptoms',
-  'notes',
   'observedSections',
-};
-
-/// Önceki sürümlerde toplanan ancak güncel giriş ekranlarında karşılığı
-/// bulunmayan alanlar. Eski yedekleri bozmayacak şekilde okunur, fakat yeni
-/// modele aktarılmaz ve tekrar yazılmaz.
-const _retiredDailyLogJsonFields = {
-  'activities',
-  'nutritionTags',
-  'nutritionNotes',
-  'moodNote',
-  'sleepDurationMinutes',
-  'sleepQuality',
-  'stressLevel',
-  'energyLevel',
-  'bowelActivity',
-  'periodPainLevel',
-  'notes',
 };
 
 /// Kullanıcının günlük kayıt sırasında gerçekten gözden geçirip kaydettiği
@@ -237,8 +208,6 @@ class MedicationEntry {
 
 /// Günlük kayıt modeli — tüm wellness modüllerini birleşik tutar.
 class DailyLog {
-  static const retiredJsonFields = _retiredDailyLogJsonFields;
-
   final DateTime date;
   final bool hasExplicitTime;
 
@@ -249,7 +218,6 @@ class DailyLog {
   final Map<String, List<String>> mealPostFeelings;
   final List<String> cravings;
   final int? waterIntakeMl;
-  final int? caffeineServings;
 
   // ── Takviyeler ───────────────────────────────────────────
   final List<MedicationEntry> supplements;
@@ -300,7 +268,6 @@ class DailyLog {
     Map<String, List<String>> mealPostFeelings = const {},
     this.cravings = const [],
     this.waterIntakeMl,
-    this.caffeineServings,
     this.supplements = const [],
     this.medications = const [],
     this.skincare = const [],
@@ -350,10 +317,6 @@ class DailyLog {
          waterIntakeMl == null || waterIntakeMl >= 0 && waterIntakeMl <= 10000,
        ),
        assert(
-         caffeineServings == null ||
-             caffeineServings >= 0 && caffeineServings <= 20,
-       ),
-       assert(
          vaginalDischargePresent != false ||
              vaginalDischargeColor == null &&
                  vaginalDischargeConsistency == null &&
@@ -385,8 +348,6 @@ class DailyLog {
     List<String>? cravings,
     int? waterIntakeMl,
     bool clearWaterIntake = false,
-    int? caffeineServings,
-    bool clearCaffeineServings = false,
     List<MedicationEntry>? supplements,
     List<MedicationEntry>? medications,
     List<String>? skincare,
@@ -430,9 +391,6 @@ class DailyLog {
       waterIntakeMl: clearWaterIntake
           ? null
           : waterIntakeMl ?? this.waterIntakeMl,
-      caffeineServings: clearCaffeineServings
-          ? null
-          : caffeineServings ?? this.caffeineServings,
       supplements: supplements ?? this.supplements,
       medications: medications ?? this.medications,
       skincare: skincare ?? this.skincare,
@@ -483,7 +441,6 @@ class DailyLog {
         mealPostFeelings.isNotEmpty ||
         cravings.isNotEmpty ||
         waterIntakeMl != null ||
-        caffeineServings != null ||
         supplements.isNotEmpty ||
         medications.isNotEmpty ||
         skincare.isNotEmpty ||
@@ -516,7 +473,6 @@ class DailyLog {
     'mealPostFeelings': mealPostFeelings,
     'cravings': cravings,
     'waterIntakeMl': waterIntakeMl,
-    'caffeineServings': caffeineServings,
     'supplements': supplements.map((e) => e.toJson()).toList(),
     'medications': medications.map((e) => e.toJson()).toList(),
     'skincare': skincare,
@@ -564,12 +520,6 @@ class DailyLog {
         'waterIntakeMl',
         minimum: 0,
         maximum: 10000,
-      ),
-      caffeineServings: _readOptionalInt(
-        json,
-        'caffeineServings',
-        minimum: 0,
-        maximum: 20,
       ),
       supplements:
           (json['supplements'] as List<dynamic>?)
@@ -921,7 +871,6 @@ class DailyLog {
       ),
       cravings: (cravings + other.cravings).toSet().toList(),
       waterIntakeMl: waterIntakeMl ?? other.waterIntakeMl,
-      caffeineServings: caffeineServings ?? other.caffeineServings,
       supplements: mergeMeds(supplements, other.supplements),
       medications: mergeMeds(medications, other.medications),
       skincare: (skincare + other.skincare).toSet().toList(),

@@ -300,7 +300,7 @@ void main() {
   testWidgets('Ruh hali bağlamına artı butonuyla özel seçenek eklenir', (
     tester,
   ) async {
-    await _pumpLogSheet(tester, initialIndex: 3);
+    final harness = await _pumpLogSheet(tester, initialIndex: 3);
 
     await tester.tap(find.text(AppStrings.continueAction));
     await tester.pumpAndSettle();
@@ -314,6 +314,29 @@ void main() {
     expect(find.byType(TextField), findsOneWidget);
     await tester.enterText(find.byType(TextField), 'Yakın arkadaşım');
     await tester.tap(find.text(AppStrings.add));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Yakın arkadaşım'), findsOneWidget);
+    expect(harness.storage.loadSettings()!.customMoodCompanions, [
+      'Yakın arkadaşım',
+    ]);
+    expect(harness.settingsChangeCount, 1);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Özel kişi seçili olmasa da sonraki kayıtta yeniden sunulur', (
+    tester,
+  ) async {
+    await _pumpLogSheet(
+      tester,
+      initialIndex: 3,
+      settings: UserSettings(
+        isOnboardingComplete: true,
+        customMoodCompanions: const ['Yakın arkadaşım'],
+      ),
+    );
+
+    await tester.tap(find.text(AppStrings.continueAction));
     await tester.pumpAndSettle();
 
     expect(find.text('Yakın arkadaşım'), findsOneWidget);
@@ -492,6 +515,8 @@ void main() {
     expect(find.text(AppStrings.symptomQuestion), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text(AppStrings.symptomOverall), findsOneWidget);
+    final stress = find.text(AppStrings.symptomOverallOptions[1]);
+    expect(stress, findsOneWidget);
     for (final title in [
       AppStrings.symptomOverall,
       AppStrings.symptomBody,
@@ -502,7 +527,21 @@ void main() {
     ]) {
       expect(find.byKey(ValueKey('symptom_group_$title')), findsOneWidget);
     }
+    for (final subgroup in [
+      AppStrings.symptomEnergyLevel,
+      AppStrings.symptomMoodState,
+      AppStrings.symptomMentalClarity,
+      AppStrings.symptomSleepQuality,
+      AppStrings.symptomWakeFeeling,
+    ]) {
+      expect(find.text(subgroup.toUpperCase()), findsOneWidget);
+    }
+    expect(find.text('Sırt ağrısı'), findsOneWidget);
+    expect(find.text('Eklem/kas ağrısı'), findsOneWidget);
+    expect(find.text('Sık idrara çıkma'), findsOneWidget);
 
+    await tester.tap(stress);
+    await tester.pumpAndSettle();
     final cramps = find.text(AppStrings.symptomBodyOptions.first);
     await tester.ensureVisible(cramps);
     await tester.tap(cramps);
@@ -522,6 +561,14 @@ void main() {
     expect(
       harness.savedLog!.symptoms,
       contains(AppStrings.symptomBodyOptions.first),
+    );
+    expect(
+      harness.savedLog!.symptoms,
+      contains(AppStrings.symptomOverallOptions[1]),
+    );
+    expect(
+      harness.savedLog!.symptomSeverities[AppStrings.symptomOverallOptions[1]],
+      2,
     );
     expect(
       harness.savedLog!.symptomSeverities[AppStrings.symptomBodyOptions.first],
@@ -556,6 +603,38 @@ void main() {
       find.widgetWithText(FilledButton, AppStrings.save).last,
     );
     expect(saveButton.style!.backgroundColor!.resolve({}), themeTone);
+  });
+
+  testWidgets('Yeni beden, enerji ve uyanış seçenekleri aktif kayda eklenir', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(tester, initialIndex: 2);
+    final selected = [
+      'Sırt ağrısı',
+      AppStrings.symptomEnergyLevelOptions.last,
+      AppStrings.symptomWakeFeelingOptions[3],
+    ];
+
+    for (final label in selected) {
+      final surface = find.byKey(ValueKey('symptom_tile_surface_$label'));
+      final tapTarget = find.descendant(
+        of: surface,
+        matching: find.byType(InkWell),
+      );
+      tester.widget<InkWell>(tapTarget).onTap!();
+      await tester.pumpAndSettle();
+    }
+
+    final saveButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, AppStrings.save),
+    );
+    saveButton.onPressed!();
+    await tester.pumpAndSettle();
+
+    expect(harness.savedLog!.symptoms, containsAll(selected));
+    expect(harness.savedLog!.dreamRemembered, isNull);
+    expect(harness.savedLog!.dreamType, isNull);
+    expect(harness.savedLog!.dreamNote, isNull);
   });
 
   testWidgets('Adet menüsü ana ekran tema renginden etkilenmez', (
@@ -1258,20 +1337,41 @@ void main() {
     );
   });
 
-  testWidgets('kafein kaydedilir, yinelenen bağırsak bağlamı gösterilmez', (
+  testWidgets('ayrı kafein sayacı yoktur; kafeinli öğün seçimi kaydedilir', (
     tester,
   ) async {
     final harness = await _pumpLogSheet(tester, initialIndex: 1);
 
-    final caffeineCard = find.byKey(const ValueKey('caffeine_card'));
-    await tester.ensureVisible(caffeineCard);
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('caffeine_increment')));
+    expect(find.byKey(const ValueKey('caffeine_card')), findsNothing);
+    expect(find.byKey(const ValueKey('caffeine_increment')), findsNothing);
     expect(find.text(AppStrings.bowelActivity), findsNothing);
+
+    final breakfast = find.text(AppStrings.nutritionMealOptions.first);
+    await tester.ensureVisible(breakfast);
+    await tester.tap(breakfast);
+    await tester.pumpAndSettle();
+
+    final caffeineCategory = AppStrings.nutritionCatalog.entries.firstWhere(
+      (entry) => entry.value.any(AppStrings.isCaffeinatedFood),
+    );
+    final category = find.byKey(
+      ValueKey('catalog_category_${caffeineCategory.key}'),
+    );
+    tester.widget<InkWell>(category).onTap!();
+    await tester.pumpAndSettle();
+
+    final caffeinatedFood = caffeineCategory.value.first;
+    final food = find.byKey(ValueKey('catalog_item_$caffeinatedFood'));
+    tester.widget<FilterChip>(food).onSelected!(true);
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text(AppStrings.saveNutrition));
     await tester.pumpAndSettle();
 
-    expect(harness.savedLog!.caffeineServings, 1);
+    expect(
+      harness.savedLog!.mealFoodGroups[AppStrings.nutritionMealOptions.first],
+      contains(caffeinatedFood),
+    );
   });
 
   test('Yeni sade kayit alanlari JSON yedeginde kaybolmaz', () {

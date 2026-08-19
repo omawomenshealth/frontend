@@ -228,10 +228,11 @@ class _OnboardingViewState extends State<OnboardingView> {
   }
 
   Future<void> _showDiseasePicker(OnboardingViewModel vm) async {
-    final catalog = {
+    final catalog = _uniqueReusableLabels([
       ...AppStrings.chronicDiseasesList,
       ...AppStrings.womenDiseasesList,
-    }.toList(growable: false);
+      ...vm.customConditions,
+    ]);
     var query = '';
     await showModalBottomSheet<void>(
       context: context,
@@ -325,7 +326,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   Future<void> _addBirthControl(OnboardingViewModel vm) async {
     final value = await _promptText(context, AppStrings.addBirthControlMethod);
-    if (value != null && value.isNotEmpty) vm.setBirthControlMethod(value);
+    if (value != null && value.isNotEmpty) vm.addBirthControlMethod(value);
   }
 
   Future<String?> _promptText(BuildContext context, String title) {
@@ -797,13 +798,14 @@ class _ReproductiveStep extends StatelessWidget {
       (AppStrings.periMenopause, MenopauseStatus.peri),
       (AppStrings.postMenopause, MenopauseStatus.post),
     ];
-    final birthControlOptions = [
+    final birthControlOptions = _uniqueReusableLabels([
       AppStrings.noBirthControl,
       AppStrings.pill,
       AppStrings.iud,
       AppStrings.condom,
       AppStrings.implant,
-    ];
+      ...vm.customBirthControlMethods,
+    ]);
     final selectedMethod = AppStrings.localizeStoredValue(
       vm.birthControlMethod ?? '',
     );
@@ -860,6 +862,18 @@ class _ReproductiveStep extends StatelessWidget {
       ],
     );
   }
+}
+
+List<String> _uniqueReusableLabels(Iterable<String> values) {
+  final result = <String>[];
+  final seen = <String>{};
+  for (final raw in values) {
+    final value = raw.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (value.isEmpty) continue;
+    final normalized = value.replaceAll(RegExp('[İIı]'), 'i').toLowerCase();
+    if (seen.add(normalized)) result.add(value);
+  }
+  return result;
 }
 
 class _CompactPrompt extends StatelessWidget {

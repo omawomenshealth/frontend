@@ -48,7 +48,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Sizi Tanıyalım'), findsOneWidget);
+    expect(find.text('Seni tanıyalım'), findsOneWidget);
     expect(find.text(AppStrings.name), findsOneWidget);
     expect(find.text('Sana hitap edebilmemiz için'), findsOneWidget);
     final nameField = tester.widget<TextField>(
@@ -75,16 +75,18 @@ void main() {
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
-    expect(find.text('Temel Sağlık Bilgileri'), findsOneWidget);
+    expect(find.text('Temel sağlık bilgilerin'), findsOneWidget);
     expect(
-      find.text('Sana özel önerilerimiz için bu bilgilere ihtiyacımız var.'),
+      find.text(
+        'Bu bilgiler, uygulamadaki özetleri sana göre düzenlememize yardımcı olur.',
+      ),
       findsOneWidget,
     );
     expect(find.text(AppStrings.wantsChildrenInYear), findsNothing);
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
-    expect(find.text('Detaylı Sağlık Bilgileri'), findsOneWidget);
+    expect(find.text('Ek sağlık bilgilerin'), findsOneWidget);
     expect(find.text('Kan değeri ara'), findsOneWidget);
     await tester.tap(find.text('Kan değeri ara'));
     await tester.pumpAndSettle();
@@ -101,7 +103,7 @@ void main() {
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
     expect(
-      find.text('Bilmemizi istediğiniz bir hastalığınız var mı?'),
+      find.text('Takipte dikkate almamızı istediğin bir hastalığın var mı?'),
       findsOneWidget,
     );
     expect(find.text('Hastalık ara'), findsOneWidget);

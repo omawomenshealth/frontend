@@ -1,5 +1,6 @@
 import 'package:app_proje_a/data/models/medication_identity_model.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
+import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
@@ -49,6 +50,61 @@ void main() {
   });
 
   test(
+    'eski bulut günlüklerini aktif şemaya temizleyip yeniden yükler',
+    () async {
+      api.cloudData = {
+        ..._minimalCloud(baseSettings),
+        'logs': [
+          {
+            'date': DateTime(2026, 8, 12, 12).toIso8601String(),
+            'mood': 'İyi',
+            'activities': ['Yürüyüş'],
+            'sleepQuality': 5,
+            'energyLevel': 4,
+            'notes': 'Eski not',
+            'caffeineServings': 2,
+          },
+        ],
+      };
+
+      expect(await sync.mergeWithCloud(), isTrue);
+      expect(storage.loadAllLogs().single.mood, 'İyi');
+      final uploaded = api.lastUploadedLogs.single;
+      expect(uploaded['mood'], 'İyi');
+      for (final field in [
+        'activities',
+        'sleepQuality',
+        'energyLevel',
+        'notes',
+        'caffeineServings',
+      ]) {
+        expect(uploaded, isNot(contains(field)));
+      }
+    },
+  );
+
+  test('stres belirtisi ve şiddeti cloud birleşiminde korunur', () async {
+    api.cloudData = {
+      ..._minimalCloud(baseSettings),
+      'logs': [
+        DailyLog(
+          date: DateTime(2026, 8, 13, 12),
+          symptoms: const ['Stres'],
+          symptomSeverities: const {'Stres': 3},
+          observedSections: const {DailyLogObservedSection.symptom},
+        ).toJson(),
+      ],
+    };
+
+    expect(await sync.mergeWithCloud(), isTrue);
+    final stored = storage.loadAllLogs().single;
+    expect(stored.symptoms, ['Stres']);
+    expect(stored.symptomSeverities, {'Stres': 3});
+    expect(api.lastUploadedLogs.single['symptoms'], ['Stres']);
+    expect(api.lastUploadedLogs.single['symptomSeverities'], {'Stres': 3});
+  });
+
+  test(
     'tamamlanmis bulut profili yarim yerel profil alanlarini korur',
     () async {
       await storage.saveSettings(UserSettings(userName: ''));
@@ -69,6 +125,71 @@ void main() {
       expect(merged.smokingYears, 4);
       expect(merged.averageCycleLength, 33);
       expect(merged.notificationsEnabled, isFalse);
+    },
+  );
+
+  test(
+    '+ katalogları iki cihazda tek kanonik insight değişkenine birleşir',
+    () async {
+      final localSettings = baseSettings.copyWith(
+        customCravings: const ['Gece Atıştırması'],
+        customMoodCompanions: const ['Kuzenim'],
+        customConditions: const ['Özel Durum'],
+        customBirthControlMethods: const ['Özel Yöntem'],
+        chronicDiseases: const ['özel durum'],
+        birthControlMethod: 'özel yöntem',
+      );
+      await storage.saveSettings(localSettings);
+      await storage.rememberCustomFood('Ev Çorbası');
+      await storage.saveDailyLog(
+        DailyLog(
+          date: DateTime(2026, 8, 10, 12),
+          cravings: const ['gece atıştırması'],
+          moodCompanions: const ['kuzenim'],
+          mealFoodGroups: const {
+            'Öğle': ['ev çorbası'],
+          },
+        ),
+      );
+
+      final cloudSettings = baseSettings.copyWith(
+        customCravings: const ['GECE ATIŞTIRMASI', 'Ekşi'],
+        customMoodCompanions: const ['KUZENİM'],
+        customConditions: const ['ÖZEL DURUM'],
+        customBirthControlMethods: const ['ÖZEL YÖNTEM'],
+      );
+      api.cloudData = {
+        ..._minimalCloud(cloudSettings),
+        'logs': [
+          DailyLog(
+            date: DateTime(2026, 8, 11, 12),
+            cravings: const ['GECE ATIŞTIRMASI'],
+            moodCompanions: const ['KUZENİM'],
+            mealFoodGroups: const {
+              'Öğle': ['EV ÇORBASI'],
+            },
+          ).toJson(),
+        ],
+        'customFoods': ['EV ÇORBASI'],
+      };
+
+      expect(await sync.mergeWithCloud(), isTrue);
+      final merged = storage.loadSettings()!;
+      expect(merged.customCravings, ['Gece Atıştırması', 'Ekşi']);
+      expect(merged.customMoodCompanions, ['Kuzenim']);
+      expect(merged.customConditions, ['Özel Durum']);
+      expect(merged.customBirthControlMethods, ['Özel Yöntem']);
+      expect(merged.chronicDiseases, ['Özel Durum']);
+      expect(merged.birthControlMethod, 'Özel Yöntem');
+      expect(api.lastUploadedFoods, ['Ev Çorbası']);
+      expect(
+        api.lastUploadedLogs.map((log) => log['cravings']).toList(),
+        everyElement(['Gece Atıştırması']),
+      );
+      expect(api.lastUploadedSettings['customCravings'], [
+        'Gece Atıştırması',
+        'Ekşi',
+      ]);
     },
   );
 
@@ -307,6 +428,8 @@ class _FakeMergeApi extends ApiService {
   int uploadCalls = 0;
 
   List<Map<String, dynamic>> lastUploadedMedications = [];
+  Map<String, dynamic> lastUploadedSettings = {};
+  List<Map<String, dynamic>> lastUploadedLogs = [];
   List<String> lastUploadedFoods = [];
   List<String> lastUploadedSkincare = [];
   List<Map<String, dynamic>> lastUploadedPlans = [];
@@ -325,6 +448,8 @@ class _FakeMergeApi extends ApiService {
     bool replaceExisting = true,
   }) async {
     uploadCalls++;
+    lastUploadedSettings = settings;
+    lastUploadedLogs = logs;
     lastUploadedMedications = customMedications;
     lastUploadedFoods = customFoods;
     lastUploadedSkincare = customSkincare;

@@ -22,7 +22,7 @@ void main() {
     expect(AppStrings.localizeStoredValue('Dengeli'), 'Medium');
     expect(
       AppStrings.insightCycleLengthBody(29),
-      'There are 29 days between your two latest recorded period starts.',
+      'There were 29 days between your two latest recorded period starts.',
     );
     expect(
       AppStrings.insightSymptomMoodBody(
@@ -31,12 +31,13 @@ void main() {
         count: 3,
       ),
       'Headache and Tired were logged on the same day 3 times. '
-      'This is an association only.',
+      'They appeared together in your logs, but this does not show that one '
+      'caused the other.',
     );
     expect(AppStrings.insightEvidenceDays(4), 'Logged days: 4');
     expect(
       AppStrings.localizeInsightFeature('cyclePhase:follicular'),
-      'Follicular Phase',
+      'Follicular phase',
     );
     expect(
       AppStrings.insightAssociationBody(
@@ -49,7 +50,7 @@ void main() {
         withoutPercent: 10,
         lagDays: 0,
       ),
-      contains('only shows a trace worth revisiting.'),
+      contains('only shows a connection worth revisiting.'),
     );
     expect(
       AppStrings.insightMoodPlaceBody(
@@ -61,8 +62,49 @@ void main() {
         withPercent: 80,
         withoutPercent: 10,
       ),
-      contains('Let’s gently follow'),
+      contains('Notice how that environment feels'),
     );
+    expect(
+      AppStrings.phaseOvulationFertility,
+      startsWith('Estimated chance of pregnancy'),
+    );
+    expect(
+      AppStrings.exploreOvulationDescription,
+      startsWith('Estimated chance of pregnancy'),
+    );
+    expect(AppStrings.symptomEnergyLevelOptions, [
+      'Energetic',
+      'Fatigue',
+      'Exhausted/burned out',
+    ]);
+    expect(AppStrings.symptomMoodStateOptions, [
+      'Motivated',
+      'Calm and balanced',
+      'Restless',
+      'Irritable',
+      'Emotional ups and downs',
+    ]);
+    expect(AppStrings.symptomMentalClarityOptions, [
+      'Focused',
+      'Brain fog',
+      'Forgetful',
+    ]);
+    expect(AppStrings.symptomSleepQualityOptions, [
+      'Slept well',
+      'Slept fairly well',
+      'Slept poorly',
+      'Trouble falling asleep',
+      'Woke often',
+    ]);
+    expect(AppStrings.symptomWakeFeelingOptions, [
+      'Woke up energized',
+      'Woke up rested',
+      'Woke up sleepy/tired',
+      'Woke up with a headache',
+      'Woke up early',
+    ]);
+    expect(AppStrings.localizeStoredValue('Deep sleep'), 'Deep sleep');
+    expect(AppStrings.localizeStoredValue('Woke refreshed'), 'Woke up rested');
   });
 
   test('İçgörü şablonları Türkçe parametrelerle biçimlenir', () async {
@@ -71,11 +113,11 @@ void main() {
     expect(AppStrings.localizeStoredValue('Balanced'), 'Orta');
     expect(
       AppStrings.insightRecordingSummaryBody(loggedDays: 8, spanDays: 14),
-      '14 günlük zaman aralığında 8 farklı gün için sağlık kaydı oluşturdun.',
+      'Son 14 günlük aralıkta 8 farklı güne kayıt ekledin.',
     );
     expect(
       AppStrings.insightFrequentMoodBody(label: 'Yorgun', count: 5, total: 8),
-      'Yorgun, ruh hâli girdiğin 8 günün 5 tanesinde yer aldı.',
+      'Ruh hâlini kaydettiğin 8 günün 5 tanesinde Yorgun seçtin.',
     );
     expect(AppStrings.insightEvidenceCycles(3), 'Hesaplanan döngü: 3');
     expect(
@@ -86,7 +128,47 @@ void main() {
     expect(AppStrings.womenDiseasesList, isNot(contains('Diğer')));
     expect(AppStrings.chronicDiseasesList, isNot(contains('Diğer')));
     expect(AppStrings.symptomSkinHairOptions, contains('Yağlı cilt'));
-    expect(AppStrings.symptomEnergyOptions, contains('Enerjik'));
+    expect(AppStrings.symptomOverallOptions, ['Her şey yolunda', 'Stres']);
+    expect(AppStrings.localizeStoredValue('Stress'), 'Stres');
+    expect(AppStrings.symptomEnergyLevelOptions, [
+      'Enerjik',
+      'Yorgunluk',
+      'Bitkin/tükenmiş',
+    ]);
+    expect(AppStrings.symptomMoodStateOptions, [
+      'Motivasyonlu',
+      'Sakin ve dengeli',
+      'Huzursuzluk',
+      'Sinirlilik',
+      'Duygusal iniş çıkış',
+    ]);
+    expect(AppStrings.symptomMentalClarityOptions, [
+      'Odaklanmış',
+      'Zihin bulanıklığı',
+      'Unutkanlık',
+    ]);
+    expect(AppStrings.symptomSleepQualityOptions, [
+      'İyi uyudum',
+      'Orta kalitede uyudum',
+      'Kötü uyudum',
+      'Uykuya dalmakta zorlandım',
+      'Sık uyandım',
+    ]);
+    expect(AppStrings.symptomWakeFeelingOptions, [
+      'Enerjik uyandım',
+      'Dinlenmiş uyandım',
+      'Uykulu/yorgun uyandım',
+      'Baş ağrısıyla uyandım',
+      'Erken uyandım',
+    ]);
+    expect(
+      AppStrings.symptomSleepOptions
+          .skip(AppStrings.symptomSleepOptions.length - 2)
+          .toList(),
+      ['Canlı rüyalar', 'Kâbus'],
+    );
+    expect(AppStrings.localizeStoredValue('Refreshed'), 'Dinç');
+    expect(AppStrings.localizeStoredValue('Back pain'), 'Bel ağrısı');
     expect(AppStrings.symptomDigestionOptions, contains('Midem iyi'));
     expect(AppStrings.skincareCatalog.keys, [
       'Akne, Yağlanma ve Gözenek',
@@ -111,24 +193,9 @@ void main() {
         withPercent: 60,
         withoutPercent: 20,
       ),
-      'Mutlu, “Foliküler Faz” günlerinde ruh hâli girdiğin 20 günün 12 '
-      'tanesinde kaydedildi (%60). Diğer fazlarda ruh hâli girdiğin 40 günde '
-      'bu oran %20. Bu bir ilişkidir; döngü fazının ruh hâline neden olduğunu '
-      'göstermez.',
-    );
-    expect(
-      AppStrings.insightEnergyCyclePhaseBody(
-        energy: 'düşük enerji',
-        phase: 'Luteal Faz',
-        withEvent: 15,
-        withTotal: 20,
-        withoutTotal: 40,
-        withPercent: 75,
-        withoutPercent: 25,
-      ),
-      'düşük enerji, “Luteal Faz” günlerinde enerji düzeyi girdiğin 20 günün '
-      '15 tanesinde görüldü (%75). Diğer fazlarda enerji düzeyi girdiğin 40 '
-      'günde bu oran %25. Bu bir ilişkidir; döngü fazının enerji düzeyine neden '
+      'Foliküler Faz günlerinde ruh hâlini kaydettiğin 20 günün 12 tanesinde '
+      'Mutlu seçtin (%60). Diğer fazlardaki 40 karşılaştırılabilir günde bu '
+      'oran %20. Bu yalnızca bir zamanlama ilişkisi; fazın bu hisse neden '
       'olduğunu göstermez.',
     );
   });
@@ -187,6 +254,30 @@ void main() {
         AppStrings.insightMoodCompanionBody(
           mood: 'İyi',
           companion: 'Yakın arkadaşım',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+        ),
+        AppStrings.insightStressCompanionBody(
+          companion: 'Yakın arkadaşım',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+        ),
+        AppStrings.insightStressCravingBody(
+          craving: 'Çikolata',
+          withEvent: 8,
+          withTotal: 10,
+          withoutTotal: 10,
+          withPercent: 80,
+          withoutPercent: 10,
+        ),
+        AppStrings.insightStressFoodBody(
+          food: 'Ev yapımı granola',
           withEvent: 8,
           withTotal: 10,
           withoutTotal: 10,

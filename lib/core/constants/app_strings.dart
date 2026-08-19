@@ -42,12 +42,6 @@ enum _TextKey {
   insightFrequentMoodBody,
   insightRecurringSymptomTitle,
   insightRecurringSymptomBody,
-  insightFrequentActivityTitle,
-  insightFrequentActivityBody,
-  insightFrequentNutritionTitle,
-  insightFrequentNutritionBody,
-  insightFrequentBowelTitle,
-  insightFrequentBowelBody,
   insightSymptomMoodTitle,
   insightSymptomMoodBody,
   insightSymptomBleedingTitle,
@@ -56,8 +50,6 @@ enum _TextKey {
   insightMoodCyclePhaseBody,
   insightSymptomCyclePhaseTitle,
   insightSymptomCyclePhaseBody,
-  insightEnergyCyclePhaseTitle,
-  insightEnergyCyclePhaseBody,
   insightMoodSymptomTitle,
   insightMoodSymptomBody,
   insightMoodFoodTitle,
@@ -71,6 +63,12 @@ enum _TextKey {
   insightMoodPlaceBody,
   insightMoodCompanionTitle,
   insightMoodCompanionBody,
+  insightStressCompanionTitle,
+  insightStressCompanionBody,
+  insightStressCravingTitle,
+  insightStressCravingBody,
+  insightStressFoodTitle,
+  insightStressFoodBody,
   insightAssociationTitle,
   insightAssociationSameDayBody,
   insightAssociationNextDayBody,
@@ -325,7 +323,12 @@ enum _TextKey {
   symptomBody,
   symptomSkinHair,
   symptomEnergy,
+  symptomEnergyLevel,
+  symptomMoodState,
+  symptomMentalClarity,
   symptomSleep,
+  symptomSleepQuality,
+  symptomWakeFeeling,
   symptomDigestion,
   dreamQuestion,
   dreamNoteQuestion,
@@ -336,6 +339,7 @@ enum _TextKey {
   moodGentleTitle,
   moodGentleBody,
   moodWhoWith,
+  moodCompanionTrackingHint,
   moodWhere,
   todaysStatus,
   noLogAdded,
@@ -352,31 +356,13 @@ enum _TextKey {
   datedLogs,
   noLogForDate,
   mood,
-  moodNote,
-  activity,
-  activityStatus,
   nutrition,
   nutritionStatus,
   dailyFactors,
   dailyFactorsHint,
-  sleep,
-  sleepDuration,
-  sleepQuality,
-  stressLevel,
-  energyLevel,
   waterIntake,
-  caffeineIntake,
-  caffeineServingHint,
-  hoursMinutes,
   milliliters,
   servingCount,
-  levelOutOfFive,
-  insightFeatureShortSleep,
-  insightFeaturePoorSleep,
-  insightFeatureHighStress,
-  insightFeatureLowEnergy,
-  insightFeatureHighEnergy,
-  insightFeatureHighCaffeine,
   insightFeatureBelowTypicalWater,
   supplements,
   medications,
@@ -809,8 +795,6 @@ enum _ListKey {
   relationshipStatuses,
   chronicDiseases,
   womenDiseases,
-  activityOptions,
-  nutritionTags,
   medicationTimes,
   stomachStates,
   moodOptions,
@@ -832,7 +816,6 @@ enum _ListKey {
   symptomEnergyOptions,
   symptomSleepOptions,
   symptomDigestionOptions,
-  bowelActivityOptions,
   flowOptions,
   dischargePresenceOptions,
   dischargeColors,
@@ -851,167 +834,166 @@ enum _ListKey {
 /// Türkçe sabit metin kataloğu.
 const Map<_TextKey, String> _turkishTexts = {
   _TextKey.appName: 'Oma',
-  _TextKey.appSlogan: 'Sağlığınızı günlük takip edin',
+  _TextKey.appSlogan: 'Sağlığını kendi ritminde takip et',
   _TextKey.home: 'Ana Sayfa',
   _TextKey.insights: 'İçgörüler',
-  _TextKey.insightsSubtitle:
-      'Günlük kayıtlarından hesaplanan kişisel örüntüler',
+  _TextKey.insightsSubtitle: 'Kayıtlarından zamanla beliren kişisel ipuçları',
   _TextKey.insightsPrivacyNote:
-      'Bu özetler cihazındaki kayıtlarla, sabit kurallar ve istatistiklerle oluşturulur. LLM kullanılmaz.',
-  _TextKey.insightsEmptyTitle: 'Henüz içgörü oluşturulamıyor',
+      'Bu özetler yalnızca cihazındaki kayıtlar, sabit kurallar ve istatistiklerle oluşturulur; üretken yapay zekâ kullanılmaz.',
+  _TextKey.insightsEmptyTitle: 'İçgörüler için biraz daha kayıt gerekiyor',
   _TextKey.insightsEmptyDescription:
-      'Ana Sayfa’dan günlük kayıt ekledikçe kişisel özetlerin burada görünecek.',
+      'Günlük kayıtların arttıkça sana özel ipuçları burada görünmeye başlayacak.',
   _TextKey.insightsDisclaimer:
-      'Bunu bir tanı olarak değil, kayıtlarında birlikte görünen küçük bir ipucu olarak düşün. Seni rahatsız eden veya süren bir değişiklik varsa bir sağlık profesyoneliyle görüş.',
+      'Bunlar tanı değil, kayıtlarında birlikte görünen ipuçlarıdır. Seni endişelendiren, süren veya kötüleşen bir değişiklik varsa bir sağlık profesyoneliyle görüş.',
   _TextKey.personalInsightsPreviewTitle: 'Sana özel içgörüler',
   _TextKey.viewAllInsights: 'Tümünü gör',
-  _TextKey.insightDataBuildingTitle: 'Örüntün oluşmaya başladı',
+  _TextKey.insightDataBuildingTitle: 'Kayıtların birikiyor',
   _TextKey.insightDataBuildingBody:
-      'Kayıt bulunan gün: {count}. En az 3 kayıtlı gün olduğunda tekrarlayan seçimleri karşılaştırmaya başlayacağız.',
-  _TextKey.insightRecordingSummaryTitle: 'Kayıt görünümün',
+      'Şimdilik {count} kayıtlı günün var. En az 3 güne ulaştığında tekrar eden seçimleri karşılaştırmaya başlayacağım.',
+  _TextKey.insightRecordingSummaryTitle: 'Kayıtlarına kısa bir bakış',
   _TextKey.insightRecordingSummaryBody:
-      '{spanDays} günlük zaman aralığında {loggedDays} farklı gün için sağlık kaydı oluşturdun.',
-  _TextKey.insightCycleLengthTitle: 'Son döngü uzunluğun',
+      'Son {spanDays} günlük aralıkta {loggedDays} farklı güne kayıt ekledin.',
+  _TextKey.insightCycleLengthTitle: 'Son hesaplanan döngün',
   _TextKey.insightCycleLengthBody:
-      'Kaydettiğin son iki regl başlangıcı arasında {length} gün var.',
-  _TextKey.insightCycleVariationTitle: 'Döngü aralığın',
+      'Kaydettiğin son iki adet başlangıcı arasında {length} gün var.',
+  _TextKey.insightCycleVariationTitle: 'Döngülerin arasındaki fark',
   _TextKey.insightCycleVariationBody:
-      'Hesaplanabilen son {count} döngün {min}–{max} gün arasında değişti.',
-  _TextKey.insightCycleTimingReviewTitle: 'Bu döngünün zamanlamasını not ettim',
+      'Hesaplanabilen son {count} döngün {min}-{max} gün arasında değişti.',
+  _TextKey.insightCycleTimingReviewTitle: 'Bu döngü biraz farklı görünüyor',
   _TextKey.insightCycleTimingReviewBody:
-      'Son iki adet başlangıcın arasında {length} gün vardı. Tek bir döngü farklı olabilir; bu süre senin için olağandışıysa veya tekrar ederse bir sağlık profesyoneliyle görüş.',
-  _TextKey.insightPeriodDurationTitle: 'Son tamamlanan kanama kaydın',
+      'Son iki adet başlangıcın arasında {length} gün vardı. Tek bir döngü farklı olabilir; bu süre sana alışılmadık geliyorsa veya yeniden olursa bir sağlık profesyoneliyle görüş.',
+  _TextKey.insightPeriodDurationTitle: 'Son tamamlanan adet süren',
   _TextKey.insightPeriodDurationBody:
-      'Ardışık kanama kayıtların {duration} gün sürdü.',
-  _TextKey.insightPeriodTrackingTitle: 'Yeni döngünün başlangıcı kaydedildi',
+      'Ardışık adet kayıtlarına göre son adetin {duration} gün sürdü.',
+  _TextKey.insightPeriodTrackingTitle: 'İlk döngü başlangıcını kaydettik',
   _TextKey.insightPeriodTrackingBody:
-      'Bu adet başlangıcını döngünün ilk referans noktası olarak not ettim. Bir sonraki başlangıç kaydında döngü süreni hesaplayıp kişisel değişimini karşılaştırabileceğiz.',
-  _TextKey.insightPeriodSymptomTitle: 'Adet dönemlerinde tekrarlayan belirti',
+      'Bu adet başlangıcı ilk referans noktan oldu. Bir sonraki başlangıcı da kaydettiğinde döngü süreni hesaplayıp zaman içindeki değişimi gösterebilirim.',
+  _TextKey.insightPeriodSymptomTitle: 'Adet günlerinde tekrar eden bir belirti',
   _TextKey.insightPeriodSymptomBody:
-      '{label}, kaydettiğin {total} adet döneminin {count} tanesinde görüldü. Şiddetini ve günlük akışı kaydetmek, bunun dönemler arasında değişip değişmediğini anlamamıza yardım eder.',
-  _TextKey.insightPeriodDurationReviewTitle:
-      'Kanama süresindeki değişikliği takip edelim',
+      '{label}, kaydettiğin {total} adet döneminin {count} tanesinde görüldü. Şiddetini ve günlük akışı ekledikçe dönemler arasındaki değişimi daha net görebiliriz.',
+  _TextKey.insightPeriodDurationReviewTitle: 'Bu süreyi birlikte takip edelim',
   _TextKey.insightPeriodDurationReviewBody:
-      'Son tamamlanan kanama kaydın {duration} gün sürdü{comparison}. Tek kayıt nedenini göstermez; süre senin için olağandışıysa, 7 günü aşıyorsa veya tekrar ederse sağlık profesyoneline danış.',
+      'Son tamamlanan adet kaydın {duration} gün sürdü{comparison}. Tek kayıt nedenini göstermez. Bu süre sana alışılmadık geliyorsa, 7 günü aşıyorsa veya yeniden olursa bir sağlık profesyoneline danış.',
   _TextKey.insightPeriodDurationComparison:
-      '; önceki tamamlanmış kayıtlarının ortancası {comparison} gündü',
-  _TextKey.insightFrequentMoodTitle: 'En sık kaydettiğin his',
+      '; önceki tamamlanmış kayıtlarının tipik süresi {comparison} gündü',
+  _TextKey.insightFrequentMoodTitle: 'Kayıtlarında en sık görünen his',
   _TextKey.insightFrequentMoodBody:
-      '{label}, ruh hâli girdiğin {total} günün {count} tanesinde yer aldı.',
-  _TextKey.insightRecurringSymptomTitle: 'Tekrarlayan belirti kaydın',
+      'Ruh hâlini kaydettiğin {total} günün {count} tanesinde {label} seçtin.',
+  _TextKey.insightRecurringSymptomTitle: 'Sık tekrarlayan bir belirti',
   _TextKey.insightRecurringSymptomBody:
-      '{label}, kayıt bulunan {total} günün {count} tanesinde işaretlendi.',
-  _TextKey.insightFrequentActivityTitle: 'En sık kaydettiğin hareket',
-  _TextKey.insightFrequentActivityBody:
-      '{label}, {total} kayıtlı günün {count} tanesinde yer aldı.',
-  _TextKey.insightFrequentNutritionTitle: 'Beslenme kayıtlarında öne çıkan',
-  _TextKey.insightFrequentNutritionBody:
-      '{label} etiketi {total} kayıtlı günün {count} tanesinde yer aldı.',
-  _TextKey.insightFrequentBowelTitle: 'Bağırsak kayıtlarında öne çıkan',
-  _TextKey.insightFrequentBowelBody:
-      '{label}, {total} kayıtlı günün {count} tanesinde işaretlendi.',
+      '{label}, kayıt eklediğin {total} günün {count} tanesinde göründü.',
   _TextKey.insightSymptomMoodTitle: 'Aynı gün kaydedilenler',
   _TextKey.insightSymptomMoodBody:
-      '{primary} ile {secondary} aynı günde {count} kez kaydedildi. Bu yalnızca bir eşleşmedir.',
+      '{primary} ile {secondary}, aynı gün içinde {count} kez birlikte kaydedildi. Bu bir ipucu; tek başına nedenini göstermez.',
   _TextKey.insightSymptomBleedingTitle: 'Kanama günlerindeki belirti',
   _TextKey.insightSymptomBleedingBody:
-      '{label}, kanama kaydı olan {total} günün {count} tanesinde işaretlendi.',
-  _TextKey.insightMoodCyclePhaseTitle: 'Döngü fazında öne çıkan ruh hâli',
+      'Kanama kaydı olan {total} günün {count} tanesinde {label} görüldü.',
+  _TextKey.insightMoodCyclePhaseTitle: 'Bu his bir fazda daha sık görünüyor',
   _TextKey.insightMoodCyclePhaseBody:
-      '{mood}, “{phase}” günlerinde ruh hâli girdiğin {withTotal} günün {withEvent} tanesinde kaydedildi (%{withPercent}). Diğer fazlarda ruh hâli girdiğin {withoutTotal} günde bu oran %{withoutPercent}. Bu bir ilişkidir; döngü fazının ruh hâline neden olduğunu göstermez.',
-  _TextKey.insightSymptomCyclePhaseTitle: 'Döngü fazında tekrarlayan belirti',
+      '{phase} günlerinde ruh hâlini kaydettiğin {withTotal} günün {withEvent} tanesinde {mood} seçtin (%{withPercent}). Diğer fazlardaki {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu yalnızca bir zamanlama ilişkisi; fazın bu hisse neden olduğunu göstermez.',
+  _TextKey.insightSymptomCyclePhaseTitle:
+      'Bu belirti bir fazda daha sık görünüyor',
   _TextKey.insightSymptomCyclePhaseBody:
-      '{symptom}, “{phase}” günlerinde belirti takibi yaptığın {withTotal} günün {withEvent} tanesinde kaydedildi (%{withPercent}). Diğer fazlarda belirti takibi yaptığın {withoutTotal} günde bu oran %{withoutPercent}. Bu bir zamanlama ilişkisidir; nedeni göstermez.',
-  _TextKey.insightEnergyCyclePhaseTitle:
-      'Döngü fazında öne çıkan enerji düzeyi',
-  _TextKey.insightEnergyCyclePhaseBody:
-      '{energy}, “{phase}” günlerinde enerji düzeyi girdiğin {withTotal} günün {withEvent} tanesinde görüldü (%{withPercent}). Diğer fazlarda enerji düzeyi girdiğin {withoutTotal} günde bu oran %{withoutPercent}. Bu bir ilişkidir; döngü fazının enerji düzeyine neden olduğunu göstermez.',
+      '{phase} günlerinde belirti takibi yaptığın {withTotal} günün {withEvent} tanesinde {symptom} kaydettin (%{withPercent}). Diğer fazlardaki {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir zamanlama ilişkisi; nedenini göstermez.',
   _TextKey.insightMoodSymptomTitle:
-      'Ruh halinle bedeninin verdiği sinyal yan yana geliyor',
+      'Ruh hâlin ve bir beden sinyali birlikte görünüyor',
   _TextKey.insightMoodSymptomBody:
-      'Küçük bir şey fark ettim: {mood} hissettiğin {withTotal} günün {withEvent} tanesinde {symptom} eşlik etti (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Şimdilik bunu birlikte izleyeceğimiz bir ipucu olarak tutalım.',
-  _TextKey.insightMoodFoodTitle:
-      'Ruh halinle besin seçimlerin arasında bir iz var',
+      'Küçük bir ipucu var: {mood} hissettiğin {withTotal} günün {withEvent} tanesinde {symptom} eşlik etti (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Şimdilik tekrar edip etmediğini izleyelim.',
+  _TextKey.insightMoodFoodTitle: 'Ruh hâlinle besin seçimin birlikte görünüyor',
   _TextKey.insightMoodFoodBody:
-      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde {food} kaydı oluşturdun (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bazen hisler seçimlerimize eşlik eder; birkaç yeni kayıt resmi netleştirecek.',
+      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde {food} kaydettin (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Birkaç yeni kayıt, bu bağlantının tekrar edip etmediğini daha net gösterecek.',
   _TextKey.insightMoodCravingTitle:
-      'Canının çektiği şey ruh haline eşlik ediyor olabilir',
+      'Bir aşerme ruh hâline eşlik ediyor olabilir',
   _TextKey.insightMoodCravingBody:
-      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde {craving} isteği kaydettin (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bu yalnızca kayıtlarındaki bir yakınlık; seni yargılamadan takip etmeyi sürdürelim.',
+      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde {craving} isteği kaydettin (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu yalnızca kayıtlarındaki bir yakınlık; tekrar edip etmediğine bakalım.',
   _TextKey.insightFoodBowelTitle:
-      'Yediklerinle bağırsak ritmin arasında bir iz var',
+      'Bir besinle bağırsak ritmin birlikte değişiyor olabilir',
   _TextKey.insightFoodBowelSameDayBody:
-      '{food} kaydettiğin {withTotal} günün {withEvent} tanesinde {bowel} işaretledin (%{withPercent}). {food} olmayan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Tek başına nedenini söylemez; tekrar edip etmediğine birlikte bakalım.',
+      '{food} kaydettiğin {withTotal} günün {withEvent} tanesinde aynı gün {bowel} görüldü (%{withPercent}). {food} olmayan {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu, nedenini göstermez; yalnızca izlemeye değer bir ipucu verir.',
   _TextKey.insightFoodBowelNextDayBody:
-      '{food} kaydettiğin {withTotal} günün {withEvent} tanesini izleyen gün {bowel} işaretledin (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bu gecikmeli iz tekrar ederse daha anlamlı hale gelecek.',
+      '{food} kaydettiğin {withTotal} günün {withEvent} tanesinden sonraki gün {bowel} görüldü (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu gecikmeli bağlantı tekrar ederse daha anlamlı hâle gelecek.',
   _TextKey.insightMoodPlaceTitle:
-      'Bulunduğun yer ruh haline eşlik ediyor olabilir',
+      'Bulunduğun yer ruh hâline eşlik ediyor olabilir',
   _TextKey.insightMoodPlaceBody:
-      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde “{place}” konumunu seçtin (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Ortamın sana nasıl geldiğini fark etmek için bunu nazikçe izleyelim.',
+      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde {place} seçtin (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Ortamın sana nasıl geldiğini görmek için bu ipucunu takip edebiliriz.',
   _TextKey.insightMoodCompanionTitle:
-      'Yanındaki kişilerle ruh halin arasında bir örüntü var',
+      'Yanındaki kişiler ruh hâline eşlik ediyor olabilir',
   _TextKey.insightMoodCompanionBody:
-      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde “{companion}” seçeneğini işaretledin (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bu kimse hakkında bir yargı değil; yalnızca senin kayıtlarında beliren bir bağlam.',
-  _TextKey.insightAssociationTitle:
-      'Birlikte takip etmeye değer küçük bir ipucu',
+      '{mood} hissettiğin {withTotal} günün {withEvent} tanesinde {companion} seçtin (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu kimse hakkında bir yargı değil; yalnızca kayıtlarında beliren bir bağlam.',
+  _TextKey.insightStressCompanionTitle:
+      'Stresli günlerinde belirli bir kişi daha sık görünüyor',
+  _TextKey.insightStressCompanionBody:
+      'Stres kaydettiğin {withTotal} günün {withEvent} tanesinde {companion} seçtin (%{withPercent}). Stres kaydetmediğin ancak kişi alanını açıkça doldurduğun {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu, {companion} hakkında bir yargı veya neden-sonuç göstermez; yalnızca o günlerin koşullarına yeniden bakman için bir bağlam sunar.',
+  _TextKey.insightStressCravingTitle:
+      'Stresli günlerinde bir aşerme daha sık görünüyor',
+  _TextKey.insightStressCravingBody:
+      'Stres kaydettiğin {withTotal} günün {withEvent} tanesinde {craving} isteği kaydettin (%{withPercent}). Stres kaydetmediğin ve aşerme alanını açıkça doldurduğun {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu, stresin bu isteğe neden olduğunu göstermez; yalnızca tekrar edip etmediğini izleyebileceğin bir örüntüdür.',
+  _TextKey.insightStressFoodTitle:
+      'Stresli günlerinde bir besin seçimi daha sık görünüyor',
+  _TextKey.insightStressFoodBody:
+      'Stres kaydettiğin {withTotal} günün {withEvent} tanesinde {food} tükettin (%{withPercent}). Stres kaydetmediğin ve besin seçimini açıkça doldurduğun {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir neden-sonuç ilişkisi değildir; yalnızca sonraki kayıtlarında yeniden bakmaya değer bir örüntü sunar.',
+  _TextKey.insightAssociationTitle: 'Takip etmeye değer küçük bir bağlantı',
   _TextKey.insightAssociationSameDayBody:
-      '{primary} kaydettiğin {withTotal} günün {withEvent} tanesinde {secondary} eşlik etti (%{withPercent}). {primary} olmayan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Bu nedenini söylemez; sadece yeniden bakmaya değer bir iz gösterir.',
+      '{primary} kaydettiğin {withTotal} günün {withEvent} tanesinde {secondary} eşlik etti (%{withPercent}). {primary} olmayan {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu nedenini göstermez; yalnızca yeniden bakmaya değer bir bağlantı sunar.',
   _TextKey.insightAssociationNextDayBody:
-      '{primary} kaydettiğin {withTotal} günün {withEvent} tanesini izleyen gün {secondary} vardı (%{withPercent}). Kalan {withoutTotal} karşılaştırılabilir gün için oran %{withoutPercent} oldu. Şimdilik bunu tekrar edip etmediğine bakacağımız bir ipucu olarak tutalım.',
-  _TextKey.insightFoodObservationTitle: 'Bunu birlikte takip edelim',
+      '{primary} kaydettiğin {withTotal} günün {withEvent} tanesinden sonraki gün {secondary} vardı (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Şimdilik tekrar edip etmediğini izleyelim.',
+  _TextKey.insightFoodObservationTitle: 'Yeni bir eşleşme fark ettim',
   _TextKey.insightFoodObservationBody:
-      '{primary} ile {secondary} aynı kayıtta ilk kez birlikte göründü. Hassasiyet demek için çok erken. Benzer öğünleri; diğer içerikler, mevcut sindirim/enerji/uyku işaretleri, döngü fazı ve {primary} olmayan günlerle birlikte karşılaştırmaya devam edeceğiz.',
+      '{primary} ile {secondary} aynı kayıtta ilk kez birlikte göründü. Buna hassasiyet demek için henüz çok erken. Benzer öğünleri; diğer içerikler, sindirim belirtileri, su, öğündeki Kafeinli seçimi, ruh hâli ve döngü kayıtlarıyla birlikte karşılaştırmaya devam edeceğim.',
   _TextKey.insightFoodPatternBuildingTitle:
-      'Besin ve sindirim örüntüsü oluşuyor',
+      'Bu besin ve sindirim eşleşmesi tekrar ediyor',
   _TextKey.insightFoodPatternBuildingBody:
-      '{primary} bulunan {withTotal} günün {withEvent} tanesinde {secondary} kaydedildi. Bu eşleşme tekrar ediyor, ancak henüz hassasiyet sonucu çıkarılamaz. {primary} olmayan günler ve diğer etkenler arttıkça karşılaştırma daha anlamlı olacak.',
-  _TextKey.insightFoodSensitivityTitle: 'Besin ve sindirim örüntüsü',
+      '{primary} bulunan {withTotal} günün {withEvent} tanesinde {secondary} kaydedildi. Eşleşme tekrar ediyor, ancak hassasiyet demek için henüz erken. {primary} olmayan günler ve diğer kayıtlar arttıkça karşılaştırma daha anlamlı olacak.',
+  _TextKey.insightFoodSensitivityTitle:
+      'Besin ve sindirim arasında belirgin bir örüntü',
   _TextKey.insightFoodSensitivityBody:
-      '{primary} içeren öğünlerden sonraki {withTotal} kaydın {withEvent} tanesinde {secondary} işaretlendi (%{withPercent}). {primary} olmayan {withoutTotal} karşılaştırılabilir kayıtta bu oran %{withoutPercent}. Bu örüntü olası bir hassasiyetle uyumlu olabilir; tanı değildir. Bir besini elemeden önce sağlık profesyoneliyle görüş.',
+      '{primary} içeren öğünlerden sonraki {withTotal} kaydın {withEvent} tanesinde {secondary} işaretlendi (%{withPercent}). {primary} olmayan {withoutTotal} karşılaştırılabilir kayıtta bu oran %{withoutPercent}. Bu örüntü olası bir hassasiyetle uyumlu olabilir, ancak tanı değildir. Bir besini hayatından çıkarmadan önce bir sağlık profesyoneliyle görüş.',
   _TextKey.insightContextAlsoSeen:
-      'Aynı günlerin kayıtlarında {contexts} sık göründü; bunlar sonucu etkiliyor olabilir.',
+      'Aynı günlerin kayıtlarında {contexts} sık göründü; bunlar karşılaştırmayı etkiliyor olabilir.',
   _TextKey.insightContextTrackNext:
-      'Daha net ayırmak için diğer öğün içeriklerini, belirtinin zamanını ve mevcut sindirim, enerji, uyku ile döngü işaretlerini kaydet.',
+      'Daha net ayırabilmek için diğer öğün içeriklerini, sindirim belirtilerini, suyu, öğündeki Kafeinli seçimini, ruh hâlini ve döngü gününü de kaydet.',
   _TextKey.insightMedicationSkipAssociationTitle:
-      'Doz yanıtından sonra görülen örüntü',
+      'Atlanan dozun ertesi gününde görünen bir bağlantı',
   _TextKey.insightMedicationSkipAssociationBody:
-      '{primary} “atlandı” olarak yanıtlanan {withTotal} günün {withEvent} tanesini izleyen gün {secondary} kaydedildi (%{withPercent}). “Alındı” yanıtı bulunan {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu bir ilişkidir; ilacın etkisi veya neden-sonuç değildir.',
-  _TextKey.insightMedicationAdherenceTitle: 'Planlanan doz yanıtların',
+      '{primary} için “atlandı” dediğin {withTotal} günün {withEvent} tanesinden sonraki gün {secondary} kaydedildi (%{withPercent}). “Alındı” dediğin {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu yalnızca bir ilişki; ilacın etkisini veya neden-sonuç bağını göstermez.',
+  _TextKey.insightMedicationAdherenceTitle: 'Doz planına kısa bir bakış',
   _TextKey.insightMedicationAdherenceBody:
-      'Zamanı geçmiş {total} planlı dozun {taken} tanesini “alındı” olarak yanıtladın. Yanıtsız dozlar alındı sayılmaz.',
-  _TextKey.insightDischargeBaselineTitle: 'Akıntı kaydını bağlama ekledim',
+      'Zamanı geçen {total} planlı dozun {taken} tanesini “alındı” diye işaretledin. Yanıt vermediğin dozlar bu sayıya dahil değil.',
+  _TextKey.insightDischargeBaselineTitle:
+      'Bu akıntı kaydı olağan örüntünü tanımaya yardımcı olacak',
   _TextKey.insightDischargeBaselineBody:
-      'Son {color}{consistency} kaydında eşlik eden bir bulgu işaretlenmedi. Berrak veya beyaz akıntı ve kıvam değişimleri döngü boyunca görülebilir; senin olağan örüntünü anlamak için renk, kıvam, koku ve döngü zamanını birlikte izleyeceğim.',
+      'Son {color}{consistency} kaydında eşlik eden bir bulgu işaretlemedin. Berrak veya beyaz akıntı ile kıvam değişimleri döngü boyunca görülebilir. Sana özgü olağan örüntüyü anlamak için renk, kıvam, koku ve döngü zamanını birlikte takip edeceğim.',
   _TextKey.insightFertileDischargeTitle:
-      'Akıntı kaydı ve tahmini verimli dönem',
+      'Akıntı kaydın tahmini verimli dönemle örtüşüyor',
   _TextKey.insightFertileDischargeBody:
-      'Son kaydındaki {color}, {consistency} görünüm tahmini verimli pencereyle örtüşüyor. Bu, doğurganlığın artabileceği bir dönemle uyumlu olabilir; ovülasyonu doğrulamaz ve gebelikten korunma yöntemi değildir.',
-  _TextKey.insightMenstrualDischargeTitle: 'Akıntı kaydı ve adet dönemi',
+      'Son kaydındaki {color}, {consistency} görünüm tahmini verimli dönemle örtüşüyor. Bu, doğurganlığın artabileceği bir zamanla uyumlu olabilir; ovülasyonu doğrulamaz ve gebelikten korunma yöntemi değildir.',
+  _TextKey.insightMenstrualDischargeTitle:
+      'Akıntı kaydın adet gününe denk geliyor',
   _TextKey.insightMenstrualDischargeBody:
-      'Son {color} akıntı kaydın adet veya kanama günüyle örtüşüyor. Bu kart yalnızca zamanlama bağlamı verir ve rengin nedenini belirlemez. Adet dışında kanlı görünüm tekrarlarsa sağlık profesyoneline danış.',
-  _TextKey.insightDischargeHealthTitle: 'Akıntı değişikliğini değerlendirin',
+      'Son {color} akıntı kaydın adet veya kanama gününe denk geliyor. Bu yalnızca zamanlama bilgisi verir; rengin nedenini göstermez. Adet dışında kanlı görünüm tekrarlarsa bir sağlık profesyoneline danış.',
+  _TextKey.insightDischargeHealthTitle: 'Bu akıntı değişikliğini gözden geçir',
   _TextKey.insightDischargeHealthBody:
-      'Son kaydında renk, kıvam, koku veya eşlik eden bulgulardan değerlendirilmesi gereken bir değişiklik işaretlendi. Bu, enfeksiyon dahil farklı nedenlerle görülebilir; uygulama nedenini belirleyemez veya tanı koyamaz. Değişiklik yeniyse, sürerse veya kötüleşirse sağlık profesyoneline başvur.',
+      'Son kaydında renk, kıvam, koku veya eşlik eden bulgulardan biri dikkat gerektirebilir. Bunun enfeksiyon dahil farklı nedenleri olabilir; uygulama nedenini belirleyemez veya tanı koyamaz. Değişiklik yeniyse, sürerse ya da kötüleşirse bir sağlık profesyoneline başvur.',
   _TextKey.insightSexualAfterPatternTitle:
-      'Cinsel aktivite sonrası tekrar eden his',
+      'Cinsel aktivite sonrasında sık kaydettiğin his',
   _TextKey.insightSexualAfterPatternBody:
-      '{feeling}, cinsel aktivite sonrası his kaydettiğin {total} girişin {count} tanesinde yer aldı. Bu yalnızca kişisel kayıt örüntündür; tek başına bir sağlık sonucu göstermez.',
+      'Cinsel aktivite sonrası his eklediğin {total} kaydın {count} tanesinde {feeling} seçtin. Bu yalnızca kişisel kayıtlarındaki bir örüntü; tek başına bir sağlık sonucu göstermez.',
   _TextKey.insightUnprotectedFertileTitle:
-      'Korunmasız ilişki ve tahmini verimli dönem',
+      'Korunmasız ilişki kaydın tahmini verimli döneme denk geliyor',
   _TextKey.insightUnprotectedFertileBody:
-      'Son korunmasız ilişki kaydın tahmini verimli pencereyle çakışıyor. Takvim tahmini ovülasyonu veya gebeliği doğrulamaz. Gebelik istemiyorsan, acil korunma seçenekleri zamana bağlı olduğundan bir sağlık profesyoneli veya eczacıyla gecikmeden görüş.',
+      'Son korunmasız ilişki kaydın tahmini verimli dönemle örtüşüyor. Takvim tahmini ovülasyonu veya gebeliği doğrulamaz. Gebelik istemiyorsan acil korunma seçenekleri zamana bağlı olabilir; bir sağlık profesyoneli veya eczacıyla gecikmeden görüş.',
   _TextKey.insightConfidenceEmerging: 'Yeni yeni belirginleşiyor',
   _TextKey.insightConfidenceModerate: 'Tutarlı görünmeye başladı',
   _TextKey.insightConfidenceStrong: 'Güçlü bir örüntüye benziyor',
   _TextKey.insightAssociationEvidence:
-      'Bunu {count} karşılaştırılabilir günde fark ettim • {confidence}',
+      'Bunu {count} karşılaştırılabilir günde gördüm • {confidence}',
   _TextKey.insightEvidenceDays: 'Kayıtlı gün: {count}',
   _TextKey.insightEvidenceCycles: 'Hesaplanan döngü: {count}',
   _TextKey.insightEvidenceEntries: 'İşaretleme girişi: {count}',
   _TextKey.insightEvidenceRecords: 'Kayıt: {count}',
   _TextKey.insightNotificationTitle: 'Yeni bir OMA içgörüsü hazır',
   _TextKey.insightNotificationBody:
-      'Kayıtlarında takip etmeye değer yeni bir bağlantı var. Ayrıntıları uygulamada gör.',
+      'Kayıtlarında takip etmeye değer yeni bir bağlantı fark ettim. Ayrıntılarına göz atabilirsin.',
   _TextKey.insightNotificationChannelName: 'Kişisel içgörüler',
   _TextKey.insightNotificationChannelDescription:
       'Yeni ve önemli kişisel örüntüler hazır olduğunda haber verir.',
@@ -1050,37 +1032,37 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.nextInsight: 'Sonraki içgörü',
   _TextKey.insightStoryDone: 'Bitti',
   _TextKey.quickLogTitle: 'Hızlı kayıt',
-  _TextKey.quickLogCaption: 'Bugün ne değişti?',
+  _TextKey.quickLogCaption: 'Bugün sende neler var?',
   _TextKey.greetingNameFallback: 'Sen',
   _TextKey.omaConnectsYourData: 'OMA VERİLERİNİ BİRBİRİNE BAĞLAR',
   _TextKey.myDailyInsights: 'Günlük İçgörülerim',
   _TextKey.viewAllChevron: 'Tümünü gör ›',
   _TextKey.insightLearning:
-      'OMA, kayıtlarından kişisel içgörüler oluşturmak için seni tanıyor.',
+      'Kayıtların arttıkça OMA sana özgü bağlantıları daha iyi fark eder.',
   _TextKey.journeyTrack: 'KAYDET',
   _TextKey.journeyConnect: 'BAĞLA',
   _TextKey.journeyUnderstand: 'ANLA',
   _TextKey.journeyAct: 'UYGULA',
   _TextKey.journeyImprove: 'GELİŞTİR',
   _TextKey.omaTalkPrompt:
-      'Bugünkü kayıtlarından konuşmak istediğin konuyu seç.',
-  _TextKey.phaseMenstrualHeadline: 'Dinlen ve\nserbest bırak',
+      'Bugünkü kayıtlarından göz atmak istediğin konuyu seç.',
+  _TextKey.phaseMenstrualHeadline: 'Bugün biraz\nyavaşlayabilirsin',
   _TextKey.phaseMenstrualBody:
-      'Bedenin arınıyor ve yeniden başlıyor. Yavaş sabahlar, sıcaklık ve nazik hareket bugün sana iyi gelebilir.',
-  _TextKey.phaseMenstrualFertility: 'Gebelik olasılığı çok düşük',
-  _TextKey.phaseFollicularHeadline: 'Yeni enerji,\ntaze fikirler',
+      'Adet günlerinde enerjin ve rahatlık ihtiyacın değişebilir. Sana iyi geliyorsa dinlenmek, sıcaklık ve hafif hareket için alan aç.',
+  _TextKey.phaseMenstrualFertility: 'Tahmini gebelik olasılığı daha düşük',
+  _TextKey.phaseFollicularHeadline: 'Enerjin değişirken\nkendini dinle',
   _TextKey.phaseFollicularBody:
-      'Östrojen yükseliyor. Kendini meraklı, sosyal ve yeni başlangıçlara açık hissedebilirsin.',
-  _TextKey.phaseFollicularFertility: 'Düşük, yükselen gebelik olasılığı',
-  _TextKey.phaseOvulationHeadline: 'En canlı\nhissettiğin günler',
+      'Bu fazda enerjin veya sosyalliğin artabilir; aynı kalması da olağan. Planlarını bugünkü hissine göre şekillendir.',
+  _TextKey.phaseFollicularFertility: 'Tahmini gebelik olasılığı yükseliyor',
+  _TextKey.phaseOvulationHeadline: 'Bugün kendini\nnasıl hissediyorsun?',
   _TextKey.phaseOvulationBody:
-      'İletişim ve bağ kurmak daha doğal gelebilir. Özgüven ve sıcaklık bu günlerde sıkça yükselir.',
-  _TextKey.phaseOvulationFertility: 'Gebelik olasılığı yüksek',
-  _TextKey.phaseLutealHeadline: 'İçe dönüş\nzamanı',
+      'Tahmini ovülasyon günlerinde enerji, istek ve sosyal hisler değişebilir. Takvim tahmini, kişisel deneyiminin yerini tutmaz.',
+  _TextKey.phaseOvulationFertility: 'Tahmini gebelik olasılığı daha yüksek',
+  _TextKey.phaseLutealHeadline: 'Ritmini biraz\nyumuşat',
   _TextKey.phaseLutealBody:
-      'Progesteron yükselip sonra yumuşar. Konfor, sakin odak ve daha nazik planlar iyi gelebilir.',
-  _TextKey.phaseLutealFertility: 'Gebelik olasılığı düşük',
-  _TextKey.readBodyChanges: 'Bedeninde neler olduğunu oku',
+      'Adet yaklaşırken enerjin, odağın ve rahatlık ihtiyacın değişebilir. Bugün sana iyi gelen tempoyu seç.',
+  _TextKey.phaseLutealFertility: 'Tahmini gebelik olasılığı daha düşük',
+  _TextKey.readBodyChanges: 'Bu faz hakkında daha fazla gör',
   _TextKey.periodDayCount: 'adet günü',
   _TextKey.daysToPeriodCount: 'adete kalan gün',
   _TextKey.profileCurrentMode: 'Şu anki modun',
@@ -1124,9 +1106,9 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.helpAndSupport: 'Yardım ve destek',
   _TextKey.helpAndSupportSubtitle: 'OMA kullanımı hakkında yardım',
   _TextKey.profile: 'Profil',
-  _TextKey.welcome: 'Hoş Geldiniz',
-  _TextKey.login: 'Giriş Yap',
-  _TextKey.register: 'Kayıt Ol',
+  _TextKey.welcome: 'Hoş geldin',
+  _TextKey.login: 'Giriş yap',
+  _TextKey.register: 'Kayıt ol',
   _TextKey.continueWithoutLogin: 'Giriş yapmadan devam et',
   _TextKey.email: 'E-posta',
   _TextKey.password: 'Şifre',
@@ -1138,15 +1120,15 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.skip: 'Atla',
   _TextKey.add: 'Ekle',
   _TextKey.save: 'Kaydet',
-  _TextKey.saved: 'Kaydedildi!',
+  _TextKey.saved: 'Kaydedildi',
   _TextKey.cancel: 'İptal',
   _TextKey.delete: 'Sil',
   _TextKey.edit: 'Düzenle',
   _TextKey.ok: 'Tamam',
   _TextKey.loading: 'Yükleniyor...',
-  _TextKey.error: 'Bir hata oluştu',
+  _TextKey.error: 'Bir şeyler ters gitti',
   _TextKey.retry: 'Tekrar dene',
-  _TextKey.noData: 'Veri bulunamadı',
+  _TextKey.noData: 'Henüz veri yok',
   _TextKey.yes: 'Evet',
   _TextKey.no: 'Hayır',
   _TextKey.notSpecified: 'Belirtilmemiş',
@@ -1161,30 +1143,31 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.year: 'Yıl',
   _TextKey.day: 'gün',
   _TextKey.days: 'gün',
-  _TextKey.letsStart: 'Haydi Başlayalım!',
-  _TextKey.tellAboutYourself: 'Bize kendinizden bahsedin',
-  _TextKey.yourName: 'Adınız',
-  _TextKey.basicInformation: 'Temel Bilgiler',
-  _TextKey.createHealthProfile: 'Sağlık profilinizi oluşturalım',
-  _TextKey.smokingStatus: 'Sigara kullanıyor musunuz?',
-  _TextKey.smokingYears: 'Kaç yıldır kullanıyorsunuz?',
-  _TextKey.relationshipStatus: 'İlişki Durumu',
-  _TextKey.sexualActivity: 'Cinsel Aktivite',
-  _TextKey.wantsChildrenInYear: '1 yıl içinde çocuk düşünüyor musunuz?',
-  _TextKey.chronicDiseases: 'Kronik Hastalıklar',
-  _TextKey.womenHealth: 'Kadın Sağlığı',
-  _TextKey.cycleAndHealthInformation: 'Döngü ve sağlık bilgileriniz',
+  _TextKey.letsStart: 'Hazırsan başlayalım',
+  _TextKey.tellAboutYourself: 'Seni biraz tanıyalım',
+  _TextKey.yourName: 'Adın',
+  _TextKey.basicInformation: 'Temel bilgiler',
+  _TextKey.createHealthProfile: 'Sağlık profilini birlikte oluşturalım',
+  _TextKey.smokingStatus: 'Sigara kullanıyor musun?',
+  _TextKey.smokingYears: 'Kaç yıldır kullanıyorsun?',
+  _TextKey.relationshipStatus: 'İlişki durumu',
+  _TextKey.sexualActivity: 'Cinsel aktivite',
+  _TextKey.wantsChildrenInYear:
+      'Önümüzdeki 1 yıl içinde çocuk düşünüyor musun?',
+  _TextKey.chronicDiseases: 'Kronik hastalıklar',
+  _TextKey.womenHealth: 'Kadın sağlığı',
+  _TextKey.cycleAndHealthInformation: 'Döngü ve sağlık bilgilerin',
   _TextKey.menstrualCycleLength: 'Regl döngüsü süresi (gün)',
-  _TextKey.menstrualCycleHint: 'Döngü sürenizi biliyorsanız girin',
+  _TextKey.menstrualCycleHint: 'Biliyorsan ortalama döngü süreni gir',
   _TextKey.doNotKnowCycleLength: 'Döngü süremi bilmiyorum',
   _TextKey.calculateCycleOverTime: 'Uygulama zamanla hesaplasın',
-  _TextKey.periodLength: 'Adet Süresi',
-  _TextKey.menopauseStatus: 'Menopoz Durumu',
+  _TextKey.periodLength: 'Adet süresi',
+  _TextKey.menopauseStatus: 'Menopoz durumu',
   _TextKey.preMenopause: 'Pre-menopoz',
   _TextKey.periMenopause: 'Peri-menopoz',
   _TextKey.postMenopause: 'Post-menopoz',
   _TextKey.noMenopause: 'Menopozda değilim',
-  _TextKey.birthControl: 'Doğum Kontrolü',
+  _TextKey.birthControl: 'Doğum kontrolü',
   _TextKey.noBirthControl: 'Kullanmıyorum',
   _TextKey.pill: 'Doğum kontrol hapı',
   _TextKey.iud: 'Spiral (RİA)',
@@ -1194,16 +1177,16 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.womenDiseases: 'Kadın Hastalıkları',
   _TextKey.commonWomenDiseases: 'Kadın Hastalıkları',
   _TextKey.lastPeriodDate: 'Son adet başlangıç tarihi',
-  _TextKey.selectDate: 'Tarih seçin',
-  _TextKey.great: 'Harika! 🎉',
-  _TextKey.profileReady: 'Profiliniz hazır. Başlayalım mı?',
+  _TextKey.selectDate: 'Tarih seç',
+  _TextKey.great: 'Harika, hazırsın',
+  _TextKey.profileReady: 'Profilin hazır. Başlayalım mı?',
   _TextKey.dashboard: 'Ana Sayfa',
   _TextKey.goodMorning: 'Günaydın',
   _TextKey.goodAfternoon: 'İyi günler',
   _TextKey.goodEvening: 'İyi akşamlar',
-  _TextKey.todaysSummary: 'Bugünün Özeti',
-  _TextKey.dailyLog: 'Günlük Kayıt',
-  _TextKey.addDailyLog: 'Günlük Kayıt Ekle',
+  _TextKey.todaysSummary: 'Bugünün özeti',
+  _TextKey.dailyLog: 'Günlük kayıt',
+  _TextKey.addDailyLog: 'Günlük kayıt ekle',
   _TextKey.logPeriodQuestion: 'Bugün akışın nasıl?',
   _TextKey.logPeriodHint:
       'Yoğunluğu kaydetmen, OMA’nın sonraki döngünü daha doğru tahmin etmesine yardımcı olur.',
@@ -1222,7 +1205,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.logMoodQuestion: 'Şu anda nasıl hissediyorsun?',
   _TextKey.logMoodHint: 'Fazla düşünmene gerek yok; şu ana en yakın olanı seç.',
   _TextKey.logAnythingElse: 'Başka ne fark ediyorsun?',
-  _TextKey.logHydration: 'Hidrasyon',
+  _TextKey.logHydration: 'Su takibi',
   _TextKey.savePeriod: 'Adet kaydını kaydet',
   _TextKey.saveNutrition: 'Beslenmeyi kaydet',
   _TextKey.saveMedication: 'Rutini kaydet',
@@ -1244,7 +1227,12 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.symptomBody: 'Beden',
   _TextKey.symptomSkinHair: 'Cilt ve Saç',
   _TextKey.symptomEnergy: 'Enerji',
+  _TextKey.symptomEnergyLevel: 'Enerji seviyesi',
+  _TextKey.symptomMoodState: 'Ruh hâli',
+  _TextKey.symptomMentalClarity: 'Zihinsel netlik',
   _TextKey.symptomSleep: 'Uyku',
+  _TextKey.symptomSleepQuality: 'Uyku kalitesi',
+  _TextKey.symptomWakeFeeling: 'Uyanış hissi',
   _TextKey.symptomDigestion: 'Sindirim',
   _TextKey.dreamQuestion: 'Rüya gördün mü?',
   _TextKey.dreamNoteQuestion: 'Rüyanı kaydetmek ister misin?',
@@ -1252,12 +1240,14 @@ const Map<_TextKey, String> _turkishTexts = {
       'Kendin için rüyalarını kaydedebilirsin; özel bilgilerinin hiçbirini okumaz ve senden izinsiz işlemeyiz.',
   _TextKey.moodBehindQuestion: '{mood} hissetmenin ardında ne var?',
   _TextKey.moodContextHint:
-      'Biraz bağlam, OMA’nın örüntülerini anlamasına yardımcı olur. Uyanların tümünü seç.',
+      'Biraz bağlam, bağlantıları daha iyi görmeme yardımcı olur. Sana uyanların tümünü seç.',
   _TextKey.omaNote: 'OMA NOTU',
-  _TextKey.moodGentleTitle: 'Bugün kendine nazik davran.',
+  _TextKey.moodGentleTitle: 'Bugün kendine biraz alan aç.',
   _TextKey.moodGentleBody:
-      'Döngünün bu noktasında daha hassas hissedebilirsin. Daha sakin bir tempo destekleyici olabilir.',
-  _TextKey.moodWhoWith: 'Kiminlesin?',
+      'Döngünün bu noktasında daha hassas hissedebilirsin. Sana iyi geliyorsa tempoyu biraz yavaşlat.',
+  _TextKey.moodWhoWith: 'Kiminleydin?',
+  _TextKey.moodCompanionTrackingHint:
+      'Belirli bir kişiyi takip etmek istersen + ile adını bir kez ekle. Sonraki kayıtlarda aynı adı yeniden seçebilirsin.',
   _TextKey.moodWhere: 'Neredesin?',
   _TextKey.todaysStatus: 'Bugünün Durumu',
   _TextKey.noLogAdded: 'Henüz kayıt eklenmedi',
@@ -1266,7 +1256,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.waiting: 'Bekleniyor',
   _TextKey.missingInformation: 'Bilgi Eksik',
   _TextKey.phasePredictionDisclaimer:
-      'Takvim ve ovülasyon bilgileri yaklaşık tahminlerdir.',
+      'Takvim ve ovülasyon bilgileri tahmindir; kişiden kişiye değişebilir.',
   _TextKey.recommendationOfTheDay: 'GÜNÜN TAVSİYESİ',
   _TextKey.recommendationTitle: 'Adet Döneminde Beslenme',
   _TextKey.recommendationSummary:
@@ -1276,32 +1266,14 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.datedLogs: '📋 {date} Tarihli Kayıtlar',
   _TextKey.noLogForDate: 'Bu tarih için henüz bir kayıt girilmemiş.',
   _TextKey.mood: 'Ruh Hali',
-  _TextKey.moodNote: 'Ruh Hali Notu',
-  _TextKey.activity: 'Hareket',
-  _TextKey.activityStatus: 'Hareket Durumu',
   _TextKey.nutrition: 'Beslenme',
   _TextKey.nutritionStatus: 'Beslenme Durumu',
   _TextKey.dailyFactors: 'Günlük Etkenler',
   _TextKey.dailyFactorsHint:
       'İsteğe bağlıdır. Düzenli kayıtlar, kişisel bağlantıları karşılaştırmayı sağlar.',
-  _TextKey.sleep: 'Uyku',
-  _TextKey.sleepDuration: 'Uyku Süresi',
-  _TextKey.sleepQuality: 'Uyku Kalitesi',
-  _TextKey.stressLevel: 'Stres Düzeyi',
-  _TextKey.energyLevel: 'Enerji Düzeyi',
   _TextKey.waterIntake: 'Su Tüketimi',
-  _TextKey.caffeineIntake: 'Kafeinli İçecek',
-  _TextKey.caffeineServingHint: 'Bardak/fincan sayısı',
-  _TextKey.hoursMinutes: '{hours} sa {minutes} dk',
   _TextKey.milliliters: '{value} ml',
   _TextKey.servingCount: '{count} porsiyon',
-  _TextKey.levelOutOfFive: '{value}/5',
-  _TextKey.insightFeatureShortSleep: 'kişisel ortancanın altında uyku süresi',
-  _TextKey.insightFeaturePoorSleep: 'düşük uyku kalitesi',
-  _TextKey.insightFeatureHighStress: 'yüksek stres',
-  _TextKey.insightFeatureLowEnergy: 'düşük enerji',
-  _TextKey.insightFeatureHighEnergy: 'yüksek enerji',
-  _TextKey.insightFeatureHighCaffeine: '2 veya daha fazla kafeinli içecek',
   _TextKey.insightFeatureBelowTypicalWater:
       'kişisel ortancanın altında su tüketimi',
   _TextKey.supplements: 'Takviyeler',
@@ -1330,15 +1302,15 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.sexualAfterFeelingQuestion:
       'Cinsel aktivite sonrasında nasıl hissettirdi?',
   _TextKey.sexualAfterFeelingSummary: 'Sonrasında: {feelings}',
-  _TextKey.notesHint: 'Bugün hakkında notlarınız...',
-  _TextKey.selectLogTime: 'Kayıt Saatini Seçin',
+  _TextKey.notesHint: 'Bugünle ilgili eklemek istediğin bir not...',
+  _TextKey.selectLogTime: 'Kayıt saatini seç',
   _TextKey.pastLogTimeQuestion: 'Bu kayda saat eklemek ister misin?',
   _TextKey.pastLogTimeHint:
       'Saat isteğe bağlıdır. Saat eklemeden de bu güne kayıt yapabilirsin.',
   _TextKey.addTime: 'Saat ekle',
   _TextKey.saveWithoutTime: 'Saat olmadan kaydet',
   _TextKey.timeNotAdded: 'Saat eklenmedi',
-  _TextKey.logSaveFailed: 'Kayıt tamamlanamadı. Lütfen tekrar deneyin.',
+  _TextKey.logSaveFailed: 'Kayıt tamamlanamadı. Bir kez daha dener misin?',
   _TextKey.futureLogNotAllowed: 'Gelecek tarihlere günlük kayıt eklenemez.',
   _TextKey.savePeriodBeforeSymptomsTitle: 'Önce adet kaydını kaydedelim',
   _TextKey.savePeriodBeforeSymptomsBody:
@@ -1350,31 +1322,31 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.customDosage: 'Özel Miktar Girin',
   _TextKey.customDosageHint: 'Örn: 2 ölçek, 250 mg, 1,5 tablet',
   _TextKey.custom: 'Özel...',
-  _TextKey.dateAwaiting: 'Tarih Bekleniyor',
+  _TextKey.dateAwaiting: 'Tarih için biraz daha veri gerekiyor',
   _TextKey.daysRemaining: 'gün kaldı',
-  _TextKey.periodToday: 'Bugün adet günü',
-  _TextKey.currentPhase: 'Mevcut Faz',
-  _TextKey.menstrualPhase: 'Adet Dönemi',
-  _TextKey.follicularPhase: 'Foliküler Faz',
-  _TextKey.estimatedOvulationWindow: 'Tahmini Ovülasyon Aralığı',
-  _TextKey.lutealPhase: 'Luteal Faz',
-  _TextKey.myCycles: '📊 Döngülerim',
-  _TextKey.previousCycleLength: 'Önceki döngü süresi',
-  _TextKey.previousPeriodLength: 'Önceki regl süresi',
-  _TextKey.normalCycleRange: 'Normal aralık: 21-35 gün',
-  _TextKey.normalPeriodRange: 'Normal aralık: 2-7 gün',
-  _TextKey.cycleLengthVariation: 'Döngü süresi değişkenliği',
-  _TextKey.insufficientData: 'Yeterli veri yok',
-  _TextKey.regularDifference: '≤7 gün fark: Düzenli',
-  _TextKey.normal: 'OLAĞAN',
-  _TextKey.abnormal: 'OLAĞAN DIŞI',
-  _TextKey.noDataStatus: 'VERİ YOK',
-  _TextKey.regular: 'DÜZENLİ',
-  _TextKey.irregular: 'DÜZENSİZ',
+  _TextKey.periodToday: 'Adet başlangıcı bugün görünüyor',
+  _TextKey.currentPhase: 'Şu anki faz',
+  _TextKey.menstrualPhase: 'Adet dönemi',
+  _TextKey.follicularPhase: 'Foliküler faz',
+  _TextKey.estimatedOvulationWindow: 'Tahmini ovülasyon aralığı',
+  _TextKey.lutealPhase: 'Luteal faz',
+  _TextKey.myCycles: 'Döngüne genel bakış',
+  _TextKey.previousCycleLength: 'Son hesaplanan döngün',
+  _TextKey.previousPeriodLength: 'Son tamamlanan adetin',
+  _TextKey.normalCycleRange: 'Genel referans aralığı: 21-35 gün',
+  _TextKey.normalPeriodRange: 'Genel referans aralığı: 2-7 gün',
+  _TextKey.cycleLengthVariation: 'Son döngülerinin aralığı',
+  _TextKey.insufficientData: 'Biraz daha kayıt gerekiyor',
+  _TextKey.regularDifference: '7 gün veya daha az fark: daha düzenli',
+  _TextKey.normal: 'OLAĞAN ARALIKTA',
+  _TextKey.abnormal: 'GÖZDEN GEÇİR',
+  _TextKey.noDataStatus: 'VERİ BEKLİYOR',
+  _TextKey.regular: 'DAHA DÜZENLİ',
+  _TextKey.irregular: 'DEĞİŞKEN',
   _TextKey.records:
       '{cycles} döngü kaydedildi · {calculated} döngü süresi hesaplandı',
   _TextKey.cycleStatisticsHint:
-      'Daha fazla veri girdikçe istatistikler daha doğru olacak',
+      'Birkaç döngü daha kaydettikçe bu görünüm sana daha çok yaklaşacak',
   _TextKey.calendar: 'Takvim',
   _TextKey.close: 'Kapat',
   _TextKey.expand: 'Genişlet',
@@ -1386,7 +1358,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.predictedPeriod: 'Tahmini adet',
   _TextKey.fertileDays: 'Doğurgan günler',
   _TextKey.noLogsForDay: 'Bu gün için kayıt yok',
-  _TextKey.viewDetails: 'Detayları Gör',
+  _TextKey.viewDetails: 'Detayları gör',
   _TextKey.period: 'Adet',
   _TextKey.all: 'Tümü',
   _TextKey.premium: 'PREMIUM',
@@ -1719,22 +1691,23 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.searchConditions: 'Hastalık ara',
   _TextKey.addCondition: 'Hastalık ekle',
   _TextKey.addBirthControlMethod: 'Doğum kontrol yöntemi ekle',
-  _TextKey.meetYouTitle: 'Sizi Tanıyalım',
-  _TextKey.meetYouSubtitle: 'Sana daha kişisel bir deneyim sunabilmemiz için.',
+  _TextKey.meetYouTitle: 'Seni tanıyalım',
+  _TextKey.meetYouSubtitle:
+      'Deneyimini sana göre şekillendirmek için birkaç kısa soru.',
   _TextKey.nameAddressHint: 'Sana hitap edebilmemiz için',
   _TextKey.birthDateInputHint: 'gg/aa/yyyy',
   _TextKey.chooseFromCalendar: 'Takvimden seç',
   _TextKey.birthDateManualEntryHint:
       'Takvimden seçebilir veya elle yazabilirsin.',
-  _TextKey.basicHealthInformationTitle: 'Temel Sağlık Bilgileri',
+  _TextKey.basicHealthInformationTitle: 'Temel sağlık bilgilerin',
   _TextKey.basicHealthInformationSubtitle:
-      'Sana özel önerilerimiz için bu bilgilere ihtiyacımız var.',
+      'Bu bilgiler, uygulamadaki özetleri sana göre düzenlememize yardımcı olur.',
   _TextKey.smokingUsage: 'Sigara kullanımı',
   _TextKey.centimeterUnit: 'cm',
   _TextKey.kilogramUnit: 'kg',
-  _TextKey.detailedHealthInformationTitle: 'Detaylı Sağlık Bilgileri',
+  _TextKey.detailedHealthInformationTitle: 'Ek sağlık bilgilerin',
   _TextKey.detailedHealthInformationSubtitle:
-      'İstersen bu alanları şimdi doldurabilir, daha sonra profilden güncelleyebilirsin.',
+      'İstersen şimdi ekleyebilir, istersen daha sonra profilinden tamamlayabilirsin.',
   _TextKey.bloodResultsDescription:
       'Kan sonuçlarını ad veya kısaltmayla arayarak ekleyebilirsin. Tüm alanlar isteğe bağlıdır.',
   _TextKey.noBloodResultsAdded: 'Henüz değer eklenmedi',
@@ -1742,7 +1715,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.bloodResultsAddedMany: '{count} değer eklendi',
   _TextKey.searchBloodTests: 'Kan değeri ara',
   _TextKey.knownConditionQuestion:
-      'Bilmemizi istediğiniz bir hastalığınız var mı?',
+      'Takipte dikkate almamızı istediğin bir hastalığın var mı?',
   _TextKey.combinedConditionsDescription:
       'Kadın hastalıkları ve kronik hastalıkları tek listeden arayabilirsin.',
   _TextKey.noConditionSelected: 'Herhangi bir hastalık seçilmedi',
@@ -1750,9 +1723,9 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.laboratoryResults: 'Laboratuvar değerleri',
   _TextKey.editLaboratoryResults: 'Laboratuvar değerlerini düzenle',
   _TextKey.emptyLaboratoryResultsHint:
-      'Sonuç eklemek için dokunun. Tüm alanlar isteğe bağlıdır.',
+      'Sonuç eklemek için dokun. Tüm alanlar isteğe bağlıdır.',
   _TextKey.laboratoryEntryDisclaimer:
-      'Raporunuzdaki değeri ve birimi aynen seçin. Tüm alanlar isteğe bağlıdır; sonuçların yorumu için raporu düzenleyen laboratuvarın referans aralığını kullanın.',
+      'Raporundaki değeri ve birimi aynen seç. Tüm alanlar isteğe bağlıdır; yorumlarken raporu düzenleyen laboratuvarın referans aralığını kullan.',
   _TextKey.searchLaboratoryValue: 'Kan değeri veya kısaltma ara',
   _TextKey.noTestDateSelected: 'Tarih seçilmedi',
   _TextKey.testDetails: 'Ölçüm bilgileri',
@@ -1766,12 +1739,12 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.nonFasting: 'Tokluk',
   _TextKey.testDate: 'Test tarihi',
   _TextKey.fastingSample: 'Açlık numunesi',
-  _TextKey.periodStartPredictionWindow: 'Regl başlangıcı tahmin aralığı',
+  _TextKey.periodStartPredictionWindow: 'Tahmini adet başlangıç aralığı',
   _TextKey.forecastConfidenceLow: 'düşük',
   _TextKey.forecastConfidenceMedium: 'orta',
   _TextKey.forecastConfidenceHigh: 'yüksek',
   _TextKey.periodPredictionSummary:
-      'Regl tahmin aralığı: {range} · {confidence} güven',
+      'Tahmini adet başlangıcı: {range} · Güven: {confidence}',
   _TextKey.dateDisplayPattern: 'dd.MM.yyyy',
   _TextKey.dateTimeDisplayPattern: 'dd.MM.yyyy HH:mm',
   _TextKey.cloudSyncPrivacyNotice:
@@ -1815,158 +1788,160 @@ const Map<_TextKey, String> _turkishTexts = {
 /// English constant text catalog.
 const Map<_TextKey, String> _englishTexts = {
   _TextKey.appName: 'Oma',
-  _TextKey.appSlogan: 'Track your health every day',
+  _TextKey.appSlogan: 'Follow your health at your own pace',
   _TextKey.home: 'Home',
   _TextKey.insights: 'Insights',
-  _TextKey.insightsSubtitle: 'Personal patterns calculated from your logs',
+  _TextKey.insightsSubtitle: 'Personal clues that take shape from your logs',
   _TextKey.insightsPrivacyNote:
-      'These summaries are created on your device using fixed rules and statistics. No LLM is used.',
-  _TextKey.insightsEmptyTitle: 'No insights yet',
+      'These summaries are created from the logs on your device using fixed rules and statistics. They do not use generative AI.',
+  _TextKey.insightsEmptyTitle: 'A few more logs will help insights appear',
   _TextKey.insightsEmptyDescription:
-      'Add daily logs from Home and your personal summaries will appear here.',
+      'Keep adding daily logs and your personal patterns will begin to appear here.',
   _TextKey.insightsDisclaimer:
       'Think of this as a small clue appearing in your logs, not a diagnosis. If a change worries you or continues, talk with a healthcare professional.',
   _TextKey.personalInsightsPreviewTitle: 'Your personal insights',
   _TextKey.viewAllInsights: 'View all',
   _TextKey.insightDataBuildingTitle: 'Your pattern is taking shape',
   _TextKey.insightDataBuildingBody:
-      'Days with logs: {count}. Repeated choices will be compared after at least 3 logged days.',
-  _TextKey.insightRecordingSummaryTitle: 'Your logging overview',
+      'You have logged {count} days so far. Once there are at least 3 logged days, recurring entries can begin to be compared.',
+  _TextKey.insightRecordingSummaryTitle: 'A quick look at your logs',
   _TextKey.insightRecordingSummaryBody:
-      'You created health logs for {loggedDays} different days across a {spanDays}-day span.',
+      'You added health logs on {loggedDays} different days across a {spanDays}-day period.',
   _TextKey.insightCycleLengthTitle: 'Your latest cycle length',
   _TextKey.insightCycleLengthBody:
-      'There are {length} days between your two latest recorded period starts.',
-  _TextKey.insightCycleVariationTitle: 'Your cycle range',
+      'There were {length} days between your two latest recorded period starts.',
+  _TextKey.insightCycleVariationTitle: 'Your recent cycle range',
   _TextKey.insightCycleVariationBody:
       'Your latest {count} calculable cycles ranged from {min} to {max} days.',
-  _TextKey.insightCycleTimingReviewTitle: 'I noted this cycle timing',
+  _TextKey.insightCycleTimingReviewTitle: 'This cycle timing is worth noting',
   _TextKey.insightCycleTimingReviewBody:
       'There were {length} days between your two latest period starts. A single cycle can differ; contact a healthcare professional if this is unusual for you or repeats.',
-  _TextKey.insightPeriodDurationTitle: 'Latest completed bleeding record',
+  _TextKey.insightPeriodDurationTitle: 'Your latest completed period',
   _TextKey.insightPeriodDurationBody:
-      'Your consecutive bleeding records lasted {duration} days.',
-  _TextKey.insightPeriodTrackingTitle: 'A new cycle start is recorded',
+      'Based on your consecutive bleeding entries, your latest period lasted {duration} days.',
+  _TextKey.insightPeriodTrackingTitle: 'Your first cycle start is saved',
   _TextKey.insightPeriodTrackingBody:
       'I saved this period start as the first reference point for your cycle. When you record the next start, we can calculate your cycle length and compare your personal variation.',
   _TextKey.insightPeriodSymptomTitle:
-      'A symptom repeating across period records',
+      'This symptom has appeared in several periods',
   _TextKey.insightPeriodSymptomBody:
-      '{label} appeared in {count} of your {total} recorded periods. Logging its intensity and daily flow will help show whether it changes between periods.',
+      '{label} appeared in {count} of your {total} recorded periods. Logging its intensity and your daily flow can help show how it changes from one period to another.',
   _TextKey.insightPeriodDurationReviewTitle:
-      'Let’s follow this bleeding-duration change',
+      'Let’s keep an eye on this change in period length',
   _TextKey.insightPeriodDurationReviewBody:
       'Your latest completed bleeding record lasted {duration} days{comparison}. One record cannot show the reason; contact a healthcare professional if this is unusual for you, lasts longer than 7 days, or repeats.',
   _TextKey.insightPeriodDurationComparison:
       '; the median of your earlier completed records was {comparison} days',
-  _TextKey.insightFrequentMoodTitle: 'Your most logged feeling',
+  _TextKey.insightFrequentMoodTitle: 'The feeling you log most often',
   _TextKey.insightFrequentMoodBody:
-      '{label} appeared on {count} of the {total} days when you logged a mood.',
-  _TextKey.insightRecurringSymptomTitle: 'Your recurring symptom log',
+      'You selected {label} on {count} of the {total} days when you logged a mood.',
+  _TextKey.insightRecurringSymptomTitle:
+      'A symptom you have logged more than once',
   _TextKey.insightRecurringSymptomBody:
       '{label} was marked on {count} of your {total} logged days.',
-  _TextKey.insightFrequentActivityTitle: 'Your most logged activity',
-  _TextKey.insightFrequentActivityBody:
-      '{label} appeared on {count} of your {total} logged days.',
-  _TextKey.insightFrequentNutritionTitle: 'Most common nutrition log',
-  _TextKey.insightFrequentNutritionBody:
-      'The {label} tag appeared on {count} of your {total} logged days.',
-  _TextKey.insightFrequentBowelTitle: 'Most common bowel log',
-  _TextKey.insightFrequentBowelBody:
-      '{label} was marked on {count} of your {total} logged days.',
-  _TextKey.insightSymptomMoodTitle: 'Logged on the same day',
+  _TextKey.insightSymptomMoodTitle: 'These two appeared on the same day',
   _TextKey.insightSymptomMoodBody:
-      '{primary} and {secondary} were logged on the same day {count} times. This is an association only.',
-  _TextKey.insightSymptomBleedingTitle: 'Symptom on bleeding days',
+      '{primary} and {secondary} were logged on the same day {count} times. They appeared together in your logs, but this does not show that one caused the other.',
+  _TextKey.insightSymptomBleedingTitle:
+      'This symptom appeared on bleeding days',
   _TextKey.insightSymptomBleedingBody:
       '{label} was also marked on {count} of the {total} days with a bleeding record.',
-  _TextKey.insightMoodCyclePhaseTitle: 'Mood pattern by cycle phase',
+  _TextKey.insightMoodCyclePhaseTitle:
+      'This feeling appears more often in one phase',
   _TextKey.insightMoodCyclePhaseBody:
       '{mood} was logged on {withEvent} of {withTotal} mood-logged days during {phase} ({withPercent}%). On {withoutTotal} mood-logged days in other phases, the rate was {withoutPercent}%. This is an association; it does not show that the cycle phase caused the mood.',
-  _TextKey.insightSymptomCyclePhaseTitle: 'A symptom pattern by cycle phase',
+  _TextKey.insightSymptomCyclePhaseTitle:
+      'This symptom appears more often in one phase',
   _TextKey.insightSymptomCyclePhaseBody:
       '{symptom} was logged on {withEvent} of {withTotal} symptom-tracked days during {phase} ({withPercent}%). On {withoutTotal} symptom-tracked days in other phases, the rate was {withoutPercent}%. This is a timing association and does not show the cause.',
-  _TextKey.insightEnergyCyclePhaseTitle: 'Energy pattern by cycle phase',
-  _TextKey.insightEnergyCyclePhaseBody:
-      '{energy} appeared on {withEvent} of {withTotal} energy-logged days during {phase} ({withPercent}%). On {withoutTotal} energy-logged days in other phases, the rate was {withoutPercent}%. This is an association; it does not show that the cycle phase caused the energy level.',
   _TextKey.insightMoodSymptomTitle:
-      'Your mood and a body signal are showing up together',
+      'Your mood and this body signal may be connected',
   _TextKey.insightMoodSymptomBody:
-      'I noticed something small: on {withEvent} of {withTotal} days you felt {mood}, you also logged {symptom} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. For now, let’s keep it as a clue to follow together.',
+      'On {withEvent} of {withTotal} days when you felt {mood}, you also logged {symptom} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This is an early connection, so it is worth watching without drawing a conclusion yet.',
   _TextKey.insightMoodFoodTitle:
-      'There is a trace between your mood and food choices',
+      'Your mood and food choices may be moving together',
   _TextKey.insightMoodFoodBody:
-      'On {withEvent} of {withTotal} days you felt {mood}, you also logged {food} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. Feelings can travel alongside our choices; a few more logs will make the picture clearer.',
-  _TextKey.insightMoodCravingTitle:
-      'What you craved may be travelling with your mood',
+      'On {withEvent} of {withTotal} days when you felt {mood}, you also logged {food} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. A few more logs will help show whether this connection continues.',
+  _TextKey.insightMoodCravingTitle: 'This craving may show up with your mood',
   _TextKey.insightMoodCravingBody:
-      'On {withEvent} of {withTotal} days you felt {mood}, you said you craved {craving} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This is only a closeness in your logs, so let’s keep watching without judgment.',
-  _TextKey.insightFoodBowelTitle:
-      'There is a trace between food and your bowel rhythm',
+      'On {withEvent} of {withTotal} days when you felt {mood}, you also craved {craving} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This is only a pattern in your logs, so it is worth observing without judgment.',
+  _TextKey.insightFoodBowelTitle: 'Food and bowel changes may be connected',
   _TextKey.insightFoodBowelSameDayBody:
-      'On {withEvent} of {withTotal} days with {food}, you also logged {bowel} that day ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable days without {food}. It cannot tell us why on its own; let’s see whether it repeats.',
+      'On {withEvent} of {withTotal} days when you logged {food}, you also logged {bowel} that day ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable days without {food}. This does not explain why it happened; a repeated pattern would make the connection more useful.',
   _TextKey.insightFoodBowelNextDayBody:
-      'After {withEvent} of {withTotal} days with {food}, {bowel} appeared the next day ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This delayed trace will become more useful if it repeats.',
-  _TextKey.insightMoodPlaceTitle:
-      'Where you were may be travelling with your mood',
+      'After {withEvent} of {withTotal} days when you logged {food}, {bowel} appeared the next day ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This delayed connection will be more useful if it continues to repeat.',
+  _TextKey.insightMoodPlaceTitle: 'Where you are may relate to how you feel',
   _TextKey.insightMoodPlaceBody:
-      'On {withEvent} of {withTotal} days you felt {mood}, you selected “{place}” ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. Let’s gently follow how that environment feels to you.',
+      'On {withEvent} of {withTotal} days when you felt {mood}, you selected “{place}” ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. Notice how that environment feels if the pattern appears again.',
   _TextKey.insightMoodCompanionTitle:
-      'There is a pattern between your mood and who was there',
+      'Who you are with may relate to how you feel',
   _TextKey.insightMoodCompanionBody:
-      'On {withEvent} of {withTotal} days you felt {mood}, “{companion}” was with you ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This is not a judgment about anyone, only context appearing in your logs.',
-  _TextKey.insightAssociationTitle: 'A small clue worth following together',
+      'On {withEvent} of {withTotal} days when you felt {mood}, you logged “{companion}” ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. This is not a judgment about anyone; it is simply context appearing in your logs.',
+  _TextKey.insightStressCompanionTitle:
+      'One person appears more often on your stressful days',
+  _TextKey.insightStressCompanionBody:
+      'You selected {companion} on {withEvent} of {withTotal} days when you logged stress ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable days when you did not log stress and explicitly filled in who you were with. This does not judge {companion} or show cause and effect; it only offers context worth revisiting.',
+  _TextKey.insightStressCravingTitle:
+      'One craving appears more often on your stressful days',
+  _TextKey.insightStressCravingBody:
+      'You also craved {craving} on {withEvent} of {withTotal} days when you logged stress ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable days when you did not log stress and explicitly filled in the craving field. This does not show that stress caused the craving; it is simply a pattern you can keep watching.',
+  _TextKey.insightStressFoodTitle:
+      'One food choice appears more often on your stressful days',
+  _TextKey.insightStressFoodBody:
+      'You consumed {food} on {withEvent} of {withTotal} days when you logged stress ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable days when you did not log stress and explicitly recorded food. This does not show cause and effect; it only highlights a pattern worth revisiting in future logs.',
+  _TextKey.insightAssociationTitle: 'A small connection worth watching',
   _TextKey.insightAssociationSameDayBody:
-      'On {withEvent} of {withTotal} days with {primary}, {secondary} was also there that day ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable days without {primary}. It does not tell us why, only shows a trace worth revisiting.',
+      'On {withEvent} of {withTotal} days when you logged {primary}, you also logged {secondary} that day ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable days without {primary}. This does not explain why; it only shows a connection worth revisiting.',
   _TextKey.insightAssociationNextDayBody:
-      '{secondary} appeared the next day after {withEvent} of {withTotal} days with {primary} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. For now, let’s keep it as a clue and see whether it repeats.',
-  _TextKey.insightFoodObservationTitle: 'Let’s follow this together',
+      '{secondary} appeared the next day after {withEvent} of {withTotal} days when you logged {primary} ({withPercent}%). The rate was {withoutPercent}% across the other {withoutTotal} comparable days. For now, treat this as an early clue and see whether it repeats.',
+  _TextKey.insightFoodObservationTitle: 'This is worth keeping an eye on',
   _TextKey.insightFoodObservationBody:
-      '{primary} and {secondary} appeared in the same entry for the first time. It is too early to call this a sensitivity. We will compare similar meals alongside other ingredients, existing digestion/energy/sleep check-ins, cycle phase, and days without {primary}.',
+      '{primary} and {secondary} appeared in the same entry for the first time. It is too early to call this a sensitivity. Future comparisons will include similar meals, other ingredients, digestion symptoms, water, the Caffeinated meal selection, mood, cycle phase and days without {primary}.',
   _TextKey.insightFoodPatternBuildingTitle:
       'A food and digestion pattern is forming',
   _TextKey.insightFoodPatternBuildingBody:
       '{secondary} was also recorded on {withEvent} of {withTotal} days with {primary}. The pairing is repeating, but it is still too early to infer a sensitivity. More days without {primary} and more context will make the comparison more useful.',
-  _TextKey.insightFoodSensitivityTitle: 'Food and digestion pattern',
+  _TextKey.insightFoodSensitivityTitle:
+      'A food and digestion pattern to review',
   _TextKey.insightFoodSensitivityBody:
-      '{secondary} was logged after {withEvent} of {withTotal} meals containing {primary} ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable logs without {primary}. This may be compatible with a possible sensitivity, but it is not a diagnosis. Talk to a healthcare professional before eliminating a food.',
+      '{secondary} was logged after {withEvent} of {withTotal} meals containing {primary} ({withPercent}%). The rate was {withoutPercent}% across {withoutTotal} comparable logs without {primary}. This may suggest a sensitivity, but it is not a diagnosis. Talk with a healthcare professional before removing a food from your diet.',
   _TextKey.insightContextAlsoSeen:
       '{contexts} also appeared often on the same days and may be affecting the result.',
   _TextKey.insightContextTrackNext:
-      'To separate the signals, also log other meal ingredients, symptom timing, and the existing digestion, energy, sleep, and cycle check-ins.',
+      'To separate the signals, also log other meal ingredients, digestion symptoms, water, the Caffeinated meal selection, mood, and your cycle day.',
   _TextKey.insightMedicationSkipAssociationTitle:
-      'Pattern after a dose response',
+      'A pattern after skipped doses',
   _TextKey.insightMedicationSkipAssociationBody:
-      '{secondary} was logged the next day after {withEvent} of {withTotal} days when {primary} was marked “skipped” ({withPercent}%). On {withoutTotal} comparable days marked “taken”, the rate was {withoutPercent}%. This is an association, not a medication effect or cause and effect.',
+      '{secondary} was logged the next day after {withEvent} of {withTotal} days when {primary} was marked “skipped” ({withPercent}%). On {withoutTotal} comparable days marked “taken”, the rate was {withoutPercent}%. This connection does not show that skipping the dose caused the symptom or changed the medication’s effect.',
   _TextKey.insightMedicationAdherenceTitle: 'Your planned dose responses',
   _TextKey.insightMedicationAdherenceBody:
       'You marked {taken} of {total} past planned doses as “taken”. Unanswered doses are not counted as taken.',
   _TextKey.insightDischargeBaselineTitle:
-      'I added this discharge entry to your baseline',
+      'This entry helps build your usual pattern',
   _TextKey.insightDischargeBaselineBody:
-      'No accompanying finding was marked with your latest {color}{consistency} entry. Clear or white discharge and consistency can change across the cycle; I will follow color, consistency, odor, and cycle timing together to learn what is usual for you.',
+      'You did not mark any accompanying symptoms with your latest {color}{consistency} entry. Clear or white discharge and its consistency can change across the cycle. Tracking color, consistency, odor and cycle timing together can help show what is usual for you.',
   _TextKey.insightFertileDischargeTitle:
-      'Discharge entry and estimated fertile window',
+      'This entry overlaps with your estimated fertile window',
   _TextKey.insightFertileDischargeBody:
-      'The {color}, {consistency} appearance in your latest entry overlaps with the estimated fertile window. This may be compatible with a time of increased fertility; it does not confirm ovulation and is not a contraceptive method.',
+      'The {color}, {consistency} appearance in your latest entry overlaps with the estimated fertile window. This kind of discharge can appear when fertility is higher, but it does not confirm ovulation and should not be used as contraception.',
   _TextKey.insightMenstrualDischargeTitle:
-      'Discharge entry and menstrual phase',
+      'This discharge entry falls on a period day',
   _TextKey.insightMenstrualDischargeBody:
-      'Your latest {color} discharge entry overlaps with a period or bleeding day. This card only provides timing context and cannot determine the cause of the color. Consult a healthcare professional if blood-tinged discharge recurs outside your period.',
+      'Your latest {color} discharge entry falls on a period or bleeding day. This only adds timing context; it cannot explain the color. If blood-tinged discharge keeps appearing outside your period, speak with a healthcare professional.',
   _TextKey.insightDischargeHealthTitle: 'Review this discharge change',
   _TextKey.insightDischargeHealthBody:
-      'Your latest entry includes a color, consistency, odor, or accompanying finding worth reviewing. This can have different causes, including infection; the app cannot identify the cause or diagnose it. Contact a healthcare professional if the change is new, persists, or worsens.',
+      'Your latest entry includes a change in color, consistency, odor or another symptom worth reviewing. There can be several causes, including infection, and the app cannot diagnose them. If the change is new, continues or gets worse, speak with a healthcare professional.',
   _TextKey.insightSexualAfterPatternTitle:
-      'A recurring feeling after sexual activity',
+      'A feeling you often log after sexual activity',
   _TextKey.insightSexualAfterPatternBody:
-      '{feeling} appeared in {count} of your {total} entries with an after-sex feeling. This is only a pattern in your personal logs and does not show a health outcome by itself.',
+      'You selected {feeling} in {count} of your {total} entries about how you felt after sexual activity. This is simply a pattern in your own logs and does not indicate a health outcome on its own.',
   _TextKey.insightUnprotectedFertileTitle:
       'Unprotected sex and the estimated fertile window',
   _TextKey.insightUnprotectedFertileBody:
-      'Your latest unprotected-sex entry overlaps with the estimated fertile window. Calendar estimates do not confirm ovulation or pregnancy. If you do not want a pregnancy, emergency contraception is time-sensitive; contact a healthcare professional or pharmacist promptly.',
+      'Your latest unprotected sex entry overlaps with the estimated fertile window. Calendar estimates do not confirm ovulation or pregnancy. If you do not want a pregnancy, emergency contraception is time-sensitive; contact a healthcare professional or pharmacist promptly.',
   _TextKey.insightConfidenceEmerging: 'Just starting to appear',
   _TextKey.insightConfidenceModerate: 'Starting to look consistent',
-  _TextKey.insightConfidenceStrong: 'Looks like a strong pattern',
+  _TextKey.insightConfidenceStrong: 'A strong pattern is emerging',
   _TextKey.insightAssociationEvidence:
       'I noticed this across {count} comparable days • {confidence}',
   _TextKey.insightEvidenceDays: 'Logged days: {count}',
@@ -1975,16 +1950,16 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.insightEvidenceRecords: 'Records: {count}',
   _TextKey.insightNotificationTitle: 'A new OMA insight is ready',
   _TextKey.insightNotificationBody:
-      'There is a new connection worth following in your logs. Open the app for details.',
+      'A new connection has appeared in your logs. Open OMA to take a closer look.',
   _TextKey.insightNotificationChannelName: 'Personal insights',
   _TextKey.insightNotificationChannelDescription:
-      'Alerts you when a new, meaningful personal pattern is ready.',
+      'Lets you know when a new personal pattern is ready to review.',
   _TextKey.articles: 'Articles',
   _TextKey.explore: 'Explore',
-  _TextKey.exploreSearchHint: 'Search for stories, rituals...',
+  _TextKey.exploreSearchHint: 'Search stories and rituals...',
   _TextKey.savedStories: 'Saved',
-  _TextKey.exploreSavedEmpty: 'You have not saved any stories yet.',
-  _TextKey.exploreSearchEmpty: 'No stories match your search.',
+  _TextKey.exploreSavedEmpty: 'Stories you save will appear here.',
+  _TextKey.exploreSearchEmpty: 'No stories matched that search.',
   _TextKey.clearFilters: 'Clear filters',
   _TextKey.viewAllUpper: 'VIEW ALL',
   _TextKey.explorePhaseDays: 'Your {phase} days',
@@ -1992,10 +1967,13 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.exploreFollicularName: 'follicular',
   _TextKey.exploreOvulationName: 'ovulation',
   _TextKey.exploreLutealName: 'luteal',
-  _TextKey.exploreMenstrualDescription: 'Very low chance of pregnancy',
-  _TextKey.exploreFollicularDescription: 'Low, rising chance of pregnancy',
-  _TextKey.exploreOvulationDescription: 'High chance of pregnancy',
-  _TextKey.exploreLutealDescription: 'Low chance of pregnancy',
+  _TextKey.exploreMenstrualDescription:
+      'Estimated chance of pregnancy is very low',
+  _TextKey.exploreFollicularDescription:
+      'Estimated chance of pregnancy is low and rising',
+  _TextKey.exploreOvulationDescription:
+      'Estimated chance of pregnancy is higher',
+  _TextKey.exploreLutealDescription: 'Estimated chance of pregnancy is lower',
   _TextKey.exploreMovement: 'Movement',
   _TextKey.exploreRituals: 'Rituals',
   _TextKey.exploreNourish: 'Nourish',
@@ -2011,13 +1989,13 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.nextInsight: 'Next insight',
   _TextKey.insightStoryDone: 'Done',
   _TextKey.quickLogTitle: 'Quick log',
-  _TextKey.quickLogCaption: 'What changed today?',
+  _TextKey.quickLogCaption: 'What have you noticed today?',
   _TextKey.greetingNameFallback: 'You',
   _TextKey.omaConnectsYourData: 'OMA CONNECTS YOUR DATA',
   _TextKey.myDailyInsights: 'My Daily Insights',
   _TextKey.viewAllChevron: 'View all ›',
   _TextKey.insightLearning:
-      'OMA is learning from your logs to build personal insights.',
+      'As your logs build up, OMA can begin to show personal patterns.',
   _TextKey.journeyTrack: 'TRACK',
   _TextKey.journeyConnect: 'CONNECT',
   _TextKey.journeyUnderstand: 'UNDERSTAND',
@@ -2025,23 +2003,23 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.journeyImprove: 'IMPROVE',
   _TextKey.omaTalkPrompt:
       'Choose what you would like to talk about from today’s logs.',
-  _TextKey.phaseMenstrualHeadline: 'Rest and\nlet go',
+  _TextKey.phaseMenstrualHeadline: 'You can slow\ndown today',
   _TextKey.phaseMenstrualBody:
-      'Your body is shedding and beginning again. Slow mornings, warmth and gentle movement feel supportive today.',
-  _TextKey.phaseMenstrualFertility: 'Very low chance of pregnancy',
-  _TextKey.phaseFollicularHeadline: 'New energy,\nfresh ideas',
+      'Your energy and comfort needs can change during period days. If it feels good, make room for rest, warmth and gentle movement.',
+  _TextKey.phaseMenstrualFertility: 'Estimated chance of pregnancy is lower',
+  _TextKey.phaseFollicularHeadline: 'Notice your energy\nas it shifts',
   _TextKey.phaseFollicularBody:
-      'Estrogen is rising. You may feel curious, social and open to starting things. A good week to plan and move.',
-  _TextKey.phaseFollicularFertility: 'Low, rising chance of pregnancy',
-  _TextKey.phaseOvulationHeadline: 'Your most\nvibrant days',
+      'Your energy or sociability may rise in this phase, or it may feel much the same. Shape your plans around how you feel today.',
+  _TextKey.phaseFollicularFertility: 'Estimated chance of pregnancy is rising',
+  _TextKey.phaseOvulationHeadline: 'How are you\nfeeling today?',
   _TextKey.phaseOvulationBody:
-      'Communication and connection feel more natural. Confidence and warmth often peak around now.',
-  _TextKey.phaseOvulationFertility: 'High chance of pregnancy',
-  _TextKey.phaseLutealHeadline: 'Turning\ninward',
+      'Energy, desire and social feelings can shift around estimated ovulation days. A calendar estimate cannot replace your own experience.',
+  _TextKey.phaseOvulationFertility: 'Estimated chance of pregnancy is higher',
+  _TextKey.phaseLutealHeadline: 'Soften your\npace a little',
   _TextKey.phaseLutealBody:
-      'Progesterone rises, then softens. Comfort, quieter focus and gentler plans often feel right in these days.',
-  _TextKey.phaseLutealFertility: 'Low chance of pregnancy',
-  _TextKey.readBodyChanges: 'Read what your body is doing',
+      'As your period approaches, your energy, focus and comfort needs may change. Choose the pace that feels right today.',
+  _TextKey.phaseLutealFertility: 'Estimated chance of pregnancy is lower',
+  _TextKey.readBodyChanges: 'See more about this phase',
   _TextKey.periodDayCount: 'days of period',
   _TextKey.daysToPeriodCount: 'days to period',
   _TextKey.profileCurrentMode: 'Your mode',
@@ -2049,17 +2027,18 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.profileSymptomPatterns: 'Symptom patterns',
   _TextKey.profileSupportTitle: 'OMA support',
   _TextKey.profileSupportDescription:
-      'Edit profile, cycle and medication settings from the matching rows on this page. Use Doctor Report for a summary of your health records.',
+      'You can update your profile, cycle and medication settings from the sections on this page. Doctor Report brings your health records into one clear summary.',
   _TextKey.profilePremiumTitle: 'OMA Premium',
   _TextKey.gotIt: 'Got it',
   _TextKey.completeCycleDetails: 'Complete your cycle details',
   _TextKey.cycleDayLabel: 'Cycle day',
   _TextKey.profileCharactersSemantics: 'OMA profile characters',
-  _TextKey.profilePremiumDescription: 'Unlock every insight for your cycle',
+  _TextKey.profilePremiumDescription:
+      'See the full picture in your personal insights',
   _TextKey.modeTrackCycle: 'Track cycle',
   _TextKey.modeTrackCycleSubtitle: 'Cycle and symptom tracking',
-  _TextKey.modeGetPregnant: 'Get pregnant',
-  _TextKey.modeGetPregnantSubtitle: 'Fertility focus',
+  _TextKey.modeGetPregnant: 'Try to conceive',
+  _TextKey.modeGetPregnantSubtitle: 'Focus on your fertile window',
   _TextKey.modePregnancy: 'Pregnancy',
   _TextKey.modePregnancySubtitle: 'Pregnancy journey',
   _TextKey.waitingForData: 'Waiting for data',
@@ -2069,7 +2048,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.variable: 'Variable',
   _TextKey.patternsForming: 'Your patterns are forming',
   _TextKey.patternsFormingDescription:
-      'Your personal trends will appear as you add daily logs.',
+      'Your personal patterns will become clearer as you add daily logs.',
   _TextKey.medicationRoutine: 'Medication routine',
   _TextKey.moodPattern: 'Mood pattern',
   _TextKey.energyPattern: 'Energy pattern',
@@ -2099,7 +2078,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.skip: 'Skip',
   _TextKey.add: 'Add',
   _TextKey.save: 'Save',
-  _TextKey.saved: 'Saved!',
+  _TextKey.saved: 'Saved',
   _TextKey.cancel: 'Cancel',
   _TextKey.delete: 'Delete',
   _TextKey.edit: 'Edit',
@@ -2107,7 +2086,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.loading: 'Loading...',
   _TextKey.error: 'Something went wrong',
   _TextKey.retry: 'Try again',
-  _TextKey.noData: 'No data found',
+  _TextKey.noData: 'No data yet',
   _TextKey.yes: 'Yes',
   _TextKey.no: 'No',
   _TextKey.notSpecified: 'Not specified',
@@ -2122,69 +2101,69 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.year: 'Year',
   _TextKey.day: 'day',
   _TextKey.days: 'days',
-  _TextKey.letsStart: 'Let’s Get Started!',
-  _TextKey.tellAboutYourself: 'Tell us about yourself',
+  _TextKey.letsStart: 'Let’s get started',
+  _TextKey.tellAboutYourself: 'Let’s get to know you',
   _TextKey.yourName: 'Your name',
-  _TextKey.basicInformation: 'Basic Information',
-  _TextKey.createHealthProfile: 'Let’s create your health profile',
+  _TextKey.basicInformation: 'Basic information',
+  _TextKey.createHealthProfile: 'Let’s build your health profile together',
   _TextKey.smokingStatus: 'Do you smoke?',
   _TextKey.smokingYears: 'How many years have you smoked?',
-  _TextKey.relationshipStatus: 'Relationship Status',
-  _TextKey.sexualActivity: 'Sexual Activity',
+  _TextKey.relationshipStatus: 'Relationship status',
+  _TextKey.sexualActivity: 'Sexual activity',
   _TextKey.wantsChildrenInYear:
       'Are you considering having a child within one year?',
-  _TextKey.chronicDiseases: 'Chronic Conditions',
-  _TextKey.womenHealth: 'Women’s Health',
+  _TextKey.chronicDiseases: 'Chronic conditions',
+  _TextKey.womenHealth: 'Women’s health',
   _TextKey.cycleAndHealthInformation: 'Your cycle and health information',
   _TextKey.menstrualCycleLength: 'Menstrual cycle length (days)',
   _TextKey.menstrualCycleHint: 'Enter your cycle length if you know it',
   _TextKey.doNotKnowCycleLength: 'I don’t know my cycle length',
   _TextKey.calculateCycleOverTime: 'Let the app calculate it over time',
-  _TextKey.periodLength: 'Period Length',
-  _TextKey.menopauseStatus: 'Menopause Status',
+  _TextKey.periodLength: 'Period length',
+  _TextKey.menopauseStatus: 'Menopause status',
   _TextKey.preMenopause: 'Premenopause',
   _TextKey.periMenopause: 'Perimenopause',
   _TextKey.postMenopause: 'Postmenopause',
   _TextKey.noMenopause: 'Not in menopause',
-  _TextKey.birthControl: 'Birth Control',
+  _TextKey.birthControl: 'Birth control',
   _TextKey.noBirthControl: 'Not using any',
   _TextKey.pill: 'Birth control pill',
   _TextKey.iud: 'IUD',
   _TextKey.condom: 'Condom',
   _TextKey.implant: 'Implant',
   _TextKey.otherMethod: 'Other',
-  _TextKey.womenDiseases: 'Gynecological Conditions',
-  _TextKey.commonWomenDiseases: 'Gynecological Conditions',
+  _TextKey.womenDiseases: 'Gynecological conditions',
+  _TextKey.commonWomenDiseases: 'Gynecological conditions',
   _TextKey.lastPeriodDate: 'First day of your last period',
   _TextKey.selectDate: 'Select a date',
-  _TextKey.great: 'Great! 🎉',
-  _TextKey.profileReady: 'Your profile is ready. Shall we begin?',
+  _TextKey.great: 'You’re all set',
+  _TextKey.profileReady: 'Your profile is ready. Ready to get started?',
   _TextKey.dashboard: 'Home',
   _TextKey.goodMorning: 'Good morning',
   _TextKey.goodAfternoon: 'Good afternoon',
   _TextKey.goodEvening: 'Good evening',
-  _TextKey.todaysSummary: 'Today’s Summary',
-  _TextKey.dailyLog: 'Daily Log',
-  _TextKey.addDailyLog: 'Add Daily Log',
+  _TextKey.todaysSummary: 'Today’s summary',
+  _TextKey.dailyLog: 'Daily log',
+  _TextKey.addDailyLog: 'Add a daily log',
   _TextKey.logPeriodQuestion: 'How is your flow today?',
   _TextKey.logPeriodHint:
       'Logging the intensity helps OMA predict your next cycle more precisely.',
   _TextKey.logNutritionQuestion: 'How did you nourish today?',
   _TextKey.logNutritionHint:
-      'A quick note is enough; OMA connects nutrition to energy and mood over time.',
-  _TextKey.logMedicationQuestion: 'How is today’s routine?',
+      'A quick note is enough. Over time, OMA can compare nutrition with your energy and mood.',
+  _TextKey.logMedicationQuestion: 'Any medications or supplements today?',
   _TextKey.logMedicationHint:
-      'Check your medications and supplements, then manage doses and reminders in one place.',
+      'Mark what you took, then manage doses and reminders in one place.',
   _TextKey.medicationTime: 'Time',
   _TextKey.medicationDose: 'Dose',
   _TextKey.medicationStomachState: 'Empty / with food',
   _TextKey.medicationTakenStatus: 'Taken status',
   _TextKey.medicationLogEmptyHint:
-      'Use the + button to add a medication or supplement or set a reminder.',
+      'Use the + button to add a medication or supplement, or to set a reminder.',
   _TextKey.logMoodQuestion: 'How do you feel right now?',
   _TextKey.logMoodHint:
       'No need to overthink it; choose what feels closest right now.',
-  _TextKey.logAnythingElse: 'Anything else you’re noticing?',
+  _TextKey.logAnythingElse: 'Anything else you have noticed?',
   _TextKey.logHydration: 'Hydration',
   _TextKey.savePeriod: 'Save period',
   _TextKey.saveNutrition: 'Save nutrition',
@@ -2192,7 +2171,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.saveMoment: 'Save this moment',
   _TextKey.continueAction: 'Continue',
   _TextKey.mealsToday: 'Meals today',
-  _TextKey.mealsFeel: 'How did you eat?',
+  _TextKey.mealsFeel: 'How did your meals feel today?',
   _TextKey.whatDidYouEat: 'What did you eat?',
   _TextKey.howFeltAfterEating: 'How did you feel after eating?',
   _TextKey.cravingsQuestion: 'Any cravings?',
@@ -2200,27 +2179,34 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.symptomQuestion: 'What are you feeling in your body?',
   _TextKey.symptom: 'Symptom',
   _TextKey.symptomHint:
-      'Pick anything you notice, even faintly. OMA connects it to your phase over time.',
+      'Choose anything you notice, even if it feels subtle. Over time, OMA can compare it with your cycle phase.',
   _TextKey.searchSymptoms: 'Search symptoms',
   _TextKey.symptomStrength: 'How strong overall?',
   _TextKey.symptomOverall: 'Overall',
   _TextKey.symptomBody: 'Body',
   _TextKey.symptomSkinHair: 'Skin & Hair',
   _TextKey.symptomEnergy: 'Energy',
+  _TextKey.symptomEnergyLevel: 'Energy level',
+  _TextKey.symptomMoodState: 'Mood',
+  _TextKey.symptomMentalClarity: 'Mental clarity',
   _TextKey.symptomSleep: 'Sleep',
+  _TextKey.symptomSleepQuality: 'Sleep quality',
+  _TextKey.symptomWakeFeeling: 'How I felt on waking',
   _TextKey.symptomDigestion: 'Digestion',
   _TextKey.dreamQuestion: 'Did you dream?',
   _TextKey.dreamNoteQuestion: 'Would you like to record your dream?',
   _TextKey.dreamNoteHint:
-      'Save your dreams for yourself. We do not read or process your private information without permission.',
+      'Your dream stays private. It is not read or processed without your permission.',
   _TextKey.moodBehindQuestion: 'What’s behind feeling {mood}?',
   _TextKey.moodContextHint:
-      'A little context helps OMA understand your patterns. Choose all that apply.',
+      'A little context can make your patterns easier to understand. Choose everything that fits.',
   _TextKey.omaNote: 'OMA NOTE',
-  _TextKey.moodGentleTitle: 'Be gentle with yourself today.',
+  _TextKey.moodGentleTitle: 'Make a little room for yourself today.',
   _TextKey.moodGentleBody:
-      'You often feel more sensitive around this point in your cycle. A quieter pace may feel supportive.',
-  _TextKey.moodWhoWith: 'Who are you with?',
+      'You may feel more sensitive around this point in your cycle. If it feels right, try a slightly slower pace.',
+  _TextKey.moodWhoWith: 'Who were you with?',
+  _TextKey.moodCompanionTrackingHint:
+      'To follow a specific person over time, add their name once with +. You can select the same name in later logs.',
   _TextKey.moodWhere: 'Where are you?',
   _TextKey.todaysStatus: 'Today’s Status',
   _TextKey.noLogAdded: 'No log added yet',
@@ -2229,49 +2215,30 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.waiting: 'Waiting',
   _TextKey.missingInformation: 'Missing Information',
   _TextKey.phasePredictionDisclaimer:
-      'Calendar and ovulation information are approximate estimates.',
+      'Calendar and ovulation information are estimates and can vary from person to person.',
   _TextKey.recommendationOfTheDay: 'TODAY’S RECOMMENDATION',
   _TextKey.recommendationTitle: 'Nutrition During Your Period',
   _TextKey.recommendationSummary:
-      'Learn how to support your nutrition throughout your cycle.',
+      'A few ways to support your nutrition throughout your cycle.',
   _TextKey.startReading: 'Start Reading',
   _TextKey.todaysLogs: '📋 Today’s Logs',
   _TextKey.datedLogs: '📋 Logs for {date}',
-  _TextKey.noLogForDate: 'No log has been entered for this date.',
+  _TextKey.noLogForDate: 'There are no logs for this date yet.',
   _TextKey.mood: 'Mood',
-  _TextKey.moodNote: 'Mood Note',
-  _TextKey.activity: 'Activity',
-  _TextKey.activityStatus: 'Activity',
   _TextKey.nutrition: 'Nutrition',
   _TextKey.nutritionStatus: 'Nutrition',
   _TextKey.dailyFactors: 'Daily Factors',
   _TextKey.dailyFactorsHint:
-      'Optional. Consistent entries let the app compare personal connections.',
-  _TextKey.sleep: 'Sleep',
-  _TextKey.sleepDuration: 'Sleep Duration',
-  _TextKey.sleepQuality: 'Sleep Quality',
-  _TextKey.stressLevel: 'Stress Level',
-  _TextKey.energyLevel: 'Energy Level',
+      'Optional. Regular entries can help reveal connections that are personal to you.',
   _TextKey.waterIntake: 'Water Intake',
-  _TextKey.caffeineIntake: 'Caffeinated Drinks',
-  _TextKey.caffeineServingHint: 'Number of cups/servings',
-  _TextKey.hoursMinutes: '{hours} h {minutes} min',
   _TextKey.milliliters: '{value} ml',
   _TextKey.servingCount: '{count} servings',
-  _TextKey.levelOutOfFive: '{value}/5',
-  _TextKey.insightFeatureShortSleep:
-      'sleep duration below your personal median',
-  _TextKey.insightFeaturePoorSleep: 'low sleep quality',
-  _TextKey.insightFeatureHighStress: 'high stress',
-  _TextKey.insightFeatureLowEnergy: 'low energy',
-  _TextKey.insightFeatureHighEnergy: 'high energy',
-  _TextKey.insightFeatureHighCaffeine: '2 or more caffeinated drinks',
   _TextKey.insightFeatureBelowTypicalWater:
       'water intake below your personal median',
   _TextKey.supplements: 'Supplements',
   _TextKey.medications: 'Medications',
   _TextKey.medicationDisclaimer:
-      'Ask your pharmacist or doctor for detailed information about your medications.',
+      'For detailed guidance about your medications, speak with your pharmacist or doctor.',
   _TextKey.bowel: 'Bowel',
   _TextKey.bowelActivity: 'Bowel Activity',
   _TextKey.pain: 'Pain',
@@ -2281,64 +2248,64 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.periodBleeding: '🩸 Period Bleeding (Flow Intensity)',
   _TextKey.periodPain: 'Period Pain',
   _TextKey.vaginalDischarge: 'Vaginal Discharge / Cervical Mucus',
-  _TextKey.dischargePresent: 'Did you notice discharge or mucus today?',
+  _TextKey.dischargePresent: 'Did you notice any discharge or mucus today?',
   _TextKey.dischargeColor: 'Color',
   _TextKey.dischargeConsistency: 'Appearance / Consistency',
   _TextKey.dischargeAmount: 'Amount',
   _TextKey.dischargeSymptoms: 'Accompanying Findings',
   _TextKey.dischargeTrackingHint:
-      'Color is not interpreted alone. Also record consistency, odor, and accompanying findings.',
+      'Color alone does not tell the whole story. Add consistency, odor and any other symptoms you noticed.',
   _TextKey.dischargeMedicalDisclaimer:
-      'This tracking does not diagnose a condition or confirm ovulation. Contact a healthcare professional for unusual or persistent changes.',
+      'This log cannot diagnose a condition or confirm ovulation. If a change is unusual for you or continues, speak with a healthcare professional.',
   _TextKey.sexualActivityQuestion: 'Was there sexual activity today?',
   _TextKey.sexualAfterFeelingQuestion:
       'How did you feel after sexual activity?',
   _TextKey.sexualAfterFeelingSummary: 'Afterwards: {feelings}',
-  _TextKey.notesHint: 'Your notes about today...',
-  _TextKey.selectLogTime: 'Select Log Time',
+  _TextKey.notesHint: 'Anything else you would like to remember about today...',
+  _TextKey.selectLogTime: 'Choose a time for this log',
   _TextKey.pastLogTimeQuestion: 'Would you like to add a time to this log?',
   _TextKey.pastLogTimeHint:
       'Time is optional. You can save the log for this day without adding one.',
   _TextKey.addTime: 'Add time',
   _TextKey.saveWithoutTime: 'Save without time',
   _TextKey.timeNotAdded: 'Time not added',
-  _TextKey.logSaveFailed: 'The log could not be saved. Please try again.',
+  _TextKey.logSaveFailed: 'We could not save this log. Please try once more.',
   _TextKey.futureLogNotAllowed: 'Daily logs cannot be added for future dates.',
-  _TextKey.savePeriodBeforeSymptomsTitle: 'Save your period log first',
+  _TextKey.savePeriodBeforeSymptomsTitle: 'Let’s save your period log first',
   _TextKey.savePeriodBeforeSymptomsBody:
       'This period log will be saved before opening symptoms.',
   _TextKey.saveAndContinue: 'Save and continue',
   _TextKey.supplementExample: 'Example: Vitamin D',
   _TextKey.medicationExample: 'Example: Paracetamol 500 mg',
-  _TextKey.previouslyAdded: 'Previously Added:',
-  _TextKey.customDosage: 'Enter a Custom Amount',
+  _TextKey.previouslyAdded: 'Previously added:',
+  _TextKey.customDosage: 'Enter a custom amount',
   _TextKey.customDosageHint: 'Example: 2 scoops, 250 mg, 1.5 tablets',
   _TextKey.custom: 'Custom...',
-  _TextKey.dateAwaiting: 'Date Not Set',
+  _TextKey.dateAwaiting: 'A little more data is needed for the date',
   _TextKey.daysRemaining: 'days remaining',
-  _TextKey.periodToday: 'Your period starts today',
-  _TextKey.currentPhase: 'Current Phase',
-  _TextKey.menstrualPhase: 'Menstrual Phase',
-  _TextKey.follicularPhase: 'Follicular Phase',
-  _TextKey.estimatedOvulationWindow: 'Estimated Ovulation Window',
-  _TextKey.lutealPhase: 'Luteal Phase',
-  _TextKey.myCycles: '📊 My Cycles',
-  _TextKey.previousCycleLength: 'Previous cycle length',
-  _TextKey.previousPeriodLength: 'Previous period length',
-  _TextKey.normalCycleRange: 'Normal range: 21–35 days',
-  _TextKey.normalPeriodRange: 'Normal range: 2–7 days',
-  _TextKey.cycleLengthVariation: 'Cycle length variation',
-  _TextKey.insufficientData: 'Not enough data',
-  _TextKey.regularDifference: '≤7-day difference: Regular',
-  _TextKey.normal: 'NORMAL',
-  _TextKey.abnormal: 'OUTSIDE RANGE',
-  _TextKey.noDataStatus: 'NO DATA',
-  _TextKey.regular: 'REGULAR',
-  _TextKey.irregular: 'IRREGULAR',
+  _TextKey.periodToday: 'Your period is expected to start today',
+  _TextKey.currentPhase: 'Current phase',
+  _TextKey.menstrualPhase: 'Menstrual phase',
+  _TextKey.follicularPhase: 'Follicular phase',
+  _TextKey.estimatedOvulationWindow: 'Estimated ovulation window',
+  _TextKey.lutealPhase: 'Luteal phase',
+  _TextKey.myCycles: 'Your cycle at a glance',
+  _TextKey.previousCycleLength: 'Latest calculated cycle',
+  _TextKey.previousPeriodLength: 'Latest completed period',
+  _TextKey.normalCycleRange: 'General reference range: 21-35 days',
+  _TextKey.normalPeriodRange: 'General reference range: 2-7 days',
+  _TextKey.cycleLengthVariation: 'Range of your latest cycles',
+  _TextKey.insufficientData: 'A few more logs are needed',
+  _TextKey.regularDifference: '7 days or less: more regular',
+  _TextKey.normal: 'WITHIN USUAL RANGE',
+  _TextKey.abnormal: 'REVIEW',
+  _TextKey.noDataStatus: 'WAITING FOR DATA',
+  _TextKey.regular: 'MORE REGULAR',
+  _TextKey.irregular: 'VARIABLE',
   _TextKey.records:
       '{cycles} cycles recorded · {calculated} cycle lengths calculated',
   _TextKey.cycleStatisticsHint:
-      'Your statistics will become more accurate as you add more data',
+      'This view will feel more personal after you log a few more cycles',
   _TextKey.calendar: 'Calendar',
   _TextKey.close: 'Close',
   _TextKey.expand: 'Expand',
@@ -2350,27 +2317,29 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.predictedPeriod: 'Predicted period',
   _TextKey.fertileDays: 'Fertile days',
   _TextKey.noLogsForDay: 'No logs for this day',
-  _TextKey.viewDetails: 'View Details',
+  _TextKey.viewDetails: 'View details',
   _TextKey.period: 'Period',
   _TextKey.all: 'All',
   _TextKey.premium: 'PREMIUM',
   _TextKey.free: 'FREE',
-  _TextKey.expertArticlesSubtitle: 'Read expert content securely',
+  _TextKey.expertArticlesSubtitle: 'Explore articles from health experts',
   _TextKey.articlesLoadFailed:
       'Articles could not be loaded. Check your connection.',
-  _TextKey.articleLoadFailed: 'The article could not be loaded. Try again.',
-  _TextKey.noArticlesForTopic: 'There are no articles on this topic yet',
+  _TextKey.articleLoadFailed:
+      'We could not load this article. Please try again.',
+  _TextKey.noArticlesForTopic: 'There are no articles on this topic yet.',
   _TextKey.articleNotPublished:
       'The content of this article has not been published yet.',
   _TextKey.healthTeam: 'OMA Health Team',
   _TextKey.generalInformation: 'General information',
   _TextKey.generalHealth: 'General Health',
-  _TextKey.shortSummary: 'Quick Summary',
+  _TextKey.shortSummary: 'Quick summary',
   _TextKey.premiumActive: 'Your Premium membership is active',
   _TextKey.unlockExpertArticles: 'Unlock all expert articles',
   _TextKey.premiumAccessDescription:
-      'Get one free article plus access to all premium health content. Your membership is managed through your Google Play account.',
-  _TextKey.premiumActiveDescription: 'You can now access premium articles.',
+      'Start with one free article, then unlock the full premium health library. Your membership is managed through your Google Play account.',
+  _TextKey.premiumActiveDescription:
+      'Your premium articles are ready whenever you are.',
   _TextKey.backToArticles: 'Back to articles',
   _TextKey.loginToContinue: 'Sign in to continue',
   _TextKey.processing: 'Processing…',
@@ -2383,14 +2352,15 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.developerTestLogin: 'Developer Test Sign-In',
   _TextKey.developerTestDescription:
       'Use this mode to test synchronization before Google Console is configured or while using a local emulator.',
-  _TextKey.syncCouldNotComplete: 'Sync could not be completed. Try again.',
-  _TextKey.cloudBackupFound: 'Cloud Backup Found',
+  _TextKey.syncCouldNotComplete:
+      'We could not complete the sync. Please try again.',
+  _TextKey.cloudBackupFound: 'We found a cloud backup',
   _TextKey.cloudBackupQuestion:
-      'Backup data was found in the cloud for this account. How would you like to continue?',
+      'This account already has a cloud backup. Choose how you would like to continue.',
   _TextKey.cloudBackupOptions:
-      '• Merge: Combines local and cloud data by date.\n'
-      '• Restore: Deletes data on this device and restores the cloud backup.\n'
-      '• Overwrite: Deletes the cloud backup and uploads this device’s data.',
+      '• Merge: Combines the data on this device with the cloud backup by date.\n'
+      '• Restore: Removes the data on this device and replaces it with the cloud backup.\n'
+      '• Overwrite: Removes the cloud backup and uploads the data from this device.',
   _TextKey.restore: 'Restore',
   _TextKey.overwrite: 'Overwrite',
   _TextKey.merge: 'Merge',
@@ -2400,14 +2370,14 @@ const Map<_TextKey, String> _englishTexts = {
       'Sync could not be completed. Your local data was preserved.',
   _TextKey.syncError: 'Sync error: {error}',
   _TextKey.profileBackupFailed:
-      'Your profile opened, but a cloud backup could not be created.',
+      'Your profile is open, but we could not create a cloud backup.',
   _TextKey.cloudBackupError: 'Cloud backup error: {error}',
   _TextKey.doctorReport: 'Doctor Report',
   _TextKey.doctorReportDescription:
-      'View your health records to date in a clear report prepared for your doctor.',
-  _TextKey.viewAndShareReport: 'View and Share Report',
-  _TextKey.downloadOrSharePdf: 'Download / Share PDF',
-  _TextKey.copyAsText: 'Copy as Text',
+      'Bring your health records together in a clear report you can review with your doctor.',
+  _TextKey.viewAndShareReport: 'View and share report',
+  _TextKey.downloadOrSharePdf: 'Download or share PDF',
+  _TextKey.copyAsText: 'Copy as text',
   _TextKey.personalHealthReport: 'OMA PERSONAL HEALTH REPORT',
   _TextKey.reportDate: 'Report Date',
   _TextKey.medicalSummary: 'Medical Summary',
@@ -2431,7 +2401,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.generalNote: 'General Note',
   _TextKey.noSavedNotes: 'No custom notes have been added.',
   _TextKey.reportCopied:
-      'Report copied! You can send it to your doctor via WhatsApp or another app.',
+      'Report copied. You can now share it with your doctor in WhatsApp or another app.',
   _TextKey.pdfCreationError: 'Error creating PDF: {error}',
   _TextKey.basicInformationEdit: 'Edit Basic Information',
   _TextKey.womenHealthEdit: 'Edit Women’s Health Information',
@@ -2447,9 +2417,10 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.lastSync: 'Last Sync',
   _TextKey.account: 'Account',
   _TextKey.neverSynced: 'Never synced',
-  _TextKey.syncSuccessful: 'Synchronization completed successfully.',
-  _TextKey.syncFailed: 'Synchronization failed.',
-  _TextKey.syncInternetFailed: 'Sync failed. Check your internet connection.',
+  _TextKey.syncSuccessful: 'Your data is up to date.',
+  _TextKey.syncFailed: 'We could not sync your data.',
+  _TextKey.syncInternetFailed:
+      'We could not sync your data. Check your internet connection and try again.',
   _TextKey.syncing: 'Syncing...',
   _TextKey.syncNow: 'Sync Now',
   _TextKey.logout: 'Sign Out',
@@ -2467,7 +2438,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.exportMyData: 'Export My Data as JSON',
   _TextKey.exportReady: 'The JSON export file is ready.',
   _TextKey.privacyActionFailed:
-      'The privacy action could not be completed. Please try again.',
+      'We could not complete this privacy request. Please try again.',
   _TextKey.consentExplanation:
       'Cycle, symptom, medication, and supplement records are health data. Cloud sync processes them on the server in encrypted form. Consent is optional and can be withdrawn at any time.',
   _TextKey.continueOffline: 'Continue Without Cloud Sync',
@@ -2493,22 +2464,23 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.deletionSuccessful:
       'Your account and data have been permanently deleted.',
   _TextKey.connectAccountDescription:
-      'Connect your Google account so you do not lose your data if the app is removed or you move to another device.',
+      'Connect your Google account to keep your data available if you reinstall the app or move to another device.',
   _TextKey.loginConnectAccount: 'Sign In / Connect Account',
-  _TextKey.logoutQuestion: 'Sign out?',
+  _TextKey.logoutQuestion: 'Would you like to sign out?',
   _TextKey.logoutDescription:
       'Signing out will clear local data from this device. If cloud sync is complete, you can sign in again later to restore your data.',
   _TextKey.logoutAndClear: 'Sign Out and Clear Data',
   _TextKey.localStorageNotInitialized:
       'Local storage has not been initialized. Call init() first.',
-  _TextKey.invalidServerResponse: 'The server returned an invalid response.',
+  _TextKey.invalidServerResponse:
+      'We received an unexpected response from the server.',
   _TextKey.loginServerError: 'Sign-in failed. Server status: {code}',
   _TextKey.connectionError: 'Connection error: {error}',
   _TextKey.uploadError: 'Data could not be backed up. Status: {code}',
   _TextKey.downloadError: 'Data could not be downloaded. Status: {code}',
-  _TextKey.articlesCouldNotLoad: 'Articles could not be loaded.',
+  _TextKey.articlesCouldNotLoad: 'We could not load the articles.',
   _TextKey.invalidArticleList: 'The server returned an invalid article list.',
-  _TextKey.articleCouldNotLoad: 'The article could not be loaded.',
+  _TextKey.articleCouldNotLoad: 'We could not load the article.',
   _TextKey.invalidArticle: 'The server returned an invalid article.',
   _TextKey.premiumStatusCouldNotCheck: 'Premium status could not be checked.',
   _TextKey.purchaseCouldNotVerify: 'The purchase could not be verified.',
@@ -2541,7 +2513,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.createReminder: 'Create reminder',
   _TextKey.editReminder: 'Edit reminder',
   _TextKey.reminderPlans: 'Reminder plans',
-  _TextKey.noReminderPlans: 'No reminder plan yet.',
+  _TextKey.noReminderPlans: 'Your reminder plans will appear here.',
   _TextKey.reminderItem: 'Medication or supplement',
   _TextKey.reminderDose: 'Dose',
   _TextKey.doseUnit: 'Count',
@@ -2561,21 +2533,21 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.customEndDate: 'Custom end date',
   _TextKey.reminderEnabled: 'Reminder enabled',
   _TextKey.notificationPermissionDenied:
-      'The plan was saved, but notification permission was not granted. You can enable OMA notifications in your phone settings.',
+      'Your plan was saved, but notifications are not allowed yet. You can turn on OMA notifications in your phone settings.',
   _TextKey.reminderSaved: 'Reminder plan saved.',
   _TextKey.reminderDeleted: 'Reminder plan deleted.',
   _TextKey.reminderDeleteQuestion:
-      'Do you want to delete the reminder plan for {name}?',
+      'Would you like to delete the reminder plan for {name}?',
   _TextKey.phoneNotificationUnsupported:
-      'The plan was saved. Scheduled notifications work in the Android and iPhone apps.',
+      'Your plan was saved. Scheduled notifications are available in the Android and iPhone apps.',
   _TextKey.reminderScheduleFailed:
       'The plan was saved, but notifications could not be scheduled: {error}',
   _TextKey.reminderNotificationTitle: 'Time for {name}',
   _TextKey.reminderNotificationBody:
-      'It is time to take {dose}. You can record your response in OMA.',
+      'It is time for {dose}. You can mark it as taken or skipped in OMA.',
   _TextKey.privateReminderNotificationTitle: 'OMA reminder',
   _TextKey.privateReminderNotificationBody:
-      'It is time for one of your scheduled health reminders.',
+      'One of your scheduled health reminders is due.',
   _TextKey.notificationScheduled: 'Notification scheduled on device',
   _TextKey.notificationNotScheduled: 'Notification not scheduled on device',
   _TextKey.reminderChannelName: 'Medication and supplement reminders',
@@ -2595,7 +2567,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.reminderSummaryDays: '{days} • {time}',
   _TextKey.reminderDateRange: '{start} – {end}',
   _TextKey.reminderDeliveryNote:
-      'OMA schedules the notification on your device. Because the phone cannot confirm that it was displayed, “taken” is recorded only when you respond. Permission and battery settings may affect delivery time.',
+      'OMA schedules this notification on your device. Because your phone cannot confirm whether it appeared, a dose is marked “taken” only after you respond. Notification permissions and battery settings may affect timing.',
   _TextKey.responseSaved: 'Dose response saved.',
   _TextKey.emptyMedicationList: 'Nothing added yet',
   _TextKey.searchFoods: 'Search foods or categories',
@@ -2603,8 +2575,8 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.searchSupplements: 'Search supplements',
   _TextKey.searchSkincare: 'Search ingredients',
   _TextKey.smartSearchHint:
-      'Smart search finds the right category even when the product is hidden.',
-  _TextKey.noSearchResults: 'No matching result found.',
+      'If you do not see the exact product, search can still help you find the right category.',
+  _TextKey.noSearchResults: 'Nothing matched your search.',
   _TextKey.addSnack: 'Add another snack',
   _TextKey.snackNumber: 'Snack {number}',
   _TextKey.customFoods: 'Your saved foods',
@@ -2614,10 +2586,11 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.skincareRoutine: 'Your skincare routine',
   _TextKey.skincareQuestion: 'Which active ingredients did you use today?',
   _TextKey.skincareHint:
-      'Choose ingredients instead of product names so OMA can track patterns over time.',
+      'Choose active ingredients instead of product names so OMA can compare patterns over time.',
   _TextKey.medicationQuestion: 'Which medications did you take today?',
   _TextKey.supplementQuestion: 'Which supplements did you take today?',
-  _TextKey.supplementPageHint: 'Choose a common supplement or add your own.',
+  _TextKey.supplementPageHint:
+      'Choose a common supplement or add one that is not listed.',
   _TextKey.addCustomFood: 'Add a new food',
   _TextKey.addFood: 'Add food',
   _TextKey.addCustomSupplement: 'Add a new supplement',
@@ -2629,9 +2602,9 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.medicationUsagePlanQuestion:
       'How long will you use this medication?',
   _TextKey.medicationUsagePlanHint:
-      'You can set a short-course or long-term usage plan now. Reminders are optional.',
+      'You can set a short-term or ongoing plan now. Reminders are optional.',
   _TextKey.setUsagePlan: 'Set usage plan',
-  _TextKey.savedForLater: 'Saved and available for future entries.',
+  _TextKey.savedForLater: 'Saved. You can choose it again in future entries.',
   _TextKey.addCustomWomenDisease: 'Add a gynecological condition',
   _TextKey.addCustomChronicDisease: 'Add a chronic condition',
   _TextKey.conditionName: 'Condition name',
@@ -2646,17 +2619,17 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.deleteDayPeriod: 'Delete period entry',
   _TextKey.deletePeriodConfirmationTitle: 'Delete period entry?',
   _TextKey.deletePeriodConfirmationBody:
-      'Period information for this day will be removed. Your other daily entries will be kept.',
+      'The period information for this day will be removed. Your other daily entries will stay in place.',
   _TextKey.periodEntryDeleted: 'Period entry deleted.',
   _TextKey.periodDeleteFailed:
-      'The period entry could not be deleted. Please try again.',
+      'We could not delete this period entry. Please try again.',
   _TextKey.premiumRequired: 'Premium required',
   _TextKey.doctorReportPremiumDescription:
       'OMA Premium is required to create and share your doctor report as a PDF.',
   _TextKey.includeRelationshipHistoryQuestion:
       'Would you like to include relationship history in the report?',
   _TextKey.includeRelationshipHistoryHint:
-      'Sexual activity and after-feelings appear only when you approve.',
+      'Sexual activity and how you felt afterwards will appear only if you choose to include them.',
   _TextKey.includeInReport: 'Include in report',
   _TextKey.doNotIncludeInReport: 'Do not include',
   _TextKey.relationshipHistory: 'Relationship history',
@@ -2664,12 +2637,12 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.recordedActivityTypes: 'Activity types',
   _TextKey.recordedAfterFeelings: 'After-activity feelings',
   _TextKey.premiumDoctorReportInsightTitle:
-      'Your records are ready for a doctor visit',
+      'Your records are ready to review with your doctor',
   _TextKey.premiumDoctorReportInsightBody:
       'Your regular entries now form a useful summary. With OMA Premium, you can prepare a PDF doctor report.',
   _TextKey.biotinInsightTitle: 'Biotin may affect some blood test results',
   _TextKey.biotinInsightBody:
-      'This is a known laboratory interaction and does not by itself mean that something is wrong in your body. For thyroid blood tests, stopping biotin at least 2 days beforehand is recommended. Because timing can vary by test and dose, tell your clinician or laboratory which product you use and follow their instructions.',
+      'This is a known laboratory interaction and does not by itself mean that anything is wrong. For some thyroid blood tests, you may be asked to stop biotin at least 2 days beforehand. Timing can vary by test and dose, so tell your clinician or laboratory which product you use and follow their instructions.',
   _TextKey.biotinInsightEvidence: 'Biotin is in your supplement routine',
   _TextKey.bloodTests: 'Blood tests',
   _TextKey.yearsSmokingOne: '{years} year',
@@ -2681,40 +2654,41 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.searchConditions: 'Search conditions',
   _TextKey.addCondition: 'Add a condition',
   _TextKey.addBirthControlMethod: 'Add a birth control method',
-  _TextKey.meetYouTitle: 'Let’s Get to Know You',
-  _TextKey.meetYouSubtitle: 'So we can make your experience more personal.',
-  _TextKey.nameAddressHint: 'So we know how to address you',
+  _TextKey.meetYouTitle: 'Let’s get to know you',
+  _TextKey.meetYouSubtitle:
+      'A few short questions will help shape the experience around you.',
+  _TextKey.nameAddressHint: 'So we know what to call you',
   _TextKey.birthDateInputHint: 'dd/mm/yyyy',
   _TextKey.chooseFromCalendar: 'Choose from calendar',
   _TextKey.birthDateManualEntryHint:
       'Choose from the calendar or type it manually.',
-  _TextKey.basicHealthInformationTitle: 'Basic Health Information',
+  _TextKey.basicHealthInformationTitle: 'Your basic health information',
   _TextKey.basicHealthInformationSubtitle:
-      'We need this information for recommendations tailored to you.',
+      'This information helps make your summaries more relevant to you.',
   _TextKey.smokingUsage: 'Smoking status',
   _TextKey.centimeterUnit: 'cm',
   _TextKey.kilogramUnit: 'kg',
-  _TextKey.detailedHealthInformationTitle: 'Detailed Health Information',
+  _TextKey.detailedHealthInformationTitle: 'A few more health details',
   _TextKey.detailedHealthInformationSubtitle:
-      'You can complete these optional details now or update them later.',
+      'Add these optional details now, or come back to them later in your profile.',
   _TextKey.bloodResultsDescription:
-      'Search by test name or abbreviation. Every field is optional.',
+      'Search by test name or abbreviation. You can leave any field blank.',
   _TextKey.noBloodResultsAdded: 'No results added yet',
   _TextKey.bloodResultsAddedOne: '{count} result added',
   _TextKey.bloodResultsAddedMany: '{count} results added',
   _TextKey.searchBloodTests: 'Search blood tests',
   _TextKey.knownConditionQuestion:
-      'Is there a condition you would like us to know about?',
+      'Is there a condition you would like OMA to keep in mind?',
   _TextKey.combinedConditionsDescription:
-      'Search all conditions in one combined list.',
+      'Search gynecological and chronic conditions in one list.',
   _TextKey.noConditionSelected: 'No condition selected',
   _TextKey.cycleInformation: 'Cycle information',
   _TextKey.laboratoryResults: 'Laboratory results',
   _TextKey.editLaboratoryResults: 'Edit laboratory results',
   _TextKey.emptyLaboratoryResultsHint:
-      'Tap to add results. Every field is optional.',
+      'Tap to add a result. You can leave any field blank.',
   _TextKey.laboratoryEntryDisclaimer:
-      'Enter the value and choose the unit exactly as shown on your report. Every field is optional; use the issuing laboratory’s reference range for interpretation.',
+      'Enter the value and unit exactly as they appear on your report. Every field is optional. When reviewing a result, use the reference range provided by the laboratory.',
   _TextKey.searchLaboratoryValue: 'Search test or abbreviation',
   _TextKey.noTestDateSelected: 'No date selected',
   _TextKey.testDetails: 'Test details',
@@ -2752,17 +2726,17 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.notNow: 'Not now',
   _TextKey.exploreDreamInterpretation: 'Explore dreams',
   _TextKey.dreamPremiumDescription:
-      'Keep your dream journal and unlock dream interpretation with Premium.',
+      'Keep your dream journal in one place and explore dream interpretation with Premium.',
   _TextKey.myDreams: 'My dreams',
   _TextKey.privateDreamJournalDescription:
-      'This is your private dream journal. Your dreams are not read or processed without permission.',
+      'This is your private dream journal. Your entries are not read or processed without your permission.',
   _TextKey.nightmaresVisible: 'Nightmares are visible',
   _TextKey.nightmaresHiddenOne: '{count} nightmare hidden',
   _TextKey.nightmaresHiddenMany: '{count} nightmares hidden',
   _TextKey.hideNightmares: 'Hide nightmares',
   _TextKey.showNightmares: 'Show nightmares',
   _TextKey.nightmaresCurrentlyHidden: 'Your nightmares are currently hidden.',
-  _TextKey.noDreamSavedYet: 'You have not saved a dream yet.',
+  _TextKey.noDreamSavedYet: 'Dreams you save will appear here.',
   _TextKey.noDreamRecords: 'No dreams saved yet',
   _TextKey.dreamRecordCountOne: '{count} saved dream',
   _TextKey.dreamRecordCountMany: '{count} saved dreams',
@@ -2813,21 +2787,6 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Tekrarlayan Vajinal Enfeksiyon',
     'Vulvodini',
     'Vajinismus',
-  ],
-  _ListKey.activityOptions: [
-    'Fitness',
-    'Yürüyüş',
-    'Ayakta durma',
-    'Oturarak çalışma',
-    'Fiziksel çalışma',
-  ],
-  _ListKey.nutritionTags: [
-    'Tuzlu',
-    'Glisemik indeksi yüksek',
-    'Paketli',
-    'Sağlıklı / Dengeli',
-    'Fast food',
-    'Ev yemeği',
   ],
   _ListKey.medicationTimes: ['Sabah', 'Öğle', 'Akşam'],
   _ListKey.stomachStates: ['Aç', 'Tok'],
@@ -2933,7 +2892,7 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Pıhtı',
   ],
   _ListKey.symptomSeverityOptions: ['Hafif', 'Orta', 'Güçlü'],
-  _ListKey.symptomOverallOptions: ['Her şey yolunda'],
+  _ListKey.symptomOverallOptions: ['Her şey yolunda', 'Stres'],
   _ListKey.symptomBodyOptions: [
     'Kramplar',
     'Baş ağrısı',
@@ -2941,6 +2900,11 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Şişkinlik',
     'Göğüs hassasiyeti',
     'Mide bulantısı',
+    'Sırt ağrısı',
+    'Eklem/kas ağrısı',
+    'Baş dönmesi',
+    'İştah artışı/azalması',
+    'Sık idrara çıkma',
   ],
   _ListKey.symptomSkinHairOptions: [
     'Akne',
@@ -2956,20 +2920,27 @@ const Map<_ListKey, List<String>> _turkishLists = {
   ],
   _ListKey.symptomEnergyOptions: [
     'Enerjik',
-    'Dinç',
-    'Motivasyonlu',
     'Yorgunluk',
-    'Huzursuzluk',
-    'Odaklanmış',
+    'Bitkin/tükenmiş',
+    'Motivasyonlu',
     'Sakin ve dengeli',
+    'Huzursuzluk',
+    'Sinirlilik',
+    'Duygusal iniş çıkış',
+    'Odaklanmış',
     'Zihin bulanıklığı',
+    'Unutkanlık',
   ],
   _ListKey.symptomSleepOptions: [
     'İyi uyudum',
-    'Derin uyku',
-    'Dinlenmiş uyandım',
+    'Orta kalitede uyudum',
+    'Kötü uyudum',
     'Uykuya dalmakta zorlandım',
     'Sık uyandım',
+    'Enerjik uyandım',
+    'Dinlenmiş uyandım',
+    'Uykulu/yorgun uyandım',
+    'Baş ağrısıyla uyandım',
     'Erken uyandım',
     'Canlı rüyalar',
     'Kâbus',
@@ -2984,13 +2955,6 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Şişkinlik',
     'Gaz',
     'Reflü',
-  ],
-  _ListKey.bowelActivityOptions: [
-    'Normal',
-    'Kabızlık',
-    'İshal',
-    'Şişkinlik',
-    'Gaz',
   ],
   _ListKey.flowOptions: ['Lekelenme', 'Hafif', 'Orta', 'Yoğun'],
   _ListKey.dischargePresenceOptions: ['Var', 'Yok'],
@@ -3110,21 +3074,6 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Vulvodynia',
     'Vaginismus',
   ],
-  _ListKey.activityOptions: [
-    'Fitness',
-    'Walking',
-    'Standing',
-    'Desk work',
-    'Physical work',
-  ],
-  _ListKey.nutritionTags: [
-    'Salty',
-    'High glycemic index',
-    'Packaged food',
-    'Healthy / Balanced',
-    'Fast food',
-    'Home-cooked meal',
-  ],
   _ListKey.medicationTimes: ['Morning', 'Noon', 'Evening'],
   _ListKey.stomachStates: ['Empty stomach', 'With food'],
   _ListKey.moodOptions: [
@@ -3217,21 +3166,26 @@ const Map<_ListKey, List<String>> _englishLists = {
   ],
   _ListKey.periodSymptomOptions: [
     'Cramps',
-    'Back pain',
+    'Lower back pain',
     'Headache',
     'Bloating',
     'Fatigue',
     'Clots',
   ],
   _ListKey.symptomSeverityOptions: ['Mild', 'Moderate', 'Strong'],
-  _ListKey.symptomOverallOptions: ['Everything is fine'],
+  _ListKey.symptomOverallOptions: ['Everything is fine', 'Stress'],
   _ListKey.symptomBodyOptions: [
     'Cramps',
     'Headache',
-    'Back pain',
+    'Lower back pain',
     'Bloating',
     'Breast tenderness',
     'Nausea',
+    'Upper/mid-back pain',
+    'Joint/muscle pain',
+    'Dizziness',
+    'Increased/decreased appetite',
+    'Frequent urination',
   ],
   _ListKey.symptomSkinHairOptions: [
     'Acne',
@@ -3247,21 +3201,28 @@ const Map<_ListKey, List<String>> _englishLists = {
   ],
   _ListKey.symptomEnergyOptions: [
     'Energetic',
-    'Refreshed',
-    'Motivated',
     'Fatigue',
-    'Restless',
-    'Focused',
+    'Exhausted/burned out',
+    'Motivated',
     'Calm and balanced',
-    'Foggy',
+    'Restless',
+    'Irritable',
+    'Emotional ups and downs',
+    'Focused',
+    'Brain fog',
+    'Forgetful',
   ],
   _ListKey.symptomSleepOptions: [
     'Slept well',
-    'Deep sleep',
-    'Woke refreshed',
+    'Slept fairly well',
+    'Slept poorly',
     'Trouble falling asleep',
     'Woke often',
-    'Woke early',
+    'Woke up energized',
+    'Woke up rested',
+    'Woke up sleepy/tired',
+    'Woke up with a headache',
+    'Woke up early',
     'Vivid dreams',
     'Nightmare',
   ],
@@ -3275,13 +3236,6 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Bloating',
     'Gas',
     'Reflux',
-  ],
-  _ListKey.bowelActivityOptions: [
-    'Normal',
-    'Constipation',
-    'Diarrhea',
-    'Bloating',
-    'Gas',
   ],
   _ListKey.flowOptions: ['Spotting', 'Light', 'Medium', 'Heavy'],
   _ListKey.dischargePresenceOptions: ['Present', 'None'],
@@ -3360,6 +3314,18 @@ const Map<_ListKey, List<String>> _englishLists = {
   _ListKey.calendarWeekdayInitials: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
 };
 
+// Eski sürümlerde kaydedilmiş fakat artık seçim kartı olarak sunulmayan
+// değerleri yeni katalog karşılıklarına taşır. Rüya kayıt alanları bu
+// eşleştirmeden bağımsızdır ve kendi modelinde korunur.
+const Map<String, String> _legacyStoredSymptomAliases = {
+  'Back pain': 'Bel ağrısı',
+  'Refreshed': 'Dinç',
+  'Foggy': 'Zihin bulanıklığı',
+  'Deep sleep': 'Derin uyku',
+  'Woke refreshed': 'Dinlenmiş uyandım',
+  'Woke early': 'Erken uyandım',
+};
+
 /// Uygulamanın merkezi ve genişletilebilir yerelleştirme erişimi.
 ///
 /// Tüm çeviriler yukarıdaki sabit kataloglarda tutulur. Örneğin Almanca
@@ -3370,12 +3336,6 @@ const Map<_ListKey, List<String>> _englishLists = {
 class AppStrings {
   AppStrings._();
 
-  static const insightFeatureShortSleepToken = 'metric:short_sleep';
-  static const insightFeaturePoorSleepToken = 'metric:poor_sleep';
-  static const insightFeatureHighStressToken = 'metric:high_stress';
-  static const insightFeatureLowEnergyToken = 'metric:low_energy';
-  static const insightFeatureHighEnergyToken = 'metric:high_energy';
-  static const insightFeatureHighCaffeineToken = 'metric:high_caffeine';
   static const insightFeatureBelowTypicalWaterToken =
       'metric:below_typical_water';
   static const dischargeColorFeaturePrefix = 'dischargeColor:';
@@ -3505,9 +3465,14 @@ class AppStrings {
     if (value == 'Dengeli' || value == 'Balanced') {
       return nutritionQualityOptions[1];
     }
+    final candidate = _legacyStoredSymptomAliases[value] ?? value;
+    if (candidate == 'Dinç') return isTurkish ? 'Dinç' : 'Refreshed';
+    if (candidate == 'Derin uyku') {
+      return isTurkish ? 'Derin uyku' : 'Deep sleep';
+    }
     for (final key in _ListKey.values) {
       for (final catalog in _listCatalogs.values) {
-        final index = catalog[key]!.indexOf(value);
+        final index = catalog[key]!.indexOf(candidate);
         if (index >= 0 && index < _list(key).length) {
           return _list(key)[index];
         }
@@ -3561,14 +3526,6 @@ class AppStrings {
       return index >= 0 ? sexualAfterFeelingOptions[index] : value;
     }
     return switch (value) {
-      insightFeatureShortSleepToken => _text(_TextKey.insightFeatureShortSleep),
-      insightFeaturePoorSleepToken => _text(_TextKey.insightFeaturePoorSleep),
-      insightFeatureHighStressToken => _text(_TextKey.insightFeatureHighStress),
-      insightFeatureLowEnergyToken => _text(_TextKey.insightFeatureLowEnergy),
-      insightFeatureHighEnergyToken => _text(_TextKey.insightFeatureHighEnergy),
-      insightFeatureHighCaffeineToken => _text(
-        _TextKey.insightFeatureHighCaffeine,
-      ),
       insightFeatureBelowTypicalWaterToken => _text(
         _TextKey.insightFeatureBelowTypicalWater,
       ),
@@ -3582,14 +3539,16 @@ class AppStrings {
     if (value == 'Dengeli' || value == 'Balanced') {
       return _turkishLists[_ListKey.nutritionQualityOptions]![1];
     }
+    final candidate = _legacyStoredSymptomAliases[value] ?? value;
+    if (candidate == 'Dinç' || candidate == 'Derin uyku') return candidate;
     for (final key in _ListKey.values) {
       final canonical = _turkishLists[key]!;
       for (final catalog in _listCatalogs.values) {
-        final index = catalog[key]!.indexOf(value);
+        final index = catalog[key]!.indexOf(candidate);
         if (index >= 0) return canonical[index];
       }
     }
-    return value;
+    return candidate;
   }
 
   static String get appName => _text(_TextKey.appName);
@@ -3691,39 +3650,6 @@ class AppStrings {
     'count': count,
     'total': total,
   });
-  static String get insightFrequentActivityTitle =>
-      _text(_TextKey.insightFrequentActivityTitle);
-  static String insightFrequentActivityBody({
-    required String label,
-    required int count,
-    required int total,
-  }) => _format(_TextKey.insightFrequentActivityBody, {
-    'label': label,
-    'count': count,
-    'total': total,
-  });
-  static String get insightFrequentNutritionTitle =>
-      _text(_TextKey.insightFrequentNutritionTitle);
-  static String insightFrequentNutritionBody({
-    required String label,
-    required int count,
-    required int total,
-  }) => _format(_TextKey.insightFrequentNutritionBody, {
-    'label': label,
-    'count': count,
-    'total': total,
-  });
-  static String get insightFrequentBowelTitle =>
-      _text(_TextKey.insightFrequentBowelTitle);
-  static String insightFrequentBowelBody({
-    required String label,
-    required int count,
-    required int total,
-  }) => _format(_TextKey.insightFrequentBowelBody, {
-    'label': label,
-    'count': count,
-    'total': total,
-  });
   static String get insightSymptomMoodTitle =>
       _text(_TextKey.insightSymptomMoodTitle);
   static String insightSymptomMoodBody({
@@ -3777,25 +3703,6 @@ class AppStrings {
     required int withoutPercent,
   }) => _format(_TextKey.insightSymptomCyclePhaseBody, {
     'symptom': symptom,
-    'phase': phase,
-    'withEvent': withEvent,
-    'withTotal': withTotal,
-    'withoutTotal': withoutTotal,
-    'withPercent': withPercent,
-    'withoutPercent': withoutPercent,
-  });
-  static String get insightEnergyCyclePhaseTitle =>
-      _text(_TextKey.insightEnergyCyclePhaseTitle);
-  static String insightEnergyCyclePhaseBody({
-    required String energy,
-    required String phase,
-    required int withEvent,
-    required int withTotal,
-    required int withoutTotal,
-    required int withPercent,
-    required int withoutPercent,
-  }) => _format(_TextKey.insightEnergyCyclePhaseBody, {
-    'energy': energy,
     'phase': phase,
     'withEvent': withEvent,
     'withTotal': withTotal,
@@ -3917,6 +3824,57 @@ class AppStrings {
   }) => _format(_TextKey.insightMoodCompanionBody, {
     'mood': mood,
     'companion': companion,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightStressCompanionTitle =>
+      _text(_TextKey.insightStressCompanionTitle);
+  static String insightStressCompanionBody({
+    required String companion,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightStressCompanionBody, {
+    'companion': companion,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightStressCravingTitle =>
+      _text(_TextKey.insightStressCravingTitle);
+  static String insightStressCravingBody({
+    required String craving,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightStressCravingBody, {
+    'craving': craving,
+    'withEvent': withEvent,
+    'withTotal': withTotal,
+    'withoutTotal': withoutTotal,
+    'withPercent': withPercent,
+    'withoutPercent': withoutPercent,
+  });
+  static String get insightStressFoodTitle =>
+      _text(_TextKey.insightStressFoodTitle);
+  static String insightStressFoodBody({
+    required String food,
+    required int withEvent,
+    required int withTotal,
+    required int withoutTotal,
+    required int withPercent,
+    required int withoutPercent,
+  }) => _format(_TextKey.insightStressFoodBody, {
+    'food': food,
     'withEvent': withEvent,
     'withTotal': withTotal,
     'withoutTotal': withoutTotal,
@@ -4373,7 +4331,13 @@ class AppStrings {
   static String get symptomBody => _text(_TextKey.symptomBody);
   static String get symptomSkinHair => _text(_TextKey.symptomSkinHair);
   static String get symptomEnergy => _text(_TextKey.symptomEnergy);
+  static String get symptomEnergyLevel => _text(_TextKey.symptomEnergyLevel);
+  static String get symptomMoodState => _text(_TextKey.symptomMoodState);
+  static String get symptomMentalClarity =>
+      _text(_TextKey.symptomMentalClarity);
   static String get symptomSleep => _text(_TextKey.symptomSleep);
+  static String get symptomSleepQuality => _text(_TextKey.symptomSleepQuality);
+  static String get symptomWakeFeeling => _text(_TextKey.symptomWakeFeeling);
   static String get symptomDigestion => _text(_TextKey.symptomDigestion);
   static String get dreamQuestion => _text(_TextKey.dreamQuestion);
   static String get dreamNoteQuestion => _text(_TextKey.dreamNoteQuestion);
@@ -4385,6 +4349,8 @@ class AppStrings {
   static String get moodGentleTitle => _text(_TextKey.moodGentleTitle);
   static String get moodGentleBody => _text(_TextKey.moodGentleBody);
   static String get moodWhoWith => _text(_TextKey.moodWhoWith);
+  static String get moodCompanionTrackingHint =>
+      _text(_TextKey.moodCompanionTrackingHint);
   static String get moodWhere => _text(_TextKey.moodWhere);
   static String get todaysStatus => _text(_TextKey.todaysStatus);
   static String get noLogAdded => _text(_TextKey.noLogAdded);
@@ -4405,31 +4371,15 @@ class AppStrings {
       _format(_TextKey.datedLogs, {'date': date});
   static String get noLogForDate => _text(_TextKey.noLogForDate);
   static String get mood => _text(_TextKey.mood);
-  static String get moodNote => _text(_TextKey.moodNote);
-  static String get activity => _text(_TextKey.activity);
-  static String get activityStatus => _text(_TextKey.activityStatus);
   static String get nutrition => _text(_TextKey.nutrition);
   static String get nutritionStatus => _text(_TextKey.nutritionStatus);
   static String get dailyFactors => _text(_TextKey.dailyFactors);
   static String get dailyFactorsHint => _text(_TextKey.dailyFactorsHint);
-  static String get sleep => _text(_TextKey.sleep);
-  static String get sleepDuration => _text(_TextKey.sleepDuration);
-  static String get sleepQuality => _text(_TextKey.sleepQuality);
-  static String get stressLevel => _text(_TextKey.stressLevel);
-  static String get energyLevel => _text(_TextKey.energyLevel);
   static String get waterIntake => _text(_TextKey.waterIntake);
-  static String get caffeineIntake => _text(_TextKey.caffeineIntake);
-  static String get caffeineServingHint => _text(_TextKey.caffeineServingHint);
-  static String hoursMinutes(int minutes) => _format(_TextKey.hoursMinutes, {
-    'hours': minutes ~/ 60,
-    'minutes': minutes % 60,
-  });
   static String milliliters(int value) =>
       _format(_TextKey.milliliters, {'value': value});
   static String servingCount(int count) =>
       _format(_TextKey.servingCount, {'count': count});
-  static String levelOutOfFive(int value) =>
-      _format(_TextKey.levelOutOfFive, {'value': value});
   static String get supplements => _text(_TextKey.supplements);
   static String get medications => _text(_TextKey.medications);
   static String get medicationDisclaimer =>
@@ -4799,8 +4749,6 @@ class AppStrings {
   static List<String> get chronicDiseasesList =>
       _list(_ListKey.chronicDiseases);
   static List<String> get womenDiseasesList => _list(_ListKey.womenDiseases);
-  static List<String> get activityOptions => _list(_ListKey.activityOptions);
-  static List<String> get nutritionTags => _list(_ListKey.nutritionTags);
   static List<String> get medicationTimes => _list(_ListKey.medicationTimes);
   static List<String> get stomachStates => _list(_ListKey.stomachStates);
   static List<String> get moodLabels => _list(_ListKey.moodOptions);
@@ -5039,6 +4987,22 @@ class AppStrings {
 
   static Map<String, List<String>> get nutritionCatalog =>
       _nutritionCatalogs[_languageCode] ?? _nutritionCatalogEn;
+  static String get caffeinatedFoodInsightSignal =>
+      canonicalizeStoredValue(nutritionFoodGroupOptions.last);
+
+  /// Öğünde seçilen kafeinli içecekleri insight motorunda tek ve dile bağlı
+  /// olmayan `Kafeinli` sinyalinde toplar.
+  static bool isCaffeinatedFood(String value) {
+    final normalized = value.trim().toLowerCase();
+    final candidates = <String>{
+      _turkishLists[_ListKey.nutritionFoodGroups]!.last,
+      _englishLists[_ListKey.nutritionFoodGroups]!.last,
+      ..._nutritionCatalogTr['Kafeinli içecekler']!,
+      ..._nutritionCatalogEn['Caffeinated drinks']!,
+    };
+    return candidates.any((item) => item.toLowerCase() == normalized);
+  }
+
   static Map<String, List<String>> get medicationCatalog =>
       _medicationCatalogs[_languageCode] ?? _medicationCatalogEn;
   static Map<String, List<String>> get medicationActiveIngredients =>
@@ -5066,8 +5030,21 @@ class AppStrings {
       _list(_ListKey.symptomSkinHairOptions);
   static List<String> get symptomEnergyOptions =>
       _list(_ListKey.symptomEnergyOptions);
+  static List<String> get symptomEnergyLevelOptions =>
+      List<String>.unmodifiable(symptomEnergyOptions.take(3));
+  static List<String> get symptomMoodStateOptions =>
+      List<String>.unmodifiable(symptomEnergyOptions.skip(3).take(5));
+  static List<String> get symptomMentalClarityOptions =>
+      List<String>.unmodifiable(symptomEnergyOptions.skip(8));
   static List<String> get symptomSleepOptions =>
       _list(_ListKey.symptomSleepOptions);
+  static List<String> get symptomSleepQualityOptions =>
+      List<String>.unmodifiable(symptomSleepOptions.take(5));
+  static List<String> get symptomWakeFeelingOptions =>
+      List<String>.unmodifiable(symptomSleepOptions.skip(5).take(5));
+  static List<String> get legacySymptomOptions => isTurkish
+      ? const ['Dinç', 'Derin uyku']
+      : const ['Refreshed', 'Deep sleep'];
   static List<String> get symptomDigestionOptions =>
       _list(_ListKey.symptomDigestionOptions);
   static List<String> get allSymptomOptions => List<String>.unmodifiable({
@@ -5077,10 +5054,9 @@ class AppStrings {
     ...symptomSkinHairOptions,
     ...symptomEnergyOptions,
     ...symptomSleepOptions,
+    ...legacySymptomOptions,
     ...symptomDigestionOptions,
   });
-  static List<String> get bowelActivityOptions =>
-      _list(_ListKey.bowelActivityOptions);
   static List<String> get flowOptions => _list(_ListKey.flowOptions);
   static List<String> get dischargePresenceOptions =>
       _list(_ListKey.dischargePresenceOptions);

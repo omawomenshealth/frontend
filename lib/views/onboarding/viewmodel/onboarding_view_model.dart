@@ -45,6 +45,8 @@ class OnboardingViewModel extends ChangeNotifier {
   MenopauseStatus _menopauseStatus = MenopauseStatus.none;
   String? _birthControlMethod;
   List<String> _womenDiseases = [];
+  final List<String> _customConditions = [];
+  final List<String> _customBirthControlMethods = [];
 
   // İlaç & Takviye
   List<MedicationIdentity> _dailyMedications = [];
@@ -75,6 +77,8 @@ class OnboardingViewModel extends ChangeNotifier {
   MenopauseStatus get menopauseStatus => _menopauseStatus;
   String? get birthControlMethod => _birthControlMethod;
   List<String> get womenDiseases => _womenDiseases;
+  List<String> get customConditions => _customConditions;
+  List<String> get customBirthControlMethods => _customBirthControlMethods;
   List<String> get knownDiseases =>
       {..._chronicDiseases, ..._womenDiseases}.toList(growable: false);
   List<MedicationIdentity> get dailyMedications => _dailyMedications;
@@ -173,7 +177,7 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void addChronicDisease(String disease) {
-    final value = disease.trim();
+    final value = _rememberCustomValue(_customConditions, disease);
     if (value.isEmpty || _containsCondition(_chronicDiseases, value)) return;
     _chronicDiseases = [..._chronicDiseases, value];
     notifyListeners();
@@ -212,6 +216,13 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addBirthControlMethod(String method) {
+    final value = _rememberCustomValue(_customBirthControlMethods, method);
+    if (value.isEmpty) return;
+    _birthControlMethod = value;
+    notifyListeners();
+  }
+
   void toggleWomenDisease(String disease) {
     final existingIndex = _womenDiseases.indexWhere(
       (value) => AppStrings.localizeStoredValue(value) == disease,
@@ -225,7 +236,7 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void addWomenDisease(String disease) {
-    final value = disease.trim();
+    final value = _rememberCustomValue(_customConditions, disease);
     if (value.isEmpty || _containsCondition(_womenDiseases, value)) return;
     _womenDiseases = [..._womenDiseases, value];
     notifyListeners();
@@ -249,7 +260,7 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void addKnownDisease(String disease) {
-    final value = disease.trim();
+    final value = _rememberCustomValue(_customConditions, disease);
     if (value.isEmpty || _containsCondition(knownDiseases, value)) return;
     _chronicDiseases = [...knownDiseases, value];
     _womenDiseases = [];
@@ -258,9 +269,26 @@ class OnboardingViewModel extends ChangeNotifier {
 
   bool _containsCondition(List<String> values, String candidate) => values.any(
     (value) =>
-        AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
-        candidate.toLowerCase(),
+        _normalizeCustomValue(AppStrings.localizeStoredValue(value)) ==
+        _normalizeCustomValue(candidate),
   );
+
+  String _rememberCustomValue(List<String> values, String rawValue) {
+    final cleaned = rawValue.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (cleaned.isEmpty) return '';
+    final normalized = _normalizeCustomValue(cleaned);
+    for (final value in values) {
+      if (_normalizeCustomValue(value) == normalized) return value;
+    }
+    values.add(cleaned);
+    return cleaned;
+  }
+
+  String _normalizeCustomValue(String value) => value
+      .trim()
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .replaceAll(RegExp('[İIı]'), 'i')
+      .toLowerCase();
 
   void addMedication(MedicationIdentity medication) {
     if (!_dailyMedications.contains(medication)) {
@@ -339,6 +367,8 @@ class OnboardingViewModel extends ChangeNotifier {
       womenDiseases: const [],
       dailyMedications: _dailyMedications,
       dailySupplements: _dailySupplements,
+      customConditions: _customConditions,
+      customBirthControlMethods: _customBirthControlMethods,
     );
 
     final success = await _storage.saveSettings(settings);

@@ -9,14 +9,13 @@ void main() {
       mealTypes: const ['Kahvaltı'],
       mealQualities: const {'Kahvaltı': 'Dengeli'},
       mealFoodGroups: const {
-        'Kahvaltı': ['Gluten', 'Yumurta'],
+        'Kahvaltı': ['Gluten', 'Yumurta', 'Filtre kahve'],
       },
       mealPostFeelings: const {
         'Kahvaltı': ['Enerjik', 'Şişkin'],
       },
       cravings: const ['Tatlı'],
       waterIntakeMl: 1750,
-      caffeineServings: 2,
       supplements: [
         MedicationEntry(
           displayName: 'Demir',
@@ -77,7 +76,7 @@ void main() {
     expect(restored.toJson(), original.toJson());
   });
 
-  test('eski günlük alanları okunur ancak yeniden kaydedilmez', () {
+  test('arayüzde artık bulunmayan günlük alanları model reddeder', () {
     final legacyJson = <String, dynamic>{
       'date': DateTime(2026, 7, 28, 14, 15).toIso8601String(),
       'mood': 'İyi',
@@ -92,21 +91,10 @@ void main() {
       'bowelActivity': ['Normal'],
       'periodPainLevel': 3,
       'notes': 'Eski genel not',
+      'caffeineServings': 2,
     };
 
-    final restored = DailyLog.fromJson(legacyJson);
-    final rewritten = restored.toJson();
-
-    expect(restored.mood, 'İyi');
-    expect(rewritten.keys.where(DailyLog.retiredJsonFields.contains), isEmpty);
-    expect(
-      DailyLog.fromJson({
-        'date': DateTime(2026, 7, 28).toIso8601String(),
-        'sleepDurationMinutes': 480,
-        'energyLevel': 5,
-      }).hasData,
-      isFalse,
-    );
+    expect(() => DailyLog.fromJson(legacyJson), throwsFormatException);
   });
 
   test('korunmalı ve korunmasız JSON seçimi birlikte kabul edilmez', () {

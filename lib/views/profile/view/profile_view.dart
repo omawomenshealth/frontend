@@ -514,6 +514,7 @@ class _ProfileMechanics extends StatelessWidget {
                   catalogItems: {
                     ...AppStrings.chronicDiseasesList,
                     ...AppStrings.womenDiseasesList,
+                    ...vm.settings.customConditions,
                   }.toList(),
                   selectedItems: vm.knownDiseases,
                   color: AppColors.primary,
@@ -661,13 +662,14 @@ class _ProfileMechanics extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    ...[
+                    ..._uniqueProfileLabels([
                       AppStrings.noBirthControl,
                       AppStrings.pill,
                       AppStrings.iud,
                       AppStrings.condom,
                       AppStrings.implant,
-                    ].map((method) {
+                      ...s.customBirthControlMethods,
+                    ]).map((method) {
                       final isSelected =
                           AppStrings.localizeStoredValue(
                             s.birthControlMethod ?? '',
@@ -714,7 +716,7 @@ class _ProfileMechanics extends StatelessWidget {
                           AppStrings.addBirthControlMethod,
                         );
                         if (method == null || method.isEmpty) return;
-                        vm.updateBirthControlMethod(method);
+                        vm.addBirthControlMethod(method);
                         setSheetState(() {});
                       },
                     ),
@@ -883,12 +885,14 @@ class _ProfileMechanics extends StatelessWidget {
                   }).toList(),
                 ),
                 const SizedBox(height: 8),
-                _addItemRow(supCtrl, AppStrings.newSupplement, () {
-                  if (supCtrl.text.trim().isNotEmpty) {
-                    vm.addSupplement(supCtrl.text.trim());
-                    supCtrl.clear();
-                    setSheetState(() {});
-                  }
+                _addItemRow(supCtrl, AppStrings.newSupplement, () async {
+                  final name = supCtrl.text.trim();
+                  if (name.isEmpty) return;
+                  final canonical =
+                      await storage.rememberCustomSupplement(name) ?? name;
+                  vm.addSupplement(canonical);
+                  supCtrl.clear();
+                  setSheetState(() {});
                 }, color: AppColors.success),
                 MedicationReminderSection(
                   key: const ValueKey('profile_supplement_reminders'),
@@ -942,8 +946,9 @@ class _ProfileMechanics extends StatelessWidget {
                   () async {
                     final name = skincareCtrl.text.trim();
                     if (name.isEmpty) return;
-                    vm.addSkincare(name);
-                    await storage.saveCustomSkincare(name);
+                    final canonical =
+                        await storage.rememberCustomSkincare(name) ?? name;
+                    vm.addSkincare(canonical);
                     skincareCtrl.clear();
                     setSheetState(() {});
                   },
@@ -1487,6 +1492,17 @@ class _ProfileMechanics extends StatelessWidget {
       ),
     );
   }
+}
+
+List<String> _uniqueProfileLabels(Iterable<String> values) {
+  final result = <String>[];
+  final seen = <String>{};
+  for (final raw in values) {
+    final value = raw.trim().replaceAll(RegExp(r'\s+'), ' ');
+    final normalized = value.replaceAll(RegExp('[İIı]'), 'i').toLowerCase();
+    if (value.isNotEmpty && seen.add(normalized)) result.add(value);
+  }
+  return result;
 }
 
 // ══════════════════════════════════════════════════════════════

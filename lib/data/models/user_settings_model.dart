@@ -7,6 +7,17 @@ import 'medication_identity_model.dart';
 /// Menopoz durumu.
 enum MenopauseStatus { none, pre, peri, post }
 
+/// Kullanıcının `+` ile eklediği ve sonraki kayıtlarda yeniden seçilebilen
+/// metin seçenekleri. Günlük kayıtlarda ilk girilen yazım korunur; böylece aynı
+/// değişken farklı büyük/küçük harf veya boşluklarla parçalanmaz.
+enum UserDefinedOptionKind {
+  craving,
+  moodCompanion,
+  moodPlace,
+  condition,
+  birthControl,
+}
+
 const _userSettingsJsonFields = {
   'userName',
   'isOnboardingComplete',
@@ -31,6 +42,11 @@ const _userSettingsJsonFields = {
   'dailyMedications',
   'dailySupplements',
   'dailySkincare',
+  'customCravings',
+  'customMoodCompanions',
+  'customMoodPlaces',
+  'customConditions',
+  'customBirthControlMethods',
   'notificationsEnabled',
 };
 
@@ -70,6 +86,13 @@ class UserSettings {
   final List<String> dailySupplements;
   final List<String> dailySkincare;
 
+  // Kullanıcının + ile eklediği yeniden kullanılabilir seçenekler.
+  final List<String> customCravings;
+  final List<String> customMoodCompanions;
+  final List<String> customMoodPlaces;
+  final List<String> customConditions;
+  final List<String> customBirthControlMethods;
+
   final bool notificationsEnabled;
 
   UserSettings({
@@ -96,6 +119,11 @@ class UserSettings {
     this.dailyMedications = const [],
     this.dailySupplements = const [],
     this.dailySkincare = const [],
+    this.customCravings = const [],
+    this.customMoodCompanions = const [],
+    this.customMoodPlaces = const [],
+    this.customConditions = const [],
+    this.customBirthControlMethods = const [],
     this.notificationsEnabled = true,
   });
 
@@ -126,6 +154,11 @@ class UserSettings {
     List<MedicationIdentity>? dailyMedications,
     List<String>? dailySupplements,
     List<String>? dailySkincare,
+    List<String>? customCravings,
+    List<String>? customMoodCompanions,
+    List<String>? customMoodPlaces,
+    List<String>? customConditions,
+    List<String>? customBirthControlMethods,
     bool? notificationsEnabled,
   }) {
     return UserSettings(
@@ -156,8 +189,57 @@ class UserSettings {
       dailyMedications: dailyMedications ?? this.dailyMedications,
       dailySupplements: dailySupplements ?? this.dailySupplements,
       dailySkincare: dailySkincare ?? this.dailySkincare,
+      customCravings: customCravings ?? this.customCravings,
+      customMoodCompanions: customMoodCompanions ?? this.customMoodCompanions,
+      customMoodPlaces: customMoodPlaces ?? this.customMoodPlaces,
+      customConditions: customConditions ?? this.customConditions,
+      customBirthControlMethods:
+          customBirthControlMethods ?? this.customBirthControlMethods,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     );
+  }
+
+  List<String> customOptions(UserDefinedOptionKind kind) => switch (kind) {
+    UserDefinedOptionKind.craving => customCravings,
+    UserDefinedOptionKind.moodCompanion => customMoodCompanions,
+    UserDefinedOptionKind.moodPlace => customMoodPlaces,
+    UserDefinedOptionKind.condition => customConditions,
+    UserDefinedOptionKind.birthControl => customBirthControlMethods,
+  };
+
+  /// Aynı seçeneğin boşluk veya harf büyüklüğü farklı bir kopyası varsa ilk
+  /// kaydedilen etiketi döndürür. Insight motoru bu sabit etiketi karşılaştırır.
+  String canonicalCustomOption(UserDefinedOptionKind kind, String rawValue) {
+    final cleaned = _cleanUserDefinedValue(rawValue);
+    if (cleaned.isEmpty) return '';
+    final normalized = _normalizeUserDefinedValue(cleaned);
+    return customOptions(kind).firstWhere(
+      (value) => _normalizeUserDefinedValue(value) == normalized,
+      orElse: () => cleaned,
+    );
+  }
+
+  UserSettings rememberCustomOption(
+    UserDefinedOptionKind kind,
+    String rawValue,
+  ) => rememberCustomOptions(kind, [rawValue]);
+
+  UserSettings rememberCustomOptions(
+    UserDefinedOptionKind kind,
+    Iterable<String> rawValues,
+  ) {
+    final merged = _mergeUserDefinedValues(customOptions(kind), rawValues);
+    return switch (kind) {
+      UserDefinedOptionKind.craving => copyWith(customCravings: merged),
+      UserDefinedOptionKind.moodCompanion => copyWith(
+        customMoodCompanions: merged,
+      ),
+      UserDefinedOptionKind.moodPlace => copyWith(customMoodPlaces: merged),
+      UserDefinedOptionKind.condition => copyWith(customConditions: merged),
+      UserDefinedOptionKind.birthControl => copyWith(
+        customBirthControlMethods: merged,
+      ),
+    };
   }
 
   Map<String, dynamic> toJson() {
@@ -189,6 +271,11 @@ class UserSettings {
           .toList(),
       'dailySupplements': dailySupplements,
       'dailySkincare': dailySkincare,
+      'customCravings': customCravings,
+      'customMoodCompanions': customMoodCompanions,
+      'customMoodPlaces': customMoodPlaces,
+      'customConditions': customConditions,
+      'customBirthControlMethods': customBirthControlMethods,
       'notificationsEnabled': notificationsEnabled,
     };
   }
@@ -267,6 +354,17 @@ class UserSettings {
       dailySkincare: List<String>.from(
         json['dailySkincare'] as List? ?? const [],
       ),
+      customCravings: _readUserDefinedValues(json, 'customCravings'),
+      customMoodCompanions: _readUserDefinedValues(
+        json,
+        'customMoodCompanions',
+      ),
+      customMoodPlaces: _readUserDefinedValues(json, 'customMoodPlaces'),
+      customConditions: _readUserDefinedValues(json, 'customConditions'),
+      customBirthControlMethods: _readUserDefinedValues(
+        json,
+        'customBirthControlMethods',
+      ),
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
     );
   }
@@ -279,3 +377,33 @@ class UserSettings {
     );
   }
 }
+
+List<String> _readUserDefinedValues(Map<String, dynamic> json, String field) {
+  final raw = json[field];
+  if (raw == null) return const [];
+  if (raw is! List || raw.any((value) => value is! String)) {
+    throw FormatException('$field geçerli bir metin listesi olmalıdır.');
+  }
+  return _mergeUserDefinedValues(const [], raw.cast<String>());
+}
+
+List<String> _mergeUserDefinedValues(
+  Iterable<String> existing,
+  Iterable<String> additions,
+) {
+  final result = <String>[];
+  final seen = <String>{};
+  for (final raw in [...existing, ...additions]) {
+    final cleaned = _cleanUserDefinedValue(raw);
+    if (cleaned.isEmpty) continue;
+    if (seen.add(_normalizeUserDefinedValue(cleaned))) result.add(cleaned);
+  }
+  return List<String>.unmodifiable(result);
+}
+
+String _cleanUserDefinedValue(String value) =>
+    value.trim().replaceAll(RegExp(r'\s+'), ' ');
+
+String _normalizeUserDefinedValue(String value) => _cleanUserDefinedValue(
+  value,
+).replaceAll(RegExp('[İIı]'), 'i').toLowerCase();

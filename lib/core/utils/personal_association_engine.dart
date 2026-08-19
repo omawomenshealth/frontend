@@ -47,7 +47,9 @@ class PersonalAssociationEngine {
               _minimumCooccurrences &&
           candidate.absoluteRateDifference >= _minimumRateDifference &&
           candidate.associationStrength >= _minimumLift &&
-          candidate.adjustedProbability <= _maximumAdjustedProbability;
+          candidate.adjustedProbability <= _maximumAdjustedProbability &&
+          (!_isStressConnection(candidate.kind) ||
+              candidate.rateDifference > 0);
     }).toList();
 
     accepted.sort((a, b) {
@@ -64,10 +66,15 @@ class PersonalAssociationEngine {
 
     final distinct = <_AssociationCandidate>[];
     final seenMoodOutcomes = <String>{};
+    final seenStressKinds = <PersonalInsightKind>{};
     for (final candidate in accepted) {
       if (_isMoodConnection(candidate.kind)) {
         final key = '${candidate.kind.name}\u0000${candidate.secondaryLabel}';
         if (!seenMoodOutcomes.add(key)) continue;
+      }
+      if (_isStressConnection(candidate.kind) &&
+          !seenStressKinds.add(candidate.kind)) {
+        continue;
       }
       distinct.add(candidate);
     }
@@ -85,10 +92,15 @@ class PersonalAssociationEngine {
       kind == PersonalInsightKind.moodPlaceAssociation ||
       kind == PersonalInsightKind.moodCompanionAssociation;
 
+  bool _isStressConnection(PersonalInsightKind kind) =>
+      kind == PersonalInsightKind.stressCompanionAssociation ||
+      kind == PersonalInsightKind.stressCravingAssociation ||
+      kind == PersonalInsightKind.stressFoodAssociation;
+
   /// Günlük kayıt ekranındaki ruh hâli, belirti, besin, aşerme, sindirim,
   /// yer ve kişi seçimlerini karşılaştırır. Aday etiketleri sabit katalogdan
-  /// değil doğrudan kayıtlardan geldiği için "+" ile eklenen özel besin, yer
-  /// ve kişi değerleri de aynı istatistiksel kontrolden geçer.
+  /// değil doğrudan kayıtlardan geldiği için "+" ile eklenen özel besin,
+  /// aşerme, yer ve kişi değerleri de aynı istatistiksel kontrolden geçer.
   void _addRequestedConnectionCandidates(
     List<_AssociationCandidate> candidates,
     Map<DateTime, _ObservedDay> days,
@@ -174,8 +186,55 @@ class PersonalAssociationEngine {
           lagDays: 0,
           exposureObserved: (day) => day.wellbeingObserved && day.mood != null,
           exposurePresent: (day) => day.mood == mood,
-          outcomeObserved: (day) => day.wellbeingObserved,
+          outcomeObserved: (day) => day.companionObserved,
           outcomePresent: (day) => day.moodCompanions.contains(companion),
+        );
+      }
+    }
+
+    final stress = _stressSignal;
+    if (days.values.any((day) => day.symptoms.contains(stress))) {
+      final alone = _canonical(AppStrings.moodCompanionOptions.first);
+      for (final companion in companions.where((value) => value != alone)) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.stressCompanionAssociation,
+          primaryLabel: stress,
+          secondaryLabel: companion,
+          lagDays: 0,
+          exposureObserved: (day) => day.symptomObserved,
+          exposurePresent: (day) => day.symptoms.contains(stress),
+          outcomeObserved: (day) => day.companionObserved,
+          outcomePresent: (day) => day.moodCompanions.contains(companion),
+        );
+      }
+      for (final craving in cravings) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.stressCravingAssociation,
+          primaryLabel: stress,
+          secondaryLabel: craving,
+          lagDays: 0,
+          exposureObserved: (day) => day.symptomObserved,
+          exposurePresent: (day) => day.symptoms.contains(stress),
+          outcomeObserved: (day) => day.cravingObserved,
+          outcomePresent: (day) => day.cravings.contains(craving),
+        );
+      }
+      for (final food in foods) {
+        _testCandidate(
+          candidates: candidates,
+          days: days,
+          kind: PersonalInsightKind.stressFoodAssociation,
+          primaryLabel: stress,
+          secondaryLabel: food,
+          lagDays: 0,
+          exposureObserved: (day) => day.symptomObserved,
+          exposurePresent: (day) => day.symptoms.contains(stress),
+          outcomeObserved: (day) => day.foodObserved,
+          outcomePresent: (day) => day.foodGroups.contains(food),
         );
       }
     }
@@ -340,7 +399,8 @@ class PersonalAssociationEngine {
     final foodGroupLabels = _allLabels(
       days.values.map((day) => day.foodGroups),
     );
-    final symptomLabels = _allLabels(days.values.map((day) => day.symptoms));
+    final symptomLabels = _allLabels(days.values.map((day) => day.symptoms))
+      ..remove(_stressSignal);
     final adverseFeelings = AppStrings.postMealFeelingOptions
         .skip(3)
         .map(_canonical)
@@ -410,6 +470,7 @@ class PersonalAssociationEngine {
       ...AppStrings.symptomDigestionOptions.map(_canonical),
       ...AppStrings.symptomEnergyOptions.map(_canonical),
       ...AppStrings.symptomSleepOptions.map(_canonical),
+      ...AppStrings.legacySymptomOptions.map(_canonical),
     };
     for (final day in pairedDays) {
       for (final otherFood in day.foodGroups.where((item) => item != food)) {
@@ -421,10 +482,6 @@ class PersonalAssociationEngine {
             !_sameSignal(item, feeling),
       )) {
         counts[signal] = (counts[signal] ?? 0) + 1;
-      }
-      if ((day.caffeineServings ?? 0) >= 2) {
-        counts[AppStrings.insightFeatureHighCaffeineToken] =
-            (counts[AppStrings.insightFeatureHighCaffeineToken] ?? 0) + 1;
       }
       final phase = cycle?.phaseAt(day);
       if (phase != null) {
@@ -630,19 +687,21 @@ class PersonalAssociationEngine {
       final moodPlaces = <String>{};
       String? mood;
       int? waterIntakeMl;
-      int? caffeineServings;
       var hasBleeding = false;
       var nutritionObserved = false;
       var symptomObserved = false;
       var wellbeingObserved = false;
       var bowelObserved = false;
+      var foodObserved = false;
+      var cravingObserved = false;
+      var companionObserved = false;
       for (final log in dayLogs) {
         foodGroups.addAll(
-          log.mealFoodGroups.values.expand((items) => items).map(_canonical),
+          _foodSignals(log.mealFoodGroups.values.expand((items) => items)),
         );
         final foodsByMeal = {
           for (final entry in log.mealFoodGroups.entries)
-            _canonical(entry.key): entry.value.map(_canonical).toSet(),
+            _canonical(entry.key): _foodSignals(entry.value),
         };
         if (log.mealPostFeelings.isNotEmpty) {
           for (final entry in log.mealPostFeelings.entries) {
@@ -666,7 +725,6 @@ class PersonalAssociationEngine {
         bowelActivities.addAll(bowelSymptomSignals);
         if (log.mood != null) mood = _canonical(log.mood!);
         waterIntakeMl = log.waterIntakeMl ?? waterIntakeMl;
-        caffeineServings = log.caffeineServings ?? caffeineServings;
         hasBleeding =
             hasBleeding || CycleRules.isMenstrualFlow(log.flowIntensity);
 
@@ -677,8 +735,7 @@ class PersonalAssociationEngine {
             log.mealFoodGroups.isNotEmpty ||
             log.mealPostFeelings.isNotEmpty ||
             log.cravings.isNotEmpty ||
-            log.waterIntakeMl != null ||
-            log.caffeineServings != null;
+            log.waterIntakeMl != null;
         symptomObserved =
             symptomObserved ||
             log.observedSections.contains(DailyLogObservedSection.symptom) ||
@@ -692,6 +749,11 @@ class PersonalAssociationEngine {
         bowelObserved =
             bowelObserved ||
             log.observedSections.contains(DailyLogObservedSection.symptom);
+        foodObserved =
+            foodObserved ||
+            log.mealFoodGroups.values.any((items) => items.isNotEmpty);
+        cravingObserved = cravingObserved || log.cravings.isNotEmpty;
+        companionObserved = companionObserved || log.moodCompanions.isNotEmpty;
       }
 
       return MapEntry(
@@ -708,12 +770,14 @@ class PersonalAssociationEngine {
           moodPlaces: moodPlaces,
           mood: mood,
           waterIntakeMl: waterIntakeMl,
-          caffeineServings: caffeineServings,
           hasBleeding: hasBleeding,
           nutritionObserved: nutritionObserved,
           symptomObserved: symptomObserved,
           wellbeingObserved: wellbeingObserved,
           bowelObserved: bowelObserved,
+          foodObserved: foodObserved,
+          cravingObserved: cravingObserved,
+          companionObserved: companionObserved,
         ),
       );
     });
@@ -729,6 +793,20 @@ class PersonalAssociationEngine {
   }
 
   String _canonical(String value) => AppStrings.canonicalizeStoredValue(value);
+
+  String get _stressSignal => _canonical(AppStrings.symptomOverallOptions[1]);
+
+  Set<String> _foodSignals(Iterable<String> values) {
+    final signals = <String>{};
+    for (final value in values) {
+      signals.add(
+        AppStrings.isCaffeinatedFood(value)
+            ? AppStrings.caffeinatedFoodInsightSignal
+            : _canonical(value),
+      );
+    }
+    return signals;
+  }
 
   bool _isBowelSignal(String value) {
     final options = AppStrings.symptomDigestionOptions;
@@ -878,12 +956,14 @@ class _ObservedDay {
   final Set<String> moodPlaces;
   final String? mood;
   final int? waterIntakeMl;
-  final int? caffeineServings;
   final bool hasBleeding;
   final bool nutritionObserved;
   final bool symptomObserved;
   final bool wellbeingObserved;
   final bool bowelObserved;
+  final bool foodObserved;
+  final bool cravingObserved;
+  final bool companionObserved;
 
   const _ObservedDay({
     required this.date,
@@ -897,12 +977,14 @@ class _ObservedDay {
     required this.moodPlaces,
     required this.mood,
     required this.waterIntakeMl,
-    required this.caffeineServings,
     required this.hasBleeding,
     required this.nutritionObserved,
     required this.symptomObserved,
     required this.wellbeingObserved,
     required this.bowelObserved,
+    required this.foodObserved,
+    required this.cravingObserved,
+    required this.companionObserved,
   });
 }
 

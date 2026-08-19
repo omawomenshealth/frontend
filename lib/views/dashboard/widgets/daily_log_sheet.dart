@@ -56,7 +56,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   late Map<String, Set<String>> _mealFoodGroups;
   late Map<String, Set<String>> _mealPostFeelings;
   late Set<String> _cravings;
-  late int? _caffeineServings;
+  late List<String> _customCravings;
 
   final _symptomSearchController = TextEditingController();
   late Set<String> _symptoms;
@@ -83,12 +83,16 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   var _moodStep = 1;
   late Set<String> _moodCompanions;
   late Set<String> _moodPlaces;
+  late List<String> _customMoodCompanions;
+  late List<String> _customMoodPlaces;
 
   @override
   void initState() {
     super.initState();
     _log = widget.initialLog;
     _logType = widget.initialTabIndex.clamp(0, 5);
+    final persistedSettings =
+        context.read<LocalStorageService>().loadSettings() ?? widget.settings;
 
     _flowIndex = _localizedIndex(
       AppStrings.flowOptions,
@@ -135,7 +139,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       _log.cravings,
       AppStrings.nutritionCravingOptions,
     );
-    _caffeineServings = _log.caffeineServings;
+    _customCravings = List<String>.from(persistedSettings.customCravings);
 
     _symptoms = _localizedSet(_log.symptoms, _allSymptomOptions);
     _symptomSeverities = {
@@ -164,11 +168,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
     _medications = _initialMedicationEntries(_log.medications);
     _supplements = _initialMedicationEntries(_log.supplements);
-    _skincare = {
+    _skincare = _uniqueCustomLabels([
       ..._log.skincare,
-      ...widget.settings.dailySkincare,
+      ...persistedSettings.dailySkincare,
       ...context.read<LocalStorageService>().getCustomSkincare(),
-    };
+    ]).toSet();
 
     _moodIndex = _localizedIndex(
       AppStrings.moodCheckInOptions,
@@ -183,6 +187,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       _log.moodPlaces,
       AppStrings.moodPlaceOptions,
     );
+    _customMoodCompanions = List<String>.from(
+      persistedSettings.customMoodCompanions,
+    );
+    _customMoodPlaces = List<String>.from(persistedSettings.customMoodPlaces);
   }
 
   @override
@@ -677,6 +685,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ),
             for (final option in {
               ...AppStrings.nutritionCravingOptions,
+              ..._customCravings,
               ..._cravings,
             })
               _PillChoice(
@@ -699,8 +708,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ),
           ],
         ),
-        const SizedBox(height: 25),
-        _buildCaffeineCard(),
         const SizedBox(height: 12),
       ],
     );
@@ -718,106 +725,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       _meals.add(label);
       _expandedMeals.add(label);
     });
-  }
-
-  Widget _buildCaffeineCard() {
-    return Container(
-      key: const ValueKey('caffeine_card'),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: _tone.withValues(alpha: 0.42)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildCounterRow(
-            keyPrefix: 'caffeine',
-            label: AppStrings.caffeineIntake,
-            value: _caffeineServings == null
-                ? AppStrings.notSpecified
-                : AppStrings.servingCount(_caffeineServings!),
-            icon: Icons.local_cafe_outlined,
-            canDecrease: (_caffeineServings ?? 0) > 0,
-            onDecrease: () => setState(() {
-              final next = (_caffeineServings ?? 1) - 1;
-              _caffeineServings = next <= 0 ? null : next;
-            }),
-            onIncrease: () => setState(
-              () => _caffeineServings = ((_caffeineServings ?? 0) + 1)
-                  .clamp(0, 20)
-                  .toInt(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCounterRow({
-    required String keyPrefix,
-    required String label,
-    required String value,
-    required IconData icon,
-    required bool canDecrease,
-    required VoidCallback onDecrease,
-    required VoidCallback onIncrease,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: Color.lerp(AppColors.surface, _tone, 0.13),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, size: 19, color: _tone),
-        ),
-        const SizedBox(width: 11),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-        _RoundButton(
-          key: ValueKey('${keyPrefix}_decrement'),
-          icon: Icons.remove_rounded,
-          color: _tone,
-          filled: false,
-          enabled: canDecrease,
-          onTap: onDecrease,
-        ),
-        const SizedBox(width: 7),
-        _RoundButton(
-          key: ValueKey('${keyPrefix}_increment'),
-          icon: Icons.add_rounded,
-          color: _tone,
-          filled: true,
-          enabled: true,
-          onTap: onIncrease,
-        ),
-      ],
-    );
   }
 
   Widget _buildMedicationCatalogPage() {
@@ -1052,24 +959,31 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final name = await _promptCustomCatalogItem(AppStrings.newMedication);
     if (!mounted || name == null || name.isEmpty) return;
     final storage = context.read<LocalStorageService>();
-    final medication = MedicationIdentity(
+    final requestedMedication = MedicationIdentity(
       displayName: name,
       mainGroup: name,
       activeIngredient: null,
     );
-    await storage.saveCustomMedication(medication);
+    final medication =
+        await storage.rememberCustomMedication(requestedMedication) ??
+        requestedMedication;
     final settings = storage.loadSettings() ?? widget.settings;
     await storage.saveSettings(
       settings.copyWith(
-        dailyMedications: {...settings.dailyMedications, medication}.toList(),
+        dailyMedications: _withCanonicalMedication(
+          settings.dailyMedications,
+          medication,
+        ),
       ),
     );
     if (!mounted) return;
-    _toggleMedicationItem(name, entries: _medications);
+    _toggleMedicationItem(medication.displayName, entries: _medications);
     await widget.onSettingsChanged?.call();
     if (!mounted) return;
     await _offerMedicationUsagePlan(
-      _medications.firstWhere((entry) => entry.displayName == name),
+      _medications.firstWhere(
+        (entry) => entry.displayName == medication.displayName,
+      ),
     );
   }
 
@@ -1077,15 +991,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final name = await _promptCustomCatalogItem(AppStrings.addCustomSupplement);
     if (!mounted || name == null || name.isEmpty) return;
     final storage = context.read<LocalStorageService>();
-    await storage.saveCustomSupplement(name);
+    final canonical = await storage.rememberCustomSupplement(name) ?? name;
     final settings = storage.loadSettings() ?? widget.settings;
     await storage.saveSettings(
       settings.copyWith(
-        dailySupplements: {...settings.dailySupplements, name}.toList(),
+        dailySupplements: _withCanonicalLabel(
+          settings.dailySupplements,
+          canonical,
+        ),
       ),
     );
     if (!mounted) return;
-    _toggleMedicationItem(name, entries: _supplements);
+    _toggleMedicationItem(canonical, entries: _supplements);
     await widget.onSettingsChanged?.call();
     if (!mounted) return;
     ScaffoldMessenger.of(
@@ -1097,15 +1014,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final name = await _promptCustomCatalogItem(AppStrings.addCustomSkincare);
     if (!mounted || name == null || name.isEmpty) return;
     final storage = context.read<LocalStorageService>();
-    await storage.saveCustomSkincare(name);
+    final canonical = await storage.rememberCustomSkincare(name) ?? name;
     final settings = storage.loadSettings() ?? widget.settings;
     await storage.saveSettings(
       settings.copyWith(
-        dailySkincare: {...settings.dailySkincare, name}.toList(),
+        dailySkincare: _withCanonicalLabel(settings.dailySkincare, canonical),
       ),
     );
     if (!mounted) return;
-    setState(() => _skincare.add(name));
+    setState(() => _skincare.add(canonical));
     await widget.onSettingsChanged?.call();
     if (!mounted) return;
     ScaffoldMessenger.of(
@@ -1191,7 +1108,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ),
         for (final group in groups)
           if (query.isEmpty ||
-              group.items.any(
+              group.allItems.any(
                 (item) => item.label.toLowerCase().contains(query),
               )) ...[
             const SizedBox(height: 14),
@@ -1206,11 +1123,20 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Widget _buildSymptomGroupCard(_SymptomGroup group, String query) {
-    final visibleItems = group.items
+    List<_SymptomItem> visible(List<_SymptomItem> source) => source
         .where(
           (item) => query.isEmpty || item.label.toLowerCase().contains(query),
         )
         .toList(growable: false);
+    final visibleItems = visible(group.items);
+    final visibleSubgroups = [
+      for (final subgroup in group.subgroups)
+        if (visible(subgroup.items).isNotEmpty)
+          _SymptomSubgroup(
+            title: subgroup.title,
+            items: visible(subgroup.items),
+          ),
+    ];
     final groupTone = _tone;
     final dreamLabel = AppStrings.hadADream;
     final showDreamTile =
@@ -1231,46 +1157,70 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         children: [
           _SectionTitle(group.title),
           const SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const spacing = 8.0;
-              final tileWidth = (constraints.maxWidth - spacing) / 2;
-              return Wrap(
-                spacing: spacing,
-                runSpacing: spacing,
-                children: [
-                  for (final item in visibleItems)
-                    SizedBox(
-                      width: tileWidth,
-                      child: _SymptomTile(
-                        item: item,
-                        selected: _symptoms.contains(item.label),
-                        severity: _symptomSeverities[item.label] ?? 2,
-                        onTap: () => _toggleSymptom(item.label),
-                        onSeverityChanged: (severity) => setState(
-                          () => _symptomSeverities[item.label] = severity,
-                        ),
-                      ),
-                    ),
-                  if (showDreamTile)
-                    SizedBox(
-                      width: tileWidth,
-                      child: _DreamRecorderTile(
-                        key: const ValueKey('dream_remembered_button'),
-                        label: dreamLabel,
-                        selected:
-                            _dreamRemembered == true &&
-                            _dreamNoteController.text.trim().isNotEmpty,
-                        color: groupTone,
-                        onTap: _openDreamRecorderSheet,
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
+          if (group.subgroups.isEmpty)
+            _buildSymptomTileWrap(visibleItems)
+          else
+            for (final subgroup in visibleSubgroups) ...[
+              Text(
+                subgroup.title.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildSymptomTileWrap(subgroup.items),
+              if (subgroup != visibleSubgroups.last) const SizedBox(height: 14),
+            ],
+          if (showDreamTile) ...[
+            if (visibleSubgroups.isNotEmpty || visibleItems.isNotEmpty)
+              const SizedBox(height: 12),
+            LayoutBuilder(
+              builder: (context, constraints) => SizedBox(
+                width: (constraints.maxWidth - 8) / 2,
+                child: _DreamRecorderTile(
+                  key: const ValueKey('dream_remembered_button'),
+                  label: dreamLabel,
+                  selected:
+                      _dreamRemembered == true &&
+                      _dreamNoteController.text.trim().isNotEmpty,
+                  color: groupTone,
+                  onTap: _openDreamRecorderSheet,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildSymptomTileWrap(List<_SymptomItem> items) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 8.0;
+        final tileWidth = (constraints.maxWidth - spacing) / 2;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (final item in items)
+              SizedBox(
+                width: tileWidth,
+                child: _SymptomTile(
+                  item: item,
+                  selected: _symptoms.contains(item.label),
+                  severity: _symptomSeverities[item.label] ?? 2,
+                  onTap: () => _toggleSymptom(item.label),
+                  onSeverityChanged: (severity) =>
+                      setState(() => _symptomSeverities[item.label] = severity),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -1789,6 +1739,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         title: AppStrings.symptomOverall,
         items: items(AppStrings.symptomOverallOptions, [
           Icons.thumb_up_alt_outlined,
+          Icons.psychology_outlined,
         ]),
       ),
       _SymptomGroup(
@@ -1800,6 +1751,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           Icons.air_rounded,
           Icons.auto_awesome_outlined,
           Icons.waves_rounded,
+          Icons.accessibility_new_rounded,
+          Icons.directions_run_outlined,
+          Icons.sync_problem_rounded,
+          Icons.restaurant_outlined,
+          Icons.water_drop_outlined,
         ]),
       ),
       _SymptomGroup(
@@ -1813,19 +1769,62 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       ),
       _SymptomGroup(
         title: AppStrings.symptomEnergy,
-        items: items(AppStrings.symptomEnergyOptions, [
-          Icons.battery_2_bar_rounded,
-          Icons.bolt_rounded,
-          Icons.center_focus_strong_outlined,
-          Icons.cloud_outlined,
-        ]),
+        items: const [],
+        subgroups: [
+          _SymptomSubgroup(
+            title: AppStrings.symptomEnergyLevel,
+            items: items(AppStrings.symptomEnergyLevelOptions, [
+              Icons.battery_full_rounded,
+              Icons.battery_3_bar_rounded,
+              Icons.battery_alert_rounded,
+            ]),
+          ),
+          _SymptomSubgroup(
+            title: AppStrings.symptomMoodState,
+            items: items(AppStrings.symptomMoodStateOptions, [
+              Icons.auto_awesome_outlined,
+              Icons.spa_outlined,
+              Icons.air_rounded,
+              Icons.mood_bad_outlined,
+              Icons.swap_vert_rounded,
+            ]),
+          ),
+          _SymptomSubgroup(
+            title: AppStrings.symptomMentalClarity,
+            items: items(AppStrings.symptomMentalClarityOptions, [
+              Icons.center_focus_strong_outlined,
+              Icons.cloud_outlined,
+              Icons.psychology_outlined,
+            ]),
+          ),
+        ],
       ),
       _SymptomGroup(
         title: AppStrings.symptomSleep,
         showsDreamRecorder: true,
-        items: items(AppStrings.symptomSleepOptions.take(6).toList(), [
-          Icons.dark_mode_outlined,
-        ]),
+        items: const [],
+        subgroups: [
+          _SymptomSubgroup(
+            title: AppStrings.symptomSleepQuality,
+            items: items(AppStrings.symptomSleepQualityOptions, [
+              Icons.bedtime_outlined,
+              Icons.hotel_outlined,
+              Icons.sentiment_neutral_outlined,
+              Icons.bedtime_off_outlined,
+              Icons.notifications_active_outlined,
+            ]),
+          ),
+          _SymptomSubgroup(
+            title: AppStrings.symptomWakeFeeling,
+            items: items(AppStrings.symptomWakeFeelingOptions, [
+              Icons.wb_sunny_outlined,
+              Icons.self_improvement_outlined,
+              Icons.battery_1_bar_rounded,
+              Icons.sick_outlined,
+              Icons.alarm_outlined,
+            ]),
+          ),
+        ],
       ),
       _SymptomGroup(
         title: AppStrings.symptomDigestion,
@@ -2116,31 +2115,44 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     );
     if (name == null || name.isEmpty || !mounted) return;
 
-    final entries = medication ? _medications : _supplements;
-    final alreadyExists = entries.any(
-      (entry) => entry.displayName.toLowerCase() == name.toLowerCase(),
-    );
-    if (alreadyExists) return;
-
     final storage = context.read<LocalStorageService>();
     final settings = storage.loadSettings() ?? widget.settings;
+    final entries = medication ? _medications : _supplements;
+    late final String canonicalName;
     if (medication) {
-      final identity = MedicationIdentity(
+      final requestedIdentity = MedicationIdentity(
         displayName: name,
         mainGroup: name,
         activeIngredient: null,
       );
-      await storage.saveCustomMedication(identity);
+      final identity =
+          await storage.rememberCustomMedication(requestedIdentity) ??
+          requestedIdentity;
+      canonicalName = identity.displayName;
+      final alreadyExists = entries.any(
+        (entry) => _sameCustomLabel(entry.displayName, canonicalName),
+      );
+      if (alreadyExists) return;
       await storage.saveSettings(
         settings.copyWith(
-          dailyMedications: {...settings.dailyMedications, identity}.toList(),
+          dailyMedications: _withCanonicalMedication(
+            settings.dailyMedications,
+            identity,
+          ),
         ),
       );
     } else {
-      await storage.saveCustomSupplement(name);
+      canonicalName = await storage.rememberCustomSupplement(name) ?? name;
+      final alreadyExists = entries.any(
+        (entry) => _sameCustomLabel(entry.displayName, canonicalName),
+      );
+      if (alreadyExists) return;
       await storage.saveSettings(
         settings.copyWith(
-          dailySupplements: {...settings.dailySupplements, name}.toList(),
+          dailySupplements: _withCanonicalLabel(
+            settings.dailySupplements,
+            canonicalName,
+          ),
         ),
       );
     }
@@ -2149,8 +2161,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     setState(() {
       entries.add(
         MedicationEntry(
-          displayName: name,
-          mainGroup: name,
+          displayName: canonicalName,
+          mainGroup: canonicalName,
           activeIngredient: null,
           times: {AppStrings.medicationTimes.first},
           stomachState: AppStrings.stomachStates.first,
@@ -2877,6 +2889,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             companion: true,
           ),
         ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            AppStrings.moodCompanionTrackingHint,
+            style: const TextStyle(
+              fontSize: 11.5,
+              height: 1.4,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
         const SizedBox(height: 24),
         Align(
           alignment: Alignment.centerLeft,
@@ -2900,33 +2924,22 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     required Set<String> selected,
     required bool companion,
   }) {
+    final reusableOptions = _uniqueCustomLabels([
+      ...options,
+      ...(companion ? _customMoodCompanions : _customMoodPlaces),
+      ...selected,
+    ]);
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
-        for (final entry in options.asMap().entries)
+        for (final entry in reusableOptions.asMap().entries)
           _PillChoice(
             key: ValueKey(
               'mood_${companion ? 'companion' : 'place'}_${entry.key}',
             ),
             label: entry.value,
             selected: selected.contains(entry.value),
-            color: _tone,
-            colorizeIdle: true,
-            onTap: () => _toggleChoice(selected, entry.value),
-          ),
-        for (final entry
-            in selected
-                .where((value) => !options.contains(value))
-                .toList()
-                .asMap()
-                .entries)
-          _PillChoice(
-            key: ValueKey(
-              'mood_${companion ? 'companion' : 'place'}_custom_${entry.key}',
-            ),
-            label: entry.value,
-            selected: true,
             color: _tone,
             colorizeIdle: true,
             onTap: () => _toggleChoice(selected, entry.value),
@@ -2985,8 +2998,23 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       ),
     );
     if (!mounted || value == null || value.isEmpty) return;
+    final kind = companion
+        ? UserDefinedOptionKind.moodCompanion
+        : UserDefinedOptionKind.moodPlace;
+    final canonical =
+        await context.read<LocalStorageService>().rememberUserDefinedOption(
+          kind,
+          value,
+        ) ??
+        value;
+    await widget.onSettingsChanged?.call();
+    if (!mounted) return;
     setState(() {
-      (companion ? _moodCompanions : _moodPlaces).add(value);
+      final catalog = companion ? _customMoodCompanions : _customMoodPlaces;
+      if (!catalog.any((item) => _sameCustomLabel(item, canonical))) {
+        catalog.add(canonical);
+      }
+      (companion ? _moodCompanions : _moodPlaces).add(canonical);
     });
   }
 
@@ -3227,10 +3255,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       ),
     );
     if (!mounted || value == null || value.isEmpty) return;
-    await context.read<LocalStorageService>().saveCustomFood(value);
+    final canonical =
+        await context.read<LocalStorageService>().rememberCustomFood(value) ??
+        value;
     if (!mounted) return;
     setState(() {
-      _mealFoodGroups.putIfAbsent(meal, () => <String>{}).add(value);
+      _mealFoodGroups.putIfAbsent(meal, () => <String>{}).add(canonical);
     });
     ScaffoldMessenger.of(
       context,
@@ -3410,8 +3440,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               entry.key: entry.value.toList(),
         },
         cravings: _cravings.toList(),
-        caffeineServings: _caffeineServings,
-        clearCaffeineServings: _caffeineServings == null,
         observedSections: observed,
       ),
       2 => _log.copyWith(
@@ -3610,7 +3638,59 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       AppStrings.customCravingQuestion,
     );
     if (!mounted || value == null || value.isEmpty) return;
-    setState(() => _cravings.add(value));
+    final canonical =
+        await context.read<LocalStorageService>().rememberUserDefinedOption(
+          UserDefinedOptionKind.craving,
+          value,
+        ) ??
+        value;
+    await widget.onSettingsChanged?.call();
+    if (!mounted) return;
+    setState(() {
+      if (!_customCravings.any((item) => _sameCustomLabel(item, canonical))) {
+        _customCravings.add(canonical);
+      }
+      _cravings.add(canonical);
+    });
+  }
+
+  static bool _sameCustomLabel(String left, String right) =>
+      _normalizeCustomLabel(left) == _normalizeCustomLabel(right);
+
+  static String _normalizeCustomLabel(String value) => value
+      .trim()
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .replaceAll(RegExp('[İIı]'), 'i')
+      .toLowerCase();
+
+  static List<String> _uniqueCustomLabels(Iterable<String> values) {
+    final result = <String>[];
+    final seen = <String>{};
+    for (final raw in values) {
+      final value = raw.trim().replaceAll(RegExp(r'\s+'), ' ');
+      if (value.isNotEmpty && seen.add(_normalizeCustomLabel(value))) {
+        result.add(value);
+      }
+    }
+    return result;
+  }
+
+  static List<String> _withCanonicalLabel(
+    Iterable<String> values,
+    String canonical,
+  ) => _uniqueCustomLabels([...values, canonical]);
+
+  static List<MedicationIdentity> _withCanonicalMedication(
+    Iterable<MedicationIdentity> values,
+    MedicationIdentity canonical,
+  ) {
+    String key(MedicationIdentity value) => [
+      value.displayName,
+      value.mainGroup,
+      value.activeIngredient ?? '',
+    ].map(_normalizeCustomLabel).join('\u0000');
+    final canonicalKey = key(canonical);
+    return [...values.where((value) => key(value) != canonicalKey), canonical];
   }
 
   Future<void> _showDreamPremiumOffer() async {
@@ -3949,13 +4029,29 @@ class _DreamDraft {
 class _SymptomGroup {
   final String title;
   final List<_SymptomItem> items;
+  final List<_SymptomSubgroup> subgroups;
   final bool showsDreamRecorder;
 
   const _SymptomGroup({
     required this.title,
     required this.items,
+    this.subgroups = const [],
     this.showsDreamRecorder = false,
   });
+
+  Iterable<_SymptomItem> get allItems sync* {
+    yield* items;
+    for (final subgroup in subgroups) {
+      yield* subgroup.items;
+    }
+  }
+}
+
+class _SymptomSubgroup {
+  final String title;
+  final List<_SymptomItem> items;
+
+  const _SymptomSubgroup({required this.title, required this.items});
 }
 
 class _SymptomItem {

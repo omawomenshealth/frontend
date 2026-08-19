@@ -236,6 +236,20 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addBirthControlMethod(String method) {
+    final remembered = _settings.rememberCustomOption(
+      UserDefinedOptionKind.birthControl,
+      method,
+    );
+    final canonical = remembered.canonicalCustomOption(
+      UserDefinedOptionKind.birthControl,
+      method,
+    );
+    if (canonical.isEmpty) return;
+    _settings = remembered.copyWith(birthControlMethod: canonical);
+    notifyListeners();
+  }
+
   void toggleWomenDisease(String disease) {
     final diseases = List<String>.from(_settings.womenDiseases);
     final existingIndex = diseases.indexWhere(
@@ -251,11 +265,21 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   void addWomenDisease(String disease) {
-    final value = disease.trim();
-    if (value.isEmpty || _containsCondition(_settings.womenDiseases, value)) {
+    final remembered = _settings.rememberCustomOption(
+      UserDefinedOptionKind.condition,
+      disease,
+    );
+    final value = remembered.canonicalCustomOption(
+      UserDefinedOptionKind.condition,
+      disease,
+    );
+    if (value.isEmpty) return;
+    if (_containsCondition(_settings.womenDiseases, value)) {
+      _settings = remembered;
+      notifyListeners();
       return;
     }
-    _settings = _settings.copyWith(
+    _settings = remembered.copyWith(
       womenDiseases: [..._settings.womenDiseases, value],
     );
     notifyListeners();
@@ -276,11 +300,21 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   void addChronicDisease(String disease) {
-    final value = disease.trim();
-    if (value.isEmpty || _containsCondition(_settings.chronicDiseases, value)) {
+    final remembered = _settings.rememberCustomOption(
+      UserDefinedOptionKind.condition,
+      disease,
+    );
+    final value = remembered.canonicalCustomOption(
+      UserDefinedOptionKind.condition,
+      disease,
+    );
+    if (value.isEmpty) return;
+    if (_containsCondition(_settings.chronicDiseases, value)) {
+      _settings = remembered;
+      notifyListeners();
       return;
     }
-    _settings = _settings.copyWith(
+    _settings = remembered.copyWith(
       chronicDiseases: [..._settings.chronicDiseases, value],
     );
     notifyListeners();
@@ -306,9 +340,21 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   void addKnownDisease(String disease) {
-    final value = disease.trim();
-    if (value.isEmpty || _containsCondition(knownDiseases, value)) return;
-    _settings = _settings.copyWith(
+    final remembered = _settings.rememberCustomOption(
+      UserDefinedOptionKind.condition,
+      disease,
+    );
+    final value = remembered.canonicalCustomOption(
+      UserDefinedOptionKind.condition,
+      disease,
+    );
+    if (value.isEmpty) return;
+    if (_containsCondition(knownDiseases, value)) {
+      _settings = remembered;
+      notifyListeners();
+      return;
+    }
+    _settings = remembered.copyWith(
       chronicDiseases: [...knownDiseases, value],
       womenDiseases: const [],
     );
@@ -317,9 +363,15 @@ class ProfileViewModel extends ChangeNotifier {
 
   bool _containsCondition(List<String> values, String candidate) => values.any(
     (value) =>
-        AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
-        candidate.toLowerCase(),
+        _normalizeCustomValue(AppStrings.localizeStoredValue(value)) ==
+        _normalizeCustomValue(candidate),
   );
+
+  String _normalizeCustomValue(String value) => value
+      .trim()
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .replaceAll(RegExp('[İIı]'), 'i')
+      .toLowerCase();
 
   // ── İlaç & Takviye ──────────────────────────────────
 

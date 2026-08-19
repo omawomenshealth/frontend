@@ -78,6 +78,58 @@ void main() {
   );
 
   test(
+    '+ ile eklenen seçenekleri kanonik adla yeniden kullanır ve şifreler',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+      await storage.init();
+      await storage.saveSettings(
+        UserSettings(isOnboardingComplete: true, userName: 'Test'),
+      );
+
+      expect(
+        await storage.rememberUserDefinedOption(
+          UserDefinedOptionKind.craving,
+          '  Gece   Atıştırması ',
+        ),
+        'Gece Atıştırması',
+      );
+      expect(
+        await storage.rememberUserDefinedOption(
+          UserDefinedOptionKind.craving,
+          'GECE ATIŞTIRMASI',
+        ),
+        'Gece Atıştırması',
+      );
+      expect(await storage.rememberCustomFood('Ev  Çorbası'), 'Ev Çorbası');
+      expect(await storage.rememberCustomFood('EV ÇORBASI'), 'Ev Çorbası');
+
+      await storage.saveDailyLog(
+        DailyLog(
+          date: DateTime(2026, 7, 24, 18),
+          cravings: const ['gece atıştırması'],
+          mealFoodGroups: const {
+            'Akşam': ['ev çorbası'],
+          },
+        ),
+      );
+
+      final settings = storage.loadSettings()!;
+      expect(settings.customCravings, ['Gece Atıştırması']);
+      final log = storage.loadAllLogs().single;
+      expect(log.cravings, ['Gece Atıştırması']);
+      expect(log.mealFoodGroups['Akşam'], ['Ev Çorbası']);
+
+      final preferences = await SharedPreferences.getInstance();
+      for (final key in _encryptedKeys(preferences)) {
+        final raw = preferences.getString(key)!;
+        expect(raw, isNot(contains('Gece Atıştırması')));
+        expect(raw, isNot(contains('Ev Çorbası')));
+      }
+    },
+  );
+
+  test(
     'açılışta eski günlük alanlarını şifreli kayıttan kalıcı olarak temizler',
     () async {
       SharedPreferences.setMockInitialValues({});
@@ -105,6 +157,7 @@ void main() {
           'stressLevel': 1,
           'energyLevel': 5,
           'notes': 'Eski not',
+          'caffeineServings': 2,
           'observedSections': ['wellbeing'],
         }),
       );
@@ -136,12 +189,68 @@ void main() {
       final rewritten = Map<String, dynamic>.from(
         jsonDecode(verifier.getString('daily_log_2026-07-24')!) as Map,
       );
-      expect(
-        rewritten.keys.where(DailyLog.retiredJsonFields.contains),
-        isEmpty,
-      );
+      const legacyFields = {
+        'activities',
+        'nutritionTags',
+        'nutritionNotes',
+        'moodNote',
+        'sleepDurationMinutes',
+        'sleepQuality',
+        'stressLevel',
+        'energyLevel',
+        'bowelActivity',
+        'periodPainLevel',
+        'notes',
+        'caffeineServings',
+      };
+      expect(rewritten.keys.where(legacyFields.contains), isEmpty);
       expect(verifier.getString('daily_log_2026-07-25'), isNull);
       expect(verifier.getStringList('daily_log_dates'), ['2026-07-24']);
+    },
+  );
+
+  test(
+    'eski + günlüklerini açılışta tek insight etiketi altında birleştirir',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final preferences = await SharedPreferences.getInstance();
+      final keyStore = MemoryLocalKeyStore();
+      bool isProtected(String key) =>
+          key == 'user_settings' ||
+          key == 'daily_log_dates' ||
+          key.startsWith('daily_log_');
+      final seedStore = LocalEncryptedStore(preferences, keyStore, isProtected);
+      await seedStore.init();
+      final firstDate = DateTime(2026, 7, 20, 12).toIso8601String();
+      final secondDate = DateTime(2026, 7, 21, 12).toIso8601String();
+      await seedStore.setString(
+        'user_settings',
+        UserSettings(isOnboardingComplete: true).toJsonString(),
+      );
+      await seedStore.setStringList('daily_log_dates', [firstDate, secondDate]);
+      await seedStore.setString(
+        'daily_log_$firstDate',
+        DailyLog(
+          date: DateTime(2026, 7, 20, 12),
+          cravings: const ['Gece Atıştırması'],
+        ).toJsonString(),
+      );
+      await seedStore.setString(
+        'daily_log_$secondDate',
+        DailyLog(
+          date: DateTime(2026, 7, 21, 12),
+          cravings: const ['GECE ATIŞTIRMASI'],
+        ).toJsonString(),
+      );
+
+      final storage = LocalStorageService(keyStore: keyStore);
+      await storage.init();
+
+      final canonical = storage.loadSettings()!.customCravings.single;
+      expect(
+        storage.loadAllLogs().expand((log) => log.cravings),
+        everyElement(canonical),
+      );
     },
   );
 

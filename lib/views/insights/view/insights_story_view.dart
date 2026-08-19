@@ -533,17 +533,18 @@ class _InsightStoryPage extends StatelessWidget {
         AppStrings.mood,
         AppStrings.moodWhoWith,
       ],
+      PersonalInsightKind.stressCompanionAssociation => [
+        AppStrings.symptom,
+        AppStrings.moodWhoWith,
+      ],
+      PersonalInsightKind.stressCravingAssociation ||
+      PersonalInsightKind.stressFoodAssociation => [
+        AppStrings.symptom,
+        AppStrings.nutrition,
+      ],
       PersonalInsightKind.symptomCyclePhaseAssociation => [
         AppStrings.symptom,
         AppStrings.myCycles,
-      ],
-      PersonalInsightKind.energyCyclePhaseAssociation => [
-        AppStrings.energyLevel,
-        AppStrings.myCycles,
-      ],
-      PersonalInsightKind.frequentNutrition => [
-        AppStrings.nutrition,
-        AppStrings.energyLevel,
       ],
       PersonalInsightKind.foodObservationStarted ||
       PersonalInsightKind.foodPatternBuilding ||

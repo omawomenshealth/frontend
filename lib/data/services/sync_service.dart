@@ -11,6 +11,23 @@ import 'notification_service.dart';
 /// Yerel şifreli kasa verileri ile PostgreSQL bulut veritabanı
 /// arasındaki senkronizasyonu yöneten servis.
 class SyncService {
+  // Eski bulut yedekleri okunurken yalnızca aktif günlük alanları modele
+  // geçirilir. Sonraki yüklemede yedek de güncel şemayla temizlenir.
+  static const Set<String> _legacyDailyLogFields = {
+    'activities',
+    'nutritionTags',
+    'nutritionNotes',
+    'moodNote',
+    'sleepDurationMinutes',
+    'sleepQuality',
+    'stressLevel',
+    'energyLevel',
+    'bowelActivity',
+    'periodPainLevel',
+    'notes',
+    'caffeineServings',
+  };
+
   final LocalStorageService _storage;
   final ApiService _api;
   final NotificationService? _notifications;
@@ -345,7 +362,9 @@ class SyncService {
           if (item is! Map) {
             throw const FormatException('Bulut log kaydı geçersiz.');
           }
-          return DailyLog.fromJson(Map<String, dynamic>.from(item));
+          final activeJson = Map<String, dynamic>.from(item)
+            ..removeWhere((key, _) => _legacyDailyLogFields.contains(key));
+          return DailyLog.fromJson(activeJson);
         })
         .toList(growable: false);
   }
@@ -411,6 +430,19 @@ class SyncService {
     final mergedSettings = localSettings == null
         ? cloudSettings
         : _mergeSettings(localSettings, cloudSettings);
+    final customMedications = _mergeMedicationIdentities(
+      local.customMedications,
+      cloud.customMedications,
+    );
+    final customSupplements = _mergeStrings(
+      local.customSupplements,
+      cloud.customSupplements,
+    );
+    final customFoods = _mergeStrings(local.customFoods, cloud.customFoods);
+    final customSkincare = _mergeStrings(
+      local.customSkincare,
+      cloud.customSkincare,
+    );
 
     final mergedLogs = <String, DailyLog>{
       for (final log in cloud.logs) log.date.toIso8601String(): log,
@@ -420,22 +452,28 @@ class SyncService {
       final cloudLog = mergedLogs[key];
       mergedLogs[key] = cloudLog == null ? log : log.mergeWith(cloudLog);
     }
-    final logs = mergedLogs.values.toList(growable: false)
-      ..sort((a, b) => a.date.compareTo(b.date));
+    final logs =
+        mergedLogs.values
+            .map(
+              (log) => _canonicalizeLog(
+                log,
+                settings: mergedSettings,
+                customMedications: customMedications,
+                customSupplements: customSupplements,
+                customFoods: customFoods,
+                customSkincare: customSkincare,
+              ),
+            )
+            .toList(growable: false)
+          ..sort((a, b) => a.date.compareTo(b.date));
 
     return _SyncData(
       settings: mergedSettings,
       logs: logs,
-      customMedications: <MedicationIdentity>{
-        ...local.customMedications,
-        ...cloud.customMedications,
-      }.toList(growable: false),
-      customSupplements: _mergeStrings(
-        local.customSupplements,
-        cloud.customSupplements,
-      ),
-      customFoods: _mergeStrings(local.customFoods, cloud.customFoods),
-      customSkincare: _mergeStrings(local.customSkincare, cloud.customSkincare),
+      customMedications: customMedications,
+      customSupplements: customSupplements,
+      customFoods: customFoods,
+      customSkincare: customSkincare,
       medicationReminderPlans: _mergeReminderPlans(
         local.medicationReminderPlans,
         cloud.medicationReminderPlans,
@@ -455,6 +493,16 @@ class SyncService {
         local.isOnboardingComplete || !cloud.isOnboardingComplete;
     final primary = preferLocal ? local : cloud;
     final secondary = preferLocal ? cloud : local;
+    final customConditions = _mergeStrings(
+      primary.customConditions,
+      secondary.customConditions,
+    );
+    final customBirthControlMethods = _mergeStrings(
+      primary.customBirthControlMethods,
+      secondary.customBirthControlMethods,
+    );
+    final selectedBirthControl =
+        primary.birthControlMethod ?? secondary.birthControlMethod;
 
     return primary.copyWith(
       userName: primary.userName.isNotEmpty
@@ -475,20 +523,21 @@ class SyncService {
       wantsChildrenInYear:
           primary.wantsChildrenInYear ?? secondary.wantsChildrenInYear,
       lastPeriodDate: primary.lastPeriodDate ?? secondary.lastPeriodDate,
-      birthControlMethod:
-          primary.birthControlMethod ?? secondary.birthControlMethod,
-      chronicDiseases: _mergeStrings(
-        primary.chronicDiseases,
-        secondary.chronicDiseases,
+      birthControlMethod: selectedBirthControl == null
+          ? null
+          : _canonicalValue(selectedBirthControl, customBirthControlMethods),
+      chronicDiseases: _canonicalizeStrings(
+        _mergeStrings(primary.chronicDiseases, secondary.chronicDiseases),
+        customConditions,
       ),
-      womenDiseases: _mergeStrings(
-        primary.womenDiseases,
-        secondary.womenDiseases,
+      womenDiseases: _canonicalizeStrings(
+        _mergeStrings(primary.womenDiseases, secondary.womenDiseases),
+        customConditions,
       ),
-      dailyMedications: <MedicationIdentity>{
-        ...primary.dailyMedications,
-        ...secondary.dailyMedications,
-      }.toList(growable: false),
+      dailyMedications: _mergeMedicationIdentities(
+        primary.dailyMedications,
+        secondary.dailyMedications,
+      ),
       dailySupplements: _mergeStrings(
         primary.dailySupplements,
         secondary.dailySupplements,
@@ -497,12 +546,163 @@ class SyncService {
         primary.dailySkincare,
         secondary.dailySkincare,
       ),
+      customCravings: _mergeStrings(
+        primary.customCravings,
+        secondary.customCravings,
+      ),
+      customMoodCompanions: _mergeStrings(
+        primary.customMoodCompanions,
+        secondary.customMoodCompanions,
+      ),
+      customMoodPlaces: _mergeStrings(
+        primary.customMoodPlaces,
+        secondary.customMoodPlaces,
+      ),
+      customConditions: customConditions,
+      customBirthControlMethods: customBirthControlMethods,
     );
   }
 
   static List<String> _mergeStrings(List<String> local, List<String> cloud) {
-    return <String>{...local, ...cloud}.toList(growable: false);
+    final result = <String>[];
+    final seen = <String>{};
+    for (final raw in [...local, ...cloud]) {
+      final value = _cleanCustomValue(raw);
+      if (value.isNotEmpty && seen.add(_normalizeCustomValue(value))) {
+        result.add(value);
+      }
+    }
+    return List<String>.unmodifiable(result);
   }
+
+  static List<MedicationIdentity> _mergeMedicationIdentities(
+    Iterable<MedicationIdentity> primary,
+    Iterable<MedicationIdentity> secondary,
+  ) {
+    final result = <MedicationIdentity>[];
+    final seen = <String>{};
+    for (final medication in [...primary, ...secondary]) {
+      final key = _medicationIdentityKey(medication);
+      if (seen.add(key)) result.add(medication);
+    }
+    return List<MedicationIdentity>.unmodifiable(result);
+  }
+
+  static DailyLog _canonicalizeLog(
+    DailyLog log, {
+    required UserSettings settings,
+    required List<MedicationIdentity> customMedications,
+    required List<String> customSupplements,
+    required List<String> customFoods,
+    required List<String> customSkincare,
+  }) {
+    final medicationCatalog = _mergeMedicationIdentities(
+      settings.dailyMedications,
+      customMedications,
+    );
+    final supplementCatalog = _mergeStrings(
+      settings.dailySupplements,
+      customSupplements,
+    );
+    final skincareCatalog = _mergeStrings(
+      settings.dailySkincare,
+      customSkincare,
+    );
+    return log.copyWith(
+      cravings: _canonicalizeStrings(log.cravings, settings.customCravings),
+      moodCompanions: _canonicalizeStrings(
+        log.moodCompanions,
+        settings.customMoodCompanions,
+      ),
+      moodPlaces: _canonicalizeStrings(
+        log.moodPlaces,
+        settings.customMoodPlaces,
+      ),
+      mealFoodGroups: {
+        for (final entry in log.mealFoodGroups.entries)
+          entry.key: _canonicalizeStrings(entry.value, customFoods),
+      },
+      supplements: log.supplements
+          .map(
+            (entry) => entry.copyWith(
+              displayName: _canonicalValue(
+                entry.displayName,
+                supplementCatalog,
+              ),
+              mainGroup: _canonicalValue(entry.mainGroup, supplementCatalog),
+            ),
+          )
+          .toList(growable: false),
+      medications: log.medications
+          .map((entry) => _canonicalizeMedication(entry, medicationCatalog))
+          .toList(growable: false),
+      skincare: _canonicalizeStrings(log.skincare, skincareCatalog),
+    );
+  }
+
+  static List<String> _canonicalizeStrings(
+    Iterable<String> values,
+    Iterable<String> catalog,
+  ) {
+    final result = <String>[];
+    final seen = <String>{};
+    for (final raw in values) {
+      final canonical = _canonicalValue(raw, catalog);
+      if (canonical.isNotEmpty && seen.add(_normalizeCustomValue(canonical))) {
+        result.add(canonical);
+      }
+    }
+    return result;
+  }
+
+  static String _canonicalValue(String rawValue, Iterable<String> catalog) {
+    final cleaned = _cleanCustomValue(rawValue);
+    final normalized = _normalizeCustomValue(cleaned);
+    for (final value in catalog) {
+      if (_normalizeCustomValue(value) == normalized) return value;
+    }
+    return cleaned;
+  }
+
+  static MedicationEntry _canonicalizeMedication(
+    MedicationEntry entry,
+    Iterable<MedicationIdentity> catalog,
+  ) {
+    final candidate = MedicationIdentity(
+      displayName: entry.displayName,
+      mainGroup: entry.mainGroup,
+      activeIngredient: entry.activeIngredient,
+    );
+    final key = _medicationIdentityKey(candidate);
+    for (final medication in catalog) {
+      if (_medicationIdentityKey(medication) == key) {
+        return entry.copyWith(
+          displayName: medication.displayName,
+          mainGroup: medication.mainGroup,
+          activeIngredient: medication.activeIngredient,
+        );
+      }
+    }
+    return entry.copyWith(
+      displayName: _cleanCustomValue(entry.displayName),
+      mainGroup: _cleanCustomValue(entry.mainGroup),
+      activeIngredient: entry.activeIngredient == null
+          ? null
+          : _cleanCustomValue(entry.activeIngredient!),
+    );
+  }
+
+  static String _medicationIdentityKey(MedicationIdentity medication) => [
+    medication.displayName,
+    medication.mainGroup,
+    medication.activeIngredient ?? '',
+  ].map(_normalizeCustomValue).join('\u0000');
+
+  static String _cleanCustomValue(String value) =>
+      value.trim().replaceAll(RegExp(r'\s+'), ' ');
+
+  static String _normalizeCustomValue(String value) =>
+      _cleanCustomValue(value).replaceAll(RegExp('[İIı]'), 'i').toLowerCase();
 
   static List<MedicationReminderPlan> _mergeReminderPlans(
     List<MedicationReminderPlan> local,

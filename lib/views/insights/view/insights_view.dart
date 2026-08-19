@@ -450,33 +450,6 @@ class _InsightPresentation {
         );
         icon = Icons.healing_rounded;
         color = AppColors.accent;
-      case PersonalInsightKind.frequentActivity:
-        title = AppStrings.insightFrequentActivityTitle;
-        body = AppStrings.insightFrequentActivityBody(
-          label: primary,
-          count: insight.value!,
-          total: insight.total!,
-        );
-        icon = Icons.directions_walk_rounded;
-        color = AppColors.primary;
-      case PersonalInsightKind.frequentNutrition:
-        title = AppStrings.insightFrequentNutritionTitle;
-        body = AppStrings.insightFrequentNutritionBody(
-          label: primary,
-          count: insight.value!,
-          total: insight.total!,
-        );
-        icon = Icons.restaurant_rounded;
-        color = AppColors.warning;
-      case PersonalInsightKind.frequentBowel:
-        title = AppStrings.insightFrequentBowelTitle;
-        body = AppStrings.insightFrequentBowelBody(
-          label: primary,
-          count: insight.value!,
-          total: insight.total!,
-        );
-        icon = Icons.waves_rounded;
-        color = AppColors.info;
       case PersonalInsightKind.symptomMoodCooccurrence:
         title = AppStrings.insightSymptomMoodTitle;
         body = AppStrings.insightSymptomMoodBody(
@@ -527,22 +500,6 @@ class _InsightPresentation {
         );
         icon = Icons.monitor_heart_outlined;
         color = AppColors.periodPrimary;
-      case PersonalInsightKind.energyCyclePhaseAssociation:
-        title = AppStrings.insightEnergyCyclePhaseTitle;
-        body = AppStrings.insightEnergyCyclePhaseBody(
-          energy: primary,
-          phase: secondary,
-          withEvent: insight.withEventCount!,
-          withTotal: insight.withTotal!,
-          withoutTotal: insight.withoutTotal!,
-          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
-          withoutPercent: _percentage(
-            insight.withoutEventCount!,
-            insight.withoutTotal!,
-          ),
-        );
-        icon = Icons.bolt_rounded;
-        color = AppColors.warning;
       case PersonalInsightKind.moodSymptomAssociation:
         title = AppStrings.insightMoodSymptomTitle;
         body = AppStrings.insightMoodSymptomBody(
@@ -640,6 +597,51 @@ class _InsightPresentation {
         );
         icon = Icons.people_alt_outlined;
         color = AppColors.primary;
+      case PersonalInsightKind.stressCompanionAssociation:
+        title = AppStrings.insightStressCompanionTitle;
+        body = AppStrings.insightStressCompanionBody(
+          companion: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.people_alt_outlined;
+        color = AppColors.accent;
+      case PersonalInsightKind.stressCravingAssociation:
+        title = AppStrings.insightStressCravingTitle;
+        body = AppStrings.insightStressCravingBody(
+          craving: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.icecream_outlined;
+        color = AppColors.secondary;
+      case PersonalInsightKind.stressFoodAssociation:
+        title = AppStrings.insightStressFoodTitle;
+        body = AppStrings.insightStressFoodBody(
+          food: secondary,
+          withEvent: insight.withEventCount!,
+          withTotal: insight.withTotal!,
+          withoutTotal: insight.withoutTotal!,
+          withPercent: _percentage(insight.withEventCount!, insight.withTotal!),
+          withoutPercent: _percentage(
+            insight.withoutEventCount!,
+            insight.withoutTotal!,
+          ),
+        );
+        icon = Icons.restaurant_menu_rounded;
+        color = AppColors.secondaryDark;
       case PersonalInsightKind.structuredAssociation:
         title = AppStrings.insightAssociationTitle;
         body = AppStrings.insightAssociationBody(

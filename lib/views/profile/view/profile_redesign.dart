@@ -1090,8 +1090,6 @@ class _PatternRow extends StatelessWidget {
             AppStrings.medicationRoutine,
           PersonalInsightKind.moodCyclePhaseAssociation =>
             AppStrings.moodPattern,
-          PersonalInsightKind.energyCyclePhaseAssociation =>
-            AppStrings.energyPattern,
           _ => AppStrings.recurringPattern,
         };
     final activeBars = insight.evidenceCount.clamp(1, 7);

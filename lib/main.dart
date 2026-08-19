@@ -450,8 +450,8 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
                 runSpacing: 9,
                 children: [
                   for (final label in [
-                    AppStrings.energyLevel,
-                    AppStrings.sleep,
+                    AppStrings.symptom,
+                    AppStrings.waterIntake,
                     AppStrings.mood,
                     AppStrings.nutrition,
                   ])

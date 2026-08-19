@@ -517,6 +517,9 @@ class PersonalInsightEngine {
         AppStrings.canonicalizeStoredValue,
       ),
       ...AppStrings.symptomSleepOptions.map(AppStrings.canonicalizeStoredValue),
+      ...AppStrings.legacySymptomOptions.map(
+        AppStrings.canonicalizeStoredValue,
+      ),
     };
     for (final day in pairedDays) {
       for (final otherFood in day.foodGroups.where((item) => item != food)) {
@@ -528,10 +531,6 @@ class PersonalInsightEngine {
             !_sameSignal(item, feeling),
       )) {
         counts[signal] = (counts[signal] ?? 0) + 1;
-      }
-      if ((day.caffeineServings ?? 0) >= 2) {
-        counts[AppStrings.insightFeatureHighCaffeineToken] =
-            (counts[AppStrings.insightFeatureHighCaffeineToken] ?? 0) + 1;
       }
       final phase = cycle?.phaseTokenAt(day.date);
       if (phase != null) counts[phase] = (counts[phase] ?? 0) + 1;
@@ -728,7 +727,6 @@ class PersonalInsightEngine {
           final symptoms = <String>{};
           final foodGroups = <String>{};
           final foodFeelingPairs = <String>{};
-          int? caffeineServings;
           var nutritionObserved = false;
           var hasBleeding = false;
 
@@ -737,15 +735,13 @@ class PersonalInsightEngine {
               log.symptoms.map(AppStrings.canonicalizeStoredValue),
             );
             foodGroups.addAll(
-              log.mealFoodGroups.values
-                  .expand((items) => items)
-                  .map(AppStrings.canonicalizeStoredValue),
+              _foodSignals(log.mealFoodGroups.values.expand((items) => items)),
             );
             final foodsByMeal = {
               for (final entry in log.mealFoodGroups.entries)
-                AppStrings.canonicalizeStoredValue(entry.key): entry.value
-                    .map(AppStrings.canonicalizeStoredValue)
-                    .toSet(),
+                AppStrings.canonicalizeStoredValue(entry.key): _foodSignals(
+                  entry.value,
+                ),
             };
             if (log.mealPostFeelings.isNotEmpty) {
               for (final entry in log.mealPostFeelings.entries) {
@@ -760,7 +756,6 @@ class PersonalInsightEngine {
                 }
               }
             }
-            caffeineServings = log.caffeineServings ?? caffeineServings;
             nutritionObserved =
                 nutritionObserved ||
                 log.observedSections.contains(
@@ -769,8 +764,7 @@ class PersonalInsightEngine {
                 log.mealTypes.isNotEmpty ||
                 log.mealFoodGroups.isNotEmpty ||
                 log.mealPostFeelings.isNotEmpty ||
-                log.waterIntakeMl != null ||
-                log.caffeineServings != null;
+                log.waterIntakeMl != null;
             hasBleeding =
                 hasBleeding || CycleRules.isMenstrualFlow(log.flowIntensity);
           }
@@ -780,7 +774,6 @@ class PersonalInsightEngine {
             symptoms: symptoms,
             foodGroups: foodGroups,
             foodFeelingPairs: foodFeelingPairs,
-            caffeineServings: caffeineServings,
             nutritionObserved: nutritionObserved,
             hasBleeding: hasBleeding,
           );
@@ -819,6 +812,18 @@ class PersonalInsightEngine {
         normalizedRight.startsWith(normalizedLeft);
   }
 
+  Set<String> _foodSignals(Iterable<String> values) {
+    final signals = <String>{};
+    for (final value in values) {
+      signals.add(
+        AppStrings.isCaffeinatedFood(value)
+            ? AppStrings.caffeinatedFoodInsightSignal
+            : AppStrings.canonicalizeStoredValue(value),
+      );
+    }
+    return signals;
+  }
+
   int _stableHash(String value) {
     var hash = 0x811c9dc5;
     for (final codeUnit in value.codeUnits) {
@@ -834,7 +839,6 @@ class _DailySnapshot {
   final Set<String> symptoms;
   final Set<String> foodGroups;
   final Set<String> foodFeelingPairs;
-  final int? caffeineServings;
   final bool nutritionObserved;
   final bool hasBleeding;
 
@@ -843,7 +847,6 @@ class _DailySnapshot {
     required this.symptoms,
     required this.foodGroups,
     required this.foodFeelingPairs,
-    required this.caffeineServings,
     required this.nutritionObserved,
     required this.hasBleeding,
   });
