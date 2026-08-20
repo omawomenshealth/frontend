@@ -61,8 +61,8 @@ Bu değer Play Console'daki subscription product ID ve sunucudaki
 
 Play Console'a uygulamayı eklemeden önce
 `android/app/build.gradle.kts` içindeki geçici
-`com.example.app_proje_a` application ID değerini size ait kalıcı paket adıyla
-değiştirin. Paket adı Play Console'da oluşturulduktan sonra değiştirilemez.
+Application ID `com.bps.oma` olarak ayarlanmıştır.
+Paket adı Play Console'da oluşturulduktan sonra değiştirilemez.
 
 Gerçek satın alma testi için imzalı Android App Bundle'ı Internal testing
 kanalına yükleyin ve test hesabını license tester olarak ekleyin. Mağaza dışından

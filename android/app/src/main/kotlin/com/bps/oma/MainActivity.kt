@@ -1,4 +1,4 @@
-package com.example.app_proje_a
+package com.bps.oma
 
 import io.flutter.embedding.android.FlutterActivity
 
