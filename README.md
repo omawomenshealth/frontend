@@ -1,5 +1,11 @@
 # OMA Flutter Uygulaması
 
+## Uygulama kimliği
+
+Android/iOS package ve bundle ID kararları [docs/APP_IDENTITY.md](docs/APP_IDENTITY.md)
+içinde tutulur. Production signing, OAuth veya Play Console/App Store Connect
+işlerine geçmeden önce bu dokümandaki kararın kesinleştiğinden emin olun.
+
 ## Sunucu bağlantısı
 
 Yerel sunucu adresi proje kökündeki `.env` dosyasındaki `OMA_API_BASE_URL`
