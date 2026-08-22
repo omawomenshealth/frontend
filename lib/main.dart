@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -35,12 +34,10 @@ import 'views/profile/viewmodel/profile_view_model.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await AppEnvironment.load();
-  final configuredApiUrl = AppEnvironment.apiBaseUrl;
-  if (kReleaseMode && !configuredApiUrl.startsWith('https://')) {
-    throw StateError(
-      'Release builds require an HTTPS OMA_API_BASE_URL in .env.',
-    );
+  try {
+    await AppEnvironment.load();
+  } catch (error) {
+    debugPrint('AppEnvironment başlatma uyarısı: $error');
   }
 
   await Future.wait([
