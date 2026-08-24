@@ -171,6 +171,123 @@ void main() {
     },
   );
 
+  testWidgets(
+    'Hızlı adet seçimi aynı takvimde çoklu çalışır ve diğer kayıt rengini korur',
+    (tester) async {
+      tester.view.physicalSize = const Size(430, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      SharedPreferences.setMockInitialValues({});
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+      await storage.init();
+      final today = DateTime.now().dateOnly;
+      final skincareDay = today.subtract(const Duration(days: 2));
+      final otherDay = today.subtract(const Duration(days: 1));
+      await storage.saveSettings(
+        UserSettings(
+          isOnboardingComplete: true,
+          lastPeriodDate: today.subtract(const Duration(days: 10)),
+        ),
+      );
+      await storage.saveDailyLog(
+        DailyLog(
+          date: skincareDay,
+          hasExplicitTime: false,
+          skincare: const ['Niasinamid'],
+          observedSections: const {DailyLogObservedSection.skincare},
+        ),
+      );
+
+      final calendar = CalendarViewModel(storage);
+      final dashboard = DashboardViewModel(storage);
+      await calendar.loadData();
+      await dashboard.loadData();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: calendar),
+            ChangeNotifierProvider.value(value: dashboard),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            locale: const Locale('tr'),
+            localizationsDelegates: const [
+              AppStrings.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppStrings.supportedLocales,
+            home: const CalendarView(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final skincareMarker = find.byKey(
+        ValueKey('calendar_log_marker_${skincareDay.toStorageKey()}'),
+      );
+      expect(skincareMarker, findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('calendar_quick_add_period')));
+      await tester.pump();
+
+      expect(
+        find.byKey(const ValueKey('calendar_quick_period_hint')),
+        findsOneWidget,
+      );
+      expect(find.text(AppStrings.month), findsOneWidget);
+      expect(skincareMarker, findsOneWidget);
+
+      await tester.tap(
+        find.byKey(ValueKey('calendar_day_${skincareDay.toStorageKey()}')),
+      );
+      await tester.tap(
+        find.byKey(ValueKey('calendar_day_${otherDay.toStorageKey()}')),
+      );
+      await tester.pump();
+
+      expect(
+        find.byKey(
+          ValueKey('quick_period_selected_${skincareDay.toStorageKey()}'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(
+          ValueKey('quick_period_selected_${otherDay.toStorageKey()}'),
+        ),
+        findsOneWidget,
+      );
+      expect(skincareMarker, findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const ValueKey('calendar_quick_period_save')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('calendar_quick_period_hint')),
+        findsNothing,
+      );
+      for (final day in [skincareDay, otherDay]) {
+        final savedLog = storage.loadLogsForDate(day).single;
+        expect(savedLog.flowIntensity, isNotNull);
+        expect(
+          AppStrings.localizeStoredValue(savedLog.flowIntensity!),
+          AppStrings.flowOptions[1],
+        );
+      }
+      expect(storage.loadLogsForDate(skincareDay).single.skincare, [
+        'Niasinamid',
+      ]);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('Takvim günlük log ayrıntısında skincare görünür', (
     tester,
   ) async {

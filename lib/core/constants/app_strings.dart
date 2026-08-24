@@ -437,6 +437,8 @@ enum _TextKey {
   month,
   editPeriodDates,
   quickAddPeriod,
+  quickPeriodSelectHint,
+  quickPeriodSaveSelection,
   quickPeriodSaved,
   quickPeriodSaveFailed,
   calendarLegend,
@@ -1367,6 +1369,9 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.month: 'Ay',
   _TextKey.editPeriodDates: 'Adet tarihlerini düzenle',
   _TextKey.quickAddPeriod: 'Hızlı adet ekle',
+  _TextKey.quickPeriodSelectHint:
+      'Kaydetmek istediğin geçmiş günlere tek tek dokun',
+  _TextKey.quickPeriodSaveSelection: '{count} günü kaydet',
   _TextKey.quickPeriodSaved: '{count} gün hafif akış olarak kaydedildi.',
   _TextKey.quickPeriodSaveFailed: 'Adet günleri kaydedilemedi.',
   _TextKey.calendarLegend: 'Takvim açıklaması',
@@ -2334,6 +2339,8 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.month: 'Month',
   _TextKey.editPeriodDates: 'Edit period dates',
   _TextKey.quickAddPeriod: 'Quick add period',
+  _TextKey.quickPeriodSelectHint: 'Tap each past day you want to save',
+  _TextKey.quickPeriodSaveSelection: 'Save {count} days',
   _TextKey.quickPeriodSaved: '{count} days saved as light flow.',
   _TextKey.quickPeriodSaveFailed: 'Period days could not be saved.',
   _TextKey.calendarLegend: 'Calendar key',
@@ -4496,6 +4503,10 @@ class AppStrings {
   static String get month => _text(_TextKey.month);
   static String get editPeriodDates => _text(_TextKey.editPeriodDates);
   static String get quickAddPeriod => _text(_TextKey.quickAddPeriod);
+  static String get quickPeriodSelectHint =>
+      _text(_TextKey.quickPeriodSelectHint);
+  static String quickPeriodSaveSelection(int count) =>
+      _format(_TextKey.quickPeriodSaveSelection, {'count': count});
   static String quickPeriodSaved(int count) =>
       _format(_TextKey.quickPeriodSaved, {'count': count});
   static String get quickPeriodSaveFailed =>

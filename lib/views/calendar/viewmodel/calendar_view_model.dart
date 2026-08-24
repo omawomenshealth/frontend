@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../data/services/sync_service.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
@@ -12,12 +13,14 @@ import '../../../domain/cycle/models/cycle_prediction.dart';
 /// Takvim iş mantığı (Optimize Edilmiş Versiyon)
 class CalendarViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
+  final SyncService? _sync;
   final CyclePredictionCoordinator _cyclePredictions;
   final bool _ownsCyclePredictions;
 
   CalendarViewModel(
     this._storage, [
     CyclePredictionCoordinator? cyclePredictions,
+    this._sync,
   ]) : _cyclePredictions =
            cyclePredictions ?? CyclePredictionCoordinator(_storage),
        _ownsCyclePredictions = cyclePredictions == null {
@@ -185,6 +188,7 @@ class CalendarViewModel extends ChangeNotifier {
     if (normalizedDays.isEmpty) return false;
 
     var allSuccessful = true;
+    var hasChanges = false;
     for (final day in normalizedDays) {
       final logs = _storage.loadLogsForDate(day);
       final alreadyHasPeriod = logs.any(
@@ -213,7 +217,13 @@ class CalendarViewModel extends ChangeNotifier {
       );
       if (!await _storage.saveDailyLog(quickPeriodLog)) {
         allSuccessful = false;
+      } else {
+        hasChanges = true;
       }
+    }
+
+    if (hasChanges && _storage.isUserLoggedIn) {
+      await _sync?.mergeWithCloud();
     }
 
     await _cyclePredictions.refresh(force: true);

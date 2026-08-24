@@ -29,6 +29,9 @@ class _CalendarViewState extends State<CalendarView> {
   late DateTime _focusedMonth;
   late PageController _monthController;
   bool _isYearView = false;
+  bool _isQuickPeriodSelectionMode = false;
+  bool _isSavingQuickPeriod = false;
+  final Set<DateTime> _quickPeriodDays = {};
 
   @override
   void initState() {
@@ -65,6 +68,8 @@ class _CalendarViewState extends State<CalendarView> {
                       Column(
                         children: [
                           _buildHeader(),
+                          if (_isQuickPeriodSelectionMode)
+                            _buildQuickPeriodSelectionHint(),
                           Expanded(
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 220),
@@ -86,6 +91,41 @@ class _CalendarViewState extends State<CalendarView> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildQuickPeriodSelectionHint() {
+    return Container(
+      key: const ValueKey('calendar_quick_period_hint'),
+      margin: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+      decoration: BoxDecoration(
+        color: AppColors.periodLight.withValues(alpha: 0.58),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: AppColors.periodPrimary.withValues(alpha: 0.28),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.touch_app_rounded,
+            size: 18,
+            color: AppColors.periodPrimary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              AppStrings.quickPeriodSelectHint,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.periodPrimary,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -169,7 +209,12 @@ class _CalendarViewState extends State<CalendarView> {
           padding: const EdgeInsets.only(bottom: 112),
           children: [
             const _WeekdayStrip(),
-            _MonthGrid(month: month, onDayTap: _openDayDetails),
+            _MonthGrid(
+              month: month,
+              onDayTap: _handleDayTap,
+              quickSelectionMode: _isQuickPeriodSelectionMode,
+              quickSelectedDays: _quickPeriodDays,
+            ),
             if (canShowNext) ...[
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
@@ -189,7 +234,12 @@ class _CalendarViewState extends State<CalendarView> {
                   ),
                 ),
               ),
-              _MonthGrid(month: nextMonth, onDayTap: _openDayDetails),
+              _MonthGrid(
+                month: nextMonth,
+                onDayTap: _handleDayTap,
+                quickSelectionMode: _isQuickPeriodSelectionMode,
+                quickSelectedDays: _quickPeriodDays,
+              ),
             ],
           ],
         );
@@ -237,7 +287,9 @@ class _CalendarViewState extends State<CalendarView> {
           _MonthGrid(
             month: DateTime(_focusedMonth.year, month),
             compact: true,
-            onDayTap: _openDayDetails,
+            onDayTap: _handleDayTap,
+            quickSelectionMode: _isQuickPeriodSelectionMode,
+            quickSelectedDays: _quickPeriodDays,
           ),
           if (month != 12)
             const Padding(
@@ -250,6 +302,9 @@ class _CalendarViewState extends State<CalendarView> {
   }
 
   Widget _buildCalendarActions() {
+    if (_isQuickPeriodSelectionMode) {
+      return _buildQuickPeriodSelectionActions();
+    }
     final selectedDay = context.read<CalendarViewModel>().selectedDay;
     final canLog = !selectedDay.dateOnly.isAfter(AppTime.now.dateOnly);
     return DecoratedBox(
@@ -268,7 +323,7 @@ class _CalendarViewState extends State<CalendarView> {
           Expanded(
             child: OutlinedButton.icon(
               key: const ValueKey('calendar_quick_add_period'),
-              onPressed: canLog ? _showQuickPeriodPicker : null,
+              onPressed: canLog ? _startQuickPeriodSelection : null,
               style: OutlinedButton.styleFrom(
                 backgroundColor: AppColors.surface,
                 foregroundColor: AppColors.periodPrimary,
@@ -311,48 +366,124 @@ class _CalendarViewState extends State<CalendarView> {
     );
   }
 
-  Future<void> _showQuickPeriodPicker() async {
-    final calendarVm = context.read<CalendarViewModel>();
-    final today = AppTime.now.dateOnly;
-    final selectedDay = calendarVm.selectedDay.dateOnly;
-    final initialDay = selectedDay.isBefore(_firstCalendarMonth)
-        ? _firstCalendarMonth
-        : selectedDay.isAfter(today)
-        ? today
-        : selectedDay;
-    final pickedRange = await showDateRangePicker(
-      context: context,
-      firstDate: _firstCalendarMonth,
-      lastDate: today,
-      initialDateRange: DateTimeRange(start: initialDay, end: initialDay),
-      helpText: AppStrings.quickAddPeriod,
-      saveText: AppStrings.save,
-      builder: (pickerContext, child) {
-        if (child == null) return const SizedBox.shrink();
-        final theme = Theme.of(pickerContext);
-        return Theme(
-          data: theme.copyWith(
-            colorScheme: theme.colorScheme.copyWith(
-              primary: AppColors.periodPrimary,
+  Widget _buildQuickPeriodSelectionActions() {
+    final selectedCount = _quickPeriodDays.length;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.periodPrimary.withValues(alpha: 0.24),
+            blurRadius: 28,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              key: const ValueKey('calendar_quick_period_cancel'),
+              onPressed: _isSavingQuickPeriod
+                  ? null
+                  : _cancelQuickPeriodSelection,
+              style: OutlinedButton.styleFrom(
+                backgroundColor: AppColors.surface,
+                foregroundColor: AppColors.textPrimary,
+                side: const BorderSide(color: AppColors.outline),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: const StadiumBorder(),
+              ),
+              child: Text(AppStrings.cancel),
             ),
           ),
-          child: child,
-        );
-      },
+          const SizedBox(width: 9),
+          Expanded(
+            child: FilledButton.icon(
+              key: const ValueKey('calendar_quick_period_save'),
+              onPressed: selectedCount == 0 || _isSavingQuickPeriod
+                  ? null
+                  : _saveQuickPeriodSelection,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.periodPrimary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: const StadiumBorder(),
+              ),
+              icon: _isSavingQuickPeriod
+                  ? const SizedBox.square(
+                      dimension: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.check_rounded, size: 18),
+              label: Text(
+                AppStrings.quickPeriodSaveSelection(selectedCount),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
-    if (pickedRange == null || !mounted) return;
+  }
 
-    final days = <DateTime>[];
-    var day = pickedRange.start.dateOnly;
-    while (!day.isAfter(pickedRange.end.dateOnly)) {
-      days.add(day);
-      day = day.add(const Duration(days: 1));
+  void _startQuickPeriodSelection() {
+    setState(() {
+      _quickPeriodDays.clear();
+      _isQuickPeriodSelectionMode = true;
+    });
+  }
+
+  void _cancelQuickPeriodSelection() {
+    setState(() {
+      _quickPeriodDays.clear();
+      _isQuickPeriodSelectionMode = false;
+    });
+  }
+
+  Future<void> _handleDayTap(DateTime day) async {
+    if (!_isQuickPeriodSelectionMode) {
+      await _openDayDetails(day);
+      return;
     }
 
+    final normalized = day.dateOnly;
+    if (normalized.isAfter(AppTime.now.dateOnly)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.futureLogNotAllowed)));
+      return;
+    }
+    if (context.read<CalendarViewModel>().isLoggedPeriodDay(normalized)) return;
+
+    setState(() {
+      if (!_quickPeriodDays.add(normalized)) {
+        _quickPeriodDays.remove(normalized);
+      }
+    });
+  }
+
+  Future<void> _saveQuickPeriodSelection() async {
+    if (_quickPeriodDays.isEmpty || _isSavingQuickPeriod) return;
+    setState(() => _isSavingQuickPeriod = true);
+
+    final calendarVm = context.read<CalendarViewModel>();
+    final days = _quickPeriodDays.toList(growable: false);
     final success = await calendarVm.addLightPeriodDays(days);
     if (!mounted) return;
     await context.read<DashboardViewModel>().loadData();
     if (!mounted) return;
+    setState(() {
+      _isSavingQuickPeriod = false;
+      if (success) {
+        _quickPeriodDays.clear();
+        _isQuickPeriodSelectionMode = false;
+      }
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -493,11 +624,15 @@ class _MonthGrid extends StatelessWidget {
   final DateTime month;
   final ValueChanged<DateTime> onDayTap;
   final bool compact;
+  final bool quickSelectionMode;
+  final Set<DateTime> quickSelectedDays;
 
   const _MonthGrid({
     required this.month,
     required this.onDayTap,
     this.compact = false,
+    this.quickSelectionMode = false,
+    this.quickSelectedDays = const {},
   });
 
   @override
@@ -529,6 +664,8 @@ class _MonthGrid extends StatelessWidget {
           return _CalendarDayCell(
             day: day,
             compact: compact,
+            quickSelectionMode: quickSelectionMode,
+            quickSelected: quickSelectedDays.contains(day.dateOnly),
             onTap: () => onDayTap(day),
           );
         },
@@ -540,11 +677,15 @@ class _MonthGrid extends StatelessWidget {
 class _CalendarDayCell extends StatelessWidget {
   final DateTime day;
   final bool compact;
+  final bool quickSelectionMode;
+  final bool quickSelected;
   final VoidCallback onTap;
 
   const _CalendarDayCell({
     required this.day,
     required this.compact,
+    required this.quickSelectionMode,
+    required this.quickSelected,
     required this.onTap,
   });
 
@@ -596,7 +737,31 @@ class _CalendarDayCell extends StatelessWidget {
       dayCircle = _circle(size: circleSize);
     }
 
-    if (isSelected && !isToday) {
+    if (quickSelected && !isToday) {
+      dayCircle = Stack(
+        key: ValueKey('quick_period_selected_${day.toStorageKey()}'),
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.periodPrimary, width: 2.2),
+            ),
+            child: dayCircle,
+          ),
+          const Positioned(
+            right: -2,
+            top: -2,
+            child: CircleAvatar(
+              radius: 7,
+              backgroundColor: AppColors.periodPrimary,
+              child: Icon(Icons.check_rounded, size: 10, color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    } else if (!quickSelectionMode && isSelected && !isToday) {
       dayCircle = Container(
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
@@ -610,7 +775,7 @@ class _CalendarDayCell extends StatelessWidget {
     return Semantics(
       key: ValueKey('calendar_day_${day.toStorageKey()}'),
       button: true,
-      selected: isSelected,
+      selected: quickSelectionMode ? quickSelected : isSelected,
       label: DateFormat.yMMMMd(AppStrings.localeName).format(day),
       child: InkResponse(
         onTap: onTap,
@@ -631,21 +796,43 @@ class _CalendarDayCell extends StatelessWidget {
               ),
             if (isToday && !compact) const SizedBox(height: 1),
             if (isToday)
-              Text(
-                '${day.day}',
-                style: TextStyle(
-                  fontFamily: 'CormorantGaramond',
-                  fontSize: compact ? 20 : 26,
-                  height: 1,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.periodPrimary,
-                ),
-              )
+              quickSelected
+                  ? Container(
+                      key: ValueKey(
+                        'quick_period_selected_${day.toStorageKey()}',
+                      ),
+                      width: circleSize,
+                      height: circleSize,
+                      decoration: const BoxDecoration(
+                        color: AppColors.periodPrimary,
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          fontSize: compact ? 13 : 15,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  : Text(
+                      '${day.day}',
+                      style: TextStyle(
+                        fontFamily: 'CormorantGaramond',
+                        fontSize: compact ? 20 : 26,
+                        height: 1,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.periodPrimary,
+                      ),
+                    )
             else
               dayCircle,
             if ((isToday || hasLog) && !compact) ...[
               const SizedBox(height: 2),
               Container(
+                key: ValueKey('calendar_log_marker_${day.toStorageKey()}'),
                 width: 4,
                 height: 4,
                 decoration: const BoxDecoration(

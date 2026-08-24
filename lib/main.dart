@@ -183,7 +183,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) => InsightsViewModel(widget.storage),
         ),
         ChangeNotifierProvider(
-          create: (_) => CalendarViewModel(widget.storage, _cyclePredictions),
+          create: (_) =>
+              CalendarViewModel(widget.storage, _cyclePredictions, syncService),
         ),
         ChangeNotifierProvider(
           create: (_) => ProfileViewModel(
