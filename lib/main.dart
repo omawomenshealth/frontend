@@ -172,8 +172,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) => OnboardingViewModel(widget.storage, syncService),
         ),
         ChangeNotifierProvider(
-          create: (_) =>
-              DashboardViewModel(widget.storage, reminders, _cyclePredictions),
+          create: (_) => DashboardViewModel(
+            widget.storage,
+            reminders,
+            _cyclePredictions,
+            syncService,
+          ),
         ),
         ChangeNotifierProvider(
           create: (_) => InsightsViewModel(widget.storage),

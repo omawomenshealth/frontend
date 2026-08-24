@@ -6,6 +6,7 @@ import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/sync_service.dart';
+import 'package:app_proje_a/views/dashboard/viewmodel/dashboard_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -102,6 +103,99 @@ void main() {
     expect(stored.symptomSeverities, {'Stres': 3});
     expect(api.lastUploadedLogs.single['symptoms'], ['Stres']);
     expect(api.lastUploadedLogs.single['symptomSeverities'], {'Stres': 3});
+  });
+
+  test(
+    'günlükten kaldırılan beslenme ve skincare eski buluttan geri gelmez',
+    () async {
+      final date = DateTime(2026, 8, 12, 12);
+      final oldLog = DailyLog(
+        date: date,
+        mealTypes: const ['Kahvaltı'],
+        cravings: const ['Tatlı'],
+        skincare: const ['Retinol'],
+        moodCompanions: const ['Arkadaşlar'],
+        observedSections: const {
+          DailyLogObservedSection.nutrition,
+          DailyLogObservedSection.skincare,
+          DailyLogObservedSection.wellbeing,
+        },
+      );
+      await storage.saveDailyLog(oldLog);
+
+      await storage.saveDailyLog(
+        DailyLog(
+          date: date,
+          mealTypes: const [],
+          cravings: const [],
+          skincare: const [],
+          observedSections: const {
+            DailyLogObservedSection.nutrition,
+            DailyLogObservedSection.skincare,
+          },
+        ),
+      );
+
+      final locallyEdited = storage.loadAllLogs().single;
+      expect(locallyEdited.skincare, isEmpty);
+      expect(locallyEdited.mealTypes, isEmpty);
+      expect(locallyEdited.cravings, isEmpty);
+      expect(locallyEdited.moodCompanions, ['Arkadaşlar']);
+
+      api.cloudData = {
+        ..._minimalCloud(baseSettings),
+        'logs': [oldLog.toJson()],
+      };
+
+      expect(await sync.mergeWithCloud(), isTrue);
+      final stored = storage.loadAllLogs().single;
+      expect(stored.skincare, isEmpty);
+      expect(stored.mealTypes, isEmpty);
+      expect(stored.cravings, isEmpty);
+      expect(stored.moodCompanions, ['Arkadaşlar']);
+
+      final uploaded = api.lastUploadedLogs.single;
+      expect(uploaded['skincare'], isEmpty);
+      expect(uploaded['mealTypes'], isEmpty);
+      expect(uploaded['cravings'], isEmpty);
+      expect(uploaded['moodCompanions'], ['Arkadaşlar']);
+    },
+  );
+
+  test('günlük kaydı buluttaki kaldırılan tiki hemen günceller', () async {
+    final date = DateTime(2026, 8, 12, 15);
+    final oldLog = DailyLog(
+      date: date,
+      mealTypes: const ['Kahvaltı'],
+      cravings: const ['Tatlı'],
+      observedSections: const {DailyLogObservedSection.nutrition},
+    );
+    await storage.saveDailyLog(oldLog);
+    api.cloudData = {
+      ..._minimalCloud(baseSettings),
+      'logs': [oldLog.toJson()],
+    };
+    final dashboard = DashboardViewModel(storage, null, null, sync);
+    addTearDown(dashboard.dispose);
+    await dashboard.loadData();
+
+    expect(
+      await dashboard.saveLog(
+        DailyLog(
+          date: date,
+          mealTypes: const [],
+          cravings: const [],
+          observedSections: const {DailyLogObservedSection.nutrition},
+        ),
+      ),
+      isTrue,
+    );
+
+    expect(api.uploadCalls, 1);
+    expect(api.lastUploadedLogs.single['mealTypes'], isEmpty);
+    expect(api.lastUploadedLogs.single['cravings'], isEmpty);
+    expect(storage.loadAllLogs().single.mealTypes, isEmpty);
+    expect(storage.loadAllLogs().single.cravings, isEmpty);
   });
 
   test(

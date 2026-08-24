@@ -4,6 +4,7 @@ import '../../../data/models/period_log_model.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/notification_service.dart';
+import '../../../data/services/sync_service.dart';
 import '../../../core/utils/personal_insight_engine.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
@@ -16,6 +17,7 @@ import '../../../domain/cycle/models/cycle_prediction.dart';
 class DashboardViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
   final NotificationService? _notifications;
+  final SyncService? _sync;
   final CyclePredictionCoordinator _cyclePredictions;
   final bool _ownsCyclePredictions;
   final PersonalInsightEngine _insightEngine = const PersonalInsightEngine();
@@ -26,6 +28,7 @@ class DashboardViewModel extends ChangeNotifier {
     this._storage, [
     this._notifications,
     CyclePredictionCoordinator? cyclePredictions,
+    this._sync,
   ]) : _cyclePredictions =
            cyclePredictions ?? CyclePredictionCoordinator(_storage),
        _ownsCyclePredictions = cyclePredictions == null {
@@ -209,10 +212,21 @@ class DashboardViewModel extends ChangeNotifier {
         .toSet();
     final success = await _storage.saveDailyLog(log);
     if (!success) return false;
+    await _syncCloudAfterDailyLogChange();
     await _syncStateAfterSave(log.date);
     await _notifyForNewInsight(beforeIds);
     notifyListeners();
     return true;
+  }
+
+  Future<void> _syncCloudAfterDailyLogChange() async {
+    final sync = _sync;
+    if (sync == null || !_storage.isUserLoggedIn) return;
+
+    // Yerel düzenleme aynı timestamp ve gözlemlenmiş bölüm için yetkilidir.
+    // Böylece kaldırılan tik buluttaki eski kopyadan geri gelmeden sunucudaki
+    // şifreli günlük de yeni anlık görüntüyle değiştirilir.
+    await sync.mergeWithCloud();
   }
 
   Future<void> _notifyForNewInsight(Set<String> beforeIds) async {

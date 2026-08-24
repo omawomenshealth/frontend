@@ -911,4 +911,72 @@ class DailyLog {
       observedSections: {...observedSections, ...other.observedSections},
     );
   }
+
+  /// [other] içindeki farklı bölümleri korurken bu kayıtta gözlemlenmiş
+  /// bölümlerin son halini (boş listeler dahil) esas alır. Düzenleme ve bulut
+  /// senkronizasyonunda kaldırılan seçimlerin eski kopyadan geri gelmesini
+  /// engeller.
+  DailyLog mergeWithAuthoritativeObservedSections(DailyLog other) {
+    var merged = mergeWith(other);
+    for (final section in observedSections) {
+      switch (section) {
+        case DailyLogObservedSection.period:
+          merged = merged.copyWith(
+            flowIntensity: flowIntensity,
+            clearFlowIntensity: flowIntensity == null,
+            symptoms: symptoms,
+            symptomSeverities: symptomSeverities,
+          );
+        case DailyLogObservedSection.nutrition:
+          merged = merged.copyWith(
+            mealTypes: mealTypes,
+            mealQualities: mealQualities,
+            mealFoodGroups: mealFoodGroups,
+            mealPostFeelings: mealPostFeelings,
+            cravings: cravings,
+            waterIntakeMl: waterIntakeMl,
+            clearWaterIntake: waterIntakeMl == null,
+          );
+        case DailyLogObservedSection.symptom:
+          merged = merged.copyWith(
+            symptoms: symptoms,
+            symptomSeverities: symptomSeverities,
+            sexualActivity: sexualActivity,
+            clearSexualActivity: sexualActivity == null,
+            sexualActivityTypes: sexualActivityTypes,
+            sexualAfterFeelings: sexualAfterFeelings,
+            vaginalDischargePresent: vaginalDischargePresent,
+            clearVaginalDischargePresent: vaginalDischargePresent == null,
+            vaginalDischargeColor: vaginalDischargeColor,
+            clearVaginalDischargeColor: vaginalDischargeColor == null,
+            vaginalDischargeConsistency: vaginalDischargeConsistency,
+            clearVaginalDischargeConsistency:
+                vaginalDischargeConsistency == null,
+            vaginalDischargeAmount: vaginalDischargeAmount,
+            clearVaginalDischargeAmount: vaginalDischargeAmount == null,
+            vaginalDischargeSymptoms: vaginalDischargeSymptoms,
+            dreamRemembered: dreamRemembered,
+            clearDreamRemembered: dreamRemembered == null,
+            dreamType: dreamType,
+            clearDreamType: dreamType == null,
+            dreamNote: dreamNote,
+            clearDreamNote: dreamNote?.isNotEmpty != true,
+          );
+        case DailyLogObservedSection.wellbeing:
+          merged = merged.copyWith(
+            mood: mood,
+            moodEmoji: moodEmoji,
+            moodCompanions: moodCompanions,
+            moodPlaces: moodPlaces,
+          );
+        case DailyLogObservedSection.medication:
+          merged = merged.copyWith(medications: medications);
+        case DailyLogObservedSection.supplement:
+          merged = merged.copyWith(supplements: supplements);
+        case DailyLogObservedSection.skincare:
+          merged = merged.copyWith(skincare: skincare);
+      }
+    }
+    return merged;
+  }
 }

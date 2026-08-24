@@ -450,7 +450,9 @@ class SyncService {
     for (final log in local.logs) {
       final key = log.date.toIso8601String();
       final cloudLog = mergedLogs[key];
-      mergedLogs[key] = cloudLog == null ? log : log.mergeWith(cloudLog);
+      mergedLogs[key] = cloudLog == null
+          ? log
+          : log.mergeWithAuthoritativeObservedSections(cloudLog);
     }
     final logs =
         mergedLogs.values

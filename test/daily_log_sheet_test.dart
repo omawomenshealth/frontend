@@ -91,6 +91,84 @@ void main() {
     },
   );
 
+  test(
+    'Tüm günlük bölümlerinde kaldırılan tikler eski kayıttan geri gelmez',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+      await storage.init();
+      final date = DateTime.now();
+      final medication = MedicationEntry(
+        displayName: 'Parol',
+        mainGroup: 'Ağrı kesici',
+        activeIngredient: 'Parasetamol',
+        times: const {'Sabah'},
+        stomachState: 'Tok',
+      );
+      final supplement = MedicationEntry(
+        displayName: 'D Vitamini',
+        mainGroup: 'Vitamin',
+        activeIngredient: null,
+        times: const {'Akşam'},
+        stomachState: 'Tok',
+      );
+      const allSections = {
+        DailyLogObservedSection.period,
+        DailyLogObservedSection.nutrition,
+        DailyLogObservedSection.symptom,
+        DailyLogObservedSection.wellbeing,
+        DailyLogObservedSection.medication,
+        DailyLogObservedSection.supplement,
+        DailyLogObservedSection.skincare,
+      };
+      await storage.saveDailyLog(
+        DailyLog(
+          date: date,
+          flowIntensity: 'Orta',
+          mealTypes: const ['Kahvaltı'],
+          mealQualities: const {'Kahvaltı': 'İyi'},
+          mealFoodGroups: const {
+            'Kahvaltı': ['Meyve'],
+          },
+          mealPostFeelings: const {
+            'Kahvaltı': ['Enerjik'],
+          },
+          cravings: const ['Tatlı'],
+          waterIntakeMl: 500,
+          symptoms: const ['Kramp'],
+          symptomSeverities: const {'Kramp': 2},
+          mood: 'İyi',
+          moodCompanions: const ['Arkadaşlar'],
+          moodPlaces: const ['Ev'],
+          medications: [medication],
+          supplements: [supplement],
+          skincare: const ['Retinol'],
+          observedSections: allSections,
+        ),
+      );
+
+      await storage.saveDailyLog(
+        DailyLog(date: date, mood: 'İyi', observedSections: allSections),
+      );
+
+      final saved = storage.loadLogsForDate(date).single;
+      expect(saved.flowIntensity, isNull);
+      expect(saved.mealTypes, isEmpty);
+      expect(saved.mealQualities, isEmpty);
+      expect(saved.mealFoodGroups, isEmpty);
+      expect(saved.mealPostFeelings, isEmpty);
+      expect(saved.cravings, isEmpty);
+      expect(saved.waterIntakeMl, isNull);
+      expect(saved.symptoms, isEmpty);
+      expect(saved.symptomSeverities, isEmpty);
+      expect(saved.moodCompanions, isEmpty);
+      expect(saved.moodPlaces, isEmpty);
+      expect(saved.medications, isEmpty);
+      expect(saved.supplements, isEmpty);
+      expect(saved.skincare, isEmpty);
+    },
+  );
+
   testWidgets('Skincare son kullanılanları yeni günde seçili açılmaz', (
     tester,
   ) async {
