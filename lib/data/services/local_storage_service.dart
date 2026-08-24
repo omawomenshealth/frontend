@@ -399,7 +399,7 @@ class LocalStorageService {
     final keyStr = canonicalLog.date.toIso8601String();
     final key = '$_logPrefix$keyStr';
 
-    DailyLog logToSave = canonicalLog;
+    var logToSave = canonicalLog;
     final existingJson = _p.getString(key);
     if (existingJson != null) {
       try {
@@ -407,7 +407,7 @@ class LocalStorageService {
           DailyLog.fromJsonString(existingJson),
           settings,
         );
-        logToSave = canonicalLog.mergeWith(existingLog);
+        logToSave = _mergeEditedLog(canonicalLog, existingLog);
       } catch (_) {}
     }
 
@@ -440,6 +440,75 @@ class LocalStorageService {
       await refreshCycleStatistics();
     }
     return success;
+  }
+
+  /// Aynı timestamp'e yeni bir bölüm eklenirken eski bölümleri korur; kullanıcı
+  /// daha önce gözlemlediği bir bölümü düzenliyorsa boş listeler dahil ekrandaki
+  /// son durumu esas alır. Böylece tiki kaldırılan değerler birleşim sırasında
+  /// eski kayıttan geri gelmez.
+  DailyLog _mergeEditedLog(DailyLog edited, DailyLog existing) {
+    var merged = edited.mergeWith(existing);
+    for (final section in edited.observedSections) {
+      switch (section) {
+        case DailyLogObservedSection.period:
+          merged = merged.copyWith(
+            flowIntensity: edited.flowIntensity,
+            clearFlowIntensity: edited.flowIntensity == null,
+            symptoms: edited.symptoms,
+            symptomSeverities: edited.symptomSeverities,
+          );
+        case DailyLogObservedSection.nutrition:
+          merged = merged.copyWith(
+            mealTypes: edited.mealTypes,
+            mealQualities: edited.mealQualities,
+            mealFoodGroups: edited.mealFoodGroups,
+            mealPostFeelings: edited.mealPostFeelings,
+            cravings: edited.cravings,
+            waterIntakeMl: edited.waterIntakeMl,
+            clearWaterIntake: edited.waterIntakeMl == null,
+          );
+        case DailyLogObservedSection.symptom:
+          merged = merged.copyWith(
+            symptoms: edited.symptoms,
+            symptomSeverities: edited.symptomSeverities,
+            sexualActivity: edited.sexualActivity,
+            clearSexualActivity: edited.sexualActivity == null,
+            sexualActivityTypes: edited.sexualActivityTypes,
+            sexualAfterFeelings: edited.sexualAfterFeelings,
+            vaginalDischargePresent: edited.vaginalDischargePresent,
+            clearVaginalDischargePresent:
+                edited.vaginalDischargePresent == null,
+            vaginalDischargeColor: edited.vaginalDischargeColor,
+            clearVaginalDischargeColor: edited.vaginalDischargeColor == null,
+            vaginalDischargeConsistency: edited.vaginalDischargeConsistency,
+            clearVaginalDischargeConsistency:
+                edited.vaginalDischargeConsistency == null,
+            vaginalDischargeAmount: edited.vaginalDischargeAmount,
+            clearVaginalDischargeAmount: edited.vaginalDischargeAmount == null,
+            vaginalDischargeSymptoms: edited.vaginalDischargeSymptoms,
+            dreamRemembered: edited.dreamRemembered,
+            clearDreamRemembered: edited.dreamRemembered == null,
+            dreamType: edited.dreamType,
+            clearDreamType: edited.dreamType == null,
+            dreamNote: edited.dreamNote,
+            clearDreamNote: edited.dreamNote?.isNotEmpty != true,
+          );
+        case DailyLogObservedSection.wellbeing:
+          merged = merged.copyWith(
+            mood: edited.mood,
+            moodEmoji: edited.moodEmoji,
+            moodCompanions: edited.moodCompanions,
+            moodPlaces: edited.moodPlaces,
+          );
+        case DailyLogObservedSection.medication:
+          merged = merged.copyWith(medications: edited.medications);
+        case DailyLogObservedSection.supplement:
+          merged = merged.copyWith(supplements: edited.supplements);
+        case DailyLogObservedSection.skincare:
+          merged = merged.copyWith(skincare: edited.skincare);
+      }
+    }
+    return merged;
   }
 
   DailyLog _canonicalizeReusableValues(DailyLog log, UserSettings? settings) {

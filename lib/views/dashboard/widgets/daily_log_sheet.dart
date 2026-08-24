@@ -76,6 +76,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   late List<MedicationEntry> _medications;
   late List<MedicationEntry> _supplements;
   late Set<String> _skincare;
+  late List<String> _skincareSuggestions;
   var _medicationSectionExpanded = false;
   String? _expandedMedicationEntry;
 
@@ -168,11 +169,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
     _medications = _initialMedicationEntries(_log.medications);
     _supplements = _initialMedicationEntries(_log.supplements);
-    _skincare = _uniqueCustomLabels([
-      ..._log.skincare,
+    final storage = context.read<LocalStorageService>();
+    _skincare = _uniqueCustomLabels(_log.skincare).toSet();
+    _skincareSuggestions = _uniqueCustomLabels([
+      for (final log in storage.loadAllLogs()) ...log.skincare,
       ...persistedSettings.dailySkincare,
-      ...context.read<LocalStorageService>().getCustomSkincare(),
-    ]).toSet();
+      ...storage.getCustomSkincare(),
+    ]);
 
     _moodIndex = _localizedIndex(
       AppStrings.moodCheckInOptions,
@@ -848,7 +851,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           searchHint: AppStrings.searchSkincare,
           categories: AppStrings.skincareCatalog,
           selected: _skincare,
-          customItems: context.read<LocalStorageService>().getCustomSkincare(),
+          customItems: _skincareSuggestions,
+          customItemsTitle: AppStrings.recentlyUsed,
           color: _tone,
           icon: Icons.spa_outlined,
           showSmartSearchHint: false,
@@ -1022,7 +1026,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       ),
     );
     if (!mounted) return;
-    setState(() => _skincare.add(canonical));
+    setState(() {
+      _skincare.add(canonical);
+      _skincareSuggestions = _uniqueCustomLabels([
+        canonical,
+        ..._skincareSuggestions,
+      ]);
+    });
     await widget.onSettingsChanged?.call();
     if (!mounted) return;
     ScaffoldMessenger.of(

@@ -76,10 +76,10 @@ class _CalendarViewState extends State<CalendarView> {
                         ],
                       ),
                       Positioned(
-                        left: 0,
-                        right: 0,
+                        left: 12,
+                        right: 12,
                         bottom: 18,
-                        child: Center(child: _buildEditPeriodButton()),
+                        child: _buildCalendarActions(),
                       ),
                     ],
                   ),
@@ -249,7 +249,7 @@ class _CalendarViewState extends State<CalendarView> {
     );
   }
 
-  Widget _buildEditPeriodButton() {
+  Widget _buildCalendarActions() {
     final selectedDay = context.read<CalendarViewModel>().selectedDay;
     final canLog = !selectedDay.dateOnly.isAfter(AppTime.now.dateOnly);
     return DecoratedBox(
@@ -263,28 +263,105 @@ class _CalendarViewState extends State<CalendarView> {
           ),
         ],
       ),
-      child: FilledButton(
-        onPressed: canLog
-            ? () async {
-                final vm = context.read<CalendarViewModel>();
-                await _showDailyLogEditor(context, vm.selectedDay, vm);
-              }
-            : null,
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 38, vertical: 15),
-          shape: const StadiumBorder(),
-        ),
-        child: Text(
-          AppStrings.editPeriodDates,
-          style: const TextStyle(
-            fontFamily: 'CormorantGaramond',
-            fontSize: 20,
-            height: 1,
-            fontWeight: FontWeight.w700,
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              key: const ValueKey('calendar_quick_add_period'),
+              onPressed: canLog ? _showQuickPeriodPicker : null,
+              style: OutlinedButton.styleFrom(
+                backgroundColor: AppColors.surface,
+                foregroundColor: AppColors.periodPrimary,
+                side: const BorderSide(color: AppColors.periodPrimary),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: const StadiumBorder(),
+              ),
+              icon: const Icon(Icons.bolt_rounded, size: 18),
+              label: Text(
+                AppStrings.quickAddPeriod,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: FilledButton(
+              onPressed: canLog
+                  ? () async {
+                      final vm = context.read<CalendarViewModel>();
+                      await _showDailyLogEditor(context, vm.selectedDay, vm);
+                    }
+                  : null,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: const StadiumBorder(),
+              ),
+              child: Text(
+                AppStrings.editPeriodDates,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showQuickPeriodPicker() async {
+    final calendarVm = context.read<CalendarViewModel>();
+    final today = AppTime.now.dateOnly;
+    final selectedDay = calendarVm.selectedDay.dateOnly;
+    final initialDay = selectedDay.isBefore(_firstCalendarMonth)
+        ? _firstCalendarMonth
+        : selectedDay.isAfter(today)
+        ? today
+        : selectedDay;
+    final pickedRange = await showDateRangePicker(
+      context: context,
+      firstDate: _firstCalendarMonth,
+      lastDate: today,
+      initialDateRange: DateTimeRange(start: initialDay, end: initialDay),
+      helpText: AppStrings.quickAddPeriod,
+      saveText: AppStrings.save,
+      builder: (pickerContext, child) {
+        if (child == null) return const SizedBox.shrink();
+        final theme = Theme.of(pickerContext);
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: AppColors.periodPrimary,
+            ),
+          ),
+          child: child,
+        );
+      },
+    );
+    if (pickedRange == null || !mounted) return;
+
+    final days = <DateTime>[];
+    var day = pickedRange.start.dateOnly;
+    while (!day.isAfter(pickedRange.end.dateOnly)) {
+      days.add(day);
+      day = day.add(const Duration(days: 1));
+    }
+
+    final success = await calendarVm.addLightPeriodDays(days);
+    if (!mounted) return;
+    await context.read<DashboardViewModel>().loadData();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? AppStrings.quickPeriodSaved(days.length)
+              : AppStrings.quickPeriodSaveFailed,
         ),
+        backgroundColor: success ? AppColors.success : AppColors.error,
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
@@ -531,6 +608,7 @@ class _CalendarDayCell extends StatelessWidget {
     }
 
     return Semantics(
+      key: ValueKey('calendar_day_${day.toStorageKey()}'),
       button: true,
       selected: isSelected,
       label: DateFormat.yMMMMd(AppStrings.localeName).format(day),
@@ -1194,6 +1272,12 @@ class _DailyLogDetails extends StatelessWidget {
                       '${item.takenDoseCount}/${item.doseCount}',
                 )
                 .join(', '),
+    );
+    add(
+      AppStrings.skincare,
+      value.skincare.isEmpty
+          ? null
+          : value.skincare.map(AppStrings.localizeStoredValue).join(', '),
     );
     add(
       AppStrings.symptom,

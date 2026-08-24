@@ -1,5 +1,7 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
+import 'package:app_proje_a/core/utils/date_extensions.dart';
+import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
@@ -13,6 +15,10 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setUp(() async {
+    await AppStrings.delegate.load(const Locale('tr'));
+  });
+
   testWidgets('üç auth ekranı kaydırmadan ve iç adımlarla ilerler', (
     tester,
   ) async {
@@ -110,6 +116,13 @@ void main() {
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
+    expect(find.text(AppStrings.lastPeriodDaysQuestion), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('onboarding_last_period_days')),
+      findsOneWidget,
+    );
+    expect(find.text(AppStrings.selectLastPeriodDays), findsOneWidget);
+
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
     expect(
@@ -118,4 +131,41 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  test(
+    'ilk kayıtta seçilen adet günleri hafif akış olarak birlikte saklanır',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+      await storage.init();
+      final vm = OnboardingViewModel(
+        storage,
+        SyncService(storage, ApiService(storage)),
+      );
+      final today = DateTime.now().dateOnly;
+      final start = today.subtract(const Duration(days: 5));
+      final selectedDays = List.generate(
+        4,
+        (index) => start.add(Duration(days: index)),
+      );
+
+      vm.setLastPeriodDays(selectedDays);
+
+      expect(vm.lastPeriodDate, start);
+      expect(vm.lastPeriodDays, selectedDays);
+      expect(vm.averagePeriodLength, 4);
+      expect(await vm.saveAndComplete(), isTrue);
+      expect(storage.loadSettings()!.lastPeriodDate, start);
+
+      for (final day in selectedDays) {
+        final log = storage.loadLogsForDate(day).single;
+        expect(
+          AppStrings.localizeStoredValue(log.flowIntensity!),
+          AppStrings.flowOptions[1],
+        );
+        expect(log.hasExplicitTime, isFalse);
+        expect(log.observedSections, contains(DailyLogObservedSection.period));
+      }
+    },
+  );
 }

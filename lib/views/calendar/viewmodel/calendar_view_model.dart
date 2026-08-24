@@ -5,6 +5,7 @@ import '../../../data/services/local_storage_service.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../application/cycle_prediction/cycle_prediction_coordinator.dart';
 import '../../../domain/cycle/models/cycle_prediction.dart';
 
@@ -160,6 +161,57 @@ class CalendarViewModel extends ChangeNotifier {
   bool isEstimatedOvulationDay(DateTime day) =>
       _ovulationDays.contains(day.dateOnly);
   bool isFertileDay(DateTime day) => _fertileDays.contains(day.dateOnly);
+
+  /// Seçilen geçmiş/today günlerini tek seferde hafif adet akışı olarak ekler.
+  /// Var olan adet kayıtlarının yoğunluğu değiştirilmez; aynı timestamp'teki
+  /// diğer günlük veriler korunur.
+  Future<bool> addLightPeriodDays(Iterable<DateTime> days) async {
+    final today = AppTime.now.dateOnly;
+    final normalizedDays =
+        days
+            .map((day) => day.dateOnly)
+            .where((day) => !day.isAfter(today))
+            .toSet()
+            .toList()
+          ..sort();
+    if (normalizedDays.isEmpty) return false;
+
+    var allSuccessful = true;
+    for (final day in normalizedDays) {
+      final logs = _storage.loadLogsForDate(day);
+      final alreadyHasPeriod = logs.any(
+        (log) =>
+            log.flowIntensity != null ||
+            log.observedSections.contains(DailyLogObservedSection.period),
+      );
+      if (alreadyHasPeriod) continue;
+
+      DailyLog? untimedLog;
+      for (final log in logs) {
+        if (log.date == day) {
+          untimedLog = log;
+          break;
+        }
+      }
+      final base = untimedLog ?? DailyLog.empty(day);
+      final quickPeriodLog = base.copyWith(
+        date: day,
+        hasExplicitTime: false,
+        flowIntensity: AppStrings.flowOptions[1],
+        observedSections: {
+          ...base.observedSections,
+          DailyLogObservedSection.period,
+        },
+      );
+      if (!await _storage.saveDailyLog(quickPeriodLog)) {
+        allSuccessful = false;
+      }
+    }
+
+    await _cyclePredictions.refresh(force: true);
+    await loadData();
+    return allSuccessful;
+  }
 
   @override
   void dispose() {

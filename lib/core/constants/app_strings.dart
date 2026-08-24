@@ -278,6 +278,10 @@ enum _TextKey {
   womenDiseases,
   commonWomenDiseases,
   lastPeriodDate,
+  lastPeriodDaysQuestion,
+  selectLastPeriodDays,
+  periodDaysSelected,
+  periodDaySelectionLimit,
   selectDate,
   great,
   profileReady,
@@ -401,6 +405,7 @@ enum _TextKey {
   supplementExample,
   medicationExample,
   previouslyAdded,
+  recentlyUsed,
   customDosage,
   customDosageHint,
   custom,
@@ -431,6 +436,9 @@ enum _TextKey {
   close,
   month,
   editPeriodDates,
+  quickAddPeriod,
+  quickPeriodSaved,
+  quickPeriodSaveFailed,
   calendarLegend,
   recordedPeriod,
   predictedPeriod,
@@ -1177,6 +1185,10 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.womenDiseases: 'Kadın Hastalıkları',
   _TextKey.commonWomenDiseases: 'Kadın Hastalıkları',
   _TextKey.lastPeriodDate: 'Son adet başlangıç tarihi',
+  _TextKey.lastPeriodDaysQuestion: 'Son adet günlerini seçelim',
+  _TextKey.selectLastPeriodDays: 'Adet günlerini seç',
+  _TextKey.periodDaysSelected: '{count} gün seçildi',
+  _TextKey.periodDaySelectionLimit: 'En fazla {count} gün seçebilirsin.',
   _TextKey.selectDate: 'Tarih seç',
   _TextKey.great: 'Harika, hazırsın',
   _TextKey.profileReady: 'Profilin hazır. Başlayalım mı?',
@@ -1319,6 +1331,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.supplementExample: 'Örn: D Vitamini',
   _TextKey.medicationExample: 'Örn: 500 mg Parol',
   _TextKey.previouslyAdded: 'Önceden Eklenenler:',
+  _TextKey.recentlyUsed: 'Son kullanılanlar:',
   _TextKey.customDosage: 'Özel Miktar Girin',
   _TextKey.customDosageHint: 'Örn: 2 ölçek, 250 mg, 1,5 tablet',
   _TextKey.custom: 'Özel...',
@@ -1353,6 +1366,9 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.collapse: 'Küçült',
   _TextKey.month: 'Ay',
   _TextKey.editPeriodDates: 'Adet tarihlerini düzenle',
+  _TextKey.quickAddPeriod: 'Hızlı adet ekle',
+  _TextKey.quickPeriodSaved: '{count} gün hafif akış olarak kaydedildi.',
+  _TextKey.quickPeriodSaveFailed: 'Adet günleri kaydedilemedi.',
   _TextKey.calendarLegend: 'Takvim açıklaması',
   _TextKey.recordedPeriod: 'Kayıtlı adet',
   _TextKey.predictedPeriod: 'Tahmini adet',
@@ -2135,6 +2151,10 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.womenDiseases: 'Gynecological conditions',
   _TextKey.commonWomenDiseases: 'Gynecological conditions',
   _TextKey.lastPeriodDate: 'First day of your last period',
+  _TextKey.lastPeriodDaysQuestion: 'Let’s select the days of your last period',
+  _TextKey.selectLastPeriodDays: 'Select period days',
+  _TextKey.periodDaysSelected: '{count} days selected',
+  _TextKey.periodDaySelectionLimit: 'You can select up to {count} days.',
   _TextKey.selectDate: 'Select a date',
   _TextKey.great: 'You’re all set',
   _TextKey.profileReady: 'Your profile is ready. Ready to get started?',
@@ -2278,6 +2298,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.supplementExample: 'Example: Vitamin D',
   _TextKey.medicationExample: 'Example: Paracetamol 500 mg',
   _TextKey.previouslyAdded: 'Previously added:',
+  _TextKey.recentlyUsed: 'Recently used:',
   _TextKey.customDosage: 'Enter a custom amount',
   _TextKey.customDosageHint: 'Example: 2 scoops, 250 mg, 1.5 tablets',
   _TextKey.custom: 'Custom...',
@@ -2312,6 +2333,9 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.collapse: 'Collapse',
   _TextKey.month: 'Month',
   _TextKey.editPeriodDates: 'Edit period dates',
+  _TextKey.quickAddPeriod: 'Quick add period',
+  _TextKey.quickPeriodSaved: '{count} days saved as light flow.',
+  _TextKey.quickPeriodSaveFailed: 'Period days could not be saved.',
   _TextKey.calendarLegend: 'Calendar key',
   _TextKey.recordedPeriod: 'Recorded period',
   _TextKey.predictedPeriod: 'Predicted period',
@@ -4280,6 +4304,14 @@ class AppStrings {
   static String get womenDiseases => _text(_TextKey.womenDiseases);
   static String get commonWomenDiseases => _text(_TextKey.commonWomenDiseases);
   static String get lastPeriodDate => _text(_TextKey.lastPeriodDate);
+  static String get lastPeriodDaysQuestion =>
+      _text(_TextKey.lastPeriodDaysQuestion);
+  static String get selectLastPeriodDays =>
+      _text(_TextKey.selectLastPeriodDays);
+  static String periodDaysSelected(int count) =>
+      _format(_TextKey.periodDaysSelected, {'count': count});
+  static String periodDaySelectionLimit(int count) =>
+      _format(_TextKey.periodDaySelectionLimit, {'count': count});
   static String get selectDate => _text(_TextKey.selectDate);
   static String get great => _text(_TextKey.great);
   static String get profileReady => _text(_TextKey.profileReady);
@@ -4426,6 +4458,7 @@ class AppStrings {
   static String get supplementExample => _text(_TextKey.supplementExample);
   static String get medicationExample => _text(_TextKey.medicationExample);
   static String get previouslyAdded => _text(_TextKey.previouslyAdded);
+  static String get recentlyUsed => _text(_TextKey.recentlyUsed);
   static String get customDosage => _text(_TextKey.customDosage);
   static String get customDosageHint => _text(_TextKey.customDosageHint);
   static String get custom => _text(_TextKey.custom);
@@ -4462,6 +4495,11 @@ class AppStrings {
   static String get collapse => _text(_TextKey.collapse);
   static String get month => _text(_TextKey.month);
   static String get editPeriodDates => _text(_TextKey.editPeriodDates);
+  static String get quickAddPeriod => _text(_TextKey.quickAddPeriod);
+  static String quickPeriodSaved(int count) =>
+      _format(_TextKey.quickPeriodSaved, {'count': count});
+  static String get quickPeriodSaveFailed =>
+      _text(_TextKey.quickPeriodSaveFailed);
   static String get calendarLegend => _text(_TextKey.calendarLegend);
   static String get recordedPeriod => _text(_TextKey.recordedPeriod);
   static String get predictedPeriod => _text(_TextKey.predictedPeriod);

@@ -314,14 +314,37 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   Future<void> _pickLastPeriod(OnboardingViewModel vm) async {
     final now = DateTime.now();
-    final selected = await showDatePicker(
+    final selectedDays = vm.lastPeriodDays;
+    final initialStart = selectedDays.isEmpty ? now : selectedDays.first;
+    final initialEnd = selectedDays.isEmpty ? now : selectedDays.last;
+    final selected = await showDateRangePicker(
       context: context,
-      initialDate: vm.lastPeriodDate ?? now,
+      initialDateRange: DateTimeRange(start: initialStart, end: initialEnd),
       firstDate: DateTime(now.year - 2),
       lastDate: now,
-      helpText: AppStrings.lastPeriodDate,
+      helpText: AppStrings.lastPeriodDaysQuestion,
+      saveText: AppStrings.save,
     );
-    if (selected != null) vm.setLastPeriodDate(selected);
+    if (selected == null || !mounted) return;
+    final dayCount = selected.duration.inDays + 1;
+    if (dayCount > CycleRules.maxPeriodLength) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppStrings.periodDaySelectionLimit(CycleRules.maxPeriodLength),
+          ),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    vm.setLastPeriodDays(
+      List.generate(
+        dayCount,
+        (index) => selected.start.add(Duration(days: index)),
+      ),
+    );
   }
 
   Future<void> _addBirthControl(OnboardingViewModel vm) async {
@@ -721,7 +744,19 @@ class _CycleStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lastPeriod = vm.lastPeriodDate;
+    final selectedDays = vm.lastPeriodDays;
+    final firstDay = selectedDays.isEmpty ? null : selectedDays.first;
+    final lastDay = selectedDays.isEmpty ? null : selectedDays.last;
+    String format(DateTime date) =>
+        '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
+    final selectionLabel = firstDay == null
+        ? AppStrings.selectLastPeriodDays
+        : selectedDays.length == 1
+        ? '${format(firstDay)} · ${AppStrings.periodDaysSelected(1)}'
+        : '${format(firstDay)} – ${format(lastDay!)} · '
+              '${AppStrings.periodDaysSelected(selectedDays.length)}';
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -765,18 +800,22 @@ class _CycleStep extends StatelessWidget {
           ),
         ],
         const SizedBox(height: 8),
+        Text(
+          AppStrings.lastPeriodDaysQuestion,
+          style: const TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 6),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
+            key: const ValueKey('onboarding_last_period_days'),
             onPressed: onPickLastPeriod,
-            icon: const Icon(Icons.calendar_month_outlined),
-            label: Text(
-              lastPeriod == null
-                  ? AppStrings.lastPeriodDate
-                  : '${lastPeriod.day.toString().padLeft(2, '0')}/'
-                        '${lastPeriod.month.toString().padLeft(2, '0')}/'
-                        '${lastPeriod.year}',
-            ),
+            icon: const Icon(Icons.date_range_outlined),
+            label: Text(selectionLabel),
           ),
         ),
       ],

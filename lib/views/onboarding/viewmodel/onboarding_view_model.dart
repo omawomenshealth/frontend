@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/medication_identity_model.dart';
+import '../../../data/models/period_log_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/sync_service.dart';
 import '../../../core/utils/cycle_rules.dart';
@@ -42,6 +43,7 @@ class OnboardingViewModel extends ChangeNotifier {
   int _averagePeriodLength = CycleRules.defaultPeriodLength;
   bool _isCycleLengthUnknown = false;
   DateTime? _lastPeriodDate;
+  List<DateTime> _lastPeriodDays = [];
   MenopauseStatus _menopauseStatus = MenopauseStatus.none;
   String? _birthControlMethod;
   List<String> _womenDiseases = [];
@@ -74,6 +76,7 @@ class OnboardingViewModel extends ChangeNotifier {
   int get averagePeriodLength => _averagePeriodLength;
   bool get isCycleLengthUnknown => _isCycleLengthUnknown;
   DateTime? get lastPeriodDate => _lastPeriodDate;
+  List<DateTime> get lastPeriodDays => List.unmodifiable(_lastPeriodDays);
   MenopauseStatus get menopauseStatus => _menopauseStatus;
   String? get birthControlMethod => _birthControlMethod;
   List<String> get womenDiseases => _womenDiseases;
@@ -202,8 +205,26 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void setLastPeriodDate(DateTime? value) {
-    _lastPeriodDate = value;
-    notifyListeners(); // Tarih gösterimini güncelle
+    setLastPeriodDays(value == null ? const [] : [value]);
+  }
+
+  void setLastPeriodDays(Iterable<DateTime> values) {
+    final today = DateTime.now();
+    final days =
+        values
+            .map((value) => DateTime(value.year, value.month, value.day))
+            .where((value) => !value.isAfter(today))
+            .toSet()
+            .toList()
+          ..sort();
+    _lastPeriodDays = days.take(CycleRules.maxPeriodLength).toList();
+    _lastPeriodDate = _lastPeriodDays.isEmpty ? null : _lastPeriodDays.first;
+    if (_lastPeriodDays.isNotEmpty) {
+      _averagePeriodLength = CycleRules.sanitizePeriodLength(
+        _lastPeriodDays.length,
+      );
+    }
+    notifyListeners();
   }
 
   void setMenopauseStatus(MenopauseStatus value) {
@@ -371,7 +392,21 @@ class OnboardingViewModel extends ChangeNotifier {
       customBirthControlMethods: _customBirthControlMethods,
     );
 
-    final success = await _storage.saveSettings(settings);
+    var success = await _storage.saveSettings(settings);
+
+    if (success) {
+      for (final day in _lastPeriodDays) {
+        final saved = await _storage.saveDailyLog(
+          DailyLog(
+            date: day,
+            hasExplicitTime: false,
+            flowIntensity: AppStrings.flowOptions[1],
+            observedSections: const {DailyLogObservedSection.period},
+          ),
+        );
+        if (!saved) success = false;
+      }
+    }
 
     // Yeni hesap için boş/eksik profil yedeği oluşturma. Bulut yedeği ancak
     // onboarding verileri başarıyla yerelde tamamlandıktan sonra başlatılır.

@@ -59,6 +59,85 @@ void main() {
     expect(reopened.waterIntakeMl, 500);
   });
 
+  test(
+    'Aynı günlük kayıt güncellendiğinde kaldırılan seçim geri gelmez',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+      await storage.init();
+      final date = DateTime.now();
+      final original = DailyLog(
+        date: date,
+        mealTypes: const ['Kahvaltı'],
+        skincare: const ['Retinol'],
+        observedSections: const {
+          DailyLogObservedSection.nutrition,
+          DailyLogObservedSection.skincare,
+        },
+      );
+      await storage.saveDailyLog(original);
+
+      await storage.saveDailyLog(
+        DailyLog(
+          date: date,
+          skincare: const [],
+          observedSections: const {DailyLogObservedSection.skincare},
+        ),
+      );
+
+      final saved = storage.loadLogsForDate(date).single;
+      expect(saved.skincare, isEmpty);
+      expect(saved.mealTypes, ['Kahvaltı']);
+    },
+  );
+
+  testWidgets('Skincare son kullanılanları yeni günde seçili açılmaz', (
+    tester,
+  ) async {
+    await _pumpLogSheet(
+      tester,
+      initialIndex: 5,
+      settings: UserSettings(
+        isOnboardingComplete: true,
+        userName: 'Test',
+        dailySkincare: const ['Retinol'],
+      ),
+    );
+
+    final recentRetinol = find.widgetWithText(FilterChip, 'Retinol');
+    expect(recentRetinol, findsOneWidget);
+    expect(tester.widget<FilterChip>(recentRetinol).selected, isFalse);
+    expect(find.text(AppStrings.recentlyUsed.toUpperCase()), findsOneWidget);
+  });
+
+  testWidgets('Skincare kaydındaki tik kaldırılıp boş olarak kaydedilebilir', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(
+      tester,
+      initialIndex: 5,
+      initialLog: DailyLog(
+        date: DateTime.now(),
+        skincare: const ['Retinol'],
+        observedSections: const {DailyLogObservedSection.skincare},
+      ),
+    );
+
+    final selected = find.byKey(const ValueKey('selected_catalog_Retinol'));
+    expect(selected, findsOneWidget);
+    tester.widget<InputChip>(selected).onDeleted!();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.saveSkincare));
+    await tester.pumpAndSettle();
+
+    expect(harness.savedLog, isNotNull);
+    expect(harness.savedLog!.skincare, isEmpty);
+    expect(
+      harness.savedLog!.observedSections,
+      contains(DailyLogObservedSection.skincare),
+    );
+  });
+
   testWidgets('canın ne çekti alanı hepsini ve özel seçeneği destekler', (
     tester,
   ) async {

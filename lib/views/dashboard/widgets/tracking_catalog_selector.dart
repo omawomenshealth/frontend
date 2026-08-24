@@ -11,6 +11,7 @@ class TrackingCatalogSelector extends StatefulWidget {
   final Map<String, List<String>> itemDetails;
   final Set<String> selected;
   final List<String> customItems;
+  final String? customItemsTitle;
   final Color color;
   final IconData icon;
   final ValueChanged<String> onToggle;
@@ -34,6 +35,7 @@ class TrackingCatalogSelector extends StatefulWidget {
     this.hiddenAliases = const {},
     this.itemDetails = const {},
     this.customItems = const [],
+    this.customItemsTitle,
     this.onAdd,
     this.onReminder,
     this.showSmartSearchHint = true,
@@ -153,7 +155,8 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
         if (savedCustomItems.isNotEmpty) ...[
           const SizedBox(height: 18),
           Text(
-            AppStrings.previouslyAdded.toUpperCase(),
+            (widget.customItemsTitle ?? AppStrings.previouslyAdded)
+                .toUpperCase(),
             style: TextStyle(
               color: widget.color,
               fontSize: 9,
