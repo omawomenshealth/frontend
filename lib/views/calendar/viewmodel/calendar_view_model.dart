@@ -110,8 +110,16 @@ class CalendarViewModel extends ChangeNotifier {
       },
     );
 
-    var windowDay = forecast.p80Window.start;
-    while (!windowDay.isAfter(forecast.p80Window.end)) {
+    // Takvimde geniş olasılık penceresinin tamamını boyamak yerine tahmini
+    // adet günlerinin yalnızca bir gün öncesini ve bir gün sonrasını göster.
+    // P80 verisi tahmin modelinde korunur; bu yalnızca takvim sunum aralığıdır.
+    final predictedPeriodStart = forecast.medianStart.dateOnly;
+    final predictedPeriodEnd = predictedPeriodStart.add(
+      Duration(days: forecast.expectedPeriodLength - 1),
+    );
+    var windowDay = predictedPeriodStart.subtract(const Duration(days: 1));
+    final displayWindowEnd = predictedPeriodEnd.add(const Duration(days: 1));
+    while (!windowDay.isAfter(displayWindowEnd)) {
       _predictionWindowDays.add(windowDay.dateOnly);
       windowDay = windowDay.add(const Duration(days: 1));
     }

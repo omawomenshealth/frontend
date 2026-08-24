@@ -1436,7 +1436,9 @@ void main() {
     expect(find.text(AppStrings.reminderItem), findsWidgets);
   });
 
-  testWidgets('Geçmiş gün kaydı saat eklemeden saklanabilir', (tester) async {
+  testWidgets('Geçmiş gün kaydı saat sormadan 00:00 olarak saklanır', (
+    tester,
+  ) async {
     final pastDate = DateTime.now().subtract(const Duration(days: 2));
     final harness = await _pumpLogSheet(
       tester,
@@ -1447,13 +1449,8 @@ void main() {
     await tester.tap(find.text(AppStrings.saveNutrition));
     await tester.pumpAndSettle();
 
-    expect(find.text(AppStrings.pastLogTimeQuestion), findsOneWidget);
-    expect(find.text(AppStrings.addTime), findsOneWidget);
-    expect(find.text(AppStrings.saveWithoutTime), findsOneWidget);
-
-    await tester.tap(find.text(AppStrings.saveWithoutTime));
-    await tester.pumpAndSettle();
-
+    expect(find.text(AppStrings.pastLogTimeQuestion), findsNothing);
+    expect(find.text(AppStrings.saveWithoutTime), findsNothing);
     expect(harness.savedLog, isNotNull);
     expect(harness.savedLog!.hasExplicitTime, isFalse);
     expect(harness.savedLog!.date.hour, 0);

@@ -69,11 +69,24 @@ void main() {
       dashboard.cycleForecast!.forecastId,
       calendar.cycleForecast!.forecastId,
     );
+    final forecast = dashboard.cycleForecast!;
+    final dayBefore = forecast.medianStart.subtract(const Duration(days: 1));
+    final dayAfter = forecast.medianStart.add(
+      Duration(days: forecast.expectedPeriodLength),
+    );
+    expect(calendar.isPeriodPredictionWindowDay(dayBefore), isTrue);
+    expect(calendar.isPeriodPredictionWindowDay(dayAfter), isTrue);
     expect(
       calendar.isPeriodPredictionWindowDay(
-        dashboard.cycleForecast!.p80Window.start,
+        dayBefore.subtract(const Duration(days: 1)),
       ),
-      isTrue,
+      isFalse,
+    );
+    expect(
+      calendar.isPeriodPredictionWindowDay(
+        dayAfter.add(const Duration(days: 1)),
+      ),
+      isFalse,
     );
 
     dashboard.dispose();

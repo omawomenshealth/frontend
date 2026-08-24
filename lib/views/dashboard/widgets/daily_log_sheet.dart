@@ -3523,41 +3523,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     var finalDate = _log.date;
     var hasExplicitTime = _log.hasExplicitTime;
     if (_log.date.dateOnly.isBefore(today)) {
-      final choice = await _choosePastLogTime();
-      if (choice == null) return false;
-      if (choice == _PastLogTimeChoice.withTime) {
-        if (!mounted) return false;
-        final pickedTime = await showTimePicker(
-          context: context,
-          initialTime: TimeOfDay.fromDateTime(_log.date),
-          helpText: AppStrings.selectLogTime,
-          builder: (pickerContext, child) {
-            if (child == null) return const SizedBox.shrink();
-            if (_logType == 0) return child;
-            final pickerTheme = Theme.of(pickerContext);
-            return Theme(
-              data: pickerTheme.copyWith(
-                colorScheme: pickerTheme.colorScheme.copyWith(primary: _tone),
-              ),
-              child: child,
-            );
-          },
-        );
-        if (pickedTime == null) return false;
-        finalDate = DateTime(
-          _log.date.year,
-          _log.date.month,
-          _log.date.day,
-          pickedTime.hour,
-          pickedTime.minute,
-        );
-        hasExplicitTime = true;
-      } else {
-        if (!_log.hasData) {
-          finalDate = _log.date.dateOnly;
-        }
-        hasExplicitTime = false;
-      }
+      // Geçmiş gün için yeni kayıtlar saat sormadan gün başlangıcına yazılır.
+      // Eski sürümden kalan saatli bir kayıt düzenleniyorsa farklı timestamp'te
+      // kopya oluşturmamak için mevcut anahtar korunur.
+      if (!_log.hasData) finalDate = _log.date.dateOnly;
+      hasExplicitTime = false;
     }
 
     setState(() => _isSaving = true);
@@ -3786,44 +3756,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       );
     }
   }
-
-  Future<_PastLogTimeChoice?> _choosePastLogTime() {
-    return showDialog<_PastLogTimeChoice>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(AppStrings.pastLogTimeQuestion),
-        content: Text(AppStrings.pastLogTimeHint),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            style: _logType == 0
-                ? null
-                : TextButton.styleFrom(foregroundColor: _tone),
-            child: Text(AppStrings.cancel),
-          ),
-          TextButton(
-            onPressed: () =>
-                Navigator.pop(dialogContext, _PastLogTimeChoice.withoutTime),
-            style: _logType == 0
-                ? null
-                : TextButton.styleFrom(foregroundColor: _tone),
-            child: Text(AppStrings.saveWithoutTime),
-          ),
-          FilledButton(
-            onPressed: () =>
-                Navigator.pop(dialogContext, _PastLogTimeChoice.withTime),
-            style: _logType == 0
-                ? null
-                : FilledButton.styleFrom(backgroundColor: _tone),
-            child: Text(AppStrings.addTime),
-          ),
-        ],
-      ),
-    );
-  }
 }
-
-enum _PastLogTimeChoice { withTime, withoutTime }
 
 enum _MedicationNutritionAction {
   addMedication,
