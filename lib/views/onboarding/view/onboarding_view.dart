@@ -76,7 +76,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                           );
                         },
                       ),
-                      const NasilsinPage(),
+                      const HowAreYouPage(),
                       BasicHealthPage(vm: vm),
                       DetailedHealthPage(
                         vm: vm,
