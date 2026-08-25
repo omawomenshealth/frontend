@@ -29,8 +29,14 @@ class DetailedHealthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = [
-      LabStep(vm: vm, onOpen: onOpenLabs),
-      DiseaseStep(vm: vm, onOpen: onOpenDiseases),
+      LabStep(
+        resultCount: vm.labResults.length,
+        onOpen: onOpenLabs,
+      ),
+      DiseaseStep(
+        diseases: vm.knownDiseases,
+        onOpen: onOpenDiseases,
+      ),
       CycleStep(vm: vm, onPickLastPeriod: onPickLastPeriod),
       ReproductiveStep(vm: vm, onAddBirthControl: onAddBirthControl),
     ];

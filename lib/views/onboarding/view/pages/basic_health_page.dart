@@ -20,67 +20,108 @@ class BasicHealthPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          OnboardingFieldLabel(AppStrings.smokingUsage),
-          const SizedBox(height: 7),
-          OnboardingYesNoSelector(value: vm.isSmoker, onChanged: vm.setIsSmoker),
+          _SmokingSection(vm: vm),
           const SizedBox(height: 16),
-          OnboardingFieldLabel(AppStrings.relationshipStatus),
-          const SizedBox(height: 7),
-          Wrap(
-            spacing: 7,
-            runSpacing: 7,
-            children: [
-              for (final status in AppStrings.relationshipStatusOptions)
-                ChoiceChip(
-                  label: Text(status),
-                  selected:
-                      AppStrings.localizeStoredValue(vm.relationshipStatus) ==
-                      status,
-                  selectedColor: AppColors.primary.withValues(alpha: 0.14),
-                  visualDensity: VisualDensity.compact,
-                  onSelected: (_) => vm.setRelationshipStatus(status),
-                ),
-            ],
-          ),
+          _RelationshipStatusSection(vm: vm),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  key: const ValueKey('onboarding_height'),
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  onChanged: (value) => vm.setHeight(double.tryParse(value)),
-                  decoration: InputDecoration(
-                    labelText: AppStrings.height,
-                    suffixText: AppStrings.centimeterUnit,
-                    prefixIcon: const Icon(Icons.height_rounded, size: 20),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: TextField(
-                  key: const ValueKey('onboarding_weight'),
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  onChanged: (value) => vm.setWeight(double.tryParse(value)),
-                  decoration: InputDecoration(
-                    labelText: AppStrings.weight,
-                    suffixText: AppStrings.kilogramUnit,
-                    prefixIcon: const Icon(
-                      Icons.monitor_weight_outlined,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _BodyMetricsRow(vm: vm),
         ],
       ),
+    );
+  }
+}
+
+class _SmokingSection extends StatelessWidget {
+  final OnboardingViewModel vm;
+
+  const _SmokingSection({required this.vm});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OnboardingSectionHeader(label: AppStrings.smokingUsage),
+        OnboardingYesNoSelector(value: vm.isSmoker, onChanged: vm.setIsSmoker),
+      ],
+    );
+  }
+}
+
+class _RelationshipStatusSection extends StatelessWidget {
+  final OnboardingViewModel vm;
+
+  const _RelationshipStatusSection({required this.vm});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OnboardingSectionHeader(label: AppStrings.relationshipStatus),
+        Wrap(
+          spacing: 7,
+          runSpacing: 7,
+          children: [
+            for (final status in AppStrings.relationshipStatusOptions)
+              ChoiceChip(
+                label: Text(status),
+                selected:
+                    AppStrings.localizeStoredValue(vm.relationshipStatus) ==
+                    status,
+                selectedColor: AppColors.primary.withValues(alpha: 0.14),
+                visualDensity: VisualDensity.compact,
+                onSelected: (_) => vm.setRelationshipStatus(status),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _BodyMetricsRow extends StatelessWidget {
+  final OnboardingViewModel vm;
+
+  const _BodyMetricsRow({required this.vm});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            key: const ValueKey('onboarding_height'),
+            keyboardType: const TextInputType.numberWithOptions(
+              decimal: true,
+            ),
+            onChanged: (value) => vm.setHeight(double.tryParse(value)),
+            decoration: InputDecoration(
+              labelText: AppStrings.height,
+              suffixText: AppStrings.centimeterUnit,
+              prefixIcon: const Icon(Icons.height_rounded, size: 20),
+            ),
+          ),
+        ),
+        const SizedBox(width: 11),
+        Expanded(
+          child: TextField(
+            key: const ValueKey('onboarding_weight'),
+            keyboardType: const TextInputType.numberWithOptions(
+              decimal: true,
+            ),
+            onChanged: (value) => vm.setWeight(double.tryParse(value)),
+            decoration: InputDecoration(
+              labelText: AppStrings.weight,
+              suffixText: AppStrings.kilogramUnit,
+              prefixIcon: const Icon(
+                Icons.monitor_weight_outlined,
+                size: 20,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
