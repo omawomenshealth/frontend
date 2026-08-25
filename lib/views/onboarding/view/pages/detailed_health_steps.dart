@@ -5,6 +5,7 @@ import '../../../../core/constants/color_constants.dart';
 import '../../../../core/utils/cycle_rules.dart';
 import '../../../../data/models/user_settings_model.dart';
 import '../../utils/onboarding_date_utils.dart';
+import '../../utils/onboarding_label_utils.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
 
@@ -125,29 +126,32 @@ class _CycleLengthSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OnboardingSectionHeader(label: AppStrings.cycleInformation),
-        Material(
-          color: Colors.transparent,
-          child: SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            title: Text(AppStrings.doNotKnowCycleLength),
-            subtitle: Text(AppStrings.calculateCycleOverTime),
-            value: vm.isCycleLengthUnknown,
-            activeThumbColor: AppColors.accent,
-            onChanged: vm.setIsCycleLengthUnknown,
+    return OnboardingQuestion(
+      question: AppStrings.cycleInformation,
+      controlSpacing: 8,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+              title: Text(AppStrings.doNotKnowCycleLength),
+              subtitle: Text(AppStrings.calculateCycleOverTime),
+              value: vm.isCycleLengthUnknown,
+              activeThumbColor: AppColors.accent,
+              onChanged: vm.setIsCycleLengthUnknown,
+            ),
           ),
-        ),
-        if (!vm.isCycleLengthUnknown)
-          _CycleLengthSlider(
-            value: vm.averageCycleLength,
-            onChanged: (value) =>
-                vm.setAverageCycleLength(value.round()),
-          ),
-      ],
+          if (!vm.isCycleLengthUnknown)
+            _CycleLengthSlider(
+              value: vm.averageCycleLength,
+              onChanged: (value) =>
+                  vm.setAverageCycleLength(value.round()),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -163,32 +167,22 @@ class _LastPeriodSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppStrings.lastPeriodDaysQuestion,
-          style: const TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
+    return OnboardingQuestion(
+      question: AppStrings.lastPeriodDaysQuestion,
+      controlSpacing: 8,
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          key: const ValueKey(
+            'onboarding_last_period_days',
+          ),
+          onPressed: onPick,
+          icon: const Icon(Icons.date_range_outlined),
+          label: Text(
+            _buildPeriodSelectionLabel(selectedDays),
           ),
         ),
-        const SizedBox(height: 6),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            key: const ValueKey(
-              'onboarding_last_period_days',
-            ),
-            onPressed: onPick,
-            icon: const Icon(Icons.date_range_outlined),
-            label: Text(
-              _buildPeriodSelectionLabel(selectedDays),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -263,13 +257,10 @@ class _MenopauseSection extends StatelessWidget {
       (AppStrings.postMenopause, MenopauseStatus.post),
     ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OnboardingSectionHeader(
-          label: AppStrings.menopauseStatus,
-        ),
-        Wrap(
+    return OnboardingQuestion(
+      question: AppStrings.menopauseStatus,
+      controlSpacing: 8,
+      child: Wrap(
           spacing: 6,
           runSpacing: 6,
           children: [
@@ -286,8 +277,7 @@ class _MenopauseSection extends StatelessWidget {
                 },
               ),
           ],
-        ),
-      ],
+      ),
     );
   }
 }
@@ -316,13 +306,10 @@ class _BirthControlSection extends StatelessWidget {
       vm.birthControlMethod ?? '',
     );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OnboardingSectionHeader(
-          label: AppStrings.birthControl,
-        ),
-        Wrap(
+    return OnboardingQuestion(
+      question: AppStrings.birthControl,
+      controlSpacing: 8,
+      child: Wrap(
           spacing: 6,
           runSpacing: 6,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -356,8 +343,7 @@ class _BirthControlSection extends StatelessWidget {
               onPressed: onAddBirthControl,
             ),
           ],
-        ),
-      ],
+      ),
     );
   }
 }
