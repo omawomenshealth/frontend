@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../localization/generated/strings.g.dart';
 
 import '../widgets/index.dart';
 
@@ -12,32 +13,31 @@ class NasilsinPage extends StatefulWidget {
 class _NasilsinPageState extends State<NasilsinPage> {
   Set<String> _moods = <String>{};
 
-  static const _moodOptions = [
-    'İyiyim',
-    'Yorgunum',
-    'Kaygılıyım',
-    'Ağrılıyım',
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     return OnboardingDeckCard(
-      eyebrow: 'Nasılsın',
+      eyebrow: t.onboarding.howAreYou.title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const OnboardingFieldLabel('Bugünlerde kendini nasıl hissediyorsun?'),
+          OnboardingFieldLabel(t.onboarding.howAreYou.moodQuestion),
           const SizedBox(height: 12),
           OnboardingMultiSelect(
-            options: _moodOptions,
+            options: [
+              t.onboarding.howAreYou.moodOptions.good,
+              t.onboarding.howAreYou.moodOptions.tired,
+              t.onboarding.howAreYou.moodOptions.anxious,
+              t.onboarding.howAreYou.moodOptions.pain,
+            ],
             selectedValues: _moods,
             onChanged: (next) => setState(() => _moods = next),
             maxSelection: 3,
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Birden fazla seçebilirsin. Detayları bir sonraki adımda ekleyeceğiz.',
+          Text(
+            t.onboarding.howAreYou.multiSelectHint,
             style: TextStyle(
               color: Color(0xFF7A756C),
               fontSize: 12,
