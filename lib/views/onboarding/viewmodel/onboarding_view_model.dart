@@ -1,46 +1,52 @@
 import 'package:flutter/material.dart';
-import '../../../data/models/user_settings_model.dart';
+
+import '../../../core/constants/app_strings.dart';
+import '../../../core/utils/cycle_rules.dart';
 import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/medication_identity_model.dart';
 import '../../../data/models/period_log_model.dart';
+import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/sync_service.dart';
-import '../../../core/utils/cycle_rules.dart';
-import '../../../core/constants/app_strings.dart';
 
 /// Onboarding iş mantığı — adım adım kullanıcı bilgisi toplama.
 class OnboardingViewModel extends ChangeNotifier {
+  // Dependencies
   final LocalStorageService _storage;
   final SyncService _sync;
 
   OnboardingViewModel(this._storage, this._sync);
 
-  // ── Sayfa kontrolü ────────────────────────────────────
+  // Navigation state
   static const detailStepCount = 4;
+
   int _currentPage = 0;
-  int get currentPage => _currentPage;
-  bool get isDetailedHealthPage => _currentPage == totalPages - 1;
+  int _detailStep = 0;
+  bool _detailForward = true;
 
-  // Toplam sayfa sayısı cinsiyete göre değişir
-  int get totalPages => 3;
-
-  // ── Form verileri ─────────────────────────────────────
+  // Form state: personal
   String _userName = '';
-  bool _isSmoker = false;
-  int _smokingYears = 0;
-  double? _weight;
-  double? _height;
   int? _age;
   DateTime? _birthDate;
+  double? _weight;
+  double? _height;
+
+  // Form state: lifestyle
+  bool _isSmoker = false;
+  int _smokingYears = 0;
+
+  // Form state: relationship
   String _relationshipStatus = AppStrings.relationshipStatusOptions.last;
   bool? _sexuallyActive;
   bool? _wantsChildrenInYear;
+
+  // Form state: health
   Map<String, LabResult> _labResults = {};
   DateTime? _labTestDate;
   bool? _labTestFasting;
   List<String> _chronicDiseases = [];
 
-  // Kadın
+  // Form state: women's health
   int _averageCycleLength = CycleRules.defaultCycleLength;
   int _averagePeriodLength = CycleRules.defaultPeriodLength;
   bool _isCycleLengthUnknown = false;
@@ -52,20 +58,84 @@ class OnboardingViewModel extends ChangeNotifier {
   final List<String> _customConditions = [];
   final List<String> _customBirthControlMethods = [];
 
-  // İlaç & Takviye
+  // Form state: medications
   List<MedicationIdentity> _dailyMedications = [];
   List<String> _dailySupplements = [];
 
+  // Persistence state
   bool _isSaving = false;
-  bool get isSaving => _isSaving;
 
-  int _detailStep = 0;
-  bool _detailForward = true;
+  // Getters: navigation
+  int get currentPage => _currentPage;
+  int get totalPages => 3;
+  bool get canGoNext => _currentPage < totalPages - 1;
+  bool get canGoBack => _currentPage > 0;
+  bool get isDetailedHealthPage => _currentPage == totalPages - 1;
 
   int get detailStep => _detailStep;
   bool get detailForward => _detailForward;
   bool get isFirstDetailStep => _detailStep == 0;
   bool get isLastDetailStep => _detailStep == detailStepCount - 1;
+
+  // Getters: form
+  String get userName => _userName;
+  int? get age => _age;
+  DateTime? get birthDate => _birthDate;
+  double? get weight => _weight;
+  double? get height => _height;
+
+  bool get isSmoker => _isSmoker;
+  int get smokingYears => _smokingYears;
+
+  String get relationshipStatus => _relationshipStatus;
+  bool? get sexuallyActive => _sexuallyActive;
+  bool? get wantsChildrenInYear => _wantsChildrenInYear;
+
+  Map<String, LabResult> get labResults => _labResults;
+  DateTime? get labTestDate => _labTestDate;
+  bool? get labTestFasting => _labTestFasting;
+  List<String> get chronicDiseases => _chronicDiseases;
+
+  int get averageCycleLength => _averageCycleLength;
+  int get averagePeriodLength => _averagePeriodLength;
+  bool get isCycleLengthUnknown => _isCycleLengthUnknown;
+  DateTime? get lastPeriodDate => _lastPeriodDate;
+  List<DateTime> get lastPeriodDays => List.unmodifiable(_lastPeriodDays);
+  MenopauseStatus get menopauseStatus => _menopauseStatus;
+  String? get birthControlMethod => _birthControlMethod;
+  List<String> get womenDiseases => _womenDiseases;
+  List<String> get customConditions => _customConditions;
+  List<String> get customBirthControlMethods => _customBirthControlMethods;
+
+  List<MedicationIdentity> get dailyMedications => _dailyMedications;
+  List<String> get dailySupplements => _dailySupplements;
+
+  // Getters: computed
+  bool get isSaving => _isSaving;
+  List<String> get knownDiseases =>
+      {..._chronicDiseases, ..._womenDiseases}.toList(growable: false);
+
+  // Navigation actions
+  void nextPage() {
+    if (_currentPage < totalPages - 1) {
+      _currentPage++;
+      notifyListeners();
+    }
+  }
+
+  void previousPage() {
+    if (_currentPage > 0) {
+      _currentPage--;
+      notifyListeners();
+    }
+  }
+
+  void goToPage(int page) {
+    if (_currentPage != page) {
+      _currentPage = page;
+      notifyListeners();
+    }
+  }
 
   void nextDetailStep() {
     if (isLastDetailStep) return;
@@ -81,70 +151,9 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Getter'lar ────────────────────────────────────────
-  String get userName => _userName;
-  bool get isSmoker => _isSmoker;
-  int get smokingYears => _smokingYears;
-  double? get weight => _weight;
-  double? get height => _height;
-  int? get age => _age;
-  DateTime? get birthDate => _birthDate;
-  String get relationshipStatus => _relationshipStatus;
-  bool? get sexuallyActive => _sexuallyActive;
-  bool? get wantsChildrenInYear => _wantsChildrenInYear;
-  Map<String, LabResult> get labResults => _labResults;
-  DateTime? get labTestDate => _labTestDate;
-  bool? get labTestFasting => _labTestFasting;
-  List<String> get chronicDiseases => _chronicDiseases;
-  int get averageCycleLength => _averageCycleLength;
-  int get averagePeriodLength => _averagePeriodLength;
-  bool get isCycleLengthUnknown => _isCycleLengthUnknown;
-  DateTime? get lastPeriodDate => _lastPeriodDate;
-  List<DateTime> get lastPeriodDays => List.unmodifiable(_lastPeriodDays);
-  MenopauseStatus get menopauseStatus => _menopauseStatus;
-  String? get birthControlMethod => _birthControlMethod;
-  List<String> get womenDiseases => _womenDiseases;
-  List<String> get customConditions => _customConditions;
-  List<String> get customBirthControlMethods => _customBirthControlMethods;
-  List<String> get knownDiseases =>
-      {..._chronicDiseases, ..._womenDiseases}.toList(growable: false);
-  List<MedicationIdentity> get dailyMedications => _dailyMedications;
-  List<String> get dailySupplements => _dailySupplements;
-
-  // ── Setter'lar ────────────────────────────────────────
-  // NOT: TextField setter'larında notifyListeners() çağırmıyoruz.
-  // Her karakter girişinde tüm widget ağacını yeniden çizmek gereksiz kasma yapar.
-  // Bu değerler sadece kaydederken (saveAndComplete) veya summary sayfasında kullanılır.
-
+  // Personal actions
   void setUserName(String value) {
     _userName = value;
-    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
-  }
-
-  void setIsSmoker(bool value) {
-    _isSmoker = value;
-    if (!value) _smokingYears = 0;
-    notifyListeners(); // UI gösterimi değişir (conditional widget)
-  }
-
-  void setSmokingYears(int value) {
-    _smokingYears = value;
-    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
-  }
-
-  void setWeight(double? value) {
-    _weight = value;
-    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
-  }
-
-  void setHeight(double? value) {
-    _height = value;
-    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
-  }
-
-  void setAge(int? value) {
-    _age = value;
-    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
   }
 
   void setBirthDate(DateTime? value) {
@@ -163,9 +172,33 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setWeight(double? value) {
+    _weight = value;
+  }
+
+  void setHeight(double? value) {
+    _height = value;
+  }
+
+  void setAge(int? value) {
+    _age = value;
+  }
+
+  // Lifestyle actions
+  void setIsSmoker(bool value) {
+    _isSmoker = value;
+    if (!value) _smokingYears = 0;
+    notifyListeners();
+  }
+
+  void setSmokingYears(int value) {
+    _smokingYears = value;
+  }
+
+  // Relationship actions
   void setRelationshipStatus(String value) {
     _relationshipStatus = value;
-    notifyListeners(); // Seçim UI'da gösterilir
+    notifyListeners();
   }
 
   void setSexuallyActive(bool? value) {
@@ -178,6 +211,17 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Lab actions
+  void setLabData({
+    required Map<String, LabResult> results,
+    DateTime? testDate,
+    bool? fasting,
+  }) {
+    _labResults = Map<String, LabResult>.from(results);
+    _labTestDate = testDate;
+    _labTestFasting = fasting;
+  }
+
   void setLabResults(Map<String, LabResult> value) {
     _labResults = Map<String, LabResult>.from(value);
   }
@@ -188,9 +232,9 @@ class OnboardingViewModel extends ChangeNotifier {
 
   void setLabTestFasting(bool? value) {
     _labTestFasting = value;
-    // notifyListeners() kaldırıldı — TextField kendi state'ini yönetir
   }
 
+  // Disease actions
   void toggleChronicDisease(String disease) {
     final existingIndex = _chronicDiseases.indexWhere(
       (value) => AppStrings.localizeStoredValue(value) == disease,
@@ -207,64 +251,6 @@ class OnboardingViewModel extends ChangeNotifier {
     final value = _rememberCustomValue(_customConditions, disease);
     if (value.isEmpty || _containsCondition(_chronicDiseases, value)) return;
     _chronicDiseases = [..._chronicDiseases, value];
-    notifyListeners();
-  }
-
-  void setAverageCycleLength(int value) {
-    _averageCycleLength = CycleRules.sanitizeCycleLength(value);
-    notifyListeners(); // Slider label güncellenmeli
-  }
-
-  void setAveragePeriodLength(int value) {
-    _averagePeriodLength = CycleRules.sanitizePeriodLength(value);
-    notifyListeners();
-  }
-
-  void setIsCycleLengthUnknown(bool value) {
-    _isCycleLengthUnknown = value;
-    if (value) {
-      _averageCycleLength = CycleRules.defaultCycleLength;
-    }
-    notifyListeners(); // Conditional widget gösterir/gizler
-  }
-
-  void setLastPeriodDate(DateTime? value) {
-    setLastPeriodDays(value == null ? const [] : [value]);
-  }
-
-  void setLastPeriodDays(Iterable<DateTime> values) {
-    final today = DateTime.now();
-    final days =
-        values
-            .map((value) => DateTime(value.year, value.month, value.day))
-            .where((value) => !value.isAfter(today))
-            .toSet()
-            .toList()
-          ..sort();
-    _lastPeriodDays = days.take(CycleRules.maxPeriodLength).toList();
-    _lastPeriodDate = _lastPeriodDays.isEmpty ? null : _lastPeriodDays.first;
-    if (_lastPeriodDays.isNotEmpty) {
-      _averagePeriodLength = CycleRules.sanitizePeriodLength(
-        _lastPeriodDays.length,
-      );
-    }
-    notifyListeners();
-  }
-
-  void setMenopauseStatus(MenopauseStatus value) {
-    _menopauseStatus = value;
-    notifyListeners();
-  }
-
-  void setBirthControlMethod(String? value) {
-    _birthControlMethod = value;
-    notifyListeners();
-  }
-
-  void addBirthControlMethod(String method) {
-    final value = _rememberCustomValue(_customBirthControlMethods, method);
-    if (value.isEmpty) return;
-    _birthControlMethod = value;
     notifyListeners();
   }
 
@@ -312,29 +298,66 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _containsCondition(List<String> values, String candidate) => values.any(
-    (value) =>
-        _normalizeCustomValue(AppStrings.localizeStoredValue(value)) ==
-        _normalizeCustomValue(candidate),
-  );
-
-  String _rememberCustomValue(List<String> values, String rawValue) {
-    final cleaned = rawValue.trim().replaceAll(RegExp(r'\s+'), ' ');
-    if (cleaned.isEmpty) return '';
-    final normalized = _normalizeCustomValue(cleaned);
-    for (final value in values) {
-      if (_normalizeCustomValue(value) == normalized) return value;
-    }
-    values.add(cleaned);
-    return cleaned;
+  // Cycle actions
+  void setAverageCycleLength(int value) {
+    _averageCycleLength = CycleRules.sanitizeCycleLength(value);
+    notifyListeners();
   }
 
-  String _normalizeCustomValue(String value) => value
-      .trim()
-      .replaceAll(RegExp(r'\s+'), ' ')
-      .replaceAll(RegExp('[İIı]'), 'i')
-      .toLowerCase();
+  void setAveragePeriodLength(int value) {
+    _averagePeriodLength = CycleRules.sanitizePeriodLength(value);
+    notifyListeners();
+  }
 
+  void setIsCycleLengthUnknown(bool value) {
+    _isCycleLengthUnknown = value;
+    if (value) {
+      _averageCycleLength = CycleRules.defaultCycleLength;
+    }
+    notifyListeners();
+  }
+
+  void setLastPeriodDate(DateTime? value) {
+    setLastPeriodDays(value == null ? const [] : [value]);
+  }
+
+  void setLastPeriodDays(Iterable<DateTime> values) {
+    final today = DateTime.now();
+    final days =
+        values
+            .map((value) => DateTime(value.year, value.month, value.day))
+            .where((value) => !value.isAfter(today))
+            .toSet()
+            .toList()
+          ..sort();
+    _lastPeriodDays = days.take(CycleRules.maxPeriodLength).toList();
+    _lastPeriodDate = _lastPeriodDays.isEmpty ? null : _lastPeriodDays.first;
+    if (_lastPeriodDays.isNotEmpty) {
+      _averagePeriodLength = CycleRules.sanitizePeriodLength(
+        _lastPeriodDays.length,
+      );
+    }
+    notifyListeners();
+  }
+
+  void setMenopauseStatus(MenopauseStatus value) {
+    _menopauseStatus = value;
+    notifyListeners();
+  }
+
+  void setBirthControlMethod(String? value) {
+    _birthControlMethod = value;
+    notifyListeners();
+  }
+
+  void addBirthControlMethod(String method) {
+    final value = _rememberCustomValue(_customBirthControlMethods, method);
+    if (value.isEmpty) return;
+    _birthControlMethod = value;
+    notifyListeners();
+  }
+
+  // Medication actions
   void addMedication(MedicationIdentity medication) {
     if (!_dailyMedications.contains(medication)) {
       _dailyMedications = List.from(_dailyMedications)..add(medication);
@@ -359,37 +382,65 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Sayfa Navigasyonu ─────────────────────────────────
-  void nextPage() {
-    if (_currentPage < totalPages - 1) {
-      _currentPage++;
-      notifyListeners();
+  // Private disease helpers
+  bool _containsCondition(List<String> values, String candidate) => values.any(
+    (value) =>
+        _normalizeCustomValue(AppStrings.localizeStoredValue(value)) ==
+        _normalizeCustomValue(candidate),
+  );
+
+  String _rememberCustomValue(List<String> values, String rawValue) {
+    final cleaned = rawValue.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (cleaned.isEmpty) return '';
+
+    final normalized = _normalizeCustomValue(cleaned);
+    for (final value in values) {
+      if (_normalizeCustomValue(value) == normalized) return value;
     }
+
+    values.add(cleaned);
+    return cleaned;
   }
 
-  void previousPage() {
-    if (_currentPage > 0) {
-      _currentPage--;
-      notifyListeners();
-    }
-  }
+  String _normalizeCustomValue(String value) => value
+      .trim()
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .replaceAll(RegExp('[İIı]'), 'i')
+      .toLowerCase();
 
-  void goToPage(int page) {
-    if (_currentPage != page) {
-      _currentPage = page;
-      notifyListeners();
-    }
-  }
-
-  bool get canGoNext => _currentPage < totalPages - 1;
-  bool get canGoBack => _currentPage > 0;
-
-  // ── Kaydet & Tamamla ──────────────────────────────────
+  // Persistence
   Future<bool> saveAndComplete() async {
     _isSaving = true;
     notifyListeners();
 
-    final settings = UserSettings(
+    var success = await _storage.saveSettings(_buildSettings());
+
+    if (success) {
+      for (final day in _lastPeriodDays) {
+        final saved = await _storage.saveDailyLog(
+          DailyLog(
+            date: day,
+            hasExplicitTime: false,
+            flowIntensity: AppStrings.flowOptions[1],
+            observedSections: const {DailyLogObservedSection.period},
+          ),
+        );
+        if (!saved) success = false;
+      }
+    }
+
+    if (success && _storage.isUserLoggedIn) {
+      await _sync.backupToCloud();
+    }
+
+    _isSaving = false;
+    notifyListeners();
+
+    return success;
+  }
+
+  UserSettings _buildSettings() {
+    return UserSettings(
       userName: _userName,
       isOnboardingComplete: true,
       isSmoker: _isSmoker,
@@ -415,32 +466,5 @@ class OnboardingViewModel extends ChangeNotifier {
       customConditions: _customConditions,
       customBirthControlMethods: _customBirthControlMethods,
     );
-
-    var success = await _storage.saveSettings(settings);
-
-    if (success) {
-      for (final day in _lastPeriodDays) {
-        final saved = await _storage.saveDailyLog(
-          DailyLog(
-            date: day,
-            hasExplicitTime: false,
-            flowIntensity: AppStrings.flowOptions[1],
-            observedSections: const {DailyLogObservedSection.period},
-          ),
-        );
-        if (!saved) success = false;
-      }
-    }
-
-    // Yeni hesap için boş/eksik profil yedeği oluşturma. Bulut yedeği ancak
-    // onboarding verileri başarıyla yerelde tamamlandıktan sonra başlatılır.
-    if (success && _storage.isUserLoggedIn) {
-      await _sync.backupToCloud();
-    }
-
-    _isSaving = false;
-    notifyListeners();
-
-    return success;
   }
 }
