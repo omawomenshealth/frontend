@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/color_constants.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/constants/color_constants.dart';
 
 class OnboardingFieldLabel extends StatelessWidget {
   final String label;

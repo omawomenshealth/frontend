@@ -5,7 +5,7 @@ import '../../../../core/constants/color_constants.dart';
 import '../../../../core/utils/cycle_rules.dart';
 import '../../../../data/models/user_settings_model.dart';
 import '../../viewmodel/onboarding_view_model.dart';
-import '../../widgets/index.dart';
+import '../widgets/index.dart';
 
 class LabStep extends StatelessWidget {
   final OnboardingViewModel vm;

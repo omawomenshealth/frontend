@@ -16,8 +16,10 @@ class OnboardingViewModel extends ChangeNotifier {
   OnboardingViewModel(this._storage, this._sync);
 
   // ── Sayfa kontrolü ────────────────────────────────────
+  static const detailStepCount = 4;
   int _currentPage = 0;
   int get currentPage => _currentPage;
+  bool get isDetailedHealthPage => _currentPage == totalPages - 1;
 
   // Toplam sayfa sayısı cinsiyete göre değişir
   int get totalPages => 3;
@@ -56,6 +58,28 @@ class OnboardingViewModel extends ChangeNotifier {
 
   bool _isSaving = false;
   bool get isSaving => _isSaving;
+
+  int _detailStep = 0;
+  bool _detailForward = true;
+
+  int get detailStep => _detailStep;
+  bool get detailForward => _detailForward;
+  bool get isFirstDetailStep => _detailStep == 0;
+  bool get isLastDetailStep => _detailStep == detailStepCount - 1;
+
+  void nextDetailStep() {
+    if (isLastDetailStep) return;
+    _detailForward = true;
+    _detailStep++;
+    notifyListeners();
+  }
+
+  void previousDetailStep() {
+    if (isFirstDetailStep) return;
+    _detailForward = false;
+    _detailStep--;
+    notifyListeners();
+  }
 
   // ── Getter'lar ────────────────────────────────────────
   String get userName => _userName;

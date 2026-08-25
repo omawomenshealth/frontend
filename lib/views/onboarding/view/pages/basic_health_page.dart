@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/color_constants.dart';
-import '../../widgets/index.dart';
+import '../widgets/index.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 
 class BasicHealthPage extends StatelessWidget {

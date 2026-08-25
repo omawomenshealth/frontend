@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/color_constants.dart';
-import '../../../core/shared_widgets/custom_button.dart';
-import '../viewmodel/onboarding_view_model.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/constants/color_constants.dart';
+import '../../../../core/shared_widgets/custom_button.dart';
+import '../../viewmodel/onboarding_view_model.dart';
 
 class OnboardingProgressHeader extends StatelessWidget {
   final int currentPage;
@@ -74,26 +74,22 @@ class OnboardingProgressHeader extends StatelessWidget {
 
 class OnboardingBottomNavigation extends StatelessWidget {
   final OnboardingViewModel vm;
-  final int detailStep;
-  final int detailStepCount;
   final VoidCallback onBack;
   final VoidCallback onNext;
 
   const OnboardingBottomNavigation({
     super.key,
     required this.vm,
-    required this.detailStep,
-    required this.detailStepCount,
     required this.onBack,
     required this.onNext,
   });
 
   @override
   Widget build(BuildContext context) {
-    final canGoBack = vm.currentPage > 0 || detailStep > 0;
+    final canGoBack = vm.currentPage > 0 || !vm.isFirstDetailStep;
     final isLast =
         vm.currentPage == vm.totalPages - 1 &&
-        detailStep == detailStepCount - 1;
+      vm.isLastDetailStep;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 18),
       child: Row(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/color_constants.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/constants/color_constants.dart';
 
 class OnboardingSelectionSheet extends StatelessWidget {
   final String title;

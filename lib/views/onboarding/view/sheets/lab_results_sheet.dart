@@ -5,7 +5,7 @@ import '../../../../../core/constants/color_constants.dart';
 import '../../../../../core/shared_widgets/lab_results_form.dart';
 import '../../../../../data/models/lab_result_model.dart';
 import '../../viewmodel/onboarding_view_model.dart';
-import '../../widgets/index.dart';
+import '../widgets/index.dart';
 
 class LabResultsSheetData {
   final Map<String, LabResult> results;
