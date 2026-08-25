@@ -81,6 +81,15 @@ void main() {
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
+    expect(find.text('Nasılsın'), findsOneWidget);
+    expect(find.text('Bugünlerde kendini nasıl hissediyorsun?'), findsOneWidget);
+    expect(
+      find.text('Birden fazla seçebilirsin. Detayları bir sonraki adımda ekleyeceğiz.'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text(AppStrings.next));
+    await tester.pumpAndSettle();
     expect(find.text('Temel sağlık bilgilerin'), findsOneWidget);
     expect(
       find.text(
