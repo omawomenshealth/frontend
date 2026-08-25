@@ -116,14 +116,14 @@ class OnboardingCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
         decoration: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.94),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.88)),
-          boxShadow: [
+          color: Colors.white.withValues(alpha: 0.92),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFFE3DFD7), width: 1),
+          boxShadow: const [
             BoxShadow(
-              color: accent.withValues(alpha: 0.08),
-              blurRadius: 26,
-              offset: const Offset(0, 12),
+              color: Color(0x1A5E5A52),
+              blurRadius: 24,
+              offset: Offset(0, 12),
             ),
           ],
         ),
@@ -166,6 +166,56 @@ class OnboardingCard extends StatelessWidget {
               ),
             ),
             if (footer != null) ...[const SizedBox(height: 8), footer!],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OnboardingFormCard extends StatelessWidget {
+  final String eyebrow;
+  final Widget child;
+
+  const OnboardingFormCard({
+    super.key,
+    required this.eyebrow,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.92),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFFE3DFD7), width: 1),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1A5E5A52),
+              blurRadius: 24,
+              offset: Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              eyebrow,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 20),
+            child,
           ],
         ),
       ),
