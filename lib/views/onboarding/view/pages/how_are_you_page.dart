@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../../../localization/generated/strings.g.dart';
 
+import '../../../../localization/generated/strings.g.dart';
 import '../widgets/index.dart';
 
-class NasilsinPage extends StatefulWidget {
-  const NasilsinPage({super.key});
+class HowAreYouPage extends StatefulWidget {
+  const HowAreYouPage({super.key});
 
   @override
-  State<NasilsinPage> createState() => _NasilsinPageState();
+  State<HowAreYouPage> createState() => _HowAreYouPageState();
 }
 
-class _NasilsinPageState extends State<NasilsinPage> {
+class _HowAreYouPageState extends State<HowAreYouPage> {
   Set<String> _moods = <String>{};
 
   @override
@@ -38,7 +38,7 @@ class _NasilsinPageState extends State<NasilsinPage> {
           const SizedBox(height: 10),
           Text(
             t.onboarding.howAreYou.multiSelectHint,
-            style: TextStyle(
+            style: const TextStyle(
               color: Color(0xFF7A756C),
               fontSize: 12,
             ),
