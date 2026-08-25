@@ -73,7 +73,20 @@ class OnboardingDeckCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              child,
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: child,
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),

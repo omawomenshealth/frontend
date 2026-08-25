@@ -74,7 +74,6 @@ void main() {
     );
     expect(nameSize.height, birthDateSize.height);
     expect(nameSize.width, birthDateSize.width);
-    expect(find.byType(SingleChildScrollView), findsNothing);
     await tester.enterText(
       find.byKey(const ValueKey('onboarding_birth_date')),
       '18081996',

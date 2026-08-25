@@ -9,6 +9,7 @@ class OnboardingMultiSelect extends StatelessWidget {
   final int? maxSelection;
   final double spacing;
   final double runSpacing;
+  final bool compact;
 
   const OnboardingMultiSelect({
     super.key,
@@ -18,6 +19,7 @@ class OnboardingMultiSelect extends StatelessWidget {
     this.maxSelection,
     this.spacing = 10,
     this.runSpacing = 10,
+    this.compact = false,
   });
 
   @override
@@ -31,6 +33,7 @@ class OnboardingMultiSelect extends StatelessWidget {
             label: option,
             isSelected: selectedValues.contains(option),
             onTap: () => _toggle(option),
+            compact: compact,
           ),
       ],
     );
@@ -57,11 +60,13 @@ class _OnboardingMultiSelectChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool compact;
 
   const _OnboardingMultiSelectChip({
     required this.label,
     required this.isSelected,
     required this.onTap,
+    required this.compact,
   });
 
   @override
@@ -71,7 +76,10 @@ class _OnboardingMultiSelectChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 10 : 14,
+          vertical: compact ? 8 : 8,
+        ),
         decoration: BoxDecoration(
           color: isSelected
               ? const Color(0x1A78904F)
