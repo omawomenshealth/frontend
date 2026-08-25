@@ -23,7 +23,7 @@ class MeetYouPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OnboardingFormCard(
+    return OnboardingDeckCard(
       eyebrow: AppStrings.meetYouTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
