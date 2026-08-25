@@ -3,33 +3,33 @@ import 'package:flutter/material.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../widgets/index.dart';
 
-class HowAreYouPage extends StatefulWidget {
-  const HowAreYouPage({super.key});
+class WellbeingPage extends StatefulWidget {
+  const WellbeingPage({super.key});
 
   @override
-  State<HowAreYouPage> createState() => _HowAreYouPageState();
+  State<WellbeingPage> createState() => _WellbeingPageState();
 }
 
-class _HowAreYouPageState extends State<HowAreYouPage> {
+class _WellbeingPageState extends State<WellbeingPage> {
   Set<String> _moods = <String>{};
 
   @override
   Widget build(BuildContext context) {
     final t = context.t;
     return OnboardingDeckCard(
-      eyebrow: t.onboarding.howAreYou.title,
+      eyebrow: t.onboarding.wellbeing.title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          OnboardingFieldLabel(t.onboarding.howAreYou.moodQuestion),
+          OnboardingFieldLabel(t.onboarding.wellbeing.moodQuestion),
           const SizedBox(height: 12),
           OnboardingMultiSelect(
             options: [
-              t.onboarding.howAreYou.moodOptions.good,
-              t.onboarding.howAreYou.moodOptions.tired,
-              t.onboarding.howAreYou.moodOptions.anxious,
-              t.onboarding.howAreYou.moodOptions.pain,
+              t.onboarding.wellbeing.moodOptions.good,
+              t.onboarding.wellbeing.moodOptions.tired,
+              t.onboarding.wellbeing.moodOptions.anxious,
+              t.onboarding.wellbeing.moodOptions.pain,
             ],
             selectedValues: _moods,
             onChanged: (next) => setState(() => _moods = next),
@@ -37,7 +37,7 @@ class _HowAreYouPageState extends State<HowAreYouPage> {
           ),
           const SizedBox(height: 10),
           Text(
-            t.onboarding.howAreYou.multiSelectHint,
+            t.onboarding.wellbeing.multiSelectHint,
             style: const TextStyle(
               color: Color(0xFF7A756C),
               fontSize: 12,

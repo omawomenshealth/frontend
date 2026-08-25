@@ -49,12 +49,12 @@ class _Translations$onboarding$tr extends Translations$onboarding$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override late final _Translations$onboarding$howAreYou$tr howAreYou = _Translations$onboarding$howAreYou$tr._(_root);
+	@override late final _Translations$onboarding$wellbeing$tr wellbeing = _Translations$onboarding$wellbeing$tr._(_root);
 }
 
-// Path: onboarding.howAreYou
-class _Translations$onboarding$howAreYou$tr extends Translations$onboarding$howAreYou$en {
-	_Translations$onboarding$howAreYou$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+// Path: onboarding.wellbeing
+class _Translations$onboarding$wellbeing$tr extends Translations$onboarding$wellbeing$en {
+	_Translations$onboarding$wellbeing$tr._(TranslationsTr root) : this._root = root, super.internal(root);
 
 	final TranslationsTr _root; // ignore: unused_field
 
@@ -63,13 +63,13 @@ class _Translations$onboarding$howAreYou$tr extends Translations$onboarding$howA
 	@override String get moodQuestion => 'Bugünlerde kendini nasıl hissediyorsun?';
 	@override String get supportQuestion => 'Nerede yanında olmamı istersin?';
 	@override String get multiSelectHint => 'Birden fazla seçebilirsin.';
-	@override late final _Translations$onboarding$howAreYou$moodOptions$tr moodOptions = _Translations$onboarding$howAreYou$moodOptions$tr._(_root);
-	@override late final _Translations$onboarding$howAreYou$supportOptions$tr supportOptions = _Translations$onboarding$howAreYou$supportOptions$tr._(_root);
+	@override late final _Translations$onboarding$wellbeing$moodOptions$tr moodOptions = _Translations$onboarding$wellbeing$moodOptions$tr._(_root);
+	@override late final _Translations$onboarding$wellbeing$supportOptions$tr supportOptions = _Translations$onboarding$wellbeing$supportOptions$tr._(_root);
 }
 
-// Path: onboarding.howAreYou.moodOptions
-class _Translations$onboarding$howAreYou$moodOptions$tr extends Translations$onboarding$howAreYou$moodOptions$en {
-	_Translations$onboarding$howAreYou$moodOptions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+// Path: onboarding.wellbeing.moodOptions
+class _Translations$onboarding$wellbeing$moodOptions$tr extends Translations$onboarding$wellbeing$moodOptions$en {
+	_Translations$onboarding$wellbeing$moodOptions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
 
 	final TranslationsTr _root; // ignore: unused_field
 
@@ -81,9 +81,9 @@ class _Translations$onboarding$howAreYou$moodOptions$tr extends Translations$onb
 	@override String get mixed => 'Karışık';
 }
 
-// Path: onboarding.howAreYou.supportOptions
-class _Translations$onboarding$howAreYou$supportOptions$tr extends Translations$onboarding$howAreYou$supportOptions$en {
-	_Translations$onboarding$howAreYou$supportOptions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+// Path: onboarding.wellbeing.supportOptions
+class _Translations$onboarding$wellbeing$supportOptions$tr extends Translations$onboarding$wellbeing$supportOptions$en {
+	_Translations$onboarding$wellbeing$supportOptions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
 
 	final TranslationsTr _root; // ignore: unused_field
 
@@ -104,21 +104,21 @@ class _Translations$onboarding$howAreYou$supportOptions$tr extends Translations$
 extension on TranslationsTr {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
-			'onboarding.howAreYou.title' => 'Nasılsın?',
-			'onboarding.howAreYou.moodQuestion' => 'Bugünlerde kendini nasıl hissediyorsun?',
-			'onboarding.howAreYou.supportQuestion' => 'Nerede yanında olmamı istersin?',
-			'onboarding.howAreYou.multiSelectHint' => 'Birden fazla seçebilirsin.',
-			'onboarding.howAreYou.moodOptions.good' => 'İyiyim',
-			'onboarding.howAreYou.moodOptions.tired' => 'Yorgunum',
-			'onboarding.howAreYou.moodOptions.anxious' => 'Kaygılıyım',
-			'onboarding.howAreYou.moodOptions.pain' => 'Ağrılıyım',
-			'onboarding.howAreYou.moodOptions.mixed' => 'Karışık',
-			'onboarding.howAreYou.supportOptions.relievePain' => 'Ağrıyı hafifletmek',
-			'onboarding.howAreYou.supportOptions.recoverEnergy' => 'Enerjimi toparlamak',
-			'onboarding.howAreYou.supportOptions.calmAnxiety' => 'Kaygımı yatıştırmak',
-			'onboarding.howAreYou.supportOptions.improveSleep' => 'Uykumu düzeltmek',
-			'onboarding.howAreYou.supportOptions.understandCycle' => 'Döngümü anlamak',
-			'onboarding.howAreYou.supportOptions.justListen' => 'Sadece dinlenmek',
+			'onboarding.wellbeing.title' => 'Nasılsın?',
+			'onboarding.wellbeing.moodQuestion' => 'Bugünlerde kendini nasıl hissediyorsun?',
+			'onboarding.wellbeing.supportQuestion' => 'Nerede yanında olmamı istersin?',
+			'onboarding.wellbeing.multiSelectHint' => 'Birden fazla seçebilirsin.',
+			'onboarding.wellbeing.moodOptions.good' => 'İyiyim',
+			'onboarding.wellbeing.moodOptions.tired' => 'Yorgunum',
+			'onboarding.wellbeing.moodOptions.anxious' => 'Kaygılıyım',
+			'onboarding.wellbeing.moodOptions.pain' => 'Ağrılıyım',
+			'onboarding.wellbeing.moodOptions.mixed' => 'Karışık',
+			'onboarding.wellbeing.supportOptions.relievePain' => 'Ağrıyı hafifletmek',
+			'onboarding.wellbeing.supportOptions.recoverEnergy' => 'Enerjimi toparlamak',
+			'onboarding.wellbeing.supportOptions.calmAnxiety' => 'Kaygımı yatıştırmak',
+			'onboarding.wellbeing.supportOptions.improveSleep' => 'Uykumu düzeltmek',
+			'onboarding.wellbeing.supportOptions.understandCycle' => 'Döngümü anlamak',
+			'onboarding.wellbeing.supportOptions.justListen' => 'Sadece dinlenmek',
 			_ => null,
 		};
 	}

@@ -85,9 +85,9 @@ void main() {
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
-    expect(find.text(t.onboarding.howAreYou.title), findsOneWidget);
-    expect(find.text(t.onboarding.howAreYou.moodQuestion), findsOneWidget);
-    expect(find.text(t.onboarding.howAreYou.multiSelectHint), findsOneWidget);
+    expect(find.text(t.onboarding.wellbeing.title), findsOneWidget);
+    expect(find.text(t.onboarding.wellbeing.moodQuestion), findsOneWidget);
+    expect(find.text(t.onboarding.wellbeing.multiSelectHint), findsOneWidget);
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();

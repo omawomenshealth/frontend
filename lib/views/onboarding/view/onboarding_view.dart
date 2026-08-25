@@ -60,7 +60,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                     physics: const NeverScrollableScrollPhysics(),
                     onPageChanged: vm.goToPage,
                     children: [
-                      MeetYouPage(
+                      IntroductionPage(
                         vm: vm,
                         birthDateController: _birthDateController,
                         onPickBirthDate: () async {
@@ -76,7 +76,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                           );
                         },
                       ),
-                      const HowAreYouPage(),
+                      const WellbeingPage(),
                       BasicHealthPage(vm: vm),
                       DetailedHealthPage(
                         vm: vm,
