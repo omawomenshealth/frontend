@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
-
+import 'localization/generated/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -33,6 +33,8 @@ import 'views/profile/viewmodel/profile_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await LocaleSettings.useDeviceLocale();
 
   try {
     await AppEnvironment.load();
@@ -74,7 +76,14 @@ void main() async {
   // Not: Test için verileri sıfırlamak isterseniz aşağıdaki satırı açın.
   // await storage.clearAll();
 
-  runApp(MyApp(storage: storage, notificationService: notificationService));
+  runApp(
+    TranslationProvider(
+      child: MyApp(
+        storage: storage,
+        notificationService: notificationService,
+      ),
+    )
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -92,7 +101,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final _homeShellKey = GlobalKey<_HomeShellState>();
   StreamSubscription<String>? _insightNotificationSubscription;
   late final CyclePredictionCoordinator _cyclePredictions;
-
   @override
   void initState() {
     super.initState();
@@ -207,8 +215,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: AppStrings.supportedLocales,
-        localeResolutionCallback: (locale, _) =>
-            AppStrings.resolveLocale(locale),
+        localeResolutionCallback: (locale, _) {
+          final resolved = AppStrings.resolveLocale(locale);
+          unawaited(LocaleSettings.setLocaleRaw(resolved.languageCode));
+          return resolved;
+        },
         initialRoute: widget.storage.isOnboardingComplete ? '/home' : '/auth',
         routes: {
           '/auth': (context) => const AuthView(),

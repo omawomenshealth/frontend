@@ -6,6 +6,7 @@ import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/sync_service.dart';
+import 'package:app_proje_a/localization/generated/strings.g.dart';
 import 'package:app_proje_a/views/onboarding/view/onboarding_view.dart';
 import 'package:app_proje_a/views/onboarding/viewmodel/onboarding_view_model.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUp(() async {
     await AppStrings.delegate.load(const Locale('tr'));
+    await LocaleSettings.setLocale(AppLocale.tr);
   });
 
   testWidgets('üç auth ekranı kaydırmadan ve iç adımlarla ilerler', (
@@ -34,21 +36,23 @@ void main() {
     final vm = OnboardingViewModel(storage, SyncService(storage, api));
 
     await tester.pumpWidget(
-      ChangeNotifierProvider<OnboardingViewModel>.value(
-        value: vm,
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          locale: const Locale('tr'),
-          localizationsDelegates: const [
-            AppStrings.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppStrings.supportedLocales,
-          routes: {'/home': (_) => const SizedBox.shrink()},
-          home: const OnboardingView(),
+      TranslationProvider(
+        child: ChangeNotifierProvider<OnboardingViewModel>.value(
+          value: vm,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            locale: const Locale('tr'),
+            localizationsDelegates: const [
+              AppStrings.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppStrings.supportedLocales,
+            routes: {'/home': (_) => const SizedBox.shrink()},
+            home: const OnboardingView(),
+          ),
         ),
       ),
     );
@@ -81,12 +85,9 @@ void main() {
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
-    expect(find.text('Nasılsın'), findsOneWidget);
-    expect(find.text('Bugünlerde kendini nasıl hissediyorsun?'), findsOneWidget);
-    expect(
-      find.text('Birden fazla seçebilirsin. Detayları bir sonraki adımda ekleyeceğiz.'),
-      findsOneWidget,
-    );
+    expect(find.text(t.onboarding.howAreYou.title), findsOneWidget);
+    expect(find.text(t.onboarding.howAreYou.moodQuestion), findsOneWidget);
+    expect(find.text(t.onboarding.howAreYou.multiSelectHint), findsOneWidget);
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();

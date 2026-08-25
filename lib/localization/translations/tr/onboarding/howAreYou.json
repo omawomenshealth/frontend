@@ -1,0 +1,21 @@
+{
+    "title": "Nasılsın?",
+    "moodQuestion": "Bugünlerde kendini nasıl hissediyorsun?",
+    "supportQuestion": "Nerede yanında olmamı istersin?",
+    "multiSelectHint": "Birden fazla seçebilirsin.",
+    "moodOptions": {
+        "good": "İyiyim",
+        "tired": "Yorgunum",
+        "anxious": "Kaygılıyım",
+        "pain": "Ağrılıyım",
+        "mixed": "Karışık"
+    },
+    "supportOptions": {
+        "relievePain": "Ağrıyı hafifletmek",
+        "recoverEnergy": "Enerjimi toparlamak",
+        "calmAnxiety": "Kaygımı yatıştırmak",
+        "improveSleep": "Uykumu düzeltmek",
+        "understandCycle": "Döngümü anlamak",
+        "justListen": "Sadece dinlenmek"
+    }
+}
