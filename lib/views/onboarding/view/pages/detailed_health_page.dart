@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/color_constants.dart';
 import '../../viewmodel/onboarding_view_model.dart';
-import '../../widgets/index.dart';
+import '../widgets/index.dart';
 import 'detailed_health_steps.dart';
 
 class DetailedHealthPage extends StatelessWidget {
@@ -14,7 +14,6 @@ class DetailedHealthPage extends StatelessWidget {
   final VoidCallback onOpenDiseases;
   final VoidCallback onPickLastPeriod;
   final VoidCallback onAddBirthControl;
-  final int detailStepCount;
 
   const DetailedHealthPage({
     super.key,
@@ -25,7 +24,6 @@ class DetailedHealthPage extends StatelessWidget {
     required this.onOpenDiseases,
     required this.onPickLastPeriod,
     required this.onAddBirthControl,
-    required this.detailStepCount,
   });
 
   @override
@@ -43,7 +41,7 @@ class DetailedHealthPage extends StatelessWidget {
       footer: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(
-          detailStepCount,
+          OnboardingViewModel.detailStepCount,
           (index) => AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             width: index == step ? 22 : 7,

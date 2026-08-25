@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/color_constants.dart';
 import '../../formatters/onboarding_date_slash_formatter.dart';
-import '../../widgets/index.dart';
+import '../widgets/index.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 
 class MeetYouPage extends StatelessWidget {
