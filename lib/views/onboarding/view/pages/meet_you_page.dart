@@ -23,12 +23,10 @@ class MeetYouPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OnboardingCard(
-      title: AppStrings.meetYouTitle,
-      subtitle: AppStrings.meetYouSubtitle,
-      accent: AppColors.accent,
+    return OnboardingFormCard(
+      eyebrow: AppStrings.meetYouTitle,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _NameField(onChanged: vm.setUserName),
           const SizedBox(height: 22),
@@ -54,14 +52,43 @@ class _NameField extends StatelessWidget {
   Widget build(BuildContext context) {
     return OnboardingInputSection(
       label: AppStrings.name,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      maxWidth: double.infinity,
+      height: 54,
+      labelStyle: const TextStyle(
+        color: AppColors.textPrimary,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
       child: TextField(
         key: const ValueKey('onboarding_name'),
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.start,
         textCapitalization: TextCapitalization.words,
         onChanged: onChanged,
-        decoration: InputDecoration(
-          hintText: AppStrings.nameAddressHint,
-          prefixIcon: const Icon(Icons.person_outline_rounded),
+        decoration: onboardingInputDecoration(hintText: AppStrings.nameAddressHint).copyWith(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(999),
+            borderSide: const BorderSide(color: Color(0xFFE3DFD7)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(999),
+            borderSide: const BorderSide(color: Color(0xFFE3DFD7), width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(999),
+            borderSide: const BorderSide(color: Color(0xFF78904F), width: 1.5),
+          ),
+          hintStyle: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        style: const TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
         ),
       ),
     );
@@ -82,11 +109,25 @@ class _BirthDateField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OnboardingInputSection(
-      label: AppStrings.age,
+      label: AppStrings.selectBirthDate,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      maxWidth: double.infinity,
+      height: 54,
+      helperText: 'Hormon ve döngü yorumlarım yaşına göre değişiyor.',
+      labelStyle: const TextStyle(
+        color: AppColors.textPrimary,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+      helperStyle: const TextStyle(
+        color: AppColors.textSecondary,
+        fontSize: 14,
+        height: 1.35,
+      ),
       child: TextField(
         key: const ValueKey('onboarding_birth_date'),
         controller: controller,
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.start,
         keyboardType: TextInputType.datetime,
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r'[0-9/]')),
@@ -94,15 +135,42 @@ class _BirthDateField extends StatelessWidget {
           const OnboardingDateSlashFormatter(),
         ],
         onChanged: onChanged,
-        decoration: InputDecoration(
-          hintText: AppStrings.birthDateInputHint,
-          prefixIcon: const Icon(Icons.cake_outlined),
+        decoration: onboardingInputDecoration(
+          hintText: 'mm/dd/yyyy',
           suffixIcon: IconButton(
             key: const ValueKey('onboarding_birth_date_picker'),
             tooltip: AppStrings.chooseFromCalendar,
             onPressed: onPickBirthDate,
-            icon: const Icon(Icons.calendar_month_outlined),
+            icon: const Icon(
+              Icons.calendar_today_outlined,
+              size: 18,
+              color: AppColors.textSecondary,
+            ),
           ),
+        ).copyWith(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(999),
+            borderSide: const BorderSide(color: Color(0xFFE3DFD7)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(999),
+            borderSide: const BorderSide(color: Color(0xFFE3DFD7), width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(999),
+            borderSide: const BorderSide(color: Color(0xFF78904F), width: 1.5),
+          ),
+          hintStyle: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        style: const TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
         ),
       ),
     );
@@ -119,14 +187,7 @@ class _AgeIndicator extends StatelessWidget {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 180),
       child: age == null
-          ? Text(
-              AppStrings.birthDateManualEntryHint,
-              key: const ValueKey('age_help'),
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 11,
-              ),
-            )
+          ? const SizedBox.shrink(key: ValueKey('age_help'))
           : Text(
               AppStrings.ageYears(age!),
               key: const ValueKey('age_value'),

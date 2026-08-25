@@ -9,6 +9,22 @@ class OnboardingBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Stack(
       children: [
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFFDFBF7),
+                  Color(0xFFF4F0E8),
+                  Color(0xFFE8EDE0),
+                ],
+                stops: [0.0, 0.5, 1.0],
+              ),
+            ),
+          ),
+        ),
         Positioned(
           top: -74,
           right: -58,
@@ -52,8 +68,8 @@ class OnboardingSoftOrb extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: color.withValues(alpha: 0.075),
-          border: Border.all(color: color.withValues(alpha: 0.08), width: 12),
+          color: color.withValues(alpha: 0.055),
+          border: Border.all(color: color.withValues(alpha: 0.07), width: 12),
         ),
       ),
     );

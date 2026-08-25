@@ -51,6 +51,8 @@ class _OnboardingViewState extends State<OnboardingView> {
                 OnboardingProgressHeader(
                   currentPage: vm.currentPage,
                   totalPages: vm.totalPages,
+                  onBack: _goBack,
+                  canGoBack: !vm.isSaving,
                 ),
                 Expanded(
                   child: PageView(
@@ -89,8 +91,8 @@ class _OnboardingViewState extends State<OnboardingView> {
                 ),
                 OnboardingBottomNavigation(
                   vm: vm,
-                  onBack: _goBack,
                   onNext: _goNext,
+                  onSkip: _goNext,
                 ),
               ],
             ),
@@ -115,7 +117,10 @@ class _OnboardingViewState extends State<OnboardingView> {
       vm.previousDetailStep();
       return;
     }
-    if (!vm.canGoBack) return;
+    if (!vm.canGoBack) {
+      Navigator.of(context).pushReplacementNamed('/auth');
+      return;
+    }
     vm.previousPage();
     _animateToPage(vm.currentPage);
   }
