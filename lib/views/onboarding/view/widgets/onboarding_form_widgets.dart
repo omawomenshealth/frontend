@@ -21,6 +21,59 @@ class OnboardingFieldLabel extends StatelessWidget {
   }
 }
 
+class OnboardingSectionHeader extends StatelessWidget {
+  final String label;
+
+  const OnboardingSectionHeader({
+    super.key,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OnboardingFieldLabel(label),
+        const SizedBox(height: 7),
+      ],
+    );
+  }
+}
+
+class OnboardingInputSection extends StatelessWidget {
+  final String label;
+  final Widget child;
+  final double maxWidth;
+  final double height;
+
+  const OnboardingInputSection({
+    super.key,
+    required this.label,
+    required this.child,
+    this.maxWidth = 310,
+    this.height = 52,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        OnboardingFieldLabel(label),
+        const SizedBox(height: 8),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: SizedBox(
+            width: double.infinity,
+            height: height,
+            child: child,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class OnboardingYesNoSelector extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
