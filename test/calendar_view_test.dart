@@ -63,31 +63,34 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text(AppStrings.month), findsOneWidget);
-    expect(find.text(AppStrings.year), findsOneWidget);
+    expect(find.text(AppStrings.month), findsNothing);
+    expect(find.text(AppStrings.year), findsNothing);
+    expect(
+      find.byKey(const ValueKey('calendar-continuous-view')),
+      findsOneWidget,
+    );
     expect(find.text(AppStrings.editPeriodDates), findsOneWidget);
-    expect(find.text(AppStrings.quickAddPeriod), findsOneWidget);
+    expect(find.text(AppStrings.quickAddPeriod), findsNothing);
+    expect(
+      find.byKey(const ValueKey('calendar_period_edit_button')),
+      findsOneWidget,
+    );
     expect(find.byTooltip(AppStrings.close), findsOneWidget);
     expect(find.byTooltip(AppStrings.calendarLegend), findsOneWidget);
+    final today = DateTime.now().dateOnly;
+    final todayCell = find.byKey(
+      ValueKey('calendar_day_${today.toStorageKey()}'),
+    );
+    expect(todayCell, findsOneWidget);
+    expect(tester.getCenter(todayCell).dy, lessThan(210));
     expect(tester.takeException(), isNull);
 
-    calendar.selectDay(DateTime.now().add(const Duration(days: 1)));
-    await tester.pump();
-    final futureEditButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, AppStrings.editPeriodDates),
+    await tester.drag(
+      find.byKey(const ValueKey('calendar-continuous-view')),
+      const Offset(0, -2500),
     );
-    expect(futureEditButton.onPressed, isNull);
-    final futureQuickButton = tester.widget<OutlinedButton>(
-      find.byKey(const ValueKey('calendar_quick_add_period')),
-    );
-    expect(futureQuickButton.onPressed, isNull);
-
-    calendar.selectDay(DateTime.now());
-    await tester.pump();
-    await tester.tap(find.text(AppStrings.year));
     await tester.pumpAndSettle();
-    expect(find.text('${DateTime.now().year}'), findsOneWidget);
-    expect(tester.takeException(), isNull);
+    expect(find.textContaining('${today.year + 1}'), findsWidgets);
 
     await tester.tap(find.byTooltip(AppStrings.calendarLegend));
     await tester.pumpAndSettle();
@@ -171,122 +174,194 @@ void main() {
     },
   );
 
-  testWidgets(
-    'Hızlı adet seçimi aynı takvimde çoklu çalışır ve diğer kayıt rengini korur',
-    (tester) async {
-      tester.view.physicalSize = const Size(430, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets('Toplu adet düzenleme seçimleri yalnızca onayla uygulanır', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(430, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
 
-      SharedPreferences.setMockInitialValues({});
-      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
-      await storage.init();
-      final today = DateTime.now().dateOnly;
-      final skincareDay = today.subtract(const Duration(days: 2));
-      final otherDay = today.subtract(const Duration(days: 1));
-      await storage.saveSettings(
-        UserSettings(
-          isOnboardingComplete: true,
-          lastPeriodDate: today.subtract(const Duration(days: 10)),
-        ),
-      );
-      await storage.saveDailyLog(
-        DailyLog(
-          date: skincareDay,
-          hasExplicitTime: false,
-          skincare: const ['Niasinamid'],
-          observedSections: const {DailyLogObservedSection.skincare},
-        ),
-      );
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await storage.init();
+    final today = DateTime.now().dateOnly;
+    final skincareDay = today.subtract(const Duration(days: 1));
+    final otherDay = today;
+    await storage.saveSettings(
+      UserSettings(
+        isOnboardingComplete: true,
+        lastPeriodDate: today.subtract(const Duration(days: 10)),
+      ),
+    );
+    await storage.saveDailyLog(
+      DailyLog(
+        date: skincareDay,
+        hasExplicitTime: false,
+        skincare: const ['Niasinamid'],
+        observedSections: const {DailyLogObservedSection.skincare},
+      ),
+    );
 
-      final calendar = CalendarViewModel(storage);
-      final dashboard = DashboardViewModel(storage);
-      await calendar.loadData();
-      await dashboard.loadData();
+    final calendar = CalendarViewModel(storage);
+    final dashboard = DashboardViewModel(storage);
+    await calendar.loadData();
+    await dashboard.loadData();
 
-      await tester.pumpWidget(
-        MultiProvider(
-          providers: [
-            ChangeNotifierProvider.value(value: calendar),
-            ChangeNotifierProvider.value(value: dashboard),
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: calendar),
+          ChangeNotifierProvider.value(value: dashboard),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          locale: const Locale('tr'),
+          localizationsDelegates: const [
+            AppStrings.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
           ],
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            locale: const Locale('tr'),
-            localizationsDelegates: const [
-              AppStrings.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: AppStrings.supportedLocales,
-            home: const CalendarView(),
-          ),
+          supportedLocales: AppStrings.supportedLocales,
+          home: const CalendarView(),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      final skincareMarker = find.byKey(
-        ValueKey('calendar_log_marker_${skincareDay.toStorageKey()}'),
-      );
-      expect(skincareMarker, findsOneWidget);
+    final skincareMarker = find.byKey(
+      ValueKey('calendar_log_marker_${skincareDay.toStorageKey()}'),
+    );
+    expect(skincareMarker, findsOneWidget);
 
-      await tester.tap(find.byKey(const ValueKey('calendar_quick_add_period')));
-      await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('calendar_period_edit_button')));
+    await tester.pump();
 
-      expect(
-        find.byKey(const ValueKey('calendar_quick_period_hint')),
-        findsOneWidget,
-      );
-      expect(find.text(AppStrings.month), findsOneWidget);
-      expect(skincareMarker, findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('calendar_quick_period_hint')),
+      findsOneWidget,
+    );
+    expect(find.text(AppStrings.confirm), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('calendar_quick_period_save')),
+      findsNothing,
+    );
+    expect(skincareMarker, findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.byKey(const ValueKey('calendar_period_edit_button')),
+          )
+          .onPressed,
+      isNull,
+    );
 
-      await tester.tap(
-        find.byKey(ValueKey('calendar_day_${skincareDay.toStorageKey()}')),
-      );
-      await tester.tap(
-        find.byKey(ValueKey('calendar_day_${otherDay.toStorageKey()}')),
-      );
-      await tester.pump();
+    await tester.tap(
+      find.byKey(ValueKey('calendar_day_${skincareDay.toStorageKey()}')),
+    );
+    await tester.pump();
+    await tester.tap(
+      find.byKey(ValueKey('calendar_day_${otherDay.toStorageKey()}')),
+    );
+    await tester.pump();
 
-      expect(
-        find.byKey(
-          ValueKey('quick_period_selected_${skincareDay.toStorageKey()}'),
-        ),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(
-          ValueKey('quick_period_selected_${otherDay.toStorageKey()}'),
-        ),
-        findsOneWidget,
-      );
-      expect(skincareMarker, findsOneWidget);
+    expect(find.text(AppStrings.deletePeriodConfirmationTitle), findsNothing);
+    expect(
+      find.byKey(ValueKey('period_pending_add_${skincareDay.toStorageKey()}')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(ValueKey('period_pending_add_${otherDay.toStorageKey()}')),
+      findsOneWidget,
+    );
+    expect(storage.loadLogsForDate(skincareDay).single.flowIntensity, isNull);
+    expect(storage.loadLogsForDate(otherDay), isEmpty);
 
-      await tester.tap(
-        find.byKey(const ValueKey('calendar_quick_period_save')),
-      );
-      await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(ValueKey('calendar_day_${skincareDay.toStorageKey()}')),
+    );
+    await tester.pump();
+    expect(
+      find.byKey(ValueKey('period_pending_add_${skincareDay.toStorageKey()}')),
+      findsNothing,
+    );
+    await tester.tap(
+      find.byKey(ValueKey('calendar_day_${skincareDay.toStorageKey()}')),
+    );
+    await tester.pump();
 
-      expect(
-        find.byKey(const ValueKey('calendar_quick_period_hint')),
-        findsNothing,
-      );
-      for (final day in [skincareDay, otherDay]) {
-        final savedLog = storage.loadLogsForDate(day).single;
-        expect(savedLog.flowIntensity, isNotNull);
-        expect(
-          AppStrings.localizeStoredValue(savedLog.flowIntensity!),
-          AppStrings.flowOptions[1],
-        );
-      }
-      expect(storage.loadLogsForDate(skincareDay).single.skincare, [
-        'Niasinamid',
-      ]);
-      expect(tester.takeException(), isNull);
-    },
-  );
+    await tester.tap(find.byKey(const ValueKey('calendar_period_edit_button')));
+    await tester.pumpAndSettle();
+
+    expect(
+      storage.loadLogsForDate(skincareDay).single.flowIntensity,
+      isNotNull,
+    );
+    expect(storage.loadLogsForDate(otherDay).single.flowIntensity, isNotNull);
+    expect(skincareMarker, findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('calendar_quick_period_hint')),
+      findsNothing,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('calendar_period_edit_button')));
+    await tester.pump();
+
+    await tester.tap(
+      find.byKey(ValueKey('calendar_day_${skincareDay.toStorageKey()}')),
+    );
+    await tester.pump();
+    expect(
+      storage.loadLogsForDate(skincareDay).single.flowIntensity,
+      isNotNull,
+    );
+    expect(
+      find.byKey(
+        ValueKey('period_pending_remove_${skincareDay.toStorageKey()}'),
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('calendar_cancel_period_changes')),
+    );
+    await tester.pump();
+    expect(
+      storage.loadLogsForDate(skincareDay).single.flowIntensity,
+      isNotNull,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('calendar_period_edit_button')));
+    await tester.pump();
+    await tester.tap(
+      find.byKey(ValueKey('calendar_day_${skincareDay.toStorageKey()}')),
+    );
+    await tester.pump();
+    expect(
+      storage.loadLogsForDate(skincareDay).single.flowIntensity,
+      isNotNull,
+    );
+    await tester.tap(find.byKey(const ValueKey('calendar_period_edit_button')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(
+        ValueKey('period_edit_recorded_${skincareDay.toStorageKey()}'),
+      ),
+      findsNothing,
+    );
+    final savedOtherDay = storage.loadLogsForDate(otherDay).single;
+    expect(savedOtherDay.flowIntensity, isNotNull);
+    expect(
+      AppStrings.localizeStoredValue(savedOtherDay.flowIntensity!),
+      AppStrings.flowOptions[1],
+    );
+    expect(storage.loadLogsForDate(skincareDay).single.flowIntensity, isNull);
+    expect(storage.loadLogsForDate(skincareDay).single.skincare, [
+      'Niasinamid',
+    ]);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('Takvim günlük log ayrıntısında skincare görünür', (
     tester,

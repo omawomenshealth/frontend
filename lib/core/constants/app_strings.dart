@@ -694,6 +694,7 @@ enum _TextKey {
   deleteDayPeriod,
   deletePeriodConfirmationTitle,
   deletePeriodConfirmationBody,
+  confirm,
   periodEntryDeleted,
   periodDeleteFailed,
   premiumRequired,
@@ -1367,10 +1368,10 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.expand: 'Genişlet',
   _TextKey.collapse: 'Küçült',
   _TextKey.month: 'Ay',
-  _TextKey.editPeriodDates: 'Adet tarihlerini düzenle',
+  _TextKey.editPeriodDates: 'Adet günlerini düzenle',
   _TextKey.quickAddPeriod: 'Hızlı adet ekle',
   _TextKey.quickPeriodSelectHint:
-      'Kaydetmek istediğin geçmiş günlere tek tek dokun',
+      'Günleri seç, tüm değişiklikleri alttan tek seferde onayla',
   _TextKey.quickPeriodSaveSelection: '{count} günü kaydet',
   _TextKey.quickPeriodSaved: '{count} gün hafif akış olarak kaydedildi.',
   _TextKey.quickPeriodSaveFailed: 'Adet günleri kaydedilemedi.',
@@ -1678,6 +1679,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.deletePeriodConfirmationTitle: 'Adet kaydı silinsin mi?',
   _TextKey.deletePeriodConfirmationBody:
       'Bu güne ait adet bilgisi kaldırılacak. Diğer günlük kayıtların korunacak.',
+  _TextKey.confirm: 'Onayla',
   _TextKey.periodEntryDeleted: 'Adet kaydı silindi.',
   _TextKey.periodDeleteFailed: 'Adet kaydı silinemedi. Lütfen tekrar dene.',
   _TextKey.premiumRequired: 'Premium gerekli',
@@ -2337,9 +2339,10 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.expand: 'Expand',
   _TextKey.collapse: 'Collapse',
   _TextKey.month: 'Month',
-  _TextKey.editPeriodDates: 'Edit period dates',
+  _TextKey.editPeriodDates: 'Edit period days',
   _TextKey.quickAddPeriod: 'Quick add period',
-  _TextKey.quickPeriodSelectHint: 'Tap each past day you want to save',
+  _TextKey.quickPeriodSelectHint:
+      'Select the days, then confirm all changes together below',
   _TextKey.quickPeriodSaveSelection: 'Save {count} days',
   _TextKey.quickPeriodSaved: '{count} days saved as light flow.',
   _TextKey.quickPeriodSaveFailed: 'Period days could not be saved.',
@@ -2651,6 +2654,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.deletePeriodConfirmationTitle: 'Delete period entry?',
   _TextKey.deletePeriodConfirmationBody:
       'The period information for this day will be removed. Your other daily entries will stay in place.',
+  _TextKey.confirm: 'Confirm',
   _TextKey.periodEntryDeleted: 'Period entry deleted.',
   _TextKey.periodDeleteFailed:
       'We could not delete this period entry. Please try again.',
@@ -4874,6 +4878,7 @@ class AppStrings {
       _text(_TextKey.deletePeriodConfirmationTitle);
   static String get deletePeriodConfirmationBody =>
       _text(_TextKey.deletePeriodConfirmationBody);
+  static String get confirm => _text(_TextKey.confirm);
   static String get periodEntryDeleted => _text(_TextKey.periodEntryDeleted);
   static String get periodDeleteFailed => _text(_TextKey.periodDeleteFailed);
   static String get premiumRequired => _text(_TextKey.premiumRequired);

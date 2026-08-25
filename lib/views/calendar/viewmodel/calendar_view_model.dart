@@ -34,13 +34,12 @@ class CalendarViewModel extends ChangeNotifier {
   PeriodCalculator? _periodCalculator;
   CycleForecast? _cycleForecast;
   bool _isLoading = true;
+  int _dataRevision = 0;
 
-  // PERFORMANS İÇİN ÖNBELLEK (CACHE) SETLERİ
-  // Hesaplanan günleri burada tutarak O(1) hızında sorgulayacağız.
-  Set<DateTime> _periodDays = {};
+  // Kullanıcının gerçek adet kayıtları ve dar tahmin aralığı bellekte tutulur.
+  // Döngü fazları PeriodCalculator üzerinden O(1) hesaplanır; böylece takvim
+  // sabit bir bitiş yılına bağlı kalmadan ileri yıllara kaydırılabilir.
   Set<DateTime> _loggedPeriodDays = {};
-  Set<DateTime> _ovulationDays = {};
-  Set<DateTime> _fertileDays = {};
   Set<DateTime> _predictionWindowDays = {};
 
   UserSettings? get settings => _settings;
@@ -48,14 +47,15 @@ class CalendarViewModel extends ChangeNotifier {
   DateTime get selectedDay => _selectedDay;
   DateTime get focusedDay => _focusedDay;
   bool get isLoading => _isLoading;
+  int get dataRevision => _dataRevision;
   CycleForecast? get cycleForecast => _cycleForecast;
 
   List<DailyLog> get selectedDayLogs => _logMap[_selectedDay] ?? [];
 
   bool get hasPeriodTracking => _cycleForecast != null;
 
-  Future<void> loadData() async {
-    if (!_isLoading) {
+  Future<void> loadData({bool showLoading = true}) async {
+    if (showLoading && !_isLoading) {
       _isLoading = true;
       notifyListeners();
     }
@@ -77,17 +77,15 @@ class CalendarViewModel extends ChangeNotifier {
     _precomputeCalendarDays();
 
     _isLoading = false;
+    _dataRevision++;
     notifyListeners();
   }
 
-  /// Takvim sınırları içerisindeki tüm özel günleri tek seferde hesaplar.
-  /// Build fonksiyonu çalışırken işlemciyi yormayı engeller.
+  /// Gerçek kayıtları, tahmin aralığını ve O(1) faz hesaplayıcısını hazırlar.
   void _precomputeCalendarDays() {
-    _periodDays = {};
     _loggedPeriodDays = {..._cyclePredictions.menstrualBleedingDays};
-    _ovulationDays = {};
-    _fertileDays = {};
     _predictionWindowDays = {};
+    _periodCalculator = null;
 
     if (!hasPeriodTracking) return;
 
@@ -126,27 +124,6 @@ class CalendarViewModel extends ChangeNotifier {
       _predictionWindowDays.add(windowDay.dateOnly);
       windowDay = windowDay.add(const Duration(days: 1));
     }
-
-    // Takviminizin desteklediği tarih aralığı (TableCalendar ile aynı olmalı)
-    final DateTime start = DateTime(2024, 1, 1);
-    final DateTime end = DateTime(2030, 12, 31);
-
-    DateTime current = start;
-    while (current.isBefore(end)) {
-      final normalizedDate = current.dateOnly;
-
-      if (_periodCalculator!.isInPeriod(normalizedDate)) {
-        _periodDays.add(normalizedDate);
-      }
-      if (_periodCalculator!.isInEstimatedOvulationWindow(normalizedDate)) {
-        _ovulationDays.add(normalizedDate);
-      } else if (_periodCalculator!.isInFertileWindow(normalizedDate)) {
-        _fertileDays.add(normalizedDate);
-      }
-
-      // Bir sonraki güne geç
-      current = current.add(const Duration(days: 1));
-    }
   }
 
   void selectDay(DateTime day) {
@@ -160,9 +137,10 @@ class CalendarViewModel extends ChangeNotifier {
     _focusedDay = day.dateOnly;
   }
 
-  // ARTIK BU METOTLAR AĞIR HESAPLAMA YAPMAZ, ANINDA CEVAP VERİR
+  // Bu sorgular modüler döngü hesabıyla O(1) çalışır.
   bool hasLogForDay(DateTime day) => _logMap.containsKey(day.dateOnly);
-  bool isPeriodDay(DateTime day) => _periodDays.contains(day.dateOnly);
+  bool isPeriodDay(DateTime day) =>
+      _periodCalculator?.isInPeriod(day.dateOnly) ?? false;
   bool isLoggedPeriodDay(DateTime day) =>
       _loggedPeriodDays.contains(day.dateOnly);
   bool isPredictedPeriodDay(DateTime day) =>
@@ -170,33 +148,63 @@ class CalendarViewModel extends ChangeNotifier {
   bool isPeriodPredictionWindowDay(DateTime day) =>
       _predictionWindowDays.contains(day.dateOnly);
   bool isEstimatedOvulationDay(DateTime day) =>
-      _ovulationDays.contains(day.dateOnly);
-  bool isFertileDay(DateTime day) => _fertileDays.contains(day.dateOnly);
+      _periodCalculator?.isInEstimatedOvulationWindow(day.dateOnly) ?? false;
+  bool isFertileDay(DateTime day) {
+    final calculator = _periodCalculator;
+    if (calculator == null || calculator.isInEstimatedOvulationWindow(day)) {
+      return false;
+    }
+    return calculator.isInFertileWindow(day.dateOnly);
+  }
+
+  /// Tek bir adet gününü ekler veya kaldırır.
+  Future<bool> setPeriodDayLogged(
+    DateTime day, {
+    required bool shouldBeLogged,
+  }) => applyPeriodDayChanges({day: shouldBeLogged});
 
   /// Seçilen geçmiş/today günlerini tek seferde hafif adet akışı olarak ekler.
   /// Var olan adet kayıtlarının yoğunluğu değiştirilmez; aynı timestamp'teki
   /// diğer günlük veriler korunur.
-  Future<bool> addLightPeriodDays(Iterable<DateTime> days) async {
+  Future<bool> addLightPeriodDays(Iterable<DateTime> days) =>
+      applyPeriodDayChanges({for (final day in days) day: true});
+
+  /// Takvimde hazırlanan ekleme ve silme taslaklarını tek işlemde uygular.
+  Future<bool> applyPeriodDayChanges(Map<DateTime, bool> changes) async {
     final today = AppTime.now.dateOnly;
-    final normalizedDays =
-        days
-            .map((day) => day.dateOnly)
-            .where((day) => !day.isAfter(today))
-            .toSet()
-            .toList()
-          ..sort();
-    if (normalizedDays.isEmpty) return false;
+    final normalizedChanges = <DateTime, bool>{};
+    for (final entry in changes.entries) {
+      final day = entry.key.dateOnly;
+      if (!day.isAfter(today)) normalizedChanges[day] = entry.value;
+    }
+    if (normalizedChanges.isEmpty) return false;
+
+    final orderedDays = normalizedChanges.keys.toList()..sort();
 
     var allSuccessful = true;
     var hasChanges = false;
-    for (final day in normalizedDays) {
+    var hasDeletion = false;
+    for (final day in orderedDays) {
+      final shouldBeLogged = normalizedChanges[day]!;
       final logs = _storage.loadLogsForDate(day);
-      final alreadyHasPeriod = logs.any(
+      final hasPeriod = logs.any(
         (log) =>
             log.flowIntensity != null ||
             log.observedSections.contains(DailyLogObservedSection.period),
       );
-      if (alreadyHasPeriod) continue;
+
+      if (!shouldBeLogged) {
+        if (!hasPeriod) continue;
+        if (!await _storage.deletePeriodLogsForDate(day)) {
+          allSuccessful = false;
+        } else {
+          hasChanges = true;
+          hasDeletion = true;
+        }
+        continue;
+      }
+
+      if (hasPeriod) continue;
 
       DailyLog? untimedLog;
       for (final log in logs) {
@@ -223,11 +231,17 @@ class CalendarViewModel extends ChangeNotifier {
     }
 
     if (hasChanges && _storage.isUserLoggedIn) {
-      await _sync?.mergeWithCloud();
+      if (hasDeletion) {
+        // Silinen period-only kayıt birleşimde buluttan geri gelmesin; yerel
+        // anlık görüntü bu toplu işlem için yetkilidir.
+        await _sync?.backupToCloud();
+      } else {
+        await _sync?.mergeWithCloud();
+      }
     }
 
     await _cyclePredictions.refresh(force: true);
-    await loadData();
+    await loadData(showLoading: false);
     return allSuccessful;
   }
 
