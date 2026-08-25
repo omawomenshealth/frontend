@@ -7,13 +7,13 @@ import '../../formatters/onboarding_date_slash_formatter.dart';
 import '../widgets/index.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 
-class MeetYouPage extends StatelessWidget {
+class IntroductionPage extends StatelessWidget {
   final OnboardingViewModel vm;
   final TextEditingController birthDateController;
   final VoidCallback onPickBirthDate;
   final ValueChanged<String> onBirthDateChanged;
 
-  const MeetYouPage({
+  const IntroductionPage({
     super.key,
     required this.vm,
     required this.birthDateController,

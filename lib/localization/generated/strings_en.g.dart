@@ -50,12 +50,12 @@ class Translations$onboarding$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
-	late final Translations$onboarding$howAreYou$en howAreYou = Translations$onboarding$howAreYou$en.internal(_root);
+	late final Translations$onboarding$wellbeing$en wellbeing = Translations$onboarding$wellbeing$en.internal(_root);
 }
 
-// Path: onboarding.howAreYou
-class Translations$onboarding$howAreYou$en {
-	Translations$onboarding$howAreYou$en.internal(this._root);
+// Path: onboarding.wellbeing
+class Translations$onboarding$wellbeing$en {
+	Translations$onboarding$wellbeing$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -73,13 +73,13 @@ class Translations$onboarding$howAreYou$en {
 	/// en: 'You can choose more than one.'
 	String get multiSelectHint => 'You can choose more than one.';
 
-	late final Translations$onboarding$howAreYou$moodOptions$en moodOptions = Translations$onboarding$howAreYou$moodOptions$en.internal(_root);
-	late final Translations$onboarding$howAreYou$supportOptions$en supportOptions = Translations$onboarding$howAreYou$supportOptions$en.internal(_root);
+	late final Translations$onboarding$wellbeing$moodOptions$en moodOptions = Translations$onboarding$wellbeing$moodOptions$en.internal(_root);
+	late final Translations$onboarding$wellbeing$supportOptions$en supportOptions = Translations$onboarding$wellbeing$supportOptions$en.internal(_root);
 }
 
-// Path: onboarding.howAreYou.moodOptions
-class Translations$onboarding$howAreYou$moodOptions$en {
-	Translations$onboarding$howAreYou$moodOptions$en.internal(this._root);
+// Path: onboarding.wellbeing.moodOptions
+class Translations$onboarding$wellbeing$moodOptions$en {
+	Translations$onboarding$wellbeing$moodOptions$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -101,9 +101,9 @@ class Translations$onboarding$howAreYou$moodOptions$en {
 	String get mixed => 'I feel mixed';
 }
 
-// Path: onboarding.howAreYou.supportOptions
-class Translations$onboarding$howAreYou$supportOptions$en {
-	Translations$onboarding$howAreYou$supportOptions$en.internal(this._root);
+// Path: onboarding.wellbeing.supportOptions
+class Translations$onboarding$wellbeing$supportOptions$en {
+	Translations$onboarding$wellbeing$supportOptions$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -136,21 +136,21 @@ class Translations$onboarding$howAreYou$supportOptions$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
-			'onboarding.howAreYou.title' => 'How are you?',
-			'onboarding.howAreYou.moodQuestion' => 'How have you been feeling lately?',
-			'onboarding.howAreYou.supportQuestion' => 'Where would you like me to support you?',
-			'onboarding.howAreYou.multiSelectHint' => 'You can choose more than one.',
-			'onboarding.howAreYou.moodOptions.good' => 'I feel good',
-			'onboarding.howAreYou.moodOptions.tired' => 'I am tired',
-			'onboarding.howAreYou.moodOptions.anxious' => 'I feel anxious',
-			'onboarding.howAreYou.moodOptions.pain' => 'I am in pain',
-			'onboarding.howAreYou.moodOptions.mixed' => 'I feel mixed',
-			'onboarding.howAreYou.supportOptions.relievePain' => 'Relieve pain',
-			'onboarding.howAreYou.supportOptions.recoverEnergy' => 'Recover energy',
-			'onboarding.howAreYou.supportOptions.calmAnxiety' => 'Calm anxiety',
-			'onboarding.howAreYou.supportOptions.improveSleep' => 'Improve sleep',
-			'onboarding.howAreYou.supportOptions.understandCycle' => 'Understand my cycle',
-			'onboarding.howAreYou.supportOptions.justListen' => 'Just listen',
+			'onboarding.wellbeing.title' => 'How are you?',
+			'onboarding.wellbeing.moodQuestion' => 'How have you been feeling lately?',
+			'onboarding.wellbeing.supportQuestion' => 'Where would you like me to support you?',
+			'onboarding.wellbeing.multiSelectHint' => 'You can choose more than one.',
+			'onboarding.wellbeing.moodOptions.good' => 'I feel good',
+			'onboarding.wellbeing.moodOptions.tired' => 'I am tired',
+			'onboarding.wellbeing.moodOptions.anxious' => 'I feel anxious',
+			'onboarding.wellbeing.moodOptions.pain' => 'I am in pain',
+			'onboarding.wellbeing.moodOptions.mixed' => 'I feel mixed',
+			'onboarding.wellbeing.supportOptions.relievePain' => 'Relieve pain',
+			'onboarding.wellbeing.supportOptions.recoverEnergy' => 'Recover energy',
+			'onboarding.wellbeing.supportOptions.calmAnxiety' => 'Calm anxiety',
+			'onboarding.wellbeing.supportOptions.improveSleep' => 'Improve sleep',
+			'onboarding.wellbeing.supportOptions.understandCycle' => 'Understand my cycle',
+			'onboarding.wellbeing.supportOptions.justListen' => 'Just listen',
 			_ => null,
 		};
 	}
