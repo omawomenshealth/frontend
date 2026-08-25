@@ -25,11 +25,12 @@ class OnboardingQuestion extends StatelessWidget {
           question,
           style: const TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 15,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
         ),
-        child,  // Display the child widget (e.g., input field, selector, etc.)
+        const SizedBox(height: 8),
+        child,
         if (helper != null) ...[
           const SizedBox(height: 8),
           Text(

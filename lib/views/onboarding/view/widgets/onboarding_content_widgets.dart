@@ -154,15 +154,16 @@ class OnboardingCard extends StatelessWidget {
             const SizedBox(height: 12),
             Expanded(
               child: LayoutBuilder(
-                builder: (context, constraints) => FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    width: constraints.maxWidth,
-                    height: 480,
-                    child: child,
-                  ),
-                ),
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: child,
+                    ),
+                  );
+                },
               ),
             ),
             if (footer != null) ...[const SizedBox(height: 8), footer!],

@@ -128,7 +128,7 @@ class _CycleLengthSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return OnboardingQuestion(
       question: AppStrings.cycleInformation,
-      controlSpacing: 8,
+      controlSpacing: 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -169,7 +169,7 @@ class _LastPeriodSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return OnboardingQuestion(
       question: AppStrings.lastPeriodDaysQuestion,
-      controlSpacing: 8,
+      controlSpacing: 0,
       child: SizedBox(
         width: double.infinity,
         child: OutlinedButton.icon(
@@ -259,7 +259,7 @@ class _MenopauseSection extends StatelessWidget {
 
     return OnboardingQuestion(
       question: AppStrings.menopauseStatus,
-      controlSpacing: 8,
+      controlSpacing: 0,
       child: Wrap(
           spacing: 6,
           runSpacing: 6,
@@ -308,7 +308,7 @@ class _BirthControlSection extends StatelessWidget {
 
     return OnboardingQuestion(
       question: AppStrings.birthControl,
-      controlSpacing: 8,
+      controlSpacing: 0,
       child: Wrap(
           spacing: 6,
           runSpacing: 6,
