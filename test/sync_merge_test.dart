@@ -205,7 +205,7 @@ void main() {
       final cloudSettings = UserSettings(
         isOnboardingComplete: true,
         userName: 'Bulut',
-        isSmoker: true,
+        smokingStatus: SmokingStatus.current,
         smokingYears: 4,
         averageCycleLength: 33,
         notificationsEnabled: false,
@@ -215,7 +215,7 @@ void main() {
       expect(await sync.mergeWithCloud(), isTrue);
       final merged = storage.loadSettings()!;
       expect(merged.userName, 'Bulut');
-      expect(merged.isSmoker, isTrue);
+      expect(merged.smokingStatus, SmokingStatus.current);
       expect(merged.smokingYears, 4);
       expect(merged.averageCycleLength, 33);
       expect(merged.notificationsEnabled, isFalse);

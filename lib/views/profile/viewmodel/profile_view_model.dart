@@ -181,10 +181,12 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateIsSmoker(bool value) {
+  void updateSmokingStatus(SmokingStatus value) {
     _settings = _settings.copyWith(
-      isSmoker: value,
-      smokingYears: value ? _settings.smokingYears : 0,
+      smokingStatus: value,
+      smokingYears: value == SmokingStatus.current
+          ? _settings.smokingYears
+          : 0,
     );
     notifyListeners();
   }

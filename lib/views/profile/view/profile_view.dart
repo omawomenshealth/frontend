@@ -123,7 +123,7 @@ class _ProfileMechanics extends StatelessWidget {
                       if (s.age != null) _infoRow(AppStrings.age, '${s.age}'),
                       _infoRow(
                         AppStrings.smoking,
-                        s.isSmoker
+                        s.smokingStatus == SmokingStatus.current
                             ? '${AppStrings.yes}${s.smokingYears != null && s.smokingYears! > 0 ? " (${AppStrings.yearsSmoking(s.smokingYears!)})" : ""}'
                             : AppStrings.no,
                       ),
@@ -481,18 +481,24 @@ class _ProfileMechanics extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _chipButton(AppStrings.yes, vm.settings.isSmoker, () {
-                      vm.updateIsSmoker(true);
+                    _chipButton(
+                      AppStrings.yes,
+                      vm.settings.smokingStatus == SmokingStatus.current,
+                      () {
+                      vm.updateSmokingStatus(SmokingStatus.current);
                       setSheetState(() {});
                     }),
                     const SizedBox(width: 8),
-                    _chipButton(AppStrings.no, !vm.settings.isSmoker, () {
-                      vm.updateIsSmoker(false);
+                    _chipButton(
+                      AppStrings.no,
+                      vm.settings.smokingStatus == SmokingStatus.never,
+                      () {
+                      vm.updateSmokingStatus(SmokingStatus.never);
                       setSheetState(() {});
                     }),
                   ],
                 ),
-                if (vm.settings.isSmoker) ...[
+                if (vm.settings.smokingStatus == SmokingStatus.current) ...[
                   const SizedBox(height: 12),
                   _sheetField(
                     AppStrings.smokingYears,

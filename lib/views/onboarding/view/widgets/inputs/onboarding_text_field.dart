@@ -5,24 +5,30 @@ import '../../../../../core/constants/color_constants.dart';
 
 class OnboardingTextField extends StatelessWidget {
   final Key? fieldKey;
-  final String hintText;
+  final String? hintText;
+  final String? labelText;
+  final String? suffixText;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
   final TextCapitalization textCapitalization;
   final List<TextInputFormatter>? inputFormatters;
-  final Widget? suffixIcon;
 
   const OnboardingTextField({
     super.key,
     this.fieldKey,
-    required this.hintText,
+    this.hintText,
+    this.labelText,
+    this.suffixText,
+    this.prefixIcon,
+    this.suffixIcon,
     this.controller,
     this.onChanged,
     this.keyboardType,
     this.textCapitalization = TextCapitalization.none,
     this.inputFormatters,
-    this.suffixIcon,
   });
 
   @override
@@ -39,36 +45,11 @@ class OnboardingTextField extends StatelessWidget {
         onChanged: onChanged,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 16,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 22,
-            vertical: 16,
-          ),
+          labelText: labelText,
+          suffixText: suffixText,
+          prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(999),
-            borderSide: const BorderSide(
-              color: Color(0xFFE3DFD7),
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(999),
-            borderSide: const BorderSide(
-              color: Color(0xFFE3DFD7),
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(999),
-            borderSide: const BorderSide(
-              color: Color(0xFF78904F),
-              width: 1.5,
-            ),
-          ),
+          // ...
         ),
         style: const TextStyle(
           color: AppColors.textPrimary,

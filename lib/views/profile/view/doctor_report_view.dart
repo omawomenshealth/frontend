@@ -166,7 +166,7 @@ class DoctorReportView extends StatelessWidget {
               ),
               _infoRow(
                 AppStrings.smoking,
-                settings.isSmoker
+                settings.smokingStatus == SmokingStatus.current
                     ? '${AppStrings.yes}${settings.smokingYears != null && settings.smokingYears! > 0 ? " (${AppStrings.yearsSmoking(settings.smokingYears!)})" : ""}'
                     : AppStrings.no,
               ),
@@ -731,7 +731,7 @@ class DoctorReportView extends StatelessWidget {
       '${AppStrings.weightHeight}: ${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm',
     );
     sb.writeln(
-      '${AppStrings.smoking}: ${settings.isSmoker ? AppStrings.yes : AppStrings.no}',
+      '${AppStrings.smoking}: ${settings.smokingStatus == SmokingStatus.current ? AppStrings.yes : AppStrings.no}',
     );
     sb.writeln(
       '${AppStrings.chronicDiseases}: ${settings.chronicDiseases.isNotEmpty ? settings.chronicDiseases.map(AppStrings.localizeStoredValue).join(", ") : AppStrings.noConditions}',

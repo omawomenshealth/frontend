@@ -131,7 +131,9 @@ class DoctorReportPdfBuilder {
           ),
           reportView._pdfInfoRow(
             AppStrings.smoking,
-            settings.isSmoker ? AppStrings.yes : AppStrings.no,
+            settings.smokingStatus == SmokingStatus.current
+              ? AppStrings.yes
+              : AppStrings.no,
           ),
           reportView._pdfInfoRow(
             AppStrings.chronicDiseases,

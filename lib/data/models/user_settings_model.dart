@@ -7,6 +7,8 @@ import 'medication_identity_model.dart';
 /// Menopoz durumu.
 enum MenopauseStatus { none, pre, peri, post }
 
+enum SmokingStatus { current, never, former }
+
 /// Kullanıcının `+` ile eklediği ve sonraki kayıtlarda yeniden seçilebilen
 /// metin seçenekleri. Günlük kayıtlarda ilk girilen yazım korunur; böylece aynı
 /// değişken farklı büyük/küçük harf veya boşluklarla parçalanmaz.
@@ -35,6 +37,7 @@ enum CustomSymptomGroup {
 const _userSettingsJsonFields = {
   'userName',
   'isOnboardingComplete',
+  'smokingStatus',
   'isSmoker',
   'smokingYears',
   'weight',
@@ -65,6 +68,18 @@ const _userSettingsJsonFields = {
   'notificationsEnabled',
 };
 
+SmokingStatus _smokingStatusFromJson(Map<String, dynamic> json) {
+  final rawStatus = json['smokingStatus'];
+  if (rawStatus is String) {
+    return SmokingStatus.values.firstWhere(
+      (value) => value.name == rawStatus,
+      orElse: () => SmokingStatus.never,
+    );
+  }
+  if (json['isSmoker'] == true) return SmokingStatus.current;
+  return SmokingStatus.never;
+}
+
 /// Kullanıcı profil ve ayar bilgilerini tutan model.
 ///
 /// Uygulama kadın sağlığı ve adet döngüsü odaklı olduğu için ayrıca bir
@@ -74,7 +89,7 @@ class UserSettings {
   final bool isOnboardingComplete;
 
   // Ortak bilgiler
-  final bool isSmoker;
+  final SmokingStatus smokingStatus;
   final int? smokingYears;
   final double? weight;
   final double? height;
@@ -114,7 +129,7 @@ class UserSettings {
   UserSettings({
     this.userName = '',
     this.isOnboardingComplete = false,
-    this.isSmoker = false,
+    this.smokingStatus = SmokingStatus.never,
     this.smokingYears,
     this.weight,
     this.height,
@@ -147,7 +162,7 @@ class UserSettings {
   UserSettings copyWith({
     String? userName,
     bool? isOnboardingComplete,
-    bool? isSmoker,
+    SmokingStatus? smokingStatus,
     int? smokingYears,
     double? weight,
     double? height,
@@ -182,7 +197,7 @@ class UserSettings {
     return UserSettings(
       userName: userName ?? this.userName,
       isOnboardingComplete: isOnboardingComplete ?? this.isOnboardingComplete,
-      isSmoker: isSmoker ?? this.isSmoker,
+      smokingStatus: smokingStatus ?? this.smokingStatus,
       smokingYears: smokingYears ?? this.smokingYears,
       weight: weight ?? this.weight,
       height: height ?? this.height,
@@ -293,7 +308,7 @@ class UserSettings {
     return {
       'userName': userName,
       'isOnboardingComplete': isOnboardingComplete,
-      'isSmoker': isSmoker,
+      'smokingStatus': smokingStatus.name,
       'smokingYears': smokingYears,
       'weight': weight,
       'height': height,
@@ -362,7 +377,7 @@ class UserSettings {
     return UserSettings(
       userName: json['userName'] as String? ?? '',
       isOnboardingComplete: json['isOnboardingComplete'] as bool? ?? false,
-      isSmoker: json['isSmoker'] as bool? ?? false,
+      smokingStatus: _smokingStatusFromJson(json),
       smokingYears: (json['smokingYears'] as num?)?.toInt(),
       weight: (json['weight'] as num?)?.toDouble(),
       height: (json['height'] as num?)?.toDouble(),

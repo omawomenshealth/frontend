@@ -90,14 +90,23 @@ void main() {
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
-    expect(find.text('Temel sağlık bilgilerin'), findsOneWidget);
-    expect(
-      find.text(
-        'Bu bilgiler, uygulamadaki özetleri sana göre düzenlememize yardımcı olur.',
-      ),
-      findsOneWidget,
-    );
-    expect(find.text(AppStrings.wantsChildrenInYear), findsNothing);
+    expect(find.text(AppStrings.symptomBody), findsOneWidget);
+    expect(find.byKey(const ValueKey('onboarding_height')), findsOneWidget);
+    expect(find.byKey(const ValueKey('onboarding_weight')), findsOneWidget);
+    expect(find.text(AppStrings.smokingStatus), findsOneWidget);
+    expect(find.text(AppStrings.knownConditionQuestion), findsOneWidget);
+
+    await tester.tap(find.text(AppStrings.next));
+    await tester.pumpAndSettle();
+    expect(find.text('Döngün'), findsOneWidget);
+    expect(find.text(AppStrings.menopauseStatus), findsOneWidget);
+    expect(find.text(AppStrings.averageCycleLength), findsNothing);
+    expect(find.text(AppStrings.birthControl), findsNothing);
+    await tester.tap(find.text(AppStrings.none));
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.averageCycleLength), findsOneWidget);
+    expect(find.text(AppStrings.lastPeriodDaysQuestion), findsOneWidget);
+    expect(find.text(AppStrings.birthControl), findsOneWidget);
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
@@ -117,27 +126,9 @@ void main() {
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
-    expect(
-      find.text('Takipte dikkate almamızı istediğin bir hastalığın var mı?'),
-      findsOneWidget,
-    );
+    expect(find.text('Ek sağlık bilgilerin'), findsOneWidget);
+    expect(find.text(AppStrings.knownConditionQuestion), findsOneWidget);
     expect(find.text('Hastalık ara'), findsOneWidget);
-
-    await tester.tap(find.text(AppStrings.next));
-    await tester.pumpAndSettle();
-    expect(find.text(AppStrings.lastPeriodDaysQuestion), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('onboarding_last_period_days')),
-      findsOneWidget,
-    );
-    expect(find.text(AppStrings.selectLastPeriodDays), findsOneWidget);
-
-    await tester.tap(find.text(AppStrings.next));
-    await tester.pumpAndSettle();
-    expect(
-      find.byKey(const ValueKey('onboarding_add_birth_control')),
-      findsOneWidget,
-    );
     expect(tester.takeException(), isNull);
   });
 
