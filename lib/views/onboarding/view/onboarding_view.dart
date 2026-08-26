@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../controller/onboarding_controller.dart';
 import '../utils/onboarding_date_utils.dart';
+import 'pages/health_profile_page.dart';
 import 'widgets/index.dart';
 import '../viewmodel/onboarding_view_model.dart';
 import 'pages/index.dart';
@@ -76,16 +77,19 @@ class _OnboardingViewState extends State<OnboardingView> {
                           );
                         },
                       ),
-                      const WellbeingPage(),
-                      BasicHealthPage(vm: vm),
+                      WellbeingPage(),
+                      HealthProfilePage(vm: vm),
+                      CyclePage(
+                        vm: vm,
+                        onPickLastPeriod: controller.pickLastPeriod,
+                        onAddBirthControl: controller.addBirthControl,
+                      ),
                       DetailedHealthPage(
                         vm: vm,
                         step: vm.detailStep,
                         forward: vm.detailForward,
                         onOpenLabs: controller.showLabPicker,
                         onOpenDiseases: controller.showDiseasePicker,
-                        onPickLastPeriod: controller.pickLastPeriod,
-                        onAddBirthControl: controller.addBirthControl,
                       ),
                     ],
                   ),

@@ -18,7 +18,7 @@ class OnboardingViewModel extends ChangeNotifier {
   OnboardingViewModel(this._storage, this._sync);
 
   // Navigation state
-  static const detailStepCount = 4;
+  static const detailStepCount = 2;
 
   int _currentPage = 0;
   int _detailStep = 0;
@@ -32,7 +32,7 @@ class OnboardingViewModel extends ChangeNotifier {
   double? _height;
 
   // Form state: lifestyle
-  bool _isSmoker = false;
+  SmokingStatus _smokingStatus = SmokingStatus.never;
   int _smokingYears = 0;
 
   // Form state: relationship
@@ -53,6 +53,7 @@ class OnboardingViewModel extends ChangeNotifier {
   DateTime? _lastPeriodDate;
   List<DateTime> _lastPeriodDays = [];
   MenopauseStatus _menopauseStatus = MenopauseStatus.none;
+  bool _hasMenopauseSelection = false;
   String? _birthControlMethod;
   List<String> _womenDiseases = [];
   final List<String> _customConditions = [];
@@ -67,7 +68,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   // Getters: navigation
   int get currentPage => _currentPage;
-  int get totalPages => 4;
+  int get totalPages => 5;
   bool get canGoNext => _currentPage < totalPages - 1;
   bool get canGoBack => _currentPage > 0;
   bool get isDetailedHealthPage => _currentPage == totalPages - 1;
@@ -84,7 +85,7 @@ class OnboardingViewModel extends ChangeNotifier {
   double? get weight => _weight;
   double? get height => _height;
 
-  bool get isSmoker => _isSmoker;
+  SmokingStatus get smokingStatus => _smokingStatus;
   int get smokingYears => _smokingYears;
 
   String get relationshipStatus => _relationshipStatus;
@@ -102,6 +103,7 @@ class OnboardingViewModel extends ChangeNotifier {
   DateTime? get lastPeriodDate => _lastPeriodDate;
   List<DateTime> get lastPeriodDays => List.unmodifiable(_lastPeriodDays);
   MenopauseStatus get menopauseStatus => _menopauseStatus;
+  bool get hasMenopauseSelection => _hasMenopauseSelection;
   String? get birthControlMethod => _birthControlMethod;
   List<String> get womenDiseases => _womenDiseases;
   List<String> get customConditions => _customConditions;
@@ -185,9 +187,9 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   // Lifestyle actions
-  void setIsSmoker(bool value) {
-    _isSmoker = value;
-    if (!value) _smokingYears = 0;
+  void setSmokingStatus(SmokingStatus value) {
+    _smokingStatus = value;
+    if (value != SmokingStatus.current) _smokingYears = 0;
     notifyListeners();
   }
 
@@ -342,6 +344,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   void setMenopauseStatus(MenopauseStatus value) {
     _menopauseStatus = value;
+    _hasMenopauseSelection = true;
     notifyListeners();
   }
 
@@ -443,8 +446,10 @@ class OnboardingViewModel extends ChangeNotifier {
     return UserSettings(
       userName: _userName,
       isOnboardingComplete: true,
-      isSmoker: _isSmoker,
-      smokingYears: _isSmoker ? _smokingYears : null,
+        smokingStatus: _smokingStatus,
+        smokingYears: _smokingStatus == SmokingStatus.current
+          ? _smokingYears
+          : null,
       weight: _weight,
       height: _height,
       age: _age,

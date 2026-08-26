@@ -7,3 +7,4 @@ export 'onboarding_navigation.dart';
 export 'onboarding_selection_sheet.dart';
 export 'onboarding_question.dart';
 export 'inputs/index.dart';
+export 'onboarding_chip.dart';

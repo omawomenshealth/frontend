@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../../core/constants/color_constants.dart';
+import '../index.dart';
 
 class OnboardingMultiSelect extends StatelessWidget {
   final List<String> options;
@@ -17,8 +16,8 @@ class OnboardingMultiSelect extends StatelessWidget {
     required this.selectedValues,
     required this.onChanged,
     this.maxSelection,
-    this.spacing = 10,
-    this.runSpacing = 10,
+    this.spacing = 6,
+    this.runSpacing = 6,
     this.compact = false,
   });
 
@@ -29,7 +28,7 @@ class OnboardingMultiSelect extends StatelessWidget {
       runSpacing: runSpacing,
       children: [
         for (final option in options)
-          _OnboardingMultiSelectChip(
+          OnboardingChip(
             label: option,
             isSelected: selectedValues.contains(option),
             onTap: () => _toggle(option),
@@ -41,8 +40,17 @@ class OnboardingMultiSelect extends StatelessWidget {
 
   void _toggle(String value) {
     final next = <String>{...selectedValues};
+
     if (next.contains(value)) {
       next.remove(value);
+      onChanged(next);
+      return;
+    }
+
+    if (maxSelection == 1 && next.isNotEmpty) {
+      next
+        ..clear()
+        ..add(value);
       onChanged(next);
       return;
     }
@@ -53,51 +61,5 @@ class OnboardingMultiSelect extends StatelessWidget {
 
     next.add(value);
     onChanged(next);
-  }
-}
-
-class _OnboardingMultiSelectChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final bool compact;
-
-  const _OnboardingMultiSelectChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-    required this.compact,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(999),
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: EdgeInsets.symmetric(
-          horizontal: compact ? 10 : 14,
-          vertical: compact ? 8 : 8,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0x1A78904F)
-              : Colors.white.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF78904F) : const Color(0xFFE3DFD7),
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? const Color(0xFF4D5F36) : AppColors.textSecondary,
-            fontSize: 14,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          ),
-        ),
-      ),
-    );
   }
 }

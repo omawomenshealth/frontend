@@ -12,8 +12,6 @@ class DetailedHealthPage extends StatelessWidget {
   final bool forward;
   final VoidCallback onOpenLabs;
   final VoidCallback onOpenDiseases;
-  final VoidCallback onPickLastPeriod;
-  final VoidCallback onAddBirthControl;
 
   const DetailedHealthPage({
     super.key,
@@ -22,8 +20,6 @@ class DetailedHealthPage extends StatelessWidget {
     required this.forward,
     required this.onOpenLabs,
     required this.onOpenDiseases,
-    required this.onPickLastPeriod,
-    required this.onAddBirthControl,
   });
 
   @override
@@ -37,8 +33,6 @@ class DetailedHealthPage extends StatelessWidget {
         diseases: vm.knownDiseases,
         onOpen: onOpenDiseases,
       ),
-      CycleStep(vm: vm, onPickLastPeriod: onPickLastPeriod),
-      ReproductiveStep(vm: vm, onAddBirthControl: onAddBirthControl),
     ];
     return OnboardingCard(
       title: AppStrings.detailedHealthInformationTitle,
