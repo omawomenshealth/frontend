@@ -17,6 +17,11 @@ Future<void> showDiseaseSelectionSheet(
     ...vm.customConditions,
   ]);
   var query = '';
+  final initialSelected = vm.knownDiseases
+      .map(AppStrings.localizeStoredValue)
+      .toSet();
+  final selected = <String>{...initialSelected};
+  final addedCustom = <String>{};
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -37,7 +42,19 @@ Future<void> showDiseaseSelectionSheet(
           title: AppStrings.conditions,
           icon: Icons.health_and_safety_outlined,
           accent: AppColors.accent,
-          onSave: () => Navigator.pop(sheetContext),
+          onSave: () {
+            for (final disease in initialSelected.difference(selected)) {
+              vm.toggleKnownDisease(disease);
+            }
+            for (final disease in selected.difference(initialSelected)) {
+              if (addedCustom.contains(disease)) {
+                vm.addKnownDisease(disease);
+              } else {
+                vm.toggleKnownDisease(disease);
+              }
+            }
+            Navigator.pop(sheetContext);
+          },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -57,16 +74,14 @@ Future<void> showDiseaseSelectionSheet(
                   for (final disease in visible)
                     FilterChip(
                       label: Text(disease),
-                      selected: vm.knownDiseases.any(
-                        (value) =>
-                            AppStrings.localizeStoredValue(
-                              value,
-                            ).toLowerCase() ==
-                            disease.toLowerCase(),
-                      ),
+                      selected: selected.contains(disease),
                       selectedColor: AppColors.accent.withValues(alpha: 0.14),
                       onSelected: (_) {
-                        vm.toggleKnownDisease(disease);
+                        if (selected.contains(disease)) {
+                          selected.remove(disease);
+                        } else {
+                          selected.add(disease);
+                        }
                         setSheetState(() {});
                       },
                     ),
@@ -80,7 +95,9 @@ Future<void> showDiseaseSelectionSheet(
                         AppStrings.addCondition,
                       );
                       if (value == null || value.isEmpty) return;
-                      vm.addKnownDisease(value);
+                      catalog.add(value);
+                      addedCustom.add(value);
+                      selected.add(value);
                       setSheetState(() {});
                     },
                   ),

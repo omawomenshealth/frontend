@@ -35,34 +35,6 @@ class LabStep extends StatelessWidget {
   }
 }
 
-class DiseaseStep extends StatelessWidget {
-  final List<String> diseases;
-  final VoidCallback onOpen;
-
-  const DiseaseStep({
-    super.key,
-    required this.diseases,
-    required this.onOpen,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return OnboardingCompactPrompt(
-      icon: Icons.health_and_safety_outlined,
-      accent: AppColors.accent,
-      title: AppStrings.knownConditionQuestion,
-      description: AppStrings.combinedConditionsDescription,
-      summary: diseases.isEmpty
-          ? AppStrings.noConditionSelected
-          : diseases
-              .map(AppStrings.localizeStoredValue)
-              .join(', '),
-      buttonLabel: AppStrings.searchConditions,
-      onPressed: onOpen,
-    );
-  }
-}
-
 class CycleStep extends StatelessWidget {
   final OnboardingViewModel vm;
   final VoidCallback onPickLastPeriod;

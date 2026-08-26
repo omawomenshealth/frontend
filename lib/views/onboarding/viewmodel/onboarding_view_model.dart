@@ -18,7 +18,7 @@ class OnboardingViewModel extends ChangeNotifier {
   OnboardingViewModel(this._storage, this._sync);
 
   // Navigation state
-  static const detailStepCount = 2;
+  static const detailStepCount = 1;
 
   int _currentPage = 0;
   int _detailStep = 0;
