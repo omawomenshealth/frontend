@@ -72,6 +72,11 @@ void main() {
       AppStrings.exploreOvulationDescription,
       startsWith('Estimated chance of pregnancy'),
     );
+    expect(
+      AppStrings.periodPredictionLowConfidenceSummary('9/17 - 9/29'),
+      'Period prediction: 9/17 - 9/29 · '
+      'Add more data for more accurate results',
+    );
     expect(AppStrings.symptomEnergyLevelOptions, [
       'Energetic',
       'Fatigue',
@@ -130,6 +135,11 @@ void main() {
     expect(AppStrings.symptomSkinHairOptions, contains('Yağlı cilt'));
     expect(AppStrings.symptomOverallOptions, ['Her şey yolunda', 'Stres']);
     expect(AppStrings.localizeStoredValue('Stress'), 'Stres');
+    expect(
+      AppStrings.periodPredictionLowConfidenceSummary('17.9 - 29.9'),
+      'Tahmini adet başlangıcı: 17.9 - 29.9 · '
+      'Verilerinle daha doğru sonuçlar elde edelim',
+    );
     expect(AppStrings.symptomEnergyLevelOptions, [
       'Enerjik',
       'Yorgunluk',

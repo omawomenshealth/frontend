@@ -766,6 +766,7 @@ enum _TextKey {
   forecastConfidenceMedium,
   forecastConfidenceHigh,
   periodPredictionSummary,
+  periodPredictionLowConfidenceSummary,
   dateDisplayPattern,
   dateTimeDisplayPattern,
   cloudSyncPrivacyNotice,
@@ -1767,6 +1768,8 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.forecastConfidenceHigh: 'yüksek',
   _TextKey.periodPredictionSummary:
       'Tahmini adet başlangıcı: {range} · Güven: {confidence}',
+  _TextKey.periodPredictionLowConfidenceSummary:
+      'Tahmini adet başlangıcı: {range} · Verilerinle daha doğru sonuçlar elde edelim',
   _TextKey.dateDisplayPattern: 'dd.MM.yyyy',
   _TextKey.dateTimeDisplayPattern: 'dd.MM.yyyy HH:mm',
   _TextKey.cloudSyncPrivacyNotice:
@@ -2743,6 +2746,8 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.forecastConfidenceHigh: 'high',
   _TextKey.periodPredictionSummary:
       'Period prediction: {range} · {confidence} confidence',
+  _TextKey.periodPredictionLowConfidenceSummary:
+      'Period prediction: {range} · Add more data for more accurate results',
   _TextKey.dateDisplayPattern: 'MM/dd/yyyy',
   _TextKey.dateTimeDisplayPattern: 'MM/dd/yyyy h:mm a',
   _TextKey.cloudSyncPrivacyNotice:
@@ -4989,6 +4994,8 @@ class AppStrings {
         'range': range,
         'confidence': confidence,
       });
+  static String periodPredictionLowConfidenceSummary(String range) =>
+      _format(_TextKey.periodPredictionLowConfidenceSummary, {'range': range});
   static String get dateDisplayPattern => _text(_TextKey.dateDisplayPattern);
   static String get dateTimeDisplayPattern =>
       _text(_TextKey.dateTimeDisplayPattern);
