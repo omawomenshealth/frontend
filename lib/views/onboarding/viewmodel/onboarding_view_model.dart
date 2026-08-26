@@ -68,7 +68,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   // Getters: navigation
   int get currentPage => _currentPage;
-  int get totalPages => 5;
+  int get totalPages => 4;
   bool get canGoNext => _currentPage < totalPages - 1;
   bool get canGoBack => _currentPage > 0;
   bool get isDetailedHealthPage => _currentPage == totalPages - 1;
