@@ -48,11 +48,17 @@ class _OnboardingViewState extends State<OnboardingView> {
           SafeArea(
             child: Column(
               children: [
-                OnboardingProgressHeader(
-                  currentPage: vm.currentPage,
-                  totalPages: vm.totalPages,
-                  onBack: _goBack,
-                  canGoBack: !vm.isSaving,
+                Visibility(
+                  visible: !vm.isPreviewPage,
+                  maintainState: true,
+                  maintainAnimation: true,
+                  maintainSize: true,
+                  child: OnboardingProgressHeader(
+                    currentPage: vm.currentPage,
+                    totalPages: vm.totalPages,
+                    onBack: _goBack,
+                    canGoBack: !vm.isSaving,
+                  ),
                 ),
                 Expanded(
                   child: PageView(
@@ -86,13 +92,20 @@ class _OnboardingViewState extends State<OnboardingView> {
                         onPickLastPeriod: controller.pickLastPeriod,
                         onAddBirthControl: controller.addBirthControl,
                       ),
+                      OnboardingPreviewPage(vm: vm, onComplete: _complete),
                     ],
                   ),
                 ),
-                OnboardingBottomNavigation(
-                  vm: vm,
-                  onNext: _goNext,
-                  onSkip: _goNext,
+                Visibility(
+                  visible: !vm.isPreviewPage,
+                  maintainState: true,
+                  maintainAnimation: true,
+                  maintainSize: true,
+                  child: OnboardingBottomNavigation(
+                    vm: vm,
+                    onNext: _goNext,
+                    onSkip: _goNext,
+                  ),
                 ),
               ],
             ),
@@ -128,7 +141,7 @@ class _OnboardingViewState extends State<OnboardingView> {
   Future<void> _goNext() async {
     FocusScope.of(context).unfocus();
     final vm = context.read<OnboardingViewModel>();
-    if (!vm.isDetailedHealthPage) {
+    if (!vm.isPreviewPage) {
       vm.nextPage();
       _animateToPage(vm.currentPage);
       return;
@@ -137,6 +150,14 @@ class _OnboardingViewState extends State<OnboardingView> {
       vm.nextDetailStep();
       return;
     }
+    final saved = await vm.saveAndComplete();
+    if (saved && mounted) {
+      Navigator.of(context).pushReplacementNamed('/home');
+    }
+  }
+
+  Future<void> _complete() async {
+    final vm = context.read<OnboardingViewModel>();
     final saved = await vm.saveAndComplete();
     if (saved && mounted) {
       Navigator.of(context).pushReplacementNamed('/home');

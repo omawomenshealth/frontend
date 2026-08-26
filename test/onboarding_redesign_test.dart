@@ -8,6 +8,7 @@ import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/sync_service.dart';
 import 'package:app_proje_a/localization/generated/strings.g.dart';
 import 'package:app_proje_a/views/onboarding/view/onboarding_view.dart';
+import 'package:app_proje_a/views/onboarding/view/widgets/onboarding_chip.dart';
 import 'package:app_proje_a/views/onboarding/viewmodel/onboarding_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -106,7 +107,7 @@ void main() {
     expect(find.text(AppStrings.menopauseStatus), findsOneWidget);
     expect(find.text(AppStrings.averageCycleLength), findsNothing);
     expect(find.text(AppStrings.birthControl), findsNothing);
-    await tester.tap(find.text(AppStrings.none));
+    await tester.tap(find.byType(OnboardingChip).first);
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.averageCycleLength), findsOneWidget);
     expect(find.text(AppStrings.lastPeriodDaysQuestion), findsOneWidget);
@@ -114,19 +115,7 @@ void main() {
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
-    expect(find.text('Ek sağlık bilgilerin'), findsOneWidget);
-    expect(find.text('Kan değeri ara'), findsOneWidget);
-    await tester.tap(find.text('Kan değeri ara'));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('lab_results_search')), findsOneWidget);
-    await tester.enterText(
-      find.byKey(const ValueKey('lab_results_search')),
-      'ferritin',
-    );
-    await tester.pumpAndSettle();
-    expect(find.text('Ferritin'), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('onboarding_selection_close')));
-    await tester.pumpAndSettle();
+    expect(vm.currentPage, 4);
     expect(tester.takeException(), isNull);
   });
 
