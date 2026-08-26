@@ -78,7 +78,10 @@ class _OnboardingViewState extends State<OnboardingView> {
                         },
                       ),
                       WellbeingPage(),
-                      HealthProfilePage(vm: vm),
+                      HealthProfilePage(
+                        vm: vm,
+                        onOpenDiseases: controller.showDiseasePicker,
+                      ),
                       CyclePage(
                         vm: vm,
                         onPickLastPeriod: controller.pickLastPeriod,
@@ -89,7 +92,6 @@ class _OnboardingViewState extends State<OnboardingView> {
                         step: vm.detailStep,
                         forward: vm.detailForward,
                         onOpenLabs: controller.showLabPicker,
-                        onOpenDiseases: controller.showDiseasePicker,
                       ),
                     ],
                   ),

@@ -95,6 +95,10 @@ void main() {
     expect(find.byKey(const ValueKey('onboarding_weight')), findsOneWidget);
     expect(find.text(AppStrings.smokingStatus), findsOneWidget);
     expect(find.text(AppStrings.knownConditionQuestion), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('onboarding_add_known_disease')),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
@@ -123,12 +127,6 @@ void main() {
     expect(find.text('Ferritin'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('onboarding_selection_close')));
     await tester.pumpAndSettle();
-
-    await tester.tap(find.text(AppStrings.next));
-    await tester.pumpAndSettle();
-    expect(find.text('Ek sağlık bilgilerin'), findsOneWidget);
-    expect(find.text(AppStrings.knownConditionQuestion), findsOneWidget);
-    expect(find.text('Hastalık ara'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

@@ -11,7 +11,6 @@ class DetailedHealthPage extends StatelessWidget {
   final int step;
   final bool forward;
   final VoidCallback onOpenLabs;
-  final VoidCallback onOpenDiseases;
 
   const DetailedHealthPage({
     super.key,
@@ -19,7 +18,6 @@ class DetailedHealthPage extends StatelessWidget {
     required this.step,
     required this.forward,
     required this.onOpenLabs,
-    required this.onOpenDiseases,
   });
 
   @override
@@ -28,10 +26,6 @@ class DetailedHealthPage extends StatelessWidget {
       LabStep(
         resultCount: vm.labResults.length,
         onOpen: onOpenLabs,
-      ),
-      DiseaseStep(
-        diseases: vm.knownDiseases,
-        onOpen: onOpenDiseases,
       ),
     ];
     return OnboardingCard(

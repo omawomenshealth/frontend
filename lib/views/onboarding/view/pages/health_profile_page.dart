@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
 import '../../../../data/models/user_settings_model.dart';
-import '../../utils/onboarding_label_utils.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
 
 class HealthProfilePage extends StatefulWidget {
   final OnboardingViewModel vm;
+  final VoidCallback onOpenDiseases;
 
-  const HealthProfilePage({super.key, required this.vm});
+  const HealthProfilePage({
+    super.key,
+    required this.vm,
+    required this.onOpenDiseases,
+  });
 
   @override
   State<HealthProfilePage> createState() => _HealthProfilePageState();
@@ -87,38 +91,44 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
           ),
           OnboardingQuestion(
             question: AppStrings.knownConditionQuestion,
-            child: OnboardingMultiSelect(
-              options: _conditionOptions(vm),
-              selectedValues: vm.knownDiseases
-                  .map(AppStrings.localizeStoredValue)
-                  .toSet(),
-              onChanged: (next) {
-                final current = vm.knownDiseases
-                    .map(AppStrings.localizeStoredValue)
-                    .toSet();
-                for (final disease in current.difference(next)) {
-                  vm.toggleKnownDisease(disease);
-                }
-                for (final disease in next.difference(current)) {
-                  vm.toggleKnownDisease(disease);
-                }
-                setState(() {});
-              },
-              spacing: 6,
-              runSpacing: 6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
+              children: [
+                OnboardingMultiSelect(
+                    options: vm.knownDiseases
+                      .map(AppStrings.localizeStoredValue)
+                      .toList(growable: false),
+                  selectedValues: vm.knownDiseases
+                      .map(AppStrings.localizeStoredValue)
+                      .toSet(),
+                  onChanged: (next) {
+                    final current = vm.knownDiseases
+                        .map(AppStrings.localizeStoredValue)
+                        .toSet();
+                    for (final disease in current.difference(next)) {
+                      vm.toggleKnownDisease(disease);
+                    }
+                    for (final disease in next.difference(current)) {
+                      vm.toggleKnownDisease(disease);
+                    }
+                    setState(() {});
+                  },
+                  spacing: 6,
+                  runSpacing: 6,
+                ),
+                ActionChip(
+                  key: const ValueKey('onboarding_add_known_disease'),
+                  avatar: const Icon(Icons.add_rounded, size: 17),
+                  label: Text(AppStrings.add),
+                  onPressed: widget.onOpenDiseases,
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
-  }
-
-  List<String> _conditionOptions(OnboardingViewModel vm) {
-    return uniqueOnboardingLabels([
-      ...AppStrings.chronicDiseasesList,
-      ...AppStrings.womenDiseasesList,
-      ...vm.customConditions,
-    ]);
   }
 
 }
