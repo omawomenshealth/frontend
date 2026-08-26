@@ -733,6 +733,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   Widget _buildMedicationCatalogPage() {
     final selected = _medications.map((entry) => entry.displayName).toSet();
     return Column(
+      key: const ValueKey('medication_catalog_page'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildIntro(title: AppStrings.medicationQuestion),
@@ -805,6 +806,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   Widget _buildSupplementCatalogPage() {
     final selected = _supplements.map((entry) => entry.displayName).toSet();
     return Column(
+      key: const ValueKey('supplement_catalog_page'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildIntro(
