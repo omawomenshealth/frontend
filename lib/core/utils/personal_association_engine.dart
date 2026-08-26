@@ -811,8 +811,7 @@ class PersonalAssociationEngine {
   bool _isBowelSignal(String value) {
     final options = AppStrings.symptomDigestionOptions;
     final bowelSignals = {
-      _canonical(options[1]),
-      _canonical(options[2]),
+      _canonical(options[0]),
       _canonical(options[4]),
       _canonical(options[5]),
       _canonical(options[6]),

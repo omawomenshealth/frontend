@@ -148,6 +148,7 @@ class LocalStorageService {
     final customCravings = <String>[];
     final customCompanions = <String>[];
     final customPlaces = <String>[];
+    final customSymptoms = <String>[];
     final defaultFoods = AppStrings.nutritionCatalog.values
         .expand((items) => items)
         .toList(growable: false);
@@ -177,6 +178,12 @@ class LocalStorageService {
               !_matchesLocalizedOption(value, AppStrings.moodPlaceOptions),
         ),
       );
+      customSymptoms.addAll(
+        log.symptoms.where(
+          (value) =>
+              !_matchesLocalizedOption(value, AppStrings.allSymptomOptions),
+        ),
+      );
     }
 
     settings = settings
@@ -186,6 +193,10 @@ class LocalStorageService {
           customCompanions,
         )
         .rememberCustomOptions(UserDefinedOptionKind.moodPlace, customPlaces);
+    settings = settings.rememberCustomSymptoms(
+      CustomSymptomGroup.body,
+      customSymptoms,
+    );
     await saveSettings(settings);
     for (final medication in settings.dailyMedications) {
       await rememberCustomMedication(medication);
@@ -452,6 +463,9 @@ class LocalStorageService {
         _canonicalFrom(values, value);
 
     final medicationCatalog = getCustomMedicationIdentities();
+    final customSymptomCatalog = settings.customSymptoms.values
+        .expand((values) => values)
+        .toList(growable: false);
     MedicationEntry canonicalMedication(MedicationEntry entry) {
       final identity = _canonicalMedicationFrom(medicationCatalog, entry);
       return identity == null
@@ -475,6 +489,14 @@ class LocalStorageService {
       moodPlaces: _canonicalList(
         log.moodPlaces,
         (value) => custom(UserDefinedOptionKind.moodPlace, value),
+      ),
+      symptoms: _canonicalList(
+        log.symptoms,
+        (value) => stored(customSymptomCatalog, value),
+      ),
+      symptomSeverities: _canonicalSymptomSeverities(
+        log.symptomSeverities,
+        (value) => stored(customSymptomCatalog, value),
       ),
       mealFoodGroups: {
         for (final entry in log.mealFoodGroups.entries)
@@ -527,6 +549,17 @@ class LocalStorageService {
                 !_matchesLocalizedOption(value, AppStrings.moodPlaceOptions),
           ),
         );
+    final knownCustomSymptoms = settings.customSymptoms.values
+        .expand((values) => values)
+        .toList(growable: false);
+    settings = settings.rememberCustomSymptoms(
+      CustomSymptomGroup.body,
+      log.symptoms.where(
+        (value) =>
+            !_matchesLocalizedOption(value, AppStrings.allSymptomOptions) &&
+            !_matchesLocalizedOption(value, knownCustomSymptoms),
+      ),
+    );
     await saveSettings(settings);
   }
 
@@ -1064,6 +1097,24 @@ class LocalStorageService {
     return await saveSettings(updated) ? canonical : null;
   }
 
+  /// Belirti ekranındaki bir alt gruba eklenen özel etiketi profil içinde
+  /// saklar. Böylece sonraki günlüklerde aynı alt grupta yeniden seçilebilir.
+  Future<String?> rememberCustomSymptom(
+    CustomSymptomGroup group,
+    String rawValue,
+  ) async {
+    final current = loadSettings();
+    if (current == null) return null;
+    final updated = current.rememberCustomSymptom(group, rawValue);
+    final canonical = updated.canonicalCustomSymptom(group, rawValue);
+    if (canonical.isEmpty) return null;
+    if (updated.customSymptomsFor(group).length ==
+        current.customSymptomsFor(group).length) {
+      return canonical;
+    }
+    return await saveSettings(updated) ? canonical : null;
+  }
+
   Future<bool> _appendUnique(
     String key,
     String rawName,
@@ -1114,6 +1165,22 @@ class LocalStorageService {
       final canonical = canonicalize(value);
       if (canonical.isEmpty) continue;
       if (seen.add(_normalizeCustomValue(canonical))) result.add(canonical);
+    }
+    return result;
+  }
+
+  Map<String, int> _canonicalSymptomSeverities(
+    Map<String, int> values,
+    String Function(String value) canonicalize,
+  ) {
+    final result = <String, int>{};
+    for (final entry in values.entries) {
+      final canonical = canonicalize(entry.key);
+      if (canonical.isEmpty) continue;
+      final current = result[canonical];
+      if (current == null || entry.value > current) {
+        result[canonical] = entry.value;
+      }
     }
     return result;
   }

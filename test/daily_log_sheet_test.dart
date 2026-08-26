@@ -678,7 +678,6 @@ void main() {
       AppStrings.symptomOverall,
       AppStrings.symptomBody,
       AppStrings.symptomSkinHair,
-      AppStrings.symptomEnergy,
       AppStrings.symptomSleep,
       AppStrings.symptomDigestion,
     ]) {
@@ -696,12 +695,26 @@ void main() {
     expect(find.text('Sırt ağrısı'), findsOneWidget);
     expect(find.text('Eklem/kas ağrısı'), findsOneWidget);
     expect(find.text('Sık idrara çıkma'), findsOneWidget);
+    expect(find.text('Mutluyum'), findsOneWidget);
+    expect(find.text('Bitkin/tükenmiş'), findsNothing);
+    expect(find.text('Bağırsaklarım iyi'), findsNothing);
+    for (final group in CustomSymptomGroup.values) {
+      expect(
+        find.byKey(ValueKey('add_custom_symptom_${group.name}')),
+        findsOneWidget,
+      );
+    }
 
     await tester.tap(stress);
     await tester.pumpAndSettle();
-    final cramps = find.text(AppStrings.symptomBodyOptions.first);
-    await tester.ensureVisible(cramps);
-    await tester.tap(cramps);
+    final crampSurface = find.byKey(
+      ValueKey('symptom_tile_surface_${AppStrings.symptomBodyOptions.first}'),
+    );
+    tester
+        .widget<InkWell>(
+          find.descendant(of: crampSurface, matching: find.byType(InkWell)),
+        )
+        .onTap!();
     await tester.pumpAndSettle();
     final severitySlider = find.byKey(
       ValueKey('symptom_severity_${AppStrings.symptomBodyOptions.first}'),
@@ -736,6 +749,41 @@ void main() {
       contains(DailyLogObservedSection.symptom),
     );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Alt başlığa eklenen özel belirti kalıcı ve seçilebilir olur', (
+    tester,
+  ) async {
+    final harness = await _pumpLogSheet(tester, initialIndex: 2);
+    final addDigestion = find.byKey(
+      const ValueKey('add_custom_symptom_digestion'),
+    );
+    tester.widget<IconButton>(addDigestion).onPressed!();
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).last, 'Karnım rahat');
+    await tester.tap(find.text(AppStrings.add));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Karnım rahat'), findsOneWidget);
+    expect(
+      harness.storage.loadSettings()!.customSymptomsFor(
+        CustomSymptomGroup.digestion,
+      ),
+      ['Karnım rahat'],
+    );
+    expect(harness.settingsChangeCount, 1);
+
+    final save = find.text(AppStrings.save);
+    await tester.ensureVisible(save);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    expect(harness.savedLog!.symptoms, contains('Karnım rahat'));
+    expect(harness.savedLog!.symptomSeverities['Karnım rahat'], 2);
+
+    await tester.tap(find.text('Aç'));
+    await tester.pumpAndSettle();
+    expect(find.text('Karnım rahat'), findsOneWidget);
   });
 
   testWidgets('Belirti menüsü ana ekran temasını tek renk olarak kullanır', (

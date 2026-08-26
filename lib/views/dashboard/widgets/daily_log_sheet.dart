@@ -61,6 +61,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   final _symptomSearchController = TextEditingController();
   late Set<String> _symptoms;
   late Map<String, int> _symptomSeverities;
+  late Map<CustomSymptomGroup, List<String>> _customSymptoms;
   late bool? _sexualActivity;
   late Set<SexualActivityType> _sexualActivityTypes;
   late Set<SexualAfterFeeling> _sexualAfterFeelings;
@@ -142,7 +143,28 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     );
     _customCravings = List<String>.from(persistedSettings.customCravings);
 
-    _symptoms = _localizedSet(_log.symptoms, _allSymptomOptions);
+    _customSymptoms = {
+      for (final group in CustomSymptomGroup.values)
+        group: _uniqueCustomLabels(persistedSettings.customSymptomsFor(group)),
+    };
+    _symptoms = _localizedSetPreservingCustom(
+      _log.symptoms,
+      _allSymptomOptions,
+    );
+    final knownCustomSymptoms = _customSymptoms.values
+        .expand((values) => values)
+        .toList(growable: false);
+    final uncategorizedSymptoms = _symptoms.where(
+      (value) =>
+          !_allSymptomOptions.any(
+            (option) => _sameCustomLabel(option, value),
+          ) &&
+          !knownCustomSymptoms.any((option) => _sameCustomLabel(option, value)),
+    );
+    _customSymptoms[CustomSymptomGroup.body] = _uniqueCustomLabels([
+      ..._customSymptoms[CustomSymptomGroup.body]!,
+      ...uncategorizedSymptoms,
+    ]);
     _symptomSeverities = {
       for (final rawSymptom in _log.symptoms)
         AppStrings.localizeStoredValue(rawSymptom):
@@ -935,7 +957,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     );
   }
 
-  Future<String?> _promptCustomCatalogItem(String title) {
+  Future<String?> _promptCustomCatalogItem(String title, {String? hintText}) {
     var value = '';
     return showDialog<String>(
       context: context,
@@ -944,6 +966,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         content: TextField(
           autofocus: true,
           maxLength: 120,
+          decoration: InputDecoration(hintText: hintText),
           onChanged: (text) => value = text,
         ),
         actions: [
@@ -1147,6 +1170,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           _SymptomSubgroup(
             title: subgroup.title,
             items: visible(subgroup.items),
+            customGroup: subgroup.customGroup,
           ),
     ];
     final groupTone = _tone;
@@ -1167,20 +1191,19 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionTitle(group.title),
+          _buildSymptomSectionHeader(
+            group.title,
+            customGroup: group.customGroup,
+            isGroupTitle: true,
+          ),
           const SizedBox(height: 12),
           if (group.subgroups.isEmpty)
             _buildSymptomTileWrap(visibleItems)
           else
             for (final subgroup in visibleSubgroups) ...[
-              Text(
-                subgroup.title.toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                  color: AppColors.textSecondary,
-                ),
+              _buildSymptomSectionHeader(
+                subgroup.title,
+                customGroup: subgroup.customGroup,
               ),
               const SizedBox(height: 8),
               _buildSymptomTileWrap(subgroup.items),
@@ -1206,6 +1229,42 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildSymptomSectionHeader(
+    String title, {
+    required CustomSymptomGroup? customGroup,
+    bool isGroupTitle = false,
+  }) {
+    final titleWidget = isGroupTitle
+        ? _SectionTitle(title)
+        : Text(
+            title.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+              color: AppColors.textSecondary,
+            ),
+          );
+    if (customGroup == null) return titleWidget;
+    return Row(
+      children: [
+        Expanded(child: titleWidget),
+        IconButton(
+          key: ValueKey('add_custom_symptom_${customGroup.name}'),
+          tooltip: AppStrings.addCustomSymptom,
+          visualDensity: VisualDensity.compact,
+          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          style: IconButton.styleFrom(
+            foregroundColor: _tone,
+            side: BorderSide(color: _tone.withValues(alpha: 0.38)),
+          ),
+          onPressed: () => _addCustomSymptom(customGroup, title),
+          icon: const Icon(Icons.add_rounded, size: 19),
+        ),
+      ],
     );
   }
 
@@ -1735,6 +1794,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   List<_SymptomGroup> get _symptomGroups {
+    List<String> withCustom(List<String> defaults, CustomSymptomGroup group) =>
+        _uniqueCustomLabels([...defaults, ...?_customSymptoms[group]]);
+
     List<_SymptomItem> items(List<String> labels, List<IconData> icons) {
       return [
         for (var index = 0; index < labels.length; index++)
@@ -1749,67 +1811,89 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return [
       _SymptomGroup(
         title: AppStrings.symptomOverall,
-        items: items(AppStrings.symptomOverallOptions, [
-          Icons.thumb_up_alt_outlined,
-          Icons.psychology_outlined,
-        ]),
-      ),
-      _SymptomGroup(
-        title: AppStrings.symptomBody,
-        items: items(AppStrings.symptomBodyOptions, [
-          Icons.radio_button_checked_rounded,
-          Icons.psychology_outlined,
-          Icons.local_fire_department_outlined,
-          Icons.air_rounded,
-          Icons.auto_awesome_outlined,
-          Icons.waves_rounded,
-          Icons.accessibility_new_rounded,
-          Icons.directions_run_outlined,
-          Icons.sync_problem_rounded,
-          Icons.restaurant_outlined,
-          Icons.water_drop_outlined,
-        ]),
-      ),
-      _SymptomGroup(
-        title: AppStrings.symptomSkinHair,
-        items: items(AppStrings.symptomSkinHairOptions, [
-          Icons.water_drop_outlined,
-          Icons.cloud_outlined,
-          Icons.water_drop_outlined,
-          Icons.content_cut_rounded,
-        ]),
-      ),
-      _SymptomGroup(
-        title: AppStrings.symptomEnergy,
         items: const [],
         subgroups: [
           _SymptomSubgroup(
             title: AppStrings.symptomEnergyLevel,
-            items: items(AppStrings.symptomEnergyLevelOptions, [
-              Icons.battery_full_rounded,
-              Icons.battery_3_bar_rounded,
-              Icons.battery_alert_rounded,
-            ]),
+            customGroup: CustomSymptomGroup.feelingEnergy,
+            items: items(
+              withCustom(
+                AppStrings.symptomEnergyLevelOptions,
+                CustomSymptomGroup.feelingEnergy,
+              ),
+              [Icons.battery_full_rounded, Icons.battery_3_bar_rounded],
+            ),
           ),
           _SymptomSubgroup(
             title: AppStrings.symptomMoodState,
-            items: items(AppStrings.symptomMoodStateOptions, [
-              Icons.auto_awesome_outlined,
-              Icons.spa_outlined,
-              Icons.air_rounded,
-              Icons.mood_bad_outlined,
-              Icons.swap_vert_rounded,
-            ]),
+            customGroup: CustomSymptomGroup.feelingEmotion,
+            items: items(
+              withCustom(
+                AppStrings.symptomMoodStateOptions,
+                CustomSymptomGroup.feelingEmotion,
+              ),
+              [
+                Icons.thumb_up_alt_outlined,
+                Icons.psychology_outlined,
+                Icons.sentiment_very_satisfied_outlined,
+                Icons.spa_outlined,
+                Icons.auto_awesome_outlined,
+                Icons.sentiment_dissatisfied_outlined,
+              ],
+            ),
           ),
           _SymptomSubgroup(
             title: AppStrings.symptomMentalClarity,
-            items: items(AppStrings.symptomMentalClarityOptions, [
-              Icons.center_focus_strong_outlined,
-              Icons.cloud_outlined,
-              Icons.psychology_outlined,
-            ]),
+            customGroup: CustomSymptomGroup.feelingMentalClarity,
+            items: items(
+              withCustom(
+                AppStrings.symptomMentalClarityOptions,
+                CustomSymptomGroup.feelingMentalClarity,
+              ),
+              [
+                Icons.center_focus_strong_outlined,
+                Icons.cloud_outlined,
+                Icons.psychology_outlined,
+              ],
+            ),
           ),
         ],
+      ),
+      _SymptomGroup(
+        title: AppStrings.symptomBody,
+        customGroup: CustomSymptomGroup.body,
+        items: items(
+          withCustom(AppStrings.symptomBodyOptions, CustomSymptomGroup.body),
+          [
+            Icons.radio_button_checked_rounded,
+            Icons.psychology_outlined,
+            Icons.local_fire_department_outlined,
+            Icons.air_rounded,
+            Icons.auto_awesome_outlined,
+            Icons.waves_rounded,
+            Icons.accessibility_new_rounded,
+            Icons.directions_run_outlined,
+            Icons.sync_problem_rounded,
+            Icons.restaurant_outlined,
+            Icons.water_drop_outlined,
+          ],
+        ),
+      ),
+      _SymptomGroup(
+        title: AppStrings.symptomSkinHair,
+        customGroup: CustomSymptomGroup.skinHair,
+        items: items(
+          withCustom(
+            AppStrings.symptomSkinHairOptions,
+            CustomSymptomGroup.skinHair,
+          ),
+          [
+            Icons.water_drop_outlined,
+            Icons.cloud_outlined,
+            Icons.water_drop_outlined,
+            Icons.content_cut_rounded,
+          ],
+        ),
       ),
       _SymptomGroup(
         title: AppStrings.symptomSleep,
@@ -1818,36 +1902,98 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         subgroups: [
           _SymptomSubgroup(
             title: AppStrings.symptomSleepQuality,
-            items: items(AppStrings.symptomSleepQualityOptions, [
-              Icons.bedtime_outlined,
-              Icons.hotel_outlined,
-              Icons.sentiment_neutral_outlined,
-              Icons.bedtime_off_outlined,
-              Icons.notifications_active_outlined,
-            ]),
+            customGroup: CustomSymptomGroup.sleepQuality,
+            items: items(
+              withCustom(
+                AppStrings.symptomSleepQualityOptions,
+                CustomSymptomGroup.sleepQuality,
+              ),
+              [
+                Icons.bedtime_outlined,
+                Icons.hotel_outlined,
+                Icons.sentiment_neutral_outlined,
+                Icons.bedtime_off_outlined,
+                Icons.notifications_active_outlined,
+              ],
+            ),
           ),
           _SymptomSubgroup(
             title: AppStrings.symptomWakeFeeling,
-            items: items(AppStrings.symptomWakeFeelingOptions, [
-              Icons.wb_sunny_outlined,
-              Icons.self_improvement_outlined,
-              Icons.battery_1_bar_rounded,
-              Icons.sick_outlined,
-              Icons.alarm_outlined,
-            ]),
+            customGroup: CustomSymptomGroup.wakeFeeling,
+            items: items(
+              withCustom(
+                AppStrings.symptomWakeFeelingOptions,
+                CustomSymptomGroup.wakeFeeling,
+              ),
+              [
+                Icons.wb_sunny_outlined,
+                Icons.self_improvement_outlined,
+                Icons.battery_1_bar_rounded,
+                Icons.sick_outlined,
+                Icons.alarm_outlined,
+              ],
+            ),
           ),
         ],
       ),
       _SymptomGroup(
         title: AppStrings.symptomDigestion,
-        items: items(AppStrings.symptomDigestionOptions, [
-          Icons.cookie_outlined,
-          Icons.restaurant_outlined,
-          Icons.waves_rounded,
-          Icons.local_fire_department_outlined,
-        ]),
+        customGroup: CustomSymptomGroup.digestion,
+        items: items(
+          withCustom(
+            AppStrings.symptomDigestionOptions,
+            CustomSymptomGroup.digestion,
+          ),
+          [
+            Icons.cookie_outlined,
+            Icons.restaurant_outlined,
+            Icons.waves_rounded,
+            Icons.local_fire_department_outlined,
+          ],
+        ),
       ),
     ];
+  }
+
+  Future<void> _addCustomSymptom(
+    CustomSymptomGroup group,
+    String sectionTitle,
+  ) async {
+    final value = await _promptCustomCatalogItem(
+      '${AppStrings.addCustomSymptom} · $sectionTitle',
+      hintText: AppStrings.customSymptomName,
+    );
+    if (!mounted || value == null || value.isEmpty) return;
+
+    final existing = [
+      ..._allSymptomOptions,
+      ..._customSymptoms.values.expand((values) => values),
+    ].where((option) => _sameCustomLabel(option, value));
+    if (existing.isNotEmpty) {
+      setState(() {
+        _symptoms.add(existing.first);
+        _symptomSeverities.putIfAbsent(existing.first, () => 2);
+      });
+      return;
+    }
+
+    final canonical = await context
+        .read<LocalStorageService>()
+        .rememberCustomSymptom(group, value);
+    if (!mounted || canonical == null) return;
+    setState(() {
+      _customSymptoms[group] = _withCanonicalLabel(
+        _customSymptoms[group] ?? const [],
+        canonical,
+      );
+      _symptoms.add(canonical);
+      _symptomSeverities[canonical] = 2;
+    });
+    await widget.onSettingsChanged?.call();
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(AppStrings.savedForLater)));
   }
 
   void _toggleSymptom(String label) {
@@ -3976,12 +4122,14 @@ class _SymptomGroup {
   final List<_SymptomItem> items;
   final List<_SymptomSubgroup> subgroups;
   final bool showsDreamRecorder;
+  final CustomSymptomGroup? customGroup;
 
   const _SymptomGroup({
     required this.title,
     required this.items,
     this.subgroups = const [],
     this.showsDreamRecorder = false,
+    this.customGroup,
   });
 
   Iterable<_SymptomItem> get allItems sync* {
@@ -3995,8 +4143,13 @@ class _SymptomGroup {
 class _SymptomSubgroup {
   final String title;
   final List<_SymptomItem> items;
+  final CustomSymptomGroup customGroup;
 
-  const _SymptomSubgroup({required this.title, required this.items});
+  const _SymptomSubgroup({
+    required this.title,
+    required this.items,
+    required this.customGroup,
+  });
 }
 
 class _SymptomItem {

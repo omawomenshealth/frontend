@@ -562,8 +562,27 @@ class SyncService {
       ),
       customConditions: customConditions,
       customBirthControlMethods: customBirthControlMethods,
+      customSymptoms: _mergeCustomSymptoms(
+        primary.customSymptoms,
+        secondary.customSymptoms,
+      ),
     );
   }
+
+  static Map<CustomSymptomGroup, List<String>> _mergeCustomSymptoms(
+    Map<CustomSymptomGroup, List<String>> primary,
+    Map<CustomSymptomGroup, List<String>> secondary,
+  ) => Map<CustomSymptomGroup, List<String>>.unmodifiable({
+    for (final group in CustomSymptomGroup.values)
+      if (_mergeStrings(
+        primary[group] ?? const [],
+        secondary[group] ?? const [],
+      ).isNotEmpty)
+        group: _mergeStrings(
+          primary[group] ?? const [],
+          secondary[group] ?? const [],
+        ),
+  });
 
   static List<String> _mergeStrings(List<String> local, List<String> cloud) {
     final result = <String>[];
@@ -610,6 +629,9 @@ class SyncService {
       settings.dailySkincare,
       customSkincare,
     );
+    final symptomCatalog = settings.customSymptoms.values
+        .expand((values) => values)
+        .toList(growable: false);
     return log.copyWith(
       cravings: _canonicalizeStrings(log.cravings, settings.customCravings),
       moodCompanions: _canonicalizeStrings(
@@ -619,6 +641,11 @@ class SyncService {
       moodPlaces: _canonicalizeStrings(
         log.moodPlaces,
         settings.customMoodPlaces,
+      ),
+      symptoms: _canonicalizeStrings(log.symptoms, symptomCatalog),
+      symptomSeverities: _canonicalizeSymptomSeverities(
+        log.symptomSeverities,
+        symptomCatalog,
       ),
       mealFoodGroups: {
         for (final entry in log.mealFoodGroups.entries)
@@ -652,6 +679,22 @@ class SyncService {
       final canonical = _canonicalValue(raw, catalog);
       if (canonical.isNotEmpty && seen.add(_normalizeCustomValue(canonical))) {
         result.add(canonical);
+      }
+    }
+    return result;
+  }
+
+  static Map<String, int> _canonicalizeSymptomSeverities(
+    Map<String, int> values,
+    Iterable<String> catalog,
+  ) {
+    final result = <String, int>{};
+    for (final entry in values.entries) {
+      final canonical = _canonicalValue(entry.key, catalog);
+      if (canonical.isEmpty) continue;
+      final current = result[canonical];
+      if (current == null || entry.value > current) {
+        result[canonical] = entry.value;
       }
     }
     return result;

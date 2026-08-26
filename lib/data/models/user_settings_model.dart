@@ -18,6 +18,20 @@ enum UserDefinedOptionKind {
   birthControl,
 }
 
+/// Kullanıcının belirti ekranında `+` ile eklediği seçeneğin tekrar
+/// gösterileceği sabit alt grup. Enum adları cihazlar ve diller arasında
+/// değişmeyen saklama anahtarlarıdır.
+enum CustomSymptomGroup {
+  feelingEnergy,
+  feelingEmotion,
+  feelingMentalClarity,
+  body,
+  skinHair,
+  sleepQuality,
+  wakeFeeling,
+  digestion,
+}
+
 const _userSettingsJsonFields = {
   'userName',
   'isOnboardingComplete',
@@ -47,6 +61,7 @@ const _userSettingsJsonFields = {
   'customMoodPlaces',
   'customConditions',
   'customBirthControlMethods',
+  'customSymptoms',
   'notificationsEnabled',
 };
 
@@ -92,6 +107,7 @@ class UserSettings {
   final List<String> customMoodPlaces;
   final List<String> customConditions;
   final List<String> customBirthControlMethods;
+  final Map<CustomSymptomGroup, List<String>> customSymptoms;
 
   final bool notificationsEnabled;
 
@@ -124,8 +140,9 @@ class UserSettings {
     this.customMoodPlaces = const [],
     this.customConditions = const [],
     this.customBirthControlMethods = const [],
+    Map<CustomSymptomGroup, List<String>> customSymptoms = const {},
     this.notificationsEnabled = true,
-  });
+  }) : customSymptoms = _cleanCustomSymptoms(customSymptoms);
 
   UserSettings copyWith({
     String? userName,
@@ -159,6 +176,7 @@ class UserSettings {
     List<String>? customMoodPlaces,
     List<String>? customConditions,
     List<String>? customBirthControlMethods,
+    Map<CustomSymptomGroup, List<String>>? customSymptoms,
     bool? notificationsEnabled,
   }) {
     return UserSettings(
@@ -195,6 +213,7 @@ class UserSettings {
       customConditions: customConditions ?? this.customConditions,
       customBirthControlMethods:
           customBirthControlMethods ?? this.customBirthControlMethods,
+      customSymptoms: customSymptoms ?? this.customSymptoms,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     );
   }
@@ -242,6 +261,34 @@ class UserSettings {
     };
   }
 
+  List<String> customSymptomsFor(CustomSymptomGroup group) =>
+      customSymptoms[group] ?? const [];
+
+  String canonicalCustomSymptom(CustomSymptomGroup group, String rawValue) {
+    final cleaned = _cleanUserDefinedValue(rawValue);
+    if (cleaned.isEmpty) return '';
+    final normalized = _normalizeUserDefinedValue(cleaned);
+    return customSymptomsFor(group).firstWhere(
+      (value) => _normalizeUserDefinedValue(value) == normalized,
+      orElse: () => cleaned,
+    );
+  }
+
+  UserSettings rememberCustomSymptom(
+    CustomSymptomGroup group,
+    String rawValue,
+  ) => rememberCustomSymptoms(group, [rawValue]);
+
+  UserSettings rememberCustomSymptoms(
+    CustomSymptomGroup group,
+    Iterable<String> rawValues,
+  ) {
+    final merged = _mergeUserDefinedValues(customSymptomsFor(group), rawValues);
+    return copyWith(
+      customSymptoms: {...customSymptoms, if (merged.isNotEmpty) group: merged},
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'userName': userName,
@@ -276,6 +323,9 @@ class UserSettings {
       'customMoodPlaces': customMoodPlaces,
       'customConditions': customConditions,
       'customBirthControlMethods': customBirthControlMethods,
+      'customSymptoms': {
+        for (final entry in customSymptoms.entries) entry.key.name: entry.value,
+      },
       'notificationsEnabled': notificationsEnabled,
     };
   }
@@ -365,6 +415,7 @@ class UserSettings {
         json,
         'customBirthControlMethods',
       ),
+      customSymptoms: _readCustomSymptoms(json, 'customSymptoms'),
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
     );
   }
@@ -386,6 +437,43 @@ List<String> _readUserDefinedValues(Map<String, dynamic> json, String field) {
   }
   return _mergeUserDefinedValues(const [], raw.cast<String>());
 }
+
+Map<CustomSymptomGroup, List<String>> _readCustomSymptoms(
+  Map<String, dynamic> json,
+  String field,
+) {
+  final raw = json[field];
+  if (raw == null) return const {};
+  if (raw is! Map) {
+    throw FormatException('$field geçerli bir nesne olmalıdır.');
+  }
+  final result = <CustomSymptomGroup, List<String>>{};
+  for (final entry in raw.entries) {
+    final group = CustomSymptomGroup.values.where(
+      (value) => value.name == entry.key,
+    );
+    if (group.isEmpty) {
+      throw FormatException(
+        '$field desteklenmeyen grup içeriyor: ${entry.key}',
+      );
+    }
+    final values = entry.value;
+    if (values is! List || values.any((value) => value is! String)) {
+      throw FormatException('$field.${entry.key} metin listesi olmalıdır.');
+    }
+    final cleaned = _mergeUserDefinedValues(const [], values.cast<String>());
+    if (cleaned.isNotEmpty) result[group.single] = cleaned;
+  }
+  return _cleanCustomSymptoms(result);
+}
+
+Map<CustomSymptomGroup, List<String>> _cleanCustomSymptoms(
+  Map<CustomSymptomGroup, List<String>> values,
+) => Map<CustomSymptomGroup, List<String>>.unmodifiable({
+  for (final entry in values.entries)
+    if (_mergeUserDefinedValues(const [], entry.value).isNotEmpty)
+      entry.key: _mergeUserDefinedValues(const [], entry.value),
+});
 
 List<String> _mergeUserDefinedValues(
   Iterable<String> existing,

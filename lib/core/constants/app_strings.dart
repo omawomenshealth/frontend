@@ -673,6 +673,8 @@ enum _TextKey {
   addFood,
   addCustomSupplement,
   addCustomSkincare,
+  addCustomSymptom,
+  customSymptomName,
   createReminderShort,
   remindEveryDay,
   remindOnSelectedDays,
@@ -1239,12 +1241,12 @@ const Map<_TextKey, String> _turkishTexts = {
       'Hafif bile olsa fark ettiğin her şeyi seç; sana içgörüler verebilmek ve vücudundaki değişimleri anlamanı sağlamak için çalışıyoruz.',
   _TextKey.searchSymptoms: 'Belirtilerde ara',
   _TextKey.symptomStrength: 'Genel olarak ne kadar güçlü?',
-  _TextKey.symptomOverall: 'Genel',
+  _TextKey.symptomOverall: 'Nasıl hissediyorsun',
   _TextKey.symptomBody: 'Beden',
   _TextKey.symptomSkinHair: 'Cilt ve Saç',
   _TextKey.symptomEnergy: 'Enerji',
-  _TextKey.symptomEnergyLevel: 'Enerji seviyesi',
-  _TextKey.symptomMoodState: 'Ruh hâli',
+  _TextKey.symptomEnergyLevel: 'Enerji',
+  _TextKey.symptomMoodState: 'Duygular',
   _TextKey.symptomMentalClarity: 'Zihinsel netlik',
   _TextKey.symptomSleep: 'Uyku',
   _TextKey.symptomSleepQuality: 'Uyku kaliten nasıldı',
@@ -1656,6 +1658,8 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.addFood: 'Yemek ekle',
   _TextKey.addCustomSupplement: 'Yeni takviye ekle',
   _TextKey.addCustomSkincare: 'Yeni içerik ekle',
+  _TextKey.addCustomSymptom: 'Takip etmek istediğin seçeneği ekle',
+  _TextKey.customSymptomName: 'Nasıl hissediyorsun veya belirtin ne?',
   _TextKey.createReminderShort: 'Hatırlatıcı oluştur',
   _TextKey.remindEveryDay: 'Her gün hatırlat',
   _TextKey.remindOnSelectedDays: 'Seçili günlerde hatırlat',
@@ -2212,12 +2216,12 @@ const Map<_TextKey, String> _englishTexts = {
       'Choose anything you notice, even if it feels subtle. Over time, we will help you understand your body better.',
   _TextKey.searchSymptoms: 'Search symptoms',
   _TextKey.symptomStrength: 'How strong overall?',
-  _TextKey.symptomOverall: 'Overall',
+  _TextKey.symptomOverall: 'How are you feeling',
   _TextKey.symptomBody: 'Body',
   _TextKey.symptomSkinHair: 'Skin & Hair',
   _TextKey.symptomEnergy: 'Energy',
-  _TextKey.symptomEnergyLevel: 'Energy level',
-  _TextKey.symptomMoodState: 'Mood',
+  _TextKey.symptomEnergyLevel: 'Energy',
+  _TextKey.symptomMoodState: 'Emotions',
   _TextKey.symptomMentalClarity: 'Mental clarity',
   _TextKey.symptomSleep: 'Sleep',
   _TextKey.symptomSleepQuality: 'How was your sleep quality?',
@@ -2632,6 +2636,8 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.addFood: 'Add food',
   _TextKey.addCustomSupplement: 'Add a new supplement',
   _TextKey.addCustomSkincare: 'Add a new ingredient',
+  _TextKey.addCustomSymptom: 'Add something you want to track',
+  _TextKey.customSymptomName: 'How do you feel, or what is your symptom?',
   _TextKey.createReminderShort: 'Create reminder',
   _TextKey.remindEveryDay: 'Remind every day',
   _TextKey.remindOnSelectedDays: 'Remind on selected days',
@@ -2932,18 +2938,26 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Pıhtı',
   ],
   _ListKey.symptomSeverityOptions: ['Hafif', 'Orta', 'Güçlü'],
-  _ListKey.symptomOverallOptions: ['Her şey yolunda', 'Stres'],
+  _ListKey.symptomOverallOptions: [
+    'İyi hissediyorum',
+    'Stresliyim',
+    'Mutluyum',
+    'Sakinim',
+    'Motivasyonluyum',
+    'Kaygılıyım',
+    'Huzursuzum',
+    'Sinirliyim',
+    'Üzgünüm',
+    'Duygusal iniş çıkış yaşıyorum',
+  ],
   _ListKey.symptomBodyOptions: [
     'Kramplar',
     'Baş ağrısı',
     'Bel ağrısı',
-    'Şişkinlik',
     'Göğüs hassasiyeti',
-    'Mide bulantısı',
     'Sırt ağrısı',
     'Eklem/kas ağrısı',
     'Baş dönmesi',
-    'İştah artışı/azalması',
     'Sık idrara çıkma',
   ],
   _ListKey.symptomSkinHairOptions: [
@@ -2961,12 +2975,6 @@ const Map<_ListKey, List<String>> _turkishLists = {
   _ListKey.symptomEnergyOptions: [
     'Enerjik',
     'Yorgunluk',
-    'Bitkin/tükenmiş',
-    'Motivasyonlu',
-    'Sakin ve dengeli',
-    'Huzursuzluk',
-    'Sinirlilik',
-    'Duygusal iniş çıkış',
     'Odaklanmış',
     'Zihin bulanıklığı',
     'Unutkanlık',
@@ -2986,10 +2994,10 @@ const Map<_ListKey, List<String>> _turkishLists = {
     'Kâbus',
   ],
   _ListKey.symptomDigestionOptions: [
-    'Midem iyi',
-    'Bağırsaklarım iyi',
-    'Düzenli sindirim',
+    'Sindirimim iyi ve düzenli',
     'Aşerme',
+    'İştah artışı/azalması',
+    'Mide bulantısı',
     'Kabızlık',
     'İshal',
     'Şişkinlik',
@@ -3213,18 +3221,26 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Clots',
   ],
   _ListKey.symptomSeverityOptions: ['Mild', 'Moderate', 'Strong'],
-  _ListKey.symptomOverallOptions: ['Everything is fine', 'Stress'],
+  _ListKey.symptomOverallOptions: [
+    'Feeling good',
+    'Stressed',
+    'Happy',
+    'Calm',
+    'Motivated',
+    'Anxious',
+    'Restless',
+    'Irritable',
+    'Sad',
+    'Experiencing mood swings',
+  ],
   _ListKey.symptomBodyOptions: [
     'Cramps',
     'Headache',
     'Lower back pain',
-    'Bloating',
     'Breast tenderness',
-    'Nausea',
     'Upper/mid-back pain',
     'Joint/muscle pain',
     'Dizziness',
-    'Increased/decreased appetite',
     'Frequent urination',
   ],
   _ListKey.symptomSkinHairOptions: [
@@ -3242,12 +3258,6 @@ const Map<_ListKey, List<String>> _englishLists = {
   _ListKey.symptomEnergyOptions: [
     'Energetic',
     'Fatigue',
-    'Exhausted/burned out',
-    'Motivated',
-    'Calm and balanced',
-    'Restless',
-    'Irritable',
-    'Emotional ups and downs',
     'Focused',
     'Brain fog',
     'Forgetful',
@@ -3267,10 +3277,10 @@ const Map<_ListKey, List<String>> _englishLists = {
     'Nightmare',
   ],
   _ListKey.symptomDigestionOptions: [
-    'Stomach feels good',
-    'Bowels feel good',
-    'Regular digestion',
+    'Digestion feels good and regular',
     'Cravings',
+    'Increased/decreased appetite',
+    'Nausea',
     'Constipation',
     'Diarrhea',
     'Bloating',
@@ -3364,6 +3374,28 @@ const Map<String, String> _legacyStoredSymptomAliases = {
   'Deep sleep': 'Derin uyku',
   'Woke refreshed': 'Dinlenmiş uyandım',
   'Woke early': 'Erken uyandım',
+  'Her şey yolunda': 'İyi hissediyorum',
+  'Everything is fine': 'İyi hissediyorum',
+  'Stres': 'Stresliyim',
+  'Stress': 'Stresliyim',
+  'Motivasyonlu': 'Motivasyonluyum',
+  'Motivated': 'Motivasyonluyum',
+  'Sakin ve dengeli': 'Sakinim',
+  'Calm and balanced': 'Sakinim',
+  'Huzursuzluk': 'Huzursuzum',
+  'Restless': 'Huzursuzum',
+  'Sinirlilik': 'Sinirliyim',
+  'Irritable': 'Sinirliyim',
+  'Duygusal iniş çıkış': 'Duygusal iniş çıkış yaşıyorum',
+  'Emotional ups and downs': 'Duygusal iniş çıkış yaşıyorum',
+  'Bitkin/tükenmiş': 'Yorgunluk',
+  'Exhausted/burned out': 'Yorgunluk',
+  'Midem iyi': 'Sindirimim iyi ve düzenli',
+  'Bağırsaklarım iyi': 'Sindirimim iyi ve düzenli',
+  'Düzenli sindirim': 'Sindirimim iyi ve düzenli',
+  'Stomach feels good': 'Sindirimim iyi ve düzenli',
+  'Bowels feel good': 'Sindirimim iyi ve düzenli',
+  'Regular digestion': 'Sindirimim iyi ve düzenli',
 };
 
 /// Uygulamanın merkezi ve genişletilebilir yerelleştirme erişimi.
@@ -4852,6 +4884,8 @@ class AppStrings {
   static String get addFood => _text(_TextKey.addFood);
   static String get addCustomSupplement => _text(_TextKey.addCustomSupplement);
   static String get addCustomSkincare => _text(_TextKey.addCustomSkincare);
+  static String get addCustomSymptom => _text(_TextKey.addCustomSymptom);
+  static String get customSymptomName => _text(_TextKey.customSymptomName);
   static String get createReminderShort => _text(_TextKey.createReminderShort);
   static String get remindEveryDay => _text(_TextKey.remindEveryDay);
   static String get remindOnSelectedDays =>
@@ -5092,11 +5126,10 @@ class AppStrings {
   static List<String> get symptomEnergyOptions =>
       _list(_ListKey.symptomEnergyOptions);
   static List<String> get symptomEnergyLevelOptions =>
-      List<String>.unmodifiable(symptomEnergyOptions.take(3));
-  static List<String> get symptomMoodStateOptions =>
-      List<String>.unmodifiable(symptomEnergyOptions.skip(3).take(5));
+      List<String>.unmodifiable(symptomEnergyOptions.take(2));
+  static List<String> get symptomMoodStateOptions => symptomOverallOptions;
   static List<String> get symptomMentalClarityOptions =>
-      List<String>.unmodifiable(symptomEnergyOptions.skip(8));
+      List<String>.unmodifiable(symptomEnergyOptions.skip(2));
   static List<String> get symptomSleepOptions =>
       _list(_ListKey.symptomSleepOptions);
   static List<String> get symptomSleepQualityOptions =>
