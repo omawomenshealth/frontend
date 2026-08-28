@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/color_constants.dart';
 import '../../../../data/models/user_settings_model.dart';
+import '../../../../localization/generated/strings.g.dart';
 import '../../utils/onboarding_label_utils.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
@@ -21,6 +22,7 @@ class CyclePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cycle = context.t.onboarding.cycle;
     final birthControlOptions = uniqueOnboardingLabels([
       AppStrings.noBirthControl,
       AppStrings.pill,
@@ -42,13 +44,13 @@ class CyclePage extends StatelessWidget {
         vm.hasMenopauseSelection && vm.menopauseStatus == MenopauseStatus.none;
 
     return OnboardingDeckCard(
-      eyebrow: 'Döngün',
+      eyebrow: cycle.title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 20,
         children: [
           OnboardingQuestion(
-            question: AppStrings.menopauseStatus,
+            question: cycle.menopauseStatus,
             child: OnboardingSingleSelect<MenopauseStatus>(
               options: [for (final option in menopauseOptions) option.$2],
               selectedValue: vm.menopauseStatus,
@@ -63,7 +65,7 @@ class CyclePage extends StatelessWidget {
             ),
           ),
           OnboardingQuestion(
-            question: AppStrings.averageCycleLength,
+            question: cycle.averageCycleLength,
             child: Row(
               children: [
                 Expanded(
@@ -78,25 +80,25 @@ class CyclePage extends StatelessWidget {
                         : null,
                   ),
                 ),
-                Text(AppStrings.dayCount(vm.averageCycleLength)),
+                Text(cycle.dayCount(days: vm.averageCycleLength)),
               ],
             ),
           ),
           OnboardingQuestion(
-            question: AppStrings.lastPeriodDaysQuestion,
-            helper: 'Yaklaşık olsa da olur.',
+            question: cycle.lastPeriodDays,
+            helper: cycle.lastPeriodHelper,
             child: SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 key: const ValueKey('onboarding_last_period_days'),
                 onPressed: isCycleInformationEnabled ? onPickLastPeriod : null,
                 icon: const Icon(Icons.date_range_outlined),
-                label: Text(AppStrings.selectLastPeriodDays),
+                label: Text(cycle.selectLastPeriodDays),
               ),
             ),
           ),
           OnboardingQuestion(
-            question: AppStrings.birthControl,
+            question: cycle.birthControl,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 8,
@@ -114,7 +116,7 @@ class CyclePage extends StatelessWidget {
                 ActionChip(
                   key: const ValueKey('onboarding_add_birth_control'),
                   avatar: const Icon(Icons.add_rounded, size: 17),
-                  label: Text(AppStrings.add),
+                  label: Text(cycle.addBirthControl),
                   onPressed: isCycleInformationEnabled
                       ? onAddBirthControl
                       : null,

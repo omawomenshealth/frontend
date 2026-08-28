@@ -20,10 +20,10 @@ class OnboardingPreviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = vm.userName.trim();
-    final conditionSummary = vm.knownDiseases.isEmpty
-        ? AppStrings.noConditionSelected
-        : vm.knownDiseases.map(AppStrings.localizeStoredValue).join(', ');
     final review = context.t.onboarding.review;
+    final conditionSummary = vm.knownDiseases.isEmpty
+        ? review.noConditions
+        : vm.knownDiseases.map(AppStrings.localizeStoredValue).join(', ');
     final accountStorageSummary = vm.isUserLoggedIn
         ? review.googleStorage
         : review.guestStorage;
@@ -56,7 +56,7 @@ class OnboardingPreviewPage extends StatelessWidget {
           const SizedBox(height: 30),
           Center(
             child: Text(
-              name.isEmpty ? AppStrings.great : 'Yanındayım, $name',
+              name.isEmpty ? review.title : review.titleWithName(name: name),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: 'CormorantGaramond',
@@ -71,7 +71,7 @@ class OnboardingPreviewPage extends StatelessWidget {
           const SizedBox(height: 10),
           Center(
             child: Text(
-              AppStrings.profileReady,
+              review.subtitle,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.textSecondary,
@@ -84,12 +84,12 @@ class OnboardingPreviewPage extends StatelessWidget {
           OnboardingPrompt(message: context.t.onboarding.prompt.review),
           const SizedBox(height: 18),
           _PreviewSummary(
-            label: AppStrings.knownConditionQuestion,
+            label: review.conditionsLabel,
             value: conditionSummary,
           ),
           _PreviewSummary(
-            label: AppStrings.cycleInformation,
-            value: AppStrings.dayCount(vm.averageCycleLength),
+            label: review.cycleLabel,
+            value: review.dayCount(days: vm.averageCycleLength),
           ),
           _PreviewSummary(
             label: review.accountStorageLabel,
@@ -106,7 +106,7 @@ class OnboardingPreviewPage extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                AppStrings.privacyAndData,
+                review.privacyAndData,
                 style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 12,
@@ -133,7 +133,7 @@ class OnboardingPreviewPage extends StatelessWidget {
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text(AppStrings.letsStart),
+                : Text(review.start),
           ),
         ],
       ),

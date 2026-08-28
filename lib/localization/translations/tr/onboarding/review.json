@@ -1,4 +1,13 @@
 {
+  "title": "Harika",
+  "titleWithName": "Yanındayım, $name",
+  "subtitle": "Profilin hazır. Başlamaya hazır mısın?",
+  "conditionsLabel": "Bilmemi istediğin sağlık durumları",
+  "noConditions": "Henüz bir sağlık durumu eklemedin",
+  "cycleLabel": "Döngü bilgilerin",
+  "dayCount": "$days gün",
+  "privacyAndData": "Gizlilik ve verilerin",
+  "start": "Hazırsan başlayalım",
   "accountStorageLabel": "Verilerin",
   "guestStorage": "Hesapsız kullanıyorsun; bu cihazda şifreli",
   "googleStorage": "Google ile giriş yaptın; şifreli yedekleniyor"

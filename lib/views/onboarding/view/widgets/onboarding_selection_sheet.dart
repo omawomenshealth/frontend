@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/color_constants.dart';
+import '../../../../localization/generated/strings.g.dart';
 
 class OnboardingSelectionSheet extends StatelessWidget {
   final String title;
@@ -76,7 +76,7 @@ class OnboardingSelectionSheet extends StatelessWidget {
                 child: FilledButton(
                   onPressed: onSave,
                   style: FilledButton.styleFrom(backgroundColor: accent),
-                  child: Text(AppStrings.save),
+                  child: Text(context.t.onboarding.common.save),
                 ),
               ),
             ),

@@ -1,0 +1,10 @@
+{
+  "title": "Let's get to know you",
+  "name": "Your name",
+  "nameHint": "What should I call you?",
+  "birthDate": "Your date of birth",
+  "birthDateHelper": "Knowing your age helps me understand your cycle better.",
+  "birthDateHint": "dd/mm/yyyy",
+  "chooseFromCalendar": "Choose from calendar",
+  "age": "$age years old"
+}

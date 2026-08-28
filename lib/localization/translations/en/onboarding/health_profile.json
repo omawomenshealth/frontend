@@ -1,0 +1,11 @@
+{
+  "title": "Your body",
+  "height": "Height",
+  "weight": "Weight",
+  "smokingStatus": "Do you smoke?",
+  "smokingCurrent": "Yes",
+  "smokingNever": "No",
+  "smokingFormer": "I quit",
+  "knownConditions": "Is there a health condition you'd like me to know about?",
+  "addCondition": "Add"
+}
