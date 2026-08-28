@@ -62,13 +62,13 @@ void main() {
     expect(find.text('Seni tanıyalım'), findsOneWidget);
     expect(find.text(t.onboarding.prompt.introduction), findsOneWidget);
     expect(find.text(t.onboarding.common.skipForNow), findsOneWidget);
-    expect(find.text(AppStrings.name), findsOneWidget);
-    expect(find.text('Sana hitap edebilmemiz için'), findsOneWidget);
+    expect(find.text(t.onboarding.introduction.name), findsOneWidget);
+    expect(find.text(t.onboarding.introduction.nameHint), findsOneWidget);
     final nameField = tester.widget<TextField>(
       find.byKey(const ValueKey('onboarding_name')),
     );
     expect(nameField.decoration?.labelText, isNull);
-    expect(nameField.decoration?.hintText, 'Sana hitap edebilmemiz için');
+    expect(nameField.decoration?.hintText, t.onboarding.introduction.nameHint);
     final nameSize = tester.getSize(
       find.byKey(const ValueKey('onboarding_name')),
     );
@@ -85,34 +85,40 @@ void main() {
     expect(find.text('18/08/1996'), findsOneWidget);
     expect(vm.age, greaterThan(0));
 
-    await tester.tap(find.text(AppStrings.next));
+    await tester.tap(find.text(t.onboarding.common.next));
     await tester.pumpAndSettle();
     expect(find.text(t.onboarding.wellbeing.title), findsOneWidget);
     expect(find.text(t.onboarding.prompt.wellbeing), findsOneWidget);
     expect(find.text(t.onboarding.wellbeing.moodQuestion), findsOneWidget);
     expect(find.text(t.onboarding.wellbeing.multiSelectHint), findsOneWidget);
 
-    await tester.tap(find.text(AppStrings.next));
+    await tester.tap(find.text(t.onboarding.common.next));
     await tester.pumpAndSettle();
-    expect(find.text(AppStrings.symptomBody), findsOneWidget);
+    expect(find.text(t.onboarding.health_profile.title), findsOneWidget);
     expect(find.text(t.onboarding.prompt.healthProfile), findsOneWidget);
     expect(find.byKey(const ValueKey('onboarding_height')), findsOneWidget);
     expect(find.byKey(const ValueKey('onboarding_weight')), findsOneWidget);
-    expect(find.text(AppStrings.smokingStatus), findsOneWidget);
-    expect(find.text(AppStrings.knownConditionQuestion), findsOneWidget);
+    expect(
+      find.text(t.onboarding.health_profile.smokingStatus),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.health_profile.knownConditions),
+      findsOneWidget,
+    );
     expect(
       find.byKey(const ValueKey('onboarding_add_known_disease')),
       findsOneWidget,
     );
 
-    await tester.tap(find.text(AppStrings.next));
+    await tester.tap(find.text(t.onboarding.common.next));
     await tester.pumpAndSettle();
-    expect(find.text('Döngün'), findsOneWidget);
+    expect(find.text(t.onboarding.cycle.title), findsOneWidget);
     expect(find.text(t.onboarding.prompt.cycle), findsOneWidget);
-    expect(find.text(AppStrings.menopauseStatus), findsOneWidget);
-    expect(find.text(AppStrings.averageCycleLength), findsOneWidget);
-    expect(find.text(AppStrings.lastPeriodDaysQuestion), findsOneWidget);
-    expect(find.text(AppStrings.birthControl), findsOneWidget);
+    expect(find.text(t.onboarding.cycle.menopauseStatus), findsOneWidget);
+    expect(find.text(t.onboarding.cycle.averageCycleLength), findsOneWidget);
+    expect(find.text(t.onboarding.cycle.lastPeriodDays), findsOneWidget);
+    expect(find.text(t.onboarding.cycle.birthControl), findsOneWidget);
     expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNull);
     expect(
       tester
@@ -134,7 +140,7 @@ void main() {
       isNotNull,
     );
 
-    await tester.tap(find.text(AppStrings.next));
+    await tester.tap(find.text(t.onboarding.common.next));
     await tester.pumpAndSettle();
     expect(vm.currentPage, 4);
     expect(find.text(t.onboarding.prompt.review), findsOneWidget);

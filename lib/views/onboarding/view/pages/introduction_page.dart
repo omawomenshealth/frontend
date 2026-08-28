@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/color_constants.dart';
+import '../../../../localization/generated/strings.g.dart';
 import '../../formatters/onboarding_date_slash_formatter.dart';
 import '../widgets/index.dart';
 import '../../viewmodel/onboarding_view_model.dart';
@@ -23,8 +23,9 @@ class IntroductionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final introduction = context.t.onboarding.introduction;
     return OnboardingDeckCard(
-      eyebrow: AppStrings.meetYouTitle,
+      eyebrow: introduction.title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -46,17 +47,16 @@ class IntroductionPage extends StatelessWidget {
 class _NameField extends StatelessWidget {
   final ValueChanged<String> onChanged;
 
-  const _NameField({
-    required this.onChanged,
-  });
+  const _NameField({required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
+    final introduction = context.t.onboarding.introduction;
     return OnboardingQuestion(
-      question: AppStrings.name,
+      question: introduction.name,
       child: OnboardingTextField(
         fieldKey: const ValueKey('onboarding_name'),
-        hintText: AppStrings.nameAddressHint,
+        hintText: introduction.nameHint,
         textCapitalization: TextCapitalization.words,
         onChanged: onChanged,
       ),
@@ -77,13 +77,14 @@ class _BirthDateField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final introduction = context.t.onboarding.introduction;
     return OnboardingQuestion(
-      question: AppStrings.selectBirthDate,
-      helper: 'Hormon ve döngü yorumlarım yaşına göre değişiyor.',
+      question: introduction.birthDate,
+      helper: introduction.birthDateHelper,
       child: OnboardingTextField(
         key: const ValueKey('onboarding_birth_date'),
         controller: controller,
-        hintText: 'mm/dd/yyyy',
+        hintText: introduction.birthDateHint,
         keyboardType: TextInputType.datetime,
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r'[0-9/]')),
@@ -93,7 +94,7 @@ class _BirthDateField extends StatelessWidget {
         onChanged: onChanged,
         suffixIcon: IconButton(
           key: const ValueKey('onboarding_birth_date_picker'),
-          tooltip: AppStrings.chooseFromCalendar,
+          tooltip: introduction.chooseFromCalendar,
           onPressed: onPickBirthDate,
           icon: const Icon(
             Icons.calendar_today_outlined,
@@ -113,12 +114,13 @@ class _AgeIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final introduction = context.t.onboarding.introduction;
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 180),
       child: age == null
           ? const SizedBox.shrink(key: ValueKey('age_help'))
           : Text(
-              AppStrings.ageYears(age!),
+              introduction.age(age: age!),
               key: const ValueKey('age_value'),
               style: const TextStyle(
                 color: AppColors.accent,

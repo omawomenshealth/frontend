@@ -1,0 +1,10 @@
+{
+  "title": "Seni tanıyalım",
+  "name": "Adın",
+  "nameHint": "Sana nasıl seslenelim?",
+  "birthDate": "Doğum tarihin",
+  "birthDateHelper": "Yaşını bilmek, döngünü daha iyi anlamama yardımcı olur.",
+  "birthDateHint": "gg/aa/yyyy",
+  "chooseFromCalendar": "Takvimden seç",
+  "age": "$age yaş"
+}

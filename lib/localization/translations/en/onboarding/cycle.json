@@ -1,0 +1,11 @@
+{
+  "title": "Your cycle",
+  "menopauseStatus": "Your menopause status",
+  "averageCycleLength": "Your average cycle length",
+  "lastPeriodDays": "Let's choose the days of your last period",
+  "lastPeriodHelper": "An estimate is completely fine.",
+  "selectLastPeriodDays": "Select period days",
+  "birthControl": "Birth control",
+  "addBirthControl": "Add",
+  "dayCount": "$days days"
+}

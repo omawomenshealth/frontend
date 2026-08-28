@@ -1,0 +1,11 @@
+{
+  "title": "Bedenin",
+  "height": "Boyun",
+  "weight": "Kilon",
+  "smokingStatus": "Sigara kullanıyor musun?",
+  "smokingCurrent": "Evet",
+  "smokingNever": "Hayır",
+  "smokingFormer": "Bıraktım",
+  "knownConditions": "Bilmemi istediğin bir sağlık durumun var mı?",
+  "addCondition": "Ekle"
+}

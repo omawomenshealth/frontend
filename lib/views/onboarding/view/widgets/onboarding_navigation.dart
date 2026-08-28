@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/color_constants.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
@@ -20,6 +19,7 @@ class OnboardingBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLast = vm.currentPage == vm.totalPages - 1 && vm.isLastDetailStep;
+    final common = context.t.onboarding.common;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 18),
@@ -59,7 +59,7 @@ class OnboardingBottomNavigation extends StatelessWidget {
                       ),
                     )
                   else ...[
-                    Text(isLast ? AppStrings.finish : AppStrings.next),
+                    Text(isLast ? common.finish : common.next),
                     const SizedBox(width: 8),
                     const Icon(Icons.arrow_forward, size: 16),
                   ],

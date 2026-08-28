@@ -51,6 +51,9 @@ class Translations$onboarding$en {
 
 	// Translations
 	late final Translations$onboarding$common$en common = Translations$onboarding$common$en.internal(_root);
+	late final Translations$onboarding$cycle$en cycle = Translations$onboarding$cycle$en.internal(_root);
+	late final Translations$onboarding$health_profile$en health_profile = Translations$onboarding$health_profile$en.internal(_root);
+	late final Translations$onboarding$introduction$en introduction = Translations$onboarding$introduction$en.internal(_root);
 	late final Translations$onboarding$prompt$en prompt = Translations$onboarding$prompt$en.internal(_root);
 	late final Translations$onboarding$review$en review = Translations$onboarding$review$en.internal(_root);
 	late final Translations$onboarding$wellbeing$en wellbeing = Translations$onboarding$wellbeing$en.internal(_root);
@@ -66,6 +69,120 @@ class Translations$onboarding$common$en {
 
 	/// en: 'Skip these questions for now'
 	String get skipForNow => 'Skip these questions for now';
+
+	/// en: 'Continue'
+	String get next => 'Continue';
+
+	/// en: 'Finish'
+	String get finish => 'Finish';
+
+	/// en: 'Save'
+	String get save => 'Save';
+}
+
+// Path: onboarding.cycle
+class Translations$onboarding$cycle$en {
+	Translations$onboarding$cycle$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your cycle'
+	String get title => 'Your cycle';
+
+	/// en: 'Your menopause status'
+	String get menopauseStatus => 'Your menopause status';
+
+	/// en: 'Your average cycle length'
+	String get averageCycleLength => 'Your average cycle length';
+
+	/// en: 'Let's choose the days of your last period'
+	String get lastPeriodDays => 'Let\'s choose the days of your last period';
+
+	/// en: 'An estimate is completely fine.'
+	String get lastPeriodHelper => 'An estimate is completely fine.';
+
+	/// en: 'Select period days'
+	String get selectLastPeriodDays => 'Select period days';
+
+	/// en: 'Birth control'
+	String get birthControl => 'Birth control';
+
+	/// en: 'Add'
+	String get addBirthControl => 'Add';
+
+	/// en: '$days days'
+	String dayCount({required Object days}) => '${days} days';
+}
+
+// Path: onboarding.health_profile
+class Translations$onboarding$health_profile$en {
+	Translations$onboarding$health_profile$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your body'
+	String get title => 'Your body';
+
+	/// en: 'Height'
+	String get height => 'Height';
+
+	/// en: 'Weight'
+	String get weight => 'Weight';
+
+	/// en: 'Do you smoke?'
+	String get smokingStatus => 'Do you smoke?';
+
+	/// en: 'Yes'
+	String get smokingCurrent => 'Yes';
+
+	/// en: 'No'
+	String get smokingNever => 'No';
+
+	/// en: 'I quit'
+	String get smokingFormer => 'I quit';
+
+	/// en: 'Is there a health condition you'd like me to know about?'
+	String get knownConditions => 'Is there a health condition you\'d like me to know about?';
+
+	/// en: 'Add'
+	String get addCondition => 'Add';
+}
+
+// Path: onboarding.introduction
+class Translations$onboarding$introduction$en {
+	Translations$onboarding$introduction$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Let's get to know you'
+	String get title => 'Let\'s get to know you';
+
+	/// en: 'Your name'
+	String get name => 'Your name';
+
+	/// en: 'What should I call you?'
+	String get nameHint => 'What should I call you?';
+
+	/// en: 'Your date of birth'
+	String get birthDate => 'Your date of birth';
+
+	/// en: 'Knowing your age helps me understand your cycle better.'
+	String get birthDateHelper => 'Knowing your age helps me understand your cycle better.';
+
+	/// en: 'dd/mm/yyyy'
+	String get birthDateHint => 'dd/mm/yyyy';
+
+	/// en: 'Choose from calendar'
+	String get chooseFromCalendar => 'Choose from calendar';
+
+	/// en: '$age years old'
+	String age({required Object age}) => '${age} years old';
 }
 
 // Path: onboarding.prompt
@@ -99,6 +216,33 @@ class Translations$onboarding$review$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Great'
+	String get title => 'Great';
+
+	/// en: 'I'm here with you, $name'
+	String titleWithName({required Object name}) => 'I\'m here with you, ${name}';
+
+	/// en: 'Your profile is ready. Ready to begin?'
+	String get subtitle => 'Your profile is ready. Ready to begin?';
+
+	/// en: 'Health conditions you'd like me to know'
+	String get conditionsLabel => 'Health conditions you\'d like me to know';
+
+	/// en: 'You haven't added a health condition yet'
+	String get noConditions => 'You haven\'t added a health condition yet';
+
+	/// en: 'Your cycle details'
+	String get cycleLabel => 'Your cycle details';
+
+	/// en: '$days days'
+	String dayCount({required Object days}) => '${days} days';
+
+	/// en: 'Your privacy and data'
+	String get privacyAndData => 'Your privacy and data';
+
+	/// en: 'Let's get started'
+	String get start => 'Let\'s get started';
 
 	/// en: 'Your data'
 	String get accountStorageLabel => 'Your data';
@@ -194,11 +338,49 @@ extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
 			'onboarding.common.skipForNow' => 'Skip these questions for now',
+			'onboarding.common.next' => 'Continue',
+			'onboarding.common.finish' => 'Finish',
+			'onboarding.common.save' => 'Save',
+			'onboarding.cycle.title' => 'Your cycle',
+			'onboarding.cycle.menopauseStatus' => 'Your menopause status',
+			'onboarding.cycle.averageCycleLength' => 'Your average cycle length',
+			'onboarding.cycle.lastPeriodDays' => 'Let\'s choose the days of your last period',
+			'onboarding.cycle.lastPeriodHelper' => 'An estimate is completely fine.',
+			'onboarding.cycle.selectLastPeriodDays' => 'Select period days',
+			'onboarding.cycle.birthControl' => 'Birth control',
+			'onboarding.cycle.addBirthControl' => 'Add',
+			'onboarding.cycle.dayCount' => ({required Object days}) => '${days} days',
+			'onboarding.health_profile.title' => 'Your body',
+			'onboarding.health_profile.height' => 'Height',
+			'onboarding.health_profile.weight' => 'Weight',
+			'onboarding.health_profile.smokingStatus' => 'Do you smoke?',
+			'onboarding.health_profile.smokingCurrent' => 'Yes',
+			'onboarding.health_profile.smokingNever' => 'No',
+			'onboarding.health_profile.smokingFormer' => 'I quit',
+			'onboarding.health_profile.knownConditions' => 'Is there a health condition you\'d like me to know about?',
+			'onboarding.health_profile.addCondition' => 'Add',
+			'onboarding.introduction.title' => 'Let\'s get to know you',
+			'onboarding.introduction.name' => 'Your name',
+			'onboarding.introduction.nameHint' => 'What should I call you?',
+			'onboarding.introduction.birthDate' => 'Your date of birth',
+			'onboarding.introduction.birthDateHelper' => 'Knowing your age helps me understand your cycle better.',
+			'onboarding.introduction.birthDateHint' => 'dd/mm/yyyy',
+			'onboarding.introduction.chooseFromCalendar' => 'Choose from calendar',
+			'onboarding.introduction.age' => ({required Object age}) => '${age} years old',
 			'onboarding.prompt.introduction' => 'Hi, I\'m Oma 🌿 What would you like me to call you?',
 			'onboarding.prompt.wellbeing' => 'How have you been lately? I\'d like to hear how you\'re feeling so I can understand you better.',
 			'onboarding.prompt.healthProfile' => 'Let\'s talk about a few things about your body. Knowing them helps me support you with more care.',
 			'onboarding.prompt.cycle' => 'Let\'s look at what your cycle has been telling you. A few details help me understand you better.',
 			'onboarding.prompt.review' => 'When you\'re ready, let\'s begin at your own pace. Oma is here for your cycle and wellbeing.',
+			'onboarding.review.title' => 'Great',
+			'onboarding.review.titleWithName' => ({required Object name}) => 'I\'m here with you, ${name}',
+			'onboarding.review.subtitle' => 'Your profile is ready. Ready to begin?',
+			'onboarding.review.conditionsLabel' => 'Health conditions you\'d like me to know',
+			'onboarding.review.noConditions' => 'You haven\'t added a health condition yet',
+			'onboarding.review.cycleLabel' => 'Your cycle details',
+			'onboarding.review.dayCount' => ({required Object days}) => '${days} days',
+			'onboarding.review.privacyAndData' => 'Your privacy and data',
+			'onboarding.review.start' => 'Let\'s get started',
 			'onboarding.review.accountStorageLabel' => 'Your data',
 			'onboarding.review.guestStorage' => 'No account; encrypted on this device',
 			'onboarding.review.googleStorage' => 'Signed in with Google; securely backed up',

@@ -1,4 +1,13 @@
 {
+  "title": "Great",
+  "titleWithName": "I'm here with you, $name",
+  "subtitle": "Your profile is ready. Ready to begin?",
+  "conditionsLabel": "Health conditions you'd like me to know",
+  "noConditions": "You haven't added a health condition yet",
+  "cycleLabel": "Your cycle details",
+  "dayCount": "$days days",
+  "privacyAndData": "Your privacy and data",
+  "start": "Let's get started",
   "accountStorageLabel": "Your data",
   "guestStorage": "No account; encrypted on this device",
   "googleStorage": "Signed in with Google; securely backed up"

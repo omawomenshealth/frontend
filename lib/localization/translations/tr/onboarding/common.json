@@ -1,3 +1,6 @@
 {
-  "skipForNow": "Bu soruları şimdilik geç"
+  "skipForNow": "Bu soruları şimdilik geç",
+  "next": "Devam et",
+  "finish": "Bitir",
+  "save": "Kaydet"
 }

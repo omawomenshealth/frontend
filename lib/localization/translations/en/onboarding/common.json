@@ -1,3 +1,6 @@
 {
-  "skipForNow": "Skip these questions for now"
+  "skipForNow": "Skip these questions for now",
+  "next": "Continue",
+  "finish": "Finish",
+  "save": "Save"
 }

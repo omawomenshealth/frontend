@@ -1,0 +1,11 @@
+{
+  "title": "Döngün",
+  "menopauseStatus": "Menopoz durumun",
+  "averageCycleLength": "Ortalama döngü süren",
+  "lastPeriodDays": "Son adet günlerini seçelim",
+  "lastPeriodHelper": "Yaklaşık olsa da olur.",
+  "selectLastPeriodDays": "Adet günlerini seç",
+  "birthControl": "Doğum kontrolü",
+  "addBirthControl": "Ekle",
+  "dayCount": "$days gün"
+}

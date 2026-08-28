@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
 import '../../../../data/models/user_settings_model.dart';
+import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
 
@@ -25,8 +26,9 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
   @override
   Widget build(BuildContext context) {
     final vm = widget.vm;
+    final healthProfile = context.t.onboarding.health_profile;
     return OnboardingDeckCard(
-      eyebrow: AppStrings.symptomBody,
+      eyebrow: healthProfile.title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 20,
@@ -34,41 +36,39 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                Expanded(
-                  child: OnboardingQuestion(
-                    question: AppStrings.height,
-                    controlSpacing: 0,
-                    child: OnboardingTextField(
-                      fieldKey: const ValueKey('onboarding_height'),
-                      hintText: '165',
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      onChanged: (value) =>
-                          vm.setHeight(double.tryParse(value)),
+              Expanded(
+                child: OnboardingQuestion(
+                  question: healthProfile.height,
+                  controlSpacing: 0,
+                  child: OnboardingTextField(
+                    fieldKey: const ValueKey('onboarding_height'),
+                    hintText: '165',
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
                     ),
+                    onChanged: (value) => vm.setHeight(double.tryParse(value)),
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: OnboardingQuestion(
-                    question: AppStrings.weight,
-                    controlSpacing: 0,
-                    child: OnboardingTextField(
-                      fieldKey: const ValueKey('onboarding_weight'),
-                      hintText: '60',
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      onChanged: (value) =>
-                          vm.setWeight(double.tryParse(value)),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: OnboardingQuestion(
+                  question: healthProfile.weight,
+                  controlSpacing: 0,
+                  child: OnboardingTextField(
+                    fieldKey: const ValueKey('onboarding_weight'),
+                    hintText: '60',
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
                     ),
+                    onChanged: (value) => vm.setWeight(double.tryParse(value)),
                   ),
                 ),
+              ),
             ],
           ),
           OnboardingQuestion(
-            question: AppStrings.smokingStatus,
+            question: healthProfile.smokingStatus,
             child: OnboardingSingleSelect(
               options: const [
                 SmokingStatus.current,
@@ -77,9 +77,13 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
               ],
               selectedValue: _smokingStatus,
               labelBuilder: (value) {
-                if (value == SmokingStatus.current) return AppStrings.yes;
-                if (value == SmokingStatus.never) return AppStrings.no;
-                return 'Bıraktım';
+                if (value == SmokingStatus.current) {
+                  return healthProfile.smokingCurrent;
+                }
+                if (value == SmokingStatus.never) {
+                  return healthProfile.smokingNever;
+                }
+                return healthProfile.smokingFormer;
               },
               onChanged: (value) {
                 setState(() => _smokingStatus = value);
@@ -90,13 +94,13 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
             ),
           ),
           OnboardingQuestion(
-            question: AppStrings.knownConditionQuestion,
+            question: healthProfile.knownConditions,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 8,
               children: [
                 OnboardingMultiSelect(
-                    options: vm.knownDiseases
+                  options: vm.knownDiseases
                       .map(AppStrings.localizeStoredValue)
                       .toList(growable: false),
                   selectedValues: vm.knownDiseases
@@ -120,7 +124,7 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
                 ActionChip(
                   key: const ValueKey('onboarding_add_known_disease'),
                   avatar: const Icon(Icons.add_rounded, size: 17),
-                  label: Text(AppStrings.add),
+                  label: Text(healthProfile.addCondition),
                   onPressed: widget.onOpenDiseases,
                 ),
               ],
@@ -130,5 +134,4 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
       ),
     );
   }
-
 }
