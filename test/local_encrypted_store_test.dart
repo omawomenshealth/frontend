@@ -103,6 +103,20 @@ void main() {
       );
       expect(await storage.rememberCustomFood('Ev  Çorbası'), 'Ev Çorbası');
       expect(await storage.rememberCustomFood('EV ÇORBASI'), 'Ev Çorbası');
+      expect(
+        await storage.rememberCustomSymptom(
+          CustomSymptomGroup.feelingEmotion,
+          '  Umutlu ',
+        ),
+        'Umutlu',
+      );
+      expect(
+        await storage.rememberCustomSymptom(
+          CustomSymptomGroup.feelingEmotion,
+          'UMUTLU',
+        ),
+        'Umutlu',
+      );
 
       await storage.saveDailyLog(
         DailyLog(
@@ -111,20 +125,28 @@ void main() {
           mealFoodGroups: const {
             'Akşam': ['ev çorbası'],
           },
+          symptoms: const ['umutlu'],
+          symptomSeverities: const {'umutlu': 3},
         ),
       );
 
       final settings = storage.loadSettings()!;
       expect(settings.customCravings, ['Gece Atıştırması']);
+      expect(settings.customSymptomsFor(CustomSymptomGroup.feelingEmotion), [
+        'Umutlu',
+      ]);
       final log = storage.loadAllLogs().single;
       expect(log.cravings, ['Gece Atıştırması']);
       expect(log.mealFoodGroups['Akşam'], ['Ev Çorbası']);
+      expect(log.symptoms, ['Umutlu']);
+      expect(log.symptomSeverities, {'Umutlu': 3});
 
       final preferences = await SharedPreferences.getInstance();
       for (final key in _encryptedKeys(preferences)) {
         final raw = preferences.getString(key)!;
         expect(raw, isNot(contains('Gece Atıştırması')));
         expect(raw, isNot(contains('Ev Çorbası')));
+        expect(raw, isNot(contains('Umutlu')));
       }
     },
   );

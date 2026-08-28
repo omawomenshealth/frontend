@@ -525,9 +525,6 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                 color: selected ? widget.color : AppColors.outline,
               ),
               onSelected: (_) {
-                if (!selected) {
-                  (widget.onItemSelected ?? _defaultItemSelection)(item, null);
-                }
                 setState(() {
                   if (!_expandedItems.remove(item)) _expandedItems.add(item);
                   _visibleDetailCounts.putIfAbsent(item, () => 5);

@@ -74,7 +74,7 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
           '${widget.forecastSummary == null ? '' : '. ${widget.forecastSummary}'}',
       child: Container(
         width: double.infinity,
-        height: 440,
+        constraints: const BoxConstraints(minHeight: 440),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: presentation.softColor,
@@ -142,7 +142,7 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _PhaseBadge(presentation: presentation),
-                  const Spacer(),
+                  const SizedBox(height: 70),
                   Text(
                     '${presentation.dayLabel}: ${widget.cycleDay} · '
                     '${presentation.fertility}',
@@ -174,8 +174,6 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
                     width: 310,
                     child: Text(
                       presentation.body,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 13,
@@ -197,8 +195,6 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
                         Expanded(
                           child: Text(
                             widget.forecastSummary!,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: presentation.color,
                               fontSize: 10.5,

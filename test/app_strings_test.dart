@@ -72,17 +72,24 @@ void main() {
       AppStrings.exploreOvulationDescription,
       startsWith('Estimated chance of pregnancy'),
     );
-    expect(AppStrings.symptomEnergyLevelOptions, [
-      'Energetic',
-      'Fatigue',
-      'Exhausted/burned out',
-    ]);
+    expect(
+      AppStrings.periodPredictionLowConfidenceSummary('9/17 - 9/29'),
+      'Period prediction: 9/17 - 9/29 · '
+      'Add more data for more accurate results',
+    );
+    expect(AppStrings.symptomOverall, 'How are you feeling');
+    expect(AppStrings.symptomEnergyLevelOptions, ['Energetic', 'Fatigue']);
     expect(AppStrings.symptomMoodStateOptions, [
+      'Feeling good',
+      'Stressed',
+      'Happy',
+      'Calm',
       'Motivated',
-      'Calm and balanced',
+      'Anxious',
       'Restless',
       'Irritable',
-      'Emotional ups and downs',
+      'Sad',
+      'Experiencing mood swings',
     ]);
     expect(AppStrings.symptomMentalClarityOptions, [
       'Focused',
@@ -128,19 +135,29 @@ void main() {
     expect(AppStrings.womenDiseasesList, isNot(contains('Diğer')));
     expect(AppStrings.chronicDiseasesList, isNot(contains('Diğer')));
     expect(AppStrings.symptomSkinHairOptions, contains('Yağlı cilt'));
-    expect(AppStrings.symptomOverallOptions, ['Her şey yolunda', 'Stres']);
-    expect(AppStrings.localizeStoredValue('Stress'), 'Stres');
-    expect(AppStrings.symptomEnergyLevelOptions, [
-      'Enerjik',
-      'Yorgunluk',
-      'Bitkin/tükenmiş',
-    ]);
+    expect(AppStrings.symptomOverall, 'Nasıl hissediyorsun');
+    expect(
+      AppStrings.symptomOverallOptions,
+      containsAll(['İyi hissediyorum', 'Stresliyim', 'Mutluyum']),
+    );
+    expect(AppStrings.localizeStoredValue('Stress'), 'Stresliyim');
+    expect(
+      AppStrings.periodPredictionLowConfidenceSummary('17.9 - 29.9'),
+      'Tahmini adet başlangıcı: 17.9 - 29.9 · '
+      'Verilerinle daha doğru sonuçlar elde edelim',
+    );
+    expect(AppStrings.symptomEnergyLevelOptions, ['Enerjik', 'Yorgunluk']);
     expect(AppStrings.symptomMoodStateOptions, [
-      'Motivasyonlu',
-      'Sakin ve dengeli',
-      'Huzursuzluk',
-      'Sinirlilik',
-      'Duygusal iniş çıkış',
+      'İyi hissediyorum',
+      'Stresliyim',
+      'Mutluyum',
+      'Sakinim',
+      'Motivasyonluyum',
+      'Kaygılıyım',
+      'Huzursuzum',
+      'Sinirliyim',
+      'Üzgünüm',
+      'Duygusal iniş çıkış yaşıyorum',
     ]);
     expect(AppStrings.symptomMentalClarityOptions, [
       'Odaklanmış',
@@ -169,7 +186,15 @@ void main() {
     );
     expect(AppStrings.localizeStoredValue('Refreshed'), 'Dinç');
     expect(AppStrings.localizeStoredValue('Back pain'), 'Bel ağrısı');
-    expect(AppStrings.symptomDigestionOptions, contains('Midem iyi'));
+    expect(
+      AppStrings.symptomDigestionOptions,
+      contains('Sindirimim iyi ve düzenli'),
+    );
+    expect(
+      AppStrings.localizeStoredValue('Bağırsaklarım iyi'),
+      'Sindirimim iyi ve düzenli',
+    );
+    expect(AppStrings.localizeStoredValue('Bitkin/tükenmiş'), 'Yorgunluk');
     expect(AppStrings.skincareCatalog.keys, [
       'Akne, Yağlanma ve Gözenek',
       'Eksfoliasyon ve Doku',

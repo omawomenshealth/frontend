@@ -235,12 +235,15 @@ class DashboardView extends StatelessWidget {
     if (forecast == null) return null;
     final start = forecast.p80Window.start;
     final end = forecast.p80Window.end;
+    final range = '${start.day}.${start.month} - ${end.day}.${end.month}';
+    if (forecast.confidence == ForecastConfidence.low) {
+      return AppStrings.periodPredictionLowConfidenceSummary(range);
+    }
     final confidence = switch (forecast.confidence) {
       ForecastConfidence.low => AppStrings.forecastConfidenceLow,
       ForecastConfidence.medium => AppStrings.forecastConfidenceMedium,
       ForecastConfidence.high => AppStrings.forecastConfidenceHigh,
     };
-    final range = '${start.day}.${start.month} - ${end.day}.${end.month}';
     return AppStrings.periodPredictionSummary(range, confidence);
   }
 

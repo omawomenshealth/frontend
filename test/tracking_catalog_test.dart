@@ -27,6 +27,104 @@ void main() {
     expect(AppStrings.supplementCatalog, contains("St. John's wort"));
   });
 
+  test('ilaç kataloğu Türkçe olarak yeni on ana grubu kullanır', () {
+    expect(
+      AppStrings.medicationCatalog.keys,
+      orderedEquals(const [
+        'Ağrı, Ateş ve Kas-Eklem İlaçları',
+        'Mide ve Bağırsak İlaçları',
+        'Alerji, Soğuk Algınlığı ve Solunum İlaçları',
+        'Enfeksiyon İlaçları',
+        'Tansiyon, Kalp ve Ödem İlaçları',
+        'Kolesterol ve Kan Sulandırıcı İlaçlar',
+        'Diyabet ve Kan Şekeri İlaçları',
+        'Ruh Sağlığı ve Uyku İlaçları',
+        'Migren, Epilepsi ve Sinir Sistemi İlaçları',
+        'Hormon, Tiroid ve Doğum Kontrol İlaçları',
+      ]),
+    );
+    expect(
+      AppStrings.medicationCatalog['Enfeksiyon İlaçları'],
+      orderedEquals(const [
+        'Antibiyotik',
+        'Mantar ilacı',
+        'Antiviral',
+        'Parazit ilacı',
+      ]),
+    );
+    expect(
+      AppStrings.medicationActiveIngredients.values.expand((items) => items),
+      containsAll(const [
+        'Parasetamol',
+        'Metamizol',
+        'Pantoprazol',
+        'Loperamid',
+        'Setirizin',
+        'Montelukast',
+        'Amoksisilin + klavulanik asit',
+        'Flukonazol',
+        'Spironolakton',
+        'Rivaroksaban',
+        'Semaglutid',
+        'İnsülin aspart',
+        'Essitalopram',
+        'Ketiapin',
+        'Levetirasetam',
+        'Levodopa + karbidopa',
+        'Karbimazol',
+        'Etonogestrel',
+      ]),
+    );
+  });
+
+  test('ilaç kataloğu İngilizce olarak aynı on ana grubu kullanır', () async {
+    await AppStrings.delegate.load(const Locale('en'));
+
+    expect(
+      AppStrings.medicationCatalog.keys,
+      orderedEquals(const [
+        'Pain, Fever, Muscle and Joint Medicines',
+        'Stomach and Bowel Medicines',
+        'Allergy, Cold and Respiratory Medicines',
+        'Infection Medicines',
+        'Blood Pressure, Heart and Edema Medicines',
+        'Cholesterol and Blood-Thinning Medicines',
+        'Diabetes and Blood Sugar Medicines',
+        'Mental Health and Sleep Medicines',
+        'Migraine, Epilepsy and Nervous System Medicines',
+        'Hormone, Thyroid and Birth Control Medicines',
+      ]),
+    );
+    expect(
+      AppStrings.medicationCatalog['Mental Health and Sleep Medicines'],
+      orderedEquals(const [
+        'Antidepressant',
+        'Anxiety medicine',
+        'Sleep medicine / sedative',
+        'Antipsychotic',
+      ]),
+    );
+    expect(
+      AppStrings.medicationActiveIngredients.values.expand((items) => items),
+      containsAll(const [
+        'Paracetamol / acetaminophen',
+        'Pantoprazole',
+        'Levocetirizine',
+        'Amoxicillin + clavulanic acid',
+        'Hydrochlorothiazide',
+        'Clopidogrel',
+        'Dulaglutide',
+        'Insulin glargine',
+        'Escitalopram',
+        'Quetiapine',
+        'Levetiracetam',
+        'Levodopa + carbidopa',
+        'Carbimazole',
+        'Ethinylestradiol',
+      ]),
+    );
+  });
+
   test('bitkisel ve bağışıklık takviyeleri katalogda loglanabilir', () async {
     expect(
       AppStrings.supplementCatalog,
@@ -193,7 +291,9 @@ void main() {
           child: TrackingCatalogSelector(
             searchHint: AppStrings.searchMedications,
             categories: const {
-              'Ağrı, Ateş ve Kas': ['Ağrı kesici'],
+              'Ağrı, Ateş ve Kas-Eklem İlaçları': [
+                'Ağrı kesici / ateş düşürücü',
+              ],
             },
             itemDetails: AppStrings.medicationActiveIngredients,
             selected: <String>{},
@@ -209,43 +309,129 @@ void main() {
     );
 
     await tester.tap(
-      find.byKey(const ValueKey('catalog_category_Ağrı, Ateş ve Kas')),
+      find.byKey(
+        const ValueKey('catalog_category_Ağrı, Ateş ve Kas-Eklem İlaçları'),
+      ),
     );
     await tester.pumpAndSettle();
 
     expect(find.text('Parasetamol'), findsNothing);
-    await tester.tap(find.widgetWithText(FilterChip, 'Ağrı kesici'));
+    await tester.tap(
+      find.widgetWithText(FilterChip, 'Ağrı kesici / ateş düşürücü'),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Parasetamol'), findsOneWidget);
     expect(find.text('Diklofenak'), findsOneWidget);
-    expect(find.text('Asetilsalisilik asit'), findsNothing);
+    expect(find.text('Ketoprofen'), findsNothing);
+    expect(selectedName, isNull);
     expect(
       find.descendant(
-        of: find.byKey(const ValueKey('catalog_item_Ağrı kesici')),
+        of: find.byKey(
+          const ValueKey('catalog_item_Ağrı kesici / ateş düşürücü'),
+        ),
         matching: find.byIcon(Icons.chevron_right_rounded),
       ),
       findsNothing,
     );
     await tester.tap(
-      find.byKey(const ValueKey('catalog_detail_more_Ağrı kesici')),
+      find.byKey(
+        const ValueKey('catalog_detail_more_Ağrı kesici / ateş düşürücü'),
+      ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Asetilsalisilik asit'), findsOneWidget);
+    expect(find.text('Ketoprofen'), findsOneWidget);
 
     await tester.tap(
-      find.byKey(const ValueKey('catalog_detail_Ağrı kesici_Parasetamol')),
+      find.byKey(
+        const ValueKey(
+          'catalog_detail_Ağrı kesici / ateş düşürücü_Parasetamol',
+        ),
+      ),
     );
-    expect(selectedName, 'Ağrı kesici - Parasetamol');
+    expect(selectedName, 'Ağrı kesici / ateş düşürücü - Parasetamol');
 
     await tester.enterText(
       find.byKey(const ValueKey('tracking_catalog_search')),
       'parasetamol',
     );
     await tester.pumpAndSettle();
-    expect(find.text('Ağrı kesici'), findsOneWidget);
+    expect(find.text('Ağrı kesici / ateş düşürücü'), findsOneWidget);
     expect(find.text('Parasetamol'), findsOneWidget);
   });
+
+  testWidgets(
+    'gerçek günlük ekranında ilaç paneli etken madde açılırken açık kalır',
+    (tester) async {
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+      await storage.init();
+      final settings = UserSettings(
+        isOnboardingComplete: true,
+        lastPeriodDate: DateTime.now(),
+      );
+      await storage.saveSettings(settings);
+
+      await tester.pumpWidget(
+        Provider<LocalStorageService>.value(
+          value: storage,
+          child: _localizedApp(
+            DailyLogSheet(
+              initialLog: DailyLog.empty(DateTime.now()),
+              settings: settings,
+              initialTabIndex: 4,
+              isSingleTab: true,
+              onSave: (_) async => true,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const ValueKey('catalog_category_group_toggle')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const ValueKey('catalog_category_Ağrı, Ateş ve Kas-Eklem İlaçları'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const ValueKey('catalog_item_Ağrı kesici / ateş düşürücü')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ağrı, Ateş ve Kas-Eklem İlaçları'), findsOneWidget);
+      expect(find.text('Parasetamol'), findsOneWidget);
+      expect(
+        find.byKey(
+          const ValueKey('selected_catalog_Ağrı kesici / ateş düşürücü'),
+        ),
+        findsNothing,
+      );
+
+      await tester.tap(
+        find.byKey(
+          const ValueKey(
+            'catalog_detail_Ağrı kesici / ateş düşürücü_Parasetamol',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ağrı, Ateş ve Kas-Eklem İlaçları'), findsOneWidget);
+      expect(find.text('Parasetamol'), findsOneWidget);
+      expect(
+        find.byKey(
+          const ValueKey(
+            'selected_catalog_Ağrı kesici / ateş düşürücü - Parasetamol',
+          ),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets('ilac ve takviye ayni ekranda tek kayitla saklanir', (
     tester,
@@ -258,8 +444,8 @@ void main() {
       userName: 'Test',
       dailyMedications: const [
         MedicationIdentity(
-          displayName: 'Ağrı kesici',
-          mainGroup: 'Ağrı kesici',
+          displayName: 'Ağrı kesici / ateş düşürücü',
+          mainGroup: 'Ağrı kesici / ateş düşürücü',
           activeIngredient: null,
         ),
       ],
@@ -309,7 +495,9 @@ void main() {
     );
     expect(find.text(AppStrings.saveMedicationAndSupplement), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(FilterChip, 'Ağrı kesici'));
+    await tester.tap(
+      find.widgetWithText(FilterChip, 'Ağrı kesici / ateş düşürücü'),
+    );
     await tester.pumpAndSettle();
     final biotin = find.widgetWithText(FilterChip, 'Biotin');
     await tester.ensureVisible(biotin);
@@ -325,7 +513,7 @@ void main() {
     expect(saved, isNotNull);
     expect(
       saved!.medications.map((entry) => entry.displayName),
-      contains('Ağrı kesici'),
+      contains('Ağrı kesici / ateş düşürücü'),
     );
     expect(
       saved!.supplements.map((entry) => entry.displayName),
@@ -377,7 +565,11 @@ void main() {
       );
       await tester.pumpAndSettle();
       await tester.tap(
-        find.byKey(const ValueKey('catalog_detail_Ağrı kesici_Parasetamol')),
+        find.byKey(
+          const ValueKey(
+            'catalog_detail_Ağrı kesici / ateş düşürücü_Parasetamol',
+          ),
+        ),
       );
       await tester.pumpAndSettle();
       await tester.tap(
@@ -389,12 +581,18 @@ void main() {
       await tester.pumpAndSettle();
 
       final savedMedication = saved!.medications.single;
-      expect(savedMedication.displayName, 'Ağrı kesici - Parasetamol');
-      expect(savedMedication.mainGroup, 'Ağrı kesici');
+      expect(
+        savedMedication.displayName,
+        'Ağrı kesici / ateş düşürücü - Parasetamol',
+      );
+      expect(savedMedication.mainGroup, 'Ağrı kesici / ateş düşürücü');
       expect(savedMedication.activeIngredient, 'Parasetamol');
       final storedMedication = storage.loadSettings()!.dailyMedications.single;
-      expect(storedMedication.displayName, 'Ağrı kesici - Parasetamol');
-      expect(storedMedication.mainGroup, 'Ağrı kesici');
+      expect(
+        storedMedication.displayName,
+        'Ağrı kesici / ateş düşürücü - Parasetamol',
+      );
+      expect(storedMedication.mainGroup, 'Ağrı kesici / ateş düşürücü');
       expect(storedMedication.activeIngredient, 'Parasetamol');
     },
   );

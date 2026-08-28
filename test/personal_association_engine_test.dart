@@ -142,6 +142,38 @@ void main() {
     expect(association.withoutTotal, 10);
   });
 
+  test('+ ile eklenen özel belirtiyi içgörü karşılaştırmasına dahil eder', () {
+    final logs = <DailyLog>[];
+    for (var day = 0; day < 20; day++) {
+      logs.add(
+        DailyLog(
+          date: DateTime(2026, 9, 1).add(Duration(days: day)),
+          waterIntakeMl: day < 10 ? 1000 : 2000,
+          symptoms: day < 8 || day == 15 ? const ['Karnım rahat'] : const [],
+          observedSections: const {
+            DailyLogObservedSection.nutrition,
+            DailyLogObservedSection.symptom,
+          },
+        ),
+      );
+    }
+
+    final association = engine
+        .generate(logs: logs)
+        .firstWhere(
+          (insight) =>
+              insight.kind == PersonalInsightKind.structuredAssociation &&
+              insight.primaryLabel ==
+                  AppStrings.insightFeatureBelowTypicalWaterToken &&
+              insight.secondaryLabel == 'Karnım rahat',
+        );
+
+    expect(association.withEventCount, 8);
+    expect(association.withTotal, 10);
+    expect(association.withoutEventCount, 1);
+    expect(association.withoutTotal, 10);
+  });
+
   test('arayüzdeki besin grubu ile aynı gün belirtisini karşılaştırır', () {
     final logs = <DailyLog>[];
     for (var day = 0; day < 20; day++) {
@@ -787,7 +819,8 @@ void main() {
       final association = insights.firstWhere(
         (insight) =>
             insight.kind == expected.$1 &&
-            insight.primaryLabel == 'Stres' &&
+            insight.primaryLabel ==
+                AppStrings.canonicalizeStoredValue('Stress') &&
             insight.secondaryLabel == expected.$2,
       );
       _expectEightToOnePattern(association);

@@ -230,6 +230,9 @@ void main() {
         customMoodCompanions: const ['Kuzenim'],
         customConditions: const ['Özel Durum'],
         customBirthControlMethods: const ['Özel Yöntem'],
+        customSymptoms: const {
+          CustomSymptomGroup.feelingEmotion: ['Umutlu'],
+        },
         chronicDiseases: const ['özel durum'],
         birthControlMethod: 'özel yöntem',
       );
@@ -240,6 +243,8 @@ void main() {
           date: DateTime(2026, 8, 10, 12),
           cravings: const ['gece atıştırması'],
           moodCompanions: const ['kuzenim'],
+          symptoms: const ['umutlu'],
+          symptomSeverities: const {'umutlu': 2},
           mealFoodGroups: const {
             'Öğle': ['ev çorbası'],
           },
@@ -251,6 +256,10 @@ void main() {
         customMoodCompanions: const ['KUZENİM'],
         customConditions: const ['ÖZEL DURUM'],
         customBirthControlMethods: const ['ÖZEL YÖNTEM'],
+        customSymptoms: const {
+          CustomSymptomGroup.feelingEmotion: ['UMUTLU', 'Meraklı'],
+          CustomSymptomGroup.digestion: ['Karnım rahat'],
+        },
       );
       api.cloudData = {
         ..._minimalCloud(cloudSettings),
@@ -259,6 +268,8 @@ void main() {
             date: DateTime(2026, 8, 11, 12),
             cravings: const ['GECE ATIŞTIRMASI'],
             moodCompanions: const ['KUZENİM'],
+            symptoms: const ['UMUTLU'],
+            symptomSeverities: const {'UMUTLU': 3},
             mealFoodGroups: const {
               'Öğle': ['EV ÇORBASI'],
             },
@@ -275,15 +286,37 @@ void main() {
       expect(merged.customBirthControlMethods, ['Özel Yöntem']);
       expect(merged.chronicDiseases, ['Özel Durum']);
       expect(merged.birthControlMethod, 'Özel Yöntem');
+      expect(merged.customSymptomsFor(CustomSymptomGroup.feelingEmotion), [
+        'Umutlu',
+        'Meraklı',
+      ]);
+      expect(merged.customSymptomsFor(CustomSymptomGroup.digestion), [
+        'Karnım rahat',
+      ]);
       expect(api.lastUploadedFoods, ['Ev Çorbası']);
       expect(
         api.lastUploadedLogs.map((log) => log['cravings']).toList(),
         everyElement(['Gece Atıştırması']),
       );
+      expect(
+        api.lastUploadedLogs.map((log) => log['symptoms']).toList(),
+        everyElement(['Umutlu']),
+      );
+      expect(
+        api.lastUploadedLogs.map((log) => log['symptomSeverities']).toList(),
+        containsAll([
+          {'Umutlu': 2},
+          {'Umutlu': 3},
+        ]),
+      );
       expect(api.lastUploadedSettings['customCravings'], [
         'Gece Atıştırması',
         'Ekşi',
       ]);
+      expect(api.lastUploadedSettings['customSymptoms'], {
+        'feelingEmotion': ['Umutlu', 'Meraklı'],
+        'digestion': ['Karnım rahat'],
+      });
     },
   );
 
