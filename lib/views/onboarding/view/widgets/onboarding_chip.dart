@@ -6,6 +6,7 @@ class OnboardingChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool enabled;
   final bool compact;
 
   const OnboardingChip({
@@ -13,6 +14,7 @@ class OnboardingChip extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.enabled = true,
     this.compact = false,
   });
 
@@ -26,9 +28,7 @@ class OnboardingChip extends StatelessWidget {
       selectedColor: const Color(0x1A78904F),
       backgroundColor: Colors.white.withValues(alpha: 0.9),
       side: BorderSide(
-        color: isSelected
-            ? const Color(0xFF78904F)
-            : const Color(0xFFE3DFD7),
+        color: isSelected ? const Color(0xFF78904F) : const Color(0xFFE3DFD7),
         width: isSelected ? 1.2 : 1,
       ),
       padding: EdgeInsets.symmetric(
@@ -38,12 +38,14 @@ class OnboardingChip extends StatelessWidget {
       labelStyle: TextStyle(
         color: isSelected
             ? const Color(0xFF4D5F36)
-            : AppColors.textSecondary,
+            : enabled
+            ? AppColors.textSecondary
+            : AppColors.textSecondary.withValues(alpha: 0.45),
         fontSize: 14,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
       ),
       visualDensity: VisualDensity.compact,
-      onSelected: (_) => onTap(),
+      onSelected: enabled ? (_) => onTap() : null,
     );
   }
 }

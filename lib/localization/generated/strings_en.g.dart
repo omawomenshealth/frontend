@@ -50,8 +50,22 @@ class Translations$onboarding$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+	late final Translations$onboarding$common$en common = Translations$onboarding$common$en.internal(_root);
 	late final Translations$onboarding$prompt$en prompt = Translations$onboarding$prompt$en.internal(_root);
+	late final Translations$onboarding$review$en review = Translations$onboarding$review$en.internal(_root);
 	late final Translations$onboarding$wellbeing$en wellbeing = Translations$onboarding$wellbeing$en.internal(_root);
+}
+
+// Path: onboarding.common
+class Translations$onboarding$common$en {
+	Translations$onboarding$common$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Skip these questions for now'
+	String get skipForNow => 'Skip these questions for now';
 }
 
 // Path: onboarding.prompt
@@ -62,17 +76,38 @@ class Translations$onboarding$prompt$en {
 
 	// Translations
 
-	/// en: 'Hello 🌿 I'm Oma. Let's get to know you first: what would you like me to call you?'
-	String get introduction => 'Hello 🌿 I\'m Oma. Let\'s get to know you first: what would you like me to call you?';
+	/// en: 'Hi, I'm Oma 🌿 What would you like me to call you?'
+	String get introduction => 'Hi, I\'m Oma 🌿 What would you like me to call you?';
 
-	/// en: 'I'd like to hear how you've been feeling. Knowing what you need helps me support you better.'
-	String get wellbeing => 'I\'d like to hear how you\'ve been feeling. Knowing what you need helps me support you better.';
+	/// en: 'How have you been lately? I'd like to hear how you're feeling so I can understand you better.'
+	String get wellbeing => 'How have you been lately? I\'d like to hear how you\'re feeling so I can understand you better.';
 
-	/// en: 'Let's get to know your body a little better. Knowing this helps me support you more thoughtfully.'
-	String get healthProfile => 'Let\'s get to know your body a little better. Knowing this helps me support you more thoughtfully.';
+	/// en: 'Let's talk about a few things about your body. Knowing them helps me support you with more care.'
+	String get healthProfile => 'Let\'s talk about a few things about your body. Knowing them helps me support you with more care.';
 
-	/// en: 'I'd like to understand your cycle with you. Knowing this helps me support you more thoughtfully.'
-	String get cycle => 'I\'d like to understand your cycle with you. Knowing this helps me support you more thoughtfully.';
+	/// en: 'Let's look at what your cycle has been telling you. A few details help me understand you better.'
+	String get cycle => 'Let\'s look at what your cycle has been telling you. A few details help me understand you better.';
+
+	/// en: 'When you're ready, let's begin at your own pace. Oma is here for your cycle and wellbeing.'
+	String get review => 'When you\'re ready, let\'s begin at your own pace. Oma is here for your cycle and wellbeing.';
+}
+
+// Path: onboarding.review
+class Translations$onboarding$review$en {
+	Translations$onboarding$review$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your data'
+	String get accountStorageLabel => 'Your data';
+
+	/// en: 'No account; encrypted on this device'
+	String get guestStorage => 'No account; encrypted on this device';
+
+	/// en: 'Signed in with Google; securely backed up'
+	String get googleStorage => 'Signed in with Google; securely backed up';
 }
 
 // Path: onboarding.wellbeing
@@ -89,8 +124,8 @@ class Translations$onboarding$wellbeing$en {
 	/// en: 'How have you been feeling lately?'
 	String get moodQuestion => 'How have you been feeling lately?';
 
-	/// en: 'Where would you like me to support you?'
-	String get supportQuestion => 'Where would you like me to support you?';
+	/// en: 'Where could I support you most today?'
+	String get supportQuestion => 'Where could I support you most today?';
 
 	/// en: 'You can choose more than one.'
 	String get multiSelectHint => 'You can choose more than one.';
@@ -116,11 +151,11 @@ class Translations$onboarding$wellbeing$moodOptions$en {
 	/// en: 'I feel anxious'
 	String get anxious => 'I feel anxious';
 
-	/// en: 'I am in pain'
-	String get pain => 'I am in pain';
+	/// en: 'I have some pain'
+	String get pain => 'I have some pain';
 
-	/// en: 'I feel mixed'
-	String get mixed => 'I feel mixed';
+	/// en: 'I feel a bit mixed'
+	String get mixed => 'I feel a bit mixed';
 }
 
 // Path: onboarding.wellbeing.supportOptions
@@ -131,8 +166,8 @@ class Translations$onboarding$wellbeing$supportOptions$en {
 
 	// Translations
 
-	/// en: 'Relieve pain'
-	String get relievePain => 'Relieve pain';
+	/// en: 'Ease my pain a little'
+	String get relievePain => 'Ease my pain a little';
 
 	/// en: 'Recover energy'
 	String get recoverEnergy => 'Recover energy';
@@ -143,11 +178,11 @@ class Translations$onboarding$wellbeing$supportOptions$en {
 	/// en: 'Improve sleep'
 	String get improveSleep => 'Improve sleep';
 
-	/// en: 'Understand my cycle'
-	String get understandCycle => 'Understand my cycle';
+	/// en: 'Understand my cycle better'
+	String get understandCycle => 'Understand my cycle better';
 
-	/// en: 'Just listen'
-	String get justListen => 'Just listen';
+	/// en: 'Take a little rest'
+	String get justListen => 'Take a little rest';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -158,25 +193,30 @@ class Translations$onboarding$wellbeing$supportOptions$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
-			'onboarding.prompt.introduction' => 'Hello 🌿 I\'m Oma. Let\'s get to know you first: what would you like me to call you?',
-			'onboarding.prompt.wellbeing' => 'I\'d like to hear how you\'ve been feeling. Knowing what you need helps me support you better.',
-			'onboarding.prompt.healthProfile' => 'Let\'s get to know your body a little better. Knowing this helps me support you more thoughtfully.',
-			'onboarding.prompt.cycle' => 'I\'d like to understand your cycle with you. Knowing this helps me support you more thoughtfully.',
+			'onboarding.common.skipForNow' => 'Skip these questions for now',
+			'onboarding.prompt.introduction' => 'Hi, I\'m Oma 🌿 What would you like me to call you?',
+			'onboarding.prompt.wellbeing' => 'How have you been lately? I\'d like to hear how you\'re feeling so I can understand you better.',
+			'onboarding.prompt.healthProfile' => 'Let\'s talk about a few things about your body. Knowing them helps me support you with more care.',
+			'onboarding.prompt.cycle' => 'Let\'s look at what your cycle has been telling you. A few details help me understand you better.',
+			'onboarding.prompt.review' => 'When you\'re ready, let\'s begin at your own pace. Oma is here for your cycle and wellbeing.',
+			'onboarding.review.accountStorageLabel' => 'Your data',
+			'onboarding.review.guestStorage' => 'No account; encrypted on this device',
+			'onboarding.review.googleStorage' => 'Signed in with Google; securely backed up',
 			'onboarding.wellbeing.title' => 'How are you?',
 			'onboarding.wellbeing.moodQuestion' => 'How have you been feeling lately?',
-			'onboarding.wellbeing.supportQuestion' => 'Where would you like me to support you?',
+			'onboarding.wellbeing.supportQuestion' => 'Where could I support you most today?',
 			'onboarding.wellbeing.multiSelectHint' => 'You can choose more than one.',
 			'onboarding.wellbeing.moodOptions.good' => 'I feel good',
 			'onboarding.wellbeing.moodOptions.tired' => 'I am tired',
 			'onboarding.wellbeing.moodOptions.anxious' => 'I feel anxious',
-			'onboarding.wellbeing.moodOptions.pain' => 'I am in pain',
-			'onboarding.wellbeing.moodOptions.mixed' => 'I feel mixed',
-			'onboarding.wellbeing.supportOptions.relievePain' => 'Relieve pain',
+			'onboarding.wellbeing.moodOptions.pain' => 'I have some pain',
+			'onboarding.wellbeing.moodOptions.mixed' => 'I feel a bit mixed',
+			'onboarding.wellbeing.supportOptions.relievePain' => 'Ease my pain a little',
 			'onboarding.wellbeing.supportOptions.recoverEnergy' => 'Recover energy',
 			'onboarding.wellbeing.supportOptions.calmAnxiety' => 'Calm anxiety',
 			'onboarding.wellbeing.supportOptions.improveSleep' => 'Improve sleep',
-			'onboarding.wellbeing.supportOptions.understandCycle' => 'Understand my cycle',
-			'onboarding.wellbeing.supportOptions.justListen' => 'Just listen',
+			'onboarding.wellbeing.supportOptions.understandCycle' => 'Understand my cycle better',
+			'onboarding.wellbeing.supportOptions.justListen' => 'Take a little rest',
 			_ => null,
 		};
 	}

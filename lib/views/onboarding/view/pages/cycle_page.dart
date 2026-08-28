@@ -38,6 +38,8 @@ class CyclePage extends StatelessWidget {
       (AppStrings.periMenopause, MenopauseStatus.peri),
       (AppStrings.postMenopause, MenopauseStatus.post),
     ];
+    final isCycleInformationEnabled =
+        vm.hasMenopauseSelection && vm.menopauseStatus == MenopauseStatus.none;
 
     return OnboardingDeckCard(
       eyebrow: 'Döngün',
@@ -48,9 +50,7 @@ class CyclePage extends StatelessWidget {
           OnboardingQuestion(
             question: AppStrings.menopauseStatus,
             child: OnboardingSingleSelect<MenopauseStatus>(
-              options: [
-                for (final option in menopauseOptions) option.$2,
-              ],
+              options: [for (final option in menopauseOptions) option.$2],
               selectedValue: vm.menopauseStatus,
               labelBuilder: (value) {
                 return menopauseOptions
@@ -62,65 +62,66 @@ class CyclePage extends StatelessWidget {
               runSpacing: 6,
             ),
           ),
-          if (vm.hasMenopauseSelection &&
-              vm.menopauseStatus == MenopauseStatus.none) ...[
-            OnboardingQuestion(
-              question: AppStrings.averageCycleLength,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Slider(
-                      value: vm.averageCycleLength.toDouble(),
-                      min: 21,
-                      max: 40,
-                      divisions: 19,
-                      activeColor: AppColors.primary,
-                      onChanged: (value) =>
-                          vm.setAverageCycleLength(value.round()),
-                    ),
+          OnboardingQuestion(
+            question: AppStrings.averageCycleLength,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Slider(
+                    value: vm.averageCycleLength.toDouble(),
+                    min: 21,
+                    max: 40,
+                    divisions: 19,
+                    activeColor: AppColors.primary,
+                    onChanged: isCycleInformationEnabled
+                        ? (value) => vm.setAverageCycleLength(value.round())
+                        : null,
                   ),
-                  Text(AppStrings.dayCount(vm.averageCycleLength)),
-                ],
-              ),
-            ),
-            OnboardingQuestion(
-              question: AppStrings.lastPeriodDaysQuestion,
-              helper: 'Yaklaşık olsa da olur.',
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  key: const ValueKey('onboarding_last_period_days'),
-                  onPressed: onPickLastPeriod,
-                  icon: const Icon(Icons.date_range_outlined),
-                  label: Text(AppStrings.selectLastPeriodDays),
                 ),
+                Text(AppStrings.dayCount(vm.averageCycleLength)),
+              ],
+            ),
+          ),
+          OnboardingQuestion(
+            question: AppStrings.lastPeriodDaysQuestion,
+            helper: 'Yaklaşık olsa da olur.',
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                key: const ValueKey('onboarding_last_period_days'),
+                onPressed: isCycleInformationEnabled ? onPickLastPeriod : null,
+                icon: const Icon(Icons.date_range_outlined),
+                label: Text(AppStrings.selectLastPeriodDays),
               ),
             ),
-            OnboardingQuestion(
-              question: AppStrings.birthControl,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 8,
-                children: [
-                  OnboardingMultiSelect(
-                    options: birthControlOptions,
-                    selectedValues: {
-                      if (selectedBirthControl.isNotEmpty) selectedBirthControl,
-                    },
-                    onChanged: (next) => vm.setBirthControlMethod(
-                      next.isEmpty ? null : next.first,
-                    ),
+          ),
+          OnboardingQuestion(
+            question: AppStrings.birthControl,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
+              children: [
+                OnboardingMultiSelect(
+                  options: birthControlOptions,
+                  selectedValues: {
+                    if (selectedBirthControl.isNotEmpty) selectedBirthControl,
+                  },
+                  onChanged: (next) => vm.setBirthControlMethod(
+                    next.isEmpty ? null : next.first,
                   ),
-                  ActionChip(
-                    key: const ValueKey('onboarding_add_birth_control'),
-                    avatar: const Icon(Icons.add_rounded, size: 17),
-                    label: Text(AppStrings.add),
-                    onPressed: onAddBirthControl,
-                  ),
-                ],
-              ),
+                  enabled: isCycleInformationEnabled,
+                ),
+                ActionChip(
+                  key: const ValueKey('onboarding_add_birth_control'),
+                  avatar: const Icon(Icons.add_rounded, size: 17),
+                  label: Text(AppStrings.add),
+                  onPressed: isCycleInformationEnabled
+                      ? onAddBirthControl
+                      : null,
+                ),
+              ],
             ),
-          ],
+          ),
         ],
       ),
     );

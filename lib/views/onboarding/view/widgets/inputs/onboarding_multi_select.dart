@@ -8,6 +8,7 @@ class OnboardingMultiSelect extends StatelessWidget {
   final int? maxSelection;
   final double spacing;
   final double runSpacing;
+  final bool enabled;
   final bool compact;
 
   const OnboardingMultiSelect({
@@ -18,6 +19,7 @@ class OnboardingMultiSelect extends StatelessWidget {
     this.maxSelection,
     this.spacing = 6,
     this.runSpacing = 6,
+    this.enabled = true,
     this.compact = false,
   });
 
@@ -32,6 +34,7 @@ class OnboardingMultiSelect extends StatelessWidget {
             label: option,
             isSelected: selectedValues.contains(option),
             onTap: () => _toggle(option),
+            enabled: enabled,
             compact: compact,
           ),
       ],

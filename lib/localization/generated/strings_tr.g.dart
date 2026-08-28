@@ -49,8 +49,20 @@ class _Translations$onboarding$tr extends Translations$onboarding$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
+	@override late final _Translations$onboarding$common$tr common = _Translations$onboarding$common$tr._(_root);
 	@override late final _Translations$onboarding$prompt$tr prompt = _Translations$onboarding$prompt$tr._(_root);
+	@override late final _Translations$onboarding$review$tr review = _Translations$onboarding$review$tr._(_root);
 	@override late final _Translations$onboarding$wellbeing$tr wellbeing = _Translations$onboarding$wellbeing$tr._(_root);
+}
+
+// Path: onboarding.common
+class _Translations$onboarding$common$tr extends Translations$onboarding$common$en {
+	_Translations$onboarding$common$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get skipForNow => 'Bu soruları şimdilik geç';
 }
 
 // Path: onboarding.prompt
@@ -60,10 +72,23 @@ class _Translations$onboarding$prompt$tr extends Translations$onboarding$prompt$
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get introduction => 'Merhaba 🌿 Ben Oma. Önce seni tanıyalım: sana nasıl seslenmemi istersin?';
-	@override String get wellbeing => 'Bugün nasıl hissettiğini duymak isterim. Neye ihtiyaç duyduğunu bilirsem sana daha doğru eşlik ederim.';
-	@override String get healthProfile => 'Bedenini biraz daha tanıyalım. Bu bilgileri bilirsem sana daha doğru eşlik ederim.';
-	@override String get cycle => 'Döngünü birlikte anlamak isterim. Bunu bilirsem sana daha doğru eşlik ederim.';
+	@override String get introduction => 'Selam, ben Oma 🌿 Sana nasıl seslenmemi istersin?';
+	@override String get wellbeing => 'Bugünlerde nasılsın? Seni daha iyi anlayabilmem için nasıl hissettiğini duymak isterim.';
+	@override String get healthProfile => 'Bedeninle ilgili birkaç şey konuşalım. Bunları bilirsem sana daha özenli eşlik edebilirim.';
+	@override String get cycle => 'Döngün sana neler söylüyor, birlikte bakalım. Birkaç küçük bilgiyle seni daha iyi anlayabilirim.';
+	@override String get review => 'Hazırsan kendi ritminde başlayalım. Oma, döngün ve iyi oluşun için burada.';
+}
+
+// Path: onboarding.review
+class _Translations$onboarding$review$tr extends Translations$onboarding$review$en {
+	_Translations$onboarding$review$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get accountStorageLabel => 'Verilerin';
+	@override String get guestStorage => 'Hesapsız kullanıyorsun; bu cihazda şifreli';
+	@override String get googleStorage => 'Google ile giriş yaptın; şifreli yedekleniyor';
 }
 
 // Path: onboarding.wellbeing
@@ -75,7 +100,7 @@ class _Translations$onboarding$wellbeing$tr extends Translations$onboarding$well
 	// Translations
 	@override String get title => 'Nasılsın?';
 	@override String get moodQuestion => 'Bugünlerde kendini nasıl hissediyorsun?';
-	@override String get supportQuestion => 'Nerede yanında olmamı istersin?';
+	@override String get supportQuestion => 'Bugün sana en çok nerede iyi gelebilirim?';
 	@override String get multiSelectHint => 'Birden fazla seçebilirsin.';
 	@override late final _Translations$onboarding$wellbeing$moodOptions$tr moodOptions = _Translations$onboarding$wellbeing$moodOptions$tr._(_root);
 	@override late final _Translations$onboarding$wellbeing$supportOptions$tr supportOptions = _Translations$onboarding$wellbeing$supportOptions$tr._(_root);
@@ -91,8 +116,8 @@ class _Translations$onboarding$wellbeing$moodOptions$tr extends Translations$onb
 	@override String get good => 'İyiyim';
 	@override String get tired => 'Yorgunum';
 	@override String get anxious => 'Kaygılıyım';
-	@override String get pain => 'Ağrılıyım';
-	@override String get mixed => 'Karışık';
+	@override String get pain => 'Ağrım var';
+	@override String get mixed => 'Karışığım';
 }
 
 // Path: onboarding.wellbeing.supportOptions
@@ -102,12 +127,12 @@ class _Translations$onboarding$wellbeing$supportOptions$tr extends Translations$
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get relievePain => 'Ağrıyı hafifletmek';
+	@override String get relievePain => 'Ağrım biraz hafiflesin';
 	@override String get recoverEnergy => 'Enerjimi toparlamak';
 	@override String get calmAnxiety => 'Kaygımı yatıştırmak';
 	@override String get improveSleep => 'Uykumu düzeltmek';
-	@override String get understandCycle => 'Döngümü anlamak';
-	@override String get justListen => 'Sadece dinlenmek';
+	@override String get understandCycle => 'Döngümü daha iyi anlamak';
+	@override String get justListen => 'Biraz dinlenmek';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -118,25 +143,30 @@ class _Translations$onboarding$wellbeing$supportOptions$tr extends Translations$
 extension on TranslationsTr {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
-			'onboarding.prompt.introduction' => 'Merhaba 🌿 Ben Oma. Önce seni tanıyalım: sana nasıl seslenmemi istersin?',
-			'onboarding.prompt.wellbeing' => 'Bugün nasıl hissettiğini duymak isterim. Neye ihtiyaç duyduğunu bilirsem sana daha doğru eşlik ederim.',
-			'onboarding.prompt.healthProfile' => 'Bedenini biraz daha tanıyalım. Bu bilgileri bilirsem sana daha doğru eşlik ederim.',
-			'onboarding.prompt.cycle' => 'Döngünü birlikte anlamak isterim. Bunu bilirsem sana daha doğru eşlik ederim.',
+			'onboarding.common.skipForNow' => 'Bu soruları şimdilik geç',
+			'onboarding.prompt.introduction' => 'Selam, ben Oma 🌿 Sana nasıl seslenmemi istersin?',
+			'onboarding.prompt.wellbeing' => 'Bugünlerde nasılsın? Seni daha iyi anlayabilmem için nasıl hissettiğini duymak isterim.',
+			'onboarding.prompt.healthProfile' => 'Bedeninle ilgili birkaç şey konuşalım. Bunları bilirsem sana daha özenli eşlik edebilirim.',
+			'onboarding.prompt.cycle' => 'Döngün sana neler söylüyor, birlikte bakalım. Birkaç küçük bilgiyle seni daha iyi anlayabilirim.',
+			'onboarding.prompt.review' => 'Hazırsan kendi ritminde başlayalım. Oma, döngün ve iyi oluşun için burada.',
+			'onboarding.review.accountStorageLabel' => 'Verilerin',
+			'onboarding.review.guestStorage' => 'Hesapsız kullanıyorsun; bu cihazda şifreli',
+			'onboarding.review.googleStorage' => 'Google ile giriş yaptın; şifreli yedekleniyor',
 			'onboarding.wellbeing.title' => 'Nasılsın?',
 			'onboarding.wellbeing.moodQuestion' => 'Bugünlerde kendini nasıl hissediyorsun?',
-			'onboarding.wellbeing.supportQuestion' => 'Nerede yanında olmamı istersin?',
+			'onboarding.wellbeing.supportQuestion' => 'Bugün sana en çok nerede iyi gelebilirim?',
 			'onboarding.wellbeing.multiSelectHint' => 'Birden fazla seçebilirsin.',
 			'onboarding.wellbeing.moodOptions.good' => 'İyiyim',
 			'onboarding.wellbeing.moodOptions.tired' => 'Yorgunum',
 			'onboarding.wellbeing.moodOptions.anxious' => 'Kaygılıyım',
-			'onboarding.wellbeing.moodOptions.pain' => 'Ağrılıyım',
-			'onboarding.wellbeing.moodOptions.mixed' => 'Karışık',
-			'onboarding.wellbeing.supportOptions.relievePain' => 'Ağrıyı hafifletmek',
+			'onboarding.wellbeing.moodOptions.pain' => 'Ağrım var',
+			'onboarding.wellbeing.moodOptions.mixed' => 'Karışığım',
+			'onboarding.wellbeing.supportOptions.relievePain' => 'Ağrım biraz hafiflesin',
 			'onboarding.wellbeing.supportOptions.recoverEnergy' => 'Enerjimi toparlamak',
 			'onboarding.wellbeing.supportOptions.calmAnxiety' => 'Kaygımı yatıştırmak',
 			'onboarding.wellbeing.supportOptions.improveSleep' => 'Uykumu düzeltmek',
-			'onboarding.wellbeing.supportOptions.understandCycle' => 'Döngümü anlamak',
-			'onboarding.wellbeing.supportOptions.justListen' => 'Sadece dinlenmek',
+			'onboarding.wellbeing.supportOptions.understandCycle' => 'Döngümü daha iyi anlamak',
+			'onboarding.wellbeing.supportOptions.justListen' => 'Biraz dinlenmek',
 			_ => null,
 		};
 	}

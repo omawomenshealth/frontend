@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/color_constants.dart';
+import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 
 class OnboardingBottomNavigation extends StatelessWidget {
@@ -94,7 +95,7 @@ class OnboardingBottomNavigation extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                child: const Text('Bu soruları şimdilik geç'),
+                child: Text(context.t.onboarding.common.skipForNow),
               ),
             ),
         ],
