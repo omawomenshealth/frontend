@@ -60,6 +60,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Seni tanıyalım'), findsOneWidget);
+    expect(find.text(t.onboarding.prompt.introduction), findsOneWidget);
     expect(find.text(AppStrings.name), findsOneWidget);
     expect(find.text('Sana hitap edebilmemiz için'), findsOneWidget);
     final nameField = tester.widget<TextField>(
@@ -86,12 +87,14 @@ void main() {
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
     expect(find.text(t.onboarding.wellbeing.title), findsOneWidget);
+    expect(find.text(t.onboarding.prompt.wellbeing), findsOneWidget);
     expect(find.text(t.onboarding.wellbeing.moodQuestion), findsOneWidget);
     expect(find.text(t.onboarding.wellbeing.multiSelectHint), findsOneWidget);
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.symptomBody), findsOneWidget);
+    expect(find.text(t.onboarding.prompt.healthProfile), findsOneWidget);
     expect(find.byKey(const ValueKey('onboarding_height')), findsOneWidget);
     expect(find.byKey(const ValueKey('onboarding_weight')), findsOneWidget);
     expect(find.text(AppStrings.smokingStatus), findsOneWidget);
@@ -104,6 +107,7 @@ void main() {
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
     expect(find.text('Döngün'), findsOneWidget);
+    expect(find.text(t.onboarding.prompt.cycle), findsOneWidget);
     expect(find.text(AppStrings.menopauseStatus), findsOneWidget);
     expect(find.text(AppStrings.averageCycleLength), findsNothing);
     expect(find.text(AppStrings.birthControl), findsNothing);

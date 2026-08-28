@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/color_constants.dart';
+import '../../../localization/generated/strings.g.dart';
 import '../controller/onboarding_controller.dart';
 import '../utils/onboarding_date_utils.dart';
 import 'widgets/index.dart';
@@ -56,6 +57,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                   child: OnboardingProgressHeader(
                     currentPage: vm.currentPage,
                     totalPages: vm.totalPages,
+                    prompt: _promptForPage(context, vm.currentPage),
                     onBack: _goBack,
                     canGoBack: !vm.isSaving,
                   ),
@@ -123,6 +125,22 @@ class _OnboardingViewState extends State<OnboardingView> {
     );
   }
 
+  String _promptForPage(BuildContext context, int page) {
+    final prompts = context.t.onboarding.prompt;
+    switch (page) {
+      case 0:
+        return prompts.introduction;
+      case 1:
+        return prompts.wellbeing;
+      case 2:
+        return prompts.healthProfile;
+      case 3:
+        return prompts.cycle;
+      default:
+        return '';
+    }
+  }
+
   void _goBack() {
     FocusScope.of(context).unfocus();
     final vm = context.read<OnboardingViewModel>();
@@ -163,5 +181,4 @@ class _OnboardingViewState extends State<OnboardingView> {
       Navigator.of(context).pushReplacementNamed('/home');
     }
   }
-
 }

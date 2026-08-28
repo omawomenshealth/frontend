@@ -50,7 +50,29 @@ class Translations$onboarding$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+	late final Translations$onboarding$prompt$en prompt = Translations$onboarding$prompt$en.internal(_root);
 	late final Translations$onboarding$wellbeing$en wellbeing = Translations$onboarding$wellbeing$en.internal(_root);
+}
+
+// Path: onboarding.prompt
+class Translations$onboarding$prompt$en {
+	Translations$onboarding$prompt$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Hello 🌿 I'm Oma. Let's get to know you first: what would you like me to call you?'
+	String get introduction => 'Hello 🌿 I\'m Oma. Let\'s get to know you first: what would you like me to call you?';
+
+	/// en: 'I'd like to hear how you've been feeling. Knowing what you need helps me support you better.'
+	String get wellbeing => 'I\'d like to hear how you\'ve been feeling. Knowing what you need helps me support you better.';
+
+	/// en: 'Let's get to know your body a little better. Knowing this helps me support you more thoughtfully.'
+	String get healthProfile => 'Let\'s get to know your body a little better. Knowing this helps me support you more thoughtfully.';
+
+	/// en: 'I'd like to understand your cycle with you. Knowing this helps me support you more thoughtfully.'
+	String get cycle => 'I\'d like to understand your cycle with you. Knowing this helps me support you more thoughtfully.';
 }
 
 // Path: onboarding.wellbeing
@@ -136,6 +158,10 @@ class Translations$onboarding$wellbeing$supportOptions$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'onboarding.prompt.introduction' => 'Hello 🌿 I\'m Oma. Let\'s get to know you first: what would you like me to call you?',
+			'onboarding.prompt.wellbeing' => 'I\'d like to hear how you\'ve been feeling. Knowing what you need helps me support you better.',
+			'onboarding.prompt.healthProfile' => 'Let\'s get to know your body a little better. Knowing this helps me support you more thoughtfully.',
+			'onboarding.prompt.cycle' => 'I\'d like to understand your cycle with you. Knowing this helps me support you more thoughtfully.',
 			'onboarding.wellbeing.title' => 'How are you?',
 			'onboarding.wellbeing.moodQuestion' => 'How have you been feeling lately?',
 			'onboarding.wellbeing.supportQuestion' => 'Where would you like me to support you?',

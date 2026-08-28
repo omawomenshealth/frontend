@@ -49,7 +49,21 @@ class _Translations$onboarding$tr extends Translations$onboarding$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
+	@override late final _Translations$onboarding$prompt$tr prompt = _Translations$onboarding$prompt$tr._(_root);
 	@override late final _Translations$onboarding$wellbeing$tr wellbeing = _Translations$onboarding$wellbeing$tr._(_root);
+}
+
+// Path: onboarding.prompt
+class _Translations$onboarding$prompt$tr extends Translations$onboarding$prompt$en {
+	_Translations$onboarding$prompt$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get introduction => 'Merhaba 🌿 Ben Oma. Önce seni tanıyalım: sana nasıl seslenmemi istersin?';
+	@override String get wellbeing => 'Bugün nasıl hissettiğini duymak isterim. Neye ihtiyaç duyduğunu bilirsem sana daha doğru eşlik ederim.';
+	@override String get healthProfile => 'Bedenini biraz daha tanıyalım. Bu bilgileri bilirsem sana daha doğru eşlik ederim.';
+	@override String get cycle => 'Döngünü birlikte anlamak isterim. Bunu bilirsem sana daha doğru eşlik ederim.';
 }
 
 // Path: onboarding.wellbeing
@@ -104,6 +118,10 @@ class _Translations$onboarding$wellbeing$supportOptions$tr extends Translations$
 extension on TranslationsTr {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'onboarding.prompt.introduction' => 'Merhaba 🌿 Ben Oma. Önce seni tanıyalım: sana nasıl seslenmemi istersin?',
+			'onboarding.prompt.wellbeing' => 'Bugün nasıl hissettiğini duymak isterim. Neye ihtiyaç duyduğunu bilirsem sana daha doğru eşlik ederim.',
+			'onboarding.prompt.healthProfile' => 'Bedenini biraz daha tanıyalım. Bu bilgileri bilirsem sana daha doğru eşlik ederim.',
+			'onboarding.prompt.cycle' => 'Döngünü birlikte anlamak isterim. Bunu bilirsem sana daha doğru eşlik ederim.',
 			'onboarding.wellbeing.title' => 'Nasılsın?',
 			'onboarding.wellbeing.moodQuestion' => 'Bugünlerde kendini nasıl hissediyorsun?',
 			'onboarding.wellbeing.supportQuestion' => 'Nerede yanında olmamı istersin?',
