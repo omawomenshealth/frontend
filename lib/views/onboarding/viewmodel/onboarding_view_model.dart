@@ -115,6 +115,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   // Getters: computed
   bool get isSaving => _isSaving;
+  bool get isUserLoggedIn => _storage.isUserLoggedIn;
   List<String> get knownDiseases =>
       {..._chronicDiseases, ..._womenDiseases}.toList(growable: false);
 
@@ -447,8 +448,8 @@ class OnboardingViewModel extends ChangeNotifier {
     return UserSettings(
       userName: _userName,
       isOnboardingComplete: true,
-        smokingStatus: _smokingStatus,
-        smokingYears: _smokingStatus == SmokingStatus.current
+      smokingStatus: _smokingStatus,
+      smokingYears: _smokingStatus == SmokingStatus.current
           ? _smokingYears
           : null,
       weight: _weight,

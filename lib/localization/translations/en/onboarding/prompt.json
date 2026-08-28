@@ -1,6 +1,7 @@
 {
-  "introduction": "Hello 🌿 I'm Oma. Let's get to know you first: what would you like me to call you?",
-  "wellbeing": "I'd like to hear how you've been feeling. Knowing what you need helps me support you better.",
-  "healthProfile": "Let's get to know your body a little better. Knowing this helps me support you more thoughtfully.",
-  "cycle": "I'd like to understand your cycle with you. Knowing this helps me support you more thoughtfully."
+  "introduction": "Hi, I'm Oma 🌿 What would you like me to call you?",
+  "wellbeing": "How have you been lately? I'd like to hear how you're feeling so I can understand you better.",
+  "healthProfile": "Let's talk about a few things about your body. Knowing them helps me support you with more care.",
+  "cycle": "Let's look at what your cycle has been telling you. A few details help me understand you better.",
+  "review": "When you're ready, let's begin at your own pace. Oma is here for your cycle and wellbeing."
 }

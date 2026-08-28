@@ -61,6 +61,7 @@ void main() {
 
     expect(find.text('Seni tanıyalım'), findsOneWidget);
     expect(find.text(t.onboarding.prompt.introduction), findsOneWidget);
+    expect(find.text(t.onboarding.common.skipForNow), findsOneWidget);
     expect(find.text(AppStrings.name), findsOneWidget);
     expect(find.text('Sana hitap edebilmemiz için'), findsOneWidget);
     final nameField = tester.widget<TextField>(
@@ -109,17 +110,37 @@ void main() {
     expect(find.text('Döngün'), findsOneWidget);
     expect(find.text(t.onboarding.prompt.cycle), findsOneWidget);
     expect(find.text(AppStrings.menopauseStatus), findsOneWidget);
-    expect(find.text(AppStrings.averageCycleLength), findsNothing);
-    expect(find.text(AppStrings.birthControl), findsNothing);
-    await tester.tap(find.byType(OnboardingChip).first);
-    await tester.pumpAndSettle();
     expect(find.text(AppStrings.averageCycleLength), findsOneWidget);
     expect(find.text(AppStrings.lastPeriodDaysQuestion), findsOneWidget);
     expect(find.text(AppStrings.birthControl), findsOneWidget);
+    expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNull);
+    expect(
+      tester
+          .widget<OutlinedButton>(
+            find.byKey(const ValueKey('onboarding_last_period_days')),
+          )
+          .onPressed,
+      isNull,
+    );
+    await tester.tap(find.byType(OnboardingChip).first);
+    await tester.pumpAndSettle();
+    expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNotNull);
+    expect(
+      tester
+          .widget<OutlinedButton>(
+            find.byKey(const ValueKey('onboarding_last_period_days')),
+          )
+          .onPressed,
+      isNotNull,
+    );
 
     await tester.tap(find.text(AppStrings.next));
     await tester.pumpAndSettle();
     expect(vm.currentPage, 4);
+    expect(find.text(t.onboarding.prompt.review), findsOneWidget);
+    expect(find.text(t.onboarding.review.accountStorageLabel), findsOneWidget);
+    expect(find.text(t.onboarding.review.guestStorage), findsOneWidget);
+    expect(find.text(AppStrings.smokingStatus), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/color_constants.dart';
 import '../../../../core/constants/image_constants.dart';
-import '../../../../data/models/user_settings_model.dart';
+import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
+import '../widgets/onboarding_prompt.dart';
 
 class OnboardingPreviewPage extends StatelessWidget {
   final OnboardingViewModel vm;
@@ -22,11 +23,10 @@ class OnboardingPreviewPage extends StatelessWidget {
     final conditionSummary = vm.knownDiseases.isEmpty
         ? AppStrings.noConditionSelected
         : vm.knownDiseases.map(AppStrings.localizeStoredValue).join(', ');
-    final smokingSummary = vm.smokingStatus == SmokingStatus.current
-        ? AppStrings.yes
-        : vm.smokingStatus == SmokingStatus.never
-        ? AppStrings.no
-        : 'Bıraktım';
+    final review = context.t.onboarding.review;
+    final accountStorageSummary = vm.isUserLoggedIn
+        ? review.googleStorage
+        : review.guestStorage;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
@@ -81,32 +81,7 @@ class OnboardingPreviewPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 28),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: const Color(0x157D4BA3),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.auto_awesome, color: Color(0xFF9252B5)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    AppStrings.insightDataBuildingTitle,
-                    style: const TextStyle(
-                      color: Color(0xFF9252B5),
-                      fontSize: 13,
-                      height: 1.45,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          OnboardingPrompt(message: context.t.onboarding.prompt.review),
           const SizedBox(height: 18),
           _PreviewSummary(
             label: AppStrings.knownConditionQuestion,
@@ -117,8 +92,8 @@ class OnboardingPreviewPage extends StatelessWidget {
             value: AppStrings.dayCount(vm.averageCycleLength),
           ),
           _PreviewSummary(
-            label: AppStrings.smokingStatus,
-            value: smokingSummary,
+            label: review.accountStorageLabel,
+            value: accountStorageSummary,
           ),
           const SizedBox(height: 12),
           Row(

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum OnboardingDeckMotion {
-  none,
-  next,
-  prev,
-}
+enum OnboardingDeckMotion { none, next, prev }
 
 class OnboardingDeckCard extends StatelessWidget {
   final String eyebrow;
@@ -42,7 +38,7 @@ class OnboardingDeckCard extends StatelessWidget {
           child: child,
         );
       },
-      child: Padding(
+      child: SingleChildScrollView(
         padding: margin,
         child: Container(
           width: double.infinity,
@@ -73,20 +69,7 @@ class OnboardingDeckCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
-                        ),
-                        child: child,
-                      ),
-                    );
-                  },
-                ),
-              ),
+              child,
             ],
           ),
         ),

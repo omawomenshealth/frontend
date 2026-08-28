@@ -1,21 +1,21 @@
 {
     "title": "How are you?",
     "moodQuestion": "How have you been feeling lately?",
-    "supportQuestion": "Where would you like me to support you?",
+    "supportQuestion": "Where could I support you most today?",
     "multiSelectHint": "You can choose more than one.",
     "moodOptions": {
         "good": "I feel good",
         "tired": "I am tired",
         "anxious": "I feel anxious",
-        "pain": "I am in pain",
-        "mixed": "I feel mixed"
+        "pain": "I have some pain",
+        "mixed": "I feel a bit mixed"
     },
     "supportOptions": {
-        "relievePain": "Relieve pain",
+        "relievePain": "Ease my pain a little",
         "recoverEnergy": "Recover energy",
         "calmAnxiety": "Calm anxiety",
         "improveSleep": "Improve sleep",
-        "understandCycle": "Understand my cycle",
-        "justListen": "Just listen"
+        "understandCycle": "Understand my cycle better",
+        "justListen": "Take a little rest"
     }
 }
