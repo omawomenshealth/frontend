@@ -10,6 +10,7 @@ output_file_name: strings.g.dart
 namespaces: true
 locale_handling: true
 flutter_integration: true
+lazy: false
 
 translate_var: t
 class_name: Translations

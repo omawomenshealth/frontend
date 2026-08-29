@@ -1,6 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../localization/catalog_localizer.dart';
+import '../localization/option_localizer.dart';
+import '../localization/option_structure.dart';
+
 /// Uygulamadaki kullanıcıya görünen sabit metinlerin anahtarları.
 ///
 /// Yeni bir metin eklerken:
@@ -803,46 +807,6 @@ enum _TextKey {
   activeIngredientOptional,
   fiveMore,
   reportFileName,
-}
-
-enum _ListKey {
-  relationshipStatuses,
-  chronicDiseases,
-  womenDiseases,
-  medicationTimes,
-  stomachStates,
-  moodOptions,
-  moodCheckInOptions,
-  moodCompanionOptions,
-  moodPlaceOptions,
-  sexualActivityOptions,
-  sexualAfterFeelingOptions,
-  nutritionMealOptions,
-  nutritionQualityOptions,
-  nutritionCravingOptions,
-  nutritionFoodGroups,
-  postMealFeelings,
-  periodSymptomOptions,
-  symptomSeverityOptions,
-  symptomOverallOptions,
-  symptomBodyOptions,
-  symptomSkinHairOptions,
-  symptomEnergyOptions,
-  symptomSleepOptions,
-  symptomDigestionOptions,
-  flowOptions,
-  dischargePresenceOptions,
-  dischargeColors,
-  dischargeConsistencies,
-  dischargeAmounts,
-  dischargeSymptoms,
-  dosageOptions,
-  shortWeekdays,
-  weekdays,
-  articleTopics,
-  defaultMedications,
-  defaultSupplements,
-  calendarWeekdayInitials,
 }
 
 /// Türkçe sabit metin kataloğu.
@@ -2793,577 +2757,6 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.reportFileName: 'oma_health_report',
 };
 
-const Map<_ListKey, List<String>> _turkishLists = {
-  _ListKey.relationshipStatuses: [
-    'Bekarım',
-    'İlişkim var',
-    'Evliyim',
-    'Belirtmek istemiyorum',
-  ],
-  _ListKey.chronicDiseases: [
-    'Diyabet (Tip 1)',
-    'Diyabet (Tip 2)',
-    'Hipertansiyon',
-    'Astım',
-    'Tiroid (Hipotiroidi)',
-    'Tiroid (Hipertiroidi)',
-    'Kalp Hastalığı',
-    'Böbrek Hastalığı',
-    'Karaciğer Hastalığı',
-    'Anemi (Kansızlık)',
-    'Epilepsi',
-    'Depresyon',
-    'Anksiyete Bozukluğu',
-    'Migren',
-    'Romatizma',
-    'Kolesterol Yüksekliği',
-  ],
-  _ListKey.womenDiseases: [
-    'Dismenore (Ağrılı Adet)',
-    'PCOS (Polikistik Over Sendromu)',
-    'Endometriozis',
-    'Adenomyozis',
-    'Miyom',
-    'Over Kisti',
-    'Düzensiz Adet',
-    'Amenore (Adet Kesilmesi)',
-    'PMS (Premenstrüel Sendrom)',
-    'Pelvik İnflamatuar Hastalık',
-    'HPV',
-    'Tekrarlayan Vajinal Enfeksiyon',
-    'Vulvodini',
-    'Vajinismus',
-  ],
-  _ListKey.medicationTimes: ['Sabah', 'Öğle', 'Akşam'],
-  _ListKey.stomachStates: ['Aç', 'Tok'],
-  _ListKey.moodOptions: [
-    'Sinirli',
-    'İyi',
-    'Kötü',
-    'Mutlu',
-    'Huzurlu',
-    'Yorgun',
-    'Enerjik',
-  ],
-  _ListKey.moodCheckInOptions: ['Düşük', 'Hassas', 'Nötr', 'İyi', 'Harika'],
-  _ListKey.moodCompanionOptions: [
-    'Yalnızdım',
-    'Partnerimleydim',
-    'Arkadaşlarımlaydım',
-    'Ailemleydim',
-    'İş arkadaşlarımlaydım',
-  ],
-  _ListKey.moodPlaceOptions: [
-    'Evdeydim',
-    'İş yerindeydim',
-    'Dışarıdaydım',
-    'Yoldaydım',
-    'Sosyal ortamdaydım',
-  ],
-  _ListKey.sexualActivityOptions: [
-    'Partnerle',
-    'Mastürbasyon',
-    'Korunmalı',
-    'Korunmasız',
-    'Aktivite olmadı',
-  ],
-  _ListKey.sexualAfterFeelingOptions: [
-    'Rahat',
-    'Bağ kurmuş',
-    'Sakin',
-    'Enerjik',
-    'Nötr',
-    'Yorgun',
-    'Hassas',
-    'Rahatsız',
-    'Ağrı',
-  ],
-  _ListKey.nutritionMealOptions: [
-    'Kahvaltı',
-    'Öğle yemeği',
-    'Akşam yemeği',
-    'Atıştırmalık',
-  ],
-  _ListKey.nutritionQualityOptions: ['Hafif', 'Orta', 'Ağır'],
-  _ListKey.nutritionCravingOptions: [
-    'Tatlı',
-    'Tuzlu',
-    'Çikolata',
-    'Karbonhidrat',
-    'Acı',
-    'Kafein',
-    'Hiçbiri',
-  ],
-  _ListKey.nutritionFoodGroups: [
-    'Gluten',
-    'Buğday',
-    'Süt ürünleri',
-    'Laktoz içeren',
-    'Yumurta',
-    'Kuruyemiş',
-    'Yer fıstığı',
-    'Soya',
-    'Susam',
-    'Baklagiller',
-    'Kırmızı et',
-    'Tavuk',
-    'Balık',
-    'Kabuklu deniz ürünleri',
-    'Sebze',
-    'Meyve',
-    'Soğan / sarımsak',
-    'İşlenmiş gıda',
-    'Acı / baharatlı',
-    'Çok yağlı / kızartma',
-    'Yapay tatlandırıcılı',
-    'Kafeinli',
-  ],
-  _ListKey.postMealFeelings: [
-    'Rahat',
-    'Enerjik',
-    'Tok',
-    'Şişkin',
-    'Yorgun',
-    'Mide bulantısı',
-    'Gaz',
-    'Reflü',
-    'Açlık devam etti',
-  ],
-  _ListKey.periodSymptomOptions: [
-    'Kramplar',
-    'Bel ağrısı',
-    'Baş ağrısı',
-    'Şişkinlik',
-    'Yorgunluk',
-    'Pıhtı',
-  ],
-  _ListKey.symptomSeverityOptions: ['Hafif', 'Orta', 'Güçlü'],
-  _ListKey.symptomOverallOptions: [
-    'İyi hissediyorum',
-    'Stresliyim',
-    'Mutluyum',
-    'Sakinim',
-    'Motivasyonluyum',
-    'Kaygılıyım',
-    'Huzursuzum',
-    'Sinirliyim',
-    'Üzgünüm',
-    'Duygusal iniş çıkış yaşıyorum',
-  ],
-  _ListKey.symptomBodyOptions: [
-    'Kramplar',
-    'Baş ağrısı',
-    'Bel ağrısı',
-    'Göğüs hassasiyeti',
-    'Sırt ağrısı',
-    'Eklem/kas ağrısı',
-    'Baş dönmesi',
-    'Sık idrara çıkma',
-  ],
-  _ListKey.symptomSkinHairOptions: [
-    'Akne',
-    'Kuru cilt',
-    'Yağlı cilt',
-    'Hassas cilt',
-    'Ciltte kızarıklık',
-    'Kaşıntılı cilt',
-    'Yağlı saç',
-    'Kuru saç',
-    'Saç dökülmesi',
-    'Kırılgan tırnaklar',
-  ],
-  _ListKey.symptomEnergyOptions: [
-    'Enerjik',
-    'Yorgunluk',
-    'Odaklanmış',
-    'Zihin bulanıklığı',
-    'Unutkanlık',
-  ],
-  _ListKey.symptomSleepOptions: [
-    'İyi uyudum',
-    'Orta kalitede uyudum',
-    'Kötü uyudum',
-    'Uykuya dalmakta zorlandım',
-    'Sık uyandım',
-    'Enerjik uyandım',
-    'Dinlenmiş uyandım',
-    'Uykulu/yorgun uyandım',
-    'Baş ağrısıyla uyandım',
-    'Erken uyandım',
-    'Canlı rüyalar',
-    'Kâbus',
-  ],
-  _ListKey.symptomDigestionOptions: [
-    'Sindirimim iyi ve düzenli',
-    'Aşerme',
-    'İştah artışı/azalması',
-    'Mide bulantısı',
-    'Kabızlık',
-    'İshal',
-    'Şişkinlik',
-    'Gaz',
-    'Reflü',
-  ],
-  _ListKey.flowOptions: ['Lekelenme', 'Hafif', 'Orta', 'Yoğun'],
-  _ListKey.dischargePresenceOptions: ['Var', 'Yok'],
-  _ListKey.dischargeColors: [
-    'Şeffaf',
-    'Beyaz',
-    'Krem',
-    'Sarı',
-    'Yeşil',
-    'Gri',
-    'Kahverengi',
-    'Pembe',
-    'Kırmızı / kanlı',
-    'Diğer',
-  ],
-  _ListKey.dischargeConsistencies: [
-    'Sulu',
-    'Kaygan',
-    'Uzayan / yumurta akı gibi',
-    'Kremsi',
-    'Yapışkan',
-    'Yoğun / pütürlü',
-    'Köpüklü',
-    'Diğer',
-  ],
-  _ListKey.dischargeAmounts: ['Az', 'Orta', 'Fazla'],
-  _ListKey.dischargeSymptoms: [
-    'Olağandışı koku',
-    'Kaşıntı',
-    'Yanma',
-    'İdrar yaparken ağrı',
-    'Pelvik / alt karın ağrısı',
-  ],
-  _ListKey.dosageOptions: [
-    '1 Adet',
-    '2 Adet',
-    '3 Adet',
-    '4 Adet',
-    '5 Adet',
-    '6 Adet',
-  ],
-  _ListKey.shortWeekdays: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
-  _ListKey.weekdays: [
-    'Pazartesi',
-    'Salı',
-    'Çarşamba',
-    'Perşembe',
-    'Cuma',
-    'Cumartesi',
-    'Pazar',
-  ],
-  _ListKey.articleTopics: [
-    'Beslenme',
-    'Egzersiz',
-    'Kadın Sağlığı',
-    'Ruh Hali',
-    'Uyku',
-    'Genel Sağlık',
-  ],
-  _ListKey.defaultMedications: [
-    'Parol',
-    'Aspirin',
-    'Arveles',
-    'Majezik',
-    'Minoset',
-  ],
-  _ListKey.defaultSupplements: [
-    'Magnezyum',
-    'D Vitamini',
-    'Omega 3',
-    'Demir',
-    'B12 Vitamini',
-    'C Vitamini',
-    'Çinko',
-  ],
-  _ListKey.calendarWeekdayInitials: ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'],
-};
-
-const Map<_ListKey, List<String>> _englishLists = {
-  _ListKey.relationshipStatuses: [
-    'Single',
-    'In a relationship',
-    'Married',
-    'Prefer not to say',
-  ],
-  _ListKey.chronicDiseases: [
-    'Type 1 Diabetes',
-    'Type 2 Diabetes',
-    'Hypertension',
-    'Asthma',
-    'Hypothyroidism',
-    'Hyperthyroidism',
-    'Heart Disease',
-    'Kidney Disease',
-    'Liver Disease',
-    'Anemia',
-    'Epilepsy',
-    'Depression',
-    'Anxiety Disorder',
-    'Migraine',
-    'Rheumatic Disease',
-    'High Cholesterol',
-  ],
-  _ListKey.womenDiseases: [
-    'Dysmenorrhea (Painful Periods)',
-    'PCOS (Polycystic Ovary Syndrome)',
-    'Endometriosis',
-    'Adenomyosis',
-    'Fibroids',
-    'Ovarian Cyst',
-    'Irregular Periods',
-    'Amenorrhea',
-    'PMS (Premenstrual Syndrome)',
-    'Pelvic Inflammatory Disease',
-    'HPV',
-    'Recurrent Vaginal Infection',
-    'Vulvodynia',
-    'Vaginismus',
-  ],
-  _ListKey.medicationTimes: ['Morning', 'Noon', 'Evening'],
-  _ListKey.stomachStates: ['Empty stomach', 'With food'],
-  _ListKey.moodOptions: [
-    'Angry',
-    'Good',
-    'Low',
-    'Happy',
-    'Calm',
-    'Tired',
-    'Energetic',
-  ],
-  _ListKey.moodCheckInOptions: ['Low', 'Sensitive', 'Neutral', 'Good', 'Great'],
-  _ListKey.moodCompanionOptions: [
-    'By myself',
-    'With my partner',
-    'With friends',
-    'With family',
-    'With co-workers',
-  ],
-  _ListKey.moodPlaceOptions: [
-    'At home',
-    'At work',
-    'Outside',
-    'In transit',
-    'Social',
-  ],
-  _ListKey.sexualActivityOptions: [
-    'With a partner',
-    'Masturbation',
-    'Protected',
-    'Unprotected',
-    'No activity',
-  ],
-  _ListKey.sexualAfterFeelingOptions: [
-    'Comfortable',
-    'Connected',
-    'Calm',
-    'Energized',
-    'Neutral',
-    'Tired',
-    'Sensitive',
-    'Uncomfortable',
-    'Pain',
-  ],
-  _ListKey.nutritionMealOptions: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
-  _ListKey.nutritionQualityOptions: ['Light', 'Medium', 'Heavy'],
-  _ListKey.nutritionCravingOptions: [
-    'Sweet',
-    'Salty',
-    'Chocolate',
-    'Carbs',
-    'Spicy',
-    'Caffeine',
-    'Nothing',
-  ],
-  _ListKey.nutritionFoodGroups: [
-    'Gluten',
-    'Wheat',
-    'Dairy',
-    'Lactose-containing',
-    'Eggs',
-    'Nuts',
-    'Peanuts',
-    'Soy',
-    'Sesame',
-    'Legumes',
-    'Red meat',
-    'Poultry',
-    'Fish',
-    'Crustacean shellfish',
-    'Vegetables',
-    'Fruit',
-    'Onion / garlic',
-    'Processed food',
-    'Spicy food',
-    'High-fat / fried',
-    'Artificially sweetened',
-    'Caffeinated',
-  ],
-  _ListKey.postMealFeelings: [
-    'Comfortable',
-    'Energetic',
-    'Full',
-    'Bloated',
-    'Tired',
-    'Nauseous',
-    'Gassy',
-    'Reflux',
-    'Still hungry',
-  ],
-  _ListKey.periodSymptomOptions: [
-    'Cramps',
-    'Lower back pain',
-    'Headache',
-    'Bloating',
-    'Fatigue',
-    'Clots',
-  ],
-  _ListKey.symptomSeverityOptions: ['Mild', 'Moderate', 'Strong'],
-  _ListKey.symptomOverallOptions: [
-    'Feeling good',
-    'Stressed',
-    'Happy',
-    'Calm',
-    'Motivated',
-    'Anxious',
-    'Restless',
-    'Irritable',
-    'Sad',
-    'Experiencing mood swings',
-  ],
-  _ListKey.symptomBodyOptions: [
-    'Cramps',
-    'Headache',
-    'Lower back pain',
-    'Breast tenderness',
-    'Upper/mid-back pain',
-    'Joint/muscle pain',
-    'Dizziness',
-    'Frequent urination',
-  ],
-  _ListKey.symptomSkinHairOptions: [
-    'Acne',
-    'Dry skin',
-    'Oily skin',
-    'Sensitive skin',
-    'Skin redness',
-    'Itchy skin',
-    'Oily hair',
-    'Dry hair',
-    'Hair loss',
-    'Brittle nails',
-  ],
-  _ListKey.symptomEnergyOptions: [
-    'Energetic',
-    'Fatigue',
-    'Focused',
-    'Brain fog',
-    'Forgetful',
-  ],
-  _ListKey.symptomSleepOptions: [
-    'Slept well',
-    'Slept fairly well',
-    'Slept poorly',
-    'Trouble falling asleep',
-    'Woke often',
-    'Woke up energized',
-    'Woke up rested',
-    'Woke up sleepy/tired',
-    'Woke up with a headache',
-    'Woke up early',
-    'Vivid dreams',
-    'Nightmare',
-  ],
-  _ListKey.symptomDigestionOptions: [
-    'Digestion feels good and regular',
-    'Cravings',
-    'Increased/decreased appetite',
-    'Nausea',
-    'Constipation',
-    'Diarrhea',
-    'Bloating',
-    'Gas',
-    'Reflux',
-  ],
-  _ListKey.flowOptions: ['Spotting', 'Light', 'Medium', 'Heavy'],
-  _ListKey.dischargePresenceOptions: ['Present', 'None'],
-  _ListKey.dischargeColors: [
-    'Clear',
-    'White',
-    'Cream',
-    'Yellow',
-    'Green',
-    'Gray',
-    'Brown',
-    'Pink',
-    'Red / blood-tinged',
-    'Other',
-  ],
-  _ListKey.dischargeConsistencies: [
-    'Watery',
-    'Slippery',
-    'Stretchy / egg-white-like',
-    'Creamy',
-    'Sticky',
-    'Thick / clumpy',
-    'Frothy',
-    'Other',
-  ],
-  _ListKey.dischargeAmounts: ['Light', 'Moderate', 'Heavy'],
-  _ListKey.dischargeSymptoms: [
-    'Unusual odor',
-    'Itching',
-    'Burning',
-    'Painful urination',
-    'Pelvic / lower abdominal pain',
-  ],
-  _ListKey.dosageOptions: [
-    '1 count',
-    '2 count',
-    '3 count',
-    '4 count',
-    '5 count',
-    '6 count',
-  ],
-  _ListKey.shortWeekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-  _ListKey.weekdays: [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ],
-  _ListKey.articleTopics: [
-    'Nutrition',
-    'Exercise',
-    'Women’s Health',
-    'Mood',
-    'Sleep',
-    'General Health',
-  ],
-  _ListKey.defaultMedications: [
-    'Parol',
-    'Aspirin',
-    'Arveles',
-    'Majezik',
-    'Minoset',
-  ],
-  _ListKey.defaultSupplements: [
-    'Magnesium',
-    'Vitamin D',
-    'Omega 3',
-    'Iron',
-    'Vitamin B12',
-    'Vitamin C',
-    'Zinc',
-  ],
-  _ListKey.calendarWeekdayInitials: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-};
-
 // Eski sürümlerde kaydedilmiş fakat artık seçim kartı olarak sunulmayan
 // değerleri yeni katalog karşılıklarına taşır. Rüya kayıt alanları bu
 // eşleştirmeden bağımsızdır ve kendi modelinde korunur.
@@ -3400,11 +2793,8 @@ const Map<String, String> _legacyStoredSymptomAliases = {
 
 /// Uygulamanın merkezi ve genişletilebilir yerelleştirme erişimi.
 ///
-/// Tüm çeviriler yukarıdaki sabit kataloglarda tutulur. Örneğin Almanca
-/// eklemek için `_germanTexts` ve `_germanLists` kataloglarını oluşturun;
-/// kategori kataloglarının Almanca karşılıklarını hazırlayın; ardından `de`
-/// anahtarını aşağıdaki katalog kayıtlarına ve [supportedLocales] listesine
-/// ekleyin. Getter veya ekran kodunda dil koşulu yazılması gerekmez.
+/// Liste seçenekleri Slang `options.json` dosyalarında, sabit ekran metinleri
+/// ise bu dosyadaki metin kataloglarında tutulur.
 class AppStrings {
   AppStrings._();
 
@@ -3429,32 +2819,6 @@ class AppStrings {
     'en': _englishTexts,
   };
 
-  static const Map<String, Map<_ListKey, List<String>>> _listCatalogs = {
-    'tr': _turkishLists,
-    'en': _englishLists,
-  };
-
-  static const Map<String, Map<String, List<String>>> _nutritionCatalogs = {
-    'tr': _nutritionCatalogTr,
-    'en': _nutritionCatalogEn,
-  };
-  static const Map<String, Map<String, List<String>>> _medicationCatalogs = {
-    'tr': _medicationCatalogTr,
-    'en': _medicationCatalogEn,
-  };
-  static const Map<String, Map<String, List<String>>>
-  _medicationActiveIngredientCatalogs = {
-    'tr': _medicationActiveIngredientsTr,
-    'en': _medicationActiveIngredientsEn,
-  };
-  static const Map<String, List<String>> _supplementCatalogs = {
-    'tr': _supplementCatalogTr,
-    'en': _supplementCatalogEn,
-  };
-  static const Map<String, Map<String, List<String>>> _skincareCatalogs = {
-    'tr': _skincareCatalogTr,
-    'en': _skincareCatalogEn,
-  };
   static const Map<String, Map<String, List<String>>> _foodAliasCatalogs = {
     'tr': _hiddenFoodAliasesTr,
     'en': _hiddenFoodAliasesEn,
@@ -3486,18 +2850,10 @@ class AppStrings {
   @visibleForTesting
   static bool get catalogsAreComplete {
     final allTextKeys = _TextKey.values.toSet();
-    final allListKeys = _ListKey.values.toSet();
     return _textCatalogs.values.every(
           (catalog) => catalog.keys.toSet().containsAll(allTextKeys),
         ) &&
-        _listCatalogs.values.every(
-          (catalog) => catalog.keys.toSet().containsAll(allListKeys),
-        ) &&
-        _listCatalogs.values.every(
-          (catalog) => _ListKey.values.every(
-            (key) => catalog[key]!.length == _turkishLists[key]!.length,
-          ),
-        );
+        OptionLocalizer.catalogsAreComplete;
   }
 
   static Locale resolveLocale(Locale? locale) {
@@ -3520,9 +2876,8 @@ class AppStrings {
     return _textCatalogs[_languageCode]?[key] ?? _englishTexts[key]!;
   }
 
-  static List<String> _list(_ListKey key) {
-    return _listCatalogs[_languageCode]?[key] ?? _englishLists[key]!;
-  }
+  static List<String> _list(OptionFamily key) =>
+      OptionLocalizer.values(key, _languageCode);
 
   static String _format(_TextKey key, Map<String, Object> values) {
     var result = _text(key);
@@ -3534,6 +2889,8 @@ class AppStrings {
 
   /// Herhangi bir desteklenen dilde saklanmış seçeneği etkin dile çevirir.
   static String localizeStoredValue(String value) {
+    final catalogLabel = CatalogLocalizer.localize(value, _languageCode);
+    if (catalogLabel != value) return catalogLabel;
     if (value == 'Dengeli' || value == 'Balanced') {
       return nutritionQualityOptions[1];
     }
@@ -3542,16 +2899,16 @@ class AppStrings {
     if (candidate == 'Derin uyku') {
       return isTurkish ? 'Derin uyku' : 'Deep sleep';
     }
-    for (final key in _ListKey.values) {
-      for (final catalog in _listCatalogs.values) {
-        final index = catalog[key]!.indexOf(candidate);
-        if (index >= 0 && index < _list(key).length) {
-          return _list(key)[index];
-        }
-      }
-    }
-    return value;
+    return OptionLocalizer.localize(candidate, _languageCode);
   }
+
+  /// Alan bağlamı bilinen kayıtları doğru `option.*` kimliğine dönüştürür.
+  static String canonicalizeOption(String value, OptionFamily family) =>
+      OptionLocalizer.canonicalKeyOrNull(value, family: family) ?? value;
+
+  /// Alan bağlamı bilinen kayıtları etkin dilde gösterir.
+  static String localizeOption(String value, OptionFamily family) =>
+      OptionLocalizer.localize(value, _languageCode, family: family);
 
   /// Analiz motorunun dile bağlı olmayan metrik kimliklerini kullanıcı diline
   /// çevirir; normal kayıt seçenekleri için mevcut liste çevirisine geri döner.
@@ -3608,19 +2965,17 @@ class AppStrings {
   /// Herhangi bir desteklenen dilde saklanmış eşdeğer seçenekleri tek bir sabit
   /// değerde toplar. Analiz motoru böylece arayüz dilinden bağımsız çalışır.
   static String canonicalizeStoredValue(String value) {
+    final catalogKey = CatalogLocalizer.canonicalKeyOrNull(value);
+    if (catalogKey != null) return catalogKey;
     if (value == 'Dengeli' || value == 'Balanced') {
-      return _turkishLists[_ListKey.nutritionQualityOptions]![1];
+      return OptionLocalizer.canonicalKeyOrNull(
+        nutritionQualityOptions[1],
+        family: OptionFamily.nutritionQualityOptions,
+      )!;
     }
     final candidate = _legacyStoredSymptomAliases[value] ?? value;
     if (candidate == 'Dinç' || candidate == 'Derin uyku') return candidate;
-    for (final key in _ListKey.values) {
-      final canonical = _turkishLists[key]!;
-      for (final catalog in _listCatalogs.values) {
-        final index = catalog[key]!.indexOf(candidate);
-        if (index >= 0) return canonical[index];
-      }
-    }
-    return candidate;
+    return OptionLocalizer.canonicalKeyOrNull(candidate) ?? candidate;
   }
 
   static String get appName => _text(_TextKey.appName);
@@ -4557,7 +3912,7 @@ class AppStrings {
   static String get predictedPeriod => _text(_TextKey.predictedPeriod);
   static String get fertileDays => _text(_TextKey.fertileDays);
   static List<String> get calendarWeekdayInitials =>
-      _list(_ListKey.calendarWeekdayInitials);
+      _list(OptionFamily.calendarWeekdayInitials);
   static String get noLogsForDay => _text(_TextKey.noLogsForDay);
   static String get viewDetails => _text(_TextKey.viewDetails);
   static String get period => _text(_TextKey.period);
@@ -4835,31 +4190,34 @@ class AppStrings {
   static String get reportFileName => _text(_TextKey.reportFileName);
 
   static List<String> get relationshipStatusOptions =>
-      _list(_ListKey.relationshipStatuses);
+      _list(OptionFamily.relationshipStatuses);
   static List<String> get chronicDiseasesList =>
-      _list(_ListKey.chronicDiseases);
-  static List<String> get womenDiseasesList => _list(_ListKey.womenDiseases);
-  static List<String> get medicationTimes => _list(_ListKey.medicationTimes);
-  static List<String> get stomachStates => _list(_ListKey.stomachStates);
-  static List<String> get moodLabels => _list(_ListKey.moodOptions);
+      _list(OptionFamily.chronicDiseases);
+  static List<String> get womenDiseasesList =>
+      _list(OptionFamily.womenDiseases);
+  static List<String> get medicationTimes =>
+      _list(OptionFamily.medicationTimes);
+  static List<String> get stomachStates => _list(OptionFamily.stomachStates);
+  static List<String> get moodLabels => _list(OptionFamily.moodOptions);
   static List<String> get moodCheckInOptions =>
-      _list(_ListKey.moodCheckInOptions);
+      _list(OptionFamily.moodCheckInOptions);
   static const List<String> moodCheckInEmojis = ['😔', '🥺', '😐', '🙂', '🥰'];
   static List<String> get moodCompanionOptions =>
-      _list(_ListKey.moodCompanionOptions);
-  static List<String> get moodPlaceOptions => _list(_ListKey.moodPlaceOptions);
+      _list(OptionFamily.moodCompanionOptions);
+  static List<String> get moodPlaceOptions =>
+      _list(OptionFamily.moodPlaceOptions);
   static List<String> get sexualActivityOptions =>
-      _list(_ListKey.sexualActivityOptions);
+      _list(OptionFamily.sexualActivityOptions);
   static List<String> get sexualAfterFeelingOptions =>
-      _list(_ListKey.sexualAfterFeelingOptions);
+      _list(OptionFamily.sexualAfterFeelingOptions);
   static List<String> get nutritionMealOptions =>
-      _list(_ListKey.nutritionMealOptions);
+      _list(OptionFamily.nutritionMealOptions);
   static List<String> get nutritionQualityOptions =>
-      _list(_ListKey.nutritionQualityOptions);
+      _list(OptionFamily.nutritionQualityOptions);
   static List<String> get nutritionCravingOptions =>
-      _list(_ListKey.nutritionCravingOptions);
+      _list(OptionFamily.nutritionCravingOptions);
   static List<String> get nutritionFoodGroupOptions =>
-      _list(_ListKey.nutritionFoodGroups);
+      _list(OptionFamily.nutritionFoodGroups);
   static String get searchFoods => _text(_TextKey.searchFoods);
   static String get searchMedications => _text(_TextKey.searchMedications);
   static String get searchSupplements => _text(_TextKey.searchSupplements);
@@ -5081,57 +4439,48 @@ class AppStrings {
   static String get fiveMore => _text(_TextKey.fiveMore);
 
   static Map<String, List<String>> get nutritionCatalog =>
-      _nutritionCatalogs[_languageCode] ?? _nutritionCatalogEn;
+      CatalogLocalizer.nutritionCatalog(_languageCode);
   static String get caffeinatedFoodInsightSignal =>
       canonicalizeStoredValue(nutritionFoodGroupOptions.last);
 
   /// Öğünde seçilen kafeinli içecekleri insight motorunda tek ve dile bağlı
   /// olmayan `Kafeinli` sinyalinde toplar.
-  static bool isCaffeinatedFood(String value) {
-    final normalized = value.trim().toLowerCase();
-    final candidates = <String>{
-      _turkishLists[_ListKey.nutritionFoodGroups]!.last,
-      _englishLists[_ListKey.nutritionFoodGroups]!.last,
-      ..._nutritionCatalogTr['Kafeinli içecekler']!,
-      ..._nutritionCatalogEn['Caffeinated drinks']!,
-    };
-    return candidates.any((item) => item.toLowerCase() == normalized);
-  }
+  static bool isCaffeinatedFood(String value) =>
+      CatalogLocalizer.isCaffeinatedFood(value);
 
   static Map<String, List<String>> get medicationCatalog =>
-      _medicationCatalogs[_languageCode] ?? _medicationCatalogEn;
+      CatalogLocalizer.medicationCatalog(_languageCode);
   static Map<String, List<String>> get medicationActiveIngredients =>
-      _medicationActiveIngredientCatalogs[_languageCode] ??
-      _medicationActiveIngredientsEn;
+      CatalogLocalizer.medicationActiveIngredients(_languageCode);
   static List<String> get supplementCatalog =>
-      _supplementCatalogs[_languageCode] ?? _supplementCatalogEn;
+      CatalogLocalizer.supplementCatalog(_languageCode);
   static Map<String, List<String>> get skincareCatalog =>
-      _skincareCatalogs[_languageCode] ?? _skincareCatalogEn;
+      CatalogLocalizer.skincareCatalog(_languageCode);
   static Map<String, List<String>> get hiddenFoodSearchAliases =>
       _foodAliasCatalogs[_languageCode] ?? _hiddenFoodAliasesEn;
   static Map<String, List<String>> get hiddenMedicationSearchAliases =>
       _medicationAliasCatalogs[_languageCode] ?? _hiddenMedicationAliasesEn;
   static List<String> get postMealFeelingOptions =>
-      _list(_ListKey.postMealFeelings);
+      _list(OptionFamily.postMealFeelings);
   static List<String> get periodSymptomOptions =>
-      _list(_ListKey.periodSymptomOptions);
+      _list(OptionFamily.periodSymptomOptions);
   static List<String> get symptomSeverityOptions =>
-      _list(_ListKey.symptomSeverityOptions);
+      _list(OptionFamily.symptomSeverityOptions);
   static List<String> get symptomOverallOptions =>
-      _list(_ListKey.symptomOverallOptions);
+      _list(OptionFamily.symptomOverallOptions);
   static List<String> get symptomBodyOptions =>
-      _list(_ListKey.symptomBodyOptions);
+      _list(OptionFamily.symptomBodyOptions);
   static List<String> get symptomSkinHairOptions =>
-      _list(_ListKey.symptomSkinHairOptions);
+      _list(OptionFamily.symptomSkinHairOptions);
   static List<String> get symptomEnergyOptions =>
-      _list(_ListKey.symptomEnergyOptions);
+      _list(OptionFamily.symptomEnergyOptions);
   static List<String> get symptomEnergyLevelOptions =>
       List<String>.unmodifiable(symptomEnergyOptions.take(2));
   static List<String> get symptomMoodStateOptions => symptomOverallOptions;
   static List<String> get symptomMentalClarityOptions =>
       List<String>.unmodifiable(symptomEnergyOptions.skip(2));
   static List<String> get symptomSleepOptions =>
-      _list(_ListKey.symptomSleepOptions);
+      _list(OptionFamily.symptomSleepOptions);
   static List<String> get symptomSleepQualityOptions =>
       List<String>.unmodifiable(symptomSleepOptions.take(5));
   static List<String> get symptomWakeFeelingOptions =>
@@ -5140,7 +4489,7 @@ class AppStrings {
       ? const ['Dinç', 'Derin uyku']
       : const ['Refreshed', 'Deep sleep'];
   static List<String> get symptomDigestionOptions =>
-      _list(_ListKey.symptomDigestionOptions);
+      _list(OptionFamily.symptomDigestionOptions);
   static List<String> get allSymptomOptions => List<String>.unmodifiable({
     ...periodSymptomOptions,
     ...symptomOverallOptions,
@@ -5151,18 +4500,18 @@ class AppStrings {
     ...legacySymptomOptions,
     ...symptomDigestionOptions,
   });
-  static List<String> get flowOptions => _list(_ListKey.flowOptions);
+  static List<String> get flowOptions => _list(OptionFamily.flowOptions);
   static List<String> get dischargePresenceOptions =>
-      _list(_ListKey.dischargePresenceOptions);
+      _list(OptionFamily.dischargePresenceOptions);
   static List<String> get dischargeColorOptions =>
-      _list(_ListKey.dischargeColors);
+      _list(OptionFamily.dischargeColors);
   static List<String> get dischargeConsistencyOptions =>
-      _list(_ListKey.dischargeConsistencies);
+      _list(OptionFamily.dischargeConsistencies);
   static List<String> get dischargeAmountOptions =>
-      _list(_ListKey.dischargeAmounts);
+      _list(OptionFamily.dischargeAmounts);
   static List<String> get dischargeSymptomOptions =>
-      _list(_ListKey.dischargeSymptoms);
-  static List<String> get dosageOptions => _list(_ListKey.dosageOptions);
+      _list(OptionFamily.dischargeSymptoms);
+  static List<String> get dosageOptions => _list(OptionFamily.dosageOptions);
 
   static String dischargeColorLabelByName(String name) {
     final index = switch (name) {
@@ -5208,20 +4557,16 @@ class AppStrings {
     return index < 0 ? name : dischargeSymptomOptions[index];
   }
 
-  static List<String> get shortWeekdays => _list(_ListKey.shortWeekdays);
-  static List<String> get weekdays => _list(_ListKey.weekdays);
-  static List<String> get articleTopics => _list(_ListKey.articleTopics);
+  static List<String> get shortWeekdays => _list(OptionFamily.shortWeekdays);
+  static List<String> get weekdays => _list(OptionFamily.weekdays);
+  static List<String> get articleTopics => _list(OptionFamily.articleTopics);
   static List<String> get defaultMedications =>
-      _list(_ListKey.defaultMedications);
+      _list(OptionFamily.defaultMedications);
   static List<String> get defaultSupplements =>
-      _list(_ListKey.defaultSupplements);
+      _list(OptionFamily.defaultSupplements);
 
   static String localizeArticleTopic(String topic) {
-    final trIndex = _turkishLists[_ListKey.articleTopics]!.indexOf(topic);
-    if (trIndex >= 0) return articleTopics[trIndex];
-    final enIndex = _englishLists[_ListKey.articleTopics]!.indexOf(topic);
-    if (enIndex >= 0) return articleTopics[enIndex];
-    return topic;
+    return localizeOption(topic, OptionFamily.articleTopics);
   }
 
   static Map<String, String> get moodOptions => Map.unmodifiable(
@@ -5272,810 +4617,6 @@ class AppStrings {
 
   static String reportDateLine(String date) => '$reportDate: $date';
 }
-
-const Map<String, List<String>> _nutritionCatalogTr = {
-  'Alkollü içecekler': ['Bira', 'Kokteyl', 'Rakı', 'Şarap', 'Votka'],
-  'Atıştırmalıklar ve paketli ürünler': [
-    'Bisküvi',
-    'Cips',
-    'Granola bar',
-    'Kraker',
-    'Patlamış mısır',
-  ],
-  'Baharatlar, soslar ve acılı gıdalar': [
-    'Acı biber',
-    'Acı sos',
-    'Karabiber',
-    'Ketçap',
-    'Mayonez',
-  ],
-  'Baklagiller': ['Barbunya', 'Bezelye', 'Kuru fasulye', 'Mercimek', 'Nohut'],
-  'Balık ve deniz ürünleri': [
-    'Hamsi',
-    'Karides',
-    'Midye',
-    'Somon',
-    'Ton balığı',
-  ],
-  'Bitki çayları': [
-    'Adaçayı',
-    'Papatya çayı',
-    'Rezene çayı',
-    'Ihlamur',
-    'Yeşil çay',
-  ],
-  'Et ve kümes hayvanları': ['Dana eti', 'Hindi', 'Köfte', 'Kuzu eti', 'Tavuk'],
-  'Fermente, salamura, tütsülenmiş ve işlenmiş gıdalar': [
-    'Füme et',
-    'Kimchi',
-    'Salam',
-    'Sucuk',
-    'Turşu',
-  ],
-  'Gazlı ve asitli içecekler': [
-    'Gazoz',
-    'Kola',
-    'Limonata',
-    'Portakal suyu',
-    'Soda',
-  ],
-  'Gluten içeren tahıllar ve hamur işleri': [
-    'Börek',
-    'Bulgur',
-    'Ekmek',
-    'Makarna',
-    'Simit',
-  ],
-  'Glutensiz tahıllar ve nişastalı gıdalar': [
-    'Basmati pirinç',
-    'Beyaz pirinç',
-    'Esmer pirinç',
-    'Karabuğday',
-    'Kinoa',
-    'Mısır',
-    'Patates',
-    'Pirinç',
-    'Pirinç pilavı',
-  ],
-  'Kafeinli içecekler': [
-    'Enerji içeceği',
-    'Espresso',
-    'Filtre kahve',
-    'Siyah çay',
-    'Türk kahvesi',
-  ],
-  'Karma yemekler ve hazır öğünler': [
-    'Döner',
-    'Hamburger',
-    'Hazır çorba',
-    'Mantı',
-    'Pizza',
-  ],
-  'Kuruyemişler ve tohumlar': [
-    'Ay çekirdeği',
-    'Badem',
-    'Ceviz',
-    'Fındık',
-    'Yer fıstığı',
-  ],
-  'Meyveler': ['Çilek', 'Elma', 'Muz', 'Portakal', 'Üzüm'],
-  'Sebzeler': ['Brokoli', 'Domates', 'Ispanak', 'Kabak', 'Salatalık'],
-  'Süt ürünleri ve peynirler': [
-    'Beyaz peynir',
-    'Kaşar peyniri',
-    'Kefir',
-    'Süt',
-    'Yoğurt',
-  ],
-  'Tatlılar ve şekerli gıdalar': [
-    'Baklava',
-    'Çikolata',
-    'Dondurma',
-    'Pasta',
-    'Şekerleme',
-  ],
-  'Yağlar ve kızartılmış gıdalar': [
-    'Çıtır tavuk',
-    'Kızarmış hamur',
-    'Kızarmış tavuk',
-    'Nugget',
-    'Patates kızartması',
-    'Tereyağı',
-    'Zeytinyağı',
-  ],
-  'Yumurta': [
-    'Haşlanmış yumurta',
-    'Menemen',
-    'Omlet',
-    'Sahanda yumurta',
-    'Yumurtalı ekmek',
-  ],
-};
-
-const Map<String, List<String>> _nutritionCatalogEn = {
-  'Alcoholic drinks': ['Beer', 'Cocktail', 'Rakı', 'Wine', 'Vodka'],
-  'Snacks and packaged foods': [
-    'Biscuits',
-    'Chips',
-    'Granola bar',
-    'Crackers',
-    'Popcorn',
-  ],
-  'Spices, sauces and spicy foods': [
-    'Chili pepper',
-    'Hot sauce',
-    'Black pepper',
-    'Ketchup',
-    'Mayonnaise',
-  ],
-  'Legumes': ['Kidney beans', 'Peas', 'White beans', 'Lentils', 'Chickpeas'],
-  'Fish and seafood': ['Anchovies', 'Shrimp', 'Mussels', 'Salmon', 'Tuna'],
-  'Herbal teas': [
-    'Sage tea',
-    'Chamomile tea',
-    'Fennel tea',
-    'Linden tea',
-    'Green tea',
-  ],
-  'Meat and poultry': ['Beef', 'Turkey', 'Meatballs', 'Lamb', 'Chicken'],
-  'Fermented, pickled, smoked and processed foods': [
-    'Smoked meat',
-    'Kimchi',
-    'Salami',
-    'Sujuk',
-    'Pickles',
-  ],
-  'Carbonated and acidic drinks': [
-    'Soda pop',
-    'Cola',
-    'Lemonade',
-    'Orange juice',
-    'Sparkling water',
-  ],
-  'Gluten grains and baked foods': [
-    'Pastry',
-    'Bulgur',
-    'Bread',
-    'Pasta',
-    'Bagel',
-  ],
-  'Gluten-free grains and starches': [
-    'Basmati rice',
-    'Brown rice',
-    'Buckwheat',
-    'Quinoa',
-    'Corn',
-    'Potato',
-    'Rice',
-    'Rice pilaf',
-    'White rice',
-  ],
-  'Caffeinated drinks': [
-    'Energy drink',
-    'Espresso',
-    'Filter coffee',
-    'Black tea',
-    'Turkish coffee',
-  ],
-  'Mixed dishes and ready meals': [
-    'Döner',
-    'Hamburger',
-    'Instant soup',
-    'Dumplings',
-    'Pizza',
-  ],
-  'Nuts and seeds': [
-    'Sunflower seeds',
-    'Almonds',
-    'Walnuts',
-    'Hazelnuts',
-    'Peanuts',
-  ],
-  'Fruits': ['Strawberries', 'Apple', 'Banana', 'Orange', 'Grapes'],
-  'Vegetables': ['Broccoli', 'Tomato', 'Spinach', 'Zucchini', 'Cucumber'],
-  'Dairy and cheese': [
-    'Feta cheese',
-    'Yellow cheese',
-    'Kefir',
-    'Milk',
-    'Yogurt',
-  ],
-  'Desserts and sugary foods': [
-    'Baklava',
-    'Chocolate',
-    'Ice cream',
-    'Cake',
-    'Candy',
-  ],
-  'Fats and fried foods': [
-    'Chicken nuggets',
-    'Crispy chicken',
-    'Fried dough',
-    'Fried chicken',
-    'French fries',
-    'Butter',
-    'Olive oil',
-  ],
-  'Eggs': ['Boiled egg', 'Menemen', 'Omelet', 'Fried egg', 'Eggy bread'],
-};
-
-const Map<String, List<String>> _medicationCatalogTr = {
-  'Ağrı, Ateş ve Kas-Eklem İlaçları': [
-    'Ağrı kesici / ateş düşürücü',
-    'İltihap giderici ağrı kesici',
-    'Kas gevşetici',
-  ],
-  'Mide ve Bağırsak İlaçları': [
-    'Mide asidini azaltan / mideyi koruyan',
-    'Bulantı / kusma',
-    'Bağırsak düzenleyiciler',
-  ],
-  'Alerji, Soğuk Algınlığı ve Solunum İlaçları': [
-    'Alerji ilaçları',
-    'Burun ilaçları',
-    'Astım / bronş açıcılar',
-    'İnhale kortizonlar',
-  ],
-  'Enfeksiyon İlaçları': [
-    'Antibiyotik',
-    'Mantar ilacı',
-    'Antiviral',
-    'Parazit ilacı',
-  ],
-  'Tansiyon, Kalp ve Ödem İlaçları': [
-    'Tansiyon düşürücü',
-    'Nabız düzenleyici',
-    'İdrar söktürücü',
-    'Kalp yetmezliği ilacı',
-  ],
-  'Kolesterol ve Kan Sulandırıcı İlaçlar': [
-    'Kolesterol ilacı',
-    'Kan sulandırıcı / pıhtı önleyici',
-  ],
-  'Diyabet ve Kan Şekeri İlaçları': [
-    'Tablet / ağızdan kullanılan',
-    'GLP-1 ilaçları',
-    'İnsülinler',
-  ],
-  'Ruh Sağlığı ve Uyku İlaçları': [
-    'Antidepresan',
-    'Kaygı giderici',
-    'Uyku / sakinleştirici',
-    'Antipsikotik',
-  ],
-  'Migren, Epilepsi ve Sinir Sistemi İlaçları': [
-    'Migren',
-    'Epilepsi / nöbet',
-    'Sinir ağrısı',
-    'Parkinson',
-  ],
-  'Hormon, Tiroid ve Doğum Kontrol İlaçları': [
-    'Tiroid ilacı',
-    'Doğum kontrolü',
-    'Progesteron',
-    'Östrojen / menopoz tedavisi',
-  ],
-};
-
-const Map<String, List<String>> _medicationCatalogEn = {
-  'Pain, Fever, Muscle and Joint Medicines': [
-    'Pain reliever / fever reducer',
-    'Anti-inflammatory pain reliever',
-    'Muscle relaxant',
-  ],
-  'Stomach and Bowel Medicines': [
-    'Acid-reducing / stomach-protecting medicine',
-    'Nausea / vomiting',
-    'Bowel regulators',
-  ],
-  'Allergy, Cold and Respiratory Medicines': [
-    'Allergy medicines',
-    'Nasal medicines',
-    'Asthma medicines / bronchodilators',
-    'Inhaled corticosteroids',
-  ],
-  'Infection Medicines': [
-    'Antibiotic',
-    'Antifungal',
-    'Antiviral',
-    'Antiparasitic',
-  ],
-  'Blood Pressure, Heart and Edema Medicines': [
-    'Blood pressure medicine',
-    'Heart rate medicine',
-    'Diuretic',
-    'Heart failure medicine',
-  ],
-  'Cholesterol and Blood-Thinning Medicines': [
-    'Cholesterol medicine',
-    'Blood thinner / clot prevention',
-  ],
-  'Diabetes and Blood Sugar Medicines': [
-    'Tablet / oral medicine',
-    'GLP-1 medicines',
-    'Insulins',
-  ],
-  'Mental Health and Sleep Medicines': [
-    'Antidepressant',
-    'Anxiety medicine',
-    'Sleep medicine / sedative',
-    'Antipsychotic',
-  ],
-  'Migraine, Epilepsy and Nervous System Medicines': [
-    'Migraine',
-    'Epilepsy / seizures',
-    'Nerve pain',
-    "Parkinson's",
-  ],
-  'Hormone, Thyroid and Birth Control Medicines': [
-    'Thyroid medicine',
-    'Birth control',
-    'Progesterone',
-    'Estrogen / menopause therapy',
-  ],
-};
-
-/// Etken maddeler grup içinde yaygın kullanım sırasına göre gösterilir.
-/// Liste yalnızca seçim kolaylığı sağlar; reçete veya doz önerisi değildir.
-const Map<String, List<String>> _medicationActiveIngredientsTr = {
-  'Ağrı kesici / ateş düşürücü': [
-    'Parasetamol',
-    'İbuprofen',
-    'Naproksen',
-    'Diklofenak',
-    'Deksketoprofen',
-    'Ketoprofen',
-    'Meloksikam',
-    'Metamizol',
-  ],
-  'İltihap giderici ağrı kesici': [
-    'İbuprofen',
-    'Naproksen',
-    'Diklofenak',
-    'Deksketoprofen',
-    'Ketoprofen',
-    'Meloksikam',
-  ],
-  'Kas gevşetici': ['Tizanidin', 'Baklofen'],
-  'Mide asidini azaltan / mideyi koruyan': [
-    'Pantoprazol',
-    'Omeprazol',
-    'Esomeprazol',
-    'Lansoprazol',
-    'Famotidin',
-    'Kalsiyum karbonat',
-    'Sodyum aljinat',
-  ],
-  'Bulantı / kusma': ['Metoklopramid', 'Ondansetron', 'Dimenhidrinat'],
-  'Bağırsak düzenleyiciler': ['Laktüloz', 'Makrogol', 'Bisakodil', 'Loperamid'],
-  'Alerji ilaçları': [
-    'Setirizin',
-    'Levosetirizin',
-    'Loratadin',
-    'Desloratadin',
-    'Feksofenadin',
-  ],
-  'Burun ilaçları': ['Budesonid', 'Flutikazon'],
-  'Astım / bronş açıcılar': [
-    'Salbutamol',
-    'Budesonid',
-    'Flutikazon',
-    'Formoterol',
-    'Montelukast',
-  ],
-  'İnhale kortizonlar': ['Budesonid', 'Flutikazon'],
-  'Antibiyotik': [
-    'Amoksisilin',
-    'Amoksisilin + klavulanik asit',
-    'Azitromisin',
-    'Klaritromisin',
-    'Sefuroksim',
-    'Siprofloksasin',
-    'Doksisiklin',
-    'Nitrofurantoin',
-    'Metronidazol',
-  ],
-  'Mantar ilacı': ['Flukonazol'],
-  'Parazit ilacı': ['Metronidazol'],
-  'Tansiyon düşürücü': [
-    'Amlodipin',
-    'Losartan',
-    'Valsartan',
-    'Enalapril',
-    'Lisinopril',
-    'Metoprolol',
-    'Bisoprolol',
-    'Hidroklorotiyazid',
-  ],
-  'Nabız düzenleyici': ['Metoprolol', 'Bisoprolol'],
-  'İdrar söktürücü': ['Hidroklorotiyazid', 'Furosemid', 'Spironolakton'],
-  'Kalp yetmezliği ilacı': [
-    'Losartan',
-    'Valsartan',
-    'Enalapril',
-    'Lisinopril',
-    'Metoprolol',
-    'Bisoprolol',
-    'Furosemid',
-    'Spironolakton',
-  ],
-  'Kolesterol ilacı': [
-    'Atorvastatin',
-    'Rosuvastatin',
-    'Simvastatin',
-    'Pravastatin',
-    'Ezetimib',
-  ],
-  'Kan sulandırıcı / pıhtı önleyici': [
-    'Aspirin',
-    'Klopidogrel',
-    'Apiksaban',
-    'Rivaroksaban',
-    'Varfarin',
-  ],
-  'Tablet / ağızdan kullanılan': [
-    'Metformin',
-    'Gliklazid',
-    'Sitagliptin',
-    'Empagliflozin',
-    'Dapagliflozin',
-  ],
-  'GLP-1 ilaçları': ['Semaglutid', 'Liraglutid', 'Dulaglutid'],
-  'İnsülinler': ['İnsülin glarjin', 'İnsülin aspart'],
-  'Antidepresan': [
-    'Sertralin',
-    'Essitalopram',
-    'Fluoksetin',
-    'Venlafaksin',
-    'Duloksetin',
-    'Mirtazapin',
-  ],
-  'Kaygı giderici': ['Alprazolam', 'Diazepam', 'Lorazepam'],
-  'Uyku / sakinleştirici': ['Alprazolam', 'Diazepam', 'Lorazepam'],
-  'Antipsikotik': ['Ketiapin'],
-  'Migren': ['Topiramat', 'Sumatriptan', 'Rizatriptan'],
-  'Epilepsi / nöbet': [
-    'Pregabalin',
-    'Gabapentin',
-    'Levetirasetam',
-    'Lamotrijin',
-    'Valproat',
-    'Karbamazepin',
-    'Topiramat',
-  ],
-  'Sinir ağrısı': ['Pregabalin', 'Gabapentin', 'Karbamazepin'],
-  'Parkinson': ['Levodopa + karbidopa'],
-  'Tiroid ilacı': ['Levotiroksin', 'Metimazol', 'Karbimazol'],
-  'Doğum kontrolü': [
-    'Etinilestradiol',
-    'Levonorgestrel',
-    'Drospirenon',
-    'Desogestrel',
-    'Etonogestrel',
-  ],
-  'Progesteron': ['Progesteron'],
-  'Östrojen / menopoz tedavisi': ['Estradiol', 'Progesteron'],
-};
-
-const Map<String, List<String>> _medicationActiveIngredientsEn = {
-  'Pain reliever / fever reducer': [
-    'Paracetamol / acetaminophen',
-    'Ibuprofen',
-    'Naproxen',
-    'Diclofenac',
-    'Dexketoprofen',
-    'Ketoprofen',
-    'Meloxicam',
-    'Metamizole',
-  ],
-  'Anti-inflammatory pain reliever': [
-    'Ibuprofen',
-    'Naproxen',
-    'Diclofenac',
-    'Dexketoprofen',
-    'Ketoprofen',
-    'Meloxicam',
-  ],
-  'Muscle relaxant': ['Tizanidine', 'Baclofen'],
-  'Acid-reducing / stomach-protecting medicine': [
-    'Pantoprazole',
-    'Omeprazole',
-    'Esomeprazole',
-    'Lansoprazole',
-    'Famotidine',
-    'Calcium carbonate',
-    'Sodium alginate',
-  ],
-  'Nausea / vomiting': ['Metoclopramide', 'Ondansetron', 'Dimenhydrinate'],
-  'Bowel regulators': [
-    'Lactulose',
-    'Macrogol / polyethylene glycol',
-    'Bisacodyl',
-    'Loperamide',
-  ],
-  'Allergy medicines': [
-    'Cetirizine',
-    'Levocetirizine',
-    'Loratadine',
-    'Desloratadine',
-    'Fexofenadine',
-  ],
-  'Nasal medicines': ['Budesonide', 'Fluticasone'],
-  'Asthma medicines / bronchodilators': [
-    'Salbutamol / albuterol',
-    'Budesonide',
-    'Fluticasone',
-    'Formoterol',
-    'Montelukast',
-  ],
-  'Inhaled corticosteroids': ['Budesonide', 'Fluticasone'],
-  'Antibiotic': [
-    'Amoxicillin',
-    'Amoxicillin + clavulanic acid',
-    'Azithromycin',
-    'Clarithromycin',
-    'Cefuroxime',
-    'Ciprofloxacin',
-    'Doxycycline',
-    'Nitrofurantoin',
-    'Metronidazole',
-  ],
-  'Antifungal': ['Fluconazole'],
-  'Antiparasitic': ['Metronidazole'],
-  'Blood pressure medicine': [
-    'Amlodipine',
-    'Losartan',
-    'Valsartan',
-    'Enalapril',
-    'Lisinopril',
-    'Metoprolol',
-    'Bisoprolol',
-    'Hydrochlorothiazide',
-  ],
-  'Heart rate medicine': ['Metoprolol', 'Bisoprolol'],
-  'Diuretic': ['Hydrochlorothiazide', 'Furosemide', 'Spironolactone'],
-  'Heart failure medicine': [
-    'Losartan',
-    'Valsartan',
-    'Enalapril',
-    'Lisinopril',
-    'Metoprolol',
-    'Bisoprolol',
-    'Furosemide',
-    'Spironolactone',
-  ],
-  'Cholesterol medicine': [
-    'Atorvastatin',
-    'Rosuvastatin',
-    'Simvastatin',
-    'Pravastatin',
-    'Ezetimibe',
-  ],
-  'Blood thinner / clot prevention': [
-    'Aspirin',
-    'Clopidogrel',
-    'Apixaban',
-    'Rivaroxaban',
-    'Warfarin',
-  ],
-  'Tablet / oral medicine': [
-    'Metformin',
-    'Gliclazide',
-    'Sitagliptin',
-    'Empagliflozin',
-    'Dapagliflozin',
-  ],
-  'GLP-1 medicines': ['Semaglutide', 'Liraglutide', 'Dulaglutide'],
-  'Insulins': ['Insulin glargine', 'Insulin aspart'],
-  'Antidepressant': [
-    'Sertraline',
-    'Escitalopram',
-    'Fluoxetine',
-    'Venlafaxine',
-    'Duloxetine',
-    'Mirtazapine',
-  ],
-  'Anxiety medicine': ['Alprazolam', 'Diazepam', 'Lorazepam'],
-  'Sleep medicine / sedative': ['Alprazolam', 'Diazepam', 'Lorazepam'],
-  'Antipsychotic': ['Quetiapine'],
-  'Migraine': ['Topiramate', 'Sumatriptan', 'Rizatriptan'],
-  'Epilepsy / seizures': [
-    'Pregabalin',
-    'Gabapentin',
-    'Levetiracetam',
-    'Lamotrigine',
-    'Valproate',
-    'Carbamazepine',
-    'Topiramate',
-  ],
-  'Nerve pain': ['Pregabalin', 'Gabapentin', 'Carbamazepine'],
-  "Parkinson's": ['Levodopa + carbidopa'],
-  'Thyroid medicine': ['Levothyroxine', 'Methimazole', 'Carbimazole'],
-  'Birth control': [
-    'Ethinylestradiol',
-    'Levonorgestrel',
-    'Drospirenone',
-    'Desogestrel',
-    'Etonogestrel',
-  ],
-  'Progesterone': ['Progesterone'],
-  'Estrogen / menopause therapy': ['Estradiol', 'Progesterone'],
-};
-const List<String> _supplementCatalogTr = [
-  'Magnezyum',
-  'D vitamini',
-  'B12 vitamini',
-  'C vitamini',
-  'Multivitamin',
-  'Omega-3 / Balık yağı',
-  'Demir',
-  'Folik asit / Folat',
-  'Çinko',
-  'Kalsiyum',
-  'Probiyotik',
-  'Kolajen',
-  'Biotin',
-  'B kompleks',
-  'Melatonin',
-  'Kreatin',
-  'Protein tozu',
-  'Elektrolit',
-  'Koenzim Q10 (CoQ10)',
-  'Ashwagandha',
-  'Sarı kantaron',
-  'Andrographis',
-  'Astragalus (geven kökü)',
-  'Ekinezya',
-  'Ginseng (Panax ginseng)',
-  'Güney Afrika sardunyası (Pelargonium sidoides)',
-  'Kara mürver (Sambucus nigra)',
-  'Kedi pençesi (Uncaria tomentosa)',
-  'Sarımsak ekstresi',
-  'Sibirya ginsengi (Eleuthero)',
-  'Yeşil çay ekstresi',
-  'Beta-glukan',
-  'Propolis',
-  'Reishi, shiitake ve maitake mantarları',
-  'Zerdeçal / Kurkumin',
-  'İnositol',
-  'Vitamin E',
-  'Vitamin K / K2',
-  'Selenyum',
-];
-
-const List<String> _supplementCatalogEn = [
-  'Magnesium',
-  'Vitamin D',
-  'Vitamin B12',
-  'Vitamin C',
-  'Multivitamin',
-  'Omega-3 / Fish oil',
-  'Iron',
-  'Folic acid / Folate',
-  'Zinc',
-  'Calcium',
-  'Probiotic',
-  'Collagen',
-  'Biotin',
-  'B complex',
-  'Melatonin',
-  'Creatine',
-  'Protein powder',
-  'Electrolyte',
-  'Coenzyme Q10 (CoQ10)',
-  'Ashwagandha',
-  "St. John's wort",
-  'Andrographis',
-  'Astragalus (astragalus root)',
-  'Echinacea',
-  'Ginseng (Panax ginseng)',
-  'South African geranium (Pelargonium sidoides)',
-  'Black elderberry (Sambucus nigra)',
-  "Cat's claw (Uncaria tomentosa)",
-  'Garlic extract',
-  'Siberian ginseng (Eleuthero)',
-  'Green tea extract',
-  'Beta-glucan',
-  'Propolis',
-  'Reishi, shiitake and maitake mushrooms',
-  'Turmeric / Curcumin',
-  'Inositol',
-  'Vitamin E',
-  'Vitamin K / K2',
-  'Selenium',
-];
-
-const Map<String, List<String>> _skincareCatalogTr = {
-  'Akne, Yağlanma ve Gözenek': [
-    'Azelaik asit',
-    'Benzoyl peroxide',
-    'Çinko',
-    'Niasinamid',
-    'Salisilik asit',
-    'Sülfür',
-  ],
-  'Eksfoliasyon ve Doku': ['AHA', 'BHA', 'Glikolik asit', 'Laktik asit', 'PHA'],
-  'Hassasiyet ve Yatıştırma': [
-    'Allantoin',
-    'Cica / Centella Asiatica',
-    'Propolis',
-    'Yeşil çay özü',
-  ],
-  'Leke ve Ton Eşitsizliği': [
-    'Arbutin / Alpha Arbutin',
-    'C vitamini',
-    'Kojik asit',
-    'Meyan kökü özü',
-    'Pirinç özü',
-    'Traneksamik asit',
-  ],
-  'Nemlendirme ve Bariyer': [
-    'Beta glucan',
-    'Hyalüronik asit',
-    'Panthenol',
-    'Seramidler',
-    'Skualan',
-    'Snail mucin / Salyangoz özü',
-    'Urea',
-  ],
-  'Yaşlanma Karşıtı ve Antioksidan': [
-    'Bakuchiol',
-    'E vitamini',
-    'Ferulik asit',
-    'Peptitler',
-    'Resveratrol',
-    'Retinol / Retinal',
-  ],
-};
-
-const Map<String, List<String>> _skincareCatalogEn = {
-  'Acne, Oiliness and Pores': [
-    'Azelaic acid',
-    'Benzoyl peroxide',
-    'Niacinamide',
-    'Salicylic acid',
-    'Sulfur',
-    'Zinc',
-  ],
-  'Anti-Aging and Antioxidants': [
-    'Bakuchiol',
-    'Ferulic acid',
-    'Peptides',
-    'Resveratrol',
-    'Retinol / Retinal',
-    'Vitamin E',
-  ],
-  'Exfoliation and Texture': [
-    'AHA',
-    'BHA',
-    'Glycolic acid',
-    'Lactic acid',
-    'PHA',
-  ],
-  'Hydration and Barrier': [
-    'Beta glucan',
-    'Ceramides',
-    'Hyaluronic acid',
-    'Panthenol',
-    'Snail mucin',
-    'Squalane',
-    'Urea',
-  ],
-  'Pigmentation and Uneven Tone': [
-    'Arbutin / Alpha Arbutin',
-    'Kojic acid',
-    'Licorice root extract',
-    'Rice extract',
-    'Tranexamic acid',
-    'Vitamin C',
-  ],
-  'Sensitivity and Soothing': [
-    'Allantoin',
-    'Cica / Centella Asiatica',
-    'Green tea extract',
-    'Propolis',
-  ],
-};
 
 const Map<String, List<String>> _hiddenFoodAliasesTr = {
   'nugget': ['Yağlar ve kızartılmış gıdalar', 'Et ve kümes hayvanları'],
@@ -6193,7 +4734,7 @@ class _AppStringsDelegate extends LocalizationsDelegate<AppStrings> {
   );
 
   @override
-  Future<AppStrings> load(Locale locale) {
+  SynchronousFuture<AppStrings> load(Locale locale) {
     AppStrings._setLocale(locale);
     return SynchronousFuture(AppStrings._());
   }

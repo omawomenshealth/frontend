@@ -192,11 +192,14 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _medications = _initialMedicationEntries(_log.medications);
     _supplements = _initialMedicationEntries(_log.supplements);
     final storage = context.read<LocalStorageService>();
-    _skincare = _uniqueCustomLabels(_log.skincare).toSet();
+    _skincare = _uniqueCustomLabels(
+      _log.skincare.map(AppStrings.localizeStoredValue),
+    ).toSet();
     _skincareSuggestions = _uniqueCustomLabels([
-      for (final log in storage.loadAllLogs()) ...log.skincare,
-      ...persistedSettings.dailySkincare,
-      ...storage.getCustomSkincare(),
+      for (final log in storage.loadAllLogs())
+        ...log.skincare.map(AppStrings.localizeStoredValue),
+      ...persistedSettings.dailySkincare.map(AppStrings.localizeStoredValue),
+      ...storage.getCustomSkincare().map(AppStrings.localizeStoredValue),
     ]);
 
     _moodIndex = _localizedIndex(
@@ -262,7 +265,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   List<MedicationEntry> _initialMedicationEntries(List<MedicationEntry> saved) {
     final entries = <String, MedicationEntry>{};
     for (final entry in saved) {
-      entries[entry.displayName] = entry.copyWith(
+      final displayName = AppStrings.localizeStoredValue(entry.displayName);
+      entries[AppStrings.canonicalizeStoredValue(displayName)] = entry.copyWith(
+        displayName: displayName,
+        mainGroup: AppStrings.localizeStoredValue(entry.mainGroup),
+        activeIngredient: entry.activeIngredient == null
+            ? null
+            : AppStrings.localizeStoredValue(entry.activeIngredient!),
         times: entry.times.map(AppStrings.localizeStoredValue).toSet(),
         stomachState: AppStrings.localizeStoredValue(entry.stomachState),
       );
@@ -753,7 +762,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Widget _buildMedicationCatalogPage() {
-    final selected = _medications.map((entry) => entry.displayName).toSet();
+    final selected = _medications
+        .map((entry) => AppStrings.localizeStoredValue(entry.displayName))
+        .toSet();
     return Column(
       key: const ValueKey('medication_catalog_page'),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -767,7 +778,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           itemDetails: AppStrings.medicationActiveIngredients,
           selected: selected,
           customItems: widget.settings.dailyMedications
-              .map((medication) => medication.displayName)
+              .map(
+                (medication) =>
+                    AppStrings.localizeStoredValue(medication.displayName),
+              )
               .toList(),
           color: _tone,
           icon: Icons.medication_outlined,
@@ -826,7 +840,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Widget _buildSupplementCatalogPage() {
-    final selected = _supplements.map((entry) => entry.displayName).toSet();
+    final selected = _supplements
+        .map((entry) => AppStrings.localizeStoredValue(entry.displayName))
+        .toSet();
     return Column(
       key: const ValueKey('supplement_catalog_page'),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -843,8 +859,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           },
           selected: selected,
           customItems: {
-            ...widget.settings.dailySupplements,
-            ...context.read<LocalStorageService>().getCustomSupplements(),
+            ...widget.settings.dailySupplements.map(
+              AppStrings.localizeStoredValue,
+            ),
+            ...context.read<LocalStorageService>().getCustomSupplements().map(
+              AppStrings.localizeStoredValue,
+            ),
           }.toList(),
           color: _tone,
           icon: Icons.vaccines_outlined,
@@ -897,7 +917,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     required List<MedicationEntry> entries,
   }) {
     setState(() {
-      final index = entries.indexWhere((entry) => entry.displayName == item);
+      final index = entries.indexWhere(
+        (entry) => _sameCustomLabel(entry.displayName, item),
+      );
       if (index >= 0) {
         entries.removeAt(index);
       } else {
@@ -917,7 +939,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   void _selectMedicationIngredient(String group, String? ingredient) {
     setState(() {
-      _medications.removeWhere((entry) => entry.mainGroup == group);
+      _medications.removeWhere(
+        (entry) => _sameCustomLabel(entry.mainGroup, group),
+      );
       _medications.add(
         MedicationEntry(
           displayName: ingredient == null ? group : '$group - $ingredient',
@@ -2339,7 +2363,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final storage = context.read<LocalStorageService>();
     final medicationIdentities = <String, MedicationIdentity>{
       for (final medication in widget.settings.dailyMedications)
-        medication.displayName: medication,
+        AppStrings.localizeStoredValue(
+          medication.displayName,
+        ): MedicationIdentity(
+          displayName: AppStrings.localizeStoredValue(medication.displayName),
+          mainGroup: AppStrings.localizeStoredValue(medication.mainGroup),
+          activeIngredient: medication.activeIngredient == null
+              ? null
+              : AppStrings.localizeStoredValue(medication.activeIngredient!),
+        ),
       for (final medication in storage.getCustomMedicationIdentities())
         medication.displayName: medication,
       for (final entry in _medications)
@@ -2351,9 +2383,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     };
     final medicationNames = medicationIdentities.keys.toList();
     final supplementNames = {
-      ...widget.settings.dailySupplements,
-      ...storage.getCustomSupplements(),
-      ..._supplements.map((entry) => entry.displayName),
+      ...widget.settings.dailySupplements.map(AppStrings.localizeStoredValue),
+      ...storage.getCustomSupplements().map(AppStrings.localizeStoredValue),
+      ..._supplements.map(
+        (entry) => AppStrings.localizeStoredValue(entry.displayName),
+      ),
     }.toList();
 
     await showModalBottomSheet<void>(
@@ -2492,7 +2526,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  entry.displayName,
+                                  AppStrings.localizeStoredValue(
+                                    entry.displayName,
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -3178,8 +3214,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   void _toggleChoice(Set<String> values, String value) {
     setState(() {
-      if (values.contains(value)) {
-        values.remove(value);
+      final existing = values.where(
+        (candidate) => _sameCustomLabel(candidate, value),
+      );
+      if (existing.isNotEmpty) {
+        values.remove(existing.first);
       } else {
         values.add(value);
       }
@@ -3783,6 +3822,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   static bool _sameCustomLabel(String left, String right) =>
+      AppStrings.canonicalizeStoredValue(left) ==
+          AppStrings.canonicalizeStoredValue(right) ||
       _normalizeCustomLabel(left) == _normalizeCustomLabel(right);
 
   static String _normalizeCustomLabel(String value) => value
@@ -3796,7 +3837,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final seen = <String>{};
     for (final raw in values) {
       final value = raw.trim().replaceAll(RegExp(r'\s+'), ' ');
-      if (value.isNotEmpty && seen.add(_normalizeCustomLabel(value))) {
+      if (value.isNotEmpty &&
+          seen.add(AppStrings.canonicalizeStoredValue(value))) {
         result.add(value);
       }
     }

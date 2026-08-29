@@ -1,13 +1,22 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
+import 'package:app_proje_a/core/localization/catalog_localizer.dart';
+import 'package:app_proje_a/core/localization/option_structure.dart';
 import 'package:app_proje_a/core/utils/personal_association_engine.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/personal_insight_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const engine = PersonalAssociationEngine();
+
+  setUpAll(CatalogLocalizer.initialize);
+
+  setUp(() async {
+    await AppStrings.delegate.load(const Locale('tr'));
+  });
 
   test('gözlemlenen günlük bölümleri JSON içinde korunur', () {
     final original = DailyLog(
@@ -133,7 +142,8 @@ void main() {
               insight.kind == PersonalInsightKind.structuredAssociation &&
               insight.primaryLabel ==
                   AppStrings.insightFeatureBelowTypicalWaterToken &&
-              insight.secondaryLabel == 'Baş ağrısı',
+              insight.secondaryLabel ==
+                  AppStrings.canonicalizeStoredValue('Baş ağrısı'),
         );
 
     expect(association.withEventCount, 8);
@@ -174,6 +184,67 @@ void main() {
     expect(association.withoutTotal, 10);
   });
 
+  test('dil değişimi bilinen ve özel belirti insightını bölmez', () async {
+    final logs = <DailyLog>[];
+    for (var day = 0; day < 20; day++) {
+      final exposed = day < 10;
+      final event = day < 8 || day == 15;
+      logs.add(
+        DailyLog(
+          date: DateTime(2026, 10, 1).add(Duration(days: day)),
+          mood: exposed
+              ? (day.isEven ? 'İyi' : 'Good')
+              : (day.isEven ? 'Nötr' : 'Neutral'),
+          symptoms: event
+              ? [day.isEven ? 'Baş ağrısı' : 'Headache', 'Karnım rahat']
+              : const [],
+          observedSections: const {
+            DailyLogObservedSection.wellbeing,
+            DailyLogObservedSection.symptom,
+          },
+        ),
+      );
+    }
+
+    await AppStrings.delegate.load(const Locale('tr'));
+    final turkish = engine.generate(logs: logs);
+    await AppStrings.delegate.load(const Locale('en'));
+    final english = engine.generate(logs: logs);
+
+    List<String> identities(List<PersonalInsight> insights) => insights
+        .map(
+          (insight) => [
+            insight.kind.name,
+            insight.primaryLabel,
+            insight.secondaryLabel,
+            insight.withEventCount,
+            insight.withTotal,
+            insight.withoutEventCount,
+            insight.withoutTotal,
+          ].join('|'),
+        )
+        .toList();
+
+    expect(identities(english), identities(turkish));
+    expect(
+      english.where(
+        (insight) =>
+            insight.kind == PersonalInsightKind.moodSymptomAssociation &&
+            insight.secondaryLabel ==
+                AppStrings.canonicalizeStoredValue('Headache'),
+      ),
+      hasLength(1),
+    );
+    expect(
+      english.where(
+        (insight) =>
+            insight.kind == PersonalInsightKind.moodSymptomAssociation &&
+            insight.secondaryLabel == 'Karnım rahat',
+      ),
+      hasLength(1),
+    );
+  });
+
   test('arayüzdeki besin grubu ile aynı gün belirtisini karşılaştırır', () {
     final logs = <DailyLog>[];
     for (var day = 0; day < 20; day++) {
@@ -201,8 +272,13 @@ void main() {
     final association = insights.firstWhere(
       (insight) =>
           insight.kind == PersonalInsightKind.structuredAssociation &&
-          insight.primaryLabel == 'Gluten' &&
-          insight.secondaryLabel == 'Şişkinlik' &&
+          insight.primaryLabel ==
+              AppStrings.canonicalizeOption(
+                'Gluten',
+                OptionFamily.nutritionFoodGroups,
+              ) &&
+          insight.secondaryLabel ==
+              AppStrings.canonicalizeStoredValue('Şişkinlik') &&
           insight.lagDays == 0,
     );
 
@@ -245,7 +321,8 @@ void main() {
                 insight.kind == PersonalInsightKind.structuredAssociation &&
                 insight.primaryLabel ==
                     AppStrings.caffeinatedFoodInsightSignal &&
-                insight.secondaryLabel == 'Gaz' &&
+                insight.secondaryLabel ==
+                    AppStrings.canonicalizeStoredValue('Gaz') &&
                 insight.lagDays == 0,
           );
 
@@ -326,7 +403,11 @@ void main() {
         .firstWhere(
           (insight) =>
               insight.kind == PersonalInsightKind.foodSensitivityAssociation &&
-              insight.primaryLabel == 'Laktoz içeren',
+              insight.primaryLabel ==
+                  AppStrings.canonicalizeOption(
+                    'Laktoz içeren',
+                    OptionFamily.nutritionFoodGroups,
+                  ),
         );
 
     expect(association.withEventCount, 8);
@@ -362,8 +443,13 @@ void main() {
     final delayed = insights.firstWhere(
       (insight) =>
           insight.kind == PersonalInsightKind.structuredAssociation &&
-          insight.primaryLabel == 'Gluten' &&
-          insight.secondaryLabel == 'Şişkinlik' &&
+          insight.primaryLabel ==
+              AppStrings.canonicalizeOption(
+                'Gluten',
+                OptionFamily.nutritionFoodGroups,
+              ) &&
+          insight.secondaryLabel ==
+              AppStrings.canonicalizeStoredValue('Şişkinlik') &&
           insight.lagDays == 1,
     );
 
@@ -401,8 +487,13 @@ void main() {
         .firstWhere(
           (insight) =>
               insight.kind == PersonalInsightKind.structuredAssociation &&
-              insight.primaryLabel == 'Gluten' &&
-              insight.secondaryLabel == 'Yağlı cilt' &&
+              insight.primaryLabel ==
+                  AppStrings.canonicalizeOption(
+                    'Gluten',
+                    OptionFamily.nutritionFoodGroups,
+                  ) &&
+              insight.secondaryLabel ==
+                  AppStrings.canonicalizeStoredValue('Yağlı cilt') &&
               insight.lagDays == 1,
         );
 
@@ -436,7 +527,8 @@ void main() {
           (insight) =>
               insight.kind ==
                   PersonalInsightKind.symptomCyclePhaseAssociation &&
-              insight.primaryLabel == 'Saç dökülmesi' &&
+              insight.primaryLabel ==
+                  AppStrings.canonicalizeStoredValue('Saç dökülmesi') &&
               insight.secondaryLabel == 'cyclePhase:menstrual',
         );
 
@@ -471,7 +563,11 @@ void main() {
       final association = insights.firstWhere(
         (insight) =>
             insight.kind == PersonalInsightKind.moodCyclePhaseAssociation &&
-            insight.primaryLabel == 'Mutlu' &&
+            insight.primaryLabel ==
+                AppStrings.canonicalizeOption(
+                  'Mutlu',
+                  OptionFamily.moodOptions,
+                ) &&
             insight.secondaryLabel == 'cyclePhase:follicular',
       );
 
@@ -543,9 +639,16 @@ void main() {
             id: 'dose-$day',
             planId: 'plan-1',
             itemType: MedicationPlanItemType.medication,
-            displayName: 'Ağrı kesici - Parasetamol',
-            mainGroup: 'Ağrı kesici',
-            activeIngredient: 'Parasetamol',
+            displayName: day < 10
+                ? 'Ağrı kesici / ateş düşürücü - Parasetamol'
+                : 'Pain reliever / fever reducer - '
+                      'Paracetamol / acetaminophen',
+            mainGroup: day < 10
+                ? 'Ağrı kesici / ateş düşürücü'
+                : 'Pain reliever / fever reducer',
+            activeIngredient: day < 10
+                ? 'Parasetamol'
+                : 'Paracetamol / acetaminophen',
             dosage: '1 Adet',
             scheduledAt: scheduledAt,
             notificationScheduled: true,
@@ -567,8 +670,15 @@ void main() {
           insight.kind == PersonalInsightKind.medicationSkipSymptomAssociation,
     );
 
-    expect(association.primaryLabel, 'Ağrı kesici - Parasetamol');
-    expect(association.secondaryLabel, 'Baş ağrısı');
+    expect(
+      association.primaryLabel,
+      'catalog.medicationSelection.'
+      'pain_reliever_fever_reducer+paracetamol_acetaminophen',
+    );
+    expect(
+      association.secondaryLabel,
+      AppStrings.canonicalizeStoredValue('Baş ağrısı'),
+    );
     expect(association.withEventCount, 8);
     expect(association.withTotal, 10);
     expect(association.withoutEventCount, 1);
@@ -644,8 +754,13 @@ void main() {
       final association = insights.firstWhere(
         (insight) =>
             insight.kind == PersonalInsightKind.moodSymptomAssociation &&
-            insight.primaryLabel == 'İyi' &&
-            insight.secondaryLabel == 'Baş ağrısı',
+            insight.primaryLabel ==
+                AppStrings.canonicalizeOption(
+                  'İyi',
+                  OptionFamily.moodOptions,
+                ) &&
+            insight.secondaryLabel ==
+                AppStrings.canonicalizeStoredValue('Baş ağrısı'),
       );
 
       _expectEightToOnePattern(association);
@@ -653,7 +768,8 @@ void main() {
         insights.where(
           (insight) =>
               insight.kind == PersonalInsightKind.moodSymptomAssociation &&
-              insight.secondaryLabel == 'Baş ağrısı',
+              insight.secondaryLabel ==
+                  AppStrings.canonicalizeStoredValue('Baş ağrısı'),
         ),
         hasLength(1),
       );
@@ -683,7 +799,11 @@ void main() {
         .firstWhere(
           (insight) =>
               insight.kind == PersonalInsightKind.moodFoodAssociation &&
-              insight.primaryLabel == 'İyi' &&
+              insight.primaryLabel ==
+                  AppStrings.canonicalizeOption(
+                    'İyi',
+                    OptionFamily.moodOptions,
+                  ) &&
               insight.secondaryLabel == 'Ev yapımı granola',
         );
 
@@ -708,7 +828,11 @@ void main() {
         .firstWhere(
           (insight) =>
               insight.kind == PersonalInsightKind.moodCravingAssociation &&
-              insight.primaryLabel == 'İyi' &&
+              insight.primaryLabel ==
+                  AppStrings.canonicalizeOption(
+                    'İyi',
+                    OptionFamily.moodOptions,
+                  ) &&
               insight.secondaryLabel == 'Gece atıştırması',
         );
 
@@ -739,7 +863,8 @@ void main() {
           (insight) =>
               insight.kind == PersonalInsightKind.foodBowelAssociation &&
               insight.primaryLabel == 'Acılı ev yemeği' &&
-              insight.secondaryLabel == 'Kabızlık' &&
+              insight.secondaryLabel ==
+                  AppStrings.canonicalizeStoredValue('Kabızlık') &&
               insight.lagDays == 0,
         );
 
@@ -761,7 +886,11 @@ void main() {
         .firstWhere(
           (insight) =>
               insight.kind == PersonalInsightKind.moodPlaceAssociation &&
-              insight.primaryLabel == 'İyi' &&
+              insight.primaryLabel ==
+                  AppStrings.canonicalizeOption(
+                    'İyi',
+                    OptionFamily.moodOptions,
+                  ) &&
               insight.secondaryLabel == 'Sahil parkı',
         );
 
@@ -783,7 +912,11 @@ void main() {
         .firstWhere(
           (insight) =>
               insight.kind == PersonalInsightKind.moodCompanionAssociation &&
-              insight.primaryLabel == 'İyi' &&
+              insight.primaryLabel ==
+                  AppStrings.canonicalizeOption(
+                    'İyi',
+                    OptionFamily.moodOptions,
+                  ) &&
               insight.secondaryLabel == 'Yakın arkadaşım',
         );
 

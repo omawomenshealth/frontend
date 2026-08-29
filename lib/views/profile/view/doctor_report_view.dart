@@ -513,20 +513,24 @@ class DoctorReportView extends StatelessWidget {
                       final activeMeds = log.medications
                           .map(
                             (m) =>
-                                '${m.displayName} (${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
+                                '${AppStrings.localizeStoredValue(m.displayName)} '
+                                '(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
                           )
                           .toList();
                       final activeSups = log.supplements
                           .map(
                             (s) =>
-                                '${s.displayName} (${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
+                                '${AppStrings.localizeStoredValue(s.displayName)} '
+                                '(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
                           )
                           .toList();
                       final all = [
                         ...activeMeds,
                         ...activeSups,
                         ...log.skincare.map(
-                          (item) => '${AppStrings.skincare}: $item',
+                          (item) =>
+                              '${AppStrings.skincare}: '
+                              '${AppStrings.localizeStoredValue(item)}',
                         ),
                       ];
                       return '$timeStr ${all.join(", ")}';
@@ -852,19 +856,25 @@ class DoctorReportView extends StatelessWidget {
               final activeMeds = log.medications
                   .map(
                     (m) =>
-                        '${m.displayName}(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
+                        '${AppStrings.localizeStoredValue(m.displayName)}'
+                        '(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
                   )
                   .toList();
               final activeSups = log.supplements
                   .map(
                     (s) =>
-                        '${s.displayName}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
+                        '${AppStrings.localizeStoredValue(s.displayName)}'
+                        '(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
                   )
                   .toList();
               final all = [
                 ...activeMeds,
                 ...activeSups,
-                ...log.skincare.map((item) => '${AppStrings.skincare}: $item'),
+                ...log.skincare.map(
+                  (item) =>
+                      '${AppStrings.skincare}: '
+                      '${AppStrings.localizeStoredValue(item)}',
+                ),
               ];
               return '$timeStr ${all.join(", ")}';
             })
@@ -1126,20 +1136,24 @@ class DoctorReportView extends StatelessWidget {
                 final activeMeds = log.medications
                     .map(
                       (m) =>
-                          '${m.displayName}(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
+                          '${AppStrings.localizeStoredValue(m.displayName)}'
+                          '(${m.takenDoseCount}/${m.doseCount} ${AppStrings.doseUnit})',
                     )
                     .toList();
                 final activeSups = log.supplements
                     .map(
                       (s) =>
-                          '${s.displayName}(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
+                          '${AppStrings.localizeStoredValue(s.displayName)}'
+                          '(${s.takenDoseCount}/${s.doseCount} ${AppStrings.doseUnit})',
                     )
                     .toList();
                 final all = [
                   ...activeMeds,
                   ...activeSups,
                   ...log.skincare.map(
-                    (item) => '${AppStrings.skincare}: $item',
+                    (item) =>
+                        '${AppStrings.skincare}: '
+                        '${AppStrings.localizeStoredValue(item)}',
                   ),
                 ];
                 return '$timeStr ${all.join(", ")}';

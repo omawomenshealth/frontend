@@ -3,6 +3,8 @@ import '../../data/models/period_log_model.dart';
 import '../../data/models/personal_insight_model.dart';
 import '../../data/models/user_settings_model.dart';
 import '../constants/app_strings.dart';
+import '../localization/catalog_localizer.dart';
+import '../localization/option_structure.dart';
 import 'app_time.dart';
 import 'cycle_rules.dart';
 import 'date_extensions.dart';
@@ -83,18 +85,19 @@ class PersonalInsightEngine {
       for (final log in logs)
         for (final supplement in log.supplements) supplement.displayName,
     };
+    final biotinKey = CatalogLocalizer.toCanonicalKey('Biotin');
     final usesBiotin = supplementNames.any(
-      (name) => name.trim().toLowerCase().contains('biotin'),
+      (name) => CatalogLocalizer.toCanonicalKey(name) == biotinKey,
     );
     if (!usesBiotin) return const [];
-    return const [
+    return [
       PersonalInsight(
         id: 'safety_biotin_lab_interaction',
         kind: PersonalInsightKind.biotinLabInteraction,
         priority: 120,
         evidenceCount: 1,
         evidenceUnit: PersonalInsightEvidenceUnit.entries,
-        primaryLabel: 'Biotin',
+        primaryLabel: biotinKey,
         notificationLevel: PersonalInsightNotificationLevel.gentle,
       ),
     ];
@@ -410,7 +413,12 @@ class PersonalInsightEngine {
   ) {
     final adverseFeelings = AppStrings.postMealFeelingOptions
         .skip(3)
-        .map(AppStrings.canonicalizeStoredValue)
+        .map(
+          (value) => AppStrings.canonicalizeOption(
+            value,
+            OptionFamily.postMealFeelings,
+          ),
+        )
         .toSet();
     final pairDays = <String, List<_DailySnapshot>>{};
     for (final snapshot in snapshots) {
@@ -433,6 +441,11 @@ class PersonalInsightEngine {
           (insight) => '${insight.primaryLabel}\u0000${insight.secondaryLabel}',
         )
         .toSet();
+    final firstSeenOrder = <String, int>{};
+    var order = 0;
+    for (final pair in pairDays.keys) {
+      firstSeenOrder[pair] = order++;
+    }
     final candidates =
         pairDays.entries
             .where((entry) => !maturePairs.contains(entry.key))
@@ -449,7 +462,9 @@ class PersonalInsightEngine {
               left.value.last.date,
             );
             if (recency != 0) return recency;
-            return left.key.compareTo(right.key);
+            return firstSeenOrder[left.key]!.compareTo(
+              firstSeenOrder[right.key]!,
+            );
           });
     if (candidates.isEmpty) return;
 
@@ -739,15 +754,26 @@ class PersonalInsightEngine {
             );
             final foodsByMeal = {
               for (final entry in log.mealFoodGroups.entries)
-                AppStrings.canonicalizeStoredValue(entry.key): _foodSignals(
+                AppStrings.canonicalizeOption(
+                  entry.key,
+                  OptionFamily.nutritionMealOptions,
+                ): _foodSignals(
                   entry.value,
                 ),
             };
             if (log.mealPostFeelings.isNotEmpty) {
               for (final entry in log.mealPostFeelings.entries) {
-                final meal = AppStrings.canonicalizeStoredValue(entry.key);
+                final meal = AppStrings.canonicalizeOption(
+                  entry.key,
+                  OptionFamily.nutritionMealOptions,
+                );
                 final feelings = entry.value
-                    .map(AppStrings.canonicalizeStoredValue)
+                    .map(
+                      (value) => AppStrings.canonicalizeOption(
+                        value,
+                        OptionFamily.postMealFeelings,
+                      ),
+                    )
                     .toSet();
                 for (final food in foodsByMeal[meal] ?? const <String>{}) {
                   for (final feeling in feelings) {
@@ -818,10 +844,16 @@ class PersonalInsightEngine {
       signals.add(
         AppStrings.isCaffeinatedFood(value)
             ? AppStrings.caffeinatedFoodInsightSignal
-            : AppStrings.canonicalizeStoredValue(value),
+            : _canonicalFood(value),
       );
     }
     return signals;
+  }
+
+  String _canonicalFood(String value) {
+    final catalog = CatalogLocalizer.canonicalKeyOrNull(value);
+    return catalog ??
+        AppStrings.canonicalizeOption(value, OptionFamily.nutritionFoodGroups);
   }
 
   int _stableHash(String value) {

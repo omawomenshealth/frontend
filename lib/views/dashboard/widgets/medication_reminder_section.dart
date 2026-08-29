@@ -189,7 +189,8 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${dose.displayName} • ${dose.dosage}',
+                  '${AppStrings.localizeStoredValue(dose.displayName)} • '
+                  '${dose.dosage}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -366,7 +367,11 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(AppStrings.delete),
-        content: Text(AppStrings.reminderDeleteQuestion(plan.displayName)),
+        content: Text(
+          AppStrings.reminderDeleteQuestion(
+            AppStrings.localizeStoredValue(plan.displayName),
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -519,7 +524,8 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${plan.displayName} • ${plan.dosage}',
+                  '${AppStrings.localizeStoredValue(plan.displayName)} • '
+                  '${plan.dosage}',
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -633,8 +639,12 @@ class _MedicationReminderFormSheetState
         .where((item) => item.trim().isNotEmpty)
         .toSet()
         .toList();
-    if (existing != null && !_itemOptions.contains(existing.displayName)) {
-      _itemOptions.add(existing.displayName);
+    final localizedExistingName = existing == null
+        ? null
+        : AppStrings.localizeStoredValue(existing.displayName);
+    if (localizedExistingName != null &&
+        !_itemOptions.contains(localizedExistingName)) {
+      _itemOptions.add(localizedExistingName);
     }
     final initialItemName = widget.initialItemName?.trim();
     if (existing == null &&
@@ -646,7 +656,7 @@ class _MedicationReminderFormSheetState
     _itemOptions.sort();
     _itemOptions.add(AppStrings.custom);
     _selectedItem =
-        existing?.displayName ??
+        localizedExistingName ??
         (initialItemName?.isNotEmpty ?? false
             ? initialItemName!
             : _itemOptions.first);

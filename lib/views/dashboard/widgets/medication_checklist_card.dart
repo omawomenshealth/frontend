@@ -134,7 +134,7 @@ class MedicationChecklistCard extends StatelessWidget {
                         // İlaç/Takviye adı
                         Expanded(
                           child: Text(
-                            item.displayName,
+                            AppStrings.localizeStoredValue(item.displayName),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,

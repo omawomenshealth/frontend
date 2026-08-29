@@ -1342,7 +1342,7 @@ class _DailyLogDetails extends StatelessWidget {
           : value.medications
                 .map(
                   (item) =>
-                      '${item.displayName} · '
+                      '${AppStrings.localizeStoredValue(item.displayName)} · '
                       '${AppStrings.localizeStoredValue(item.time)} · '
                       '${AppStrings.localizeStoredValue(item.dosage)} · '
                       '${AppStrings.localizeStoredValue(item.stomachState)} · '
@@ -1357,7 +1357,7 @@ class _DailyLogDetails extends StatelessWidget {
           : value.supplements
                 .map(
                   (item) =>
-                      '${item.displayName} · '
+                      '${AppStrings.localizeStoredValue(item.displayName)} · '
                       '${AppStrings.localizeStoredValue(item.time)} · '
                       '${AppStrings.localizeStoredValue(item.dosage)} · '
                       '${AppStrings.localizeStoredValue(item.stomachState)} · '

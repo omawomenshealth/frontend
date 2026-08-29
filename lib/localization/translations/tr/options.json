@@ -1,0 +1,336 @@
+{
+  "relationshipStatuses(map)": {
+    "single": "Bekarım",
+    "in_a_relationship": "İlişkim var",
+    "married": "Evliyim",
+    "prefer_not_to_say": "Belirtmek istemiyorum"
+  },
+  "chronicDiseases(map)": {
+    "type_1_diabetes": "Diyabet (Tip 1)",
+    "type_2_diabetes": "Diyabet (Tip 2)",
+    "hypertension": "Hipertansiyon",
+    "asthma": "Astım",
+    "hypothyroidism": "Tiroid (Hipotiroidi)",
+    "hyperthyroidism": "Tiroid (Hipertiroidi)",
+    "heart_disease": "Kalp Hastalığı",
+    "kidney_disease": "Böbrek Hastalığı",
+    "liver_disease": "Karaciğer Hastalığı",
+    "anemia": "Anemi (Kansızlık)",
+    "epilepsy": "Epilepsi",
+    "depression": "Depresyon",
+    "anxiety_disorder": "Anksiyete Bozukluğu",
+    "migraine": "Migren",
+    "rheumatic_disease": "Romatizma",
+    "high_cholesterol": "Kolesterol Yüksekliği"
+  },
+  "womenDiseases(map)": {
+    "dysmenorrhea_painful_periods": "Dismenore (Ağrılı Adet)",
+    "pcos_polycystic_ovary_syndrome": "PCOS (Polikistik Over Sendromu)",
+    "endometriosis": "Endometriozis",
+    "adenomyosis": "Adenomyozis",
+    "fibroids": "Miyom",
+    "ovarian_cyst": "Over Kisti",
+    "irregular_periods": "Düzensiz Adet",
+    "amenorrhea": "Amenore (Adet Kesilmesi)",
+    "pms_premenstrual_syndrome": "PMS (Premenstrüel Sendrom)",
+    "pelvic_inflammatory_disease": "Pelvik İnflamatuar Hastalık",
+    "hpv": "HPV",
+    "recurrent_vaginal_infection": "Tekrarlayan Vajinal Enfeksiyon",
+    "vulvodynia": "Vulvodini",
+    "vaginismus": "Vajinismus"
+  },
+  "medicationTimes(map)": {
+    "morning": "Sabah",
+    "noon": "Öğle",
+    "evening": "Akşam"
+  },
+  "stomachStates(map)": {
+    "empty_stomach": "Aç",
+    "with_food": "Tok"
+  },
+  "moodOptions(map)": {
+    "angry": "Sinirli",
+    "good": "İyi",
+    "low": "Kötü",
+    "happy": "Mutlu",
+    "calm": "Huzurlu",
+    "tired": "Yorgun",
+    "energetic": "Enerjik"
+  },
+  "moodCheckInOptions(map)": {
+    "low": "Düşük",
+    "sensitive": "Hassas",
+    "neutral": "Nötr",
+    "good": "İyi",
+    "great": "Harika"
+  },
+  "moodCompanionOptions(map)": {
+    "by_myself": "Yalnızdım",
+    "with_my_partner": "Partnerimleydim",
+    "with_friends": "Arkadaşlarımlaydım",
+    "with_family": "Ailemleydim",
+    "with_co_workers": "İş arkadaşlarımlaydım"
+  },
+  "moodPlaceOptions(map)": {
+    "at_home": "Evdeydim",
+    "at_work": "İş yerindeydim",
+    "outside": "Dışarıdaydım",
+    "in_transit": "Yoldaydım",
+    "social": "Sosyal ortamdaydım"
+  },
+  "sexualActivityOptions(map)": {
+    "with_a_partner": "Partnerle",
+    "masturbation": "Mastürbasyon",
+    "protected": "Korunmalı",
+    "unprotected": "Korunmasız",
+    "no_activity": "Aktivite olmadı"
+  },
+  "sexualAfterFeelingOptions(map)": {
+    "comfortable": "Rahat",
+    "connected": "Bağ kurmuş",
+    "calm": "Sakin",
+    "energized": "Enerjik",
+    "neutral": "Nötr",
+    "tired": "Yorgun",
+    "sensitive": "Hassas",
+    "uncomfortable": "Rahatsız",
+    "pain": "Ağrı"
+  },
+  "nutritionMealOptions(map)": {
+    "breakfast": "Kahvaltı",
+    "lunch": "Öğle yemeği",
+    "dinner": "Akşam yemeği",
+    "snack": "Atıştırmalık"
+  },
+  "nutritionQualityOptions(map)": {
+    "light": "Hafif",
+    "medium": "Orta",
+    "heavy": "Ağır"
+  },
+  "nutritionCravingOptions(map)": {
+    "sweet": "Tatlı",
+    "salty": "Tuzlu",
+    "chocolate": "Çikolata",
+    "carbs": "Karbonhidrat",
+    "spicy": "Acı",
+    "caffeine": "Kafein",
+    "nothing": "Hiçbiri"
+  },
+  "nutritionFoodGroups(map)": {
+    "gluten": "Gluten",
+    "wheat": "Buğday",
+    "dairy": "Süt ürünleri",
+    "lactose_containing": "Laktoz içeren",
+    "eggs": "Yumurta",
+    "nuts": "Kuruyemiş",
+    "peanuts": "Yer fıstığı",
+    "soy": "Soya",
+    "sesame": "Susam",
+    "legumes": "Baklagiller",
+    "red_meat": "Kırmızı et",
+    "poultry": "Tavuk",
+    "fish": "Balık",
+    "crustacean_shellfish": "Kabuklu deniz ürünleri",
+    "vegetables": "Sebze",
+    "fruit": "Meyve",
+    "onion_garlic": "Soğan / sarımsak",
+    "processed_food": "İşlenmiş gıda",
+    "spicy_food": "Acı / baharatlı",
+    "high_fat_fried": "Çok yağlı / kızartma",
+    "artificially_sweetened": "Yapay tatlandırıcılı",
+    "caffeinated": "Kafeinli"
+  },
+  "postMealFeelings(map)": {
+    "comfortable": "Rahat",
+    "energetic": "Enerjik",
+    "full": "Tok",
+    "bloated": "Şişkin",
+    "tired": "Yorgun",
+    "nauseous": "Mide bulantısı",
+    "gassy": "Gaz",
+    "reflux": "Reflü",
+    "still_hungry": "Açlık devam etti"
+  },
+  "periodSymptomOptions(map)": {
+    "cramps": "Kramplar",
+    "lower_back_pain": "Bel ağrısı",
+    "headache": "Baş ağrısı",
+    "bloating": "Şişkinlik",
+    "fatigue": "Yorgunluk",
+    "clots": "Pıhtı"
+  },
+  "symptomSeverityOptions(map)": {
+    "mild": "Hafif",
+    "moderate": "Orta",
+    "strong": "Güçlü"
+  },
+  "symptomOverallOptions(map)": {
+    "feeling_good": "İyi hissediyorum",
+    "stressed": "Stresliyim",
+    "happy": "Mutluyum",
+    "calm": "Sakinim",
+    "motivated": "Motivasyonluyum",
+    "anxious": "Kaygılıyım",
+    "restless": "Huzursuzum",
+    "irritable": "Sinirliyim",
+    "sad": "Üzgünüm",
+    "experiencing_mood_swings": "Duygusal iniş çıkış yaşıyorum"
+  },
+  "symptomBodyOptions(map)": {
+    "cramps": "Kramplar",
+    "headache": "Baş ağrısı",
+    "lower_back_pain": "Bel ağrısı",
+    "breast_tenderness": "Göğüs hassasiyeti",
+    "upper_mid_back_pain": "Sırt ağrısı",
+    "joint_muscle_pain": "Eklem/kas ağrısı",
+    "dizziness": "Baş dönmesi",
+    "frequent_urination": "Sık idrara çıkma"
+  },
+  "symptomSkinHairOptions(map)": {
+    "acne": "Akne",
+    "dry_skin": "Kuru cilt",
+    "oily_skin": "Yağlı cilt",
+    "sensitive_skin": "Hassas cilt",
+    "skin_redness": "Ciltte kızarıklık",
+    "itchy_skin": "Kaşıntılı cilt",
+    "oily_hair": "Yağlı saç",
+    "dry_hair": "Kuru saç",
+    "hair_loss": "Saç dökülmesi",
+    "brittle_nails": "Kırılgan tırnaklar"
+  },
+  "symptomEnergyOptions(map)": {
+    "energetic": "Enerjik",
+    "fatigue": "Yorgunluk",
+    "focused": "Odaklanmış",
+    "brain_fog": "Zihin bulanıklığı",
+    "forgetful": "Unutkanlık"
+  },
+  "symptomSleepOptions(map)": {
+    "slept_well": "İyi uyudum",
+    "slept_fairly_well": "Orta kalitede uyudum",
+    "slept_poorly": "Kötü uyudum",
+    "trouble_falling_asleep": "Uykuya dalmakta zorlandım",
+    "woke_often": "Sık uyandım",
+    "woke_up_energized": "Enerjik uyandım",
+    "woke_up_rested": "Dinlenmiş uyandım",
+    "woke_up_sleepy_tired": "Uykulu/yorgun uyandım",
+    "woke_up_with_a_headache": "Baş ağrısıyla uyandım",
+    "woke_up_early": "Erken uyandım",
+    "vivid_dreams": "Canlı rüyalar",
+    "nightmare": "Kâbus"
+  },
+  "symptomDigestionOptions(map)": {
+    "digestion_feels_good_and_regular": "Sindirimim iyi ve düzenli",
+    "cravings": "Aşerme",
+    "increased_decreased_appetite": "İştah artışı/azalması",
+    "nausea": "Mide bulantısı",
+    "constipation": "Kabızlık",
+    "diarrhea": "İshal",
+    "bloating": "Şişkinlik",
+    "gas": "Gaz",
+    "reflux": "Reflü"
+  },
+  "flowOptions(map)": {
+    "spotting": "Lekelenme",
+    "light": "Hafif",
+    "medium": "Orta",
+    "heavy": "Yoğun"
+  },
+  "dischargePresenceOptions(map)": {
+    "present": "Var",
+    "none": "Yok"
+  },
+  "dischargeColors(map)": {
+    "clear": "Şeffaf",
+    "white": "Beyaz",
+    "cream": "Krem",
+    "yellow": "Sarı",
+    "green": "Yeşil",
+    "gray": "Gri",
+    "brown": "Kahverengi",
+    "pink": "Pembe",
+    "red_blood_tinged": "Kırmızı / kanlı",
+    "other": "Diğer"
+  },
+  "dischargeConsistencies(map)": {
+    "watery": "Sulu",
+    "slippery": "Kaygan",
+    "stretchy_egg_white_like": "Uzayan / yumurta akı gibi",
+    "creamy": "Kremsi",
+    "sticky": "Yapışkan",
+    "thick_clumpy": "Yoğun / pütürlü",
+    "frothy": "Köpüklü",
+    "other": "Diğer"
+  },
+  "dischargeAmounts(map)": {
+    "light": "Az",
+    "moderate": "Orta",
+    "heavy": "Fazla"
+  },
+  "dischargeSymptoms(map)": {
+    "unusual_odor": "Olağandışı koku",
+    "itching": "Kaşıntı",
+    "burning": "Yanma",
+    "painful_urination": "İdrar yaparken ağrı",
+    "pelvic_lower_abdominal_pain": "Pelvik / alt karın ağrısı"
+  },
+  "dosageOptions(map)": {
+    "1_count": "1 Adet",
+    "2_count": "2 Adet",
+    "3_count": "3 Adet",
+    "4_count": "4 Adet",
+    "5_count": "5 Adet",
+    "6_count": "6 Adet"
+  },
+  "shortWeekdays(map)": {
+    "mon": "Pzt",
+    "tue": "Sal",
+    "wed": "Çar",
+    "thu": "Per",
+    "fri": "Cum",
+    "sat": "Cmt",
+    "sun": "Paz"
+  },
+  "weekdays(map)": {
+    "monday": "Pazartesi",
+    "tuesday": "Salı",
+    "wednesday": "Çarşamba",
+    "thursday": "Perşembe",
+    "friday": "Cuma",
+    "saturday": "Cumartesi",
+    "sunday": "Pazar"
+  },
+  "articleTopics(map)": {
+    "nutrition": "Beslenme",
+    "exercise": "Egzersiz",
+    "womens_health": "Kadın Sağlığı",
+    "mood": "Ruh Hali",
+    "sleep": "Uyku",
+    "general_health": "Genel Sağlık"
+  },
+  "defaultMedications(map)": {
+    "parol": "Parol",
+    "aspirin": "Aspirin",
+    "arveles": "Arveles",
+    "majezik": "Majezik",
+    "minoset": "Minoset"
+  },
+  "defaultSupplements(map)": {
+    "magnesium": "Magnezyum",
+    "vitamin_d": "D Vitamini",
+    "omega_3": "Omega 3",
+    "iron": "Demir",
+    "vitamin_b12": "B12 Vitamini",
+    "vitamin_c": "C Vitamini",
+    "zinc": "Çinko"
+  },
+  "calendarWeekdayInitials(map)": {
+    "m": "P",
+    "t": "S",
+    "w": "Ç",
+    "t_2": "P",
+    "f": "C",
+    "s": "C",
+    "s_2": "P"
+  }
+}

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../core/constants/app_strings.dart';
+import '../../core/localization/catalog_localizer.dart';
 import 'medication_identity_model.dart';
 
 void _rejectUnknownJsonFields(
@@ -800,11 +801,12 @@ class DailyLog {
     ) {
       final Map<String, MedicationEntry> merged = {};
       for (var item in [...listA, ...listB]) {
-        final existing = merged[item.displayName];
+        final identityKey = CatalogLocalizer.toCanonicalKey(item.displayName);
+        final existing = merged[identityKey];
         if (existing == null) {
-          merged[item.displayName] = item;
+          merged[identityKey] = item;
         } else {
-          merged[item.displayName] = existing.copyWith(
+          merged[identityKey] = existing.copyWith(
             times: {...item.times, ...existing.times},
             doseCount: existing.doseCount >= item.doseCount
                 ? existing.doseCount

@@ -1,13 +1,22 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
+import 'package:app_proje_a/core/localization/catalog_localizer.dart';
+import 'package:app_proje_a/core/localization/option_structure.dart';
 import 'package:app_proje_a/core/utils/personal_insight_engine.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/personal_insight_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const engine = PersonalInsightEngine();
+
+  setUpAll(CatalogLocalizer.initialize);
+
+  setUp(() async {
+    await AppStrings.delegate.load(const Locale('tr'));
+  });
 
   PersonalInsight? insightOf(
     List<PersonalInsight> insights,
@@ -79,11 +88,23 @@ void main() {
       PersonalInsightKind.foodObservationStarted,
     );
     expect(observation, isNotNull);
-    expect(observation!.primaryLabel, 'Gluten');
-    expect(observation.secondaryLabel, 'Şişkin');
+    expect(
+      observation!.primaryLabel,
+      AppStrings.canonicalizeOption('Gluten', OptionFamily.nutritionFoodGroups),
+    );
+    expect(
+      observation.secondaryLabel,
+      AppStrings.canonicalizeOption('Şişkin', OptionFamily.postMealFeelings),
+    );
     expect(
       observation.contextLabels,
-      containsAll(['Süt ürünleri', 'Yorgunluk']),
+      containsAll([
+        AppStrings.canonicalizeOption(
+          'Süt ürünleri',
+          OptionFamily.nutritionFoodGroups,
+        ),
+        AppStrings.canonicalizeStoredValue('Yorgunluk'),
+      ]),
     );
     expect(observation.shouldNotify, isTrue);
   });
@@ -109,7 +130,10 @@ void main() {
     );
     expect(observation, isNotNull);
     expect(observation!.primaryLabel, AppStrings.caffeinatedFoodInsightSignal);
-    expect(observation.secondaryLabel, 'Gaz');
+    expect(
+      observation.secondaryLabel,
+      AppStrings.canonicalizeOption('Gaz', OptionFamily.postMealFeelings),
+    );
   });
 
   test('tekrarlayan gluten ve şişkinlik kaydını oluşan örüntü yapar', () {
@@ -157,8 +181,17 @@ void main() {
       PersonalInsightKind.foodObservationStarted,
     );
     expect(observation, isNotNull);
-    expect(observation!.primaryLabel, 'Laktoz içeren');
-    expect(observation.secondaryLabel, 'Şişkin');
+    expect(
+      observation!.primaryLabel,
+      AppStrings.canonicalizeOption(
+        'Laktoz içeren',
+        OptionFamily.nutritionFoodGroups,
+      ),
+    );
+    expect(
+      observation.secondaryLabel,
+      AppStrings.canonicalizeOption('Şişkin', OptionFamily.postMealFeelings),
+    );
     expect(observation.shouldNotify, isTrue);
   });
 
@@ -182,16 +215,26 @@ void main() {
     expect(
       insights.any(
         (insight) =>
-            insight.primaryLabel == 'Gluten' &&
-            insight.secondaryLabel == 'Şişkin',
+            insight.primaryLabel ==
+                AppStrings.canonicalizeStoredValue('Gluten') &&
+            insight.secondaryLabel ==
+                AppStrings.canonicalizeOption(
+                  'Şişkin',
+                  OptionFamily.postMealFeelings,
+                ),
       ),
       isFalse,
     );
     expect(
       insights.any(
         (insight) =>
-            insight.primaryLabel == 'Yumurta' &&
-            insight.secondaryLabel == 'Şişkin',
+            insight.primaryLabel ==
+                AppStrings.canonicalizeStoredValue('Yumurta') &&
+            insight.secondaryLabel ==
+                AppStrings.canonicalizeOption(
+                  'Şişkin',
+                  OptionFamily.postMealFeelings,
+                ),
       ),
       isTrue,
     );
@@ -219,7 +262,11 @@ void main() {
     final phaseMood = insights.firstWhere(
       (insight) =>
           insight.kind == PersonalInsightKind.moodCyclePhaseAssociation &&
-          insight.primaryLabel == 'Mutlu' &&
+          insight.primaryLabel ==
+              AppStrings.canonicalizeOption(
+                'Mutlu',
+                OptionFamily.moodOptions,
+              ) &&
           insight.secondaryLabel == 'cyclePhase:follicular',
     );
 
@@ -665,7 +712,8 @@ void main() {
       final phasePattern = insights.firstWhere(
         (insight) =>
             insight.kind == PersonalInsightKind.symptomCyclePhaseAssociation &&
-            insight.primaryLabel == 'Kramplar' &&
+            insight.primaryLabel ==
+                AppStrings.canonicalizeStoredValue('Kramplar') &&
             insight.secondaryLabel == 'cyclePhase:menstrual',
       );
 
@@ -687,7 +735,7 @@ void main() {
       PersonalInsightKind.biotinLabInteraction,
     );
     expect(biotin, isNotNull);
-    expect(biotin!.primaryLabel, 'Biotin');
+    expect(biotin!.primaryLabel, AppStrings.canonicalizeStoredValue('Biotin'));
     expect(biotin.notificationLevel, PersonalInsightNotificationLevel.gentle);
   });
 

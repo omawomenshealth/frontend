@@ -1231,8 +1231,9 @@ class LocalStorageService {
   String _cleanCustomValue(String value) =>
       value.trim().replaceAll(RegExp(r'\s+'), ' ');
 
-  String _normalizeCustomValue(String value) =>
-      _cleanCustomValue(value).replaceAll(RegExp('[İIı]'), 'i').toLowerCase();
+  String _normalizeCustomValue(String value) => _cleanCustomValue(
+    AppStrings.canonicalizeStoredValue(value),
+  ).replaceAll(RegExp('[İIı]'), 'i').toLowerCase();
 
   // ── İlaç & Takviye Hatırlatıcıları ─────────────────────
 

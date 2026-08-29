@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 
+import '../../core/constants/app_strings.dart';
 import '../models/medication_identity_model.dart';
 import '../models/medication_reminder_model.dart';
 import '../models/period_log_model.dart';
@@ -746,8 +747,9 @@ class SyncService {
   static String _cleanCustomValue(String value) =>
       value.trim().replaceAll(RegExp(r'\s+'), ' ');
 
-  static String _normalizeCustomValue(String value) =>
-      _cleanCustomValue(value).replaceAll(RegExp('[İIı]'), 'i').toLowerCase();
+  static String _normalizeCustomValue(String value) => _cleanCustomValue(
+    AppStrings.canonicalizeStoredValue(value),
+  ).replaceAll(RegExp('[İIı]'), 'i').toLowerCase();
 
   static List<MedicationReminderPlan> _mergeReminderPlans(
     List<MedicationReminderPlan> local,

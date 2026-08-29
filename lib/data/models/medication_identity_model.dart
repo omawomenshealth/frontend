@@ -1,3 +1,5 @@
+import '../../core/localization/catalog_localizer.dart';
+
 /// İlaçları arayüz adından bağımsız, analiz edilebilir alanlarla tanımlar.
 ///
 /// [activeIngredient] isteğe bağlıdır; kullanıcı yalnızca ana grubu seçtiğinde
@@ -58,10 +60,20 @@ class MedicationIdentity {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MedicationIdentity &&
-          displayName == other.displayName &&
-          mainGroup == other.mainGroup &&
-          activeIngredient == other.activeIngredient;
+          CatalogLocalizer.toCanonicalKey(displayName) ==
+              CatalogLocalizer.toCanonicalKey(other.displayName) &&
+          CatalogLocalizer.toCanonicalKey(mainGroup) ==
+              CatalogLocalizer.toCanonicalKey(other.mainGroup) &&
+          _canonicalNullable(activeIngredient) ==
+              _canonicalNullable(other.activeIngredient);
 
   @override
-  int get hashCode => Object.hash(displayName, mainGroup, activeIngredient);
+  int get hashCode => Object.hash(
+    CatalogLocalizer.toCanonicalKey(displayName),
+    CatalogLocalizer.toCanonicalKey(mainGroup),
+    _canonicalNullable(activeIngredient),
+  );
+
+  static String? _canonicalNullable(String? value) =>
+      value == null ? null : CatalogLocalizer.toCanonicalKey(value);
 }

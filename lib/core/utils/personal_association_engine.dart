@@ -5,6 +5,8 @@ import '../../data/models/period_log_model.dart';
 import '../../data/models/personal_insight_model.dart';
 import '../../data/models/user_settings_model.dart';
 import '../constants/app_strings.dart';
+import '../localization/catalog_localizer.dart';
+import '../localization/option_structure.dart';
 import 'cycle_rules.dart';
 import 'date_extensions.dart';
 
@@ -112,7 +114,12 @@ class PersonalAssociationEngine {
     final symptoms = _allLabels(days.values.map((day) => day.symptoms));
     final foods = _allLabels(days.values.map((day) => day.foodGroups));
     final cravings = _allLabels(days.values.map((day) => day.cravings))
-      ..remove(_canonical(AppStrings.nutritionCravingOptions.last));
+      ..remove(
+        _canonicalOption(
+          AppStrings.nutritionCravingOptions.last,
+          OptionFamily.nutritionCravingOptions,
+        ),
+      );
     final bowelActivities = _allLabels(
       days.values.map((day) => day.bowelActivities),
     );
@@ -194,7 +201,10 @@ class PersonalAssociationEngine {
 
     final stress = _stressSignal;
     if (days.values.any((day) => day.symptoms.contains(stress))) {
-      final alone = _canonical(AppStrings.moodCompanionOptions.first);
+      final alone = _canonicalOption(
+        AppStrings.moodCompanionOptions.first,
+        OptionFamily.moodCompanionOptions,
+      );
       for (final companion in companions.where((value) => value != alone)) {
         _testCandidate(
           candidates: candidates,
@@ -511,15 +521,24 @@ class PersonalAssociationEngine {
           record.itemType == MedicationPlanItemType.medication &&
           record.status != null,
     );
-    final displayNames = explicitResponses
-        .map((record) => record.displayName)
-        .toSet();
+    final medicationLabelsByKey = <String, String>{};
+    for (final record in explicitResponses) {
+      final key = CatalogLocalizer.toCanonicalKey(record.displayName);
+      medicationLabelsByKey.putIfAbsent(
+        key,
+        () =>
+            CatalogLocalizer.canonicalKeyOrNull(record.displayName) ??
+            record.displayName.trim(),
+      );
+    }
     final symptomLabels = _allLabels(days.values.map((day) => day.symptoms));
 
-    for (final displayName in displayNames) {
+    for (final medicationKey in medicationLabelsByKey.keys) {
       final responseByDate = <DateTime, bool>{};
       for (final record in explicitResponses.where(
-        (record) => record.displayName == displayName,
+        (record) =>
+            CatalogLocalizer.toCanonicalKey(record.displayName) ==
+            medicationKey,
       )) {
         final date = record.scheduledAt.dateOnly;
         final skipped = record.status == MedicationDoseResponseStatus.skipped;
@@ -531,7 +550,7 @@ class PersonalAssociationEngine {
           candidates: candidates,
           days: days,
           kind: PersonalInsightKind.medicationSkipSymptomAssociation,
-          primaryLabel: displayName,
+          primaryLabel: medicationLabelsByKey[medicationKey]!,
           secondaryLabel: symptom,
           lagDays: 1,
           exposureObserved: (day) => responseByDate.containsKey(day.date),
@@ -701,12 +720,21 @@ class PersonalAssociationEngine {
         );
         final foodsByMeal = {
           for (final entry in log.mealFoodGroups.entries)
-            _canonical(entry.key): _foodSignals(entry.value),
+            _canonicalOption(entry.key, OptionFamily.nutritionMealOptions):
+                _foodSignals(entry.value),
         };
         if (log.mealPostFeelings.isNotEmpty) {
           for (final entry in log.mealPostFeelings.entries) {
-            final meal = _canonical(entry.key);
-            final feelings = entry.value.map(_canonical).toSet();
+            final meal = _canonicalOption(
+              entry.key,
+              OptionFamily.nutritionMealOptions,
+            );
+            final feelings = entry.value
+                .map(
+                  (value) =>
+                      _canonicalOption(value, OptionFamily.postMealFeelings),
+                )
+                .toSet();
             postMealFeelings.addAll(feelings);
             for (final food in foodsByMeal[meal] ?? const <String>{}) {
               for (final feeling in feelings) {
@@ -716,14 +744,30 @@ class PersonalAssociationEngine {
           }
         }
         symptoms.addAll(log.symptoms.map(_canonical));
-        cravings.addAll(log.cravings.map(_canonical));
-        moodCompanions.addAll(log.moodCompanions.map(_canonical));
-        moodPlaces.addAll(log.moodPlaces.map(_canonical));
+        cravings.addAll(
+          log.cravings.map(
+            (value) =>
+                _canonicalOption(value, OptionFamily.nutritionCravingOptions),
+          ),
+        );
+        moodCompanions.addAll(
+          log.moodCompanions.map(
+            (value) =>
+                _canonicalOption(value, OptionFamily.moodCompanionOptions),
+          ),
+        );
+        moodPlaces.addAll(
+          log.moodPlaces.map(
+            (value) => _canonicalOption(value, OptionFamily.moodPlaceOptions),
+          ),
+        );
         final bowelSymptomSignals = log.symptoms
             .map(_canonical)
             .where(_isBowelSignal);
         bowelActivities.addAll(bowelSymptomSignals);
-        if (log.mood != null) mood = _canonical(log.mood!);
+        if (log.mood != null) {
+          mood = _canonicalOption(log.mood!, OptionFamily.moodOptions);
+        }
         waterIntakeMl = log.waterIntakeMl ?? waterIntakeMl;
         hasBleeding =
             hasBleeding || CycleRules.isMenstrualFlow(log.flowIntensity);
@@ -794,6 +838,9 @@ class PersonalAssociationEngine {
 
   String _canonical(String value) => AppStrings.canonicalizeStoredValue(value);
 
+  String _canonicalOption(String value, OptionFamily family) =>
+      AppStrings.canonicalizeOption(value, family);
+
   String get _stressSignal => _canonical(AppStrings.symptomOverallOptions[1]);
 
   Set<String> _foodSignals(Iterable<String> values) {
@@ -802,10 +849,15 @@ class PersonalAssociationEngine {
       signals.add(
         AppStrings.isCaffeinatedFood(value)
             ? AppStrings.caffeinatedFoodInsightSignal
-            : _canonical(value),
+            : _canonicalFood(value),
       );
     }
     return signals;
+  }
+
+  String _canonicalFood(String value) {
+    final catalog = CatalogLocalizer.canonicalKeyOrNull(value);
+    return catalog ?? _canonicalOption(value, OptionFamily.nutritionFoodGroups);
   }
 
   bool _isBowelSignal(String value) {

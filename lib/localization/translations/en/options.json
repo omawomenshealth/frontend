@@ -1,0 +1,336 @@
+{
+  "relationshipStatuses(map)": {
+    "single": "Single",
+    "in_a_relationship": "In a relationship",
+    "married": "Married",
+    "prefer_not_to_say": "Prefer not to say"
+  },
+  "chronicDiseases(map)": {
+    "type_1_diabetes": "Type 1 Diabetes",
+    "type_2_diabetes": "Type 2 Diabetes",
+    "hypertension": "Hypertension",
+    "asthma": "Asthma",
+    "hypothyroidism": "Hypothyroidism",
+    "hyperthyroidism": "Hyperthyroidism",
+    "heart_disease": "Heart Disease",
+    "kidney_disease": "Kidney Disease",
+    "liver_disease": "Liver Disease",
+    "anemia": "Anemia",
+    "epilepsy": "Epilepsy",
+    "depression": "Depression",
+    "anxiety_disorder": "Anxiety Disorder",
+    "migraine": "Migraine",
+    "rheumatic_disease": "Rheumatic Disease",
+    "high_cholesterol": "High Cholesterol"
+  },
+  "womenDiseases(map)": {
+    "dysmenorrhea_painful_periods": "Dysmenorrhea (Painful Periods)",
+    "pcos_polycystic_ovary_syndrome": "PCOS (Polycystic Ovary Syndrome)",
+    "endometriosis": "Endometriosis",
+    "adenomyosis": "Adenomyosis",
+    "fibroids": "Fibroids",
+    "ovarian_cyst": "Ovarian Cyst",
+    "irregular_periods": "Irregular Periods",
+    "amenorrhea": "Amenorrhea",
+    "pms_premenstrual_syndrome": "PMS (Premenstrual Syndrome)",
+    "pelvic_inflammatory_disease": "Pelvic Inflammatory Disease",
+    "hpv": "HPV",
+    "recurrent_vaginal_infection": "Recurrent Vaginal Infection",
+    "vulvodynia": "Vulvodynia",
+    "vaginismus": "Vaginismus"
+  },
+  "medicationTimes(map)": {
+    "morning": "Morning",
+    "noon": "Noon",
+    "evening": "Evening"
+  },
+  "stomachStates(map)": {
+    "empty_stomach": "Empty stomach",
+    "with_food": "With food"
+  },
+  "moodOptions(map)": {
+    "angry": "Angry",
+    "good": "Good",
+    "low": "Low",
+    "happy": "Happy",
+    "calm": "Calm",
+    "tired": "Tired",
+    "energetic": "Energetic"
+  },
+  "moodCheckInOptions(map)": {
+    "low": "Low",
+    "sensitive": "Sensitive",
+    "neutral": "Neutral",
+    "good": "Good",
+    "great": "Great"
+  },
+  "moodCompanionOptions(map)": {
+    "by_myself": "By myself",
+    "with_my_partner": "With my partner",
+    "with_friends": "With friends",
+    "with_family": "With family",
+    "with_co_workers": "With co-workers"
+  },
+  "moodPlaceOptions(map)": {
+    "at_home": "At home",
+    "at_work": "At work",
+    "outside": "Outside",
+    "in_transit": "In transit",
+    "social": "Social"
+  },
+  "sexualActivityOptions(map)": {
+    "with_a_partner": "With a partner",
+    "masturbation": "Masturbation",
+    "protected": "Protected",
+    "unprotected": "Unprotected",
+    "no_activity": "No activity"
+  },
+  "sexualAfterFeelingOptions(map)": {
+    "comfortable": "Comfortable",
+    "connected": "Connected",
+    "calm": "Calm",
+    "energized": "Energized",
+    "neutral": "Neutral",
+    "tired": "Tired",
+    "sensitive": "Sensitive",
+    "uncomfortable": "Uncomfortable",
+    "pain": "Pain"
+  },
+  "nutritionMealOptions(map)": {
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snack": "Snack"
+  },
+  "nutritionQualityOptions(map)": {
+    "light": "Light",
+    "medium": "Medium",
+    "heavy": "Heavy"
+  },
+  "nutritionCravingOptions(map)": {
+    "sweet": "Sweet",
+    "salty": "Salty",
+    "chocolate": "Chocolate",
+    "carbs": "Carbs",
+    "spicy": "Spicy",
+    "caffeine": "Caffeine",
+    "nothing": "Nothing"
+  },
+  "nutritionFoodGroups(map)": {
+    "gluten": "Gluten",
+    "wheat": "Wheat",
+    "dairy": "Dairy",
+    "lactose_containing": "Lactose-containing",
+    "eggs": "Eggs",
+    "nuts": "Nuts",
+    "peanuts": "Peanuts",
+    "soy": "Soy",
+    "sesame": "Sesame",
+    "legumes": "Legumes",
+    "red_meat": "Red meat",
+    "poultry": "Poultry",
+    "fish": "Fish",
+    "crustacean_shellfish": "Crustacean shellfish",
+    "vegetables": "Vegetables",
+    "fruit": "Fruit",
+    "onion_garlic": "Onion / garlic",
+    "processed_food": "Processed food",
+    "spicy_food": "Spicy food",
+    "high_fat_fried": "High-fat / fried",
+    "artificially_sweetened": "Artificially sweetened",
+    "caffeinated": "Caffeinated"
+  },
+  "postMealFeelings(map)": {
+    "comfortable": "Comfortable",
+    "energetic": "Energetic",
+    "full": "Full",
+    "bloated": "Bloated",
+    "tired": "Tired",
+    "nauseous": "Nauseous",
+    "gassy": "Gassy",
+    "reflux": "Reflux",
+    "still_hungry": "Still hungry"
+  },
+  "periodSymptomOptions(map)": {
+    "cramps": "Cramps",
+    "lower_back_pain": "Lower back pain",
+    "headache": "Headache",
+    "bloating": "Bloating",
+    "fatigue": "Fatigue",
+    "clots": "Clots"
+  },
+  "symptomSeverityOptions(map)": {
+    "mild": "Mild",
+    "moderate": "Moderate",
+    "strong": "Strong"
+  },
+  "symptomOverallOptions(map)": {
+    "feeling_good": "Feeling good",
+    "stressed": "Stressed",
+    "happy": "Happy",
+    "calm": "Calm",
+    "motivated": "Motivated",
+    "anxious": "Anxious",
+    "restless": "Restless",
+    "irritable": "Irritable",
+    "sad": "Sad",
+    "experiencing_mood_swings": "Experiencing mood swings"
+  },
+  "symptomBodyOptions(map)": {
+    "cramps": "Cramps",
+    "headache": "Headache",
+    "lower_back_pain": "Lower back pain",
+    "breast_tenderness": "Breast tenderness",
+    "upper_mid_back_pain": "Upper/mid-back pain",
+    "joint_muscle_pain": "Joint/muscle pain",
+    "dizziness": "Dizziness",
+    "frequent_urination": "Frequent urination"
+  },
+  "symptomSkinHairOptions(map)": {
+    "acne": "Acne",
+    "dry_skin": "Dry skin",
+    "oily_skin": "Oily skin",
+    "sensitive_skin": "Sensitive skin",
+    "skin_redness": "Skin redness",
+    "itchy_skin": "Itchy skin",
+    "oily_hair": "Oily hair",
+    "dry_hair": "Dry hair",
+    "hair_loss": "Hair loss",
+    "brittle_nails": "Brittle nails"
+  },
+  "symptomEnergyOptions(map)": {
+    "energetic": "Energetic",
+    "fatigue": "Fatigue",
+    "focused": "Focused",
+    "brain_fog": "Brain fog",
+    "forgetful": "Forgetful"
+  },
+  "symptomSleepOptions(map)": {
+    "slept_well": "Slept well",
+    "slept_fairly_well": "Slept fairly well",
+    "slept_poorly": "Slept poorly",
+    "trouble_falling_asleep": "Trouble falling asleep",
+    "woke_often": "Woke often",
+    "woke_up_energized": "Woke up energized",
+    "woke_up_rested": "Woke up rested",
+    "woke_up_sleepy_tired": "Woke up sleepy/tired",
+    "woke_up_with_a_headache": "Woke up with a headache",
+    "woke_up_early": "Woke up early",
+    "vivid_dreams": "Vivid dreams",
+    "nightmare": "Nightmare"
+  },
+  "symptomDigestionOptions(map)": {
+    "digestion_feels_good_and_regular": "Digestion feels good and regular",
+    "cravings": "Cravings",
+    "increased_decreased_appetite": "Increased/decreased appetite",
+    "nausea": "Nausea",
+    "constipation": "Constipation",
+    "diarrhea": "Diarrhea",
+    "bloating": "Bloating",
+    "gas": "Gas",
+    "reflux": "Reflux"
+  },
+  "flowOptions(map)": {
+    "spotting": "Spotting",
+    "light": "Light",
+    "medium": "Medium",
+    "heavy": "Heavy"
+  },
+  "dischargePresenceOptions(map)": {
+    "present": "Present",
+    "none": "None"
+  },
+  "dischargeColors(map)": {
+    "clear": "Clear",
+    "white": "White",
+    "cream": "Cream",
+    "yellow": "Yellow",
+    "green": "Green",
+    "gray": "Gray",
+    "brown": "Brown",
+    "pink": "Pink",
+    "red_blood_tinged": "Red / blood-tinged",
+    "other": "Other"
+  },
+  "dischargeConsistencies(map)": {
+    "watery": "Watery",
+    "slippery": "Slippery",
+    "stretchy_egg_white_like": "Stretchy / egg-white-like",
+    "creamy": "Creamy",
+    "sticky": "Sticky",
+    "thick_clumpy": "Thick / clumpy",
+    "frothy": "Frothy",
+    "other": "Other"
+  },
+  "dischargeAmounts(map)": {
+    "light": "Light",
+    "moderate": "Moderate",
+    "heavy": "Heavy"
+  },
+  "dischargeSymptoms(map)": {
+    "unusual_odor": "Unusual odor",
+    "itching": "Itching",
+    "burning": "Burning",
+    "painful_urination": "Painful urination",
+    "pelvic_lower_abdominal_pain": "Pelvic / lower abdominal pain"
+  },
+  "dosageOptions(map)": {
+    "1_count": "1 count",
+    "2_count": "2 count",
+    "3_count": "3 count",
+    "4_count": "4 count",
+    "5_count": "5 count",
+    "6_count": "6 count"
+  },
+  "shortWeekdays(map)": {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "weekdays(map)": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+  "articleTopics(map)": {
+    "nutrition": "Nutrition",
+    "exercise": "Exercise",
+    "womens_health": "Women’s Health",
+    "mood": "Mood",
+    "sleep": "Sleep",
+    "general_health": "General Health"
+  },
+  "defaultMedications(map)": {
+    "parol": "Parol",
+    "aspirin": "Aspirin",
+    "arveles": "Arveles",
+    "majezik": "Majezik",
+    "minoset": "Minoset"
+  },
+  "defaultSupplements(map)": {
+    "magnesium": "Magnesium",
+    "vitamin_d": "Vitamin D",
+    "omega_3": "Omega 3",
+    "iron": "Iron",
+    "vitamin_b12": "Vitamin B12",
+    "vitamin_c": "Vitamin C",
+    "zinc": "Zinc"
+  },
+  "calendarWeekdayInitials(map)": {
+    "m": "M",
+    "t": "T",
+    "w": "W",
+    "t_2": "T",
+    "f": "F",
+    "s": "S",
+    "s_2": "S"
+  }
+}

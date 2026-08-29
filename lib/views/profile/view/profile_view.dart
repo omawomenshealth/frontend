@@ -5,6 +5,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/shared_widgets/condition_selector.dart';
 import '../../../core/shared_widgets/lab_results_form.dart';
 import '../../../data/models/lab_result_model.dart';
+import '../../../data/models/medication_identity_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
@@ -195,7 +196,11 @@ class _ProfileMechanics extends StatelessWidget {
                         _infoRow(
                           AppStrings.medications,
                           s.dailyMedications
-                              .map((medication) => medication.displayName)
+                              .map(
+                                (medication) => AppStrings.localizeStoredValue(
+                                  medication.displayName,
+                                ),
+                              )
                               .join(', '),
                         )
                       else
@@ -206,7 +211,9 @@ class _ProfileMechanics extends StatelessWidget {
                       if (s.dailySupplements.isNotEmpty)
                         _infoRow(
                           AppStrings.supplements,
-                          s.dailySupplements.join(', '),
+                          s.dailySupplements
+                              .map(AppStrings.localizeStoredValue)
+                              .join(', '),
                         )
                       else
                         _infoRow(
@@ -216,7 +223,9 @@ class _ProfileMechanics extends StatelessWidget {
                       if (s.dailySkincare.isNotEmpty)
                         _infoRow(
                           AppStrings.skincare,
-                          s.dailySkincare.join(', '),
+                          s.dailySkincare
+                              .map(AppStrings.localizeStoredValue)
+                              .join(', '),
                         )
                       else
                         _infoRow(AppStrings.skincare, AppStrings.notSpecified),
@@ -485,17 +494,19 @@ class _ProfileMechanics extends StatelessWidget {
                       AppStrings.yes,
                       vm.settings.smokingStatus == SmokingStatus.current,
                       () {
-                      vm.updateSmokingStatus(SmokingStatus.current);
-                      setSheetState(() {});
-                    }),
+                        vm.updateSmokingStatus(SmokingStatus.current);
+                        setSheetState(() {});
+                      },
+                    ),
                     const SizedBox(width: 8),
                     _chipButton(
                       AppStrings.no,
                       vm.settings.smokingStatus == SmokingStatus.never,
                       () {
-                      vm.updateSmokingStatus(SmokingStatus.never);
-                      setSheetState(() {});
-                    }),
+                        vm.updateSmokingStatus(SmokingStatus.never);
+                        setSheetState(() {});
+                      },
+                    ),
                   ],
                 ),
                 if (vm.settings.smokingStatus == SmokingStatus.current) ...[
@@ -788,21 +799,42 @@ class _ProfileMechanics extends StatelessWidget {
             final storage = ctx2.read<LocalStorageService>();
             final medicationIdentities = {
               for (final medication in vm.settings.dailyMedications)
-                medication.displayName: medication,
+                AppStrings.localizeStoredValue(
+                  medication.displayName,
+                ): MedicationIdentity(
+                  displayName: AppStrings.localizeStoredValue(
+                    medication.displayName,
+                  ),
+                  mainGroup: AppStrings.localizeStoredValue(
+                    medication.mainGroup,
+                  ),
+                  activeIngredient: medication.activeIngredient == null
+                      ? null
+                      : AppStrings.localizeStoredValue(
+                          medication.activeIngredient!,
+                        ),
+                ),
               for (final medication in storage.getCustomMedicationIdentities())
-                medication.displayName: medication,
+                AppStrings.localizeStoredValue(medication.displayName):
+                    medication,
             };
             final medicationNames = medicationIdentities.keys.toList();
             final supplementNames = {
-              ...vm.settings.dailySupplements,
-              ...storage.getCustomSupplements(),
+              ...vm.settings.dailySupplements.map(
+                AppStrings.localizeStoredValue,
+              ),
+              ...storage.getCustomSupplements().map(
+                AppStrings.localizeStoredValue,
+              ),
             }.toList();
             final skincareNames = {
               ...AppStrings.skincareCatalog.values.expand(
                 (ingredients) => ingredients,
               ),
-              ...vm.settings.dailySkincare,
-              ...storage.getCustomSkincare(),
+              ...vm.settings.dailySkincare.map(AppStrings.localizeStoredValue),
+              ...storage.getCustomSkincare().map(
+                AppStrings.localizeStoredValue,
+              ),
             }.toList();
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -823,7 +855,7 @@ class _ProfileMechanics extends StatelessWidget {
                   children: vm.settings.dailyMedications.map((med) {
                     return Chip(
                       label: Text(
-                        med.displayName,
+                        AppStrings.localizeStoredValue(med.displayName),
                         style: const TextStyle(fontSize: 12),
                       ),
                       deleteIcon: const Icon(
@@ -872,7 +904,10 @@ class _ProfileMechanics extends StatelessWidget {
                   runSpacing: 8,
                   children: vm.settings.dailySupplements.map((sup) {
                     return Chip(
-                      label: Text(sup, style: const TextStyle(fontSize: 12)),
+                      label: Text(
+                        AppStrings.localizeStoredValue(sup),
+                        style: const TextStyle(fontSize: 12),
+                      ),
                       deleteIcon: const Icon(
                         Icons.close,
                         size: 16,
@@ -923,7 +958,10 @@ class _ProfileMechanics extends StatelessWidget {
                   runSpacing: 8,
                   children: vm.settings.dailySkincare.map((item) {
                     return Chip(
-                      label: Text(item, style: const TextStyle(fontSize: 12)),
+                      label: Text(
+                        AppStrings.localizeStoredValue(item),
+                        style: const TextStyle(fontSize: 12),
+                      ),
                       deleteIcon: const Icon(
                         Icons.close,
                         size: 16,
