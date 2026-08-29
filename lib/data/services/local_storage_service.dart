@@ -51,6 +51,7 @@ class LocalStorageService {
   static const String _insightNotificationHistoryKey =
       'insight_notification_history';
   static const String _cycleForecastSnapshotKey = 'cycle_forecast_snapshot_v1';
+  static const String _profileAppearanceKey = 'profile_appearance_v1';
 
   final LocalKeyStore _keyStore;
   LocalEncryptedStore? _encryptedStore;
@@ -96,6 +97,34 @@ class LocalStorageService {
       _p.setString(_virtualDaysOffsetKey, value.toString());
 
   bool get isUserLoggedIn => authToken != null;
+
+  // Profil görünümü sağlık verisi değildir; yalnızca bu cihazda tutulan
+  // hafif bir görsel tercihtir.
+  String get profileBackgroundId =>
+      _loadProfileAppearance()['backgroundId'] ?? 'mossy_canopy';
+  String get profileCharacterId =>
+      _loadProfileAppearance()['characterId'] ?? 'monstera';
+
+  Future<bool> saveProfileAppearance({
+    required String backgroundId,
+    required String characterId,
+  }) async {
+    return _p.setString(
+      _profileAppearanceKey,
+      jsonEncode({'backgroundId': backgroundId, 'characterId': characterId}),
+    );
+  }
+
+  Map<String, String> _loadProfileAppearance() {
+    final raw = _p.getString(_profileAppearanceKey);
+    if (raw == null) return const {};
+    try {
+      final decoded = Map<String, dynamic>.from(jsonDecode(raw) as Map);
+      return decoded.map((key, value) => MapEntry(key, value.toString()));
+    } catch (_) {
+      return const {};
+    }
+  }
 
   /// Servisi başlat.
   Future<void> init() async {

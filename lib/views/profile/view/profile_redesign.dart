@@ -42,6 +42,8 @@ class ProfileView extends StatelessWidget {
                     accent: accent,
                     onEditProfile: () =>
                         _mechanics._showBasicInfoSheet(context, profile),
+                    onCustomize: () =>
+                        _showProfileAppearanceSheet(context, profile, accent),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 116),
@@ -201,7 +203,235 @@ class ProfileView extends StatelessWidget {
       MaterialPageRoute(builder: (_) => const DoctorReportView()),
     );
   }
+
+  Future<void> _showProfileAppearanceSheet(
+    BuildContext context,
+    ProfileViewModel profile,
+    Color accent,
+  ) {
+    var selectedBackground = profile.profileBackgroundId;
+    var selectedCharacter = profile.profileCharacterId;
+
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => SafeArea(
+          top: false,
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.92,
+            ),
+            decoration: const BoxDecoration(
+              color: AppColors.scaffoldBackground,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 42,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.textSecondary.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppStrings.profilePersonalize,
+                          style: const TextStyle(
+                            fontFamily: 'CormorantGaramond',
+                            fontSize: 27,
+                            height: 1,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: AppStrings.cancel,
+                        onPressed: () => Navigator.pop(sheetContext),
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 286),
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: _ProfileAppearancePreview(
+                          backgroundId: selectedBackground,
+                          characterId: selectedCharacter,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  _AppearanceSectionLabel(
+                    text: AppStrings.profileChooseBackground,
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: _profileBackgrounds
+                        .map(
+                          (option) => _AppearanceChoiceTile(
+                            label: option.label,
+                            assetPath: option.assetPath,
+                            selected: selectedBackground == option.id,
+                            accent: accent,
+                            onTap: () => setSheetState(
+                              () => selectedBackground = option.id,
+                            ),
+                          ),
+                        )
+                        .toList(growable: false),
+                  ),
+                  const SizedBox(height: 24),
+                  _AppearanceSectionLabel(
+                    text: AppStrings.profileChooseCharacter,
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: _profileCharacters
+                        .map(
+                          (option) => _AppearanceChoiceTile(
+                            label: option.label,
+                            assetPath: option.assetPath,
+                            selected: selectedCharacter == option.id,
+                            accent: accent,
+                            contain: true,
+                            onTap: () => setSheetState(
+                              () => selectedCharacter = option.id,
+                            ),
+                          ),
+                        )
+                        .toList(growable: false),
+                  ),
+                  const SizedBox(height: 26),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: accent,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      onPressed: () async {
+                        final saved = await profile.updateProfileAppearance(
+                          backgroundId: selectedBackground,
+                          characterId: selectedCharacter,
+                        );
+                        if (!sheetContext.mounted) return;
+                        if (saved) {
+                          Navigator.pop(sheetContext);
+                        } else {
+                          ScaffoldMessenger.of(sheetContext).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppStrings.profileAppearanceSaveFailed,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text(AppStrings.save),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
+
+class _ProfileBackgroundOption {
+  final String id;
+  final String assetPath;
+
+  const _ProfileBackgroundOption({required this.id, required this.assetPath});
+
+  String get label => switch (id) {
+    'fig_sunset' => AppStrings.profileBackgroundFig,
+    _ => AppStrings.profileBackgroundMossy,
+  };
+}
+
+class _ProfileCharacterOption {
+  final String id;
+  final String assetPath;
+
+  const _ProfileCharacterOption({required this.id, required this.assetPath});
+
+  String get label => switch (id) {
+    'blueberry' => AppStrings.profileCharacterBlueberry,
+    'tangerine' => AppStrings.profileCharacterTangerine,
+    'dragon_fruit' => AppStrings.profileCharacterDragonFruit,
+    _ => AppStrings.profileCharacterMonstera,
+  };
+}
+
+const _profileBackgrounds = <_ProfileBackgroundOption>[
+  _ProfileBackgroundOption(
+    id: 'mossy_canopy',
+    assetPath: 'assets/images/oma-profile-bg-mossy-canopy.png',
+  ),
+  _ProfileBackgroundOption(
+    id: 'fig_sunset',
+    assetPath: 'assets/images/oma-profile-bg-fig-sunset.png',
+  ),
+];
+
+const _profileCharacters = <_ProfileCharacterOption>[
+  _ProfileCharacterOption(
+    id: 'monstera',
+    assetPath: 'assets/images/oma-profile-character-monstera.png',
+  ),
+  _ProfileCharacterOption(
+    id: 'blueberry',
+    assetPath: 'assets/images/oma-profile-character-blueberry.png',
+  ),
+  _ProfileCharacterOption(
+    id: 'tangerine',
+    assetPath: 'assets/images/oma-profile-character-tangerine.png',
+  ),
+  _ProfileCharacterOption(
+    id: 'dragon_fruit',
+    assetPath: 'assets/images/oma-profile-character-dragon-fruit.png',
+  ),
+];
+
+_ProfileBackgroundOption _backgroundOption(String id) =>
+    _profileBackgrounds.firstWhere(
+      (option) => option.id == id,
+      orElse: () => _profileBackgrounds.first,
+    );
+
+_ProfileCharacterOption _characterOption(String id) =>
+    _profileCharacters.firstWhere(
+      (option) => option.id == id,
+      orElse: () => _profileCharacters.first,
+    );
 
 class _ProfileHero extends StatelessWidget {
   final ProfileViewModel profile;
@@ -209,6 +439,7 @@ class _ProfileHero extends StatelessWidget {
   final int cycleDay;
   final Color accent;
   final VoidCallback onEditProfile;
+  final VoidCallback onCustomize;
 
   const _ProfileHero({
     required this.profile,
@@ -216,6 +447,7 @@ class _ProfileHero extends StatelessWidget {
     required this.cycleDay,
     required this.accent,
     required this.onEditProfile,
+    required this.onCustomize,
   });
 
   @override
@@ -230,7 +462,7 @@ class _ProfileHero extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      height: 318,
+      height: 400,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -312,26 +544,253 @@ class _ProfileHero extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 46, height: 46),
+                _RoundIconButton(
+                  icon: Icons.palette_outlined,
+                  accent: accent,
+                  tooltip: AppStrings.profilePersonalize,
+                  onTap: onCustomize,
+                ),
               ],
             ),
           ),
           Positioned(
-            left: 0,
-            right: 0,
-            bottom: -1,
-            child: Semantics(
-              image: true,
-              label: AppStrings.profileCharactersSemantics,
-              child: Image.asset(
-                'assets/images/oma-profile-characters.png',
-                height: 228,
-                fit: BoxFit.contain,
-                alignment: Alignment.bottomCenter,
+            left: 24,
+            right: 24,
+            top: 82,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 296),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: accent.withValues(alpha: 0.16),
+                          blurRadius: 28,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
+                    ),
+                    child: _ProfileAppearancePreview(
+                      backgroundId: profile.profileBackgroundId,
+                      characterId: profile.profileCharacterId,
+                      onTap: onCustomize,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ProfileAppearancePreview extends StatelessWidget {
+  final String backgroundId;
+  final String characterId;
+  final VoidCallback? onTap;
+
+  const _ProfileAppearancePreview({
+    required this.backgroundId,
+    required this.characterId,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final background = _backgroundOption(backgroundId);
+    final character = _characterOption(characterId);
+    final preview = ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(background.assetPath, fit: BoxFit.cover),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.transparent, Color(0x1A143B32)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.55, 1],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(34, 28, 34, 8),
+            child: Image.asset(
+              character.assetPath,
+              fit: BoxFit.contain,
+              alignment: Alignment.bottomCenter,
+            ),
+          ),
+          if (onTap != null)
+            Positioned(
+              right: 12,
+              bottom: 12,
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.88),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  size: 18,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+
+    return Semantics(
+      image: true,
+      button: onTap != null,
+      label:
+          '${AppStrings.profileCharactersSemantics}: ${character.label}, ${background.label}',
+      child: onTap == null
+          ? preview
+          : Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: onTap,
+                child: preview,
+              ),
+            ),
+    );
+  }
+}
+
+class _AppearanceSectionLabel extends StatelessWidget {
+  final String text;
+
+  const _AppearanceSectionLabel({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontFamily: 'Karla',
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      ),
+    );
+  }
+}
+
+class _AppearanceChoiceTile extends StatelessWidget {
+  final String label;
+  final String assetPath;
+  final bool selected;
+  final Color accent;
+  final VoidCallback onTap;
+  final bool contain;
+
+  const _AppearanceChoiceTile({
+    required this.label,
+    required this.assetPath,
+    required this.selected,
+    required this.accent,
+    required this.onTap,
+    this.contain = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: SizedBox(
+        width: 104,
+        child: Column(
+          children: [
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(18),
+                onTap: onTap,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  width: 104,
+                  height: 104,
+                  padding: contain ? const EdgeInsets.all(10) : EdgeInsets.zero,
+                  decoration: BoxDecoration(
+                    color: contain
+                        ? Color.lerp(accent, Colors.white, 0.90)
+                        : null,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: selected
+                          ? accent
+                          : AppColors.textSecondary.withValues(alpha: 0.14),
+                      width: selected ? 3 : 1,
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(
+                        assetPath,
+                        fit: contain ? BoxFit.contain : BoxFit.cover,
+                      ),
+                      if (selected)
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            margin: const EdgeInsets.all(7),
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: accent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.check_rounded,
+                              size: 15,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 7),
+            Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Karla',
+                fontSize: 11,
+                height: 1.15,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                color: selected ? accent : AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

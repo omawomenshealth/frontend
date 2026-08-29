@@ -28,6 +28,8 @@ class ProfileViewModel extends ChangeNotifier {
   bool _isSyncing = false;
   bool _isDeletingAccount = false;
   String? _syncError;
+  String _profileBackgroundId = 'mossy_canopy';
+  String _profileCharacterId = 'monstera';
 
   UserSettings get settings => _settings;
   bool get isLoading => _isLoading;
@@ -35,6 +37,8 @@ class ProfileViewModel extends ChangeNotifier {
   bool get isSyncing => _isSyncing;
   bool get isDeletingAccount => _isDeletingAccount;
   String? get syncError => _syncError;
+  String get profileBackgroundId => _profileBackgroundId;
+  String get profileCharacterId => _profileCharacterId;
   List<String> get knownDiseases => {
     ..._settings.chronicDiseases,
     ..._settings.womenDiseases,
@@ -150,8 +154,33 @@ class ProfileViewModel extends ChangeNotifier {
           .where((value) => !_isLegacyOther(value))
           .toList(growable: false),
     );
+    _profileBackgroundId = _storage.profileBackgroundId;
+    _profileCharacterId = _storage.profileCharacterId;
     _isLoading = false;
     notifyListeners();
+  }
+
+  /// Profil kartının sağlık verisinden bağımsız görsel tercihlerini kaydeder.
+  Future<bool> updateProfileAppearance({
+    required String backgroundId,
+    required String characterId,
+  }) async {
+    final previousBackground = _profileBackgroundId;
+    final previousCharacter = _profileCharacterId;
+    _profileBackgroundId = backgroundId;
+    _profileCharacterId = characterId;
+    notifyListeners();
+
+    final saved = await _storage.saveProfileAppearance(
+      backgroundId: backgroundId,
+      characterId: characterId,
+    );
+    if (!saved) {
+      _profileBackgroundId = previousBackground;
+      _profileCharacterId = previousCharacter;
+      notifyListeners();
+    }
+    return saved;
   }
 
   bool _isLegacyOther(String value) {
@@ -184,9 +213,7 @@ class ProfileViewModel extends ChangeNotifier {
   void updateSmokingStatus(SmokingStatus value) {
     _settings = _settings.copyWith(
       smokingStatus: value,
-      smokingYears: value == SmokingStatus.current
-          ? _settings.smokingYears
-          : 0,
+      smokingYears: value == SmokingStatus.current ? _settings.smokingYears : 0,
     );
     notifyListeners();
   }

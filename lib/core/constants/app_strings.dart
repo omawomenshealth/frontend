@@ -181,6 +181,16 @@ enum _TextKey {
   completeCycleDetails,
   cycleDayLabel,
   profileCharactersSemantics,
+  profilePersonalize,
+  profileChooseBackground,
+  profileChooseCharacter,
+  profileBackgroundMossy,
+  profileBackgroundFig,
+  profileCharacterMonstera,
+  profileCharacterBlueberry,
+  profileCharacterTangerine,
+  profileCharacterDragonFruit,
+  profileAppearanceSaveFailed,
   profilePremiumDescription,
   modeTrackCycle,
   modeTrackCycleSubtitle,
@@ -1054,6 +1064,17 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.completeCycleDetails: 'Döngü bilgilerini tamamla',
   _TextKey.cycleDayLabel: 'Döngü günü',
   _TextKey.profileCharactersSemantics: 'OMA profil karakterleri',
+  _TextKey.profilePersonalize: 'Profilini kişiselleştir',
+  _TextKey.profileChooseBackground: 'Arka plan',
+  _TextKey.profileChooseCharacter: 'Karakter',
+  _TextKey.profileBackgroundMossy: 'Yosun bahçesi',
+  _TextKey.profileBackgroundFig: 'İncir günbatımı',
+  _TextKey.profileCharacterMonstera: 'Monstera',
+  _TextKey.profileCharacterBlueberry: 'Yaban mersini',
+  _TextKey.profileCharacterTangerine: 'Mandalina',
+  _TextKey.profileCharacterDragonFruit: 'Ejder meyvesi',
+  _TextKey.profileAppearanceSaveFailed:
+      'Profil görünümü kaydedilemedi. Lütfen tekrar dene.',
   _TextKey.profilePremiumDescription: 'Döngüne özel tüm içgörüleri aç',
   _TextKey.modeTrackCycle: 'Döngüyü takip et',
   _TextKey.modeTrackCycleSubtitle: 'Döngü ve semptom takibi',
@@ -2027,6 +2048,17 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.completeCycleDetails: 'Complete your cycle details',
   _TextKey.cycleDayLabel: 'Cycle day',
   _TextKey.profileCharactersSemantics: 'OMA profile characters',
+  _TextKey.profilePersonalize: 'Personalize your profile',
+  _TextKey.profileChooseBackground: 'Background',
+  _TextKey.profileChooseCharacter: 'Character',
+  _TextKey.profileBackgroundMossy: 'Moss garden',
+  _TextKey.profileBackgroundFig: 'Fig sunset',
+  _TextKey.profileCharacterMonstera: 'Monstera',
+  _TextKey.profileCharacterBlueberry: 'Blueberry',
+  _TextKey.profileCharacterTangerine: 'Tangerine',
+  _TextKey.profileCharacterDragonFruit: 'Dragon fruit',
+  _TextKey.profileAppearanceSaveFailed:
+      'Your profile look could not be saved. Please try again.',
   _TextKey.profilePremiumDescription:
       'See the full picture in your personal insights',
   _TextKey.modeTrackCycle: 'Track cycle',
@@ -3582,6 +3614,25 @@ class AppStrings {
   static String get cycleDayLabel => _text(_TextKey.cycleDayLabel);
   static String get profileCharactersSemantics =>
       _text(_TextKey.profileCharactersSemantics);
+  static String get profilePersonalize => _text(_TextKey.profilePersonalize);
+  static String get profileChooseBackground =>
+      _text(_TextKey.profileChooseBackground);
+  static String get profileChooseCharacter =>
+      _text(_TextKey.profileChooseCharacter);
+  static String get profileBackgroundMossy =>
+      _text(_TextKey.profileBackgroundMossy);
+  static String get profileBackgroundFig =>
+      _text(_TextKey.profileBackgroundFig);
+  static String get profileCharacterMonstera =>
+      _text(_TextKey.profileCharacterMonstera);
+  static String get profileCharacterBlueberry =>
+      _text(_TextKey.profileCharacterBlueberry);
+  static String get profileCharacterTangerine =>
+      _text(_TextKey.profileCharacterTangerine);
+  static String get profileCharacterDragonFruit =>
+      _text(_TextKey.profileCharacterDragonFruit);
+  static String get profileAppearanceSaveFailed =>
+      _text(_TextKey.profileAppearanceSaveFailed);
   static String get profilePremiumDescription =>
       _text(_TextKey.profilePremiumDescription);
   static String get modeTrackCycle => _text(_TextKey.modeTrackCycle);
