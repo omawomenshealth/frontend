@@ -180,9 +180,11 @@ class MedicationEntry {
   }
 
   Map<String, dynamic> toJson() => {
-    'displayName': displayName,
-    'mainGroup': mainGroup,
-    'activeIngredient': activeIngredient,
+    'displayName': CatalogLocalizer.valueForStorage(displayName),
+    'mainGroup': CatalogLocalizer.valueForStorage(mainGroup),
+    'activeIngredient': activeIngredient == null
+        ? null
+        : CatalogLocalizer.valueForStorage(activeIngredient!),
     'times': times.toList(),
     'stomachState': stomachState,
     'doseCount': doseCount,

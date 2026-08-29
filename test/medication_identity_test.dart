@@ -23,11 +23,27 @@ void main() {
       times: const {'Sabah'},
       stomachState: 'Tok',
     ).toJson();
-    expect(entryJson, containsPair('displayName', identity.displayName));
-    expect(entryJson, containsPair('mainGroup', identity.mainGroup));
     expect(
       entryJson,
-      containsPair('activeIngredient', identity.activeIngredient),
+      containsPair(
+        'displayName',
+        'catalog.medicationSelection.'
+            'pain_reliever_fever_reducer+paracetamol_acetaminophen',
+      ),
+    );
+    expect(
+      entryJson,
+      containsPair(
+        'mainGroup',
+        'catalog.medications.group.pain_reliever_fever_reducer',
+      ),
+    );
+    expect(
+      entryJson,
+      containsPair(
+        'activeIngredient',
+        'catalog.medicationIngredients.item.paracetamol_acetaminophen',
+      ),
     );
     expect(entryJson, isNot(contains('name')));
   });
