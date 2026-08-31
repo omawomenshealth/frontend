@@ -958,7 +958,8 @@ Future<void> _showDailyLogEditor(
     0 => DailyLogObservedSection.period,
     1 => DailyLogObservedSection.nutrition,
     2 => DailyLogObservedSection.symptom,
-    _ => DailyLogObservedSection.wellbeing,
+    3 => DailyLogObservedSection.wellbeing,
+    _ => DailyLogObservedSection.skincare,
   };
   await showModalBottomSheet<void>(
     context: context,
@@ -972,7 +973,7 @@ Future<void> _showDailyLogEditor(
           : AppColors.forCyclePhase(
               dashboardVm.periodCalculator?.phaseAt(date),
             ),
-      initialTabIndex: initialIndex,
+      initialTabIndex: initialIndex == 4 ? 5 : initialIndex,
       isSingleTab: true,
       onSettingsChanged: () async {
         context.read<ProfileViewModel>().loadSettings();
@@ -1026,6 +1027,11 @@ Future<void> _showDailyLogTypePicker(
       label: AppStrings.mood,
       icon: Icons.mood_outlined,
       color: AppColors.primaryDark,
+    ),
+    (
+      label: AppStrings.skincare,
+      icon: Icons.spa_outlined,
+      color: AppColors.secondaryDark,
     ),
   ];
   final selected = await showModalBottomSheet<int>(
