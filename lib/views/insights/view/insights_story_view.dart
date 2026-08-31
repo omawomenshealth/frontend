@@ -573,7 +573,8 @@ class _InsightStoryPage extends StatelessWidget {
         AppStrings.myCycles,
       ],
       PersonalInsightKind.sexualAfterFeelingPattern ||
-      PersonalInsightKind.unprotectedFertileWindowNotice => [
+      PersonalInsightKind.unprotectedFertileWindowNotice ||
+      PersonalInsightKind.fertileWindowFocus => [
         AppStrings.sexualActivity,
         AppStrings.myCycles,
       ],

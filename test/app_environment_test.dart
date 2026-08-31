@@ -8,11 +8,15 @@ void main() {
     final values = AppEnvironment.parse('''
 # yorum
 OMA_API_BASE_URL="https://api.example.com"
+GOOGLE_PLAY_PACKAGE_NAME=com.bps.oma
+GOOGLE_PLAY_PLUS_PRODUCT_ID=oma_plus_monthly
 export GOOGLE_PLAY_PREMIUM_PRODUCT_ID=oma_premium_monthly # açıklama
 gecersiz-anahtar=değer
 ''');
 
     expect(values['OMA_API_BASE_URL'], 'https://api.example.com');
+    expect(values['GOOGLE_PLAY_PACKAGE_NAME'], 'com.bps.oma');
+    expect(values['GOOGLE_PLAY_PLUS_PRODUCT_ID'], 'oma_plus_monthly');
     expect(values['GOOGLE_PLAY_PREMIUM_PRODUCT_ID'], 'oma_premium_monthly');
     expect(values, isNot(contains('gecersiz-anahtar')));
   });
@@ -21,6 +25,8 @@ gecersiz-anahtar=değer
     await AppEnvironment.load();
 
     expect(AppEnvironment.apiBaseUrl, startsWith('http'));
+    expect(AppEnvironment.googlePlayPackageName, 'com.bps.oma');
+    expect(AppEnvironment.googlePlayPlusProductId, isNotEmpty);
     expect(AppEnvironment.googlePlayPremiumProductId, isNotEmpty);
   });
 

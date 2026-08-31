@@ -5,6 +5,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../core/utils/pregnancy_calculator.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/models/medication_identity_model.dart';
@@ -1173,12 +1174,127 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             const SizedBox(height: 14),
             _buildSymptomGroupCard(group, query),
           ],
+        // Gebelik testi bölümü şimdilik belirti ekranında gösterilmiyor.
+        // const SizedBox(height: 14),
+        // _buildPregnancyTestCard(),
         const SizedBox(height: 14),
         _buildSexualActivityCard(),
         const SizedBox(height: 14),
         _buildVaginalDischargeCard(),
       ],
     );
+  }
+
+  // ignore: unused_element
+  Widget _buildPregnancyTestCard() {
+    final isPregnant =
+        (context.read<LocalStorageService>().loadSettings() ?? widget.settings)
+            .trackingMode ==
+        TrackingMode.pregnant;
+    return Container(
+      key: const ValueKey('pregnancy_test_section'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.outline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(AppStrings.pregnancyTest),
+          const SizedBox(height: 5),
+          Text(
+            AppStrings.pregnancyTestHint,
+            style: const TextStyle(
+              fontSize: 12,
+              height: 1.35,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 11),
+          LayoutBuilder(
+            builder: (context, constraints) => SizedBox(
+              width: (constraints.maxWidth - 8) / 2,
+              child: _TrackingChoiceTile(
+                key: const ValueKey('pregnancy_test_positive'),
+                label: AppStrings.pregnancyTestPositiveAction,
+                icon: Icons.science_outlined,
+                selected: isPregnant,
+                color: _tone,
+                onTap: isPregnant ? () {} : _confirmPregnancyMode,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmPregnancyMode() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        key: const ValueKey('tracking_mode_confirmation'),
+        icon: const Icon(
+          Icons.child_friendly_outlined,
+          color: AppColors.periodPrimary,
+        ),
+        title: Text(AppStrings.modeChangeConfirmationTitle),
+        content: Text(
+          AppStrings.modeChangeConfirmationBody(
+            AppStrings.pregnancyTestPositiveAction,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            key: const ValueKey('tracking_mode_confirm'),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.periodPrimary,
+            ),
+            child: Text(AppStrings.changeModeAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final storage = context.read<LocalStorageService>();
+    final current = storage.loadSettings() ?? widget.settings;
+    final estimate = PregnancyCalculator.estimate(
+      settings: current,
+      logs: storage.loadAllLogs(),
+      asOf: AppTime.now,
+    );
+    final updatedSettings = current.copyWith(
+      trackingMode: TrackingMode.pregnant,
+      pregnancyStartDate: estimate?.startDate,
+      clearPregnancyStartDate: estimate == null,
+      pregnancyTestPositiveDate: AppTime.now.dateOnly,
+    );
+    final saved = await storage.saveSettings(updatedSettings);
+    if (!mounted) return;
+    if (!saved) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.modeChangeFailed)));
+      return;
+    }
+    try {
+      await context.read<NotificationService>().rescheduleFertilityInsights(
+        settings: updatedSettings,
+      );
+    } on ProviderNotFoundException {
+      // İzole widget testlerinde bildirim sağlayıcısı bulunmayabilir.
+    }
+    await widget.onSettingsChanged?.call();
+    if (!mounted) return;
+    Navigator.pop(context);
   }
 
   Widget _buildSymptomGroupCard(_SymptomGroup group, String query) {

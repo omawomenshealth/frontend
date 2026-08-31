@@ -9,6 +9,7 @@ import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/personal_insight_model.dart';
+import '../../../data/models/user_settings_model.dart';
 import '../../../domain/cycle/models/cycle_prediction.dart';
 import '../../calendar/view/calendar_view.dart' as cal;
 import '../../calendar/viewmodel/calendar_view_model.dart';
@@ -43,7 +44,10 @@ class DashboardView extends StatelessWidget {
         final calculator = vm.periodCalculator;
         final phase =
             calculator?.phaseAt(vm.selectedDate) ?? CyclePhase.follicular;
-        final accent = AppColors.forCyclePhase(phase);
+        final trackingMode = vm.settings?.trackingMode ?? TrackingMode.cycle;
+        final accent = trackingMode == TrackingMode.pregnant
+            ? AppColors.secondaryDark
+            : AppColors.forCyclePhase(phase);
         final cycleDay = _cycleDay(calculator, vm.selectedDate);
         final periodCount = phase == CyclePhase.menstrual
             ? cycleDay
@@ -95,19 +99,26 @@ class DashboardView extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: 20),
-                    PhaseHeroCard(
-                      phase: phase,
-                      cycleDay: cycleDay,
-                      periodCount: periodCount,
-                      forecastSummary: _forecastSummary(vm),
-                      onOpenInsights: () => _openInsights(context),
-                      onPeriodTap: () => _showDailyLogSheet(
-                        context,
-                        vm,
-                        initialIndex: 0,
-                        isSingleTab: true,
+                    if (trackingMode == TrackingMode.pregnant)
+                      PregnancyHeroCard(
+                        estimate: vm.pregnancyEstimate,
+                        positiveTestDate:
+                            vm.settings?.pregnancyTestPositiveDate,
+                      )
+                    else
+                      PhaseHeroCard(
+                        phase: phase,
+                        cycleDay: cycleDay,
+                        periodCount: periodCount,
+                        forecastSummary: _forecastSummary(vm),
+                        onOpenInsights: () => _openInsights(context),
+                        onPeriodTap: () => _showDailyLogSheet(
+                          context,
+                          vm,
+                          initialIndex: 0,
+                          isSingleTab: true,
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 30),
                     _SectionTitle(
                       title: AppStrings.quickLogTitle,

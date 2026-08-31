@@ -7,6 +7,7 @@ import '../../../data/services/notification_service.dart';
 import '../../../data/services/sync_service.dart';
 import '../../../core/utils/personal_insight_engine.dart';
 import '../../../core/utils/period_calculator.dart';
+import '../../../core/utils/pregnancy_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/constants/app_strings.dart';
@@ -41,6 +42,7 @@ class DashboardViewModel extends ChangeNotifier {
   CycleInsights? _cycleInsights;
   CycleForecast? _cycleForecast;
   List<PersonalInsight> _personalInsights = const [];
+  PregnancyEstimate? _pregnancyEstimate;
   bool _isLoading = true;
   DateTime _selectedDate = AppTime.now;
   Set<DateTime> _bleedingDays = {};
@@ -52,6 +54,7 @@ class DashboardViewModel extends ChangeNotifier {
   CycleInsights? get cycleInsights => _cycleInsights;
   CycleForecast? get cycleForecast => _cycleForecast;
   List<PersonalInsight> get personalInsights => _personalInsights;
+  PregnancyEstimate? get pregnancyEstimate => _pregnancyEstimate;
   bool get isLoading => _isLoading;
   DateTime get selectedDate => _selectedDate;
 
@@ -137,6 +140,7 @@ class DashboardViewModel extends ChangeNotifier {
 
     final allLogs = _storage.loadAllLogs();
     _refreshPersonalInsights(allLogs);
+    _refreshPregnancyEstimate(allLogs);
     _rebuildCycleState();
 
     _isLoading = false;
@@ -151,7 +155,19 @@ class DashboardViewModel extends ChangeNotifier {
 
     final allLogs = _storage.loadAllLogs();
     _refreshPersonalInsights(allLogs);
+    _refreshPregnancyEstimate(allLogs);
     _rebuildCycleState();
+  }
+
+  void _refreshPregnancyEstimate(List<DailyLog> allLogs) {
+    final settings = _settings;
+    _pregnancyEstimate = settings?.trackingMode == TrackingMode.pregnant
+        ? PregnancyCalculator.estimate(
+            settings: settings!,
+            logs: allLogs,
+            asOf: AppTime.now,
+          )
+        : null;
   }
 
   void _rebuildCycleState() {

@@ -1,0 +1,16 @@
+{
+  "testTitle": "Hamilelik testi",
+  "testHint": "Testler beklenen adetin ilk gününden itibaren daha güvenilirdir. Adet tarihini bilmiyorsan korunmasız ilişkiden en az 21 gün sonra test yap.",
+  "testPositiveAction": "Hamileyim",
+  "positiveTestRecorded": "Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.",
+  "badge": "GEBELİK",
+  "estimatedWeek": "TAHMİNİ GEBELİK HAFTASI",
+  "weekLabel": "haftalık",
+  "weekAndDay": "{week} hafta {day} gün",
+  "estimateCombined": "Son adet ve cinsel ilişki kayıtlarına göre tahmini",
+  "estimateLastPeriod": "Son adet başlangıcına göre tahmini",
+  "estimateSexualActivity": "Cinsel ilişki kaydına göre yaklaşık tahmin",
+  "estimateUnavailable": "Haftayı hesaplamak için son adet tarihini veya cinsel ilişki kaydını ekle.",
+  "infoComingSoon": "Haftalık bilgilendirici içerikler yakında",
+  "estimatedDueDate": "Tahmini buluşma tarihi: {date}"
+}

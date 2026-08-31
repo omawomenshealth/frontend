@@ -1,0 +1,10 @@
+{
+  "getPregnant": "Try to conceive",
+  "getPregnantSubtitle": "Cycle tracking with fertile-window insights",
+  "pregnant": "I’m pregnant",
+  "pregnantSubtitle": "Pregnancy journey",
+  "changeConfirmationTitle": "Do you want to change your mode?",
+  "changeConfirmationBody": "Your tracking preference will change to {mode}. Your existing logs will stay in place.",
+  "changeAction": "Yes, change it",
+  "changeFailed": "Your mode could not be changed. Try again."
+}

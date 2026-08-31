@@ -349,7 +349,11 @@ class ApiService {
 
   Future<Map<String, dynamic>> fetchPremiumStatus() async {
     if (_storage.authToken == null) {
-      return const {'isPremium': false};
+      return const {
+        'membershipTier': 'free',
+        'hasPaidAccess': false,
+        'isPremium': false,
+      };
     }
 
     final response = await _authorizedRequest(

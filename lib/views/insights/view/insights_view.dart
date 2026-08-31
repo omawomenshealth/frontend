@@ -754,6 +754,11 @@ class _InsightPresentation {
         body = AppStrings.insightUnprotectedFertileBody;
         icon = Icons.health_and_safety_outlined;
         color = AppColors.warning;
+      case PersonalInsightKind.fertileWindowFocus:
+        title = AppStrings.insightFertilityFocusTitle;
+        body = AppStrings.insightFertilityFocusBody;
+        icon = Icons.favorite_outline_rounded;
+        color = AppColors.ovulation;
     }
 
     return _InsightPresentation(

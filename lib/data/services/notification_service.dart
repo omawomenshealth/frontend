@@ -7,7 +7,9 @@ import 'package:timezone/data/latest.dart' as timezone_data;
 import 'package:timezone/timezone.dart' as timezone;
 
 import '../../core/constants/app_strings.dart';
+import '../../core/utils/period_calculator.dart';
 import '../models/medication_reminder_model.dart';
+import '../models/user_settings_model.dart';
 
 class ReminderScheduleResult {
   final bool supported;
@@ -31,6 +33,7 @@ class NotificationService {
   static const _insightPayloadPrefix = 'oma_insight:';
   static const _channelId = 'oma_medication_reminders_v1';
   static const _insightChannelId = 'oma_personal_insights_v1';
+  static const _fertilityInsightIdPrefix = 'fertile_window_focus_';
   static const _maxPendingMedicationNotifications = 50;
 
   final FlutterLocalNotificationsPlugin _plugin;
@@ -160,6 +163,70 @@ class NotificationService {
       payload: '$_insightPayloadPrefix$insightId',
     );
     return true;
+  }
+
+  /// Hamile kal modunda, içinde bulunulan ve sıradaki verimli pencerenin ilk
+  /// gününe birer genel OMA bildirimi planlar. Bildirim gövdesi hassas sağlık
+  /// bilgisini kilit ekranına yazmaz; Android tarafında ayrıca `secret`tır.
+  Future<int> rescheduleFertilityInsights({
+    required UserSettings settings,
+    DateTime? now,
+  }) async {
+    if (!isSupported) return 0;
+    await init();
+    await _cancelFertilityInsights();
+    final lastPeriod = settings.lastPeriodDate;
+    if (settings.trackingMode != TrackingMode.tryingToConceive ||
+        !settings.notificationsEnabled ||
+        lastPeriod == null) {
+      return 0;
+    }
+
+    final current = now ?? DateTime.now();
+    final start = DateTime(current.year, current.month, current.day);
+    final calculator = PeriodCalculator(
+      lastPeriodDate: lastPeriod,
+      cycleLength: settings.averageCycleLength,
+      periodLength: settings.averagePeriodLength,
+    );
+    final windowStarts = <DateTime>[];
+    var previousWasFertile = false;
+    for (
+      var offset = 0;
+      offset <= settings.averageCycleLength * 2 && windowStarts.length < 2;
+      offset++
+    ) {
+      final day = start.add(Duration(days: offset));
+      final isFertile = calculator.isInFertileWindow(day);
+      if (isFertile && !previousWasFertile) windowStarts.add(day);
+      previousWasFertile = isFertile;
+    }
+
+    var scheduledCount = 0;
+    for (final day in windowStarts) {
+      var delivery = DateTime(day.year, day.month, day.day, 10);
+      if (!delivery.isAfter(current)) {
+        delivery = current.add(const Duration(minutes: 2));
+      }
+      final id = '$_fertilityInsightIdPrefix${day.toIso8601String()}';
+      if (await scheduleInsightReady(insightId: id, deliverAt: delivery)) {
+        scheduledCount++;
+      }
+    }
+    return scheduledCount;
+  }
+
+  Future<void> _cancelFertilityInsights() async {
+    final pending = await _plugin.pendingNotificationRequests();
+    for (final notification in pending) {
+      final payload = notification.payload;
+      if (payload?.startsWith(
+            '$_insightPayloadPrefix$_fertilityInsightIdPrefix',
+          ) ??
+          false) {
+        await _plugin.cancel(id: notification.id);
+      }
+    }
   }
 
   /// Tüm OMA ilaç/takviye bildirimlerini yeniden üretir.

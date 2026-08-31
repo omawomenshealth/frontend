@@ -32,6 +32,33 @@ void main() {
     expect(engine.generate(const []), isEmpty);
   });
 
+  test(
+    'hamile kal modunda verimli gün içgörüsü ve gizli bildirim adayı üretir',
+    () {
+      final today = DateTime(2026, 8, 30);
+      final insights = engine.generate(
+        const [],
+        now: today,
+        settings: UserSettings(
+          trackingMode: TrackingMode.tryingToConceive,
+          lastPeriodDate: DateTime(2026, 8, 16),
+          averageCycleLength: 28,
+        ),
+      );
+
+      final insight = insightOf(
+        insights,
+        PersonalInsightKind.fertileWindowFocus,
+      );
+      expect(insight, isNotNull);
+      expect(insight!.shouldNotify, isTrue);
+      expect(
+        insight.notificationLevel,
+        PersonalInsightNotificationLevel.gentle,
+      );
+    },
+  );
+
   test('az örnekli ruh hali eşleşmesini anlamlı insight gibi sunmaz', () {
     final logs = [
       DailyLog(

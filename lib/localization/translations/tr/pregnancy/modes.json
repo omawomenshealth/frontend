@@ -1,0 +1,10 @@
+{
+  "getPregnant": "Hamile kal",
+  "getPregnantSubtitle": "Döngü takibi ve verimli dönem içgörüleri",
+  "pregnant": "Hamileyim",
+  "pregnantSubtitle": "Gebelik yolculuğu",
+  "changeConfirmationTitle": "Modunu değiştirmek istiyor musun?",
+  "changeConfirmationBody": "Takip tercihin {mode} olarak değiştirilecek. Kayıtların silinmeyecek.",
+  "changeAction": "Evet, değiştir",
+  "changeFailed": "Mod şu anda değiştirilemedi. Tekrar dene."
+}

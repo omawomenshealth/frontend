@@ -28,10 +28,11 @@ class PersonalInsightEngine {
     final snapshots = _buildDailySnapshots(logs);
     final currentTime = now ?? AppTime.now;
     final safetyInsights = _buildSafetyInsights(logs, settings);
-    if (snapshots.isEmpty) return safetyInsights;
-
     final today = currentTime.dateOnly;
     final insights = <PersonalInsight>[...safetyInsights];
+    _addFertilityModeInsight(insights, snapshots, today, settings);
+    if (snapshots.isEmpty) return insights;
+
     final associationInsights = const PersonalAssociationEngine().generate(
       logs: logs,
       doseRecords: doseRecords,
@@ -58,6 +59,27 @@ class PersonalInsightEngine {
     });
 
     return insights.take(_maxInsights).toList(growable: false);
+  }
+
+  void _addFertilityModeInsight(
+    List<PersonalInsight> insights,
+    List<_DailySnapshot> snapshots,
+    DateTime today,
+    UserSettings? settings,
+  ) {
+    if (settings?.trackingMode != TrackingMode.tryingToConceive) return;
+    final cycle = _buildInsightCycleContext(snapshots, settings, today);
+    if (cycle == null || !cycle.isFertileDay(today)) return;
+    insights.add(
+      PersonalInsight(
+        id: 'fertile_window_focus_${today.toIso8601String()}',
+        kind: PersonalInsightKind.fertileWindowFocus,
+        priority: 118,
+        evidenceCount: 1,
+        evidenceUnit: PersonalInsightEvidenceUnit.days,
+        notificationLevel: PersonalInsightNotificationLevel.gentle,
+      ),
+    );
   }
 
   void _addPremiumReportInsight(

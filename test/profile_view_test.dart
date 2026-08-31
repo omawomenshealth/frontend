@@ -46,6 +46,7 @@ void main() {
         labTestDate: DateTime(2026, 7, 18),
         labTestFasting: true,
         lastPeriodDate: DateTime.now().subtract(const Duration(days: 13)),
+        trackingMode: TrackingMode.tryingToConceive,
       ),
     );
     await storage.saveDailyLog(
@@ -100,6 +101,43 @@ void main() {
     expect(find.text('42 mmol/mol'), findsOneWidget);
     expect(find.text('Ferritin'), findsOneWidget);
     expect(find.text('38 µg/L'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    final conceiveMode = find.byKey(
+      const ValueKey('profile_mode_tryingToConceive'),
+    );
+    await tester.ensureVisible(conceiveMode);
+    expect(tester.widget<InkWell>(conceiveMode).onTap, isNull);
+    await tester.tap(conceiveMode);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('tracking_mode_confirmation')),
+      findsNothing,
+    );
+    expect(storage.loadSettings()!.trackingMode, TrackingMode.tryingToConceive);
+
+    final pregnantMode = find.byKey(const ValueKey('profile_mode_pregnant'));
+    expect(tester.widget<InkWell>(pregnantMode).onTap, isNull);
+    await tester.tap(pregnantMode);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('tracking_mode_confirmation')),
+      findsNothing,
+    );
+    expect(storage.loadSettings()!.trackingMode, TrackingMode.tryingToConceive);
+
+    final cycleMode = find.byKey(const ValueKey('profile_mode_cycle'));
+    expect(tester.widget<InkWell>(cycleMode).onTap, isNotNull);
+    await tester.tap(cycleMode);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('tracking_mode_confirmation')),
+      findsOneWidget,
+    );
+    expect(storage.loadSettings()!.trackingMode, TrackingMode.tryingToConceive);
+    await tester.tap(find.byKey(const ValueKey('tracking_mode_confirm')));
+    await tester.pumpAndSettle();
+    expect(storage.loadSettings()!.trackingMode, TrackingMode.cycle);
     expect(tester.takeException(), isNull);
 
     final name = tester.widget<Text>(find.text('Özge'));

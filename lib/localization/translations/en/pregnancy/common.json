@@ -1,0 +1,16 @@
+{
+  "testTitle": "Pregnancy test",
+  "testHint": "Tests are more reliable from the first day of a missed period. If you do not know when your period is due, test at least 21 days after unprotected sex.",
+  "testPositiveAction": "I’m pregnant",
+  "positiveTestRecorded": "Positive test recorded: {date} · This alone does not determine the pregnancy week.",
+  "badge": "PREGNANCY",
+  "estimatedWeek": "ESTIMATED PREGNANCY WEEK",
+  "weekLabel": "weeks",
+  "weekAndDay": "{week} weeks {day} days",
+  "estimateCombined": "Estimated from your last period and sexual activity logs",
+  "estimateLastPeriod": "Estimated from the start of your last period",
+  "estimateSexualActivity": "Approximate estimate from a sexual activity log",
+  "estimateUnavailable": "Add your last period date or a sexual activity log to estimate the week.",
+  "infoComingSoon": "Weekly guidance is coming soon",
+  "estimatedDueDate": "Estimated due date: {date}"
+}

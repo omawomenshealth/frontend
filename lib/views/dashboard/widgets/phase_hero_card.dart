@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/period_calculator.dart';
+import '../../../core/utils/pregnancy_calculator.dart';
 
 class PhaseHeroCard extends StatefulWidget {
   final CyclePhase phase;
@@ -53,7 +54,10 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
         ..stop()
         ..value = 0.28;
     } else {
-      _petalController.repeat();
+      // Kart açıldığında tek, yumuşak bir çiçek geçişi oynatılır. Süresiz
+      // ticker hem pil tüketir hem de ekranın hiçbir zaman durağanlaşmamasına
+      // neden olur.
+      _petalController.forward(from: 0);
     }
   }
 
@@ -461,8 +465,369 @@ class _PhasePresentation {
     };
   }
 
-  String periodLabel(int count) {
-    return isPeriod ? AppStrings.periodDayLabel : AppStrings.daysToPeriodLabel;
+  String periodLabel(int count) =>
+      isPeriod ? AppStrings.periodDayLabel : AppStrings.daysToPeriodLabel;
+}
+
+/// Gebelik modunda döngü kartının yerini alan, haftaya göre dokuz ayrı içerik
+/// döneminden birini gösteren çiçekli kart.
+class PregnancyHeroCard extends StatelessWidget {
+  final PregnancyEstimate? estimate;
+  final DateTime? positiveTestDate;
+
+  const PregnancyHeroCard({
+    super.key,
+    required this.estimate,
+    this.positiveTestDate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final presentation = _PregnancyPresentation.forWeek(
+      estimate?.displayWeek ?? 1,
+    );
+    final week = estimate?.displayWeek;
+    final source = switch (estimate?.source) {
+      PregnancyEstimateSource.combined => AppStrings.pregnancyEstimateCombined,
+      PregnancyEstimateSource.lastPeriod =>
+        AppStrings.pregnancyEstimateLastPeriod,
+      PregnancyEstimateSource.sexualActivity =>
+        AppStrings.pregnancyEstimateSexualActivity,
+      null => AppStrings.pregnancyEstimateUnavailable,
+    };
+    final dueDate = estimate == null
+        ? null
+        : AppStrings.estimatedDueDateLabel(
+            MaterialLocalizations.of(
+              context,
+            ).formatMediumDate(estimate!.estimatedDueDate),
+          );
+    final positiveTest = positiveTestDate == null
+        ? null
+        : AppStrings.positivePregnancyTestRecorded(
+            MaterialLocalizations.of(
+              context,
+            ).formatMediumDate(positiveTestDate!),
+          );
+
+    return Semantics(
+      label: '${presentation.title}. ${presentation.body}. $source',
+      child: Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(minHeight: 440),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: presentation.softColor,
+          borderRadius: BorderRadius.circular(32),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: 0,
+              top: 0,
+              width: 252,
+              height: 252,
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: 0.9,
+                  child: Image.asset(
+                    presentation.assetPath,
+                    fit: BoxFit.contain,
+                    alignment: Alignment.topRight,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 22,
+              bottom: 94,
+              child: Icon(
+                Icons.local_florist_outlined,
+                color: presentation.color.withValues(alpha: 0.16),
+                size: 54,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 22, 24, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.72),
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 7,
+                      ),
+                      child: Text(
+                        AppStrings.pregnancyBadge,
+                        style: TextStyle(
+                          color: presentation.color,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.35,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 70),
+                  Text(
+                    week == null
+                        ? AppStrings.estimatedPregnancyWeek
+                        : '${AppStrings.estimatedPregnancyWeek} · '
+                              '${AppStrings.pregnancyWeekAndDay(estimate!.completedWeeks, estimate!.dayOfWeek)}',
+                    style: TextStyle(
+                      color: presentation.color,
+                      fontSize: 10.5,
+                      height: 1.2,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.45,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  SizedBox(
+                    width: 300,
+                    child: Text(
+                      presentation.title,
+                      style: TextStyle(
+                        color: presentation.color,
+                        fontFamily: 'CormorantGaramond',
+                        fontSize: 31,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w600,
+                        height: 1.02,
+                        letterSpacing: -0.8,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 13),
+                  SizedBox(
+                    width: 310,
+                    child: Text(
+                      presentation.body,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                        height: 1.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 11),
+                  _PregnancyInfoLine(
+                    icon: Icons.calculate_outlined,
+                    text: source,
+                    color: presentation.color,
+                  ),
+                  if (positiveTest != null) ...[
+                    const SizedBox(height: 6),
+                    _PregnancyInfoLine(
+                      icon: Icons.science_outlined,
+                      text: positiveTest,
+                      color: presentation.color,
+                    ),
+                  ],
+                  if (dueDate != null) ...[
+                    const SizedBox(height: 6),
+                    _PregnancyInfoLine(
+                      icon: Icons.event_outlined,
+                      text: dueDate,
+                      color: presentation.color,
+                    ),
+                  ],
+                  const SizedBox(height: 14),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 13,
+                            vertical: 11,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.72),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.auto_awesome_outlined,
+                                color: presentation.color,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  AppStrings.pregnancyInfoComingSoon,
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 10.5,
+                                    height: 1.2,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      _PregnancyWeekBadge(
+                        color: presentation.color,
+                        week: week,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PregnancyInfoLine extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final Color color;
+
+  const _PregnancyInfoLine({
+    required this.icon,
+    required this.text,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 14),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 10.5,
+              height: 1.25,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PregnancyWeekBadge extends StatelessWidget {
+  final Color color;
+  final int? week;
+
+  const _PregnancyWeekBadge({required this.color, required this.week});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 72,
+      height: 72,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.82),
+        shape: BoxShape.circle,
+        border: Border.all(color: color, width: 1.6),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            week?.toString() ?? '—',
+            style: TextStyle(
+              color: color,
+              fontFamily: 'CormorantGaramond',
+              fontSize: 22,
+              height: 0.95,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            AppStrings.pregnancyWeekLabel,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PregnancyPresentation {
+  final Color color;
+  final Color softColor;
+  final String assetPath;
+  final String title;
+  final String body;
+
+  const _PregnancyPresentation({
+    required this.color,
+    required this.softColor,
+    required this.assetPath,
+    required this.title,
+    required this.body,
+  });
+
+  factory _PregnancyPresentation.forWeek(int week) {
+    final index = PregnancyStage.forWeek(week).index;
+    final colors = [
+      AppColors.periodPrimary,
+      AppColors.primary,
+      AppColors.ovulation,
+      AppColors.lutealDark,
+      AppColors.secondaryDark,
+      AppColors.primaryDark,
+      AppColors.ovulation,
+      AppColors.periodPrimary,
+      AppColors.primaryDark,
+    ];
+    final softColors = [
+      AppColors.periodLight,
+      const Color(0xFFEAF0E5),
+      const Color(0xFFECE7F3),
+      const Color(0xFFFFF3D9),
+      const Color(0xFFF5E9EC),
+      const Color(0xFFE7F0EB),
+      const Color(0xFFF0EAF4),
+      const Color(0xFFF8E9EB),
+      const Color(0xFFE8EFE7),
+    ];
+    final assets = [
+      'assets/images/oma-hero-menstrual-cutout.png',
+      'assets/images/oma-hero-follicular-cutout.png',
+      'assets/images/oma-hero-ovulation-cutout.png',
+      'assets/images/oma-hero-luteal-cutout.png',
+      'assets/images/oma-hero-menstrual-cutout.png',
+      'assets/images/oma-hero-follicular-cutout.png',
+      'assets/images/oma-hero-ovulation-cutout.png',
+      'assets/images/oma-hero-menstrual-cutout.png',
+      'assets/images/oma-hero-follicular-cutout.png',
+    ];
+    return _PregnancyPresentation(
+      color: colors[index],
+      softColor: softColors[index],
+      assetPath: assets[index],
+      title: AppStrings.pregnancyStageTitles[index],
+      body: AppStrings.pregnancyStageBodies[index],
+    );
   }
 }
 

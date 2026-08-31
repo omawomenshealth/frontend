@@ -39,6 +39,7 @@ enum PersonalInsightKind {
   dischargeHealthNotice,
   sexualAfterFeelingPattern,
   unprotectedFertileWindowNotice,
+  fertileWindowFocus,
 }
 
 enum PersonalInsightEvidenceUnit { days, cycles, entries, records }

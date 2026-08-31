@@ -8,6 +8,7 @@ import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/main.dart';
+import 'package:app_proje_a/views/dashboard/widgets/phase_hero_card.dart';
 import 'package:app_proje_a/views/insights/view/insights_view.dart';
 
 void main() {
@@ -18,6 +19,29 @@ void main() {
     await tester.pumpWidget(MyApp(storage: storage));
     // Uygulama başarıyla oluşturuldu mu kontrol et
     expect(find.byType(MyApp), findsOneWidget);
+  });
+
+  testWidgets('hamile kal odağı döngü kartını değiştirmez', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await storage.init();
+    final now = DateTime.now();
+    await storage.saveSettings(
+      UserSettings(
+        isOnboardingComplete: true,
+        userName: 'Test',
+        trackingMode: TrackingMode.tryingToConceive,
+        lastPeriodDate: DateTime(now.year, now.month, now.day),
+      ),
+    );
+
+    await tester.pumpWidget(MyApp(storage: storage));
+    await tester.pump();
+
+    expect(find.byType(PhaseHeroCard), findsOneWidget);
+    expect(find.text(AppStrings.phaseMenstrualHeadline), findsOneWidget);
+    expect(find.text(AppStrings.periodDayLabel), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Keşfet ve İçgörüler kaynak tasarımdaki sıradadır', (

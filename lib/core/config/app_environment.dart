@@ -69,8 +69,14 @@ abstract final class AppEnvironment {
         (first == 192 && second == 168);
   }
 
+  static String get googlePlayPlusProductId =>
+      _required('GOOGLE_PLAY_PLUS_PRODUCT_ID');
+
   static String get googlePlayPremiumProductId =>
       _required('GOOGLE_PLAY_PREMIUM_PRODUCT_ID');
+
+  static String get googlePlayPackageName =>
+      _required('GOOGLE_PLAY_PACKAGE_NAME');
 
   static Map<String, String> parse(String source) {
     final result = <String, String>{};

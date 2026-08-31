@@ -67,6 +67,10 @@ void main() async {
       plans: reminderPlans,
     );
     scheduledDoseIds = result.scheduledDoses.map((dose) => dose.id).toSet();
+    final settings = storage.loadSettings();
+    if (settings != null) {
+      await notificationService.rescheduleFertilityInsights(settings: settings);
+    }
   } catch (error) {
     debugPrint('Hatırlatıcılar başlangıçta zamanlanamadı: $error');
   }
@@ -80,11 +84,8 @@ void main() async {
 
   runApp(
     TranslationProvider(
-      child: MyApp(
-        storage: storage,
-        notificationService: notificationService,
-      ),
-    )
+      child: MyApp(storage: storage, notificationService: notificationService),
+    ),
   );
 }
 

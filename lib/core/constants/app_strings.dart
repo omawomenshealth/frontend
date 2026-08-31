@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../localization/generated/strings.g.dart';
 import '../localization/catalog_localizer.dart';
 import '../localization/option_localizer.dart';
 import '../localization/option_structure.dart';
@@ -184,10 +185,6 @@ enum _TextKey {
   profilePremiumDescription,
   modeTrackCycle,
   modeTrackCycleSubtitle,
-  modeGetPregnant,
-  modeGetPregnantSubtitle,
-  modePregnancy,
-  modePregnancySubtitle,
   waitingForData,
   editCycleSettings,
   review,
@@ -1057,10 +1054,6 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.profilePremiumDescription: 'Döngüne özel tüm içgörüleri aç',
   _TextKey.modeTrackCycle: 'Döngüyü takip et',
   _TextKey.modeTrackCycleSubtitle: 'Döngü ve semptom takibi',
-  _TextKey.modeGetPregnant: 'Hamile kal',
-  _TextKey.modeGetPregnantSubtitle: 'Doğurganlık odağı',
-  _TextKey.modePregnancy: 'Hamilelik',
-  _TextKey.modePregnancySubtitle: 'Gebelik yolculuğu',
   _TextKey.waitingForData: 'Veri bekleniyor',
   _TextKey.editCycleSettings: 'Döngü ayarlarını düzenle',
   _TextKey.review: 'Takip et',
@@ -2031,10 +2024,6 @@ const Map<_TextKey, String> _englishTexts = {
       'See the full picture in your personal insights',
   _TextKey.modeTrackCycle: 'Track cycle',
   _TextKey.modeTrackCycleSubtitle: 'Cycle and symptom tracking',
-  _TextKey.modeGetPregnant: 'Try to conceive',
-  _TextKey.modeGetPregnantSubtitle: 'Focus on your fertile window',
-  _TextKey.modePregnancy: 'Pregnancy',
-  _TextKey.modePregnancySubtitle: 'Pregnancy journey',
   _TextKey.waitingForData: 'Waiting for data',
   _TextKey.editCycleSettings: 'Edit cycle settings',
   _TextKey.review: 'Review',
@@ -2798,6 +2787,51 @@ const Map<String, String> _legacyStoredSymptomAliases = {
 class AppStrings {
   AppStrings._();
 
+  static const _pregnancyTextPaths = <String>[
+    'modes.getPregnant',
+    'modes.getPregnantSubtitle',
+    'modes.pregnant',
+    'modes.pregnantSubtitle',
+    'modes.changeConfirmationTitle',
+    'modes.changeConfirmationBody',
+    'modes.changeAction',
+    'modes.changeFailed',
+    'fertility.insightTitle',
+    'fertility.insightBody',
+    'common.testTitle',
+    'common.testHint',
+    'common.testPositiveAction',
+    'common.positiveTestRecorded',
+    'common.badge',
+    'common.estimatedWeek',
+    'common.weekLabel',
+    'common.weekAndDay',
+    'common.estimateCombined',
+    'common.estimateLastPeriod',
+    'common.estimateSexualActivity',
+    'common.estimateUnavailable',
+    'common.infoComingSoon',
+    'common.estimatedDueDate',
+    'stages.stage1.title',
+    'stages.stage1.body',
+    'stages.stage2.title',
+    'stages.stage2.body',
+    'stages.stage3.title',
+    'stages.stage3.body',
+    'stages.stage4.title',
+    'stages.stage4.body',
+    'stages.stage5.title',
+    'stages.stage5.body',
+    'stages.stage6.title',
+    'stages.stage6.body',
+    'stages.stage7.title',
+    'stages.stage7.body',
+    'stages.stage8.title',
+    'stages.stage8.body',
+    'stages.stage9.title',
+    'stages.stage9.body',
+  ];
+
   static const insightFeatureBelowTypicalWaterToken =
       'metric:below_typical_water';
   static const dischargeColorFeaturePrefix = 'dischargeColor:';
@@ -2853,7 +2887,21 @@ class AppStrings {
     return _textCatalogs.values.every(
           (catalog) => catalog.keys.toSet().containsAll(allTextKeys),
         ) &&
-        OptionLocalizer.catalogsAreComplete;
+        OptionLocalizer.catalogsAreComplete &&
+        _pregnancyCatalogsAreComplete;
+  }
+
+  static bool get _pregnancyCatalogsAreComplete {
+    try {
+      return AppLocale.values.every(
+        (locale) => _pregnancyTextPaths.every((path) {
+          final value = locale.translations['pregnancy.$path'];
+          return value is String && value.isNotEmpty;
+        }),
+      );
+    } catch (_) {
+      return false;
+    }
   }
 
   static Locale resolveLocale(Locale? locale) {
@@ -2881,6 +2929,24 @@ class AppStrings {
 
   static String _format(_TextKey key, Map<String, Object> values) {
     var result = _text(key);
+    for (final entry in values.entries) {
+      result = result.replaceAll('{${entry.key}}', entry.value.toString());
+    }
+    return result;
+  }
+
+  static String _pregnancyText(String path) {
+    final locale = AppLocale.values.firstWhere(
+      (candidate) => candidate.languageCode == _languageCode,
+      orElse: () => AppLocale.en,
+    );
+    final value = locale.translations['pregnancy.$path'];
+    if (value is String) return value;
+    return AppLocale.en.translations['pregnancy.$path'] as String;
+  }
+
+  static String _pregnancyFormat(String path, Map<String, Object> values) {
+    var result = _pregnancyText(path);
     for (final entry in values.entries) {
       result = result.replaceAll('{${entry.key}}', entry.value.toString());
     }
@@ -3587,12 +3653,54 @@ class AppStrings {
   static String get modeTrackCycle => _text(_TextKey.modeTrackCycle);
   static String get modeTrackCycleSubtitle =>
       _text(_TextKey.modeTrackCycleSubtitle);
-  static String get modeGetPregnant => _text(_TextKey.modeGetPregnant);
+  static String get modeGetPregnant => _pregnancyText('modes.getPregnant');
   static String get modeGetPregnantSubtitle =>
-      _text(_TextKey.modeGetPregnantSubtitle);
-  static String get modePregnancy => _text(_TextKey.modePregnancy);
+      _pregnancyText('modes.getPregnantSubtitle');
+  static String get modePregnancy => _pregnancyText('modes.pregnant');
   static String get modePregnancySubtitle =>
-      _text(_TextKey.modePregnancySubtitle);
+      _pregnancyText('modes.pregnantSubtitle');
+  static String get modeChangeConfirmationTitle =>
+      _pregnancyText('modes.changeConfirmationTitle');
+  static String modeChangeConfirmationBody(String mode) =>
+      _pregnancyFormat('modes.changeConfirmationBody', {'mode': mode});
+  static String get changeModeAction => _pregnancyText('modes.changeAction');
+  static String get modeChangeFailed => _pregnancyText('modes.changeFailed');
+  static String get pregnancyTest => _pregnancyText('common.testTitle');
+  static String get pregnancyTestHint => _pregnancyText('common.testHint');
+  static String get pregnancyTestPositiveAction =>
+      _pregnancyText('common.testPositiveAction');
+  static String positivePregnancyTestRecorded(String date) =>
+      _pregnancyFormat('common.positiveTestRecorded', {'date': date});
+  static String get pregnancyBadge => _pregnancyText('common.badge');
+  static String get estimatedPregnancyWeek =>
+      _pregnancyText('common.estimatedWeek');
+  static String get pregnancyWeekLabel => _pregnancyText('common.weekLabel');
+  static String pregnancyWeekAndDay(int week, int day) =>
+      _pregnancyFormat('common.weekAndDay', {'week': week, 'day': day});
+  static String get pregnancyEstimateCombined =>
+      _pregnancyText('common.estimateCombined');
+  static String get pregnancyEstimateLastPeriod =>
+      _pregnancyText('common.estimateLastPeriod');
+  static String get pregnancyEstimateSexualActivity =>
+      _pregnancyText('common.estimateSexualActivity');
+  static String get pregnancyEstimateUnavailable =>
+      _pregnancyText('common.estimateUnavailable');
+  static String get pregnancyInfoComingSoon =>
+      _pregnancyText('common.infoComingSoon');
+  static String estimatedDueDateLabel(String date) =>
+      _pregnancyFormat('common.estimatedDueDate', {'date': date});
+  static List<String> get pregnancyStageTitles => [
+    for (var stage = 1; stage <= 9; stage++)
+      _pregnancyText('stages.stage$stage.title'),
+  ];
+  static List<String> get pregnancyStageBodies => [
+    for (var stage = 1; stage <= 9; stage++)
+      _pregnancyText('stages.stage$stage.body'),
+  ];
+  static String get insightFertilityFocusTitle =>
+      _pregnancyText('fertility.insightTitle');
+  static String get insightFertilityFocusBody =>
+      _pregnancyText('fertility.insightBody');
   static String get waitingForData => _text(_TextKey.waitingForData);
   static String get editCycleSettings => _text(_TextKey.editCycleSettings);
   static String get review => _text(_TextKey.review);

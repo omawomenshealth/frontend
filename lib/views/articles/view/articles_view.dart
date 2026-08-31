@@ -6,6 +6,7 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/premium_purchase_service.dart';
+import '../../../localization/generated/strings.g.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
 import '../model/article_model.dart';
 import '../widgets/premium_paywall.dart';
@@ -179,7 +180,7 @@ class _ArticlesViewState extends State<ArticlesView> {
     final calculator = context.watch<DashboardViewModel>().periodCalculator;
     final phase = calculator?.currentPhase ?? CyclePhase.follicular;
     final accent = _phaseColor(phase);
-    final isPremium = context.watch<PremiumPurchaseService>().isPremium;
+    final membershipTier = context.watch<PremiumPurchaseService>().tier;
 
     return Scaffold(
       backgroundColor: Color.lerp(AppColors.scaffoldBackground, accent, 0.028),
@@ -198,7 +199,7 @@ class _ArticlesViewState extends State<ArticlesView> {
               child: _buildBody(
                 phase: phase,
                 accent: accent,
-                isPremium: isPremium,
+                membershipTier: membershipTier,
               ),
             ),
           ],
@@ -210,7 +211,7 @@ class _ArticlesViewState extends State<ArticlesView> {
   Widget _buildBody({
     required CyclePhase phase,
     required Color accent,
-    required bool isPremium,
+    required MembershipTier membershipTier,
   }) {
     if (_isLoading && _articles.isEmpty) {
       return Center(child: CircularProgressIndicator(color: accent));
@@ -234,7 +235,11 @@ class _ArticlesViewState extends State<ArticlesView> {
         ),
         padding: const EdgeInsets.only(bottom: 122),
         children: [
-          _ExploreHero(phase: phase, accent: accent, isPremium: isPremium),
+          _ExploreHero(
+            phase: phase,
+            accent: accent,
+            membershipTier: membershipTier,
+          ),
           if (_articles.isNotEmpty) ...[
             const SizedBox(height: 25),
             _buildQuickTopics(accent),
@@ -577,12 +582,12 @@ class _ExploreSearchHeader extends StatelessWidget {
 class _ExploreHero extends StatelessWidget {
   final CyclePhase phase;
   final Color accent;
-  final bool isPremium;
+  final MembershipTier membershipTier;
 
   const _ExploreHero({
     required this.phase,
     required this.accent,
-    required this.isPremium,
+    required this.membershipTier,
   });
 
   @override
@@ -632,7 +637,7 @@ class _ExploreHero extends StatelessWidget {
               ],
             ),
           ),
-          if (isPremium)
+          if (membershipTier != MembershipTier.free)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
@@ -645,7 +650,9 @@ class _ExploreHero extends StatelessWidget {
                   Icon(Icons.auto_awesome_rounded, color: accent, size: 13),
                   const SizedBox(width: 4),
                   Text(
-                    AppStrings.premium,
+                    membershipTier == MembershipTier.premium
+                        ? t.premium.premiumPlanName
+                        : t.premium.plusPlanName,
                     style: TextStyle(
                       color: accent,
                       fontSize: 9,

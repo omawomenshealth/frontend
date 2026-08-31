@@ -518,27 +518,38 @@ class _ProfileModeSelector extends StatefulWidget {
 }
 
 class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
-  int _selected = 0;
-
   @override
   Widget build(BuildContext context) {
+    final selectedMode = context
+        .watch<ProfileViewModel>()
+        .settings
+        .trackingMode;
     final options = [
       (
+        mode: TrackingMode.cycle,
         icon: Icons.local_florist_outlined,
         title: AppStrings.modeTrackCycle,
         subtitle: AppStrings.modeTrackCycleSubtitle,
+        enabled: true,
       ),
       (
+        mode: TrackingMode.tryingToConceive,
         icon: Icons.favorite_border_rounded,
         title: AppStrings.modeGetPregnant,
         subtitle: AppStrings.modeGetPregnantSubtitle,
+        enabled: false,
       ),
       (
+        mode: TrackingMode.pregnant,
         icon: Icons.child_friendly_outlined,
         title: AppStrings.modePregnancy,
         subtitle: AppStrings.modePregnancySubtitle,
+        enabled: false,
       ),
     ];
+    final selected = options.indexWhere(
+      (option) => option.mode == selectedMode,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -553,53 +564,66 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
                   Expanded(
                     child: Semantics(
                       button: true,
-                      selected: _selected == index,
+                      enabled: options[index].enabled,
+                      selected: selected == index,
                       label: options[index].title,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(18),
-                          onTap: () => setState(() => _selected = index),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            curve: Curves.easeOut,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 13,
+                      child: Opacity(
+                        opacity: options[index].enabled ? 1 : 0.42,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            key: ValueKey(
+                              'profile_mode_${options[index].mode.name}',
                             ),
-                            decoration: BoxDecoration(
-                              color: _selected == index
-                                  ? widget.accent.withValues(alpha: 0.11)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  options[index].icon,
-                                  size: 22,
-                                  color: _selected == index
-                                      ? widget.accent
-                                      : AppColors.textHint,
-                                ),
-                                const SizedBox(height: 7),
-                                Text(
-                                  options[index].title,
-                                  maxLines: 2,
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontFamily: 'Karla',
-                                    fontSize: 11,
-                                    height: 1.1,
-                                    fontWeight: FontWeight.w700,
-                                    color: _selected == index
+                            borderRadius: BorderRadius.circular(18),
+                            onTap: options[index].enabled
+                                ? () => _selectMode(
+                                    context,
+                                    options[index].mode,
+                                    options[index].title,
+                                  )
+                                : null,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              curve: Curves.easeOut,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 13,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected == index
+                                    ? widget.accent.withValues(alpha: 0.11)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    options[index].icon,
+                                    size: 22,
+                                    color: selected == index
                                         ? widget.accent
-                                        : AppColors.textSecondary,
+                                        : AppColors.textHint,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 7),
+                                  Text(
+                                    options[index].title,
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontFamily: 'Karla',
+                                      fontSize: 11,
+                                      height: 1.1,
+                                      fontWeight: FontWeight.w700,
+                                      color: selected == index
+                                          ? widget.accent
+                                          : AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -614,7 +638,7 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
         Padding(
           padding: const EdgeInsets.only(left: 4),
           child: Text(
-            options[_selected].subtitle,
+            options[selected < 0 ? 0 : selected].subtitle,
             style: const TextStyle(
               fontFamily: 'Karla',
               fontSize: 11,
@@ -624,6 +648,56 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
         ),
       ],
     );
+  }
+
+  Future<void> _selectMode(
+    BuildContext context,
+    TrackingMode mode,
+    String title,
+  ) async {
+    final profile = context.read<ProfileViewModel>();
+    if (profile.settings.trackingMode == mode) return;
+
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            key: const ValueKey('tracking_mode_confirmation'),
+            icon: Icon(switch (mode) {
+              TrackingMode.cycle => Icons.local_florist_outlined,
+              TrackingMode.tryingToConceive => Icons.favorite_border_rounded,
+              TrackingMode.pregnant => Icons.child_friendly_outlined,
+            }, color: widget.accent),
+            title: Text(AppStrings.modeChangeConfirmationTitle),
+            content: Text(AppStrings.modeChangeConfirmationBody(title)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                key: const ValueKey('tracking_mode_confirm'),
+                onPressed: () => Navigator.pop(dialogContext, true),
+                style: FilledButton.styleFrom(backgroundColor: widget.accent),
+                child: Text(AppStrings.changeModeAction),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!confirmed || !context.mounted) return;
+
+    final saved = await profile.setTrackingMode(mode);
+    if (!context.mounted) return;
+    if (!saved) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.modeChangeFailed)));
+      return;
+    }
+    await context.read<DashboardViewModel>().loadData();
+    if (!context.mounted) return;
+    await context.read<CalendarViewModel>().loadData();
   }
 }
 

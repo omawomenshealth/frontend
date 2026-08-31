@@ -43,6 +43,8 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$catalogs$en catalogs = Translations$catalogs$en.internal(_root);
 	late final Translations$onboarding$en onboarding = Translations$onboarding$en.internal(_root);
 	late final Translations$options$en options = Translations$options$en.internal(_root);
+	late final Translations$pregnancy$en pregnancy = Translations$pregnancy$en.internal(_root);
+	late final Translations$premium$en premium = Translations$premium$en.internal(_root);
 }
 
 // Path: catalogs
@@ -416,6 +418,250 @@ class Translations$options$en {
 		's': 'S',
 		's_2': 'S',
 	};
+}
+
+// Path: pregnancy
+class Translations$pregnancy$en {
+	Translations$pregnancy$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$pregnancy$common$en common = Translations$pregnancy$common$en.internal(_root);
+	late final Translations$pregnancy$fertility$en fertility = Translations$pregnancy$fertility$en.internal(_root);
+	late final Translations$pregnancy$modes$en modes = Translations$pregnancy$modes$en.internal(_root);
+	late final Translations$pregnancy$stages$en stages = Translations$pregnancy$stages$en.internal(_root);
+}
+
+// Path: premium
+class Translations$premium$en {
+	Translations$premium$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Premium'
+	String get pageTitle => 'Premium';
+
+	/// en: 'Close Premium'
+	String get close => 'Close Premium';
+
+	/// en: 'Your cycle, in greater detail'
+	String get eyebrow => 'Your cycle, in greater detail';
+
+	/// en: 'Understand your patterns more clearly'
+	String get heroTitle => 'Understand your patterns more clearly';
+
+	/// en: 'OMA Premium brings your insights, expert content and health summary together in one calm, private space.'
+	String get heroDescription => 'OMA Premium brings your insights, expert content and health summary together in one calm, private space.';
+
+	/// en: 'Membership active'
+	String get activeEyebrow => 'Membership active';
+
+	/// en: 'Premium is ready for you'
+	String get activeTitle => 'Premium is ready for you';
+
+	/// en: '$plan is ready for you'
+	String activePlanTitle({required Object plan}) => '${plan} is ready for you';
+
+	/// en: 'The paid features in your plan are unlocked on this account.'
+	String get activeDescription => 'The paid features in your plan are unlocked on this account.';
+
+	/// en: 'What's in the selected plan'
+	String get benefitsTitle => 'What\'s in the selected plan';
+
+	/// en: 'Compare each level and choose the amount of support that feels right for you.'
+	String get benefitsDescription => 'Compare each level and choose the amount of support that feels right for you.';
+
+	/// en: 'Cycle and wellbeing tracking'
+	String get benefitTrackingTitle => 'Cycle and wellbeing tracking';
+
+	/// en: 'Keep your calendar, symptoms and daily wellbeing notes together.'
+	String get benefitTrackingDescription => 'Keep your calendar, symptoms and daily wellbeing notes together.';
+
+	/// en: 'Deeper personal insights'
+	String get benefitInsightsTitle => 'Deeper personal insights';
+
+	/// en: 'See meaningful connections across your cycle, mood and daily logs.'
+	String get benefitInsightsDescription => 'See meaningful connections across your cycle, mood and daily logs.';
+
+	/// en: 'Full expert library'
+	String get benefitArticlesTitle => 'Full expert library';
+
+	/// en: 'Read every OMA article prepared to support each phase.'
+	String get benefitArticlesDescription => 'Read every OMA article prepared to support each phase.';
+
+	/// en: 'Shareable doctor report'
+	String get benefitReportTitle => 'Shareable doctor report';
+
+	/// en: 'Bring your cycle and health records into one clear summary.'
+	String get benefitReportDescription => 'Bring your cycle and health records into one clear summary.';
+
+	/// en: 'Dream reflections'
+	String get benefitDreamsTitle => 'Dream reflections';
+
+	/// en: 'Explore the feelings and themes behind the dreams you record.'
+	String get benefitDreamsDescription => 'Explore the feelings and themes behind the dreams you record.';
+
+	/// en: 'Choose your experience'
+	String get plansTitle => 'Choose your experience';
+
+	/// en: 'OMA Free'
+	String get freePlanName => 'OMA Free';
+
+	/// en: 'Starter'
+	String get freePlanBadge => 'Starter';
+
+	/// en: 'Free'
+	String get freePlanPrice => 'Free';
+
+	/// en: 'Daily cycle and wellbeing tracking'
+	String get freePlanDescription => 'Daily cycle and wellbeing tracking';
+
+	/// en: 'OMA Plus'
+	String get plusPlanName => 'OMA Plus';
+
+	/// en: 'Most popular'
+	String get plusPlanBadge => 'Most popular';
+
+	/// en: 'Personal insights and the complete expert library'
+	String get plusPlanDescription => 'Personal insights and the complete expert library';
+
+	/// en: 'OMA Premium'
+	String get premiumPlanName => 'OMA Premium';
+
+	/// en: 'Complete access'
+	String get premiumPlanBadge => 'Complete access';
+
+	/// en: 'Everything in Plus, with doctor reports and dream reflections'
+	String get premiumPlanDescription => 'Everything in Plus, with doctor reports and dream reflections';
+
+	/// en: 'Active plan'
+	String get activePlanBadge => 'Active plan';
+
+	/// en: 'Included in this plan'
+	String get selectedPlanTitle => 'Included in this plan';
+
+	/// en: 'Monthly membership via Google Play'
+	String get monthlyBilling => 'Monthly membership via Google Play';
+
+	/// en: 'Secure purchase through Google Play'
+	String get securePurchase => 'Secure purchase through Google Play';
+
+	/// en: 'Renews automatically. Cancel anytime from Google Play.'
+	String get renewalNote => 'Renews automatically. Cancel anytime from Google Play.';
+
+	/// en: 'Sign in first so your Premium access stays linked to your account.'
+	String get signInNote => 'Sign in first so your Premium access stays linked to your account.';
+
+	/// en: 'Membership update'
+	String get statusTitle => 'Membership update';
+
+	/// en: 'Done'
+	String get back => 'Done';
+
+	/// en: 'Sign in and continue'
+	String get signIn => 'Sign in and continue';
+
+	/// en: 'Processing…'
+	String get processing => 'Processing…';
+
+	/// en: 'Get Premium · $price'
+	String startPremium({required Object price}) => 'Get Premium · ${price}';
+
+	/// en: 'Get Plus · $price'
+	String startPlus({required Object price}) => 'Get Plus · ${price}';
+
+	/// en: 'Switch plan · $price'
+	String changePlan({required Object price}) => 'Switch plan · ${price}';
+
+	/// en: 'Your current plan'
+	String get currentPlan => 'Your current plan';
+
+	/// en: 'Manage in Google Play'
+	String get manageSubscription => 'Manage in Google Play';
+
+	/// en: 'To return to Free, cancel your paid membership in Google Play. Paid access continues until the current billing period ends.'
+	String get freeManagementNote => 'To return to Free, cancel your paid membership in Google Play. Paid access continues until the current billing period ends.';
+
+	/// en: 'Restore purchases'
+	String get restore => 'Restore purchases';
+
+	/// en: 'Google Play price'
+	String get googlePlayPrice => 'Google Play price';
+
+	/// en: 'Purchase update could not be read: $error'
+	String purchaseUpdateFailed({required Object error}) => 'Purchase update could not be read: ${error}';
+
+	/// en: 'Premium status could not be confirmed right now.'
+	String get serverUnavailable => 'Premium status could not be confirmed right now.';
+
+	/// en: 'Google Play purchases are not available on this device.'
+	String get storeUnavailable => 'Google Play purchases are not available on this device.';
+
+	/// en: 'The Premium membership could not be found in Google Play.'
+	String get productNotFound => 'The Premium membership could not be found in Google Play.';
+
+	/// en: 'One or more paid plans could not be found in Google Play.'
+	String get productsNotFound => 'One or more paid plans could not be found in Google Play.';
+
+	/// en: 'Could not connect to Google Play: $error'
+	String storeConnectionFailed({required Object error}) => 'Could not connect to Google Play: ${error}';
+
+	/// en: 'Sign in before starting Premium.'
+	String get loginRequired => 'Sign in before starting Premium.';
+
+	/// en: 'Sign in before restoring a purchase.'
+	String get loginRestoreRequired => 'Sign in before restoring a purchase.';
+
+	/// en: 'The Premium account link is invalid.'
+	String get invalidAccount => 'The Premium account link is invalid.';
+
+	/// en: 'The Google Play purchase screen could not be opened.'
+	String get purchaseScreenFailed => 'The Google Play purchase screen could not be opened.';
+
+	/// en: 'The purchase could not be started: $error'
+	String purchaseStartFailed({required Object error}) => 'The purchase could not be started: ${error}';
+
+	/// en: 'Checking your Google Play purchases…'
+	String get checkingPurchases => 'Checking your Google Play purchases…';
+
+	/// en: 'Purchases could not be restored: $error'
+	String restoreFailed({required Object error}) => 'Purchases could not be restored: ${error}';
+
+	/// en: 'Your purchase is pending approval in Google Play.'
+	String get purchasePending => 'Your purchase is pending approval in Google Play.';
+
+	/// en: 'The purchase was not completed.'
+	String get purchaseFailed => 'The purchase was not completed.';
+
+	/// en: 'The purchase was cancelled.'
+	String get purchaseCancelled => 'The purchase was cancelled.';
+
+	/// en: 'Verifying your purchase securely…'
+	String get verifyingPurchase => 'Verifying your purchase securely…';
+
+	/// en: 'Only Google Play purchases are supported.'
+	String get googlePlayOnly => 'Only Google Play purchases are supported.';
+
+	/// en: 'No active Premium membership was found.'
+	String get noActivePremium => 'No active Premium membership was found.';
+
+	/// en: 'Premium is active. Welcome to OMA Premium.'
+	String get premiumActivated => 'Premium is active. Welcome to OMA Premium.';
+
+	/// en: '$plan is active on this account.'
+	String membershipActivated({required Object plan}) => '${plan} is active on this account.';
+
+	/// en: 'Your current Google Play purchase could not be loaded. Restore purchases before changing plans.'
+	String get planChangeNeedsRestore => 'Your current Google Play purchase could not be loaded. Restore purchases before changing plans.';
+
+	/// en: 'Google Play subscription management could not be opened.'
+	String get subscriptionManagementFailed => 'Google Play subscription management could not be opened.';
+
+	/// en: 'The purchase could not be verified: $error'
+	String purchaseVerificationFailed({required Object error}) => 'The purchase could not be verified: ${error}';
 }
 
 // Path: catalogs.nutrition
@@ -1088,6 +1334,123 @@ class Translations$onboarding$wellbeing$en {
 	late final Translations$onboarding$wellbeing$supportOptions$en supportOptions = Translations$onboarding$wellbeing$supportOptions$en.internal(_root);
 }
 
+// Path: pregnancy.common
+class Translations$pregnancy$common$en {
+	Translations$pregnancy$common$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Pregnancy test'
+	String get testTitle => 'Pregnancy test';
+
+	/// en: 'Tests are more reliable from the first day of a missed period. If you do not know when your period is due, test at least 21 days after unprotected sex.'
+	String get testHint => 'Tests are more reliable from the first day of a missed period. If you do not know when your period is due, test at least 21 days after unprotected sex.';
+
+	/// en: 'I’m pregnant'
+	String get testPositiveAction => 'I’m pregnant';
+
+	/// en: 'Positive test recorded: {date} · This alone does not determine the pregnancy week.'
+	String get positiveTestRecorded => 'Positive test recorded: {date} · This alone does not determine the pregnancy week.';
+
+	/// en: 'PREGNANCY'
+	String get badge => 'PREGNANCY';
+
+	/// en: 'ESTIMATED PREGNANCY WEEK'
+	String get estimatedWeek => 'ESTIMATED PREGNANCY WEEK';
+
+	/// en: 'weeks'
+	String get weekLabel => 'weeks';
+
+	/// en: '{week} weeks {day} days'
+	String get weekAndDay => '{week} weeks {day} days';
+
+	/// en: 'Estimated from your last period and sexual activity logs'
+	String get estimateCombined => 'Estimated from your last period and sexual activity logs';
+
+	/// en: 'Estimated from the start of your last period'
+	String get estimateLastPeriod => 'Estimated from the start of your last period';
+
+	/// en: 'Approximate estimate from a sexual activity log'
+	String get estimateSexualActivity => 'Approximate estimate from a sexual activity log';
+
+	/// en: 'Add your last period date or a sexual activity log to estimate the week.'
+	String get estimateUnavailable => 'Add your last period date or a sexual activity log to estimate the week.';
+
+	/// en: 'Weekly guidance is coming soon'
+	String get infoComingSoon => 'Weekly guidance is coming soon';
+
+	/// en: 'Estimated due date: {date}'
+	String get estimatedDueDate => 'Estimated due date: {date}';
+}
+
+// Path: pregnancy.fertility
+class Translations$pregnancy$fertility$en {
+	Translations$pregnancy$fertility$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your estimated fertile window has begun'
+	String get insightTitle => 'Your estimated fertile window has begun';
+
+	/// en: 'Your cycle logs place you in the estimated fertile window. Logging body signals and discharge changes can help you see your own patterns. A calendar estimate does not confirm ovulation.'
+	String get insightBody => 'Your cycle logs place you in the estimated fertile window. Logging body signals and discharge changes can help you see your own patterns. A calendar estimate does not confirm ovulation.';
+}
+
+// Path: pregnancy.modes
+class Translations$pregnancy$modes$en {
+	Translations$pregnancy$modes$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Try to conceive'
+	String get getPregnant => 'Try to conceive';
+
+	/// en: 'Cycle tracking with fertile-window insights'
+	String get getPregnantSubtitle => 'Cycle tracking with fertile-window insights';
+
+	/// en: 'I’m pregnant'
+	String get pregnant => 'I’m pregnant';
+
+	/// en: 'Pregnancy journey'
+	String get pregnantSubtitle => 'Pregnancy journey';
+
+	/// en: 'Do you want to change your mode?'
+	String get changeConfirmationTitle => 'Do you want to change your mode?';
+
+	/// en: 'Your tracking preference will change to {mode}. Your existing logs will stay in place.'
+	String get changeConfirmationBody => 'Your tracking preference will change to {mode}. Your existing logs will stay in place.';
+
+	/// en: 'Yes, change it'
+	String get changeAction => 'Yes, change it';
+
+	/// en: 'Your mode could not be changed. Try again.'
+	String get changeFailed => 'Your mode could not be changed. Try again.';
+}
+
+// Path: pregnancy.stages
+class Translations$pregnancy$stages$en {
+	Translations$pregnancy$stages$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$pregnancy$stages$stage1$en stage1 = Translations$pregnancy$stages$stage1$en.internal(_root);
+	late final Translations$pregnancy$stages$stage2$en stage2 = Translations$pregnancy$stages$stage2$en.internal(_root);
+	late final Translations$pregnancy$stages$stage3$en stage3 = Translations$pregnancy$stages$stage3$en.internal(_root);
+	late final Translations$pregnancy$stages$stage4$en stage4 = Translations$pregnancy$stages$stage4$en.internal(_root);
+	late final Translations$pregnancy$stages$stage5$en stage5 = Translations$pregnancy$stages$stage5$en.internal(_root);
+	late final Translations$pregnancy$stages$stage6$en stage6 = Translations$pregnancy$stages$stage6$en.internal(_root);
+	late final Translations$pregnancy$stages$stage7$en stage7 = Translations$pregnancy$stages$stage7$en.internal(_root);
+	late final Translations$pregnancy$stages$stage8$en stage8 = Translations$pregnancy$stages$stage8$en.internal(_root);
+	late final Translations$pregnancy$stages$stage9$en stage9 = Translations$pregnancy$stages$stage9$en.internal(_root);
+}
+
 // Path: onboarding.wellbeing.moodOptions
 class Translations$onboarding$wellbeing$moodOptions$en {
 	Translations$onboarding$wellbeing$moodOptions$en.internal(this._root);
@@ -1137,6 +1500,141 @@ class Translations$onboarding$wellbeing$supportOptions$en {
 
 	/// en: 'Take a little rest'
 	String get justListen => 'Take a little rest';
+}
+
+// Path: pregnancy.stages.stage1
+class Translations$pregnancy$stages$stage1$en {
+	Translations$pregnancy$stages$stage1$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 1–4 · Beginning and Implantation'
+	String get title => 'Weeks 1–4 · Beginning and Implantation';
+
+	/// en: 'Everything is just beginning. Your body is preparing for tiny but important changes. 💗'
+	String get body => 'Everything is just beginning. Your body is preparing for tiny but important changes. 💗';
+}
+
+// Path: pregnancy.stages.stage2
+class Translations$pregnancy$stages$stage2$en {
+	Translations$pregnancy$stages$stage2$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 5–8 · Foundations Are Forming'
+	String get title => 'Weeks 5–8 · Foundations Are Forming';
+
+	/// en: 'Small developments are moving quickly. You may also begin to notice more changes in your body.'
+	String get body => 'Small developments are moving quickly. You may also begin to notice more changes in your body.';
+}
+
+// Path: pregnancy.stages.stage3
+class Translations$pregnancy$stages$stage3$en {
+	Translations$pregnancy$stages$stage3$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 9–13 · Moving Into the Fetal Period'
+	String get title => 'Weeks 9–13 · Moving Into the Fetal Period';
+
+	/// en: 'You have moved through most of the earliest weeks. Your baby becomes a little more distinct each day. ✨'
+	String get body => 'You have moved through most of the earliest weeks. Your baby becomes a little more distinct each day. ✨';
+}
+
+// Path: pregnancy.stages.stage4
+class Translations$pregnancy$stages$stage4$en {
+	Translations$pregnancy$stages$stage4$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 14–17 · Rapid Growth'
+	String get title => 'Weeks 14–17 · Rapid Growth';
+
+	/// en: 'As your baby grows quickly, you are continuing to settle into this new stage of pregnancy.'
+	String get body => 'As your baby grows quickly, you are continuing to settle into this new stage of pregnancy.';
+}
+
+// Path: pregnancy.stages.stage5
+class Translations$pregnancy$stages$stage5$en {
+	Translations$pregnancy$stages$stage5$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 18–22 · First Movements'
+	String get title => 'Weeks 18–22 · First Movements';
+
+	/// en: 'These are special weeks when you may begin to notice those tiny movements. 🫶'
+	String get body => 'These are special weeks when you may begin to notice those tiny movements. 🫶';
+}
+
+// Path: pregnancy.stages.stage6
+class Translations$pregnancy$stages$stage6$en {
+	Translations$pregnancy$stages$stage6$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 23–27 · Growing Stronger'
+	String get title => 'Weeks 23–27 · Growing Stronger';
+
+	/// en: 'Your baby’s movements may now feel more distinct. There is a small but very active world inside.'
+	String get body => 'Your baby’s movements may now feel more distinct. There is a small but very active world inside.';
+}
+
+// Path: pregnancy.stages.stage7
+class Translations$pregnancy$stages$stage7$en {
+	Translations$pregnancy$stages$stage7$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 28–31 · Maturing'
+	String get title => 'Weeks 28–31 · Maturing';
+
+	/// en: 'Your baby continues to grow and gain strength. You are moving gently toward meeting each other. 🤍'
+	String get body => 'Your baby continues to grow and gain strength. You are moving gently toward meeting each other. 🤍';
+}
+
+// Path: pregnancy.stages.stage8
+class Translations$pregnancy$stages$stage8$en {
+	Translations$pregnancy$stages$stage8$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 32–35 · Preparing for Birth'
+	String get title => 'Weeks 32–35 · Preparing for Birth';
+
+	/// en: 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.'
+	String get body => 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.';
+}
+
+// Path: pregnancy.stages.stage9
+class Translations$pregnancy$stages$stage9$en {
+	Translations$pregnancy$stages$stage9$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 36–40+ · Final Weeks'
+	String get title => 'Weeks 36–40+ · Final Weeks';
+
+	/// en: 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷'
+	String get body => 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -1859,6 +2357,122 @@ extension on Translations {
 			'options.calendarWeekdayInitials.f' => 'F',
 			'options.calendarWeekdayInitials.s' => 'S',
 			'options.calendarWeekdayInitials.s_2' => 'S',
+			'pregnancy.common.testTitle' => 'Pregnancy test',
+			'pregnancy.common.testHint' => 'Tests are more reliable from the first day of a missed period. If you do not know when your period is due, test at least 21 days after unprotected sex.',
+			'pregnancy.common.testPositiveAction' => 'I’m pregnant',
+			'pregnancy.common.positiveTestRecorded' => 'Positive test recorded: {date} · This alone does not determine the pregnancy week.',
+			'pregnancy.common.badge' => 'PREGNANCY',
+			'pregnancy.common.estimatedWeek' => 'ESTIMATED PREGNANCY WEEK',
+			'pregnancy.common.weekLabel' => 'weeks',
+			'pregnancy.common.weekAndDay' => '{week} weeks {day} days',
+			'pregnancy.common.estimateCombined' => 'Estimated from your last period and sexual activity logs',
+			'pregnancy.common.estimateLastPeriod' => 'Estimated from the start of your last period',
+			'pregnancy.common.estimateSexualActivity' => 'Approximate estimate from a sexual activity log',
+			'pregnancy.common.estimateUnavailable' => 'Add your last period date or a sexual activity log to estimate the week.',
+			'pregnancy.common.infoComingSoon' => 'Weekly guidance is coming soon',
+			'pregnancy.common.estimatedDueDate' => 'Estimated due date: {date}',
+			'pregnancy.fertility.insightTitle' => 'Your estimated fertile window has begun',
+			'pregnancy.fertility.insightBody' => 'Your cycle logs place you in the estimated fertile window. Logging body signals and discharge changes can help you see your own patterns. A calendar estimate does not confirm ovulation.',
+			'pregnancy.modes.getPregnant' => 'Try to conceive',
+			'pregnancy.modes.getPregnantSubtitle' => 'Cycle tracking with fertile-window insights',
+			'pregnancy.modes.pregnant' => 'I’m pregnant',
+			'pregnancy.modes.pregnantSubtitle' => 'Pregnancy journey',
+			'pregnancy.modes.changeConfirmationTitle' => 'Do you want to change your mode?',
+			'pregnancy.modes.changeConfirmationBody' => 'Your tracking preference will change to {mode}. Your existing logs will stay in place.',
+			'pregnancy.modes.changeAction' => 'Yes, change it',
+			'pregnancy.modes.changeFailed' => 'Your mode could not be changed. Try again.',
+			'pregnancy.stages.stage1.title' => 'Weeks 1–4 · Beginning and Implantation',
+			'pregnancy.stages.stage1.body' => 'Everything is just beginning. Your body is preparing for tiny but important changes. 💗',
+			'pregnancy.stages.stage2.title' => 'Weeks 5–8 · Foundations Are Forming',
+			'pregnancy.stages.stage2.body' => 'Small developments are moving quickly. You may also begin to notice more changes in your body.',
+			'pregnancy.stages.stage3.title' => 'Weeks 9–13 · Moving Into the Fetal Period',
+			'pregnancy.stages.stage3.body' => 'You have moved through most of the earliest weeks. Your baby becomes a little more distinct each day. ✨',
+			'pregnancy.stages.stage4.title' => 'Weeks 14–17 · Rapid Growth',
+			'pregnancy.stages.stage4.body' => 'As your baby grows quickly, you are continuing to settle into this new stage of pregnancy.',
+			'pregnancy.stages.stage5.title' => 'Weeks 18–22 · First Movements',
+			'pregnancy.stages.stage5.body' => 'These are special weeks when you may begin to notice those tiny movements. 🫶',
+			'pregnancy.stages.stage6.title' => 'Weeks 23–27 · Growing Stronger',
+			'pregnancy.stages.stage6.body' => 'Your baby’s movements may now feel more distinct. There is a small but very active world inside.',
+			'pregnancy.stages.stage7.title' => 'Weeks 28–31 · Maturing',
+			'pregnancy.stages.stage7.body' => 'Your baby continues to grow and gain strength. You are moving gently toward meeting each other. 🤍',
+			'pregnancy.stages.stage8.title' => 'Weeks 32–35 · Preparing for Birth',
+			'pregnancy.stages.stage8.body' => 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.',
+			'pregnancy.stages.stage9.title' => 'Weeks 36–40+ · Final Weeks',
+			'pregnancy.stages.stage9.body' => 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷',
+			'premium.pageTitle' => 'Premium',
+			'premium.close' => 'Close Premium',
+			'premium.eyebrow' => 'Your cycle, in greater detail',
+			'premium.heroTitle' => 'Understand your patterns more clearly',
+			'premium.heroDescription' => 'OMA Premium brings your insights, expert content and health summary together in one calm, private space.',
+			'premium.activeEyebrow' => 'Membership active',
+			'premium.activeTitle' => 'Premium is ready for you',
+			'premium.activePlanTitle' => ({required Object plan}) => '${plan} is ready for you',
+			'premium.activeDescription' => 'The paid features in your plan are unlocked on this account.',
+			'premium.benefitsTitle' => 'What\'s in the selected plan',
+			'premium.benefitsDescription' => 'Compare each level and choose the amount of support that feels right for you.',
+			'premium.benefitTrackingTitle' => 'Cycle and wellbeing tracking',
+			'premium.benefitTrackingDescription' => 'Keep your calendar, symptoms and daily wellbeing notes together.',
+			'premium.benefitInsightsTitle' => 'Deeper personal insights',
+			'premium.benefitInsightsDescription' => 'See meaningful connections across your cycle, mood and daily logs.',
+			'premium.benefitArticlesTitle' => 'Full expert library',
+			'premium.benefitArticlesDescription' => 'Read every OMA article prepared to support each phase.',
+			'premium.benefitReportTitle' => 'Shareable doctor report',
+			'premium.benefitReportDescription' => 'Bring your cycle and health records into one clear summary.',
+			'premium.benefitDreamsTitle' => 'Dream reflections',
+			'premium.benefitDreamsDescription' => 'Explore the feelings and themes behind the dreams you record.',
+			'premium.plansTitle' => 'Choose your experience',
+			'premium.freePlanName' => 'OMA Free',
+			'premium.freePlanBadge' => 'Starter',
+			'premium.freePlanPrice' => 'Free',
+			'premium.freePlanDescription' => 'Daily cycle and wellbeing tracking',
+			'premium.plusPlanName' => 'OMA Plus',
+			'premium.plusPlanBadge' => 'Most popular',
+			'premium.plusPlanDescription' => 'Personal insights and the complete expert library',
+			'premium.premiumPlanName' => 'OMA Premium',
+			'premium.premiumPlanBadge' => 'Complete access',
+			'premium.premiumPlanDescription' => 'Everything in Plus, with doctor reports and dream reflections',
+			'premium.activePlanBadge' => 'Active plan',
+			'premium.selectedPlanTitle' => 'Included in this plan',
+			'premium.monthlyBilling' => 'Monthly membership via Google Play',
+			'premium.securePurchase' => 'Secure purchase through Google Play',
+			'premium.renewalNote' => 'Renews automatically. Cancel anytime from Google Play.',
+			'premium.signInNote' => 'Sign in first so your Premium access stays linked to your account.',
+			'premium.statusTitle' => 'Membership update',
+			'premium.back' => 'Done',
+			'premium.signIn' => 'Sign in and continue',
+			'premium.processing' => 'Processing…',
+			'premium.startPremium' => ({required Object price}) => 'Get Premium · ${price}',
+			'premium.startPlus' => ({required Object price}) => 'Get Plus · ${price}',
+			'premium.changePlan' => ({required Object price}) => 'Switch plan · ${price}',
+			'premium.currentPlan' => 'Your current plan',
+			'premium.manageSubscription' => 'Manage in Google Play',
+			'premium.freeManagementNote' => 'To return to Free, cancel your paid membership in Google Play. Paid access continues until the current billing period ends.',
+			'premium.restore' => 'Restore purchases',
+			'premium.googlePlayPrice' => 'Google Play price',
+			'premium.purchaseUpdateFailed' => ({required Object error}) => 'Purchase update could not be read: ${error}',
+			'premium.serverUnavailable' => 'Premium status could not be confirmed right now.',
+			'premium.storeUnavailable' => 'Google Play purchases are not available on this device.',
+			'premium.productNotFound' => 'The Premium membership could not be found in Google Play.',
+			'premium.productsNotFound' => 'One or more paid plans could not be found in Google Play.',
+			'premium.storeConnectionFailed' => ({required Object error}) => 'Could not connect to Google Play: ${error}',
+			'premium.loginRequired' => 'Sign in before starting Premium.',
+			'premium.loginRestoreRequired' => 'Sign in before restoring a purchase.',
+			'premium.invalidAccount' => 'The Premium account link is invalid.',
+			'premium.purchaseScreenFailed' => 'The Google Play purchase screen could not be opened.',
+			'premium.purchaseStartFailed' => ({required Object error}) => 'The purchase could not be started: ${error}',
+			'premium.checkingPurchases' => 'Checking your Google Play purchases…',
+			'premium.restoreFailed' => ({required Object error}) => 'Purchases could not be restored: ${error}',
+			'premium.purchasePending' => 'Your purchase is pending approval in Google Play.',
+			'premium.purchaseFailed' => 'The purchase was not completed.',
+			'premium.purchaseCancelled' => 'The purchase was cancelled.',
+			'premium.verifyingPurchase' => 'Verifying your purchase securely…',
+			'premium.googlePlayOnly' => 'Only Google Play purchases are supported.',
+			'premium.noActivePremium' => 'No active Premium membership was found.',
+			'premium.premiumActivated' => 'Premium is active. Welcome to OMA Premium.',
+			'premium.membershipActivated' => ({required Object plan}) => '${plan} is active on this account.',
+			'premium.planChangeNeedsRestore' => 'Your current Google Play purchase could not be loaded. Restore purchases before changing plans.',
+			'premium.subscriptionManagementFailed' => 'Google Play subscription management could not be opened.',
+			'premium.purchaseVerificationFailed' => ({required Object error}) => 'The purchase could not be verified: ${error}',
 			_ => null,
 		};
 	}

@@ -525,6 +525,12 @@ class SyncService {
       sexuallyActive: primary.sexuallyActive ?? secondary.sexuallyActive,
       wantsChildrenInYear:
           primary.wantsChildrenInYear ?? secondary.wantsChildrenInYear,
+      trackingMode: primary.trackingMode,
+      pregnancyStartDate:
+          primary.pregnancyStartDate ?? secondary.pregnancyStartDate,
+      pregnancyTestPositiveDate:
+          primary.pregnancyTestPositiveDate ??
+          secondary.pregnancyTestPositiveDate,
       lastPeriodDate: primary.lastPeriodDate ?? secondary.lastPeriodDate,
       birthControlMethod: selectedBirthControl == null
           ? null

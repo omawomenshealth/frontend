@@ -5,6 +5,8 @@ import '../../../data/models/medication_identity_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/notification_service.dart';
+import '../../../core/utils/app_time.dart';
+import '../../../core/utils/pregnancy_calculator.dart';
 
 /// Profil iş mantığı — kullanıcı bilgilerini görüntüleme ve güncelleme.
 import '../../../data/services/sync_service.dart';
@@ -184,9 +186,7 @@ class ProfileViewModel extends ChangeNotifier {
   void updateSmokingStatus(SmokingStatus value) {
     _settings = _settings.copyWith(
       smokingStatus: value,
-      smokingYears: value == SmokingStatus.current
-          ? _settings.smokingYears
-          : 0,
+      smokingYears: value == SmokingStatus.current ? _settings.smokingYears : 0,
     );
     notifyListeners();
   }
@@ -209,6 +209,56 @@ class ProfileViewModel extends ChangeNotifier {
   void updateWantsChildrenInYear(bool? value) {
     _settings = _settings.copyWith(wantsChildrenInYear: value);
     notifyListeners();
+  }
+
+  /// Kullanıcının ana takip deneyimini kalıcı olarak değiştirir. Gebelik modu
+  /// ilk kez açılırken eldeki son adet ve cinsel ilişki kayıtlarından tarih
+  /// referansı dondurulur; hamile kal modunda gizli verimli dönem bildirimleri
+  /// hazırlanır.
+  Future<bool> setTrackingMode(TrackingMode value) async {
+    final previous = _settings;
+    DateTime? pregnancyStart = previous.pregnancyStartDate;
+    if (value == TrackingMode.pregnant) {
+      pregnancyStart = PregnancyCalculator.estimate(
+        settings: previous,
+        logs: _storage.loadAllLogs(),
+        asOf: AppTime.now,
+      )?.startDate;
+    }
+    _settings = previous.copyWith(
+      trackingMode: value,
+      wantsChildrenInYear: value == TrackingMode.tryingToConceive
+          ? true
+          : previous.wantsChildrenInYear,
+      pregnancyStartDate: pregnancyStart,
+      clearPregnancyStartDate:
+          value != TrackingMode.pregnant || pregnancyStart == null,
+      clearPregnancyTestPositiveDate: value != TrackingMode.pregnant,
+    );
+    notifyListeners();
+
+    final saved = await _storage.saveSettings(_settings);
+    if (!saved) {
+      _settings = previous;
+      notifyListeners();
+      return false;
+    }
+
+    try {
+      if (value == TrackingMode.tryingToConceive &&
+          _settings.notificationsEnabled) {
+        final permissionGranted = await _notifications
+            .requestInsightPermissions();
+        if (permissionGranted) {
+          await _notifications.rescheduleFertilityInsights(settings: _settings);
+        }
+      } else {
+        await _notifications.rescheduleFertilityInsights(settings: _settings);
+      }
+    } catch (error) {
+      debugPrint('Verimli dönem bildirimleri güncellenemedi: $error');
+    }
+    return true;
   }
 
   void updateLaboratoryResults({

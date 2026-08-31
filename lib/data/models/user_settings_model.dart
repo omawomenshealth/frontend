@@ -9,6 +9,9 @@ enum MenopauseStatus { none, pre, peri, post }
 
 enum SmokingStatus { current, never, former }
 
+/// Ana ekranın hangi sağlık yolculuğuna odaklanacağını belirler.
+enum TrackingMode { cycle, tryingToConceive, pregnant }
+
 /// Kullanıcının `+` ile eklediği ve sonraki kayıtlarda yeniden seçilebilen
 /// metin seçenekleri. Günlük kayıtlarda ilk girilen yazım korunur; böylece aynı
 /// değişken farklı büyük/küçük harf veya boşluklarla parçalanmaz.
@@ -66,6 +69,9 @@ const _userSettingsJsonFields = {
   'customBirthControlMethods',
   'customSymptoms',
   'notificationsEnabled',
+  'trackingMode',
+  'pregnancyStartDate',
+  'pregnancyTestPositiveDate',
 };
 
 SmokingStatus _smokingStatusFromJson(Map<String, dynamic> json) {
@@ -125,6 +131,17 @@ class UserSettings {
   final Map<CustomSymptomGroup, List<String>> customSymptoms;
 
   final bool notificationsEnabled;
+  final TrackingMode trackingMode;
+
+  /// Gebelik yaşının sıfırıncı günü. Genellikle son adet başlangıcıdır; son
+  /// adet verisi yoksa olası döllenme tarihinden 14 gün geriye gidilerek
+  /// tahmin edilir. Mod değiştikten sonra haftanın kaymaması için saklanır.
+  final DateTime? pregnancyStartDate;
+
+  /// Kullanıcının belirti ekranından pozitif olarak kaydettiği ev tipi testin
+  /// tarihi. Gebelik haftasını tek başına belirlemek için kullanılmaz; kartta
+  /// destekleyici kayıt ve belirsizlik bilgisi olarak gösterilir.
+  final DateTime? pregnancyTestPositiveDate;
 
   UserSettings({
     this.userName = '',
@@ -157,6 +174,9 @@ class UserSettings {
     this.customBirthControlMethods = const [],
     Map<CustomSymptomGroup, List<String>> customSymptoms = const {},
     this.notificationsEnabled = true,
+    this.trackingMode = TrackingMode.cycle,
+    this.pregnancyStartDate,
+    this.pregnancyTestPositiveDate,
   }) : customSymptoms = _cleanCustomSymptoms(customSymptoms);
 
   UserSettings copyWith({
@@ -193,6 +213,11 @@ class UserSettings {
     List<String>? customBirthControlMethods,
     Map<CustomSymptomGroup, List<String>>? customSymptoms,
     bool? notificationsEnabled,
+    TrackingMode? trackingMode,
+    DateTime? pregnancyStartDate,
+    bool clearPregnancyStartDate = false,
+    DateTime? pregnancyTestPositiveDate,
+    bool clearPregnancyTestPositiveDate = false,
   }) {
     return UserSettings(
       userName: userName ?? this.userName,
@@ -230,6 +255,13 @@ class UserSettings {
           customBirthControlMethods ?? this.customBirthControlMethods,
       customSymptoms: customSymptoms ?? this.customSymptoms,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      trackingMode: trackingMode ?? this.trackingMode,
+      pregnancyStartDate: clearPregnancyStartDate
+          ? null
+          : pregnancyStartDate ?? this.pregnancyStartDate,
+      pregnancyTestPositiveDate: clearPregnancyTestPositiveDate
+          ? null
+          : pregnancyTestPositiveDate ?? this.pregnancyTestPositiveDate,
     );
   }
 
@@ -342,6 +374,9 @@ class UserSettings {
         for (final entry in customSymptoms.entries) entry.key.name: entry.value,
       },
       'notificationsEnabled': notificationsEnabled,
+      'trackingMode': trackingMode.name,
+      'pregnancyStartDate': pregnancyStartDate?.toIso8601String(),
+      'pregnancyTestPositiveDate': pregnancyTestPositiveDate?.toIso8601String(),
     };
   }
 
@@ -432,6 +467,16 @@ class UserSettings {
       ),
       customSymptoms: _readCustomSymptoms(json, 'customSymptoms'),
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
+      trackingMode: TrackingMode.values.firstWhere(
+        (value) => value.name == json['trackingMode'],
+        orElse: () => TrackingMode.cycle,
+      ),
+      pregnancyStartDate: json['pregnancyStartDate'] != null
+          ? DateTime.tryParse(json['pregnancyStartDate'].toString())
+          : null,
+      pregnancyTestPositiveDate: json['pregnancyTestPositiveDate'] != null
+          ? DateTime.tryParse(json['pregnancyTestPositiveDate'].toString())
+          : null,
     );
   }
 

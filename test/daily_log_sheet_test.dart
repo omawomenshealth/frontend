@@ -1576,6 +1576,15 @@ void main() {
     );
   });
 
+  testWidgets('hamilelik testi alanı belirti ekranında şimdilik gizlidir', (
+    tester,
+  ) async {
+    await _pumpLogSheet(tester, initialIndex: 2);
+
+    expect(find.byKey(const ValueKey('pregnancy_test_section')), findsNothing);
+    expect(find.byKey(const ValueKey('pregnancy_test_positive')), findsNothing);
+  });
+
   test('Yeni sade kayit alanlari JSON yedeginde kaybolmaz', () {
     final original = DailyLog(
       date: DateTime(2026, 7, 27, 18, 30),

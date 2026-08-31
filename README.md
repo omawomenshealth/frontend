@@ -53,17 +53,19 @@ Makale kartları ve detay metinleri API'den alınır. Uygulama paketinde makale
 gövdesi bulunmaz. Bir ücretsiz makale doğrudan açılır; premium makalelerin detayı
 sunucu entitlement kontrolünden sonra gönderilir.
 
-## Google Play premium
+## Google Play üyelikleri
 
-Abonelik kimliği de `.env` içindeki
-`GOOGLE_PLAY_PREMIUM_PRODUCT_ID` değeriyle ayarlanır:
+Ücretli iki paket `.env` içinde ayrı Google Play ürünlerine bağlanır:
 
 ```dotenv
+GOOGLE_PLAY_PACKAGE_NAME=com.bps.oma
+GOOGLE_PLAY_PLUS_PRODUCT_ID=oma_plus_monthly
 GOOGLE_PLAY_PREMIUM_PRODUCT_ID=oma_premium_monthly
 ```
 
-Bu değer Play Console'daki subscription product ID ve sunucudaki
-`GOOGLE_PLAY_PREMIUM_PRODUCT_ID` ile aynı olmalıdır.
+Bu değerler Play Console'daki abonelik ürün kimlikleri ve sunucudaki değerlerle
+birebir aynı olmalıdır. Ücretsiz paket için mağaza ürünü oluşturulmaz. Ekrandaki
+yerelleştirilmiş fiyatlar uygulamada sabitlenmez; Google Play'den okunur.
 
 Play Console'a uygulamayı eklemeden önce
 `android/app/build.gradle.kts` içindeki geçici
@@ -87,7 +89,9 @@ keyPassword=<güçlü-parola>
 Bu dosya veya keystore eksikse release derlemesi güvenli biçimde durur. Anahtarı
 ve parolaları CI secret kasasında yedekleyin; repoya eklemeyin.
 
-Sunucu ve Google Play servis hesabı kurulumu için `../Server/README.md` dosyasına
+Uçtan uca kurulum, üyelik verisinin kaynağı ve test adımları için
+`docs/GOOGLE_PLAY_MEMBERSHIP_SETUP_TR.md`; sunucu ayarları için
+`../Server/README.md` dosyasına
 bakın.
 
 ## Dil yapısı
