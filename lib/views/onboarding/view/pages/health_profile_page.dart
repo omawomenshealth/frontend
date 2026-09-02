@@ -125,6 +125,7 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
                   key: const ValueKey('onboarding_add_known_disease'),
                   avatar: const Icon(Icons.add_rounded, size: 17),
                   label: Text(healthProfile.addCondition),
+                  labelStyle: OnboardingTypography.control,
                   onPressed: widget.onOpenDiseases,
                 ),
               ],

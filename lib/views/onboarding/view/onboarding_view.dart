@@ -39,80 +39,89 @@ class _OnboardingViewState extends State<OnboardingView> {
   Widget build(BuildContext context) {
     final vm = context.watch<OnboardingViewModel>();
     final controller = OnboardingController(context: context, vm: vm);
+    final appTheme = Theme.of(context);
+    final onboardingTheme = appTheme.copyWith(
+      textTheme: appTheme.textTheme.apply(fontFamily: 'DM Sans'),
+    );
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: AppColors.scaffoldBackground,
-      body: Stack(
-        children: [
-          const OnboardingBackground(),
-          SafeArea(
-            child: Column(
-              children: [
-                Visibility(
-                  visible: !vm.isPreviewPage,
-                  maintainState: true,
-                  maintainAnimation: true,
-                  maintainSize: true,
-                  child: OnboardingProgressHeader(
-                    currentPage: vm.currentPage,
-                    totalPages: vm.totalPages,
-                    prompt: _promptForPage(context, vm.currentPage),
-                    onBack: _goBack,
-                    canGoBack: !vm.isSaving,
+    return Theme(
+      data: onboardingTheme,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: AppColors.scaffoldBackground,
+        body: Stack(
+          children: [
+            const OnboardingBackground(),
+            SafeArea(
+              child: Column(
+                children: [
+                  Visibility(
+                    visible: !vm.isPreviewPage,
+                    maintainState: true,
+                    maintainAnimation: true,
+                    maintainSize: true,
+                    child: OnboardingProgressHeader(
+                      currentPage: vm.currentPage,
+                      totalPages: vm.totalPages,
+                      prompt: _promptForPage(context, vm.currentPage),
+                      onBack: _goBack,
+                      canGoBack: !vm.isSaving,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    onPageChanged: vm.goToPage,
-                    children: [
-                      IntroductionPage(
-                        vm: vm,
-                        birthDateController: _birthDateController,
-                        onPickBirthDate: () async {
-                          await controller.pickBirthDate();
-                          if (mounted && vm.birthDate != null) {
-                            _birthDateController.text =
-                                OnboardingDateUtils.formatDate(vm.birthDate!);
-                          }
-                        },
-                        onBirthDateChanged: (value) {
-                          vm.setBirthDate(
-                            OnboardingDateUtils.parseBirthDate(value),
-                          );
-                        },
-                      ),
-                      WellbeingPage(),
-                      HealthProfilePage(
-                        vm: vm,
-                        onOpenDiseases: controller.showDiseasePicker,
-                      ),
-                      CyclePage(
-                        vm: vm,
-                        onPickLastPeriod: controller.pickLastPeriod,
-                        onAddBirthControl: controller.addBirthControl,
-                      ),
-                      OnboardingPreviewPage(vm: vm, onComplete: _complete),
-                    ],
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onPageChanged: vm.goToPage,
+                      children: [
+                        IntroductionPage(
+                          vm: vm,
+                          birthDateController: _birthDateController,
+                          onPickBirthDate: () async {
+                            await controller.pickBirthDate();
+                            if (mounted && vm.birthDate != null) {
+                              _birthDateController.text =
+                                  OnboardingDateUtils.formatDate(
+                                    vm.birthDate!,
+                                  );
+                            }
+                          },
+                          onBirthDateChanged: (value) {
+                            vm.setBirthDate(
+                              OnboardingDateUtils.parseBirthDate(value),
+                            );
+                          },
+                        ),
+                        WellbeingPage(),
+                        HealthProfilePage(
+                          vm: vm,
+                          onOpenDiseases: controller.showDiseasePicker,
+                        ),
+                        CyclePage(
+                          vm: vm,
+                          onPickLastPeriod: controller.pickLastPeriod,
+                          onAddBirthControl: controller.addBirthControl,
+                        ),
+                        OnboardingPreviewPage(vm: vm, onComplete: _complete),
+                      ],
+                    ),
                   ),
-                ),
-                Visibility(
-                  visible: !vm.isPreviewPage,
-                  maintainState: true,
-                  maintainAnimation: true,
-                  maintainSize: true,
-                  child: OnboardingBottomNavigation(
-                    vm: vm,
-                    onNext: _goNext,
-                    onSkip: _goNext,
+                  Visibility(
+                    visible: !vm.isPreviewPage,
+                    maintainState: true,
+                    maintainAnimation: true,
+                    maintainSize: true,
+                    child: OnboardingBottomNavigation(
+                      vm: vm,
+                      onNext: _goNext,
+                      onSkip: _goNext,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

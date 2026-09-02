@@ -80,7 +80,12 @@ class CyclePage extends StatelessWidget {
                         : null,
                   ),
                 ),
-                Text(cycle.dayCount(days: vm.averageCycleLength)),
+                Text(
+                  cycle.dayCount(days: vm.averageCycleLength),
+                  style: OnboardingTypography.counter.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -92,6 +97,9 @@ class CyclePage extends StatelessWidget {
               child: OutlinedButton.icon(
                 key: const ValueKey('onboarding_last_period_days'),
                 onPressed: isCycleInformationEnabled ? onPickLastPeriod : null,
+                style: OutlinedButton.styleFrom(
+                  textStyle: OnboardingTypography.button,
+                ),
                 icon: const Icon(Icons.date_range_outlined),
                 label: Text(cycle.selectLastPeriodDays),
               ),
@@ -117,6 +125,7 @@ class CyclePage extends StatelessWidget {
                   key: const ValueKey('onboarding_add_birth_control'),
                   avatar: const Icon(Icons.add_rounded, size: 17),
                   label: Text(cycle.addBirthControl),
+                  labelStyle: OnboardingTypography.control,
                   onPressed: isCycleInformationEnabled
                       ? onAddBirthControl
                       : null,

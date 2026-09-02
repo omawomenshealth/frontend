@@ -6,6 +6,7 @@ import '../../../../core/constants/image_constants.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/onboarding_prompt.dart';
+import '../widgets/onboarding_typography.dart';
 
 class OnboardingPreviewPage extends StatelessWidget {
   final OnboardingViewModel vm;
@@ -58,13 +59,8 @@ class OnboardingPreviewPage extends StatelessWidget {
             child: Text(
               name.isEmpty ? review.title : review.titleWithName(name: name),
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: 'CormorantGaramond',
+              style: OnboardingTypography.welcomeDisplay.copyWith(
                 color: AppColors.textPrimary,
-                fontSize: 34,
-                height: 1.05,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -73,10 +69,8 @@ class OnboardingPreviewPage extends StatelessWidget {
             child: Text(
               review.subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: OnboardingTypography.body.copyWith(
                 color: AppColors.textSecondary,
-                fontSize: 15,
-                height: 1.4,
               ),
             ),
           ),
@@ -107,9 +101,8 @@ class OnboardingPreviewPage extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 review.privacyAndData,
-                style: const TextStyle(
+                style: OnboardingTypography.helper.copyWith(
                   color: AppColors.textSecondary,
-                  fontSize: 12,
                 ),
               ),
             ],
@@ -122,10 +115,7 @@ class OnboardingPreviewPage extends StatelessWidget {
               backgroundColor: const Color(0xFF9252B5),
               foregroundColor: Colors.white,
               shape: const StadiumBorder(),
-              textStyle: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
+              textStyle: OnboardingTypography.button,
             ),
             child: vm.isSaving
                 ? const SizedBox(
@@ -164,9 +154,8 @@ class _PreviewSummary extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
+                style: OnboardingTypography.helper.copyWith(
                   color: AppColors.textSecondary,
-                  fontSize: 12,
                 ),
               ),
             ),
@@ -175,10 +164,8 @@ class _PreviewSummary extends StatelessWidget {
               child: Text(
                 value,
                 textAlign: TextAlign.end,
-                style: const TextStyle(
+                style: OnboardingTypography.counter.copyWith(
                   color: AppColors.textPrimary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),

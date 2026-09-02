@@ -61,8 +61,14 @@ Future<void> showDiseaseSelectionSheet(
               TextField(
                 key: const ValueKey('onboarding_disease_search'),
                 onChanged: (value) => setSheetState(() => query = value),
+                style: OnboardingTypography.input.copyWith(
+                  color: AppColors.textPrimary,
+                ),
                 decoration: InputDecoration(
                   hintText: AppStrings.searchConditions,
+                  hintStyle: OnboardingTypography.input.copyWith(
+                    color: AppColors.textHint,
+                  ),
                   prefixIcon: const Icon(Icons.search_rounded),
                 ),
               ),
@@ -76,6 +82,9 @@ Future<void> showDiseaseSelectionSheet(
                       label: Text(disease),
                       selected: selected.contains(disease),
                       selectedColor: AppColors.accent.withValues(alpha: 0.14),
+                        labelStyle: selected.contains(disease)
+                          ? OnboardingTypography.selectedControl
+                          : OnboardingTypography.control,
                       onSelected: (_) {
                         if (selected.contains(disease)) {
                           selected.remove(disease);
@@ -89,6 +98,7 @@ Future<void> showDiseaseSelectionSheet(
                     key: const ValueKey('onboarding_add_known_disease'),
                     avatar: const Icon(Icons.add_rounded, size: 17),
                     label: Text(AppStrings.add),
+                    labelStyle: OnboardingTypography.control,
                     onPressed: () async {
                       final value = await showOnboardingTextInputDialog(
                         sheetContext,

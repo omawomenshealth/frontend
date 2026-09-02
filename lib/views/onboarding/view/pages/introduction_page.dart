@@ -122,10 +122,8 @@ class _AgeIndicator extends StatelessWidget {
           : Text(
               introduction.age(age: age!),
               key: const ValueKey('age_value'),
-              style: const TextStyle(
+              style: OnboardingTypography.counter.copyWith(
                 color: AppColors.accent,
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
               ),
             ),
     );
