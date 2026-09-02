@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/color_constants.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
+import 'onboarding_typography.dart';
 
 class OnboardingBottomNavigation extends StatelessWidget {
   final OnboardingViewModel vm;
@@ -37,10 +38,7 @@ class OnboardingBottomNavigation extends StatelessWidget {
                 disabledBackgroundColor: const Color(0xFFBFCBB0),
                 disabledForegroundColor: AppColors.textOnPrimary,
                 shape: const StadiumBorder(),
-                textStyle: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                textStyle: OnboardingTypography.button,
                 elevation: 0,
                 shadowColor: Colors.transparent,
               ),
@@ -90,10 +88,7 @@ class OnboardingBottomNavigation extends StatelessWidget {
                 style: TextButton.styleFrom(
                   minimumSize: const Size.fromHeight(44),
                   foregroundColor: AppColors.textSecondary,
-                  textStyle: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  textStyle: OnboardingTypography.secondaryButton,
                 ),
                 child: Text(context.t.onboarding.common.skipForNow),
               ),

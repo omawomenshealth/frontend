@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../../core/constants/color_constants.dart';
+import '../onboarding_typography.dart';
 
 class OnboardingTextField extends StatelessWidget {
   final Key? fieldKey;
@@ -47,13 +48,21 @@ class OnboardingTextField extends StatelessWidget {
           hintText: hintText,
           labelText: labelText,
           suffixText: suffixText,
+          hintStyle: OnboardingTypography.input.copyWith(
+            color: AppColors.textHint,
+          ),
+          labelStyle: OnboardingTypography.label.copyWith(
+            color: AppColors.textSecondary,
+          ),
+          suffixStyle: OnboardingTypography.control.copyWith(
+            color: AppColors.textSecondary,
+          ),
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
           // ...
         ),
-        style: const TextStyle(
+        style: OnboardingTypography.input.copyWith(
           color: AppColors.textPrimary,
-          fontSize: 16,
         ),
       ),
     );

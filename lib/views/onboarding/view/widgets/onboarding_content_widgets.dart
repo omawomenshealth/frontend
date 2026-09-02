@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/color_constants.dart';
+import 'onboarding_typography.dart';
 
 class OnboardingCompactPrompt extends StatelessWidget {
   final IconData icon;
@@ -40,22 +41,17 @@ class OnboardingCompactPrompt extends StatelessWidget {
         Text(
           title,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontFamily: 'CormorantGaramond',
+          style: OnboardingTypography.displayHeading.copyWith(
             color: AppColors.textPrimary,
-            fontSize: 21,
-            height: 1.08,
-            fontWeight: FontWeight.w700,
+            fontSize: 28,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           description,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: OnboardingTypography.helper.copyWith(
             color: AppColors.textSecondary,
-            fontSize: 11.5,
-            height: 1.35,
           ),
         ),
         const SizedBox(height: 13),
@@ -71,9 +67,8 @@ class OnboardingCompactPrompt extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: OnboardingTypography.helper.copyWith(
               color: AppColors.textSecondary,
-              fontSize: 11.5,
             ),
           ),
         ),
@@ -82,7 +77,10 @@ class OnboardingCompactPrompt extends StatelessWidget {
           width: double.infinity,
           child: FilledButton.icon(
             onPressed: onPressed,
-            style: FilledButton.styleFrom(backgroundColor: accent),
+            style: FilledButton.styleFrom(
+              backgroundColor: accent,
+              textStyle: OnboardingTypography.button,
+            ),
             icon: const Icon(Icons.search_rounded, size: 18),
             label: Text(buttonLabel),
           ),
@@ -132,12 +130,9 @@ class OnboardingCard extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: 'CormorantGaramond',
+              style: OnboardingTypography.displayHeading.copyWith(
                 color: AppColors.textPrimary,
-                fontSize: 27,
-                height: 1,
-                fontWeight: FontWeight.w700,
+                fontSize: 30,
               ),
             ),
             const SizedBox(height: 6),
@@ -145,10 +140,8 @@ class OnboardingCard extends StatelessWidget {
               subtitle,
               maxLines: 2,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: OnboardingTypography.helper.copyWith(
                 color: AppColors.textSecondary,
-                fontSize: 11.5,
-                height: 1.3,
               ),
             ),
             const SizedBox(height: 12),
@@ -208,10 +201,8 @@ class OnboardingFormCard extends StatelessWidget {
           children: [
             Text(
               eyebrow,
-              style: const TextStyle(
+              style: OnboardingTypography.counter.copyWith(
                 color: AppColors.textSecondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
                 letterSpacing: 2,
               ),
             ),

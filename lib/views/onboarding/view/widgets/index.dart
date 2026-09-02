@@ -6,5 +6,6 @@ export 'onboarding_navigation.dart';
 export 'onboarding_prompt.dart';
 export 'onboarding_selection_sheet.dart';
 export 'onboarding_question.dart';
+export 'onboarding_typography.dart';
 export 'inputs/index.dart';
 export 'onboarding_chip.dart';

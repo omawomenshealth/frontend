@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/color_constants.dart';
+import 'onboarding_typography.dart';
 
 class OnboardingQuestion extends StatelessWidget {
   final String question;
@@ -23,10 +24,8 @@ class OnboardingQuestion extends StatelessWidget {
       children: [
         Text(
           question,
-          style: const TextStyle(
+          style: OnboardingTypography.label.copyWith(
             color: AppColors.textPrimary,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 8),
@@ -35,10 +34,8 @@ class OnboardingQuestion extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             helper!,
-            style: const TextStyle(
+            style: OnboardingTypography.helper.copyWith(
               color: AppColors.textSecondary,
-              fontSize: 12,
-              height: 1.35,
             ),
           ),
         ],

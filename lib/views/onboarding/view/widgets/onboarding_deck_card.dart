@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'onboarding_typography.dart';
+
 enum OnboardingDeckMotion { none, next, prev }
 
 class OnboardingDeckCard extends StatelessWidget {
@@ -61,11 +63,8 @@ class OnboardingDeckCard extends StatelessWidget {
             children: [
               Text(
                 eyebrow,
-                style: const TextStyle(
+                style: OnboardingTypography.displayHeading.copyWith(
                   color: Color(0xFF7A756C),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 2,
                 ),
               ),
               const SizedBox(height: 20),

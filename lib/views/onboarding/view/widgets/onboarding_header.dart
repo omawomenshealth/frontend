@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/color_constants.dart';
 import 'onboarding_prompt.dart';
+import 'onboarding_typography.dart';
 
 class OnboardingProgressHeader extends StatelessWidget {
   final int currentPage;
@@ -74,10 +75,8 @@ class OnboardingProgressHeader extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 '${currentPage + 1}/$safeTotalPages',
-                style: const TextStyle(
+                style: OnboardingTypography.counter.copyWith(
                   color: Color(0xFF7A756C),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),

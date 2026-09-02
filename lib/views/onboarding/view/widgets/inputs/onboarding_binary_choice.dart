@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/constants/app_strings.dart';
 import '../../../../../core/constants/color_constants.dart';
+import '../onboarding_typography.dart';
 
 class OnboardingBinaryChoice extends StatelessWidget {
   final bool? value;
@@ -70,14 +71,13 @@ class _ChoiceButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: TextStyle(
+            style: (isSelected
+                ? OnboardingTypography.selectedControl
+                : OnboardingTypography.control)
+              .copyWith(
             color: isSelected
                 ? const Color(0xFF4D5F36)
                 : AppColors.textSecondary,
-            fontSize: 14,
-            fontWeight: isSelected
-                ? FontWeight.w600
-                : FontWeight.w500,
           ),
         ),
       ),

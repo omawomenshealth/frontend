@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/color_constants.dart';
+import 'onboarding_typography.dart';
 
 class OnboardingPrompt extends StatelessWidget {
   final String message;
@@ -30,10 +31,9 @@ class OnboardingPrompt extends StatelessWidget {
         Expanded(
           child: Text(
             message,
-            style: const TextStyle(
+            style: OnboardingTypography.body.copyWith(
               color: AppColors.textPrimary,
               fontSize: 14,
-              height: 1.45,
             ),
           ),
         ),

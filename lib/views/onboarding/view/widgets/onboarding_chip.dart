@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/constants/color_constants.dart';
+import 'onboarding_typography.dart';
 
 class OnboardingChip extends StatelessWidget {
   final String label;
@@ -35,14 +36,15 @@ class OnboardingChip extends StatelessWidget {
         horizontal: compact ? 10 : 14,
         vertical: compact ? 4 : 5,
       ),
-      labelStyle: TextStyle(
+      labelStyle: (isSelected
+              ? OnboardingTypography.selectedControl
+              : OnboardingTypography.control)
+          .copyWith(
         color: isSelected
             ? const Color(0xFF4D5F36)
             : enabled
             ? AppColors.textSecondary
             : AppColors.textSecondary.withValues(alpha: 0.45),
-        fontSize: 14,
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
       ),
       visualDensity: VisualDensity.compact,
       onSelected: enabled ? (_) => onTap() : null,

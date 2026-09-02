@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/color_constants.dart';
 import '../../../../localization/generated/strings.g.dart';
+import 'onboarding_typography.dart';
 
 class OnboardingSelectionSheet extends StatelessWidget {
   final String title;
@@ -47,11 +48,7 @@ class OnboardingSelectionSheet extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(
-                        fontFamily: 'CormorantGaramond',
-                        fontSize: 23,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: OnboardingTypography.displayHeading,
                     ),
                   ),
                   IconButton(
@@ -75,7 +72,10 @@ class OnboardingSelectionSheet extends StatelessWidget {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: onSave,
-                  style: FilledButton.styleFrom(backgroundColor: accent),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: accent,
+                    textStyle: OnboardingTypography.button,
+                  ),
                   child: Text(context.t.onboarding.common.save),
                 ),
               ),
