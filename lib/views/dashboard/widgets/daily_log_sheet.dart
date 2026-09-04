@@ -644,7 +644,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     icon: Icons.add_rounded,
                     color: _tone,
                     filled: true,
-                    enabled: _waterGlasses < 12,
+                    enabled: _waterGlasses < 8,
                     onTap: () =>
                         setState(() => _waterGlasses = _waterGlasses + 1),
                   ),
@@ -655,22 +655,37 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 children: List.generate(8, (index) {
                   final filled = index < _waterGlasses;
                   return Expanded(
-                    child: Container(
-                      height: 41,
-                      margin: EdgeInsets.only(right: index == 7 ? 0 : 6),
-                      decoration: BoxDecoration(
-                        color: filled
-                            ? Color.lerp(AppColors.surface, _tone, 0.16)
-                            : Colors.transparent,
+                    child: Semantics(
+                      button: true,
+                      selected: filled,
+                      label: AppStrings.hydrationGlasses(index + 1, 8),
+                      child: InkWell(
+                        key: ValueKey('water_glass_${index + 1}'),
                         borderRadius: BorderRadius.circular(9),
-                        border: Border.all(
-                          color: filled ? _tone : _tone.withValues(alpha: 0.26),
+                        onTap: () =>
+                            setState(() => _waterGlasses = index + 1),
+                        child: Container(
+                          height: 41,
+                          margin: EdgeInsets.only(right: index == 7 ? 0 : 6),
+                          decoration: BoxDecoration(
+                            color: filled
+                                ? Color.lerp(AppColors.surface, _tone, 0.16)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(9),
+                            border: Border.all(
+                              color: filled
+                                  ? _tone
+                                  : _tone.withValues(alpha: 0.26),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.local_drink_outlined,
+                            size: 16,
+                            color: filled
+                                ? _tone
+                                : _tone.withValues(alpha: 0.52),
+                          ),
                         ),
-                      ),
-                      child: Icon(
-                        Icons.local_drink_outlined,
-                        size: 16,
-                        color: filled ? _tone : _tone.withValues(alpha: 0.52),
                       ),
                     ),
                   );

@@ -650,6 +650,28 @@ void main() {
     expect(harness.savedLog!.waterIntakeMl, 1000);
   });
 
+  testWidgets('Su bardakları miktarı doğrudan seçer ve sayaçla senkron kalır', (
+    tester,
+  ) async {
+    await _pumpLogSheet(tester, initialIndex: 1);
+
+    await tester.tap(find.byKey(const ValueKey('water_glass_5')));
+    await tester.pump();
+    expect(find.text(AppStrings.hydrationGlasses(5, 8)), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('water_glass_2')));
+    await tester.pump();
+    expect(find.text(AppStrings.hydrationGlasses(2, 8)), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('water_increment')));
+    await tester.pump();
+    expect(find.text(AppStrings.hydrationGlasses(3, 8)), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('water_decrement')));
+    await tester.pump();
+    expect(find.text(AppStrings.hydrationGlasses(2, 8)), findsOneWidget);
+  });
+
   testWidgets('Gelecek tarihe günlük kayıt eklenemez', (tester) async {
     final harness = await _pumpLogSheet(
       tester,
