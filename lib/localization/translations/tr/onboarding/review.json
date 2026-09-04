@@ -7,6 +7,7 @@
   "cycleLabel": "Döngü bilgilerin",
   "dayCount": "$days gün",
   "privacyAndData": "Gizlilik ve verilerin",
+  "deviceEncryptionNote": "Verilerin yalnızca bu cihazda şifreli saklanır",
   "start": "Hazırsan başlayalım",
   "accountStorageLabel": "Verilerin",
   "guestStorage": "Hesapsız kullanıyorsun; bu cihazda şifreli",

@@ -37,7 +37,6 @@ class IntroductionPage extends StatelessWidget {
             onPickBirthDate: onPickBirthDate,
           ),
           const SizedBox(height: 8),
-          _AgeIndicator(age: vm.age),
         ],
       ),
     );
@@ -103,31 +102,6 @@ class _BirthDateField extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AgeIndicator extends StatelessWidget {
-  final int? age;
-
-  const _AgeIndicator({required this.age});
-
-  @override
-  Widget build(BuildContext context) {
-    final introduction = context.t.onboarding.introduction;
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 180),
-      child: age == null
-          ? const SizedBox.shrink(key: ValueKey('age_help'))
-          : Text(
-              introduction.age(age: age!),
-              key: const ValueKey('age_value'),
-              style: const TextStyle(
-                color: AppColors.accent,
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
     );
   }
 }

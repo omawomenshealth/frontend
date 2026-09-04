@@ -7,6 +7,7 @@
   "cycleLabel": "Your cycle details",
   "dayCount": "$days days",
   "privacyAndData": "Your privacy and data",
+  "deviceEncryptionNote": "Your data is encrypted and stored only on this device",
   "start": "Let's get started",
   "accountStorageLabel": "Your data",
   "guestStorage": "No account; encrypted on this device",
