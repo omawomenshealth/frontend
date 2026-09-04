@@ -45,7 +45,7 @@ class _OnboardingViewState extends State<OnboardingView> {
       backgroundColor: AppColors.scaffoldBackground,
       body: Stack(
         children: [
-          const OnboardingBackground(),
+          OnboardingBackground(pageIndex: vm.currentPage),
           SafeArea(
             child: Column(
               children: [

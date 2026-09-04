@@ -32,20 +32,12 @@ class OnboardingPreviewPage extends StatelessWidget {
         ? review.googleStorage
         : review.guestStorage;
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFBF6EE), Color(0xFFF2ECE0)],
-        ),
-      ),
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 448),
-            child: Column(
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 448),
+          child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -143,7 +135,6 @@ class OnboardingPreviewPage extends StatelessWidget {
                 const SizedBox(height: 12),
                 _PreviewPrivacy(label: review.deviceEncryptionNote),
               ],
-            ),
           ),
         ),
       ),

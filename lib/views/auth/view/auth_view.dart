@@ -4,6 +4,7 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/image_constants.dart';
 import '../../../core/shared_widgets/custom_button.dart';
+import '../../../core/shared_widgets/pastel_flower.dart';
 import '../viewmodel/auth_view_model.dart';
 
 /// Giriş ekranı — Google Sign-In, Simüle giriş ve giriş yapmadan devam etme seçenekleri.
@@ -20,24 +21,44 @@ class AuthView extends StatelessWidget {
           body: Stack(
             children: [
               const Positioned(
-                top: -118,
-                right: -92,
-                child: _AuthGlow(size: 284, color: AppColors.primaryLight),
+                top: -24,
+                right: -22,
+                child: PastelFlower(size: 116, rotation: 0.2),
               ),
               const Positioned(
-                top: 205,
-                left: -104,
-                child: _AuthGlow(size: 210, color: AppColors.accentLight),
+                top: 224,
+                left: -26,
+                child: PastelFlower(size: 94, rotation: -0.22),
               ),
               const Positioned(
-                bottom: -104,
-                right: -82,
-                child: _AuthGlow(size: 230, color: AppColors.secondaryLight),
+                top: 104,
+                left: -14,
+                child: PastelFlower(size: 58, rotation: 0.14, opacity: 0.52),
               ),
               const Positioned(
-                bottom: 118,
-                left: -66,
-                child: _AuthGlow(size: 126, color: Color(0x339A762B)),
+                top: 376,
+                right: -16,
+                child: PastelFlower(size: 64, rotation: -0.16, opacity: 0.54),
+              ),
+              const Positioned(
+                bottom: -24,
+                right: -20,
+                child: PastelFlower(size: 100, rotation: 0.18),
+              ),
+              const Positioned(
+                bottom: 232,
+                left: 10,
+                child: PastelFlower(size: 54, rotation: 0.28, opacity: 0.5),
+              ),
+              const Positioned(
+                bottom: 112,
+                left: -18,
+                child: PastelFlower(size: 76, rotation: -0.12),
+              ),
+              const Positioned(
+                bottom: 48,
+                right: 18,
+                child: PastelFlower(size: 48, rotation: -0.3, opacity: 0.48),
               ),
               SafeArea(
                 child: CustomScrollView(
@@ -396,27 +417,6 @@ class _AuthLogo extends StatelessWidget {
           ImageConstants.logo,
           fit: BoxFit.contain,
           semanticLabel: AppStrings.appName,
-        ),
-      ),
-    );
-  }
-}
-
-class _AuthGlow extends StatelessWidget {
-  final double size;
-  final Color color;
-
-  const _AuthGlow({required this.size, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: color.a * 0.72),
-          shape: BoxShape.circle,
         ),
       ),
     );
