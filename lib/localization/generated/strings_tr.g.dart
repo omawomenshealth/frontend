@@ -1061,6 +1061,7 @@ class _Translations$onboarding$review$tr extends Translations$onboarding$review$
 	@override String get cycleLabel => 'Döngü bilgilerin';
 	@override String dayCount({required Object days}) => '${days} gün';
 	@override String get privacyAndData => 'Gizlilik ve verilerin';
+	@override String get deviceEncryptionNote => 'Verilerin yalnızca bu cihazda şifreli saklanır';
 	@override String get start => 'Hazırsan başlayalım';
 	@override String get accountStorageLabel => 'Verilerin';
 	@override String get guestStorage => 'Hesapsız kullanıyorsun; bu cihazda şifreli';
@@ -1718,6 +1719,7 @@ extension on TranslationsTr {
 			'onboarding.review.cycleLabel' => 'Döngü bilgilerin',
 			'onboarding.review.dayCount' => ({required Object days}) => '${days} gün',
 			'onboarding.review.privacyAndData' => 'Gizlilik ve verilerin',
+			'onboarding.review.deviceEncryptionNote' => 'Verilerin yalnızca bu cihazda şifreli saklanır',
 			'onboarding.review.start' => 'Hazırsan başlayalım',
 			'onboarding.review.accountStorageLabel' => 'Verilerin',
 			'onboarding.review.guestStorage' => 'Hesapsız kullanıyorsun; bu cihazda şifreli',
@@ -1798,9 +1800,9 @@ extension on TranslationsTr {
 			'options.moodPlaceOptions.outside' => 'Dışarıdaydım',
 			'options.moodPlaceOptions.in_transit' => 'Yoldaydım',
 			'options.moodPlaceOptions.social' => 'Sosyal ortamdaydım',
-			'options.sexualActivityOptions.with_a_partner' => 'Partnerle',
 			_ => null,
 		} ?? switch (path) {
+			'options.sexualActivityOptions.with_a_partner' => 'Partnerle',
 			'options.sexualActivityOptions.masturbation' => 'Mastürbasyon',
 			'options.sexualActivityOptions.protected' => 'Korunmalı',
 			'options.sexualActivityOptions.unprotected' => 'Korunmasız',

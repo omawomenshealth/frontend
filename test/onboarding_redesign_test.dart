@@ -8,6 +8,7 @@ import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/sync_service.dart';
 import 'package:app_proje_a/localization/generated/strings.g.dart';
 import 'package:app_proje_a/views/onboarding/view/onboarding_view.dart';
+import 'package:app_proje_a/views/onboarding/view/pages/onboarding_preview_page.dart';
 import 'package:app_proje_a/views/onboarding/view/widgets/onboarding_chip.dart';
 import 'package:app_proje_a/views/onboarding/viewmodel/onboarding_view_model.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,40 @@ void main() {
   setUp(() async {
     await AppStrings.delegate.load(const Locale('tr'));
     await LocaleSettings.setLocale(AppLocale.tr);
+  });
+
+  testWidgets('önizleme kartı bilgilerini sağa hizalar', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    await storage.init();
+    final vm = OnboardingViewModel(
+      storage,
+      SyncService(storage, ApiService(storage)),
+    );
+
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          locale: const Locale('tr'),
+          localizationsDelegates: const [
+            AppStrings.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppStrings.supportedLocales,
+          home: Scaffold(
+            body: OnboardingPreviewPage(vm: vm, onComplete: () {}),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      tester.widget<Text>(find.text(t.onboarding.review.guestStorage)).textAlign,
+      TextAlign.end,
+    );
   });
 
   testWidgets('üç auth ekranı kaydırmadan ve iç adımlarla ilerler', (
@@ -146,6 +181,10 @@ void main() {
     expect(find.text(t.onboarding.prompt.review), findsOneWidget);
     expect(find.text(t.onboarding.review.accountStorageLabel), findsOneWidget);
     expect(find.text(t.onboarding.review.guestStorage), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.text(t.onboarding.review.guestStorage)).textAlign,
+      TextAlign.end,
+    );
     expect(find.text(AppStrings.smokingStatus), findsNothing);
     expect(tester.takeException(), isNull);
   });

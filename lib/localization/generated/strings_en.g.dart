@@ -1297,6 +1297,9 @@ class Translations$onboarding$review$en {
 	/// en: 'Your privacy and data'
 	String get privacyAndData => 'Your privacy and data';
 
+	/// en: 'Your data is encrypted and stored only on this device'
+	String get deviceEncryptionNote => 'Your data is encrypted and stored only on this device';
+
 	/// en: 'Let's get started'
 	String get start => 'Let\'s get started';
 
@@ -2076,6 +2079,7 @@ extension on Translations {
 			'onboarding.review.cycleLabel' => 'Your cycle details',
 			'onboarding.review.dayCount' => ({required Object days}) => '${days} days',
 			'onboarding.review.privacyAndData' => 'Your privacy and data',
+			'onboarding.review.deviceEncryptionNote' => 'Your data is encrypted and stored only on this device',
 			'onboarding.review.start' => 'Let\'s get started',
 			'onboarding.review.accountStorageLabel' => 'Your data',
 			'onboarding.review.guestStorage' => 'No account; encrypted on this device',
@@ -2156,9 +2160,9 @@ extension on Translations {
 			'options.moodPlaceOptions.outside' => 'Outside',
 			'options.moodPlaceOptions.in_transit' => 'In transit',
 			'options.moodPlaceOptions.social' => 'Social',
-			'options.sexualActivityOptions.with_a_partner' => 'With a partner',
 			_ => null,
 		} ?? switch (path) {
+			'options.sexualActivityOptions.with_a_partner' => 'With a partner',
 			'options.sexualActivityOptions.masturbation' => 'Masturbation',
 			'options.sexualActivityOptions.protected' => 'Protected',
 			'options.sexualActivityOptions.unprotected' => 'Unprotected',
