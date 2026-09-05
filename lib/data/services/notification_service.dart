@@ -336,7 +336,7 @@ class NotificationService {
 
   Future<void> cancelAll() async {
     if (!isSupported) return;
-    await init();
+    // Cancellation does not need timezone or notification-tap initialization.
     await _plugin.cancelAll();
   }
 }

@@ -1400,6 +1400,7 @@ class _ProfileMechanics extends StatelessWidget {
     final emailController = TextEditingController();
     var isSubmitting = false;
     String? errorMessage;
+    final isCloudDeletion = vm.isLoggedIn;
 
     await showDialog<void>(
       context: context,
@@ -1461,11 +1462,16 @@ class _ProfileMechanics extends StatelessWidget {
                           isSubmitting = true;
                           errorMessage = null;
                         });
-                        final success = vm.isLoggedIn
-                            ? await vm.deleteAccountAndData(
-                                emailController.text.trim(),
-                              )
-                            : await vm.deleteLocalData();
+                        bool success;
+                        try {
+                          success = isCloudDeletion
+                              ? await vm.deleteAccountAndData(
+                                  emailController.text.trim(),
+                                )
+                              : await vm.deleteLocalData();
+                        } catch (_) {
+                          success = false;
+                        }
                         if (!dialogContext.mounted) return;
                         if (!success) {
                           setDialogState(() {
@@ -1477,6 +1483,15 @@ class _ProfileMechanics extends StatelessWidget {
                         }
                         Navigator.pop(dialogContext);
                         if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                isCloudDeletion
+                                    ? AppStrings.deletionSuccessful
+                                    : AppStrings.localDeletionSuccessful,
+                              ),
+                            ),
+                          );
                           vm.navigateAfterDeletion(context);
                         }
                       },
