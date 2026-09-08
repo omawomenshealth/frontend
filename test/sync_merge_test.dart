@@ -14,6 +14,7 @@ void main() {
   late LocalStorageService storage;
   late _FakeMergeApi api;
   late SyncService sync;
+  late MemoryLocalKeyStore keyStore;
 
   final baseSettings = UserSettings(
     isOnboardingComplete: true,
@@ -34,13 +35,255 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
-    storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+    keyStore = MemoryLocalKeyStore();
+    storage = _FailingSettingsStorage(keyStore: keyStore);
     await storage.init();
     await storage.setAuthToken('test-token');
     await storage.saveSettings(baseSettings);
     api = _FakeMergeApi(storage);
     sync = SyncService(storage, api);
   });
+
+  for (final phase in ['download', 'upload', 'restore']) {
+    test('rotated session survives sync during $phase', () async {
+      await storage.setAuthRefreshToken('old-refresh');
+      await storage.setAuthGoogleId('account-a');
+      await storage.setAuthEmail('account-a@example.test');
+      final originalKey = await keyStore.read();
+      api.cloudData = _minimalCloud(baseSettings);
+      Future<void> rotate() async {
+        await storage.setAuthToken('new-access');
+        await storage.setAuthRefreshToken('new-refresh');
+      }
+
+      if (phase == 'upload') {
+        api.onUpload = rotate;
+      } else {
+        api.onDownload = rotate;
+      }
+
+      expect(
+        await (phase == 'restore'
+            ? sync.restoreFromCloud()
+            : sync.mergeWithCloud()),
+        isTrue,
+      );
+      expect(storage.authToken, 'new-access');
+      expect(storage.authRefreshToken, 'new-refresh');
+      expect(storage.authGoogleId, 'account-a');
+      expect(storage.authEmail, 'account-a@example.test');
+      expect(await keyStore.read(), originalKey);
+      final reopened = LocalStorageService(keyStore: keyStore);
+      await reopened.init();
+      expect(reopened.authRefreshToken, 'new-refresh');
+    });
+  }
+
+  test(
+    'rollback restores health data without rolling back the session',
+    () async {
+      final log = DailyLog(date: DateTime(2026, 8, 1, 12), mood: 'İyi');
+      await storage.saveDailyLog(log);
+      await storage.setLastSyncTime('previous-sync');
+      api.cloudData = _minimalCloud(baseSettings);
+      api.onUpload = () async {
+        await storage.setAuthToken('new-access');
+        await storage.setAuthRefreshToken('new-refresh');
+        (storage as _FailingSettingsStorage).failNextSettingsSave = true;
+      };
+
+      expect(await sync.mergeWithCloud(), isFalse);
+      expect(storage.authToken, 'new-access');
+      expect(storage.authRefreshToken, 'new-refresh');
+      expect(storage.loadSettings()?.userName, baseSettings.userName);
+      expect(storage.loadAllLogs().single.date, log.date);
+      expect(storage.lastSyncTime, 'previous-sync');
+    },
+  );
+
+  test(
+    'signing out while downloading does not restore the old session or data',
+    () async {
+      api.cloudData = _minimalCloud(baseSettings);
+      api.onDownload = () async {
+        await storage.clearAll();
+      };
+      expect(await sync.mergeWithCloud(), isFalse);
+      expect(storage.authToken, isNull);
+      expect(storage.loadSettings(), isNull);
+      expect(api.uploadCalls, 0);
+    },
+  );
+
+  test(
+    'deleted plans stay deleted after failed sync, restart and repeated stale backups',
+    () async {
+      final deleted = _plan('deleted');
+      final other = _plan('other');
+      await storage.saveMedicationReminderPlans([deleted]);
+      expect(await storage.deleteMedicationReminderPlan(deleted.id), isTrue);
+      api.cloudData = {
+        ..._minimalCloud(baseSettings),
+        'medicationReminderPlans': [deleted.toJson(), other.toJson()],
+        'medicationDoseRecords': [
+          _dose(planId: deleted.id, notificationScheduled: false).toJson(),
+        ],
+      };
+      api.uploadResult = false;
+      expect(await sync.mergeWithCloud(), isFalse);
+      expect(storage.loadMedicationReminderPlans(), isEmpty);
+
+      storage = LocalStorageService(keyStore: keyStore);
+      await storage.init();
+      final staleCloud = api.cloudData;
+      api = _FakeMergeApi(storage)..cloudData = staleCloud;
+      sync = SyncService(storage, api);
+      for (var attempt = 0; attempt < 2; attempt++) {
+        expect(await sync.mergeWithCloud(), isTrue);
+        expect(storage.loadMedicationReminderPlans().map((p) => p.id), [
+          'other',
+        ]);
+        expect(api.lastUploadedPlans.map((p) => p['id']), ['other']);
+        expect(storage.loadMedicationDoseRecords().single.planId, deleted.id);
+      }
+    },
+  );
+
+  test(
+    'deleted daily logs are excluded from merge and upload while unrelated logs remain',
+    () async {
+      final deleted = DailyLog(date: DateTime(2026, 8, 1, 12), mood: 'İyi');
+      final other = DailyLog(date: DateTime(2026, 8, 2, 12), mood: 'İyi');
+      await storage.saveDailyLog(deleted);
+      expect(await storage.deleteLogsForDate(deleted.date), isTrue);
+      api.cloudData = {
+        ..._minimalCloud(baseSettings),
+        'logs': [deleted.toJson(), other.toJson()],
+      };
+      expect(await sync.mergeWithCloud(), isTrue);
+      expect(storage.loadAllLogs().single.date, other.date);
+      expect(api.lastUploadedLogs.single['date'], other.date.toIso8601String());
+      expect(
+        storage.loadSyncDeletionMarkers().logs,
+        contains(deleted.date.toIso8601String()),
+      );
+    },
+  );
+
+  test(
+    'period-only deletion does not resurrect the log or last period setting',
+    () async {
+      final date = DateTime(2026, 8, 1);
+      final log = DailyLog(
+        date: date,
+        flowIntensity: 'Orta',
+        observedSections: const {DailyLogObservedSection.period},
+      );
+      await storage.saveSettings(baseSettings.copyWith(lastPeriodDate: date));
+      await storage.saveDailyLog(log);
+      expect(await storage.deletePeriodLogsForDate(date), isTrue);
+      api.cloudData = {
+        ..._minimalCloud(baseSettings.copyWith(lastPeriodDate: date)),
+        'logs': [log.toJson()],
+      };
+      expect(await sync.mergeWithCloud(), isTrue);
+      expect(storage.loadAllLogs(), isEmpty);
+      expect(storage.loadSettings()?.lastPeriodDate, isNull);
+      expect(api.lastUploadedLogs, isEmpty);
+      expect(api.lastUploadedSettings['lastPeriodDate'], isNull);
+    },
+  );
+
+  test(
+    'period deletion preserves other sections and independently logged symptoms',
+    () async {
+      final log = DailyLog(
+        date: DateTime(2026, 8, 1, 12),
+        flowIntensity: 'Orta',
+        mood: 'İyi',
+        symptoms: const ['Stres'],
+        symptomSeverities: const {'Stres': 2},
+        observedSections: const {
+          DailyLogObservedSection.period,
+          DailyLogObservedSection.symptom,
+          DailyLogObservedSection.wellbeing,
+        },
+      );
+      await storage.saveDailyLog(log);
+      expect(await storage.deletePeriodLogsForDate(log.date), isTrue);
+      api.cloudData = {
+        ..._minimalCloud(baseSettings),
+        'logs': [log.toJson()],
+      };
+      expect(await sync.mergeWithCloud(), isTrue);
+      final merged = storage.loadAllLogs().single;
+      expect(merged.flowIntensity, isNull);
+      expect(
+        merged.observedSections,
+        isNot(contains(DailyLogObservedSection.period)),
+      );
+      expect(merged.mood, 'İyi');
+      expect(merged.symptoms, ['Stres']);
+    },
+  );
+
+  test(
+    'a deliberate new local record at the deleted timestamp is retained',
+    () async {
+      final date = DateTime(2026, 8, 1, 12);
+      final old = DailyLog(date: date, mood: 'İyi');
+      await storage.saveDailyLog(old);
+      await storage.deleteLogsForDate(date);
+      await storage.saveDailyLog(DailyLog(date: date, waterIntakeMl: 500));
+      api.cloudData = {
+        ..._minimalCloud(baseSettings),
+        'logs': [old.toJson()],
+      };
+      expect(await sync.mergeWithCloud(), isTrue);
+      expect(storage.loadAllLogs().single.waterIntakeMl, 500);
+      expect(storage.loadAllLogs().single.mood, isNull);
+    },
+  );
+
+  test(
+    'explicit cloud restore resets local deletion intent after success',
+    () async {
+      final plan = _plan('restore-me');
+      await storage.saveMedicationReminderPlans([plan]);
+      await storage.deleteMedicationReminderPlan(plan.id);
+      api.cloudData = {
+        ..._minimalCloud(baseSettings),
+        'medicationReminderPlans': [plan.toJson()],
+      };
+      expect(await sync.restoreFromCloud(), isTrue);
+      expect(storage.loadMedicationReminderPlans().single.id, plan.id);
+      expect(storage.loadSyncDeletionMarkers().reminderPlans, isEmpty);
+    },
+  );
+
+  test(
+    'failed restore preserves deletion intent and the refreshed session',
+    () async {
+      final plan = _plan('deleted');
+      await storage.saveMedicationReminderPlans([plan]);
+      await storage.deleteMedicationReminderPlan(plan.id);
+      api.cloudData = {
+        ..._minimalCloud(baseSettings),
+        'medicationReminderPlans': [plan.toJson()],
+      };
+      api.onDownload = () async {
+        await storage.setAuthRefreshToken('rotated-refresh');
+        (storage as _FailingSettingsStorage).failNextSettingsSave = true;
+      };
+      expect(await sync.restoreFromCloud(), isFalse);
+      expect(storage.loadMedicationReminderPlans(), isEmpty);
+      expect(
+        storage.loadSyncDeletionMarkers().reminderPlans,
+        contains(plan.id),
+      );
+      expect(storage.authRefreshToken, 'rotated-refresh');
+    },
+  );
 
   // ── 1. Temel başarı senaryosu ──────────────────────────────────────────────
 
@@ -553,6 +796,8 @@ class _FakeMergeApi extends ApiService {
   Map<String, dynamic>? cloudData;
   bool uploadResult = true;
   int uploadCalls = 0;
+  Future<void> Function()? onDownload;
+  Future<void> Function()? onUpload;
 
   List<Map<String, dynamic>> lastUploadedMedications = [];
   Map<String, dynamic> lastUploadedSettings = {};
@@ -574,6 +819,7 @@ class _FakeMergeApi extends ApiService {
     required List<Map<String, dynamic>> medicationDoseRecords,
     bool replaceExisting = true,
   }) async {
+    await onUpload?.call();
     uploadCalls++;
     lastUploadedSettings = settings;
     lastUploadedLogs = logs;
@@ -587,6 +833,21 @@ class _FakeMergeApi extends ApiService {
 
   @override
   Future<Map<String, dynamic>> downloadSync() async {
+    await onDownload?.call();
     return cloudData ?? (throw StateError('İndirme başarısız.'));
+  }
+}
+
+class _FailingSettingsStorage extends LocalStorageService {
+  _FailingSettingsStorage({required super.keyStore});
+  bool failNextSettingsSave = false;
+
+  @override
+  Future<bool> saveSettings(UserSettings settings) async {
+    if (failNextSettingsSave) {
+      failNextSettingsSave = false;
+      return false;
+    }
+    return super.saveSettings(settings);
   }
 }

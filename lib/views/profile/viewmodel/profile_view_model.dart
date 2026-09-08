@@ -131,6 +131,9 @@ class ProfileViewModel extends ChangeNotifier {
       await _notifications.cancelAll();
       final cleared = await _storage.clearAll();
       return cleared || await _storage.clearAll();
+    } catch (_) {
+      _syncError = AppStrings.deletionFailed;
+      return false;
     } finally {
       _isDeletingAccount = false;
       notifyListeners();

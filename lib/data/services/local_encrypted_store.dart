@@ -159,6 +159,16 @@ final class LocalEncryptedStore {
     return removed;
   }
 
+  /// Removes selected records without rotating the key or touching sessions.
+  Future<bool> removeWhere(bool Function(String key) predicate) async {
+    _requireInitialized();
+    final keys = _cache.keys.where(predicate).toList(growable: false);
+    for (final key in keys) {
+      if (!await remove(key)) return false;
+    }
+    return true;
+  }
+
   /// Yalnızca OMA'nın korumalı kayıtlarını ve yerel veri anahtarını siler.
   /// Uygulamanın korumasız teknik ayarlarına dokunmaz.
   Future<bool> clear() async {

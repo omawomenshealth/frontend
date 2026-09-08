@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 
 import '../../core/constants/app_strings.dart';
+import '../../core/utils/cycle_rules.dart';
 import '../models/medication_identity_model.dart';
 import '../models/medication_reminder_model.dart';
 import '../models/period_log_model.dart';
+import '../models/sync_deletion_markers.dart';
 import '../models/user_settings_model.dart';
 import 'api_service.dart';
 import 'local_storage_service.dart';
@@ -77,6 +79,11 @@ class SyncService {
         lastSyncTime: _nowIso(),
         cycleForecastSnapshot: null,
       );
+      if (!await _storage.saveSyncDeletionMarkers(
+        const SyncDeletionMarkers(),
+      )) {
+        throw StateError('Silme geçmişi sıfırlanamadı.');
+      }
       await _refreshDeviceReminders();
       return true;
     } catch (error) {
@@ -109,7 +116,8 @@ class SyncService {
         return backupToCloud();
       }
 
-      final merged = _mergeData(local.data, cloud);
+      _requireSameAccount(local);
+      final merged = _mergeData(local.data, cloud, local.deletions);
 
       // Yerel kasayı değiştirmeden önce bulut yazmasının tamamlandığını doğrula.
       if (!await _upload(merged)) return false;
@@ -162,15 +170,10 @@ class SyncService {
         medicationReminderPlans: _storage.loadMedicationReminderPlans(),
         medicationDoseRecords: _storage.loadMedicationDoseRecords(),
       ),
-      authToken: _storage.authToken,
-      authRefreshToken: _storage.authRefreshToken,
-      authEmail: _storage.authEmail,
-      authName: _storage.authName,
       authGoogleId: _storage.authGoogleId,
       lastSyncTime: _storage.lastSyncTime,
-      virtualDaysOffset: _storage.virtualDaysOffset,
-      notifiedInsightIds: _storage.loadNotifiedInsightIds(),
       cycleForecastSnapshot: _storage.loadCycleForecastSnapshot(),
+      deletions: _storage.loadSyncDeletionMarkers(),
     );
   }
 
@@ -182,8 +185,18 @@ class SyncService {
         lastSyncTime: snapshot.lastSyncTime,
         cycleForecastSnapshot: snapshot.cycleForecastSnapshot,
       );
+      if (!await _storage.saveSyncDeletionMarkers(snapshot.deletions)) {
+        throw StateError('Silme geçmişi geri alınamadı.');
+      }
     } catch (rollbackError) {
       debugPrint('Yerel veri geri alma hatası: $rollbackError');
+    }
+  }
+
+  void _requireSameAccount(_LocalSnapshot snapshot) {
+    if (!_storage.isUserLoggedIn ||
+        _storage.authGoogleId != snapshot.authGoogleId) {
+      throw StateError('Senkronizasyon sırasında oturum değişti.');
     }
   }
 
@@ -197,44 +210,8 @@ class SyncService {
       if (!success) throw StateError('$operation tamamlanamadı.');
     }
 
-    requireSuccess(await _storage.clearAll(), 'Yerel veri temizleme');
-
-    await _writeOptional(
-      deviceState.authToken,
-      _storage.setAuthToken,
-      'Oturum anahtarı yazma',
-    );
-    await _writeOptional(
-      deviceState.authRefreshToken,
-      _storage.setAuthRefreshToken,
-      'Oturum yenileme anahtarı yazma',
-    );
-    await _writeOptional(
-      deviceState.authEmail,
-      _storage.setAuthEmail,
-      'Oturum e-postası yazma',
-    );
-    await _writeOptional(
-      deviceState.authName,
-      _storage.setAuthName,
-      'Oturum adı yazma',
-    );
-    await _writeOptional(
-      deviceState.authGoogleId,
-      _storage.setAuthGoogleId,
-      'Google kimliği yazma',
-    );
-
-    requireSuccess(
-      await _storage.setVirtualDaysOffset(deviceState.virtualDaysOffset),
-      'Sanal tarih ayarı yazma',
-    );
-    for (final insightId in deviceState.notifiedInsightIds) {
-      requireSuccess(
-        await _storage.markInsightNotificationSent(insightId),
-        'Bildirim geçmişi yazma',
-      );
-    }
+    _requireSameAccount(deviceState);
+    requireSuccess(await _storage.clearSyncedData(), 'Yerel veri temizleme');
 
     // Ayarları en son yazarak günlük kayıtların geçici istatistiklerle bulut
     // ayarlarını değiştirmesini önle.
@@ -425,10 +402,14 @@ class SyncService {
         .toList(growable: false);
   }
 
-  static _SyncData _mergeData(_SyncData local, _SyncData cloud) {
+  static _SyncData _mergeData(
+    _SyncData local,
+    _SyncData cloud,
+    SyncDeletionMarkers deletions,
+  ) {
     final cloudSettings = cloud.settings!;
     final localSettings = local.settings;
-    final mergedSettings = localSettings == null
+    var mergedSettings = localSettings == null
         ? cloudSettings
         : _mergeSettings(localSettings, cloudSettings);
     final customMedications = _mergeMedicationIdentities(
@@ -446,7 +427,8 @@ class SyncService {
     );
 
     final mergedLogs = <String, DailyLog>{
-      for (final log in cloud.logs) log.date.toIso8601String(): log,
+      for (final log in _applyLogDeletions(cloud.logs, deletions))
+        log.date.toIso8601String(): log,
     };
     for (final log in local.logs) {
       final key = log.date.toIso8601String();
@@ -470,6 +452,14 @@ class SyncService {
             .toList(growable: false)
           ..sort((a, b) => a.date.compareTo(b.date));
 
+    // A deleted last period must not be restored from the settings fallback.
+    if ((deletions.logs.isNotEmpty || deletions.periods.isNotEmpty) &&
+        localSettings != null &&
+        localSettings.lastPeriodDate == null &&
+        !logs.any((log) => CycleRules.isMenstrualFlow(log.flowIntensity))) {
+      mergedSettings = mergedSettings.copyWith(clearLastPeriodDate: true);
+    }
+
     return _SyncData(
       settings: mergedSettings,
       logs: logs,
@@ -479,13 +469,39 @@ class SyncService {
       customSkincare: customSkincare,
       medicationReminderPlans: _mergeReminderPlans(
         local.medicationReminderPlans,
-        cloud.medicationReminderPlans,
+        cloud.medicationReminderPlans
+            .where((plan) => !deletions.reminderPlans.contains(plan.id))
+            .toList(growable: false),
       ),
       medicationDoseRecords: _mergeDoseRecords(
         local.medicationDoseRecords,
         cloud.medicationDoseRecords,
       ),
     );
+  }
+
+  static Iterable<DailyLog> _applyLogDeletions(
+    List<DailyLog> logs,
+    SyncDeletionMarkers deletions,
+  ) sync* {
+    for (final log in logs) {
+      final key = log.date.toIso8601String();
+      if (deletions.logs.contains(key)) continue;
+      if (!deletions.periods.contains(key)) {
+        yield log;
+        continue;
+      }
+      final sections = {...log.observedSections}
+        ..remove(DailyLogObservedSection.period);
+      final keepSymptoms = sections.contains(DailyLogObservedSection.symptom);
+      final cleaned = log.copyWith(
+        clearFlowIntensity: true,
+        symptoms: keepSymptoms ? log.symptoms : const [],
+        symptomSeverities: keepSymptoms ? log.symptomSeverities : const {},
+        observedSections: sections,
+      );
+      if (cleaned.hasData) yield cleaned;
+    }
   }
 
   static UserSettings _mergeSettings(UserSettings local, UserSettings cloud) {
@@ -898,26 +914,16 @@ class _SyncData {
 
 class _LocalSnapshot {
   final _SyncData data;
-  final String? authToken;
-  final String? authRefreshToken;
-  final String? authEmail;
-  final String? authName;
   final String? authGoogleId;
   final String? lastSyncTime;
-  final int virtualDaysOffset;
-  final Set<String> notifiedInsightIds;
   final String? cycleForecastSnapshot;
+  final SyncDeletionMarkers deletions;
 
   const _LocalSnapshot({
     required this.data,
-    required this.authToken,
-    required this.authRefreshToken,
-    required this.authEmail,
-    required this.authName,
     required this.authGoogleId,
     required this.lastSyncTime,
-    required this.virtualDaysOffset,
-    required this.notifiedInsightIds,
     required this.cycleForecastSnapshot,
+    required this.deletions,
   });
 }

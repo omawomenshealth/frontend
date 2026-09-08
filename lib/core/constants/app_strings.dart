@@ -565,6 +565,7 @@ enum _TextKey {
   deletionCouldNotStart,
   deletionFailed,
   deletionSuccessful,
+  localDeletionSuccessful,
   connectAccountDescription,
   loginConnectAccount,
   logoutQuestion,
@@ -1483,6 +1484,7 @@ const Map<_TextKey, String> _turkishTexts = {
       'Hesap ve veriler silinemedi. Lütfen yeniden deneyin.',
   _TextKey.deletionSuccessful:
       'Hesabınız ve verileriniz kalıcı olarak silindi.',
+  _TextKey.localDeletionSuccessful: 'Bu cihazdaki verileriniz silindi.',
   _TextKey.connectAccountDescription:
       'Uygulama silindiğinde veya başka bir cihaza geçtiğinizde verilerinizi kaybetmemek için Google hesabınızı bağlayabilirsiniz.',
   _TextKey.loginConnectAccount: 'Giriş Yap / Hesap Bağla',
@@ -2457,6 +2459,8 @@ const Map<_TextKey, String> _englishTexts = {
       'The account and data could not be deleted. Please try again.',
   _TextKey.deletionSuccessful:
       'Your account and data have been permanently deleted.',
+  _TextKey.localDeletionSuccessful:
+      'Your data on this device has been deleted.',
   _TextKey.connectAccountDescription:
       'Connect your Google account to keep your data available if you reinstall the app or move to another device.',
   _TextKey.loginConnectAccount: 'Sign In / Connect Account',
@@ -4169,6 +4173,8 @@ class AppStrings {
       _text(_TextKey.deletionCouldNotStart);
   static String get deletionFailed => _text(_TextKey.deletionFailed);
   static String get deletionSuccessful => _text(_TextKey.deletionSuccessful);
+  static String get localDeletionSuccessful =>
+      _text(_TextKey.localDeletionSuccessful);
   static String get connectAccountDescription =>
       _text(_TextKey.connectAccountDescription);
   static String get loginConnectAccount => _text(_TextKey.loginConnectAccount);
