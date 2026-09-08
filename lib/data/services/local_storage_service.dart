@@ -4,6 +4,7 @@ import '../models/user_settings_model.dart';
 import '../models/period_log_model.dart';
 import '../models/medication_reminder_model.dart';
 import '../models/medication_identity_model.dart';
+import '../models/sync_deletion_markers.dart';
 import '../../core/utils/date_extensions.dart';
 import '../../core/utils/app_time.dart';
 import '../../core/utils/cycle_rules.dart';
@@ -51,6 +52,7 @@ class LocalStorageService {
   static const String _insightNotificationHistoryKey =
       'insight_notification_history';
   static const String _cycleForecastSnapshotKey = 'cycle_forecast_snapshot_v1';
+  static const String _syncDeletionMarkersKey = 'sync_deletion_markers_v1';
 
   final LocalKeyStore _keyStore;
   LocalEncryptedStore? _encryptedStore;
@@ -358,6 +360,7 @@ class LocalStorageService {
       key == _medicationDoseRecordsKey ||
       key == _insightNotificationHistoryKey ||
       key == _cycleForecastSnapshotKey ||
+      key == _syncDeletionMarkersKey ||
       key.startsWith(_logPrefix);
 
   // ── Kullanıcı Ayarları ─────────────────────────────────
@@ -569,11 +572,25 @@ class LocalStorageService {
     final dates = _getDatesSet();
     final toRemove = dates.where((d) => d.startsWith(dateStr)).toList();
 
+    final markers = loadSyncDeletionMarkers();
+    if (!await saveSyncDeletionMarkers(
+      SyncDeletionMarkers(
+        logs: {...markers.logs, ...toRemove},
+        periods: markers.periods,
+        reminderPlans: markers.reminderPlans,
+      ),
+    )) {
+      return false;
+    }
+
     bool allSuccess = true;
     for (final keyStr in toRemove) {
       final success = await _p.remove('$_logPrefix$keyStr');
-      if (!success) allSuccess = false;
-      dates.remove(keyStr);
+      if (!success) {
+        allSuccess = false;
+      } else {
+        dates.remove(keyStr);
+      }
     }
 
     if (allSuccess) {
@@ -612,6 +629,18 @@ class LocalStorageService {
           log.flowIntensity != null ||
           log.observedSections.contains(DailyLogObservedSection.period);
       if (!hasPeriodData) continue;
+
+      final markers = loadSyncDeletionMarkers();
+      if (!await saveSyncDeletionMarkers(
+        SyncDeletionMarkers(
+          logs: markers.logs,
+          periods: {...markers.periods, keyStr},
+          reminderPlans: markers.reminderPlans,
+        ),
+      )) {
+        allSuccess = false;
+        continue;
+      }
 
       final remainingSections = {...log.observedSections}
         ..remove(DailyLogObservedSection.period);
@@ -965,6 +994,33 @@ class LocalStorageService {
     return _p.clear();
   }
 
+  /// Sync must never delete authentication, device preferences or the key.
+  Future<bool> clearSyncedData() => _p.removeWhere(
+    (key) =>
+        key == _settingsKey ||
+        key.startsWith(_logPrefix) ||
+        key == _allMedsKey ||
+        key == _allSupsKey ||
+        key == _allFoodsKey ||
+        key == _allSkincareKey ||
+        key == _medicationReminderPlansKey ||
+        key == _medicationDoseRecordsKey ||
+        key == _cycleForecastSnapshotKey ||
+        key == _authLastSyncKey,
+  );
+
+  SyncDeletionMarkers loadSyncDeletionMarkers() {
+    final raw = _p.getString(_syncDeletionMarkersKey);
+    if (raw == null) return const SyncDeletionMarkers();
+    // Fail closed rather than silently resurrect records if metadata is invalid.
+    return SyncDeletionMarkers.fromJson(
+      Map<String, dynamic>.from(jsonDecode(raw) as Map),
+    );
+  }
+
+  Future<bool> saveSyncDeletionMarkers(SyncDeletionMarkers markers) =>
+      _p.setString(_syncDeletionMarkersKey, jsonEncode(markers.toJson()));
+
   // ── Özel İlaç & Takviye Kayıtları ───────────────────────
 
   /// Kayıtlı tüm özel ilaç isimlerini getir.
@@ -1275,6 +1331,16 @@ class LocalStorageService {
   }
 
   Future<bool> deleteMedicationReminderPlan(String id) async {
+    final markers = loadSyncDeletionMarkers();
+    if (!await saveSyncDeletionMarkers(
+      SyncDeletionMarkers(
+        logs: markers.logs,
+        periods: markers.periods,
+        reminderPlans: {...markers.reminderPlans, id},
+      ),
+    )) {
+      return false;
+    }
     final plans = loadMedicationReminderPlans()
       ..removeWhere((plan) => plan.id == id);
     return saveMedicationReminderPlans(plans);
