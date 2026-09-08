@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../views/onboarding/view/widgets/oma_theme.dart';
+import 'oma_theme.dart';
 
 class OmaInput extends StatelessWidget {
   const OmaInput({

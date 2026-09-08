@@ -5,11 +5,16 @@ import '../../../core/constants/color_constants.dart';
 import '../../../localization/generated/strings.g.dart';
 import '../controller/onboarding_controller.dart';
 import '../utils/onboarding_date_utils.dart';
-import 'widgets/index.dart';
 import '../viewmodel/onboarding_view_model.dart';
 import 'pages/index.dart';
+import 'widgets/index.dart';
 
-/// Üç ana ekrandan oluşan, dikey kaydırma gerektirmeyen ilk kurulum akışı.
+/// Onboarding akışını yöneten ana ekran.
+///
+/// Akış:
+/// Introduction → Wellbeing → Health Profile → Cycle → Preview
+///
+/// Preview sonrasında footer'daki Finish butonu onboarding'i tamamlar.
 class OnboardingView extends StatefulWidget {
   const OnboardingView({super.key});
 
@@ -19,98 +24,132 @@ class OnboardingView extends StatefulWidget {
 
 class _OnboardingViewState extends State<OnboardingView> {
   late final PageController _pageController;
+  late final TextEditingController _nameController;
   late final TextEditingController _birthDateController;
+  late final TextEditingController _heightController;
+  late final TextEditingController _weightController;
 
   @override
   void initState() {
     super.initState();
+
     _pageController = PageController();
+    _nameController = TextEditingController();
     _birthDateController = TextEditingController();
+    _heightController = TextEditingController();
+    _weightController = TextEditingController();
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _nameController.dispose();
     _birthDateController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<OnboardingViewModel>();
+
     final controller = OnboardingController(context: context, vm: vm);
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: AppColors.scaffoldBackground,
-      body: Stack(
-        children: [
-          OnboardingBackground(pageIndex: vm.currentPage),
-          SafeArea(
-            child: Column(
-              children: [
-                Visibility(
-                  visible: !vm.isPreviewPage,
-                  maintainState: true,
-                  maintainAnimation: true,
-                  maintainSize: true,
-                  child: OnboardingHeader(
-                    onBack: _goBack,
-                    index: vm.currentPage,
-                    total: vm.totalPages,
-                  ),
-                ),
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    onPageChanged: vm.goToPage,
-                    children: [
-                      IntroductionPage(
-                        vm: vm,
-                        birthDateController: _birthDateController,
-                        onPickBirthDate: () async {
-                          await controller.pickBirthDate();
-                          if (mounted && vm.birthDate != null) {
-                            _birthDateController.text =
-                                OnboardingDateUtils.formatDate(vm.birthDate!);
-                          }
-                        },
-                        onBirthDateChanged: (value) {
-                          vm.setBirthDate(
-                            OnboardingDateUtils.parseBirthDate(value),
-                          );
-                        },
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+
+          _goBack();
+        },
+        child: Stack(
+          children: [
+            OnboardingBackground(pageIndex: vm.currentPage),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
+                child: Column(
+                  children: [
+                    if (!vm.isPreviewPage) ...[
+                      OnboardingHeader(
+                        onBack: _goBack,
+                        index: vm.currentPage,
+                        total: vm.totalPages,
                       ),
-                      WellbeingPage(),
-                      HealthProfilePage(
-                        vm: vm,
-                        onOpenDiseases: controller.showDiseasePicker,
+                      const SizedBox(height: 10),
+                      OnboardingPrompt(
+                        message: _promptForPage(context, vm.currentPage),
                       ),
-                      CyclePage(
-                        vm: vm,
-                        onPickLastPeriod: controller.pickLastPeriod,
-                        onAddBirthControl: controller.addBirthControl,
-                      ),
-                      OnboardingPreviewPage(vm: vm, onComplete: _complete),
+                      const SizedBox(height: 10),
                     ],
-                  ),
+
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        physics: const NeverScrollableScrollPhysics(),
+                        onPageChanged: vm.goToPage,
+                        children: [
+                          IntroductionPage(
+                            vm: vm,
+                            nameController: _nameController,
+                            birthDateController: _birthDateController,
+                            onPickBirthDate: () async {
+                              await controller.pickBirthDate();
+
+                              if (mounted && vm.birthDate != null) {
+                                _birthDateController.text =
+                                    OnboardingDateUtils.formatDate(
+                                      vm.birthDate!,
+                                    );
+                              }
+                            },
+                            onBirthDateChanged: (value) {
+                              vm.setBirthDate(
+                                OnboardingDateUtils.parseBirthDate(value),
+                              );
+                            },
+                          ),
+
+                          WellbeingPage(vm: vm),
+
+                          HealthProfilePage(
+                            vm: vm,
+                            heightController: _heightController,
+                            weightController: _weightController,
+                            onOpenDiseases: controller.showDiseasePicker,
+                          ),
+
+                          CyclePage(
+                            vm: vm,
+                            onPickLastPeriod: controller.pickLastPeriod,
+                            onAddBirthControl: controller.addBirthControl,
+                          ),
+
+                          OnboardingPreviewPage(vm: vm),
+                        ],
+                      ),
+                    ),
+
+                    OnboardingFooter(
+                      canContinue: vm.isPreviewPage
+                          ? !vm.isSaving
+                          : vm.canGoNext,
+                      onContinue: _goNext,
+                      onSkip: _goNext,
+                      isFirst: vm.currentPage == 0,
+                      isLast: vm.isPreviewPage,
+                      isSkippable: !vm.isPreviewPage,
+                    ),
+                  ],
                 ),
-                Visibility(
-                  visible: !vm.isPreviewPage,
-                  maintainState: true,
-                  maintainAnimation: true,
-                  maintainSize: true,
-                  child: OnboardingBottomNavigation(
-                    vm: vm,
-                    onNext: _goNext,
-                    onSkip: _goNext,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -125,15 +164,20 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   String _promptForPage(BuildContext context, int page) {
     final prompts = context.t.onboarding.prompt;
+
     switch (page) {
       case 0:
         return prompts.introduction;
+
       case 1:
         return prompts.wellbeing;
+
       case 2:
         return prompts.healthProfile;
+
       case 3:
         return prompts.cycle;
+
       default:
         return '';
     }
@@ -141,40 +185,43 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   void _goBack() {
     FocusScope.of(context).unfocus();
+
     final vm = context.read<OnboardingViewModel>();
-    if (vm.isDetailedHealthPage && !vm.isFirstDetailStep) {
-      vm.previousDetailStep();
+
+    // Preview → Cycle
+    if (vm.isPreviewPage) {
+      vm.previousPage();
+      _animateToPage(vm.currentPage);
       return;
     }
+
+    // İlk onboarding sayfasından Auth'a dön.
     if (!vm.canGoBack) {
       Navigator.of(context).pushReplacementNamed('/auth');
       return;
     }
+
     vm.previousPage();
     _animateToPage(vm.currentPage);
   }
 
   Future<void> _goNext() async {
     FocusScope.of(context).unfocus();
+
     final vm = context.read<OnboardingViewModel>();
+
+    // Normal onboarding sayfaları.
     if (!vm.isPreviewPage) {
       vm.nextPage();
       _animateToPage(vm.currentPage);
       return;
     }
-    if (!vm.isLastDetailStep) {
-      vm.nextDetailStep();
-      return;
-    }
-    final saved = await vm.saveAndComplete();
-    if (saved && mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
-    }
-  }
 
-  Future<void> _complete() async {
-    final vm = context.read<OnboardingViewModel>();
+    // Preview → Finish → Home
+    if (vm.isSaving) return;
+
     final saved = await vm.saveAndComplete();
+
     if (saved && mounted) {
       Navigator.of(context).pushReplacementNamed('/home');
     }

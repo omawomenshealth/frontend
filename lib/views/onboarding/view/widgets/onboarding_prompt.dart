@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'oma_theme.dart';
+import '../../../../core/widgets/oma_theme.dart';
 
 class OnboardingPrompt extends StatelessWidget {
   const OnboardingPrompt({

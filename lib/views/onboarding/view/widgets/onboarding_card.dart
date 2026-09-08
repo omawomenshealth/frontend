@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'oma_theme.dart';
+import '../../../../core/widgets/index.dart';
 
 enum OnboardingDeckMotion { none, next, prev }
 
@@ -15,7 +15,6 @@ class OnboardingCard extends StatelessWidget {
     required this.children,
     this.motion = OnboardingDeckMotion.none,
     this.duration = const Duration(milliseconds: 350),
-    this.margin = const EdgeInsets.fromLTRB(20, 8, 20, 4),
     this.padding = const EdgeInsets.all(20),
     this.itemSpacing = 8,
   });
@@ -26,7 +25,6 @@ class OnboardingCard extends StatelessWidget {
   final OnboardingDeckMotion motion;
   final Duration duration;
 
-  final EdgeInsetsGeometry margin;
   final EdgeInsetsGeometry padding;
   final double itemSpacing;
 
@@ -52,7 +50,6 @@ class OnboardingCard extends StatelessWidget {
         );
       },
       child: SingleChildScrollView(
-        padding: margin,
         child: Container(
           width: double.infinity,
           padding: padding,

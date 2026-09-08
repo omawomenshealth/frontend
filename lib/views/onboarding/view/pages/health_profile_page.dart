@@ -7,22 +7,19 @@ import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
 
-class HealthProfilePage extends StatefulWidget {
+class HealthProfilePage extends StatelessWidget {
   const HealthProfilePage({
     super.key,
     required this.vm,
+    required this.heightController,
+    required this.weightController,
     required this.onOpenDiseases,
   });
 
   final OnboardingViewModel vm;
+  final TextEditingController heightController;
+  final TextEditingController weightController;
   final VoidCallback onOpenDiseases;
-
-  @override
-  State<HealthProfilePage> createState() => _HealthProfilePageState();
-}
-
-class _HealthProfilePageState extends State<HealthProfilePage> {
-  SmokingStatus? _smokingStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -32,24 +29,20 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
       label: healthProfile.title,
       children: [
         _BodyMeasurementsField(
-          vm: widget.vm,
+          vm: vm,
+          heightController: heightController,
+          weightController: weightController,
           healthProfile: healthProfile,
         ),
         _SmokingField(
-          value: _smokingStatus,
+          value: vm.smokingStatus,
           healthProfile: healthProfile,
-          onChanged: (value) {
-            setState(() {
-              _smokingStatus = value;
-            });
-
-            widget.vm.setSmokingStatus(value);
-          },
+          onChanged: vm.setSmokingStatus,
         ),
         _KnownConditionsField(
-          vm: widget.vm,
+          vm: vm,
           healthProfile: healthProfile,
-          onOpenDiseases: widget.onOpenDiseases,
+          onOpenDiseases: onOpenDiseases,
         ),
       ],
     );
@@ -59,10 +52,14 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
 class _BodyMeasurementsField extends StatelessWidget {
   const _BodyMeasurementsField({
     required this.vm,
+    required this.heightController,
+    required this.weightController,
     required this.healthProfile,
   });
 
   final OnboardingViewModel vm;
+  final TextEditingController heightController;
+  final TextEditingController weightController;
   final dynamic healthProfile;
 
   @override
@@ -74,6 +71,7 @@ class _BodyMeasurementsField extends StatelessWidget {
           child: OmaField(
             label: healthProfile.height,
             child: OmaInput(
+              controller: heightController,
               hintText: '165',
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
@@ -89,6 +87,7 @@ class _BodyMeasurementsField extends StatelessWidget {
           child: OmaField(
             label: healthProfile.weight,
             child: OmaInput(
+              controller: weightController,
               hintText: '60',
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,

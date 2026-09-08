@@ -1134,6 +1134,9 @@ class Translations$onboarding$common$en {
 
 	/// en: 'Save'
 	String get save => 'Save';
+
+	/// en: 'You can also swipe the card left to continue'
+	String get swipeToContinue => 'You can also swipe the card left to continue';
 }
 
 // Path: onboarding.cycle
@@ -2040,6 +2043,7 @@ extension on Translations {
 			'onboarding.common.next' => 'Continue',
 			'onboarding.common.finish' => 'Finish',
 			'onboarding.common.save' => 'Save',
+			'onboarding.common.swipeToContinue' => 'You can also swipe the card left to continue',
 			'onboarding.cycle.title' => 'Your cycle',
 			'onboarding.cycle.menopauseStatus' => 'Your menopause status',
 			'onboarding.cycle.averageCycleLength' => 'Your average cycle length',
@@ -2159,9 +2163,9 @@ extension on Translations {
 			'options.moodPlaceOptions.at_work' => 'At work',
 			'options.moodPlaceOptions.outside' => 'Outside',
 			'options.moodPlaceOptions.in_transit' => 'In transit',
-			'options.moodPlaceOptions.social' => 'Social',
 			_ => null,
 		} ?? switch (path) {
+			'options.moodPlaceOptions.social' => 'Social',
 			'options.sexualActivityOptions.with_a_partner' => 'With a partner',
 			'options.sexualActivityOptions.masturbation' => 'Masturbation',
 			'options.sexualActivityOptions.protected' => 'Protected',

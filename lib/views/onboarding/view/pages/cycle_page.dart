@@ -7,7 +7,6 @@ import '../../../../localization/generated/strings.g.dart';
 import '../../utils/onboarding_label_utils.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
-import '../widgets/oma_theme.dart';
 
 class CyclePage extends StatelessWidget {
   const CyclePage({

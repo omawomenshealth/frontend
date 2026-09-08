@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../views/onboarding/view/widgets/oma_theme.dart';
+import 'oma_theme.dart';
 
 
 /// Label + field + optional hint.

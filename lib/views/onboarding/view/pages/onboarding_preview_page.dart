@@ -8,133 +8,117 @@ import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 
 const _readyPlum = Color(0xFF7A4F63);
-const _readyPlumForeground = Color(0xFFFFF7FA);
 const _readyPlumSoft = Color(0x1A7A4F63);
 
 class OnboardingPreviewPage extends StatelessWidget {
   final OnboardingViewModel vm;
-  final VoidCallback onComplete;
 
   const OnboardingPreviewPage({
     super.key,
     required this.vm,
-    required this.onComplete,
   });
 
   @override
   Widget build(BuildContext context) {
     final name = vm.userName.trim();
     final review = context.t.onboarding.review;
+
     final conditionSummary = vm.knownDiseases.isEmpty
         ? review.noConditions
         : vm.knownDiseases.map(AppStrings.localizeStoredValue).join(', ');
+
     final accountStorageSummary = vm.isUserLoggedIn
         ? review.googleStorage
         : review.guestStorage;
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 32,
+        ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 448),
           child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface.withValues(alpha: 0.86),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x14705F4A),
-                          blurRadius: 24,
-                          offset: Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: Image.asset(ImageConstants.logo),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  name.isEmpty
-                      ? review.title
-                      : review.titleWithName(name: name),
-                  textAlign: TextAlign.center,
-                  style: OmaTypography.display(
-                    size: 32,
-                    weight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  review.subtitle,
-                  textAlign: TextAlign.center,
-                  style: OmaTypography.body(
-                    color: AppColors.textSecondary,
-                    height: 1.45,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _PreviewNote(message: context.t.onboarding.prompt.review),
-                const SizedBox(height: 24),
-                _PreviewSummary(
-                  label: review.conditionsLabel,
-                  value: conditionSummary,
-                ),
-                _PreviewSummary(
-                  label: review.cycleLabel,
-                  value: review.dayCount(days: vm.averageCycleLength),
-                ),
-                _PreviewSummary(
-                  label: review.accountStorageLabel,
-                  value: accountStorageSummary,
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  height: 48,
-                  child: DecoratedBox(
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(999)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0x26705F4A),
-                          blurRadius: 32,
-                          offset: Offset(0, 14),
-                        ),
-                      ],
-                    ),
-                    child: FilledButton(
-                      onPressed: vm.isSaving ? null : onComplete,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: _readyPlum,
-                        foregroundColor: _readyPlumForeground,
-                        shape: const StadiumBorder(),
-                        textStyle: OmaTypography.body(
-                          size: 15,
-                          color: _readyPlumForeground,
-                          weight: FontWeight.w600,
-                        ),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface.withValues(alpha: 0.86),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x14705F4A),
+                        blurRadius: 24,
+                        offset: Offset(0, 8),
                       ),
-                      child: vm.isSaving
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(review.start),
-                    ),
+                    ],
                   ),
+                  alignment: Alignment.center,
+                  child: Image.asset(ImageConstants.logo),
                 ),
-                const SizedBox(height: 12),
-                _PreviewPrivacy(label: review.deviceEncryptionNote),
-              ],
+              ),
+
+              const SizedBox(height: 24),
+
+              Text(
+                name.isEmpty
+                    ? review.title
+                    : review.titleWithName(name: name),
+                textAlign: TextAlign.center,
+                style: OmaTypography.display(
+                  size: 32,
+                  weight: FontWeight.w600,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Text(
+                review.subtitle,
+                textAlign: TextAlign.center,
+                style: OmaTypography.body(
+                  color: AppColors.textSecondary,
+                  height: 1.45,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              _PreviewNote(
+                message: context.t.onboarding.prompt.review,
+              ),
+
+              const SizedBox(height: 24),
+
+              _PreviewSummary(
+                label: review.conditionsLabel,
+                value: conditionSummary,
+              ),
+
+              _PreviewSummary(
+                label: review.cycleLabel,
+                value: review.dayCount(
+                  days: vm.averageCycleLength,
+                ),
+              ),
+
+              _PreviewSummary(
+                label: review.accountStorageLabel,
+                value: accountStorageSummary,
+              ),
+
+              const SizedBox(height: 24),
+
+              _PreviewPrivacy(
+                label: review.deviceEncryptionNote,
+              ),
+            ],
           ),
         ),
       ),
@@ -145,7 +129,9 @@ class OnboardingPreviewPage extends StatelessWidget {
 class _PreviewNote extends StatelessWidget {
   final String message;
 
-  const _PreviewNote({required this.message});
+  const _PreviewNote({
+    required this.message,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +156,10 @@ class _PreviewNote extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: OmaTypography.body(size: 12, color: _readyPlum),
+              style: OmaTypography.body(
+                size: 12,
+                color: _readyPlum,
+              ),
             ),
           ),
         ],
@@ -182,7 +171,9 @@ class _PreviewNote extends StatelessWidget {
 class _PreviewPrivacy extends StatelessWidget {
   final String label;
 
-  const _PreviewPrivacy({required this.label});
+  const _PreviewPrivacy({
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +205,10 @@ class _PreviewSummary extends StatelessWidget {
   final String label;
   final String value;
 
-  const _PreviewSummary({required this.label, required this.value});
+  const _PreviewSummary({
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +216,10 @@ class _PreviewSummary extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         decoration: BoxDecoration(
           color: AppColors.surface.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(12),
@@ -245,7 +242,10 @@ class _PreviewSummary extends StatelessWidget {
               child: Text(
                 value,
                 textAlign: TextAlign.end,
-                style: OmaTypography.body(size: 12, weight: FontWeight.w600),
+                style: OmaTypography.body(
+                  size: 12,
+                  weight: FontWeight.w600,
+                ),
               ),
             ),
           ],

@@ -977,6 +977,7 @@ class _Translations$onboarding$common$tr extends Translations$onboarding$common$
 	@override String get next => 'Devam et';
 	@override String get finish => 'Bitir';
 	@override String get save => 'Kaydet';
+	@override String get swipeToContinue => 'Devam etmek için kartı sola da kaydırabilirsin';
 }
 
 // Path: onboarding.cycle
@@ -1680,6 +1681,7 @@ extension on TranslationsTr {
 			'onboarding.common.next' => 'Devam et',
 			'onboarding.common.finish' => 'Bitir',
 			'onboarding.common.save' => 'Kaydet',
+			'onboarding.common.swipeToContinue' => 'Devam etmek için kartı sola da kaydırabilirsin',
 			'onboarding.cycle.title' => 'Döngün',
 			'onboarding.cycle.menopauseStatus' => 'Menopoz durumun',
 			'onboarding.cycle.averageCycleLength' => 'Ortalama döngü süren',
@@ -1799,9 +1801,9 @@ extension on TranslationsTr {
 			'options.moodPlaceOptions.at_work' => 'İş yerindeydim',
 			'options.moodPlaceOptions.outside' => 'Dışarıdaydım',
 			'options.moodPlaceOptions.in_transit' => 'Yoldaydım',
-			'options.moodPlaceOptions.social' => 'Sosyal ortamdaydım',
 			_ => null,
 		} ?? switch (path) {
+			'options.moodPlaceOptions.social' => 'Sosyal ortamdaydım',
 			'options.sexualActivityOptions.with_a_partner' => 'Partnerle',
 			'options.sexualActivityOptions.masturbation' => 'Mastürbasyon',
 			'options.sexualActivityOptions.protected' => 'Korunmalı',

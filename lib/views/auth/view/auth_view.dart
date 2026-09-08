@@ -131,7 +131,7 @@ class AuthView extends StatelessWidget {
   }
 
   void _navigateToOnboarding(BuildContext context) {
-    Navigator.of(context).pushReplacementNamed('/onboarding');
+    Navigator.of(context).pushNamed('/onboarding');
   }
 
   void _navigateToNextScreen(BuildContext context, AuthViewModel vm) {

@@ -2,20 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/index.dart';
 import '../../../../localization/generated/strings.g.dart';
+import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
 
-class WellbeingPage extends StatefulWidget {
-  const WellbeingPage({
-    super.key,
-  });
+class WellbeingPage extends StatelessWidget {
+  const WellbeingPage({super.key, required this.vm});
 
-  @override
-  State<WellbeingPage> createState() => _WellbeingPageState();
-}
-
-class _WellbeingPageState extends State<WellbeingPage> {
-  Set<String> _moods = <String>{};
-  Set<String> _supportNeeds = <String>{};
+  final OnboardingViewModel vm;
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +26,9 @@ class _WellbeingPageState extends State<WellbeingPage> {
               wellbeing.moodOptions.anxious,
               wellbeing.moodOptions.pain,
             ],
-            selectedValues: _moods,
+            selectedValues: vm.moods,
             labelBuilder: (value) => value,
-            onChanged: (next) {
-              setState(() {
-                _moods = next;
-              });
-            },
+            onChanged: vm.setMoods,
           ),
         ),
         OmaField(
@@ -54,13 +43,9 @@ class _WellbeingPageState extends State<WellbeingPage> {
               wellbeing.supportOptions.understandCycle,
               wellbeing.supportOptions.justListen,
             ],
-            selectedValues: _supportNeeds,
+            selectedValues: vm.supportNeeds,
             labelBuilder: (value) => value,
-            onChanged: (next) {
-              setState(() {
-                _supportNeeds = next;
-              });
-            },
+            onChanged: vm.setSupportNeeds,
           ),
         ),
       ],

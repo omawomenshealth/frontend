@@ -66,9 +66,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: AppStrings.supportedLocales,
-          home: Scaffold(
-            body: OnboardingPreviewPage(vm: vm, onComplete: () {}),
-          ),
+          home: Scaffold(body: OnboardingPreviewPage(vm: vm)),
         ),
       ),
     );
@@ -140,6 +138,10 @@ void main() {
       find.byKey(const ValueKey('onboarding_birth_date')),
       '18081996',
     );
+    await tester.enterText(
+      find.byKey(const ValueKey('onboarding_name')),
+      'Ayse',
+    );
     await tester.pump();
     expect(find.text('18/08/1996'), findsOneWidget);
     expect(vm.age, greaterThan(0));
@@ -150,6 +152,19 @@ void main() {
     expect(find.text(t.onboarding.prompt.wellbeing), findsOneWidget);
     expect(find.text(t.onboarding.wellbeing.moodQuestion), findsOneWidget);
     expect(find.text(t.onboarding.wellbeing.multiSelectHint), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('onboarding_name')))
+          .controller!
+          .text,
+      'Ayse',
+    );
+
+    await tester.tap(find.text(t.onboarding.common.next));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text(t.onboarding.common.next));
     await tester.pumpAndSettle();

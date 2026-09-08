@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import './oma_theme.dart';
+import '../../../../core/widgets/oma_theme.dart';
 
 /// Geri butonu + ilerleme çizgileri + sayaç.
 class OnboardingHeader extends StatelessWidget {

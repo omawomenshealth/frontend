@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../views/onboarding/view/widgets/oma_theme.dart';
+import 'oma_theme.dart';
 
 /// Seçilebilir yuvarlak etiket.
 class OmaChip extends StatelessWidget {

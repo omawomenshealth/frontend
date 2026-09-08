@@ -21,8 +21,6 @@ class OnboardingViewModel extends ChangeNotifier {
   static const detailStepCount = 1;
 
   int _currentPage = 0;
-  int _detailStep = 0;
-  bool _detailForward = true;
 
   // Form state: personal
   String _userName = '';
@@ -32,6 +30,8 @@ class OnboardingViewModel extends ChangeNotifier {
   double? _height;
 
   // Form state: lifestyle
+  Set<String> _moods = {};
+  Set<String> _supportNeeds = {};
   SmokingStatus _smokingStatus = SmokingStatus.never;
   int _smokingYears = 0;
 
@@ -71,13 +71,7 @@ class OnboardingViewModel extends ChangeNotifier {
   int get totalPages => 5;
   bool get canGoNext => _currentPage < totalPages - 1;
   bool get canGoBack => _currentPage > 0;
-  bool get isDetailedHealthPage => _currentPage == totalPages - 1;
   bool get isPreviewPage => _currentPage == totalPages - 1;
-
-  int get detailStep => _detailStep;
-  bool get detailForward => _detailForward;
-  bool get isFirstDetailStep => _detailStep == 0;
-  bool get isLastDetailStep => _detailStep == detailStepCount - 1;
 
   // Getters: form
   String get userName => _userName;
@@ -86,6 +80,8 @@ class OnboardingViewModel extends ChangeNotifier {
   double? get weight => _weight;
   double? get height => _height;
 
+  Set<String> get moods => Set.unmodifiable(_moods);
+  Set<String> get supportNeeds => Set.unmodifiable(_supportNeeds);
   SmokingStatus get smokingStatus => _smokingStatus;
   int get smokingYears => _smokingYears;
 
@@ -141,20 +137,6 @@ class OnboardingViewModel extends ChangeNotifier {
     }
   }
 
-  void nextDetailStep() {
-    if (isLastDetailStep) return;
-    _detailForward = true;
-    _detailStep++;
-    notifyListeners();
-  }
-
-  void previousDetailStep() {
-    if (isFirstDetailStep) return;
-    _detailForward = false;
-    _detailStep--;
-    notifyListeners();
-  }
-
   // Personal actions
   void setUserName(String value) {
     _userName = value;
@@ -189,6 +171,16 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   // Lifestyle actions
+  void setMoods(Set<String> values) {
+    _moods = Set<String>.from(values);
+    notifyListeners();
+  }
+
+  void setSupportNeeds(Set<String> values) {
+    _supportNeeds = Set<String>.from(values);
+    notifyListeners();
+  }
+
   void setSmokingStatus(SmokingStatus value) {
     _smokingStatus = value;
     if (value != SmokingStatus.current) _smokingYears = 0;
