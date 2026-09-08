@@ -54,12 +54,10 @@ class _OnboardingViewState extends State<OnboardingView> {
                   maintainState: true,
                   maintainAnimation: true,
                   maintainSize: true,
-                  child: OnboardingProgressHeader(
-                    currentPage: vm.currentPage,
-                    totalPages: vm.totalPages,
-                    prompt: _promptForPage(context, vm.currentPage),
+                  child: OnboardingHeader(
                     onBack: _goBack,
-                    canGoBack: !vm.isSaving,
+                    index: vm.currentPage,
+                    total: vm.totalPages,
                   ),
                 ),
                 Expanded(
