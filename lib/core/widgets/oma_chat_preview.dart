@@ -50,7 +50,19 @@ class OmaTalkPreview extends StatelessWidget {
                   AppStrings.mood,
                   AppStrings.nutrition,
                 ])
-                  OmaFeaturePreviewChip(label: label),
+                  OmaBadge.label(
+                    label,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 13,
+                      vertical: 9,
+                    ),
+                    foreground: OmaColors.primary.withValues(alpha: 0.72),
+                    background: OmaColors.primary.withValues(alpha: 0.07),
+                    border: Border.all(
+                      color: OmaColors.primary.withValues(alpha: 0.22),
+                    ),
+                    borderRadius: 20,
+                  ),
               ],
             ),
           ],

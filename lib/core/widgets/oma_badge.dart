@@ -13,6 +13,7 @@ class OmaBadge extends StatelessWidget {
     this.padding,
     this.iconSize,
     this.borderRadius,
+    this.border,
   }) : assert(
           icon != null || label != null,
           'OmaBadge requires either an icon or a label.',
@@ -27,6 +28,7 @@ class OmaBadge extends StatelessWidget {
     this.padding,
     this.iconSize,
     this.borderRadius,
+    this.border,
   }) : label = null;
 
   const OmaBadge.label(
@@ -38,6 +40,7 @@ class OmaBadge extends StatelessWidget {
     this.padding,
     this.iconSize,
     this.borderRadius,
+    this.border,
   }) : icon = null;
 
   final IconData? icon;
@@ -54,6 +57,7 @@ class OmaBadge extends StatelessWidget {
 
   final double? iconSize;
   final double? borderRadius;
+  final BoxBorder? border;
 
   bool get isIconOnly => icon != null && label == null;
 
@@ -94,6 +98,7 @@ class OmaBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(
           borderRadius ?? 20,
         ),
+        border: border,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
