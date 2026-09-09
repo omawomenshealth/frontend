@@ -690,9 +690,12 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
     final saved = await profile.setTrackingMode(mode);
     if (!context.mounted) return;
     if (!saved) {
-      ScaffoldMessenger.of(
+      OmaToast.show(
         context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.modeChangeFailed)));
+        title: AppStrings.error,
+        description: AppStrings.modeChangeFailed,
+        icon: Icons.error_outline_rounded,
+      );
       return;
     }
     await context.read<DashboardViewModel>().loadData();

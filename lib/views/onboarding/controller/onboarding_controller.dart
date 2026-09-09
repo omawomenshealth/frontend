@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/cycle_rules.dart';
+import '../../../core/widgets/oma_toast.dart';
 import '../view/sheets/index.dart';
 import '../viewmodel/onboarding_view_model.dart';
 
@@ -68,12 +68,11 @@ class OnboardingController {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-      ),
+    OmaToast.show(
+      context,
+      title: AppStrings.error,
+      description: message,
+      icon: Icons.error_outline_rounded,
     );
   }
 }

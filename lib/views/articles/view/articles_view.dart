@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/period_calculator.dart';
+import '../../../core/widgets/oma_toast.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/premium_purchase_service.dart';
 import '../../../localization/generated/strings.g.dart';
@@ -161,8 +162,11 @@ class _ArticlesViewState extends State<ArticlesView> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: AppColors.error),
+    OmaToast.show(
+      context,
+      title: AppStrings.error,
+      description: message,
+      icon: Icons.error_outline_rounded,
     );
   }
 

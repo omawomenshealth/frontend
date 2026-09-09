@@ -8,6 +8,7 @@ import '../../../data/models/medication_identity_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/notification_service.dart';
+import '../../../core/widgets/oma_toast.dart';
 
 Future<String> saveMedicationReminderPlan({
   required LocalStorageService storage,
@@ -350,9 +351,11 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
 
     if (!mounted) return;
     setState(() => _busy = false);
-    ScaffoldMessenger.of(
+    OmaToast.show(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+      title: AppStrings.reminderSaved,
+      description: message,
+    );
   }
 
   Future<void> _togglePlan(MedicationReminderPlan plan, bool enabled) async {
@@ -407,9 +410,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
     widget.onChanged?.call();
     if (!mounted) return;
     setState(() => _busy = false);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.reminderDeleted)));
+    OmaToast.show(context, title: AppStrings.reminderDeleted);
   }
 
   @override
@@ -1172,9 +1173,11 @@ class _MedicationReminderFormSheetState
   }
 
   void _showValidation(String message) {
-    ScaffoldMessenger.of(
+    OmaToast.show(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+      title: AppStrings.reminderSaved,
+      description: message,
+    );
   }
 
   String _formatDate(DateTime date) =>

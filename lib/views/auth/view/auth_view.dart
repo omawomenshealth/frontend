@@ -5,6 +5,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/image_constants.dart';
 import '../../../core/shared_widgets/custom_button.dart';
 import '../../../core/shared_widgets/pastel_flower.dart';
+import '../../../core/widgets/oma_toast.dart';
 import '../viewmodel/auth_view_model.dart';
 
 /// Giriş ekranı — Google Sign-In, Simüle giriş ve giriş yapmadan devam etme seçenekleri.
@@ -218,11 +219,11 @@ class AuthView extends StatelessWidget {
       _navigateToNextScreen(context, vm);
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(vm.errorMessage ?? AppStrings.syncCouldNotComplete),
-        backgroundColor: AppColors.error,
-      ),
+    OmaToast.show(
+      context,
+      title: AppStrings.error,
+      description: vm.errorMessage ?? AppStrings.syncCouldNotComplete,
+      icon: Icons.error_outline_rounded,
     );
   }
 
