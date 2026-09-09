@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import 'oma_badge.dart';
-import '../widgets/index.dart';
+import '../../core/widgets/oma_badge.dart';
+import '../../core/widgets/index.dart';
 
 class OmaTalkPreview extends StatelessWidget {
   const OmaTalkPreview({super.key, required this.accent});

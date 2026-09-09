@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'oma_theme.dart';
-import 'oma_sunburst.dart';
+import '../../core/widgets/oma_theme.dart';
+import '../../core/widgets/oma_sunburst.dart';
 
 class OmaBottomNavigation extends StatelessWidget {
   const OmaBottomNavigation({
