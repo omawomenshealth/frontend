@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:math' as math;
+import 'core/widgets/oma_bottom_navigation.dart';
+import 'core/widgets/oma_chat_preview.dart';
 import 'localization/generated/strings.g.dart';
 import 'core/localization/catalog_localizer.dart';
 import 'package:flutter/material.dart';
@@ -319,207 +320,57 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
           const ProfileView(),
         ],
       ),
-      bottomNavigationBar: _currentIndex == 2
-          ? null
-          : SafeArea(
-              top: false,
-              minimum: const EdgeInsets.fromLTRB(14, 0, 14, 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 70,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.96),
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF3C322C,
-                            ).withValues(alpha: 0.13),
-                            blurRadius: 28,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: BottomNavigationBar(
-                        currentIndex: _currentIndex,
-                        onTap: _selectPage,
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        type: BottomNavigationBarType.fixed,
-                        selectedItemColor: activeColor,
-                        unselectedItemColor: AppColors.textSecondary,
-                        iconSize: 20,
-                        selectedFontSize: 10.5,
-                        unselectedFontSize: 10.5,
-                        selectedLabelStyle: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                        ),
-                        unselectedLabelStyle: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
-                        items: [
-                          BottomNavigationBarItem(
-                            icon: const Icon(Icons.home_outlined),
-                            activeIcon: const Icon(Icons.home_rounded),
-                            label: AppStrings.home,
-                          ),
-                          BottomNavigationBarItem(
-                            icon: const Icon(Icons.explore_outlined),
-                            activeIcon: const Icon(Icons.explore_rounded),
-                            label: AppStrings.explore,
-                          ),
-                          BottomNavigationBarItem(
-                            icon: const Icon(Icons.auto_awesome_outlined),
-                            activeIcon: const Icon(Icons.auto_awesome_rounded),
-                            label: AppStrings.insights,
-                          ),
-                          BottomNavigationBarItem(
-                            icon: const Icon(Icons.circle_outlined),
-                            activeIcon: const Icon(Icons.circle),
-                            label: AppStrings.profile,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 9),
-                  Semantics(
-                    button: true,
-                    label: AppStrings.appName,
-                    child: InkWell(
-                      onTap: () => _showOmaSheet(context, activeColor),
-                      customBorder: const CircleBorder(),
-                      child: Container(
-                        width: 66,
-                        height: 66,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.96),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(
-                                0xFF3C322C,
-                              ).withValues(alpha: 0.13),
-                              blurRadius: 28,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: CustomPaint(
-                            size: const Size.square(35),
-                            painter: _SunburstPainter(color: activeColor),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      bottomNavigationBar: _buildBottomNavigation(activeColor),
     );
   }
 
+  // Returns the list of navigation items for the bottom navigation bar.
+  // Builds the bottom navigation bar, returning null if the Insights page is active.
+
+  List<BottomNavigationBarItem> get _navigationItems => [
+    BottomNavigationBarItem(
+      icon: const Icon(Icons.home_outlined),
+      activeIcon: const Icon(Icons.home_rounded),
+      label: AppStrings.home,
+    ),
+    BottomNavigationBarItem(
+      icon: const Icon(Icons.explore_outlined),
+      activeIcon: const Icon(Icons.explore_rounded),
+      label: AppStrings.explore,
+    ),
+    BottomNavigationBarItem(
+      icon: const Icon(Icons.auto_awesome_outlined),
+      activeIcon: const Icon(Icons.auto_awesome_rounded),
+      label: AppStrings.insights,
+    ),
+    BottomNavigationBarItem(
+      icon: const Icon(Icons.circle_outlined),
+      activeIcon: const Icon(Icons.circle),
+      label: AppStrings.profile,
+    ),
+  ];
+
+  Widget? _buildBottomNavigation(Color activeColor) {
+    if (_currentIndex == 2) return null;
+
+    return OmaBottomNavigation(
+      currentIndex: _currentIndex,
+      onTap: _selectPage,
+      activeColor: activeColor,
+      onOmaTap: () => _showOmaSheet(context, activeColor),
+      items: _navigationItems,
+    );
+  }
+
+  // Shows the Oma sheet with the given accent color.
   void _showOmaSheet(BuildContext context, Color accent) {
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 4, 24, 28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  CustomPaint(
-                    size: const Size.square(34),
-                    painter: _SunburstPainter(color: accent),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    AppStrings.appName,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontFamily: 'CormorantGaramond',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              Text(
-                AppStrings.omaTalkPrompt,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 14,
-                  height: 1.45,
-                ),
-              ),
-              const SizedBox(height: 18),
-              Wrap(
-                spacing: 9,
-                runSpacing: 9,
-                children: [
-                  for (final label in [
-                    AppStrings.symptom,
-                    AppStrings.waterIntake,
-                    AppStrings.mood,
-                    AppStrings.nutrition,
-                  ])
-                    ActionChip(
-                      label: Text(label),
-                      onPressed: () => Navigator.pop(context),
-                      side: BorderSide(color: accent.withValues(alpha: 0.3)),
-                      backgroundColor: Color.lerp(accent, Colors.white, 0.9),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
+      builder: (_) => OmaTalkPreview(
+        accent: accent,
       ),
     );
   }
 }
 
-class _SunburstPainter extends CustomPainter {
-  final Color color;
-
-  const _SunburstPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final outer = size.shortestSide / 2;
-    final inner = outer * 0.42;
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.6
-      ..strokeCap = StrokeCap.round;
-
-    for (var index = 0; index < 24; index++) {
-      final angle = index * math.pi * 2 / 24;
-      canvas.drawLine(
-        Offset(
-          center.dx + inner * math.cos(angle),
-          center.dy + inner * math.sin(angle),
-        ),
-        Offset(
-          center.dx + outer * math.cos(angle),
-          center.dy + outer * math.sin(angle),
-        ),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _SunburstPainter oldDelegate) {
-    return oldDelegate.color != color;
-  }
-}

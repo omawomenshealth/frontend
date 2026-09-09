@@ -6,3 +6,7 @@ export 'oma_form_field.dart';
 export 'oma_button.dart';
 export 'oma_theme.dart';
 export 'oma_toast.dart';
+export 'oma_bottom_navigation.dart';
+export 'oma_sunburst.dart';
+export 'oma_chat_preview.dart';
+export 'oma_feature_preview.dart';

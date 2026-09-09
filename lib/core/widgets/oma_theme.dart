@@ -25,7 +25,11 @@ class OmaShadows {
 }
 
 class OmaText {
-  static TextStyle display(double size, {FontStyle? style, Color? color}) =>
+  static TextStyle display(
+    double size, {
+    FontStyle? style,
+    Color? color,
+  }) =>
       GoogleFonts.fraunces(
         fontSize: size,
         height: 1.15,
@@ -46,6 +50,28 @@ class OmaText {
         height: height,
         letterSpacing: letterSpacing,
         color: color ?? OmaColors.foreground,
+      );
+
+  static TextStyle label({
+    Color? color,
+    FontWeight weight = FontWeight.w600,
+  }) =>
+      body(
+        11,
+        weight: weight,
+        color: color ?? OmaColors.foreground,
+        height: 1.2,
+      );
+
+  static TextStyle caption({
+    Color? color,
+    FontWeight weight = FontWeight.w400,
+  }) =>
+      body(
+        12,
+        weight: weight,
+        color: color ?? OmaColors.muted,
+        height: 1.35,
       );
 }
 
