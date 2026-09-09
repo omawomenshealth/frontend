@@ -73,6 +73,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   void setUserName(String value) {
     _userName = value;
+    notifyListeners();
   }
 
   void setBirthDate(DateTime? value) {
@@ -97,6 +98,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   void setAge(int? value) {
     _age = value;
+    notifyListeners();
   }
 
   // ===========================================================================
@@ -133,7 +135,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   double? _weight;
   double? _height;
-  SmokingStatus _smokingStatus = SmokingStatus.never;
+  SmokingStatus? _smokingStatus;
   List<String> _conditions = [];
   final List<String> _customConditions = [];
 
@@ -141,7 +143,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   double? get weight => _weight;
   double? get height => _height;
-  SmokingStatus get smokingStatus => _smokingStatus;
+  SmokingStatus? get smokingStatus => _smokingStatus;
 
   List<String> get chronicDiseases =>
       List.unmodifiable(_conditions);
@@ -159,13 +161,15 @@ class OnboardingViewModel extends ChangeNotifier {
 
   void setWeight(double? value) {
     _weight = value;
+    notifyListeners();
   }
 
   void setHeight(double? value) {
     _height = value;
+    notifyListeners();
   }
 
-  void setSmokingStatus(SmokingStatus value) {
+  void setSmokingStatus(SmokingStatus? value) {
     _smokingStatus = value;
     notifyListeners();
   }
@@ -276,11 +280,6 @@ class OnboardingViewModel extends ChangeNotifier {
 
   List<String> get customBirthControlMethods =>
       List.unmodifiable(_customBirthControlMethods);
-
-  // Computed
-
-  bool get hasMenopauseSelection =>
-      _menopauseStatus != null;
 
   // Setters / Actions
 

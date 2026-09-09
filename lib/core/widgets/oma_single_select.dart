@@ -9,12 +9,14 @@ class OmaSingleSelect<T> extends StatelessWidget {
     required this.selectedValue,
     required this.onChanged,
     required this.labelBuilder,
+    this.allowDeselect = false,
   });
 
   final List<T> options;
   final T? selectedValue;
   final ValueChanged<T> onChanged;
   final String Function(T value) labelBuilder;
+  final bool allowDeselect;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,13 @@ class OmaSingleSelect<T> extends StatelessWidget {
           OmaChip(
             label: labelBuilder(option),
             selected: selectedValue == option,
-            onTap: () => onChanged(option),
+            onTap: () {
+              if (allowDeselect && selectedValue == option) {
+                return;
+              }
+
+              onChanged(option);
+            },
           ),
       ],
     );

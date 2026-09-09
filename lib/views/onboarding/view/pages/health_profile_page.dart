@@ -112,7 +112,7 @@ class _SmokingField extends StatelessWidget {
 
   final SmokingStatus? value;
   final dynamic healthProfile;
-  final ValueChanged<SmokingStatus> onChanged;
+  final ValueChanged<SmokingStatus?> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +136,7 @@ class _SmokingField extends StatelessWidget {
           }
         },
         onChanged: onChanged,
+        allowDeselect: true,
       ),
     );
   }

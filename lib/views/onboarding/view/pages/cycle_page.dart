@@ -24,9 +24,6 @@ class CyclePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final cycle = context.t.onboarding.cycle;
 
-    final canEnterCycleInformation =
-        vm.hasMenopauseSelection &&
-        vm.menopauseStatus == MenopauseStatus.none;
 
     return OnboardingCard(
       label: cycle.title,
@@ -35,7 +32,7 @@ class CyclePage extends StatelessWidget {
           vm: vm,
           cycle: cycle,
         ),
-        if (canEnterCycleInformation) ...[
+        if(vm.menopauseStatus != null) ...[
           _CycleLengthField(
             vm: vm,
             cycle: cycle,
@@ -44,11 +41,12 @@ class CyclePage extends StatelessWidget {
             cycle: cycle,
             onPickLastPeriod: onPickLastPeriod,
           ),
-          _BirthControlField(
-            vm: vm,
-            cycle: cycle,
-            onAddBirthControl: onAddBirthControl,
-          ),
+          if (vm.menopauseStatus == MenopauseStatus.none) 
+            _BirthControlField(
+              vm: vm,
+              cycle: cycle,
+              onAddBirthControl: onAddBirthControl,
+            ),
         ],
       ],
     );
@@ -91,9 +89,7 @@ class _MenopauseField extends StatelessWidget {
         options: [
           for (final option in menopauseOptions) option.$2,
         ],
-        selectedValue: vm.hasMenopauseSelection
-            ? vm.menopauseStatus
-            : null,
+        selectedValue: vm.menopauseStatus,
         labelBuilder: (value) {
           return menopauseOptions
               .firstWhere(
