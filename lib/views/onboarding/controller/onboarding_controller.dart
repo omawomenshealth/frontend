@@ -7,10 +7,7 @@ import '../view/sheets/index.dart';
 import '../viewmodel/onboarding_view_model.dart';
 
 class OnboardingController {
-  OnboardingController({
-    required this.context,
-    required this.vm,
-  });
+  OnboardingController({required this.context, required this.vm});
 
   final BuildContext context;
   final OnboardingViewModel vm;
@@ -26,14 +23,6 @@ class OnboardingController {
     );
     if (selected == null) return;
     vm.setBirthDate(selected);
-  }
-
-  Future<void> showLabPicker() async {
-    final data = await showLabResultsSheet(context, vm);
-    if (data == null) return;
-    vm.setLabResults(data.results);
-    vm.setLabTestDate(data.testDate);
-    vm.setLabTestFasting(data.fasting);
   }
 
   Future<void> showDiseasePicker() async {
