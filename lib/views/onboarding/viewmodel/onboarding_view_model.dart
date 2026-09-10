@@ -256,8 +256,6 @@ class OnboardingViewModel extends ChangeNotifier {
   DateTime? _lastPeriodDate;
   List<DateTime> _lastPeriodDays = [];
 
-  MenopauseStatus? _menopauseStatus;
-
   String? _birthControlMethod;
 
   final List<String> _customBirthControlMethods = [];
@@ -271,9 +269,6 @@ class OnboardingViewModel extends ChangeNotifier {
 
   List<DateTime> get lastPeriodDays =>
       List.unmodifiable(_lastPeriodDays);
-
-  MenopauseStatus? get menopauseStatus =>
-      _menopauseStatus;
 
   String? get birthControlMethod =>
       _birthControlMethod;
@@ -331,18 +326,6 @@ class OnboardingViewModel extends ChangeNotifier {
           CycleRules.sanitizePeriodLength(
         _lastPeriodDays.length,
       );
-    }
-
-    notifyListeners();
-  }
-
-  void setMenopauseStatus(MenopauseStatus? value) {
-    _menopauseStatus = value;
-
-    // Birth control is only applicable when
-    // the user explicitly selects "none".
-    if (value != MenopauseStatus.none) {
-      _birthControlMethod = null;
     }
 
     notifyListeners();
@@ -424,8 +407,6 @@ class OnboardingViewModel extends ChangeNotifier {
       averageCycleLength: _averageCycleLength,
       averagePeriodLength: _averagePeriodLength,
       lastPeriodDate: _lastPeriodDate,
-      menopauseStatus:
-          _menopauseStatus ?? MenopauseStatus.none,
       birthControlMethod: _birthControlMethod,
       customConditions: _customConditions,
       customBirthControlMethods:
