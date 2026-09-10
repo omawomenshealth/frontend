@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/cycle_rules.dart';
+import '../../../core/widgets/oma_toast.dart';
 import '../view/sheets/index.dart';
 import '../viewmodel/onboarding_view_model.dart';
 
 class OnboardingController {
-  OnboardingController({
-    required this.context,
-    required this.vm,
-  });
+  OnboardingController({required this.context, required this.vm});
 
   final BuildContext context;
   final OnboardingViewModel vm;
@@ -26,14 +23,6 @@ class OnboardingController {
     );
     if (selected == null) return;
     vm.setBirthDate(selected);
-  }
-
-  Future<void> showLabPicker() async {
-    final data = await showLabResultsSheet(context, vm);
-    if (data == null) return;
-    vm.setLabResults(data.results);
-    vm.setLabTestDate(data.testDate);
-    vm.setLabTestFasting(data.fasting);
   }
 
   Future<void> showDiseasePicker() async {
@@ -79,12 +68,11 @@ class OnboardingController {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-      ),
+    OmaToast.show(
+      context,
+      title: AppStrings.error,
+      description: message,
+      icon: Icons.error_outline_rounded,
     );
   }
 }

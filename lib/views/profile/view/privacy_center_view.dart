@@ -9,6 +9,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../core/widgets/oma_toast.dart';
 
 class PrivacyCenterView extends StatefulWidget {
   const PrivacyCenterView({super.key});
@@ -100,9 +101,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
       await context.read<ApiService>().withdrawPrivacyConsent();
       await _load();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppStrings.cloudDataDeletedLocalRemains)),
-        );
+        OmaToast.show(context, title: AppStrings.cloudDataDeletedLocalRemains);
       }
     });
   }

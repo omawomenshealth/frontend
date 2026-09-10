@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/color_constants.dart';
 import '../../../../core/shared_widgets/pastel_flower.dart';
 
 class OnboardingBackground extends StatelessWidget {

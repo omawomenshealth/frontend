@@ -10,6 +10,7 @@ import '../../../data/models/user_settings_model.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/period_calculator.dart';
+import '../../../core/widgets/oma_toast.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/services/local_storage_service.dart';
@@ -1213,17 +1214,17 @@ class _ProfileMechanics extends StatelessWidget {
                         : () async {
                             final success = await vm.syncNow();
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    success
-                                        ? AppStrings.syncSuccessful
-                                        : AppStrings.syncFailed,
-                                  ),
-                                  backgroundColor: success
-                                      ? Colors.green
-                                      : Colors.redAccent,
-                                ),
+                              OmaToast.show(
+                                context,
+                                title: success
+                                    ? AppStrings.syncSuccessful
+                                    : AppStrings.error,
+                                description: success
+                                    ? null
+                                    : AppStrings.syncFailed,
+                                icon: success
+                                    ? Icons.check_rounded
+                                    : Icons.error_outline_rounded,
                               );
                               // Diğer görünümleri yenile
                               context.read<DashboardViewModel>().loadData();
@@ -1483,14 +1484,11 @@ class _ProfileMechanics extends StatelessWidget {
                         }
                         Navigator.pop(dialogContext);
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                isCloudDeletion
-                                    ? AppStrings.deletionSuccessful
-                                    : AppStrings.localDeletionSuccessful,
-                              ),
-                            ),
+                          OmaToast.show(
+                            context,
+                            title: isCloudDeletion
+                                ? AppStrings.deletionSuccessful
+                                : AppStrings.localDeletionSuccessful,
                           );
                           vm.navigateAfterDeletion(context);
                         }

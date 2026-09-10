@@ -12,6 +12,7 @@ import '../../../data/models/medication_identity_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/notification_service.dart';
+import '../../../core/widgets/oma_toast.dart';
 import 'medication_reminder_section.dart';
 import 'tracking_catalog_selector.dart';
 import '../../articles/widgets/premium_paywall.dart';
@@ -662,8 +663,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       child: InkWell(
                         key: ValueKey('water_glass_${index + 1}'),
                         borderRadius: BorderRadius.circular(9),
-                        onTap: () =>
-                            setState(() => _waterGlasses = index + 1),
+                        onTap: () => setState(() => _waterGlasses = index + 1),
                         child: Container(
                           height: 41,
                           margin: EdgeInsets.only(right: index == 7 ? 0 : 6),
@@ -1074,9 +1074,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _toggleMedicationItem(canonical, entries: _supplements);
     await widget.onSettingsChanged?.call();
     if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.savedForLater)));
+    OmaToast.show(context, title: AppStrings.savedForLater);
   }
 
   Future<void> _addCatalogSkincare() async {
@@ -1100,9 +1098,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     });
     await widget.onSettingsChanged?.call();
     if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.savedForLater)));
+    OmaToast.show(context, title: AppStrings.savedForLater);
   }
 
   Future<void> _showReminderManagerForType(
@@ -1295,9 +1291,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final saved = await storage.saveSettings(updatedSettings);
     if (!mounted) return;
     if (!saved) {
-      ScaffoldMessenger.of(
+      OmaToast.show(
         context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.modeChangeFailed)));
+        title: AppStrings.error,
+        description: AppStrings.modeChangeFailed,
+        icon: Icons.error_outline_rounded,
+      );
       return;
     }
     try {
@@ -2146,9 +2145,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     });
     await widget.onSettingsChanged?.call();
     if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.savedForLater)));
+    OmaToast.show(context, title: AppStrings.savedForLater);
   }
 
   void _toggleSymptom(String label) {
@@ -3058,9 +3055,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       plan: plan,
     );
     if (!mounted) return;
-    ScaffoldMessenger.of(
+    OmaToast.show(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+      title: AppStrings.reminderSaved,
+      description: message,
+    );
   }
 
   TimeOfDay? _reminderTimeForMedicationValue(String value) {
@@ -3590,9 +3589,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     setState(() {
       _mealFoodGroups.putIfAbsent(meal, () => <String>{}).add(canonical);
     });
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.savedForLater)));
+    OmaToast.show(context, title: AppStrings.savedForLater);
   }
 
   Widget _buildBottomAction() {
@@ -3676,23 +3673,15 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     if (!mounted) return;
     setState(() => _isSaving = false);
 
-    final messenger = ScaffoldMessenger.of(context);
     if (success) {
       Navigator.pop(context);
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.periodEntryDeleted),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      OmaToast.show(context, title: AppStrings.periodEntryDeleted);
     } else {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.periodDeleteFailed),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-        ),
+      OmaToast.show(
+        context,
+        title: AppStrings.error,
+        description: AppStrings.periodDeleteFailed,
+        icon: Icons.error_outline_rounded,
       );
     }
   }
@@ -3829,12 +3818,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   Future<bool> _saveLog({bool closeSheet = true}) async {
     final today = AppTime.now.dateOnly;
     if (_log.date.dateOnly.isAfter(today)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.futureLogNotAllowed),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-        ),
+      OmaToast.show(
+        context,
+        title: AppStrings.error,
+        description: AppStrings.futureLogNotAllowed,
+        icon: Icons.error_outline_rounded,
       );
       return false;
     }
@@ -3868,14 +3856,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         await _persistStructuredMedicationSelections();
         if (!mounted) return true;
       }
-      final messenger = ScaffoldMessenger.of(context);
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.saved),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      OmaToast.show(context, title: AppStrings.dailyLogSaved);
       final savedDream =
           _logType == 2 &&
           _dreamRemembered == true &&
@@ -3887,12 +3868,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       if (closeSheet) Navigator.pop(context);
       return true;
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.logSaveFailed),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-        ),
+      OmaToast.show(
+        context,
+        title: AppStrings.error,
+        description: AppStrings.logSaveFailed,
+        icon: Icons.error_outline_rounded,
       );
       return false;
     }

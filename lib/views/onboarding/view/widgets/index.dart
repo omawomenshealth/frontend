@@ -1,10 +1,6 @@
 export 'onboarding_background.dart';
-export 'onboarding_content_widgets.dart';
-export 'onboarding_deck_card.dart';
 export 'onboarding_header.dart';
-export 'onboarding_navigation.dart';
 export 'onboarding_prompt.dart';
 export 'onboarding_selection_sheet.dart';
-export 'onboarding_question.dart';
-export 'inputs/index.dart';
-export 'onboarding_chip.dart';
+export 'onboarding_card.dart';
+export 'onboarding_footer.dart';

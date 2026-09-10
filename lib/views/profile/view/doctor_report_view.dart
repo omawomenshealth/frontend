@@ -9,6 +9,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/daily_log_formatters.dart';
+import '../../../core/widgets/oma_toast.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/user_settings_model.dart';
@@ -923,16 +924,7 @@ class DoctorReportView extends StatelessWidget {
     await Clipboard.setData(ClipboardData(text: sb.toString()));
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.reportCopied),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
+      OmaToast.show(context, title: AppStrings.reportCopied);
     }
   }
 
@@ -995,11 +987,11 @@ class DoctorReportView extends StatelessWidget {
     } catch (e) {
       if (context.mounted) Navigator.pop(context);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppStrings.pdfCreationError(e)),
-            backgroundColor: AppColors.error,
-          ),
+        OmaToast.show(
+          context,
+          title: AppStrings.error,
+          description: AppStrings.pdfCreationError(e),
+          icon: Icons.error_outline_rounded,
         );
       }
     }

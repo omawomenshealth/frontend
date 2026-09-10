@@ -9,6 +9,7 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/daily_log_formatters.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../core/widgets/oma_toast.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
 import '../../dashboard/widgets/daily_log_sheet.dart';
@@ -380,9 +381,12 @@ class _CalendarViewState extends State<CalendarView> {
 
     final normalized = day.dateOnly;
     if (normalized.isAfter(AppTime.now.dateOnly)) {
-      ScaffoldMessenger.of(
+      OmaToast.show(
         context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.futureLogNotAllowed)));
+        title: AppStrings.error,
+        description: AppStrings.futureLogNotAllowed,
+        icon: Icons.error_outline_rounded,
+      );
       return;
     }
     final calendarVm = context.read<CalendarViewModel>();
@@ -417,12 +421,11 @@ class _CalendarViewState extends State<CalendarView> {
       }
     });
     if (!success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.quickPeriodSaveFailed),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-        ),
+      OmaToast.show(
+        context,
+        title: AppStrings.error,
+        description: AppStrings.quickPeriodSaveFailed,
+        icon: Icons.error_outline_rounded,
       );
     }
   }
@@ -940,17 +943,23 @@ Future<void> _showDailyLogEditor(
   int initialIndex = 0,
 }) async {
   if (date.dateOnly.isAfter(AppTime.now.dateOnly)) {
-    ScaffoldMessenger.of(
+    OmaToast.show(
       context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.futureLogNotAllowed)));
+      title: AppStrings.error,
+      description: AppStrings.futureLogNotAllowed,
+      icon: Icons.error_outline_rounded,
+    );
     return;
   }
   final dashboardVm = context.read<DashboardViewModel>();
   final settings = calendarVm.settings ?? dashboardVm.settings;
   if (settings == null) {
-    ScaffoldMessenger.of(
+    OmaToast.show(
       context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.missingInformation)));
+      title: AppStrings.error,
+      description: AppStrings.missingInformation,
+      icon: Icons.error_outline_rounded,
+    );
     return;
   }
 
@@ -1002,9 +1011,12 @@ Future<void> _showDailyLogTypePicker(
   CalendarViewModel calendarVm,
 ) async {
   if (date.dateOnly.isAfter(AppTime.now.dateOnly)) {
-    ScaffoldMessenger.of(
+    OmaToast.show(
       context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.futureLogNotAllowed)));
+      title: AppStrings.error,
+      description: AppStrings.futureLogNotAllowed,
+      icon: Icons.error_outline_rounded,
+    );
     return;
   }
   final options = [

@@ -222,6 +222,7 @@ enum _TextKey {
   add,
   save,
   saved,
+  dailyLogSaved,
   cancel,
   delete,
   edit,
@@ -1093,6 +1094,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.add: 'Ekle',
   _TextKey.save: 'Kaydet',
   _TextKey.saved: 'Kaydedildi',
+  _TextKey.dailyLogSaved: 'Günlük kaydın tamamlandı.',
   _TextKey.cancel: 'İptal',
   _TextKey.delete: 'Sil',
   _TextKey.edit: 'Düzenle',
@@ -2064,6 +2066,7 @@ const Map<_TextKey, String> _englishTexts = {
   _TextKey.add: 'Add',
   _TextKey.save: 'Save',
   _TextKey.saved: 'Saved',
+  _TextKey.dailyLogSaved: 'Your daily log is complete.',
   _TextKey.cancel: 'Cancel',
   _TextKey.delete: 'Delete',
   _TextKey.edit: 'Edit',
@@ -3749,6 +3752,7 @@ class AppStrings {
   static String get add => _text(_TextKey.add);
   static String get save => _text(_TextKey.save);
   static String get saved => _text(_TextKey.saved);
+  static String get dailyLogSaved => _text(_TextKey.dailyLogSaved);
   static String get cancel => _text(_TextKey.cancel);
   static String get delete => _text(_TextKey.delete);
   static String get edit => _text(_TextKey.edit);

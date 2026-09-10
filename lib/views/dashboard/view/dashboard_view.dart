@@ -6,6 +6,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
+import '../../../core/widgets/oma_toast.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/personal_insight_model.dart';
@@ -265,9 +266,12 @@ class DashboardView extends StatelessWidget {
     bool isSingleTab = false,
   }) {
     if (vm.selectedDate.dateOnly.isAfter(AppTime.now.dateOnly)) {
-      ScaffoldMessenger.of(
+      OmaToast.show(
         context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.futureLogNotAllowed)));
+        title: AppStrings.error,
+        description: AppStrings.futureLogNotAllowed,
+        icon: Icons.error_outline_rounded,
+      );
       return;
     }
     final section = switch (initialIndex) {

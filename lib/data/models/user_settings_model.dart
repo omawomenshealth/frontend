@@ -95,7 +95,7 @@ class UserSettings {
   final bool isOnboardingComplete;
 
   // Ortak bilgiler
-  final SmokingStatus smokingStatus;
+  final SmokingStatus? smokingStatus;
   final int? smokingYears;
   final double? weight;
   final double? height;
@@ -146,7 +146,7 @@ class UserSettings {
   UserSettings({
     this.userName = '',
     this.isOnboardingComplete = false,
-    this.smokingStatus = SmokingStatus.never,
+    this.smokingStatus,
     this.smokingYears,
     this.weight,
     this.height,
@@ -340,7 +340,7 @@ class UserSettings {
     return {
       'userName': userName,
       'isOnboardingComplete': isOnboardingComplete,
-      'smokingStatus': smokingStatus.name,
+      'smokingStatus': smokingStatus?.name,
       'smokingYears': smokingYears,
       'weight': weight,
       'height': height,

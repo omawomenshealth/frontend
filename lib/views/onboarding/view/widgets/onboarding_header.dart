@@ -1,92 +1,85 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/color_constants.dart';
-import 'onboarding_prompt.dart';
+import '../../../../core/widgets/oma_theme.dart';
 
-class OnboardingProgressHeader extends StatelessWidget {
-  final int currentPage;
-  final int totalPages;
-  final String prompt;
-  final VoidCallback onBack;
-  final bool canGoBack;
-
-  const OnboardingProgressHeader({
+/// Geri butonu + ilerleme çizgileri + sayaç.
+class OnboardingHeader extends StatelessWidget {
+  const OnboardingHeader({
     super.key,
-    required this.currentPage,
-    required this.totalPages,
-    required this.prompt,
+    required this.index,
+    required this.total,
     required this.onBack,
-    required this.canGoBack,
   });
+
+  final int index;
+  final int total;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
-    final safeTotalPages = totalPages <= 0 ? 1 : totalPages;
-    final progress = ((currentPage + 1) / safeTotalPages)
-        .clamp(0.0, 1.0)
-        .toDouble();
+    final safeTotal = total <= 0 ? 1 : total;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 14, 24, 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: onBack,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: OmaColors.card.withValues(alpha: 0.8),
+              shape: BoxShape.circle,
+              boxShadow: OmaShadows.soft,
+            ),
+            child: const Icon(
+              Icons.arrow_back,
+              size: 16,
+              color: OmaColors.muted,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Row(
             children: [
-              GestureDetector(
-                onTap: canGoBack ? onBack : null,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.80),
-                    shape: BoxShape.circle,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x1A5E5A52),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    size: 16,
-                    color: canGoBack
-                        ? const Color(0xFF7A756C)
-                        : AppColors.textSecondary.withValues(alpha: 0.4),
+              for (var i = 0; i < safeTotal; i++) ...[
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 4,
+                          color: OmaColors.border,
+                        ),
+                        AnimatedFractionallySizedBox(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOut,
+                          widthFactor: i <= index ? 1 : 0,
+                          child: Container(
+                            height: 4,
+                            color: OmaColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(999),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    minHeight: 4,
-                    backgroundColor: const Color(0xFFE3DFD7),
-                    valueColor: const AlwaysStoppedAnimation(Color(0xFF78904F)),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                '${currentPage + 1}/$safeTotalPages',
-                style: const TextStyle(
-                  color: Color(0xFF7A756C),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
+                if (i != safeTotal - 1)
+                  const SizedBox(width: 6),
+              ],
             ],
           ),
-          const SizedBox(height: 24),
-          OnboardingPrompt(message: prompt),
-        ],
-      ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          '${index + 1}/$safeTotal',
+          style: OmaText.body(
+            12,
+            color: OmaColors.muted,
+          ),
+        ),
+      ],
     );
   }
 }

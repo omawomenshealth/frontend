@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/cycle_rules.dart';
-import '../../../data/models/lab_result_model.dart';
-import '../../../data/models/medication_identity_model.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
@@ -11,342 +9,342 @@ import '../../../data/services/sync_service.dart';
 
 /// Onboarding iş mantığı — adım adım kullanıcı bilgisi toplama.
 class OnboardingViewModel extends ChangeNotifier {
+  // ===========================================================================
   // Dependencies
+  // ===========================================================================
+
   final LocalStorageService _storage;
   final SyncService _sync;
 
   OnboardingViewModel(this._storage, this._sync);
 
-  // Navigation state
+  // ===========================================================================
+  // Navigation
+  // ===========================================================================
+
   static const detailStepCount = 1;
 
   int _currentPage = 0;
-  int _detailStep = 0;
-  bool _detailForward = true;
 
-  // Form state: personal
-  String _userName = '';
-  int? _age;
-  DateTime? _birthDate;
-  double? _weight;
-  double? _height;
-
-  // Form state: lifestyle
-  SmokingStatus _smokingStatus = SmokingStatus.never;
-  int _smokingYears = 0;
-
-  // Form state: relationship
-  String _relationshipStatus = AppStrings.relationshipStatusOptions.last;
-  bool? _sexuallyActive;
-  bool? _wantsChildrenInYear;
-
-  // Form state: health
-  Map<String, LabResult> _labResults = {};
-  DateTime? _labTestDate;
-  bool? _labTestFasting;
-  List<String> _chronicDiseases = [];
-
-  // Form state: women's health
-  int _averageCycleLength = CycleRules.defaultCycleLength;
-  int _averagePeriodLength = CycleRules.defaultPeriodLength;
-  bool _isCycleLengthUnknown = false;
-  DateTime? _lastPeriodDate;
-  List<DateTime> _lastPeriodDays = [];
-  MenopauseStatus _menopauseStatus = MenopauseStatus.none;
-  bool _hasMenopauseSelection = false;
-  String? _birthControlMethod;
-  List<String> _womenDiseases = [];
-  final List<String> _customConditions = [];
-  final List<String> _customBirthControlMethods = [];
-
-  // Form state: medications
-  List<MedicationIdentity> _dailyMedications = [];
-  List<String> _dailySupplements = [];
-
-  // Persistence state
-  bool _isSaving = false;
-
-  // Getters: navigation
   int get currentPage => _currentPage;
   int get totalPages => 5;
   bool get canGoNext => _currentPage < totalPages - 1;
   bool get canGoBack => _currentPage > 0;
-  bool get isDetailedHealthPage => _currentPage == totalPages - 1;
   bool get isPreviewPage => _currentPage == totalPages - 1;
 
-  int get detailStep => _detailStep;
-  bool get detailForward => _detailForward;
-  bool get isFirstDetailStep => _detailStep == 0;
-  bool get isLastDetailStep => _detailStep == detailStepCount - 1;
-
-  // Getters: form
-  String get userName => _userName;
-  int? get age => _age;
-  DateTime? get birthDate => _birthDate;
-  double? get weight => _weight;
-  double? get height => _height;
-
-  SmokingStatus get smokingStatus => _smokingStatus;
-  int get smokingYears => _smokingYears;
-
-  String get relationshipStatus => _relationshipStatus;
-  bool? get sexuallyActive => _sexuallyActive;
-  bool? get wantsChildrenInYear => _wantsChildrenInYear;
-
-  Map<String, LabResult> get labResults => _labResults;
-  DateTime? get labTestDate => _labTestDate;
-  bool? get labTestFasting => _labTestFasting;
-  List<String> get chronicDiseases => _chronicDiseases;
-
-  int get averageCycleLength => _averageCycleLength;
-  int get averagePeriodLength => _averagePeriodLength;
-  bool get isCycleLengthUnknown => _isCycleLengthUnknown;
-  DateTime? get lastPeriodDate => _lastPeriodDate;
-  List<DateTime> get lastPeriodDays => List.unmodifiable(_lastPeriodDays);
-  MenopauseStatus get menopauseStatus => _menopauseStatus;
-  bool get hasMenopauseSelection => _hasMenopauseSelection;
-  String? get birthControlMethod => _birthControlMethod;
-  List<String> get womenDiseases => _womenDiseases;
-  List<String> get customConditions => _customConditions;
-  List<String> get customBirthControlMethods => _customBirthControlMethods;
-
-  List<MedicationIdentity> get dailyMedications => _dailyMedications;
-  List<String> get dailySupplements => _dailySupplements;
-
-  // Getters: computed
-  bool get isSaving => _isSaving;
-  bool get isUserLoggedIn => _storage.isUserLoggedIn;
-  List<String> get knownDiseases =>
-      {..._chronicDiseases, ..._womenDiseases}.toList(growable: false);
-
-  // Navigation actions
   void nextPage() {
-    if (_currentPage < totalPages - 1) {
-      _currentPage++;
-      notifyListeners();
-    }
+    if (!canGoNext) return;
+
+    _currentPage++;
+    notifyListeners();
   }
 
   void previousPage() {
-    if (_currentPage > 0) {
-      _currentPage--;
-      notifyListeners();
-    }
+    if (!canGoBack) return;
+
+    _currentPage--;
+    notifyListeners();
   }
 
   void goToPage(int page) {
-    if (_currentPage != page) {
-      _currentPage = page;
-      notifyListeners();
-    }
-  }
+    if (_currentPage == page) return;
 
-  void nextDetailStep() {
-    if (isLastDetailStep) return;
-    _detailForward = true;
-    _detailStep++;
+    _currentPage = page;
     notifyListeners();
   }
 
-  void previousDetailStep() {
-    if (isFirstDetailStep) return;
-    _detailForward = false;
-    _detailStep--;
-    notifyListeners();
-  }
+  // ===========================================================================
+  // Personal
+  // ===========================================================================
 
-  // Personal actions
+  // State
+
+  String _userName = '';
+  int? _age;
+  DateTime? _birthDate;
+
+  // Getters
+
+  String get userName => _userName;
+  int? get age => _age;
+  DateTime? get birthDate => _birthDate;
+
+  // Setters / Actions
+
   void setUserName(String value) {
     _userName = value;
+    notifyListeners();
   }
 
   void setBirthDate(DateTime? value) {
     _birthDate = value;
+
     if (value == null) {
       _age = null;
     } else {
       final today = DateTime.now();
       var years = today.year - value.year;
+
       if (today.month < value.month ||
-          today.month == value.month && today.day < value.day) {
+          (today.month == value.month && today.day < value.day)) {
         years--;
       }
+
       _age = years < 0 ? null : years;
     }
+
     notifyListeners();
-  }
-
-  void setWeight(double? value) {
-    _weight = value;
-  }
-
-  void setHeight(double? value) {
-    _height = value;
   }
 
   void setAge(int? value) {
     _age = value;
+    notifyListeners();
   }
 
-  // Lifestyle actions
-  void setSmokingStatus(SmokingStatus value) {
+  // ===========================================================================
+  // Wellbeing
+  // ===========================================================================
+
+  // State
+
+  Set<String> _moods = {};
+  Set<String> _supportNeeds = {};
+
+  // Getters
+
+  Set<String> get moods => Set.unmodifiable(_moods);
+  Set<String> get supportNeeds => Set.unmodifiable(_supportNeeds);
+
+  // Setters / Actions
+
+  void setMoods(Set<String> values) {
+    _moods = Set<String>.from(values);
+    notifyListeners();
+  }
+
+  void setSupportNeeds(Set<String> values) {
+    _supportNeeds = Set<String>.from(values);
+    notifyListeners();
+  }
+
+  // ===========================================================================
+  // Health
+  // ===========================================================================
+
+  // State
+
+  double? _weight;
+  double? _height;
+  SmokingStatus? _smokingStatus;
+  List<String> _conditions = [];
+  final List<String> _customConditions = [];
+
+  // Getters
+
+  double? get weight => _weight;
+  double? get height => _height;
+  SmokingStatus? get smokingStatus => _smokingStatus;
+
+  List<String> get chronicDiseases =>
+      List.unmodifiable(_conditions);
+
+  List<String> get womenDiseases =>
+      List.unmodifiable(_conditions);
+
+  List<String> get customConditions =>
+      List.unmodifiable(_customConditions);
+
+  List<String> get knownDiseases =>
+      List.unmodifiable(_conditions);
+
+  // Setters / Actions
+
+  void setWeight(double? value) {
+    _weight = value;
+    notifyListeners();
+  }
+
+  void setHeight(double? value) {
+    _height = value;
+    notifyListeners();
+  }
+
+  void setSmokingStatus(SmokingStatus? value) {
     _smokingStatus = value;
-    if (value != SmokingStatus.current) _smokingYears = 0;
     notifyListeners();
   }
 
-  void setSmokingYears(int value) {
-    _smokingYears = value;
-  }
-
-  // Relationship actions
-  void setRelationshipStatus(String value) {
-    _relationshipStatus = value;
-    notifyListeners();
-  }
-
-  void setSexuallyActive(bool? value) {
-    _sexuallyActive = value;
-    notifyListeners();
-  }
-
-  void setWantsChildrenInYear(bool? value) {
-    _wantsChildrenInYear = value;
-    notifyListeners();
-  }
-
-  // Lab actions
-  void setLabData({
-    required Map<String, LabResult> results,
-    DateTime? testDate,
-    bool? fasting,
-  }) {
-    _labResults = Map<String, LabResult>.from(results);
-    _labTestDate = testDate;
-    _labTestFasting = fasting;
-  }
-
-  void setLabResults(Map<String, LabResult> value) {
-    _labResults = Map<String, LabResult>.from(value);
-  }
-
-  void setLabTestDate(DateTime? value) {
-    _labTestDate = value;
-  }
-
-  void setLabTestFasting(bool? value) {
-    _labTestFasting = value;
-  }
-
-  // Disease actions
   void toggleChronicDisease(String disease) {
-    final existingIndex = _chronicDiseases.indexWhere(
+    final existingIndex = _conditions.indexWhere(
       (value) => AppStrings.localizeStoredValue(value) == disease,
     );
+
     if (existingIndex >= 0) {
-      _chronicDiseases = List.from(_chronicDiseases)..removeAt(existingIndex);
+      _conditions = List.from(_conditions)..removeAt(existingIndex);
     } else {
-      _chronicDiseases = List.from(_chronicDiseases)..add(disease);
+      _conditions = List.from(_conditions)..add(disease);
     }
+
     notifyListeners();
   }
 
   void addChronicDisease(String disease) {
-    final value = _rememberCustomValue(_customConditions, disease);
-    if (value.isEmpty || _containsCondition(_chronicDiseases, value)) return;
-    _chronicDiseases = [..._chronicDiseases, value];
-    notifyListeners();
-  }
-
-  void toggleWomenDisease(String disease) {
-    final existingIndex = _womenDiseases.indexWhere(
-      (value) => AppStrings.localizeStoredValue(value) == disease,
+    final value = _rememberCustomValue(
+      _customConditions,
+      disease,
     );
-    if (existingIndex >= 0) {
-      _womenDiseases = List.from(_womenDiseases)..removeAt(existingIndex);
-    } else {
-      _womenDiseases = List.from(_womenDiseases)..add(disease);
+
+    if (value.isEmpty || _containsCondition(_conditions, value)) {
+      return;
     }
+
+    _conditions = [..._conditions, value];
     notifyListeners();
   }
 
   void addWomenDisease(String disease) {
-    final value = _rememberCustomValue(_customConditions, disease);
-    if (value.isEmpty || _containsCondition(_womenDiseases, value)) return;
-    _womenDiseases = [..._womenDiseases, value];
-    notifyListeners();
+    addChronicDisease(disease);
   }
 
   void toggleKnownDisease(String disease) {
     final diseases = List<String>.from(knownDiseases);
+
     final existingIndex = diseases.indexWhere(
       (value) =>
-          AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
+          AppStrings.localizeStoredValue(value)
+              .trim()
+              .toLowerCase() ==
           disease.trim().toLowerCase(),
     );
+
     if (existingIndex >= 0) {
       diseases.removeAt(existingIndex);
     } else {
       diseases.add(disease);
     }
-    _chronicDiseases = diseases;
-    _womenDiseases = [];
+
+    _conditions = diseases;
     notifyListeners();
   }
 
   void addKnownDisease(String disease) {
-    final value = _rememberCustomValue(_customConditions, disease);
-    if (value.isEmpty || _containsCondition(knownDiseases, value)) return;
-    _chronicDiseases = [...knownDiseases, value];
-    _womenDiseases = [];
+    final value = _rememberCustomValue(
+      _customConditions,
+      disease,
+    );
+
+    if (value.isEmpty || _containsCondition(knownDiseases, value)) {
+      return;
+    }
+
+    _conditions = [...knownDiseases, value];
     notifyListeners();
   }
 
-  // Cycle actions
+  // ===========================================================================
+  // Cycle
+  // ===========================================================================
+
+  // State
+
+  int _averageCycleLength =
+      CycleRules.defaultCycleLength;
+
+  int _averagePeriodLength =
+      CycleRules.defaultPeriodLength;
+
+  DateTime? _lastPeriodDate;
+  List<DateTime> _lastPeriodDays = [];
+
+  MenopauseStatus? _menopauseStatus;
+
+  String? _birthControlMethod;
+
+  final List<String> _customBirthControlMethods = [];
+
+  // Getters
+
+  int get averageCycleLength => _averageCycleLength;
+  int get averagePeriodLength => _averagePeriodLength;
+
+  DateTime? get lastPeriodDate => _lastPeriodDate;
+
+  List<DateTime> get lastPeriodDays =>
+      List.unmodifiable(_lastPeriodDays);
+
+  MenopauseStatus? get menopauseStatus =>
+      _menopauseStatus;
+
+  String? get birthControlMethod =>
+      _birthControlMethod;
+
+  List<String> get customBirthControlMethods =>
+      List.unmodifiable(_customBirthControlMethods);
+
+  // Setters / Actions
+
   void setAverageCycleLength(int value) {
-    _averageCycleLength = CycleRules.sanitizeCycleLength(value);
+    _averageCycleLength =
+        CycleRules.sanitizeCycleLength(value);
+
     notifyListeners();
   }
 
   void setAveragePeriodLength(int value) {
-    _averagePeriodLength = CycleRules.sanitizePeriodLength(value);
-    notifyListeners();
-  }
+    _averagePeriodLength =
+        CycleRules.sanitizePeriodLength(value);
 
-  void setIsCycleLengthUnknown(bool value) {
-    _isCycleLengthUnknown = value;
-    if (value) {
-      _averageCycleLength = CycleRules.defaultCycleLength;
-    }
     notifyListeners();
   }
 
   void setLastPeriodDate(DateTime? value) {
-    setLastPeriodDays(value == null ? const [] : [value]);
+    setLastPeriodDays(
+      value == null ? const [] : [value],
+    );
   }
 
   void setLastPeriodDays(Iterable<DateTime> values) {
     final today = DateTime.now();
-    final days =
-        values
-            .map((value) => DateTime(value.year, value.month, value.day))
-            .where((value) => !value.isAfter(today))
-            .toSet()
-            .toList()
-          ..sort();
-    _lastPeriodDays = days.take(CycleRules.maxPeriodLength).toList();
-    _lastPeriodDate = _lastPeriodDays.isEmpty ? null : _lastPeriodDays.first;
+
+    final days = values
+        .map(
+          (value) => DateTime(
+            value.year,
+            value.month,
+            value.day,
+          ),
+        )
+        .where((value) => !value.isAfter(today))
+        .toSet()
+        .toList()
+      ..sort();
+
+    _lastPeriodDays =
+        days.take(CycleRules.maxPeriodLength).toList();
+
+    _lastPeriodDate = _lastPeriodDays.isEmpty
+        ? null
+        : _lastPeriodDays.first;
+
     if (_lastPeriodDays.isNotEmpty) {
-      _averagePeriodLength = CycleRules.sanitizePeriodLength(
+      _averagePeriodLength =
+          CycleRules.sanitizePeriodLength(
         _lastPeriodDays.length,
       );
     }
+
     notifyListeners();
   }
 
-  void setMenopauseStatus(MenopauseStatus value) {
+  void setMenopauseStatus(MenopauseStatus? value) {
     _menopauseStatus = value;
-    _hasMenopauseSelection = true;
+
+    // Birth control is only applicable when
+    // the user explicitly selects "none".
+    if (value != MenopauseStatus.none) {
+      _birthControlMethod = null;
+    }
+
     notifyListeners();
   }
 
@@ -356,69 +354,33 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void addBirthControlMethod(String method) {
-    final value = _rememberCustomValue(_customBirthControlMethods, method);
+    final value = _rememberCustomValue(
+      _customBirthControlMethods,
+      method,
+    );
+
     if (value.isEmpty) return;
+
     _birthControlMethod = value;
     notifyListeners();
   }
 
-  // Medication actions
-  void addMedication(MedicationIdentity medication) {
-    if (!_dailyMedications.contains(medication)) {
-      _dailyMedications = List.from(_dailyMedications)..add(medication);
-      notifyListeners();
-    }
-  }
-
-  void removeMedication(MedicationIdentity medication) {
-    _dailyMedications = List.from(_dailyMedications)..remove(medication);
-    notifyListeners();
-  }
-
-  void addSupplement(String name) {
-    if (name.isNotEmpty && !_dailySupplements.contains(name)) {
-      _dailySupplements = List.from(_dailySupplements)..add(name);
-      notifyListeners();
-    }
-  }
-
-  void removeSupplement(String name) {
-    _dailySupplements = List.from(_dailySupplements)..remove(name);
-    notifyListeners();
-  }
-
-  // Private disease helpers
-  bool _containsCondition(List<String> values, String candidate) => values.any(
-    (value) =>
-        _normalizeCustomValue(AppStrings.localizeStoredValue(value)) ==
-        _normalizeCustomValue(candidate),
-  );
-
-  String _rememberCustomValue(List<String> values, String rawValue) {
-    final cleaned = rawValue.trim().replaceAll(RegExp(r'\s+'), ' ');
-    if (cleaned.isEmpty) return '';
-
-    final normalized = _normalizeCustomValue(cleaned);
-    for (final value in values) {
-      if (_normalizeCustomValue(value) == normalized) return value;
-    }
-
-    values.add(cleaned);
-    return cleaned;
-  }
-
-  String _normalizeCustomValue(String value) => value
-      .trim()
-      .replaceAll(RegExp(r'\s+'), ' ')
-      .replaceAll(RegExp('[İIı]'), 'i')
-      .toLowerCase();
-
+  // ===========================================================================
   // Persistence
+  // ===========================================================================
+
+  bool _isSaving = false;
+
+  bool get isSaving => _isSaving;
+  bool get isUserLoggedIn => _storage.isUserLoggedIn;
+
   Future<bool> saveAndComplete() async {
     _isSaving = true;
     notifyListeners();
 
-    var success = await _storage.saveSettings(_buildSettings());
+    var success = await _storage.saveSettings(
+      _buildSettings(),
+    );
 
     if (success) {
       for (final day in _lastPeriodDays) {
@@ -427,10 +389,15 @@ class OnboardingViewModel extends ChangeNotifier {
             date: day,
             hasExplicitTime: false,
             flowIntensity: AppStrings.flowOptions[1],
-            observedSections: const {DailyLogObservedSection.period},
+            observedSections: const {
+              DailyLogObservedSection.period,
+            },
           ),
         );
-        if (!saved) success = false;
+
+        if (!saved) {
+          success = false;
+        }
       }
     }
 
@@ -449,29 +416,68 @@ class OnboardingViewModel extends ChangeNotifier {
       userName: _userName,
       isOnboardingComplete: true,
       smokingStatus: _smokingStatus,
-      smokingYears: _smokingStatus == SmokingStatus.current
-          ? _smokingYears
-          : null,
+      smokingYears: null,
       weight: _weight,
       height: _height,
       age: _age,
-      relationshipStatus: _relationshipStatus,
-      sexuallyActive: _sexuallyActive,
-      wantsChildrenInYear: null,
-      labResults: _labResults,
-      labTestDate: _labTestDate,
-      labTestFasting: _labTestFasting,
       chronicDiseases: knownDiseases,
       averageCycleLength: _averageCycleLength,
       averagePeriodLength: _averagePeriodLength,
       lastPeriodDate: _lastPeriodDate,
-      menopauseStatus: _menopauseStatus,
+      menopauseStatus:
+          _menopauseStatus ?? MenopauseStatus.none,
       birthControlMethod: _birthControlMethod,
-      womenDiseases: const [],
-      dailyMedications: _dailyMedications,
-      dailySupplements: _dailySupplements,
       customConditions: _customConditions,
-      customBirthControlMethods: _customBirthControlMethods,
+      customBirthControlMethods:
+          _customBirthControlMethods,
     );
+  }
+
+  // ===========================================================================
+  // Private Helpers
+  // ===========================================================================
+
+  bool _containsCondition(
+    List<String> values,
+    String candidate,
+  ) {
+    return values.any(
+      (value) =>
+          _normalizeCustomValue(
+            AppStrings.localizeStoredValue(value),
+          ) ==
+          _normalizeCustomValue(candidate),
+    );
+  }
+
+  String _rememberCustomValue(
+    List<String> values,
+    String rawValue,
+  ) {
+    final cleaned = rawValue
+        .trim()
+        .replaceAll(RegExp(r'\s+'), ' ');
+
+    if (cleaned.isEmpty) return '';
+
+    final normalized =
+        _normalizeCustomValue(cleaned);
+
+    for (final value in values) {
+      if (_normalizeCustomValue(value) == normalized) {
+        return value;
+      }
+    }
+
+    values.add(cleaned);
+    return cleaned;
+  }
+
+  String _normalizeCustomValue(String value) {
+    return value
+        .trim()
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .replaceAll(RegExp('[İIı]'), 'i')
+        .toLowerCase();
   }
 }
