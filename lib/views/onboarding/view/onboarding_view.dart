@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/color_constants.dart';
+import '../../../core/widgets/oma_background.dart';
 import '../../../localization/generated/strings.g.dart';
 import '../controller/onboarding_controller.dart';
 import '../utils/onboarding_date_utils.dart';
@@ -68,21 +69,33 @@ class _OnboardingViewState extends State<OnboardingView> {
         },
         child: Stack(
           children: [
-            OnboardingBackground(pageIndex: vm.currentPage),
+            Positioned.fill(
+              child: OmaBackground(
+                key: ValueKey('onboarding_background_${vm.currentPage}'),
+                seed: vm.currentPage,
+                spotCount: 10,
+              ),
+            ),
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
+                padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Column(
                   children: [
                     if (!vm.isPreviewPage) ...[
-                      OnboardingHeader(
-                        onBack: _goBack,
-                        index: vm.currentPage,
-                        total: vm.totalPages,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: OnboardingHeader(
+                          onBack: _goBack,
+                          index: vm.currentPage,
+                          total: vm.totalPages,
+                        ),
                       ),
                       const SizedBox(height: 10),
-                      OnboardingPrompt(
-                        message: _promptForPage(context, vm.currentPage),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: OnboardingPrompt(
+                          message: _promptForPage(context, vm.currentPage),
+                        ),
                       ),
                       const SizedBox(height: 10),
                     ],
@@ -134,15 +147,18 @@ class _OnboardingViewState extends State<OnboardingView> {
                       ),
                     ),
 
-                    OnboardingFooter(
-                      canContinue: vm.isPreviewPage
-                          ? !vm.isSaving
-                          : vm.canGoNext,
-                      onContinue: _goNext,
-                      onSkip: _goNext,
-                      isFirst: vm.currentPage == 0,
-                      isLast: vm.isPreviewPage,
-                      isSkippable: !vm.isPreviewPage,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: OnboardingFooter(
+                        canContinue: vm.isPreviewPage
+                            ? !vm.isSaving
+                            : vm.canGoNext,
+                        onContinue: _goNext,
+                        onSkip: _goNext,
+                        isFirst: vm.currentPage == 0,
+                        isLast: vm.isPreviewPage,
+                        isSkippable: !vm.isPreviewPage,
+                      ),
                     ),
                   ],
                 ),

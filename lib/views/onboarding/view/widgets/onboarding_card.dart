@@ -16,6 +16,7 @@ class OnboardingCard extends StatelessWidget {
     this.motion = OnboardingDeckMotion.none,
     this.duration = const Duration(milliseconds: 350),
     this.padding = const EdgeInsets.all(20),
+    this.margin = const EdgeInsets.symmetric(horizontal: 20),
     this.itemSpacing = 8,
   });
 
@@ -26,6 +27,7 @@ class OnboardingCard extends StatelessWidget {
   final Duration duration;
 
   final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry margin;
   final double itemSpacing;
 
   @override
@@ -52,6 +54,7 @@ class OnboardingCard extends StatelessWidget {
       child: SingleChildScrollView(
         child: Container(
           width: double.infinity,
+          margin: margin,
           padding: padding,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
