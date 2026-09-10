@@ -40,11 +40,22 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	Translations $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => Translations(meta: meta ?? this.$meta);
 
 	// Translations
+	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
 	late final Translations$catalogs$en catalogs = Translations$catalogs$en.internal(_root);
 	late final Translations$onboarding$en onboarding = Translations$onboarding$en.internal(_root);
 	late final Translations$options$en options = Translations$options$en.internal(_root);
 	late final Translations$pregnancy$en pregnancy = Translations$pregnancy$en.internal(_root);
 	late final Translations$premium$en premium = Translations$premium$en.internal(_root);
+}
+
+// Path: auth
+class Translations$auth$en {
+	Translations$auth$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$auth$auth$en auth = Translations$auth$auth$en.internal(_root);
 }
 
 // Path: catalogs
@@ -662,6 +673,20 @@ class Translations$premium$en {
 
 	/// en: 'The purchase could not be verified: $error'
 	String purchaseVerificationFailed({required Object error}) => 'The purchase could not be verified: ${error}';
+}
+
+// Path: auth.auth
+class Translations$auth$auth$en {
+	Translations$auth$auth$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$auth$auth$intro$en intro = Translations$auth$auth$intro$en.internal(_root);
+	late final Translations$auth$auth$actionCard$en actionCard = Translations$auth$auth$actionCard$en.internal(_root);
+
+	/// en: 'Your privacy and data are under your control'
+	String get privacyNote => 'Your privacy and data are under your control';
 }
 
 // Path: catalogs.nutrition
@@ -1457,6 +1482,40 @@ class Translations$pregnancy$stages$en {
 	late final Translations$pregnancy$stages$stage9$en stage9 = Translations$pregnancy$stages$stage9$en.internal(_root);
 }
 
+// Path: auth.auth.intro
+class Translations$auth$auth$intro$en {
+	Translations$auth$auth$intro$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Oma'
+	String get title => 'Oma';
+
+	/// en: 'Understand your cycle, understand yourself better'
+	String get description => 'Understand your cycle, understand yourself better';
+}
+
+// Path: auth.auth.actionCard
+class Translations$auth$auth$actionCard$en {
+	Translations$auth$auth$actionCard$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'How would you like to continue?'
+	String get title => 'How would you like to continue?';
+
+	late final Translations$auth$auth$actionCard$account$en account = Translations$auth$auth$actionCard$account$en.internal(_root);
+
+	/// en: 'or'
+	String get alternativeLabel => 'or';
+
+	late final Translations$auth$auth$actionCard$offline$en offline = Translations$auth$auth$actionCard$offline$en.internal(_root);
+}
+
 // Path: onboarding.wellbeing.moodOptions
 class Translations$onboarding$wellbeing$moodOptions$en {
 	Translations$onboarding$wellbeing$moodOptions$en.internal(this._root);
@@ -1643,6 +1702,42 @@ class Translations$pregnancy$stages$stage9$en {
 	String get body => 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷';
 }
 
+// Path: auth.auth.actionCard.account
+class Translations$auth$auth$actionCard$account$en {
+	Translations$auth$auth$actionCard$account$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your data stays with you through your account, even when you switch devices.'
+	String get description => 'Your data stays with you through your account, even when you switch devices.';
+
+	/// en: 'Continue with Google'
+	String get google => 'Continue with Google';
+
+	/// en: 'Continue with Apple'
+	String get apple => 'Continue with Apple';
+
+	/// en: 'Continue with Email'
+	String get email => 'Continue with Email';
+}
+
+// Path: auth.auth.actionCard.offline
+class Translations$auth$auth$actionCard$offline$en {
+	Translations$auth$auth$actionCard$offline$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Continue without an account'
+	String get kContinue => 'Continue without an account';
+
+	/// en: 'Your data is stored only on this phone, and no account is created.'
+	String get description => 'Your data is stored only on this phone, and no account is created.';
+}
+
 /// The flat map containing all translations for locale <en>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -1651,6 +1746,17 @@ class Translations$pregnancy$stages$stage9$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.auth.intro.title' => 'Oma',
+			'auth.auth.intro.description' => 'Understand your cycle, understand yourself better',
+			'auth.auth.actionCard.title' => 'How would you like to continue?',
+			'auth.auth.actionCard.account.description' => 'Your data stays with you through your account, even when you switch devices.',
+			'auth.auth.actionCard.account.google' => 'Continue with Google',
+			'auth.auth.actionCard.account.apple' => 'Continue with Apple',
+			'auth.auth.actionCard.account.email' => 'Continue with Email',
+			'auth.auth.actionCard.alternativeLabel' => 'or',
+			'auth.auth.actionCard.offline.kContinue' => 'Continue without an account',
+			'auth.auth.actionCard.offline.description' => 'Your data is stored only on this phone, and no account is created.',
+			'auth.auth.privacyNote' => 'Your privacy and data are under your control',
 			'catalogs.nutrition.categories.alcoholic_drinks' => 'Alcoholic drinks',
 			'catalogs.nutrition.categories.snacks_and_packaged_foods' => 'Snacks and packaged foods',
 			'catalogs.nutrition.categories.spices_sauces_and_spicy_foods' => 'Spices, sauces and spicy foods',
@@ -2152,6 +2258,8 @@ extension on Translations {
 			'options.moodCheckInOptions.low' => 'Low',
 			'options.moodCheckInOptions.sensitive' => 'Sensitive',
 			'options.moodCheckInOptions.neutral' => 'Neutral',
+			_ => null,
+		} ?? switch (path) {
 			'options.moodCheckInOptions.good' => 'Good',
 			'options.moodCheckInOptions.great' => 'Great',
 			'options.moodCompanionOptions.by_myself' => 'By myself',
@@ -2163,8 +2271,6 @@ extension on Translations {
 			'options.moodPlaceOptions.at_work' => 'At work',
 			'options.moodPlaceOptions.outside' => 'Outside',
 			'options.moodPlaceOptions.in_transit' => 'In transit',
-			_ => null,
-		} ?? switch (path) {
 			'options.moodPlaceOptions.social' => 'Social',
 			'options.sexualActivityOptions.with_a_partner' => 'With a partner',
 			'options.sexualActivityOptions.masturbation' => 'Masturbation',

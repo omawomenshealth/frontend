@@ -13,6 +13,12 @@ class OmaColors {
   static const primaryForeground = Color(0xFFFFFDF9);
   static const plum = Color(0xFF7A5468);
   static const plumForeground = Color(0xFFFFF6F1);
+
+  // Hata / uyarı durumları için sıcak paletle uyumlu tonlar.
+  // (Örn. giriş ekranındaki hata banner'ı, form validasyonu.)
+  static const error = Color(0xFFB3564A); // warm terracotta
+  static const errorForeground = Color(0xFFFFF6F1);
+  static const errorLight = Color(0xFFF7E6E1); // banner arka planı
 }
 
 class OmaShadows {
@@ -57,7 +63,7 @@ class OmaText {
     FontWeight weight = FontWeight.w600,
   }) =>
       body(
-        11,
+        12,
         weight: weight,
         color: color ?? OmaColors.foreground,
         height: 1.2,

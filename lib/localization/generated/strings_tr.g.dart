@@ -39,11 +39,22 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	TranslationsTr $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsTr(meta: meta ?? this.$meta);
 
 	// Translations
+	@override late final _Translations$auth$tr auth = _Translations$auth$tr._(_root);
 	@override late final _Translations$catalogs$tr catalogs = _Translations$catalogs$tr._(_root);
 	@override late final _Translations$onboarding$tr onboarding = _Translations$onboarding$tr._(_root);
 	@override late final _Translations$options$tr options = _Translations$options$tr._(_root);
 	@override late final _Translations$pregnancy$tr pregnancy = _Translations$pregnancy$tr._(_root);
 	@override late final _Translations$premium$tr premium = _Translations$premium$tr._(_root);
+}
+
+// Path: auth
+class _Translations$auth$tr extends Translations$auth$en {
+	_Translations$auth$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$auth$auth$tr auth = _Translations$auth$auth$tr._(_root);
 }
 
 // Path: catalogs
@@ -513,6 +524,18 @@ class _Translations$premium$tr extends Translations$premium$en {
 	@override String get planChangeNeedsRestore => 'Mevcut Google Play satın alman yüklenemedi. Paket değiştirmeden önce satın almayı geri yükle.';
 	@override String get subscriptionManagementFailed => 'Google Play üyelik yönetimi açılamadı.';
 	@override String purchaseVerificationFailed({required Object error}) => 'Satın alma doğrulanamadı: ${error}';
+}
+
+// Path: auth.auth
+class _Translations$auth$auth$tr extends Translations$auth$auth$en {
+	_Translations$auth$auth$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$auth$auth$intro$tr intro = _Translations$auth$auth$intro$tr._(_root);
+	@override late final _Translations$auth$auth$actionCard$tr actionCard = _Translations$auth$auth$actionCard$tr._(_root);
+	@override String get privacyNote => 'Gizlilik ve verilerin senin kontrolünde';
 }
 
 // Path: catalogs.nutrition
@@ -1153,6 +1176,29 @@ class _Translations$pregnancy$stages$tr extends Translations$pregnancy$stages$en
 	@override late final _Translations$pregnancy$stages$stage9$tr stage9 = _Translations$pregnancy$stages$stage9$tr._(_root);
 }
 
+// Path: auth.auth.intro
+class _Translations$auth$auth$intro$tr extends Translations$auth$auth$intro$en {
+	_Translations$auth$auth$intro$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Oma';
+	@override String get description => 'Döngünü anla, kendini daha iyi tanı.';
+}
+
+// Path: auth.auth.actionCard
+class _Translations$auth$auth$actionCard$tr extends Translations$auth$auth$actionCard$en {
+	_Translations$auth$auth$actionCard$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$auth$auth$actionCard$account$tr account = _Translations$auth$auth$actionCard$account$tr._(_root);
+	@override String get alternativeLabel => 'veya';
+	@override late final _Translations$auth$auth$actionCard$offline$tr offline = _Translations$auth$auth$actionCard$offline$tr._(_root);
+}
+
 // Path: onboarding.wellbeing.moodOptions
 class _Translations$onboarding$wellbeing$moodOptions$tr extends Translations$onboarding$wellbeing$moodOptions$en {
 	_Translations$onboarding$wellbeing$moodOptions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -1281,6 +1327,30 @@ class _Translations$pregnancy$stages$stage9$tr extends Translations$pregnancy$st
 	@override String get body => 'Buluşma zamanı giderek yaklaşıyor. Bu son haftalarda kendine biraz daha nazik davranmayı unutma. 🌷';
 }
 
+// Path: auth.auth.actionCard.account
+class _Translations$auth$auth$actionCard$account$tr extends Translations$auth$auth$actionCard$account$en {
+	_Translations$auth$auth$actionCard$account$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Hesabınla verilerin seninle kalır, cihaz değiştirsen de erişebilirsin.';
+	@override String get google => 'Google ile devam et';
+	@override String get apple => 'Apple ile devam et';
+	@override String get email => 'E-posta ile devam et';
+}
+
+// Path: auth.auth.actionCard.offline
+class _Translations$auth$auth$actionCard$offline$tr extends Translations$auth$auth$actionCard$offline$en {
+	_Translations$auth$auth$actionCard$offline$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get kContinue => 'Hesapsız devam et';
+	@override String get description => 'Verilerin yalnızca bu telefonda saklanır ve hesap oluşturulmaz.';
+}
+
 /// The flat map containing all translations for locale <tr>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -1289,6 +1359,16 @@ class _Translations$pregnancy$stages$stage9$tr extends Translations$pregnancy$st
 extension on TranslationsTr {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.auth.intro.title' => 'Oma',
+			'auth.auth.intro.description' => 'Döngünü anla, kendini daha iyi tanı.',
+			'auth.auth.actionCard.account.description' => 'Hesabınla verilerin seninle kalır, cihaz değiştirsen de erişebilirsin.',
+			'auth.auth.actionCard.account.google' => 'Google ile devam et',
+			'auth.auth.actionCard.account.apple' => 'Apple ile devam et',
+			'auth.auth.actionCard.account.email' => 'E-posta ile devam et',
+			'auth.auth.actionCard.alternativeLabel' => 'veya',
+			'auth.auth.actionCard.offline.kContinue' => 'Hesapsız devam et',
+			'auth.auth.actionCard.offline.description' => 'Verilerin yalnızca bu telefonda saklanır ve hesap oluşturulmaz.',
+			'auth.auth.privacyNote' => 'Gizlilik ve verilerin senin kontrolünde',
 			'catalogs.nutrition.categories.alcoholic_drinks' => 'Alkollü içecekler',
 			'catalogs.nutrition.categories.snacks_and_packaged_foods' => 'Atıştırmalıklar ve paketli ürünler',
 			'catalogs.nutrition.categories.spices_sauces_and_spicy_foods' => 'Baharatlar, soslar ve acılı gıdalar',
@@ -1791,6 +1871,8 @@ extension on TranslationsTr {
 			'options.moodCheckInOptions.sensitive' => 'Hassas',
 			'options.moodCheckInOptions.neutral' => 'Nötr',
 			'options.moodCheckInOptions.good' => 'İyi',
+			_ => null,
+		} ?? switch (path) {
 			'options.moodCheckInOptions.great' => 'Harika',
 			'options.moodCompanionOptions.by_myself' => 'Yalnızdım',
 			'options.moodCompanionOptions.with_my_partner' => 'Partnerimleydim',
@@ -1801,8 +1883,6 @@ extension on TranslationsTr {
 			'options.moodPlaceOptions.at_work' => 'İş yerindeydim',
 			'options.moodPlaceOptions.outside' => 'Dışarıdaydım',
 			'options.moodPlaceOptions.in_transit' => 'Yoldaydım',
-			_ => null,
-		} ?? switch (path) {
 			'options.moodPlaceOptions.social' => 'Sosyal ortamdaydım',
 			'options.sexualActivityOptions.with_a_partner' => 'Partnerle',
 			'options.sexualActivityOptions.masturbation' => 'Mastürbasyon',
