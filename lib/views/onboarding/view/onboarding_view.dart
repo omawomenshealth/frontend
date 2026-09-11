@@ -139,7 +139,6 @@ class _OnboardingViewState extends State<OnboardingView> {
                           CyclePage(
                             vm: vm,
                             onPickLastPeriod: controller.pickLastPeriod,
-                            onAddBirthControl: controller.addBirthControl,
                           ),
 
                           OnboardingPreviewPage(vm: vm),

@@ -58,15 +58,6 @@ class OnboardingController {
     );
   }
 
-  Future<void> addBirthControl() async {
-    final value = await showOnboardingTextInputDialog(
-      context,
-      AppStrings.addBirthControlMethod,
-    );
-    if (value == null || value.isEmpty) return;
-    vm.addBirthControlMethod(value);
-  }
-
   void _showError(String message) {
     OmaToast.show(
       context,

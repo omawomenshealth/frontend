@@ -12,12 +12,10 @@ class CyclePage extends StatelessWidget {
     super.key,
     required this.vm,
     required this.onPickLastPeriod,
-    required this.onAddBirthControl,
   });
 
   final OnboardingViewModel vm;
   final VoidCallback onPickLastPeriod;
-  final VoidCallback onAddBirthControl;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +36,6 @@ class CyclePage extends StatelessWidget {
         _BirthControlField(
           vm: vm,
           cycle: cycle,
-          onAddBirthControl: onAddBirthControl,
         ),
       ],
     );
@@ -122,12 +119,10 @@ class _BirthControlField extends StatelessWidget {
   const _BirthControlField({
     required this.vm,
     required this.cycle,
-    required this.onAddBirthControl,
   });
 
   final OnboardingViewModel vm;
   final dynamic cycle;
-  final VoidCallback onAddBirthControl;
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +132,6 @@ class _BirthControlField extends StatelessWidget {
       AppStrings.iud,
       AppStrings.condom,
       AppStrings.implant,
-      ...vm.customBirthControlMethods,
     ]);
 
     final selectedBirthControl =
@@ -147,24 +141,13 @@ class _BirthControlField extends StatelessWidget {
 
     return OmaField(
       label: cycle.birthControl,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          OmaSingleSelect<String>(
-            options: birthControlOptions,
-            selectedValue: selectedBirthControl.isEmpty
-                ? null
-                : selectedBirthControl,
-            labelBuilder: (value) => value,
-            onChanged: vm.setBirthControlMethod,
-          ),
-          const SizedBox(height: 8),
-          OmaChip(
-            label: cycle.addBirthControl,
-            showCheck: false,
-            onTap: onAddBirthControl,
-          ),
-        ],
+      child: OmaSingleSelect<String>(
+        options: birthControlOptions,
+        selectedValue: selectedBirthControl.isEmpty
+            ? null
+            : selectedBirthControl,
+        labelBuilder: (value) => value,
+        onChanged: vm.setBirthControlMethod,
       ),
     );
   }
