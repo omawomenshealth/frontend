@@ -26,6 +26,7 @@ import 'views/onboarding/view/onboarding_view.dart';
 import 'views/onboarding/viewmodel/onboarding_view_model.dart';
 import 'views/profile/view/privacy_center_view.dart';
 import 'views/profile/viewmodel/profile_view_model.dart';
+import 'views/splash/view/splash_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -217,8 +218,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           unawaited(LocaleSettings.setLocaleRaw(resolved.languageCode));
           return resolved;
         },
-        initialRoute: widget.storage.isOnboardingComplete ? '/home' : '/auth',
+        initialRoute: '/splash',
         routes: {
+          '/splash': (context) => SplashView(
+            onDone: () => Navigator.of(context).pushReplacementNamed(
+              widget.storage.isOnboardingComplete ? '/home' : '/auth',
+            ),
+          ),
           '/auth': (context) => const AuthView(),
           '/onboarding': (context) => const OnboardingView(),
           '/home': (context) => HomeShell(key: _homeShellKey),
