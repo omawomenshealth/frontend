@@ -6,6 +6,7 @@ enum OmaButtonVariant {
   primary,
   secondary,
   outline,
+  dashed,
   text,
 }
 
@@ -25,6 +26,7 @@ class OmaButton extends StatelessWidget {
     this.size = OmaButtonSize.medium,
     this.trailingIcon,
     this.leadingIcon,
+    this.isLoading = false,
   });
 
   final String label;
@@ -36,16 +38,27 @@ class OmaButton extends StatelessWidget {
   final IconData? leadingIcon;
   final IconData? trailingIcon;
 
+  /// true olduğunda buton etkileşimi engellenir, içerik yerini ortalanmış
+  /// bir spinner'a bırakır ama buton rengi/boyutu değişmez — bu sayede
+  /// yükleme sırasında düzen (layout) zıplaması olmaz.
+  final bool isLoading;
+
+  /// Kullanıcı etkileşimine açık mı (dokunma amaçlı).
+  bool get _interactive => onPressed != null && !isLoading;
+
+  /// Görsel olarak "aktif" mi — yükleme sırasında da true kalır, böylece
+  /// buton soluklaşmaz; sadece gerçekten devre dışıyken (onPressed null ve
+  /// yükleme yokken) soluklaşır.
+  bool get _visuallyActive => onPressed != null;
+
   @override
   Widget build(BuildContext context) {
-    final enabled = onPressed != null;
-
     return Opacity(
-      opacity: enabled ? 1 : 0.4,
+      opacity: _visuallyActive ? 1 : 0.4,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          boxShadow: _boxShadow(enabled),
+          boxShadow: _boxShadow(_visuallyActive),
         ),
         child: _buildButton(),
       ),
@@ -54,35 +67,58 @@ class OmaButton extends StatelessWidget {
 
   Widget _buildButton() {
     final style = _buttonStyle();
-
     final child = _buildChild();
 
-    switch (variant) {
-      case OmaButtonVariant.primary:
-      case OmaButtonVariant.secondary:
-        return FilledButton(
-          onPressed: onPressed,
+    return switch (variant) {
+      OmaButtonVariant.primary ||
+      OmaButtonVariant.secondary =>
+        FilledButton(
+          onPressed: _interactive ? onPressed : null,
           style: style,
           child: child,
-        );
+        ),
 
-      case OmaButtonVariant.outline:
-        return OutlinedButton(
-          onPressed: onPressed,
+      OmaButtonVariant.outline ||
+      OmaButtonVariant.dashed =>
+        OutlinedButton(
+          onPressed: _interactive ? onPressed : null,
           style: style,
           child: child,
-        );
+        ),
 
-      case OmaButtonVariant.text:
-        return TextButton(
-          onPressed: onPressed,
+      OmaButtonVariant.text =>
+        TextButton(
+          onPressed: _interactive ? onPressed : null,
           style: style,
           child: child,
-        );
-    }
+        ),
+    };
   }
 
   Widget _buildChild() {
+    final content = _buildContent();
+
+    if (!isLoading) return content;
+
+    // İçeriği görünmez tutup üstüne spinner bindirerek buton genişliğini
+    // sabit tutuyoruz; aksi halde metin kaybolunca buton daralır/zıplar.
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Opacity(opacity: 0, child: content),
+        SizedBox(
+          width: _iconSize,
+          height: _iconSize,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(_foregroundColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContent() {
     final children = <Widget>[];
 
     if (leadingIcon != null) {
@@ -92,7 +128,7 @@ class OmaButton extends StatelessWidget {
           size: _iconSize,
         ),
       );
-      children.add(const SizedBox(width: 8));
+      children.add(const SizedBox(width: 10));
     }
 
     children.add(
@@ -107,7 +143,7 @@ class OmaButton extends StatelessWidget {
     );
 
     if (trailingIcon != null) {
-      children.add(const SizedBox(width: 8));
+      children.add(const SizedBox(width: 10));
       children.add(
         Icon(
           trailingIcon,
@@ -123,10 +159,20 @@ class OmaButton extends StatelessWidget {
   }
 
   ButtonStyle _buttonStyle() {
+    // Yükleme sırasında onPressed'i null yaparak dokunmayı engelliyoruz;
+    // ama görsel olarak "disabled" (soluk/gri) görünmesini istemiyoruz.
+    // Bu yüzden isLoading true iken normal renkleri disabled state'e de
+    // açıkça set ediyoruz.
+    final keepColorsWhileLoading = isLoading;
+
     return switch (variant) {
       OmaButtonVariant.primary => FilledButton.styleFrom(
           backgroundColor: OmaColors.primary,
           foregroundColor: OmaColors.primaryForeground,
+          disabledBackgroundColor:
+              keepColorsWhileLoading ? OmaColors.primary : null,
+          disabledForegroundColor:
+              keepColorsWhileLoading ? OmaColors.primaryForeground : null,
           minimumSize: Size.fromHeight(_height),
           padding: _padding,
           shape: const StadiumBorder(),
@@ -135,23 +181,47 @@ class OmaButton extends StatelessWidget {
       OmaButtonVariant.secondary => FilledButton.styleFrom(
           backgroundColor: OmaColors.card,
           foregroundColor: OmaColors.primary,
+          disabledBackgroundColor:
+              keepColorsWhileLoading ? OmaColors.card : null,
+          disabledForegroundColor:
+              keepColorsWhileLoading ? OmaColors.primary : null,
           minimumSize: Size.fromHeight(_height),
           padding: _padding,
           shape: const StadiumBorder(),
         ),
 
       OmaButtonVariant.outline => OutlinedButton.styleFrom(
-          foregroundColor: OmaColors.primary,
+          foregroundColor: OmaColors.foreground,
+          disabledForegroundColor:
+              keepColorsWhileLoading ? OmaColors.foreground : null,
           minimumSize: Size.fromHeight(_height),
           padding: _padding,
           shape: const StadiumBorder(),
           side: BorderSide(
-            color: OmaColors.primary.withValues(alpha: 0.5),
+            color: OmaColors.border,
+          ),
+        ),
+
+      OmaButtonVariant.dashed => OutlinedButton.styleFrom(
+          foregroundColor: OmaColors.primary,
+          backgroundColor: OmaColors.primary.withValues(alpha: 0.04),
+          disabledForegroundColor:
+              keepColorsWhileLoading ? OmaColors.primary : null,
+          disabledBackgroundColor: keepColorsWhileLoading
+              ? OmaColors.primary.withValues(alpha: 0.04)
+              : null,
+          minimumSize: Size.fromHeight(_height),
+          padding: _padding,
+          shape: const StadiumBorder(),
+          side: BorderSide(
+            color: OmaColors.primary.withValues(alpha: 0.4),
           ),
         ),
 
       OmaButtonVariant.text => TextButton.styleFrom(
           foregroundColor: OmaColors.muted,
+          disabledForegroundColor:
+              keepColorsWhileLoading ? OmaColors.muted : null,
           minimumSize: Size.fromHeight(_height),
           padding: _padding,
           shape: const StadiumBorder(),
@@ -159,13 +229,14 @@ class OmaButton extends StatelessWidget {
     };
   }
 
-  List<BoxShadow>? _boxShadow(bool enabled) {
-    if (!enabled) return null;
+  List<BoxShadow>? _boxShadow(bool visuallyActive) {
+    if (!visuallyActive) return null;
 
     return switch (variant) {
       OmaButtonVariant.primary => OmaShadows.lift,
       OmaButtonVariant.secondary => OmaShadows.soft,
-      OmaButtonVariant.outline => null,
+      OmaButtonVariant.outline ||
+      OmaButtonVariant.dashed ||
       OmaButtonVariant.text => null,
     };
   }
@@ -174,7 +245,8 @@ class OmaButton extends StatelessWidget {
     return switch (variant) {
       OmaButtonVariant.primary => OmaColors.primaryForeground,
       OmaButtonVariant.secondary => OmaColors.primary,
-      OmaButtonVariant.outline => OmaColors.primary,
+      OmaButtonVariant.outline => OmaColors.foreground,
+      OmaButtonVariant.dashed => OmaColors.primary,
       OmaButtonVariant.text => OmaColors.muted,
     };
   }
@@ -182,19 +254,16 @@ class OmaButton extends StatelessWidget {
   double get _height {
     return switch (size) {
       OmaButtonSize.small => 40,
-      OmaButtonSize.medium => 48,
+      OmaButtonSize.medium => 50,
       OmaButtonSize.large => 56,
     };
   }
 
   EdgeInsetsGeometry get _padding {
     return switch (size) {
-      OmaButtonSize.small =>
-        const EdgeInsets.symmetric(horizontal: 16),
-      OmaButtonSize.medium =>
-        const EdgeInsets.symmetric(horizontal: 20),
-      OmaButtonSize.large =>
-        const EdgeInsets.symmetric(horizontal: 24),
+      OmaButtonSize.small => const EdgeInsets.symmetric(horizontal: 16),
+      OmaButtonSize.medium => const EdgeInsets.symmetric(horizontal: 20),
+      OmaButtonSize.large => const EdgeInsets.symmetric(horizontal: 24),
     };
   }
 
@@ -209,7 +278,7 @@ class OmaButton extends StatelessWidget {
   double get _iconSize {
     return switch (size) {
       OmaButtonSize.small => 14,
-      OmaButtonSize.medium => 16,
+      OmaButtonSize.medium => 17,
       OmaButtonSize.large => 18,
     };
   }

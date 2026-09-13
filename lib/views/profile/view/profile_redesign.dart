@@ -324,7 +324,7 @@ class _ProfileHero extends StatelessWidget {
               image: true,
               label: AppStrings.profileCharactersSemantics,
               child: Image.asset(
-                'assets/images/oma-profile-characters.png',
+                ImageConstants.profileCharacters,
                 height: 228,
                 fit: BoxFit.contain,
                 alignment: Alignment.bottomCenter,

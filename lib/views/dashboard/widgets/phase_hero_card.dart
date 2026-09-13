@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/image_constants.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/pregnancy_calculator.dart';
 
@@ -417,7 +418,7 @@ class _PhasePresentation {
       CyclePhase.menstrual => _PhasePresentation(
         color: AppColors.periodPrimary,
         softColor: AppColors.periodLight,
-        assetPath: 'assets/images/oma-hero-menstrual-cutout.png',
+        assetPath: ImageConstants.phaseMenstrualHero,
         phaseLabel: AppStrings.menstrualPhase,
         headline: AppStrings.phaseMenstrualHeadline,
         body: AppStrings.phaseMenstrualBody,
@@ -429,7 +430,7 @@ class _PhasePresentation {
       CyclePhase.follicular => _PhasePresentation(
         color: AppColors.primary,
         softColor: const Color(0xFFEAF0E5),
-        assetPath: 'assets/images/oma-hero-follicular-cutout.png',
+        assetPath: ImageConstants.phaseFollicularHero,
         phaseLabel: AppStrings.follicularPhase,
         headline: AppStrings.phaseFollicularHeadline,
         body: AppStrings.phaseFollicularBody,
@@ -441,7 +442,7 @@ class _PhasePresentation {
       CyclePhase.ovulation => _PhasePresentation(
         color: AppColors.ovulation,
         softColor: const Color(0xFFECE7F3),
-        assetPath: 'assets/images/oma-hero-ovulation-cutout.png',
+        assetPath: ImageConstants.phaseOvulationHero,
         phaseLabel: AppStrings.estimatedOvulationWindow,
         headline: AppStrings.phaseOvulationHeadline,
         body: AppStrings.phaseOvulationBody,
@@ -453,7 +454,7 @@ class _PhasePresentation {
       CyclePhase.luteal => _PhasePresentation(
         color: AppColors.lutealDark,
         softColor: const Color(0xFFFFF3D9),
-        assetPath: 'assets/images/oma-hero-luteal-cutout.png',
+        assetPath: ImageConstants.phaseLutealHero,
         phaseLabel: AppStrings.lutealPhase,
         headline: AppStrings.phaseLutealHeadline,
         body: AppStrings.phaseLutealBody,
@@ -811,15 +812,15 @@ class _PregnancyPresentation {
       const Color(0xFFE8EFE7),
     ];
     final assets = [
-      'assets/images/oma-hero-menstrual-cutout.png',
-      'assets/images/oma-hero-follicular-cutout.png',
-      'assets/images/oma-hero-ovulation-cutout.png',
-      'assets/images/oma-hero-luteal-cutout.png',
-      'assets/images/oma-hero-menstrual-cutout.png',
-      'assets/images/oma-hero-follicular-cutout.png',
-      'assets/images/oma-hero-ovulation-cutout.png',
-      'assets/images/oma-hero-menstrual-cutout.png',
-      'assets/images/oma-hero-follicular-cutout.png',
+      ImageConstants.phaseMenstrualHero,
+      ImageConstants.phaseFollicularHero,
+      ImageConstants.phaseOvulationHero,
+      ImageConstants.phaseLutealHero,
+      ImageConstants.phaseMenstrualHero,
+      ImageConstants.phaseFollicularHero,
+      ImageConstants.phaseOvulationHero,
+      ImageConstants.phaseMenstrualHero,
+      ImageConstants.phaseFollicularHero,
     ];
     return _PregnancyPresentation(
       color: colors[index],

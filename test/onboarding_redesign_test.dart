@@ -9,7 +9,7 @@ import 'package:app_proje_a/data/services/sync_service.dart';
 import 'package:app_proje_a/localization/generated/strings.g.dart';
 import 'package:app_proje_a/views/onboarding/view/onboarding_view.dart';
 import 'package:app_proje_a/views/onboarding/view/pages/onboarding_preview_page.dart';
-import 'package:app_proje_a/views/onboarding/view/widgets/onboarding_background.dart';
+import 'package:app_proje_a/core/widgets/oma_background.dart';
 import 'package:app_proje_a/core/widgets/oma_chip.dart';
 import 'package:app_proje_a/views/onboarding/viewmodel/onboarding_view_model.dart';
 import 'package:flutter/material.dart';
@@ -24,25 +24,41 @@ void main() {
     await LocaleSettings.setLocale(AppLocale.tr);
   });
 
-  testWidgets('onboarding sayfaları farklı çiçek yerleşimleri kullanır', (
+  testWidgets('onboarding sayfaları farklı çiçek dizilimleri kullanır', (
     tester,
   ) async {
     await tester.pumpWidget(
       const Directionality(
         textDirection: TextDirection.ltr,
-        child: SizedBox.expand(child: OnboardingBackground(pageIndex: 0)),
+        child: MediaQuery(
+          data: MediaQueryData(size: Size(360, 640)),
+          child: SizedBox.expand(child: OmaBackground(seed: 0)),
+        ),
       ),
     );
-    expect(find.byKey(const ValueKey('onboarding_flower_0_0')), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 700));
+    final firstPageAssets = tester
+        .widgetList<Image>(find.byType(Image))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toList();
+    expect(firstPageAssets, hasLength(5));
 
     await tester.pumpWidget(
       const Directionality(
         textDirection: TextDirection.ltr,
-        child: SizedBox.expand(child: OnboardingBackground(pageIndex: 1)),
+        child: MediaQuery(
+          data: MediaQueryData(size: Size(360, 640)),
+          child: SizedBox.expand(child: OmaBackground(seed: 1)),
+        ),
       ),
     );
-    expect(find.byKey(const ValueKey('onboarding_flower_1_0')), findsOneWidget);
-    expect(find.byKey(const ValueKey('onboarding_flower_0_0')), findsNothing);
+    await tester.pump(const Duration(milliseconds: 700));
+    final secondPageAssets = tester
+        .widgetList<Image>(find.byType(Image))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toList();
+    expect(secondPageAssets, hasLength(5));
+    expect(secondPageAssets, isNot(equals(firstPageAssets)));
   });
 
   testWidgets('önizleme kartı bilgilerini sağa hizalar', (tester) async {
@@ -114,7 +130,7 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Seni tanıyalım'), findsOneWidget);
     expect(find.text(t.onboarding.prompt.introduction), findsOneWidget);
@@ -147,14 +163,14 @@ void main() {
     expect(vm.age, greaterThan(0));
 
     await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
     expect(find.text(t.onboarding.wellbeing.title), findsOneWidget);
     expect(find.text(t.onboarding.prompt.wellbeing), findsOneWidget);
     expect(find.text(t.onboarding.wellbeing.moodQuestion), findsOneWidget);
     expect(find.text(t.onboarding.wellbeing.multiSelectHint), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.arrow_back));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
     expect(
       tester
           .widget<TextField>(find.byKey(const ValueKey('onboarding_name')))
@@ -164,10 +180,10 @@ void main() {
     );
 
     await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
 
     await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
     expect(find.text(t.onboarding.health_profile.title), findsOneWidget);
     expect(find.text(t.onboarding.prompt.healthProfile), findsOneWidget);
     expect(find.byKey(const ValueKey('onboarding_height')), findsOneWidget);
@@ -186,7 +202,7 @@ void main() {
     );
 
     await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
     expect(find.text(t.onboarding.cycle.title), findsOneWidget);
     expect(find.text(t.onboarding.prompt.cycle), findsOneWidget);
     expect(find.text(t.onboarding.cycle.menopauseStatus), findsOneWidget);
@@ -203,7 +219,7 @@ void main() {
       isNull,
     );
     await tester.tap(find.byType(OmaChip).first);
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
     expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNotNull);
     expect(
       tester
@@ -215,7 +231,7 @@ void main() {
     );
 
     await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
     expect(vm.currentPage, 4);
     expect(find.text(t.onboarding.prompt.review), findsOneWidget);
     expect(find.text(t.onboarding.review.accountStorageLabel), findsOneWidget);

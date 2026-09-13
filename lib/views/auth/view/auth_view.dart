@@ -1,130 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/color_constants.dart';
+
 import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/image_constants.dart';
-import '../../../core/shared_widgets/custom_button.dart';
-import '../../../core/shared_widgets/pastel_flower.dart';
-import '../../../core/widgets/oma_toast.dart';
+import '../../../core/widgets/index.dart';
+import '../../../core/widgets/rise_in.dart';
+import '../../../localization/generated/strings.g.dart' as context;
 import '../viewmodel/auth_view_model.dart';
+import 'widgets/auth_brand_header.dart';
+import 'widgets/auth_action_card.dart';
+
 
 /// Giriş ekranı — Google Sign-In, Simüle giriş ve giriş yapmadan devam etme seçenekleri.
-class AuthView extends StatelessWidget {
+///
+/// İş mantığı aynıdır; yalnızca görsel dil `WelcomePage` ile aynı Oma
+/// tasarım sistemine (OmaColors / OmaText / OmaButton / OmaSurface)
+/// taşınmıştır.
+class AuthView extends StatefulWidget {
   const AuthView({super.key});
 
+  @override
+  State<AuthView> createState() => _AuthViewState();
+}
+
+class _AuthViewState extends State<AuthView>
+    with SingleTickerProviderStateMixin, RiseAnimationMixin {
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
     return Consumer<AuthViewModel>(
       builder: (context, vm, _) {
-        return Scaffold(
-          backgroundColor: AppColors.scaffoldBackground,
-          body: Stack(
-            children: [
-              const Positioned(
-                top: -24,
-                right: -22,
-                child: PastelFlower(size: 116, rotation: 0.2),
-              ),
-              const Positioned(
-                top: 224,
-                left: -26,
-                child: PastelFlower(size: 94, rotation: -0.22),
-              ),
-              const Positioned(
-                top: 104,
-                left: -14,
-                child: PastelFlower(size: 58, rotation: 0.14, opacity: 0.52),
-              ),
-              const Positioned(
-                top: 376,
-                right: -16,
-                child: PastelFlower(size: 64, rotation: -0.16, opacity: 0.54),
-              ),
-              const Positioned(
-                bottom: -24,
-                right: -20,
-                child: PastelFlower(size: 100, rotation: 0.18),
-              ),
-              const Positioned(
-                bottom: 232,
-                left: 10,
-                child: PastelFlower(size: 54, rotation: 0.28, opacity: 0.5),
-              ),
-              const Positioned(
-                bottom: 112,
-                left: -18,
-                child: PastelFlower(size: 76, rotation: -0.12),
-              ),
-              const Positioned(
-                bottom: 48,
-                right: 18,
-                child: PastelFlower(size: 48, rotation: -0.3, opacity: 0.48),
-              ),
-              SafeArea(
-                child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(22, 18, 22, 18),
-                      sliver: SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 10),
-                            const _AuthLogo(),
-                            const SizedBox(height: 20),
-                            Text(
-                              AppStrings.appName,
-                              style: const TextStyle(
-                                color: AppColors.textPrimary,
-                                fontFamily: 'CormorantGaramond',
-                                fontSize: 44,
-                                height: 1,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.4,
-                              ),
-                            ),
-                            const SizedBox(height: 9),
-                            Text(
-                              AppStrings.appSlogan,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 15,
-                                height: 1.4,
-                              ),
-                            ),
-                            const Spacer(),
-                            _AuthActionCard(vm: vm, owner: this),
-                            const SizedBox(height: 18),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.shield_outlined,
-                                  size: 15,
-                                  color: AppColors.primary,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  AppStrings.privacyAndData,
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+        return OmaSurface(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Stack(
+              children: [
+                const Positioned.fill(child: OmaBackground(seed: 1)),
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: RiseIn(
+                            animation: riseAt(0),
+                            child: const AuthBrandHeader(),
+                          ),
                         ),
-                      ),
+                        RiseIn(
+                          animation: riseAt(0.2),
+                          child: AuthActionCard(
+                            vm: vm,
+                            onGoogleLogin: () => _handleGoogleLogin(context, vm),
+                            onContinueWithoutAccount: () =>
+                                _navigateToOnboarding(context),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        RiseIn(
+                          animation: riseAt(0.3),
+                          child: const _PrivacyNote(),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -161,18 +104,24 @@ class AuthView extends StatelessWidget {
       final accepted = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
-          icon: const Icon(Icons.health_and_safety_outlined),
-          title: Text(AppStrings.healthCloudConsent),
-          content: Text(AppStrings.consentExplanation),
+        builder: (dialogContext) => OmaDialog(
+          icon: Icons.health_and_safety_outlined,
+          title: AppStrings.healthCloudConsent,
+          content: Text(
+            AppStrings.consentExplanation,
+            style: OmaText.body(13.5, color: OmaColors.muted),
+          ),
           actions: [
-            TextButton(
+            OmaButton(
+              label: AppStrings.continueOffline,
+              variant: OmaButtonVariant.outline,
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text(AppStrings.continueOffline),
             ),
-            FilledButton(
+            const SizedBox(height: 10),
+            OmaButton(
+              label: AppStrings.grantConsent,
+              variant: OmaButtonVariant.primary,
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: Text(AppStrings.grantConsent),
             ),
           ],
         ),
@@ -232,74 +181,50 @@ class AuthView extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false, // Kullanıcı mutlaka seçim yapmalı
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            const Icon(Icons.cloud_done_rounded, color: AppColors.primary),
-            const SizedBox(width: 8),
-            Text(AppStrings.cloudBackupFound),
-          ],
-        ),
+      builder: (ctx) => OmaDialog(
+        icon: Icons.cloud_done_rounded,
+        title: AppStrings.cloudBackupFound,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               AppStrings.cloudBackupQuestion,
-              style: const TextStyle(fontSize: 14, height: 1.4),
+              style: OmaText.body(14, color: OmaColors.foreground),
             ),
             const SizedBox(height: 12),
             Text(
               AppStrings.cloudBackupOptions,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
-                height: 1.5,
-              ),
+              style: OmaText.body(12, color: OmaColors.muted),
             ),
           ],
         ),
-        actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
-          ElevatedButton(
+          OmaButton(
+            label: AppStrings.restore,
+            variant: OmaButtonVariant.outline,
             onPressed: () async {
               Navigator.pop(ctx);
-              await _resolveAndNavigate(
-                context,
-                vm,
-                SyncConflictAction.restore,
-              );
+              await _resolveAndNavigate(context, vm, SyncConflictAction.restore);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[200],
-              foregroundColor: Colors.black87,
-              elevation: 0,
-            ),
-            child: Text(AppStrings.restore),
           ),
-          ElevatedButton(
+          const SizedBox(height: 10),
+          OmaButton(
+            label: AppStrings.overwrite,
+            variant: OmaButtonVariant.outline,
             onPressed: () async {
               Navigator.pop(ctx);
               await _resolveAndNavigate(context, vm, SyncConflictAction.backup);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[200],
-              foregroundColor: Colors.black87,
-              elevation: 0,
-            ),
-            child: Text(AppStrings.overwrite),
           ),
-          ElevatedButton(
+          const SizedBox(height: 10),
+          OmaButton(
+            label: AppStrings.merge,
+            variant: OmaButtonVariant.primary,
             onPressed: () async {
               Navigator.pop(ctx);
               await _resolveAndNavigate(context, vm, SyncConflictAction.merge);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(AppStrings.merge),
           ),
         ],
       ),
@@ -307,119 +232,22 @@ class AuthView extends StatelessWidget {
   }
 }
 
-class _AuthActionCard extends StatelessWidget {
-  final AuthViewModel vm;
-  final AuthView owner;
-
-  const _AuthActionCard({required this.vm, required this.owner});
+class _PrivacyNote extends StatelessWidget {
+  const _PrivacyNote();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.94),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.9)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryDark.withValues(alpha: 0.08),
-            blurRadius: 30,
-            offset: const Offset(0, 14),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(
-            AppStrings.loginToContinue,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
-              fontFamily: 'CormorantGaramond',
-              fontSize: 21,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 16),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 180),
-            child: vm.errorMessage == null
-                ? const SizedBox.shrink()
-                : Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentLight,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: AppColors.error.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: Text(
-                        vm.errorMessage!,
-                        style: const TextStyle(
-                          color: AppColors.error,
-                          fontSize: 12.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-          ),
-          CustomButton(
-            text: AppStrings.googleConnect,
-            icon: Icons.g_mobiledata_rounded,
-            isLoading: vm.isLoading,
-            onPressed: () => owner._handleGoogleLogin(context, vm),
-            gradient: AppColors.primaryGradient,
-          ),
-          const SizedBox(height: 11),
-          CustomButton(
-            text: AppStrings.continueWithoutLogin,
-            icon: Icons.arrow_forward_rounded,
-            isLoading: vm.isLoading,
-            onPressed: () => owner._navigateToOnboarding(context),
-            isOutlined: true,
-            backgroundColor: AppColors.primary,
-            textColor: AppColors.primaryDark,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AuthLogo extends StatelessWidget {
-  const _AuthLogo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 126,
-      height: 126,
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.96),
-        borderRadius: BorderRadius.circular(42),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.24)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryDark.withValues(alpha: 0.1),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(13),
-        child: Image.asset(
-          ImageConstants.logo,
-          fit: BoxFit.contain,
-          semanticLabel: AppStrings.appName,
+    final t = context.t.auth;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.shield_outlined, size: 14, color: OmaColors.muted),
+        const SizedBox(width: 6),
+        Text(
+          t.auth.privacyNote,
+          style: OmaText.body(12, color: OmaColors.muted),
         ),
-      ),
+      ],
     );
   }
 }

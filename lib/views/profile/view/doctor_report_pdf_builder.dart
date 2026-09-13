@@ -20,10 +20,10 @@ class DoctorReportPdfBuilder {
     );
 
     final regularFont = pw.Font.ttf(
-      await rootBundle.load('assets/fonts/Karla-Variable.ttf'),
+      await rootBundle.load('assets/fonts/karla/Karla-Variable.ttf'),
     );
     final italicFont = pw.Font.ttf(
-      await rootBundle.load('assets/fonts/Karla-Italic-Variable.ttf'),
+      await rootBundle.load('assets/fonts/karla/Karla-Italic-Variable.ttf'),
     );
     final reportDate = generatedAt ?? AppTime.now;
     const accent = PdfColor.fromInt(0xFF9CAB84);

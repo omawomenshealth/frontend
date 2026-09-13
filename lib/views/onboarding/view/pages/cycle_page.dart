@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/index.dart';
-import '../../../../data/models/user_settings_model.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../utils/onboarding_label_utils.dart';
 import '../../viewmodel/onboarding_view_model.dart';
@@ -13,12 +12,10 @@ class CyclePage extends StatelessWidget {
     super.key,
     required this.vm,
     required this.onPickLastPeriod,
-    required this.onAddBirthControl,
   });
 
   final OnboardingViewModel vm;
   final VoidCallback onPickLastPeriod;
-  final VoidCallback onAddBirthControl;
 
   @override
   Widget build(BuildContext context) {
@@ -28,77 +25,19 @@ class CyclePage extends StatelessWidget {
     return OnboardingCard(
       label: cycle.title,
       children: [
-        _MenopauseField(
+        _CycleLengthField(
           vm: vm,
           cycle: cycle,
         ),
-        if(vm.menopauseStatus != null) ...[
-          _CycleLengthField(
-            vm: vm,
-            cycle: cycle,
-          ),
-          _LastPeriodField(
-            cycle: cycle,
-            onPickLastPeriod: onPickLastPeriod,
-          ),
-          if (vm.menopauseStatus == MenopauseStatus.none) 
-            _BirthControlField(
-              vm: vm,
-              cycle: cycle,
-              onAddBirthControl: onAddBirthControl,
-            ),
-        ],
+        _LastPeriodField(
+          cycle: cycle,
+          onPickLastPeriod: onPickLastPeriod,
+        ),
+        _BirthControlField(
+          vm: vm,
+          cycle: cycle,
+        ),
       ],
-    );
-  }
-}
-
-class _MenopauseField extends StatelessWidget {
-  const _MenopauseField({
-    required this.vm,
-    required this.cycle,
-  });
-
-  final OnboardingViewModel vm;
-  final dynamic cycle;
-
-  @override
-  Widget build(BuildContext context) {
-    final menopauseOptions = <(String, MenopauseStatus)>[
-      (
-        AppStrings.none,
-        MenopauseStatus.none,
-      ),
-      (
-        AppStrings.preMenopause,
-        MenopauseStatus.pre,
-      ),
-      (
-        AppStrings.periMenopause,
-        MenopauseStatus.peri,
-      ),
-      (
-        AppStrings.postMenopause,
-        MenopauseStatus.post,
-      ),
-    ];
-
-    return OmaField(
-      label: cycle.menopauseStatus,
-      child: OmaSingleSelect<MenopauseStatus>(
-        options: [
-          for (final option in menopauseOptions) option.$2,
-        ],
-        selectedValue: vm.menopauseStatus,
-        labelBuilder: (value) {
-          return menopauseOptions
-              .firstWhere(
-                (option) => option.$2 == value,
-              )
-              .$1;
-        },
-        onChanged: vm.setMenopauseStatus,
-      ),
     );
   }
 }
@@ -180,12 +119,10 @@ class _BirthControlField extends StatelessWidget {
   const _BirthControlField({
     required this.vm,
     required this.cycle,
-    required this.onAddBirthControl,
   });
 
   final OnboardingViewModel vm;
   final dynamic cycle;
-  final VoidCallback onAddBirthControl;
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +132,6 @@ class _BirthControlField extends StatelessWidget {
       AppStrings.iud,
       AppStrings.condom,
       AppStrings.implant,
-      ...vm.customBirthControlMethods,
     ]);
 
     final selectedBirthControl =
@@ -205,24 +141,13 @@ class _BirthControlField extends StatelessWidget {
 
     return OmaField(
       label: cycle.birthControl,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          OmaSingleSelect<String>(
-            options: birthControlOptions,
-            selectedValue: selectedBirthControl.isEmpty
-                ? null
-                : selectedBirthControl,
-            labelBuilder: (value) => value,
-            onChanged: vm.setBirthControlMethod,
-          ),
-          const SizedBox(height: 8),
-          OmaChip(
-            label: cycle.addBirthControl,
-            showCheck: false,
-            onTap: onAddBirthControl,
-          ),
-        ],
+      child: OmaSingleSelect<String>(
+        options: birthControlOptions,
+        selectedValue: selectedBirthControl.isEmpty
+            ? null
+            : selectedBirthControl,
+        labelBuilder: (value) => value,
+        onChanged: vm.setBirthControlMethod,
       ),
     );
   }
