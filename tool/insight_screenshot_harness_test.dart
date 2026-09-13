@@ -1770,9 +1770,13 @@ List<DailyLog> _foodSensitivityLogs() => [
 
 Future<void> _loadScreenshotFonts() async {
   final karla = FontLoader('Karla')
-    ..addFont(rootBundle.load('assets/fonts/Karla-Variable.ttf'));
+    ..addFont(rootBundle.load('assets/fonts/karla/Karla-Variable.ttf'));
   final cormorant = FontLoader('CormorantGaramond')
-    ..addFont(rootBundle.load('assets/fonts/CormorantGaramond-Variable.ttf'));
+    ..addFont(
+      rootBundle.load(
+        'assets/fonts/cormorant-garamond/CormorantGaramond-Variable.ttf',
+      ),
+    );
   final flutterRoot =
       Platform.environment['FLUTTER_ROOT'] ??
       File(Platform.resolvedExecutable).parent.parent.parent.parent.parent.path;

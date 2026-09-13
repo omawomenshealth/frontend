@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/image_constants.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../data/services/api_service.dart';
@@ -22,12 +23,12 @@ class ArticlesView extends StatefulWidget {
 
 class _ArticlesViewState extends State<ArticlesView> {
   static const _editorialImages = <String>[
-    'assets/images/explore-movement.jpg',
-    'assets/images/explore-intimacy.jpg',
-    'assets/images/explore-ritual.jpg',
-    'assets/images/explore-nutrition.jpg',
-    'assets/images/explore-sleep.jpg',
-    'assets/images/explore-reflection.jpg',
+    ImageConstants.articleMovementCover,
+    ImageConstants.articleIntimacyCover,
+    ImageConstants.articleRitualCover,
+    ImageConstants.articleNutritionCover,
+    ImageConstants.articleSleepCover,
+    ImageConstants.articleReflectionCover,
   ];
 
   final TextEditingController _searchController = TextEditingController();
@@ -435,12 +436,12 @@ class _ArticlesViewState extends State<ArticlesView> {
 
   String _imageFor(Article article, int index) {
     const keyedImages = <String, String>{
-      'movement': 'assets/images/explore-movement.jpg',
-      'intimacy': 'assets/images/explore-intimacy.jpg',
-      'ritual': 'assets/images/explore-ritual.jpg',
-      'nutrition': 'assets/images/explore-nutrition.jpg',
-      'sleep': 'assets/images/explore-sleep.jpg',
-      'reflection': 'assets/images/explore-reflection.jpg',
+      'movement': ImageConstants.articleMovementCover,
+      'intimacy': ImageConstants.articleIntimacyCover,
+      'ritual': ImageConstants.articleRitualCover,
+      'nutrition': ImageConstants.articleNutritionCover,
+      'sleep': ImageConstants.articleSleepCover,
+      'reflection': ImageConstants.articleReflectionCover,
     };
     final configuredImage = keyedImages[article.imageKey];
     if (configuredImage != null) return configuredImage;
