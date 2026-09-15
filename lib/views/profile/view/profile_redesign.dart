@@ -225,7 +225,7 @@ class _ProfileHero extends StatelessWidget {
         : AppStrings.user;
     final phaseLine = calculator == null
         ? AppStrings.completeCycleDetails
-        : '${AppStrings.cycleDayLabel} $cycleDay · '
+        : '${AppStrings.cycleDay(cycleDay)} · '
               '${calculator!.currentPhaseName}';
 
     return Container(

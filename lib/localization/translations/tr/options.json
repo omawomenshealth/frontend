@@ -275,12 +275,12 @@
     "pelvic_lower_abdominal_pain": "Pelvik / alt karın ağrısı"
   },
   "dosageOptions(map)": {
-    "1_count": "1 Adet",
-    "2_count": "2 Adet",
-    "3_count": "3 Adet",
-    "4_count": "4 Adet",
-    "5_count": "5 Adet",
-    "6_count": "6 Adet"
+    "1_count": "1 adet",
+    "2_count": "2 adet",
+    "3_count": "3 adet",
+    "4_count": "4 adet",
+    "5_count": "5 adet",
+    "6_count": "6 adet"
   },
   "shortWeekdays(map)": {
     "mon": "Pzt",
@@ -304,7 +304,7 @@
     "nutrition": "Beslenme",
     "exercise": "Egzersiz",
     "womens_health": "Kadın Sağlığı",
-    "mood": "Ruh Hali",
+    "mood": "Ruh hâli",
     "sleep": "Uyku",
     "general_health": "Genel Sağlık"
   },

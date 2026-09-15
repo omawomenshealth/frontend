@@ -350,7 +350,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   Widget _buildTopBar() {
     final meta = _cycleDay > 0
         ? '${AppStrings.today.toUpperCase()} · '
-              '${AppStrings.cycleDayLabel.toUpperCase()} $_cycleDay'
+              '${AppStrings.cycleDay(_cycleDay).toUpperCase()}'
         : AppStrings.today.toUpperCase();
 
     return Padding(
