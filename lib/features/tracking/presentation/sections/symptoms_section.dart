@@ -1,6 +1,130 @@
 part of '../daily_log_sheet.dart';
 
-extension _SymptomsSection on _DailyLogSheetState {
+class SymptomsTrackingSheet extends DailyLogSheet {
+  const SymptomsTrackingSheet({
+    super.key,
+    required super.initialLog,
+    required super.settings,
+    required super.onSave,
+    super.onSettingsChanged,
+    super.themeColor,
+  }) : super(initialSection: TrackingSection.symptoms, isSingleTab: true);
+
+  @override
+  State<DailyLogSheet> createState() => _SymptomsTrackingSheetState();
+}
+
+class _SymptomsTrackingSheetState extends _TrackingSheetState {
+  final _symptomSearchController = TextEditingController();
+  final _dreamNoteController = TextEditingController();
+  late Set<String> _symptoms;
+  late Map<String, int> _symptomSeverities;
+  late Map<CustomSymptomGroup, List<String>> _customSymptoms;
+  late bool? _sexualActivity;
+  late Set<SexualActivityType> _sexualActivityTypes;
+  late Set<SexualAfterFeeling> _sexualAfterFeelings;
+  late bool? _vaginalDischargePresent;
+  late VaginalDischargeColor? _vaginalDischargeColor;
+  late VaginalDischargeConsistency? _vaginalDischargeConsistency;
+  late VaginalDischargeAmount? _vaginalDischargeAmount;
+  late Set<VaginalDischargeSymptom> _vaginalDischargeSymptoms;
+  late bool? _dreamRemembered;
+  late DreamType? _dreamType;
+
+  List<String> get _allSymptomOptions => AppStrings.allSymptomOptions;
+
+  @override
+  void _initializeSection() {
+    final persistedSettings = _persistedSettings;
+    _customSymptoms = {
+      for (final group in CustomSymptomGroup.values)
+        group: _uniqueCustomLabels(persistedSettings.customSymptomsFor(group)),
+    };
+    _symptoms = _localizedSetPreservingCustom(
+      _log.symptoms,
+      _allSymptomOptions,
+    );
+    final knownCustomSymptoms = _customSymptoms.values
+        .expand((values) => values)
+        .toList(growable: false);
+    final uncategorizedSymptoms = _symptoms.where(
+      (value) =>
+          !_allSymptomOptions.any(
+            (option) => _sameCustomLabel(option, value),
+          ) &&
+          !knownCustomSymptoms.any((option) => _sameCustomLabel(option, value)),
+    );
+    _customSymptoms[CustomSymptomGroup.body] = _uniqueCustomLabels([
+      ..._customSymptoms[CustomSymptomGroup.body]!,
+      ...uncategorizedSymptoms,
+    ]);
+    _symptomSeverities = {
+      for (final rawSymptom in _log.symptoms)
+        AppStrings.localizeStoredValue(rawSymptom):
+            _log.symptomSeverities[rawSymptom] ??
+            _log.symptomSeverities[AppStrings.localizeStoredValue(
+              rawSymptom,
+            )] ??
+            2,
+    };
+    _sexualActivity = _log.sexualActivity;
+    _sexualActivityTypes = {..._log.sexualActivityTypes};
+    _sexualAfterFeelings = {..._log.sexualAfterFeelings};
+    if (_sexualActivity == false && _sexualActivityTypes.isEmpty) {
+      _sexualActivityTypes.add(SexualActivityType.none);
+    }
+    _vaginalDischargePresent = _log.vaginalDischargePresent;
+    _vaginalDischargeColor = _log.vaginalDischargeColor;
+    _vaginalDischargeConsistency = _log.vaginalDischargeConsistency;
+    _vaginalDischargeAmount = _log.vaginalDischargeAmount;
+    _vaginalDischargeSymptoms = {..._log.vaginalDischargeSymptoms};
+    _dreamRemembered = _log.dreamRemembered;
+    _dreamType = _log.dreamType;
+    _dreamNoteController.text = _log.dreamNote ?? '';
+  }
+
+  @override
+  void dispose() {
+    _symptomSearchController.dispose();
+    _dreamNoteController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget _buildContent() => _buildSymptomPage();
+
+  @override
+  DailyLogDraft _currentDraft() => SymptomsLogDraft(
+    symptoms: _symptoms.toList(),
+    symptomSeverities: {
+      for (final symptom in _symptoms)
+        symptom: _symptomSeverities[symptom] ?? 2,
+    },
+    sexualActivity: _sexualActivity,
+    sexualActivityTypes: _sexualActivityTypes,
+    sexualAfterFeelings: _sexualAfterFeelings,
+    vaginalDischargePresent: _vaginalDischargePresent,
+    vaginalDischargeColor: _vaginalDischargeColor,
+    vaginalDischargeConsistency: _vaginalDischargeConsistency,
+    vaginalDischargeAmount: _vaginalDischargeAmount,
+    vaginalDischargeSymptoms: _vaginalDischargeSymptoms,
+    dreamRemembered: _dreamRemembered,
+    dreamType: _dreamType,
+    dreamNote: _dreamNoteController.text.trim().isEmpty
+        ? null
+        : _dreamNoteController.text.trim(),
+  );
+
+  @override
+  Future<void> _afterSavedToast() async {
+    if (_dreamRemembered == true &&
+        _dreamNoteController.text.trim().isNotEmpty) {
+      await _showDreamPremiumOffer();
+    }
+  }
+}
+
+extension _SymptomsSection on _SymptomsTrackingSheetState {
   Widget _buildSymptomPage() {
     final groups = _symptomGroups;
     final query = _symptomSearchController.text.trim().toLowerCase();

@@ -369,6 +369,9 @@ void main() {
       harness.savedLog!.observedSections,
       contains(DailyLogObservedSection.period),
     );
+    expect(find.byType(DailyLogSheet), findsNothing);
+    expect(find.byType(PeriodTrackingSheet), findsNothing);
+    expect(find.byType(SymptomsTrackingSheet), findsOneWidget);
     expect(find.text(AppStrings.symptomQuestion), findsOneWidget);
   });
 

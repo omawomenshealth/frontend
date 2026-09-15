@@ -1,6 +1,42 @@
 part of '../daily_log_sheet.dart';
 
-extension _MedicationSection on _DailyLogSheetState {
+class MedicationTrackingSheet extends DailyLogSheet {
+  const MedicationTrackingSheet({
+    super.key,
+    required super.initialLog,
+    required super.settings,
+    required super.onSave,
+    super.onSettingsChanged,
+    super.themeColor,
+  }) : super(initialSection: TrackingSection.medication, isSingleTab: true);
+
+  @override
+  State<DailyLogSheet> createState() => _MedicationTrackingSheetState();
+}
+
+class _MedicationTrackingSheetState extends _TrackingSheetState {
+  late List<MedicationEntry> _medications;
+  late List<MedicationEntry> _supplements;
+  String? _expandedMedicationEntry;
+
+  @override
+  void _initializeSection() {
+    _medications = _initialMedicationEntries(_log.medications);
+    _supplements = _initialMedicationEntries(_log.supplements);
+  }
+
+  @override
+  Widget _buildContent() => _buildMedicationAndSupplementCatalogPage();
+
+  @override
+  DailyLogDraft _currentDraft() =>
+      MedicationLogDraft(medications: _medications, supplements: _supplements);
+
+  @override
+  Future<void> _afterSave() => _persistStructuredMedicationSelections();
+}
+
+extension _MedicationSection on _MedicationTrackingSheetState {
   Widget _buildMedicationCatalogPage() {
     final selected = _medications
         .map((entry) => AppStrings.localizeStoredValue(entry.displayName))
@@ -285,6 +321,7 @@ extension _MedicationSection on _DailyLogSheetState {
     );
   }
 
+  // ignore: unused_element
   Future<void> _showMedicationActions() async {
     final tone = _tone;
     final action = await showModalBottomSheet<_MedicationNutritionAction>(
@@ -439,7 +476,6 @@ extension _MedicationSection on _DailyLogSheetState {
           takenDoseCount: 1,
         ),
       );
-      _medicationSectionExpanded = true;
     });
     if (medication && mounted) {
       await _offerMedicationUsagePlan(entries.last);

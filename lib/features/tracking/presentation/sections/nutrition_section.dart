@@ -1,6 +1,102 @@
 part of '../daily_log_sheet.dart';
 
-extension _NutritionSection on _DailyLogSheetState {
+class NutritionTrackingSheet extends DailyLogSheet {
+  const NutritionTrackingSheet({
+    super.key,
+    required super.initialLog,
+    required super.settings,
+    required super.onSave,
+    super.onSettingsChanged,
+    super.themeColor,
+  }) : super(initialSection: TrackingSection.nutrition, isSingleTab: true);
+
+  @override
+  State<DailyLogSheet> createState() => _NutritionTrackingSheetState();
+}
+
+class _NutritionTrackingSheetState extends _TrackingSheetState {
+  late int _waterGlasses;
+  late Set<String> _meals;
+  late List<String> _mealSlots;
+  late Set<String> _expandedMeals;
+  late Map<String, int> _mealQualityIndices;
+  late Map<String, Set<String>> _mealFoodGroups;
+  late Map<String, Set<String>> _mealPostFeelings;
+  late Set<String> _cravings;
+  late List<String> _customCravings;
+
+  @override
+  void _initializeSection() {
+    _waterGlasses = _log.waterIntakeMl == null
+        ? 0
+        : (_log.waterIntakeMl! / 250).round().clamp(0, 12);
+    _meals = _localizedSet(_log.mealTypes, AppStrings.nutritionMealOptions);
+    _meals.addAll(
+      _log.mealTypes.where(
+        (meal) => !AppStrings.nutritionMealOptions.contains(meal),
+      ),
+    );
+    _mealSlots = [
+      ...AppStrings.nutritionMealOptions,
+      ..._meals.where(
+        (meal) => !AppStrings.nutritionMealOptions.contains(meal),
+      ),
+    ];
+    _expandedMeals = <String>{};
+    _mealQualityIndices = {
+      for (final entry in _log.mealQualities.entries)
+        AppStrings.localizeStoredValue(entry.key): _localizedIndex(
+          AppStrings.nutritionQualityOptions,
+          entry.value,
+          fallback: 1,
+        ),
+    };
+    _mealFoodGroups = {
+      for (final entry in _log.mealFoodGroups.entries)
+        AppStrings.localizeStoredValue(entry.key): entry.value
+            .map(AppStrings.localizeStoredValue)
+            .toSet(),
+    };
+    _mealPostFeelings = {
+      for (final entry in _log.mealPostFeelings.entries)
+        AppStrings.localizeStoredValue(entry.key): entry.value
+            .map(AppStrings.localizeStoredValue)
+            .toSet(),
+    };
+    _cravings = _localizedSetPreservingCustom(
+      _log.cravings,
+      AppStrings.nutritionCravingOptions,
+    );
+    _customCravings = List<String>.from(_persistedSettings.customCravings);
+  }
+
+  @override
+  Widget _buildContent() => _buildNutritionPage();
+
+  @override
+  DailyLogDraft _currentDraft() => NutritionLogDraft(
+    waterIntakeMl: _waterGlasses * 250,
+    mealTypes: _meals.toList(),
+    mealQualities: {
+      for (final entry in _mealQualityIndices.entries)
+        if (_meals.contains(entry.key))
+          entry.key: AppStrings.nutritionQualityOptions[entry.value],
+    },
+    mealFoodGroups: {
+      for (final entry in _mealFoodGroups.entries)
+        if (_meals.contains(entry.key) && entry.value.isNotEmpty)
+          entry.key: entry.value.toList(),
+    },
+    mealPostFeelings: {
+      for (final entry in _mealPostFeelings.entries)
+        if (_meals.contains(entry.key) && entry.value.isNotEmpty)
+          entry.key: entry.value.toList(),
+    },
+    cravings: _cravings.toList(),
+  );
+}
+
+extension _NutritionSection on _NutritionTrackingSheetState {
   Widget _buildNutritionPage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,172 +286,6 @@ extension _NutritionSection on _DailyLogSheetState {
       _meals.add(label);
       _expandedMeals.add(label);
     });
-  }
-
-  // Kept for the medication-in-nutrition flow while that UI is phased out.
-  // ignore: unused_element
-  Widget _buildNutritionMedicationSection() {
-    final summary =
-        '${AppStrings.medications}: ${_medications.length}  •  '
-        '${AppStrings.supplements}: ${_supplements.length}';
-
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: Color.lerp(AppColors.surface, _tone, 0.035),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _tone.withValues(alpha: 0.24)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    key: const ValueKey('medication_section_toggle'),
-                    onTap: () => _mutate(
-                      () => _medicationSectionExpanded =
-                          !_medicationSectionExpanded,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 11, 8, 11),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              color: _tone.withValues(alpha: 0.12),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.medication_outlined,
-                              color: _tone,
-                              size: 18,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppStrings.medicationAndSupplement,
-                                  style: const TextStyle(
-                                    fontFamily: 'CormorantGaramond',
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 1),
-                                Text(
-                                  summary,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 10.5,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          AnimatedRotation(
-                            turns: _medicationSectionExpanded ? 0.5 : 0,
-                            duration: const Duration(milliseconds: 180),
-                            child: Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: _tone,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 9),
-                child: IconButton.filled(
-                  tooltip: AppStrings.add,
-                  onPressed: _showMedicationActions,
-                  style: IconButton.styleFrom(
-                    backgroundColor: _tone,
-                    foregroundColor: Colors.white,
-                  ),
-                  icon: const Icon(Icons.add_rounded),
-                ),
-              ),
-            ],
-          ),
-          if (_medicationSectionExpanded) ...[
-            Divider(height: 1, color: _tone.withValues(alpha: 0.18)),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
-              child: _buildNutritionMedicationDetails(),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNutritionMedicationDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (_medications.isEmpty && _supplements.isEmpty)
-          Row(
-            children: [
-              Icon(Icons.info_outline_rounded, color: _tone, size: 19),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Text(
-                  AppStrings.medicationLogEmptyHint,
-                  style: const TextStyle(
-                    fontSize: 11.5,
-                    height: 1.4,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-            ],
-          )
-        else ...[
-          if (_medications.isNotEmpty)
-            _buildMedicationGroup(
-              title: AppStrings.medications,
-              entries: _medications,
-              icon: Icons.medication_outlined,
-              groupKey: 'medication',
-              itemType: MedicationPlanItemType.medication,
-            ),
-          if (_medications.isNotEmpty && _supplements.isNotEmpty)
-            const SizedBox(height: 20),
-          if (_supplements.isNotEmpty)
-            _buildMedicationGroup(
-              title: AppStrings.supplements,
-              entries: _supplements,
-              icon: Icons.spa_outlined,
-              groupKey: 'supplement',
-              itemType: MedicationPlanItemType.supplement,
-            ),
-          const SizedBox(height: 14),
-          Text(
-            AppStrings.medicationDisclaimer,
-            style: const TextStyle(
-              fontSize: 10,
-              height: 1.4,
-              color: AppColors.textHint,
-            ),
-          ),
-        ],
-      ],
-    );
   }
 
   void _toggleMeal(String meal) {

@@ -51,57 +51,66 @@ class DailyLogSheet extends StatefulWidget {
   });
 
   @override
-  State<DailyLogSheet> createState() => _DailyLogSheetState();
+  State<DailyLogSheet> createState() => _LegacyTrackingSheetState();
 }
 
-class _DailyLogSheetState extends State<DailyLogSheet> {
+/// Compatibility adapter for direct callers; no form state is stored here.
+class _LegacyTrackingSheetState extends State<DailyLogSheet> {
+  @override
+  Widget build(BuildContext context) => switch (widget.initialSection ??
+      TrackingSection.fromTabIndex(widget.initialTabIndex)) {
+    TrackingSection.period => PeriodTrackingSheet(
+      initialLog: widget.initialLog,
+      settings: widget.settings,
+      onSave: widget.onSave,
+      onDeletePeriod: widget.onDeletePeriod,
+      onSettingsChanged: widget.onSettingsChanged,
+      themeColor: widget.themeColor,
+    ),
+    TrackingSection.nutrition => NutritionTrackingSheet(
+      initialLog: widget.initialLog,
+      settings: widget.settings,
+      onSave: widget.onSave,
+      onSettingsChanged: widget.onSettingsChanged,
+      themeColor: widget.themeColor,
+    ),
+    TrackingSection.symptoms => SymptomsTrackingSheet(
+      initialLog: widget.initialLog,
+      settings: widget.settings,
+      onSave: widget.onSave,
+      onSettingsChanged: widget.onSettingsChanged,
+      themeColor: widget.themeColor,
+    ),
+    TrackingSection.wellbeing => WellbeingTrackingSheet(
+      initialLog: widget.initialLog,
+      settings: widget.settings,
+      onSave: widget.onSave,
+      onSettingsChanged: widget.onSettingsChanged,
+      themeColor: widget.themeColor,
+    ),
+    TrackingSection.medication => MedicationTrackingSheet(
+      initialLog: widget.initialLog,
+      settings: widget.settings,
+      onSave: widget.onSave,
+      onSettingsChanged: widget.onSettingsChanged,
+      themeColor: widget.themeColor,
+    ),
+    TrackingSection.skincare => SkincareTrackingSheet(
+      initialLog: widget.initialLog,
+      settings: widget.settings,
+      onSave: widget.onSave,
+      onSettingsChanged: widget.onSettingsChanged,
+      themeColor: widget.themeColor,
+    ),
+  };
+}
+
+abstract class _TrackingSheetState extends State<DailyLogSheet> {
   void _mutate(VoidCallback change) => setState(change);
 
   late DailyLog _log;
   late TrackingSection _section;
   var _isSaving = false;
-
-  late int _flowIndex;
-
-  late int _waterGlasses;
-  late Set<String> _meals;
-  late List<String> _mealSlots;
-  late Set<String> _expandedMeals;
-  late Map<String, int> _mealQualityIndices;
-  late Map<String, Set<String>> _mealFoodGroups;
-  late Map<String, Set<String>> _mealPostFeelings;
-  late Set<String> _cravings;
-  late List<String> _customCravings;
-
-  final _symptomSearchController = TextEditingController();
-  late Set<String> _symptoms;
-  late Map<String, int> _symptomSeverities;
-  late Map<CustomSymptomGroup, List<String>> _customSymptoms;
-  late bool? _sexualActivity;
-  late Set<SexualActivityType> _sexualActivityTypes;
-  late Set<SexualAfterFeeling> _sexualAfterFeelings;
-  late bool? _vaginalDischargePresent;
-  late VaginalDischargeColor? _vaginalDischargeColor;
-  late VaginalDischargeConsistency? _vaginalDischargeConsistency;
-  late VaginalDischargeAmount? _vaginalDischargeAmount;
-  late Set<VaginalDischargeSymptom> _vaginalDischargeSymptoms;
-  late bool? _dreamRemembered;
-  late DreamType? _dreamType;
-  final _dreamNoteController = TextEditingController();
-
-  late List<MedicationEntry> _medications;
-  late List<MedicationEntry> _supplements;
-  late Set<String> _skincare;
-  late List<String> _skincareSuggestions;
-  var _medicationSectionExpanded = false;
-  String? _expandedMedicationEntry;
-
-  late int _moodIndex;
-  var _moodStep = 1;
-  late Set<String> _moodCompanions;
-  late Set<String> _moodPlaces;
-  late List<String> _customMoodCompanions;
-  late List<String> _customMoodPlaces;
 
   @override
   void initState() {
@@ -110,142 +119,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _section =
         widget.initialSection ??
         TrackingSection.fromTabIndex(widget.initialTabIndex);
-    final persistedSettings =
-        context.read<LocalStorageService>().loadSettings() ?? widget.settings;
-
-    _flowIndex = _localizedIndex(
-      AppStrings.flowOptions,
-      _log.flowIntensity,
-      fallback: 2,
-    );
-    _waterGlasses = _log.waterIntakeMl == null
-        ? 0
-        : (_log.waterIntakeMl! / 250).round().clamp(0, 12);
-    _meals = _localizedSet(_log.mealTypes, AppStrings.nutritionMealOptions);
-    _meals.addAll(
-      _log.mealTypes.where(
-        (meal) => !AppStrings.nutritionMealOptions.contains(meal),
-      ),
-    );
-    _mealSlots = [
-      ...AppStrings.nutritionMealOptions,
-      ..._meals.where(
-        (meal) => !AppStrings.nutritionMealOptions.contains(meal),
-      ),
-    ];
-    _expandedMeals = <String>{};
-    _mealQualityIndices = {
-      for (final entry in _log.mealQualities.entries)
-        AppStrings.localizeStoredValue(entry.key): _localizedIndex(
-          AppStrings.nutritionQualityOptions,
-          entry.value,
-          fallback: 1,
-        ),
-    };
-    _mealFoodGroups = {
-      for (final entry in _log.mealFoodGroups.entries)
-        AppStrings.localizeStoredValue(entry.key): entry.value
-            .map(AppStrings.localizeStoredValue)
-            .toSet(),
-    };
-    _mealPostFeelings = {
-      for (final entry in _log.mealPostFeelings.entries)
-        AppStrings.localizeStoredValue(entry.key): entry.value
-            .map(AppStrings.localizeStoredValue)
-            .toSet(),
-    };
-    _cravings = _localizedSetPreservingCustom(
-      _log.cravings,
-      AppStrings.nutritionCravingOptions,
-    );
-    _customCravings = List<String>.from(persistedSettings.customCravings);
-
-    _customSymptoms = {
-      for (final group in CustomSymptomGroup.values)
-        group: _uniqueCustomLabels(persistedSettings.customSymptomsFor(group)),
-    };
-    _symptoms = _localizedSetPreservingCustom(
-      _log.symptoms,
-      _allSymptomOptions,
-    );
-    final knownCustomSymptoms = _customSymptoms.values
-        .expand((values) => values)
-        .toList(growable: false);
-    final uncategorizedSymptoms = _symptoms.where(
-      (value) =>
-          !_allSymptomOptions.any(
-            (option) => _sameCustomLabel(option, value),
-          ) &&
-          !knownCustomSymptoms.any((option) => _sameCustomLabel(option, value)),
-    );
-    _customSymptoms[CustomSymptomGroup.body] = _uniqueCustomLabels([
-      ..._customSymptoms[CustomSymptomGroup.body]!,
-      ...uncategorizedSymptoms,
-    ]);
-    _symptomSeverities = {
-      for (final rawSymptom in _log.symptoms)
-        AppStrings.localizeStoredValue(rawSymptom):
-            _log.symptomSeverities[rawSymptom] ??
-            _log.symptomSeverities[AppStrings.localizeStoredValue(
-              rawSymptom,
-            )] ??
-            2,
-    };
-    _sexualActivity = _log.sexualActivity;
-    _sexualActivityTypes = {..._log.sexualActivityTypes};
-    _sexualAfterFeelings = {..._log.sexualAfterFeelings};
-    if (_sexualActivity == false && _sexualActivityTypes.isEmpty) {
-      _sexualActivityTypes.add(SexualActivityType.none);
-    }
-    _vaginalDischargePresent = _log.vaginalDischargePresent;
-    _vaginalDischargeColor = _log.vaginalDischargeColor;
-    _vaginalDischargeConsistency = _log.vaginalDischargeConsistency;
-    _vaginalDischargeAmount = _log.vaginalDischargeAmount;
-    _vaginalDischargeSymptoms = {..._log.vaginalDischargeSymptoms};
-    _dreamRemembered = _log.dreamRemembered;
-    _dreamType = _log.dreamType;
-    _dreamNoteController.text = _log.dreamNote ?? '';
-
-    _medications = _initialMedicationEntries(_log.medications);
-    _supplements = _initialMedicationEntries(_log.supplements);
-    final storage = context.read<LocalStorageService>();
-    _skincare = _uniqueCustomLabels(
-      _log.skincare.map(AppStrings.localizeStoredValue),
-    ).toSet();
-    _skincareSuggestions = _uniqueCustomLabels([
-      for (final log in storage.loadAllLogs())
-        ...log.skincare.map(AppStrings.localizeStoredValue),
-      ...persistedSettings.dailySkincare.map(AppStrings.localizeStoredValue),
-      ...storage.getCustomSkincare().map(AppStrings.localizeStoredValue),
-    ]);
-
-    _moodIndex = _localizedIndex(
-      AppStrings.moodCheckInOptions,
-      _log.mood,
-      fallback: 1,
-    );
-    _moodCompanions = _localizedSetPreservingCustom(
-      _log.moodCompanions,
-      AppStrings.moodCompanionOptions,
-    );
-    _moodPlaces = _localizedSetPreservingCustom(
-      _log.moodPlaces,
-      AppStrings.moodPlaceOptions,
-    );
-    _customMoodCompanions = List<String>.from(
-      persistedSettings.customMoodCompanions,
-    );
-    _customMoodPlaces = List<String>.from(persistedSettings.customMoodPlaces);
+    _initializeSection();
   }
 
-  @override
-  void dispose() {
-    _symptomSearchController.dispose();
-    _dreamNoteController.dispose();
-    super.dispose();
-  }
+  void _initializeSection();
 
-  List<String> get _allSymptomOptions => AppStrings.allSymptomOptions;
+  UserSettings get _persistedSettings =>
+      context.read<LocalStorageService>().loadSettings() ?? widget.settings;
 
   int _localizedIndex(
     List<String> options,
@@ -311,13 +191,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     _ => widget.themeColor,
   };
 
-  bool get _isMoodContext =>
-      _section == TrackingSection.wellbeing && _moodStep == 2;
+  bool get _isMoodContext => false;
+
+  void _goBackFromMoodContext() {}
+
+  String get _contentKey => _section.name;
 
   String get _actionLabel {
-    if (_section == TrackingSection.wellbeing && _moodStep == 1) {
-      return AppStrings.continueAction;
-    }
     return switch (_section) {
       TrackingSection.period => AppStrings.savePeriod,
       TrackingSection.nutrition => AppStrings.saveNutrition,
@@ -350,7 +230,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 220),
                   child: ListView(
-                    key: ValueKey('${_section.name}-$_moodStep'),
+                    key: ValueKey(_contentKey),
                     controller: scrollController,
                     padding: const EdgeInsets.fromLTRB(18, 4, 18, 104),
                     children: [_buildContent()],
@@ -381,7 +261,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             child: _isMoodContext
                 ? IconButton(
                     tooltip: AppStrings.back,
-                    onPressed: () => setState(() => _moodStep = 1),
+                    onPressed: _goBackFromMoodContext,
                     icon: const Icon(Icons.chevron_left_rounded, size: 24),
                   )
                 : null,
@@ -418,17 +298,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     );
   }
 
-  Widget _buildContent() {
-    return switch (_section) {
-      TrackingSection.period => _buildPeriodPage(),
-      TrackingSection.nutrition => _buildNutritionPage(),
-      TrackingSection.symptoms => _buildSymptomPage(),
-      TrackingSection.wellbeing =>
-        _moodStep == 1 ? _buildMoodPage() : _buildMoodContextPage(),
-      TrackingSection.medication => _buildMedicationAndSupplementCatalogPage(),
-      TrackingSection.skincare => _buildSkincarePage(),
-    };
-  }
+  Widget _buildContent();
 
   Widget _buildIntro({
     required String title,
@@ -573,10 +443,6 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
   }
 
   Future<void> _handleAction() async {
-    if (_section == TrackingSection.wellbeing && _moodStep == 1) {
-      setState(() => _moodStep = 2);
-      return;
-    }
     await _saveLog();
   }
 
@@ -588,69 +454,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     );
   }
 
-  DailyLogDraft _currentDraft() {
-    final selectedSymptomSeverities = {
-      for (final symptom in _symptoms)
-        symptom: _symptomSeverities[symptom] ?? 2,
-    };
-    return switch (_section) {
-      TrackingSection.period => PeriodLogDraft(
-        flowIntensity: AppStrings.flowOptions[_flowIndex],
-        symptoms: _symptoms.toList(),
-        symptomSeverities: selectedSymptomSeverities,
-      ),
-      TrackingSection.nutrition => NutritionLogDraft(
-        waterIntakeMl: _waterGlasses * 250,
-        mealTypes: _meals.toList(),
-        mealQualities: {
-          for (final entry in _mealQualityIndices.entries)
-            if (_meals.contains(entry.key))
-              entry.key: AppStrings.nutritionQualityOptions[entry.value],
-        },
-        mealFoodGroups: {
-          for (final entry in _mealFoodGroups.entries)
-            if (_meals.contains(entry.key) && entry.value.isNotEmpty)
-              entry.key: entry.value.toList(),
-        },
-        mealPostFeelings: {
-          for (final entry in _mealPostFeelings.entries)
-            if (_meals.contains(entry.key) && entry.value.isNotEmpty)
-              entry.key: entry.value.toList(),
-        },
-        cravings: _cravings.toList(),
-      ),
-      TrackingSection.symptoms => SymptomsLogDraft(
-        symptoms: _symptoms.toList(),
-        symptomSeverities: selectedSymptomSeverities,
-        sexualActivity: _sexualActivity,
-        sexualActivityTypes: _sexualActivityTypes,
-        sexualAfterFeelings: _sexualAfterFeelings,
-        vaginalDischargePresent: _vaginalDischargePresent,
-        vaginalDischargeColor: _vaginalDischargeColor,
-        vaginalDischargeConsistency: _vaginalDischargeConsistency,
-        vaginalDischargeAmount: _vaginalDischargeAmount,
-        vaginalDischargeSymptoms: _vaginalDischargeSymptoms,
-        dreamRemembered: _dreamRemembered,
-        dreamType: _dreamType,
-        dreamNote: _dreamNoteController.text.trim().isEmpty
-            ? null
-            : _dreamNoteController.text.trim(),
-      ),
-      TrackingSection.wellbeing => WellbeingLogDraft(
-        mood: AppStrings.moodCheckInOptions[_moodIndex],
-        moodEmoji: AppStrings.moodCheckInEmojis[_moodIndex],
-        moodCompanions: _moodCompanions.toList(),
-        moodPlaces: _moodPlaces.toList(),
-      ),
-      TrackingSection.medication => MedicationLogDraft(
-        medications: _medications,
-        supplements: _supplements,
-      ),
-      TrackingSection.skincare => SkincareLogDraft(
-        skincare: _skincare.toList(),
-      ),
-    };
-  }
+  DailyLogDraft _currentDraft();
 
   Future<bool> _saveLog({bool closeSheet = true}) async {
     final today = AppTime.now.dateOnly;
@@ -689,19 +493,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
     if (success) {
       _log = preparedLog;
-      if (_section == TrackingSection.medication) {
-        await _persistStructuredMedicationSelections();
-        if (!mounted) return true;
-      }
+      await _afterSave();
+      if (!mounted) return true;
       OmaToast.show(context, title: AppStrings.dailyLogSaved);
-      final savedDream =
-          _section == TrackingSection.symptoms &&
-          _dreamRemembered == true &&
-          _dreamNoteController.text.trim().isNotEmpty;
-      if (savedDream) {
-        await _showDreamPremiumOffer();
-        if (!mounted) return true;
-      }
+      await _afterSavedToast();
+      if (!mounted) return true;
       if (closeSheet) Navigator.pop(context);
       return true;
     } else {
@@ -713,6 +509,23 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       );
       return false;
     }
+  }
+
+  Future<void> _afterSave() async {}
+
+  Future<void> _afterSavedToast() async {}
+
+  void _toggleChoice(Set<String> values, String value) {
+    _mutate(() {
+      final existing = values.where(
+        (candidate) => _sameCustomLabel(candidate, value),
+      );
+      if (existing.isNotEmpty) {
+        values.remove(existing.first);
+      } else {
+        values.add(value);
+      }
+    });
   }
 
   bool _sameCustomLabel(String left, String right) =>

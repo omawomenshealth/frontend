@@ -8,6 +8,7 @@ import 'package:app_proje_a/core/widgets/oma_toast.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 
 import '../application/tracking_controller.dart';
+import '../domain/models/daily_log.dart';
 import '../domain/models/tracking_section.dart';
 import 'daily_log_sheet.dart';
 
@@ -20,7 +21,6 @@ abstract final class TrackingLauncher {
     required DateTime date,
     required UserSettings settings,
     required Color themeColor,
-    bool isSingleTab = true,
     Future<void> Function()? onChanged,
     Future<void> Function()? onSettingsChanged,
   }) async {
@@ -36,28 +36,67 @@ abstract final class TrackingLauncher {
 
     final tracking = context.read<TrackingController>();
     final initialLog = tracking.initialLogForSection(section, date);
+    Future<bool> save(DailyLog log) async {
+      final saved = await tracking.saveLog(log);
+      if (saved) await _refreshConsumer(onChanged);
+      return saved;
+    }
+
+    Future<bool> deletePeriod(DateTime date) async {
+      final deleted = await tracking.deletePeriodForDate(date);
+      if (deleted) await _refreshConsumer(onChanged);
+      return deleted;
+    }
+
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => DailyLogSheet(
-        initialLog: initialLog,
-        settings: settings,
-        themeColor: themeColor,
-        initialSection: section,
-        isSingleTab: isSingleTab,
-        onSettingsChanged: onSettingsChanged,
-        onSave: (log) async {
-          final saved = await tracking.saveLog(log);
-          if (saved) await _refreshConsumer(onChanged);
-          return saved;
-        },
-        onDeletePeriod: (date) async {
-          final deleted = await tracking.deletePeriodForDate(date);
-          if (deleted) await _refreshConsumer(onChanged);
-          return deleted;
-        },
-      ),
+      builder: (_) => switch (section) {
+        TrackingSection.period => PeriodTrackingSheet(
+          initialLog: initialLog,
+          settings: settings,
+          themeColor: themeColor,
+          onSave: save,
+          onDeletePeriod: deletePeriod,
+          onSettingsChanged: onSettingsChanged,
+        ),
+        TrackingSection.nutrition => NutritionTrackingSheet(
+          initialLog: initialLog,
+          settings: settings,
+          themeColor: themeColor,
+          onSave: save,
+          onSettingsChanged: onSettingsChanged,
+        ),
+        TrackingSection.symptoms => SymptomsTrackingSheet(
+          initialLog: initialLog,
+          settings: settings,
+          themeColor: themeColor,
+          onSave: save,
+          onSettingsChanged: onSettingsChanged,
+        ),
+        TrackingSection.wellbeing => WellbeingTrackingSheet(
+          initialLog: initialLog,
+          settings: settings,
+          themeColor: themeColor,
+          onSave: save,
+          onSettingsChanged: onSettingsChanged,
+        ),
+        TrackingSection.medication => MedicationTrackingSheet(
+          initialLog: initialLog,
+          settings: settings,
+          themeColor: themeColor,
+          onSave: save,
+          onSettingsChanged: onSettingsChanged,
+        ),
+        TrackingSection.skincare => SkincareTrackingSheet(
+          initialLog: initialLog,
+          settings: settings,
+          themeColor: themeColor,
+          onSave: save,
+          onSettingsChanged: onSettingsChanged,
+        ),
+      },
     );
   }
 

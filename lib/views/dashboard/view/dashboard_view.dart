@@ -112,11 +112,10 @@ class DashboardView extends StatelessWidget {
                         periodCount: periodCount,
                         forecastSummary: _forecastSummary(vm),
                         onOpenInsights: () => _openInsights(context),
-                        onPeriodTap: () => _showDailyLogSheet(
+                        onPeriodTap: () => _openTrackingSheet(
                           context,
                           vm,
                           section: TrackingSection.period,
-                          isSingleTab: true,
                         ),
                       ),
                     const SizedBox(height: 30),
@@ -128,41 +127,35 @@ class DashboardView extends StatelessWidget {
                     FeelingCard(
                       showPeriod: false,
                       themeColor: accent,
-                      onPeriodTap: () => _showDailyLogSheet(
+                      onPeriodTap: () => _openTrackingSheet(
                         context,
                         vm,
                         section: TrackingSection.period,
-                        isSingleTab: true,
                       ),
-                      onNutritionTap: () => _showDailyLogSheet(
+                      onNutritionTap: () => _openTrackingSheet(
                         context,
                         vm,
                         section: TrackingSection.nutrition,
-                        isSingleTab: true,
                       ),
-                      onSymptomTap: () => _showDailyLogSheet(
+                      onSymptomTap: () => _openTrackingSheet(
                         context,
                         vm,
                         section: TrackingSection.symptoms,
-                        isSingleTab: true,
                       ),
-                      onMoodTap: () => _showDailyLogSheet(
+                      onMoodTap: () => _openTrackingSheet(
                         context,
                         vm,
                         section: TrackingSection.wellbeing,
-                        isSingleTab: true,
                       ),
-                      onMedicationTap: () => _showDailyLogSheet(
+                      onMedicationTap: () => _openTrackingSheet(
                         context,
                         vm,
                         section: TrackingSection.medication,
-                        isSingleTab: true,
                       ),
-                      onSkincareTap: () => _showDailyLogSheet(
+                      onSkincareTap: () => _openTrackingSheet(
                         context,
                         vm,
                         section: TrackingSection.skincare,
-                        isSingleTab: true,
                       ),
                     ),
                     const SizedBox(height: 38),
@@ -259,11 +252,10 @@ class DashboardView extends StatelessWidget {
     return AppStrings.periodPredictionSummary(range, confidence);
   }
 
-  void _showDailyLogSheet(
+  void _openTrackingSheet(
     BuildContext context,
     DashboardViewModel vm, {
     required TrackingSection section,
-    bool isSingleTab = true,
   }) {
     final settings = vm.settings;
     if (settings == null) return;
@@ -275,7 +267,6 @@ class DashboardView extends StatelessWidget {
       themeColor: AppColors.forCyclePhase(
         vm.periodCalculator?.phaseAt(vm.selectedDate),
       ),
-      isSingleTab: isSingleTab,
       onSettingsChanged: () async {
         if (!context.mounted) return;
         context.read<ProfileViewModel>().loadSettings();

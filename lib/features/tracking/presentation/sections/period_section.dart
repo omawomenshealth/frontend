@@ -1,6 +1,74 @@
 part of '../daily_log_sheet.dart';
 
-extension _PeriodSection on _DailyLogSheetState {
+/// Independent period sheet opened by the dashboard's period action.
+class PeriodTrackingSheet extends DailyLogSheet {
+  const PeriodTrackingSheet({
+    super.key,
+    required super.initialLog,
+    required super.settings,
+    required super.onSave,
+    super.onDeletePeriod,
+    super.onSettingsChanged,
+    super.themeColor,
+  }) : super(initialSection: TrackingSection.period, isSingleTab: true);
+
+  @override
+  State<DailyLogSheet> createState() => _PeriodTrackingSheetState();
+}
+
+class _PeriodTrackingSheetState extends _TrackingSheetState {
+  late int _flowIndex;
+  late Set<String> _symptoms;
+  late Map<String, int> _symptomSeverities;
+
+  @override
+  void _initializeSection() {
+    _flowIndex = _localizedIndex(
+      AppStrings.flowOptions,
+      _log.flowIntensity,
+      fallback: 2,
+    );
+    _symptoms = _localizedSetPreservingCustom(
+      _log.symptoms,
+      AppStrings.allSymptomOptions,
+    );
+    _symptomSeverities = {
+      for (final rawSymptom in _log.symptoms)
+        AppStrings.localizeStoredValue(rawSymptom):
+            _log.symptomSeverities[rawSymptom] ??
+            _log.symptomSeverities[AppStrings.localizeStoredValue(
+              rawSymptom,
+            )] ??
+            2,
+    };
+  }
+
+  @override
+  Widget _buildContent() => _buildPeriodPage();
+
+  @override
+  DailyLogDraft _currentDraft() => PeriodLogDraft(
+    flowIntensity: AppStrings.flowOptions[_flowIndex],
+    symptoms: _symptoms.toList(),
+    symptomSeverities: {
+      for (final symptom in _symptoms)
+        symptom: _symptomSeverities[symptom] ?? 2,
+    },
+  );
+
+  void _toggleSymptom(String label) {
+    _mutate(() {
+      if (_symptoms.remove(label)) {
+        _symptomSeverities.remove(label);
+      } else {
+        _symptoms.add(label);
+        _symptomSeverities[label] = 2;
+      }
+    });
+  }
+}
+
+extension _PeriodSection on _PeriodTrackingSheetState {
   Widget _buildPeriodPage() {
     final flowTones = [
       const Color(0xFFE8BAC0),
@@ -206,6 +274,24 @@ extension _PeriodSection on _DailyLogSheetState {
     if (confirmed != true || !mounted) return;
     final saved = await _saveLog(closeSheet: false);
     if (!saved || !mounted) return;
-    _mutate(() => _section = TrackingSection.symptoms);
+    final navigator = Navigator.of(context);
+    final nextLog = _log;
+    final settings = widget.settings;
+    final onSave = widget.onSave;
+    final onSettingsChanged = widget.onSettingsChanged;
+    final themeColor = widget.themeColor;
+    navigator.pop();
+    await showModalBottomSheet<void>(
+      context: navigator.context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => SymptomsTrackingSheet(
+        initialLog: nextLog,
+        settings: settings,
+        onSave: onSave,
+        onSettingsChanged: onSettingsChanged,
+        themeColor: themeColor,
+      ),
+    );
   }
 }

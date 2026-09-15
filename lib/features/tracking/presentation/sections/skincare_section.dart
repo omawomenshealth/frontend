@@ -1,6 +1,46 @@
 part of '../daily_log_sheet.dart';
 
-extension _SkincareSection on _DailyLogSheetState {
+class SkincareTrackingSheet extends DailyLogSheet {
+  const SkincareTrackingSheet({
+    super.key,
+    required super.initialLog,
+    required super.settings,
+    required super.onSave,
+    super.onSettingsChanged,
+    super.themeColor,
+  }) : super(initialSection: TrackingSection.skincare, isSingleTab: true);
+
+  @override
+  State<DailyLogSheet> createState() => _SkincareTrackingSheetState();
+}
+
+class _SkincareTrackingSheetState extends _TrackingSheetState {
+  late Set<String> _skincare;
+  late List<String> _skincareSuggestions;
+
+  @override
+  void _initializeSection() {
+    final storage = context.read<LocalStorageService>();
+    _skincare = _uniqueCustomLabels(
+      _log.skincare.map(AppStrings.localizeStoredValue),
+    ).toSet();
+    _skincareSuggestions = _uniqueCustomLabels([
+      for (final log in storage.loadAllLogs())
+        ...log.skincare.map(AppStrings.localizeStoredValue),
+      ..._persistedSettings.dailySkincare.map(AppStrings.localizeStoredValue),
+      ...storage.getCustomSkincare().map(AppStrings.localizeStoredValue),
+    ]);
+  }
+
+  @override
+  Widget _buildContent() => _buildSkincarePage();
+
+  @override
+  DailyLogDraft _currentDraft() =>
+      SkincareLogDraft(skincare: _skincare.toList());
+}
+
+extension _SkincareSection on _SkincareTrackingSheetState {
   Widget _buildSkincarePage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,5 +93,35 @@ extension _SkincareSection on _DailyLogSheetState {
     await widget.onSettingsChanged?.call();
     if (!mounted) return;
     OmaToast.show(context, title: AppStrings.savedForLater);
+  }
+
+  Future<void> _showReminderManagerForType(
+    MedicationPlanItemType itemType,
+    List<String> items,
+    Color color,
+  ) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.92,
+        ),
+        decoration: const BoxDecoration(
+          color: AppColors.scaffoldBackground,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 28),
+          child: MedicationReminderSection(
+            itemType: itemType,
+            availableItems: items,
+            color: color,
+          ),
+        ),
+      ),
+    );
   }
 }

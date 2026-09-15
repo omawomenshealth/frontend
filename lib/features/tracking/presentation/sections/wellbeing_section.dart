@@ -1,6 +1,84 @@
 part of '../daily_log_sheet.dart';
 
-extension _WellbeingSection on _DailyLogSheetState {
+class WellbeingTrackingSheet extends DailyLogSheet {
+  const WellbeingTrackingSheet({
+    super.key,
+    required super.initialLog,
+    required super.settings,
+    required super.onSave,
+    super.onSettingsChanged,
+    super.themeColor,
+  }) : super(initialSection: TrackingSection.wellbeing, isSingleTab: true);
+
+  @override
+  State<DailyLogSheet> createState() => _WellbeingTrackingSheetState();
+}
+
+class _WellbeingTrackingSheetState extends _TrackingSheetState {
+  late int _moodIndex;
+  var _moodStep = 1;
+  late Set<String> _moodCompanions;
+  late Set<String> _moodPlaces;
+  late List<String> _customMoodCompanions;
+  late List<String> _customMoodPlaces;
+
+  @override
+  void _initializeSection() {
+    _moodIndex = _localizedIndex(
+      AppStrings.moodCheckInOptions,
+      _log.mood,
+      fallback: 1,
+    );
+    _moodCompanions = _localizedSetPreservingCustom(
+      _log.moodCompanions,
+      AppStrings.moodCompanionOptions,
+    );
+    _moodPlaces = _localizedSetPreservingCustom(
+      _log.moodPlaces,
+      AppStrings.moodPlaceOptions,
+    );
+    _customMoodCompanions = List<String>.from(
+      _persistedSettings.customMoodCompanions,
+    );
+    _customMoodPlaces = List<String>.from(_persistedSettings.customMoodPlaces);
+  }
+
+  @override
+  bool get _isMoodContext => _moodStep == 2;
+
+  @override
+  String get _contentKey => '${_section.name}-$_moodStep';
+
+  @override
+  void _goBackFromMoodContext() => _mutate(() => _moodStep = 1);
+
+  @override
+  String get _actionLabel =>
+      _moodStep == 1 ? AppStrings.continueAction : AppStrings.saveMoment;
+
+  @override
+  Widget _buildContent() =>
+      _moodStep == 1 ? _buildMoodPage() : _buildMoodContextPage();
+
+  @override
+  DailyLogDraft _currentDraft() => WellbeingLogDraft(
+    mood: AppStrings.moodCheckInOptions[_moodIndex],
+    moodEmoji: AppStrings.moodCheckInEmojis[_moodIndex],
+    moodCompanions: _moodCompanions.toList(),
+    moodPlaces: _moodPlaces.toList(),
+  );
+
+  @override
+  Future<void> _handleAction() async {
+    if (_moodStep == 1) {
+      _mutate(() => _moodStep = 2);
+      return;
+    }
+    await _saveLog();
+  }
+}
+
+extension _WellbeingSection on _WellbeingTrackingSheetState {
   Widget _buildMoodPage() {
     final tone = _tone;
     return Column(
@@ -266,19 +344,6 @@ extension _WellbeingSection on _DailyLogSheetState {
         catalog.add(canonical);
       }
       (companion ? _moodCompanions : _moodPlaces).add(canonical);
-    });
-  }
-
-  void _toggleChoice(Set<String> values, String value) {
-    _mutate(() {
-      final existing = values.where(
-        (candidate) => _sameCustomLabel(candidate, value),
-      );
-      if (existing.isNotEmpty) {
-        values.remove(existing.first);
-      } else {
-        values.add(value);
-      }
     });
   }
 }
