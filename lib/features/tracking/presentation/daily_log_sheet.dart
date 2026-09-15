@@ -19,12 +19,12 @@ import 'widgets/medication_reminder_section.dart';
 import 'widgets/tracking_catalog_selector.dart';
 import 'package:app_proje_a/views/articles/widgets/premium_paywall.dart';
 
-part 'sections/period_section.dart';
-part 'sections/nutrition_section.dart';
-part 'sections/symptoms_section.dart';
-part 'sections/wellbeing_section.dart';
-part 'sections/medication_section.dart';
-part 'sections/skincare_section.dart';
+part 'sections/period_tracking_sheet.dart';
+part 'sections/nutrition_tracking_sheet.dart';
+part 'sections/symptoms_tracking_sheet.dart';
+part 'sections/wellbeing_tracking_sheet.dart';
+part 'sections/medication_tracking_sheet.dart';
+part 'sections/skincare_tracking_sheet.dart';
 
 class DailyLogSheet extends StatefulWidget {
   final DailyLog initialLog;
