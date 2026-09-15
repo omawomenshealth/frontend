@@ -3,7 +3,7 @@ import 'package:app_proje_a/core/constants/color_constants.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
-import 'package:app_proje_a/views/dashboard/widgets/medication_reminder_section.dart';
+import 'package:app_proje_a/features/tracking/presentation/widgets/medication_reminder_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';

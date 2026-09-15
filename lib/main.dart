@@ -17,6 +17,7 @@ import 'data/services/premium_purchase_service.dart';
 import 'data/services/sync_service.dart';
 import 'localization/generated/strings.g.dart';
 import 'shell/home_shell.dart';
+import 'features/tracking/application/tracking_controller.dart';
 import 'views/auth/view/auth_view.dart';
 import 'views/auth/viewmodel/auth_view_model.dart';
 import 'views/calendar/viewmodel/calendar_view_model.dart';
@@ -168,6 +169,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           value: _cyclePredictions,
         ),
         ChangeNotifierProvider(
+          create: (_) => TrackingController.local(
+            widget.storage,
+            cyclePredictions: _cyclePredictions,
+            notifications: reminders,
+            sync: syncService,
+          ),
+        ),
+        ChangeNotifierProvider(
           create: (_) =>
               PremiumPurchaseService(widget.storage, apiService)..initialize(),
         ),
@@ -175,22 +184,31 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) => AuthViewModel(widget.storage, apiService, syncService),
         ),
         ChangeNotifierProvider(
-          create: (_) => OnboardingViewModel(widget.storage, syncService),
+          create: (context) => OnboardingViewModel(
+            widget.storage,
+            syncService,
+            context.read<TrackingController>(),
+          ),
         ),
         ChangeNotifierProvider(
-          create: (_) => DashboardViewModel(
+          create: (context) => DashboardViewModel(
             widget.storage,
             reminders,
             _cyclePredictions,
             syncService,
+            context.read<TrackingController>(),
           ),
         ),
         ChangeNotifierProvider(
           create: (_) => InsightsViewModel(widget.storage),
         ),
         ChangeNotifierProvider(
-          create: (_) =>
-              CalendarViewModel(widget.storage, _cyclePredictions, syncService),
+          create: (context) => CalendarViewModel(
+            widget.storage,
+            _cyclePredictions,
+            syncService,
+            context.read<TrackingController>(),
+          ),
         ),
         ChangeNotifierProvider(
           create: (_) => ProfileViewModel(

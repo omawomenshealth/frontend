@@ -19,7 +19,7 @@ import '../../../data/services/premium_purchase_service.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
-import '../../dashboard/widgets/medication_reminder_section.dart';
+import 'package:app_proje_a/features/tracking/presentation/widgets/medication_reminder_section.dart';
 import '../../articles/widgets/premium_paywall.dart';
 
 import 'doctor_report_view.dart';

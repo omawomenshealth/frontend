@@ -6,24 +6,33 @@ import '../../../data/services/sync_service.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../application/cycle_prediction/cycle_prediction_coordinator.dart';
 import '../../../domain/cycle/models/cycle_prediction.dart';
+import 'package:app_proje_a/features/tracking/application/tracking_controller.dart';
 
 /// Takvim iş mantığı (Optimize Edilmiş Versiyon)
 class CalendarViewModel extends ChangeNotifier {
-  final LocalStorageService _storage;
-  final SyncService? _sync;
   final CyclePredictionCoordinator _cyclePredictions;
   final bool _ownsCyclePredictions;
+  late final TrackingController _tracking;
+  late final bool _ownsTracking;
 
   CalendarViewModel(
-    this._storage, [
+    LocalStorageService storage, [
     CyclePredictionCoordinator? cyclePredictions,
-    this._sync,
+    SyncService? sync,
+    TrackingController? tracking,
   ]) : _cyclePredictions =
-           cyclePredictions ?? CyclePredictionCoordinator(_storage),
+           cyclePredictions ?? CyclePredictionCoordinator(storage),
        _ownsCyclePredictions = cyclePredictions == null {
+    _tracking =
+        tracking ??
+        TrackingController.local(
+          storage,
+          cyclePredictions: _cyclePredictions,
+          sync: sync,
+        );
+    _ownsTracking = tracking == null;
     loadData();
   }
 
@@ -49,6 +58,7 @@ class CalendarViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   int get dataRevision => _dataRevision;
   CycleForecast? get cycleForecast => _cycleForecast;
+  PeriodCalculator? get periodCalculator => _periodCalculator;
 
   List<DailyLog> get selectedDayLogs => _logMap[_selectedDay] ?? [];
 
@@ -65,7 +75,7 @@ class CalendarViewModel extends ChangeNotifier {
     await _cyclePredictions.refresh();
     _settings = _cyclePredictions.effectiveSettings;
     _cycleForecast = _cyclePredictions.forecast;
-    final logs = _storage.loadAllLogs();
+    final logs = _tracking.allLogs();
 
     _logMap = {};
     for (var log in logs) {
@@ -171,82 +181,14 @@ class CalendarViewModel extends ChangeNotifier {
 
   /// Takvimde hazırlanan ekleme ve silme taslaklarını tek işlemde uygular.
   Future<bool> applyPeriodDayChanges(Map<DateTime, bool> changes) async {
-    final today = AppTime.now.dateOnly;
-    final normalizedChanges = <DateTime, bool>{};
-    for (final entry in changes.entries) {
-      final day = entry.key.dateOnly;
-      if (!day.isAfter(today)) normalizedChanges[day] = entry.value;
-    }
-    if (normalizedChanges.isEmpty) return false;
-
-    final orderedDays = normalizedChanges.keys.toList()..sort();
-
-    var allSuccessful = true;
-    var hasChanges = false;
-    var hasDeletion = false;
-    for (final day in orderedDays) {
-      final shouldBeLogged = normalizedChanges[day]!;
-      final logs = _storage.loadLogsForDate(day);
-      final hasPeriod = logs.any(
-        (log) =>
-            log.flowIntensity != null ||
-            log.observedSections.contains(DailyLogObservedSection.period),
-      );
-
-      if (!shouldBeLogged) {
-        if (!hasPeriod) continue;
-        if (!await _storage.deletePeriodLogsForDate(day)) {
-          allSuccessful = false;
-        } else {
-          hasChanges = true;
-          hasDeletion = true;
-        }
-        continue;
-      }
-
-      if (hasPeriod) continue;
-
-      DailyLog? untimedLog;
-      for (final log in logs) {
-        if (log.date == day) {
-          untimedLog = log;
-          break;
-        }
-      }
-      final base = untimedLog ?? DailyLog.empty(day);
-      final quickPeriodLog = base.copyWith(
-        date: day,
-        hasExplicitTime: false,
-        flowIntensity: AppStrings.flowOptions[1],
-        observedSections: {
-          ...base.observedSections,
-          DailyLogObservedSection.period,
-        },
-      );
-      if (!await _storage.saveDailyLog(quickPeriodLog)) {
-        allSuccessful = false;
-      } else {
-        hasChanges = true;
-      }
-    }
-
-    if (hasChanges && _storage.isUserLoggedIn) {
-      if (hasDeletion) {
-        // Silinen period-only kayıt birleşimde buluttan geri gelmesin; yerel
-        // anlık görüntü bu toplu işlem için yetkilidir.
-        await _sync?.backupToCloud();
-      } else {
-        await _sync?.mergeWithCloud();
-      }
-    }
-
-    await _cyclePredictions.refresh(force: true);
+    final success = await _tracking.applyPeriodDayChanges(changes);
     await loadData(showLoading: false);
-    return allSuccessful;
+    return success;
   }
 
   @override
   void dispose() {
+    if (_ownsTracking) _tracking.dispose();
     if (_ownsCyclePredictions) _cyclePredictions.dispose();
     super.dispose();
   }

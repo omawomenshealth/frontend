@@ -44,6 +44,7 @@ void main() {
         providers: [
           ChangeNotifierProvider.value(value: calendar),
           ChangeNotifierProvider.value(value: dashboard),
+          ChangeNotifierProvider.value(value: dashboard.trackingController),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -213,6 +214,7 @@ void main() {
         providers: [
           ChangeNotifierProvider.value(value: calendar),
           ChangeNotifierProvider.value(value: dashboard),
+          ChangeNotifierProvider.value(value: dashboard.trackingController),
         ],
         child: MaterialApp(
           theme: AppTheme.lightTheme,
@@ -395,6 +397,7 @@ void main() {
         providers: [
           ChangeNotifierProvider.value(value: calendar),
           ChangeNotifierProvider.value(value: dashboard),
+          ChangeNotifierProvider.value(value: dashboard.trackingController),
         ],
         child: MaterialApp(
           theme: AppTheme.lightTheme,

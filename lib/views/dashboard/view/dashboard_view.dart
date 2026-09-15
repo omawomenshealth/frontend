@@ -6,9 +6,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
-import '../../../core/widgets/oma_toast.dart';
 import '../../../core/utils/period_calculator.dart';
-import '../../../data/models/period_log_model.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../domain/cycle/models/cycle_prediction.dart';
@@ -16,11 +14,12 @@ import '../../calendar/view/calendar_view.dart' as cal;
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../../insights/view/insights_view.dart';
 import '../../profile/viewmodel/profile_view_model.dart';
+import 'package:app_proje_a/features/tracking/domain/models/tracking_section.dart';
+import 'package:app_proje_a/features/tracking/presentation/tracking_launcher.dart';
 import '../viewmodel/dashboard_view_model.dart';
-import '../widgets/daily_log_sheet.dart';
 import '../widgets/feeling_card.dart';
 import '../widgets/horizontal_calendar.dart';
-import '../widgets/medication_reminder_section.dart';
+import 'package:app_proje_a/features/tracking/presentation/widgets/medication_reminder_section.dart';
 import '../widgets/phase_hero_card.dart';
 
 /// Oma's daily home screen, adapted from the exported mobile design while
@@ -116,7 +115,7 @@ class DashboardView extends StatelessWidget {
                         onPeriodTap: () => _showDailyLogSheet(
                           context,
                           vm,
-                          initialIndex: 0,
+                          section: TrackingSection.period,
                           isSingleTab: true,
                         ),
                       ),
@@ -132,37 +131,37 @@ class DashboardView extends StatelessWidget {
                       onPeriodTap: () => _showDailyLogSheet(
                         context,
                         vm,
-                        initialIndex: 0,
+                        section: TrackingSection.period,
                         isSingleTab: true,
                       ),
                       onNutritionTap: () => _showDailyLogSheet(
                         context,
                         vm,
-                        initialIndex: 1,
+                        section: TrackingSection.nutrition,
                         isSingleTab: true,
                       ),
                       onSymptomTap: () => _showDailyLogSheet(
                         context,
                         vm,
-                        initialIndex: 2,
+                        section: TrackingSection.symptoms,
                         isSingleTab: true,
                       ),
                       onMoodTap: () => _showDailyLogSheet(
                         context,
                         vm,
-                        initialIndex: 3,
+                        section: TrackingSection.wellbeing,
                         isSingleTab: true,
                       ),
                       onMedicationTap: () => _showDailyLogSheet(
                         context,
                         vm,
-                        initialIndex: 4,
+                        section: TrackingSection.medication,
                         isSingleTab: true,
                       ),
                       onSkincareTap: () => _showDailyLogSheet(
                         context,
                         vm,
-                        initialIndex: 5,
+                        section: TrackingSection.skincare,
                         isSingleTab: true,
                       ),
                     ),
@@ -263,59 +262,31 @@ class DashboardView extends StatelessWidget {
   void _showDailyLogSheet(
     BuildContext context,
     DashboardViewModel vm, {
-    int initialIndex = 0,
-    bool isSingleTab = false,
+    required TrackingSection section,
+    bool isSingleTab = true,
   }) {
-    if (vm.selectedDate.dateOnly.isAfter(AppTime.now.dateOnly)) {
-      OmaToast.show(
-        context,
-        title: AppStrings.error,
-        description: AppStrings.futureLogNotAllowed,
-        icon: Icons.error_outline_rounded,
-      );
-      return;
-    }
-    final section = switch (initialIndex) {
-      0 => DailyLogObservedSection.period,
-      1 => DailyLogObservedSection.nutrition,
-      2 => DailyLogObservedSection.symptom,
-      3 => DailyLogObservedSection.wellbeing,
-      4 => DailyLogObservedSection.medication,
-      _ => DailyLogObservedSection.skincare,
-    };
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => DailyLogSheet(
-        initialLog: vm.initialLogForSection(section),
-        settings: vm.settings!,
-        themeColor: AppColors.forCyclePhase(
-          vm.periodCalculator?.phaseAt(vm.selectedDate),
-        ),
-        initialTabIndex: initialIndex,
-        isSingleTab: isSingleTab,
-        onSettingsChanged: () async {
-          context.read<ProfileViewModel>().loadSettings();
-          await vm.loadData();
-        },
-        onSave: (log) async {
-          final success = log.flowIntensity != null
-              ? await vm.recordPeriodAndRecalculate(log)
-              : await vm.saveLog(log);
-          if (success && context.mounted) {
-            await context.read<CalendarViewModel>().loadData();
-          }
-          return success;
-        },
-        onDeletePeriod: (date) async {
-          final success = await vm.deletePeriodForDate(date);
-          if (success && context.mounted) {
-            await context.read<CalendarViewModel>().loadData();
-          }
-          return success;
-        },
+    final settings = vm.settings;
+    if (settings == null) return;
+    TrackingLauncher.open(
+      context,
+      section: section,
+      date: vm.selectedDate,
+      settings: settings,
+      themeColor: AppColors.forCyclePhase(
+        vm.periodCalculator?.phaseAt(vm.selectedDate),
       ),
+      isSingleTab: isSingleTab,
+      onSettingsChanged: () async {
+        if (!context.mounted) return;
+        context.read<ProfileViewModel>().loadSettings();
+        await vm.loadData();
+      },
+      onChanged: () async {
+        await vm.loadData();
+        if (context.mounted) {
+          await context.read<CalendarViewModel>().loadData();
+        }
+      },
     );
   }
 }

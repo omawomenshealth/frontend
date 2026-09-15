@@ -10,7 +10,7 @@ import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/main.dart';
-import 'package:app_proje_a/views/dashboard/widgets/daily_log_sheet.dart';
+import 'package:app_proje_a/features/tracking/presentation/daily_log_sheet.dart';
 import 'package:app_proje_a/views/insights/view/insights_view.dart';
 import 'package:app_proje_a/views/insights/viewmodel/insights_view_model.dart';
 import 'package:flutter/material.dart';

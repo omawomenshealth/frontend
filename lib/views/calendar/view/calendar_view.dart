@@ -12,7 +12,8 @@ import '../../../core/utils/date_extensions.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../dashboard/viewmodel/dashboard_view_model.dart';
-import '../../dashboard/widgets/daily_log_sheet.dart';
+import 'package:app_proje_a/features/tracking/domain/models/tracking_section.dart';
+import 'package:app_proje_a/features/tracking/presentation/tracking_launcher.dart';
 import '../../profile/viewmodel/profile_view_model.dart';
 import '../viewmodel/calendar_view_model.dart';
 
@@ -940,19 +941,9 @@ Future<void> _showDailyLogEditor(
   BuildContext context,
   DateTime date,
   CalendarViewModel calendarVm, {
-  int initialIndex = 0,
+  required TrackingSection section,
 }) async {
-  if (date.dateOnly.isAfter(AppTime.now.dateOnly)) {
-    OmaToast.show(
-      context,
-      title: AppStrings.error,
-      description: AppStrings.futureLogNotAllowed,
-      icon: Icons.error_outline_rounded,
-    );
-    return;
-  }
-  final dashboardVm = context.read<DashboardViewModel>();
-  final settings = calendarVm.settings ?? dashboardVm.settings;
+  final settings = calendarVm.settings;
   if (settings == null) {
     OmaToast.show(
       context,
@@ -963,45 +954,28 @@ Future<void> _showDailyLogEditor(
     return;
   }
 
-  final section = switch (initialIndex) {
-    0 => DailyLogObservedSection.period,
-    1 => DailyLogObservedSection.nutrition,
-    2 => DailyLogObservedSection.symptom,
-    3 => DailyLogObservedSection.wellbeing,
-    _ => DailyLogObservedSection.skincare,
-  };
-  await showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (_) => DailyLogSheet(
-      initialLog: dashboardVm.initialLogForSection(section, date: date),
-      settings: settings,
-      themeColor: initialIndex == 0
-          ? AppColors.periodPrimary
-          : AppColors.forCyclePhase(
-              dashboardVm.periodCalculator?.phaseAt(date),
-            ),
-      initialTabIndex: initialIndex == 4 ? 5 : initialIndex,
-      isSingleTab: true,
-      onSettingsChanged: () async {
-        context.read<ProfileViewModel>().loadSettings();
-        await dashboardVm.loadData();
-        await calendarVm.loadData();
-      },
-      onSave: (log) async {
-        final success = log.flowIntensity != null
-            ? await dashboardVm.recordPeriodAndRecalculate(log)
-            : await dashboardVm.saveLog(log);
-        if (success) await calendarVm.loadData();
-        return success;
-      },
-      onDeletePeriod: (date) async {
-        final success = await dashboardVm.deletePeriodForDate(date);
-        if (success) await calendarVm.loadData();
-        return success;
-      },
-    ),
+  await TrackingLauncher.open(
+    context,
+    section: section,
+    date: date,
+    settings: settings,
+    themeColor: section == TrackingSection.period
+        ? AppColors.periodPrimary
+        : AppColors.forCyclePhase(calendarVm.periodCalculator?.phaseAt(date)),
+    onSettingsChanged: () async {
+      if (!context.mounted) return;
+      context.read<ProfileViewModel>().loadSettings();
+      await calendarVm.loadData();
+      if (context.mounted) {
+        await context.read<DashboardViewModel>().loadData();
+      }
+    },
+    onChanged: () async {
+      await calendarVm.loadData();
+      if (context.mounted) {
+        await context.read<DashboardViewModel>().loadData();
+      }
+    },
   );
 }
 
@@ -1021,26 +995,31 @@ Future<void> _showDailyLogTypePicker(
   }
   final options = [
     (
+      section: TrackingSection.period,
       label: AppStrings.period,
       icon: Icons.water_drop_outlined,
       color: AppColors.periodPrimary,
     ),
     (
+      section: TrackingSection.nutrition,
       label: AppStrings.nutrition,
       icon: Icons.restaurant_outlined,
       color: AppColors.secondaryDark,
     ),
     (
+      section: TrackingSection.symptoms,
       label: AppStrings.symptom,
       icon: Icons.healing_outlined,
       color: AppColors.periodFlow,
     ),
     (
+      section: TrackingSection.wellbeing,
       label: AppStrings.mood,
       icon: Icons.mood_outlined,
       color: AppColors.primaryDark,
     ),
     (
+      section: TrackingSection.skincare,
       label: AppStrings.skincare,
       icon: Icons.spa_outlined,
       color: AppColors.secondaryDark,
@@ -1089,7 +1068,12 @@ Future<void> _showDailyLogTypePicker(
     ),
   );
   if (selected == null || !context.mounted) return;
-  await _showDailyLogEditor(context, date, calendarVm, initialIndex: selected);
+  await _showDailyLogEditor(
+    context,
+    date,
+    calendarVm,
+    section: options[selected].section,
+  );
 }
 
 class _DayDetailSection extends StatelessWidget {

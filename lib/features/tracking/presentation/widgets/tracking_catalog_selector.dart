@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/color_constants.dart';
+import 'package:app_proje_a/core/constants/app_strings.dart';
+import 'package:app_proje_a/core/constants/color_constants.dart';
 
 /// Beslenme, ilaç, takviye ve cilt bakımı için ortak akıllı katalog seçicisi.
 class TrackingCatalogSelector extends StatefulWidget {

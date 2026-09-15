@@ -13,26 +13,38 @@ import '../../../core/utils/app_time.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../application/cycle_prediction/cycle_prediction_coordinator.dart';
 import '../../../domain/cycle/models/cycle_prediction.dart';
+import 'package:app_proje_a/features/tracking/application/tracking_controller.dart';
+import 'package:app_proje_a/features/tracking/domain/models/tracking_section.dart';
 
 /// Dashboard iş mantığı.
 class DashboardViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
-  final NotificationService? _notifications;
-  final SyncService? _sync;
   final CyclePredictionCoordinator _cyclePredictions;
   final bool _ownsCyclePredictions;
+  late final TrackingController _tracking;
+  late final bool _ownsTracking;
   final PersonalInsightEngine _insightEngine = const PersonalInsightEngine();
 
   static const int _previewInsightLimit = 2;
 
   DashboardViewModel(
     this._storage, [
-    this._notifications,
+    NotificationService? notifications,
     CyclePredictionCoordinator? cyclePredictions,
-    this._sync,
+    SyncService? sync,
+    TrackingController? tracking,
   ]) : _cyclePredictions =
            cyclePredictions ?? CyclePredictionCoordinator(_storage),
        _ownsCyclePredictions = cyclePredictions == null {
+    _tracking =
+        tracking ??
+        TrackingController.local(
+          _storage,
+          cyclePredictions: _cyclePredictions,
+          notifications: notifications,
+          sync: sync,
+        );
+    _ownsTracking = tracking == null;
     loadData();
   }
 
@@ -59,47 +71,31 @@ class DashboardViewModel extends ChangeNotifier {
   DateTime get selectedDate => _selectedDate;
 
   bool get hasPeriodTracking => _settings != null;
+  TrackingController get trackingController => _tracking;
 
   DailyLog initialLogForSection(
     DailyLogObservedSection section, {
     DateTime? date,
   }) {
-    final targetDate = date ?? _selectedDate;
-    final logs = targetDate.isSameDay(_selectedDate)
-        ? _todayLogs
-        : _storage.loadLogsForDate(targetDate);
-    DailyLog? matchingLog;
-    for (final log in logs) {
-      if (log.observedSections.contains(section)) {
-        matchingLog = log;
-        break;
-      }
-      // Birleşik hızlı işlem, eski sürümlerde ayrı kaydedilmiş takviyeyi de açar.
-      if (section == DailyLogObservedSection.medication &&
-          log.observedSections.contains(DailyLogObservedSection.supplement) &&
-          log.supplements.isNotEmpty) {
-        matchingLog = log;
-        break;
-      }
-      // Eski sürümlerde takviyeler ilaç bölümü altında tutuluyordu.
-      if (section == DailyLogObservedSection.supplement &&
-          log.observedSections.contains(DailyLogObservedSection.medication) &&
-          log.supplements.isNotEmpty) {
-        matchingLog = log;
-        break;
-      }
-    }
-    if (matchingLog != null) {
-      return matchingLog;
-    }
-    final initialDate = targetDate.isToday ? AppTime.now : targetDate.dateOnly;
-    return DailyLog.empty(initialDate);
+    final trackingSection = switch (section) {
+      DailyLogObservedSection.period => TrackingSection.period,
+      DailyLogObservedSection.nutrition => TrackingSection.nutrition,
+      DailyLogObservedSection.symptom => TrackingSection.symptoms,
+      DailyLogObservedSection.wellbeing => TrackingSection.wellbeing,
+      DailyLogObservedSection.medication ||
+      DailyLogObservedSection.supplement => TrackingSection.medication,
+      DailyLogObservedSection.skincare => TrackingSection.skincare,
+    };
+    return _tracking.initialLogForSection(
+      trackingSection,
+      date ?? _selectedDate,
+    );
   }
 
   /// Takvimde tarih seçildiğinde çağrılır.
   void selectDate(DateTime date) {
     _selectedDate = date;
-    _todayLogs = _storage.loadLogsForDate(date);
+    _todayLogs = _tracking.logsForDate(date);
     notifyListeners();
   }
 
@@ -136,9 +132,9 @@ class DashboardViewModel extends ChangeNotifier {
     // dönem bittikten sonra ekran tekrar açıldığında da güncellenmelidir.
     await _cyclePredictions.refresh();
     _settings = _cyclePredictions.effectiveSettings;
-    _todayLogs = _storage.loadLogsForDate(_selectedDate);
+    _todayLogs = _tracking.logsForDate(_selectedDate);
 
-    final allLogs = _storage.loadAllLogs();
+    final allLogs = _tracking.allLogs();
     _refreshPersonalInsights(allLogs);
     _refreshPregnancyEstimate(allLogs);
     _rebuildCycleState();
@@ -149,11 +145,11 @@ class DashboardViewModel extends ChangeNotifier {
 
   /// Kayıt işleminden sonra tüm durum ve hesaplamaları senkronize eden yardımcı metot.
   Future<void> _syncStateAfterSave(DateTime dateForLogs) async {
-    _todayLogs = _storage.loadLogsForDate(dateForLogs);
+    _todayLogs = _tracking.logsForDate(dateForLogs);
     await _cyclePredictions.refresh(force: true);
     _settings = _cyclePredictions.effectiveSettings;
 
-    final allLogs = _storage.loadAllLogs();
+    final allLogs = _tracking.allLogs();
     _refreshPersonalInsights(allLogs);
     _refreshPregnancyEstimate(allLogs);
     _rebuildCycleState();
@@ -200,6 +196,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    if (_ownsTracking) _tracking.dispose();
     if (_ownsCyclePredictions) _cyclePredictions.dispose();
     super.dispose();
   }
@@ -217,78 +214,11 @@ class DashboardViewModel extends ChangeNotifier {
 
   /// Günlük kaydı ekle veya güncelle.
   Future<bool> saveLog(DailyLog log) async {
-    final beforeIds = _insightEngine
-        .generate(
-          _storage.loadAllLogs(),
-          doseRecords: _storage.loadMedicationDoseRecords(),
-          settings: _storage.loadSettings(),
-        )
-        .where((insight) => insight.shouldNotify)
-        .map((insight) => insight.id)
-        .toSet();
-    final success = await _storage.saveDailyLog(log);
+    final success = await _tracking.saveLog(log);
     if (!success) return false;
-    await _syncCloudAfterDailyLogChange();
     await _syncStateAfterSave(log.date);
-    await _notifyForNewInsight(beforeIds);
     notifyListeners();
     return true;
-  }
-
-  Future<void> _syncCloudAfterDailyLogChange() async {
-    final sync = _sync;
-    if (sync == null || !_storage.isUserLoggedIn) return;
-
-    // Yerel düzenleme aynı timestamp ve gözlemlenmiş bölüm için yetkilidir.
-    // Böylece kaldırılan tik buluttaki eski kopyadan geri gelmeden sunucudaki
-    // şifreli günlük de yeni anlık görüntüyle değiştirilir.
-    await sync.mergeWithCloud();
-  }
-
-  Future<void> _notifyForNewInsight(Set<String> beforeIds) async {
-    final notifications = _notifications;
-    if (notifications == null ||
-        !notifications.isSupported ||
-        _settings?.notificationsEnabled == false) {
-      return;
-    }
-    final sentIds = _storage.loadNotifiedInsightIds();
-    final candidates =
-        _insightEngine
-            .generate(
-              _storage.loadAllLogs(),
-              doseRecords: _storage.loadMedicationDoseRecords(),
-              settings: _settings,
-            )
-            .where(
-              (insight) =>
-                  insight.shouldNotify &&
-                  !beforeIds.contains(insight.id) &&
-                  !sentIds.contains(insight.id),
-            )
-            .toList()
-          ..sort((left, right) {
-            final urgency = right.notificationLevel.index.compareTo(
-              left.notificationLevel.index,
-            );
-            if (urgency != 0) return urgency;
-            return right.priority.compareTo(left.priority);
-          });
-    if (candidates.isEmpty) return;
-
-    try {
-      final permissionGranted = await notifications.requestInsightPermissions();
-      if (!permissionGranted) return;
-      final candidate = candidates.first;
-      final scheduled = await notifications.scheduleInsightReady(
-        insightId: candidate.id,
-      );
-      if (scheduled) {
-        await _storage.markInsightNotificationSent(candidate.id);
-      }
-    } catch (error) {
-      debugPrint('Insight bildirimi planlanamadı: $error');
-    }
   }
 
   /// Adet girişi yapıldığında döngü istatistiklerini yeniden hesaplar.
@@ -303,7 +233,7 @@ class DashboardViewModel extends ChangeNotifier {
   /// Seçilen günün adet kaydını, aynı güne ait diğer günlük verileri koruyarak
   /// kaldırır ve döngü hesaplarını yeniler.
   Future<bool> deletePeriodForDate(DateTime date) async {
-    final success = await _storage.deletePeriodLogsForDate(date);
+    final success = await _tracking.deletePeriodForDate(date);
     if (!success) return false;
     await _syncStateAfterSave(date);
     notifyListeners();
