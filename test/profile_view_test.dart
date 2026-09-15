@@ -92,7 +92,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Özge'), findsOneWidget);
-    expect(find.text('Şu anki modun'), findsOneWidget);
+    expect(find.text('Takip tercihin'), findsOneWidget);
     expect(find.text('Döngü takibim'), findsOneWidget);
     expect(find.text('OMA Premium'), findsOneWidget);
     expect(find.text('Rüyalarım'), findsOneWidget);

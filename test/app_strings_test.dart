@@ -124,18 +124,19 @@ void main() {
     );
     expect(
       AppStrings.insightFrequentMoodBody(label: 'Yorgun', count: 5, total: 8),
-      'Ruh hâlini kaydettiğin 8 günün 5 tanesinde Yorgun seçtin.',
+      'Ruh hâli kaydı bulunan 8 günün 5 tanesinde “Yorgun” seçeneği '
+      'işaretlendi.',
     );
     expect(AppStrings.insightEvidenceCycles(3), 'Hesaplanan döngü: 3');
     expect(
-      AppStrings.dosageOptions.every((dose) => dose.endsWith('Adet')),
+      AppStrings.dosageOptions.every((dose) => dose.endsWith('adet')),
       isTrue,
     );
     expect(AppStrings.womenDiseasesList, contains('Adenomyozis'));
     expect(AppStrings.womenDiseasesList, isNot(contains('Diğer')));
     expect(AppStrings.chronicDiseasesList, isNot(contains('Diğer')));
     expect(AppStrings.symptomSkinHairOptions, contains('Yağlı cilt'));
-    expect(AppStrings.symptomOverall, 'Nasıl hissediyorsun');
+    expect(AppStrings.symptomOverall, 'Genel ruh hâlin nasıl?');
     expect(
       AppStrings.symptomOverallOptions,
       containsAll(['İyi hissediyorum', 'Stresliyim', 'Mutluyum']),
@@ -143,8 +144,29 @@ void main() {
     expect(AppStrings.localizeStoredValue('Stress'), 'Stresliyim');
     expect(
       AppStrings.periodPredictionLowConfidenceSummary('17.9 - 29.9'),
-      'Tahmini adet başlangıcı: 17.9 - 29.9 · '
-      'Verilerinle daha doğru sonuçlar elde edelim',
+      'Sonraki adet tahmini: 17.9 - 29.9\n'
+      'Kayıt ekledikçe tahminler daha kişisel hale gelir.',
+    );
+    expect(AppStrings.cycleDay(3), 'Döngünün 3. günü');
+    expect(AppStrings.periodDayNumber(3), '3.');
+    expect(AppStrings.periodDayLabel, 'gün');
+    expect(AppStrings.phaseMenstrualHeadline, 'Adetinin ilk\ngünlerindesin');
+    expect(
+      AppStrings.phaseMenstrualFertility,
+      'Tahmini gebelik ihtimali düşük',
+    );
+    expect(
+      AppStrings.phaseMenstrualBody,
+      isNot(anyOf(contains('alan aç'), contains('harika bir gün'))),
+    );
+    expect(
+      [
+        AppStrings.phaseFollicularBody,
+        AppStrings.phaseOvulationBody,
+        AppStrings.phaseLutealBody,
+        AppStrings.moodGentleBody,
+      ].join(' '),
+      isNot(anyOf(contains('sosyalliğin'), contains('tempoyu biraz yavaşlat'))),
     );
     expect(AppStrings.symptomEnergyLevelOptions, ['Enerjik', 'Yorgunluk']);
     expect(AppStrings.symptomMoodStateOptions, [
@@ -218,10 +240,9 @@ void main() {
         withPercent: 60,
         withoutPercent: 20,
       ),
-      'Foliküler Faz günlerinde ruh hâlini kaydettiğin 20 günün 12 tanesinde '
-      'Mutlu seçtin (%60). Diğer fazlardaki 40 karşılaştırılabilir günde bu '
-      'oran %20. Bu yalnızca bir zamanlama ilişkisi; fazın bu hisse neden '
-      'olduğunu göstermez.',
+      '“Foliküler Faz” için 20 ruh hâli kaydının 12 tanesinde “Mutlu” '
+      'seçildi (%60). Diğer fazlardaki 40 karşılaştırılabilir kayıtta oran '
+      '%20. Bu, neden-sonuç ilişkisi göstermez.',
     );
   });
 

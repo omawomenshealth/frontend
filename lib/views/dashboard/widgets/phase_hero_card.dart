@@ -149,7 +149,7 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
                   _PhaseBadge(presentation: presentation),
                   const SizedBox(height: 70),
                   Text(
-                    '${presentation.dayLabel}: ${widget.cycleDay} · '
+                    '${AppStrings.cycleDay(widget.cycleDay)} · '
                     '${presentation.fertility}',
                     style: TextStyle(
                       color: presentation.color,
@@ -269,7 +269,9 @@ class _PhaseHeroCardState extends State<PhaseHeroCard>
                       const SizedBox(width: 12),
                       _PeriodBadge(
                         color: presentation.color,
-                        value: widget.periodCount,
+                        value: presentation.isPeriod
+                            ? AppStrings.periodDayNumber(widget.periodCount)
+                            : '${widget.periodCount}',
                         label: presentation.periodLabel(widget.periodCount),
                       ),
                     ],
@@ -328,7 +330,7 @@ class _PhaseBadge extends StatelessWidget {
 
 class _PeriodBadge extends StatelessWidget {
   final Color color;
-  final int value;
+  final String value;
   final String label;
 
   const _PeriodBadge({
@@ -358,7 +360,7 @@ class _PeriodBadge extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            '$value',
+            value,
             style: TextStyle(
               color: color,
               fontFamily: 'CormorantGaramond',
@@ -396,7 +398,6 @@ class _PhasePresentation {
   final String headline;
   final String body;
   final String fertility;
-  final String dayLabel;
   final String readLabel;
   final bool isPeriod;
 
@@ -408,7 +409,6 @@ class _PhasePresentation {
     required this.headline,
     required this.body,
     required this.fertility,
-    required this.dayLabel,
     required this.readLabel,
     required this.isPeriod,
   });
@@ -423,7 +423,6 @@ class _PhasePresentation {
         headline: AppStrings.phaseMenstrualHeadline,
         body: AppStrings.phaseMenstrualBody,
         fertility: AppStrings.phaseMenstrualFertility,
-        dayLabel: AppStrings.cycleDayLabel,
         readLabel: AppStrings.readBodyChanges,
         isPeriod: true,
       ),
@@ -435,7 +434,6 @@ class _PhasePresentation {
         headline: AppStrings.phaseFollicularHeadline,
         body: AppStrings.phaseFollicularBody,
         fertility: AppStrings.phaseFollicularFertility,
-        dayLabel: AppStrings.cycleDayLabel,
         readLabel: AppStrings.readBodyChanges,
         isPeriod: false,
       ),
@@ -447,7 +445,6 @@ class _PhasePresentation {
         headline: AppStrings.phaseOvulationHeadline,
         body: AppStrings.phaseOvulationBody,
         fertility: AppStrings.phaseOvulationFertility,
-        dayLabel: AppStrings.cycleDayLabel,
         readLabel: AppStrings.readBodyChanges,
         isPeriod: false,
       ),
@@ -459,7 +456,6 @@ class _PhasePresentation {
         headline: AppStrings.phaseLutealHeadline,
         body: AppStrings.phaseLutealBody,
         fertility: AppStrings.phaseLutealFertility,
-        dayLabel: AppStrings.cycleDayLabel,
         readLabel: AppStrings.readBodyChanges,
         isPeriod: false,
       ),

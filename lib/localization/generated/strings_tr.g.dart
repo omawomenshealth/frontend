@@ -370,12 +370,12 @@ class _Translations$options$tr extends Translations$options$en {
 		'pelvic_lower_abdominal_pain': 'Pelvik / alt karın ağrısı',
 	};
 	@override Map<String, String> get dosageOptions => {
-		'1_count': '1 Adet',
-		'2_count': '2 Adet',
-		'3_count': '3 Adet',
-		'4_count': '4 Adet',
-		'5_count': '5 Adet',
-		'6_count': '6 Adet',
+		'1_count': '1 adet',
+		'2_count': '2 adet',
+		'3_count': '3 adet',
+		'4_count': '4 adet',
+		'5_count': '5 adet',
+		'6_count': '6 adet',
 	};
 	@override Map<String, String> get shortWeekdays => {
 		'mon': 'Pzt',
@@ -399,7 +399,7 @@ class _Translations$options$tr extends Translations$options$en {
 		'nutrition': 'Beslenme',
 		'exercise': 'Egzersiz',
 		'womens_health': 'Kadın Sağlığı',
-		'mood': 'Ruh Hali',
+		'mood': 'Ruh hâli',
 		'sleep': 'Uyku',
 		'general_health': 'Genel Sağlık',
 	};
@@ -452,42 +452,42 @@ class _Translations$premium$tr extends Translations$premium$en {
 	// Translations
 	@override String get pageTitle => 'Premium';
 	@override String get close => 'Premium ekranını kapat';
-	@override String get eyebrow => 'Döngün, daha fazla ayrıntıyla';
-	@override String get heroTitle => 'Örüntülerini daha net gör';
-	@override String get heroDescription => 'OMA Premium; kişisel içgörülerini, uzman içeriklerini ve sağlık özetini sakin ve sana özel tek bir alanda buluşturur.';
-	@override String get activeEyebrow => 'Üyeliğin aktif';
-	@override String get activeTitle => 'Premium senin için hazır';
-	@override String activePlanTitle({required Object plan}) => '${plan} senin için hazır';
+	@override String get eyebrow => 'Döngü kayıtlarında daha fazla ayrıntı';
+	@override String get heroTitle => 'Daha ayrıntılı kişisel örüntüler';
+	@override String get heroDescription => 'OMA Premium; kişisel içgörüleri, uzman içeriklerini ve sağlık özetini tek yerde sunar.';
+	@override String get activeEyebrow => 'Üyeliğin etkin';
+	@override String get activeTitle => 'Premium özellikleri açık';
+	@override String activePlanTitle({required Object plan}) => '${plan} özellikleri açık';
 	@override String get activeDescription => 'Paketindeki ücretli özellikler bu hesapta açık.';
 	@override String get benefitsTitle => 'Seçtiğin pakette neler var';
-	@override String get benefitsDescription => 'Her seviyeyi karşılaştır ve sana iyi gelen desteği seç.';
-	@override String get benefitTrackingTitle => 'Döngü ve iyi yaşam takibi';
-	@override String get benefitTrackingDescription => 'Takvimini, belirtilerini ve günlük iyi yaşam notlarını bir arada tut.';
+	@override String get benefitsDescription => 'Paketleri karşılaştırarak ihtiyacına uygun özellikleri seçebilirsin.';
+	@override String get benefitTrackingTitle => 'Döngü ve günlük kayıt takibi';
+	@override String get benefitTrackingDescription => 'Takvim, belirti ve günlük sağlık kayıtlarını tek yerde toplar.';
 	@override String get benefitInsightsTitle => 'Daha derin kişisel içgörüler';
-	@override String get benefitInsightsDescription => 'Döngün, ruh halin ve günlük kayıtların arasındaki anlamlı bağlantıları gör.';
+	@override String get benefitInsightsDescription => 'Döngü, ruh hâli ve günlük kayıtlar arasındaki bağlantıları gösterir.';
 	@override String get benefitArticlesTitle => 'Tüm uzman içerikleri';
-	@override String get benefitArticlesDescription => 'Her fazı desteklemek için hazırlanan tüm OMA yazılarını oku.';
+	@override String get benefitArticlesDescription => 'Döngü fazları hakkında hazırlanan tüm OMA yazılarına erişim sağlar.';
 	@override String get benefitReportTitle => 'Paylaşılabilir doktor raporu';
-	@override String get benefitReportDescription => 'Döngü ve sağlık kayıtlarını anlaşılır tek bir özette bir araya getir.';
+	@override String get benefitReportDescription => 'Döngü ve sağlık kayıtlarını anlaşılır bir özette sunar.';
 	@override String get benefitDreamsTitle => 'Rüya yorumları';
-	@override String get benefitDreamsDescription => 'Kaydettiğin rüyaların hislerini ve öne çıkan temalarını keşfet.';
-	@override String get plansTitle => 'Deneyimini seç';
+	@override String get benefitDreamsDescription => 'Kaydettiğin rüyalardaki öne çıkan temalara yönelik yorumlar sunar.';
+	@override String get plansTitle => 'Paketleri karşılaştır';
 	@override String get freePlanName => 'OMA Ücretsiz';
 	@override String get freePlanBadge => 'Başlangıç';
 	@override String get freePlanPrice => 'Ücretsiz';
-	@override String get freePlanDescription => 'Günlük döngü ve iyi yaşam takibi';
+	@override String get freePlanDescription => 'Günlük döngü ve sağlık kaydı takibi';
 	@override String get plusPlanName => 'OMA Plus';
 	@override String get plusPlanBadge => 'En popüler';
 	@override String get plusPlanDescription => 'Kişisel içgörüler ve tüm uzman içerikleri';
 	@override String get premiumPlanName => 'OMA Premium';
 	@override String get premiumPlanBadge => 'Tam erişim';
 	@override String get premiumPlanDescription => 'Plus\'taki her şeye ek doktor raporu ve rüya yorumları';
-	@override String get activePlanBadge => 'Aktif plan';
+	@override String get activePlanBadge => 'Etkin plan';
 	@override String get selectedPlanTitle => 'Bu pakette bulunanlar';
 	@override String get monthlyBilling => 'Google Play üzerinden aylık üyelik';
 	@override String get securePurchase => 'Google Play ile güvenli satın alma';
 	@override String get renewalNote => 'Otomatik yenilenir. Google Play\'den istediğin zaman iptal edebilirsin.';
-	@override String get signInNote => 'Premium erişiminin hesabına bağlı kalması için önce giriş yapmalısın.';
+	@override String get signInNote => 'Giriş yaptığında Premium erişimin hesabına bağlanır.';
 	@override String get statusTitle => 'Üyelik bilgisi';
 	@override String get back => 'Tamam';
 	@override String get signIn => 'Giriş yap ve devam et';
@@ -497,7 +497,7 @@ class _Translations$premium$tr extends Translations$premium$en {
 	@override String changePlan({required Object price}) => 'Paketi değiştir · ${price}';
 	@override String get currentPlan => 'Mevcut paketin';
 	@override String get manageSubscription => 'Google Play\'de yönet';
-	@override String get freeManagementNote => 'Ücretsiz pakete dönmek için ücretli üyeliğini Google Play\'den iptal et. Erişimin mevcut fatura dönemi sonuna kadar devam eder.';
+	@override String get freeManagementNote => 'Ücretsiz pakete dönmek için ücretli üyeliğini Google Play\'den iptal etmen gerekir. Erişimin mevcut fatura dönemi sonuna kadar devam eder.';
 	@override String get restore => 'Satın almayı geri yükle';
 	@override String get googlePlayPrice => 'Google Play fiyatı';
 	@override String purchaseUpdateFailed({required Object error}) => 'Satın alma güncellemesi okunamadı: ${error}';
@@ -506,8 +506,8 @@ class _Translations$premium$tr extends Translations$premium$en {
 	@override String get productNotFound => 'Premium üyeliği Google Play\'de bulunamadı.';
 	@override String get productsNotFound => 'Ücretli paketlerden biri veya birkaçı Google Play\'de bulunamadı.';
 	@override String storeConnectionFailed({required Object error}) => 'Google Play\'e bağlanılamadı: ${error}';
-	@override String get loginRequired => 'Premium\'u başlatmadan önce giriş yapmalısın.';
-	@override String get loginRestoreRequired => 'Satın almayı geri yüklemeden önce giriş yapmalısın.';
+	@override String get loginRequired => 'Premium\'u başlatmak için giriş yapman gerekiyor.';
+	@override String get loginRestoreRequired => 'Satın almayı geri yüklemek için giriş yapman gerekiyor.';
 	@override String get invalidAccount => 'Premium hesap eşleştirme kimliği geçersiz.';
 	@override String get purchaseScreenFailed => 'Google Play satın alma ekranı açılamadı.';
 	@override String purchaseStartFailed({required Object error}) => 'Satın alma başlatılamadı: ${error}';
@@ -518,10 +518,10 @@ class _Translations$premium$tr extends Translations$premium$en {
 	@override String get purchaseCancelled => 'Satın alma iptal edildi.';
 	@override String get verifyingPurchase => 'Satın alman güvenli biçimde doğrulanıyor…';
 	@override String get googlePlayOnly => 'Yalnızca Google Play satın almaları destekleniyor.';
-	@override String get noActivePremium => 'Aktif bir Premium üyeliği bulunamadı.';
-	@override String get premiumActivated => 'Premium aktif. OMA Premium\'a hoş geldin.';
-	@override String membershipActivated({required Object plan}) => '${plan} bu hesapta aktif.';
-	@override String get planChangeNeedsRestore => 'Mevcut Google Play satın alman yüklenemedi. Paket değiştirmeden önce satın almayı geri yükle.';
+	@override String get noActivePremium => 'Etkin bir Premium üyeliği bulunamadı.';
+	@override String get premiumActivated => 'Premium üyeliğin etkinleştirildi.';
+	@override String membershipActivated({required Object plan}) => '${plan} bu hesapta etkin.';
+	@override String get planChangeNeedsRestore => 'Mevcut Google Play satın alman yüklenemedi. Paket değişikliği için önce satın almayı geri yüklemen gerekir.';
 	@override String get subscriptionManagementFailed => 'Google Play üyelik yönetimi açılamadı.';
 	@override String purchaseVerificationFailed({required Object error}) => 'Satın alma doğrulanamadı: ${error}';
 }
@@ -1115,7 +1115,7 @@ class _Translations$pregnancy$common$tr extends Translations$pregnancy$common$en
 
 	// Translations
 	@override String get testTitle => 'Hamilelik testi';
-	@override String get testHint => 'Testler beklenen adetin ilk gününden itibaren daha güvenilirdir. Adet tarihini bilmiyorsan korunmasız ilişkiden en az 21 gün sonra test yap.';
+	@override String get testHint => 'Testler beklenen adetin ilk gününden itibaren daha güvenilir sonuç verebilir. Adet tarihini bilmiyorsan korunmasız ilişkiden en az 21 gün sonra test yapabilirsin.';
 	@override String get testPositiveAction => 'Hamileyim';
 	@override String get positiveTestRecorded => 'Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.';
 	@override String get badge => 'GEBELİK';
@@ -1125,9 +1125,9 @@ class _Translations$pregnancy$common$tr extends Translations$pregnancy$common$en
 	@override String get estimateCombined => 'Son adet ve cinsel ilişki kayıtlarına göre tahmini';
 	@override String get estimateLastPeriod => 'Son adet başlangıcına göre tahmini';
 	@override String get estimateSexualActivity => 'Cinsel ilişki kaydına göre yaklaşık tahmin';
-	@override String get estimateUnavailable => 'Haftayı hesaplamak için son adet tarihini veya cinsel ilişki kaydını ekle.';
+	@override String get estimateUnavailable => 'Gebelik haftası için son adet tarihi veya cinsel ilişki kaydı gerekiyor.';
 	@override String get infoComingSoon => 'Haftalık bilgilendirici içerikler yakında';
-	@override String get estimatedDueDate => 'Tahmini buluşma tarihi: {date}';
+	@override String get estimatedDueDate => 'Tahmini doğum tarihi: {date}';
 }
 
 // Path: pregnancy.fertility
@@ -1137,8 +1137,8 @@ class _Translations$pregnancy$fertility$tr extends Translations$pregnancy$fertil
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get insightTitle => 'Tahmini verimli dönemin başladı';
-	@override String get insightBody => 'Döngü kayıtlarına göre tahmini verimli dönemdesin. Vücut sinyallerini ve akıntı değişimlerini kaydetmen, kendi örüntülerini görmene yardımcı olabilir. Takvim tahmini ovülasyonu doğrulamaz.';
+	@override String get insightTitle => 'Tahmini ovülasyon dönemi';
+	@override String get insightBody => 'Döngü kayıtlarına göre tahmini ovülasyon döneminde olabilirsin. İstersen akıntı gibi vücut sinyallerini kaydedebilirsin. Takvim tahmini ovülasyonu doğrulamaz.';
 }
 
 // Path: pregnancy.modes
@@ -1149,13 +1149,13 @@ class _Translations$pregnancy$modes$tr extends Translations$pregnancy$modes$en {
 
 	// Translations
 	@override String get getPregnant => 'Hamile kal';
-	@override String get getPregnantSubtitle => 'Döngü takibi ve verimli dönem içgörüleri';
+	@override String get getPregnantSubtitle => 'Döngü takibi ve tahmini ovülasyon bilgileri';
 	@override String get pregnant => 'Hamileyim';
-	@override String get pregnantSubtitle => 'Gebelik yolculuğu';
+	@override String get pregnantSubtitle => 'Gebelik takibi';
 	@override String get changeConfirmationTitle => 'Modunu değiştirmek istiyor musun?';
 	@override String get changeConfirmationBody => 'Takip tercihin {mode} olarak değiştirilecek. Kayıtların silinmeyecek.';
 	@override String get changeAction => 'Evet, değiştir';
-	@override String get changeFailed => 'Mod şu anda değiştirilemedi. Tekrar dene.';
+	@override String get changeFailed => 'Mod şu anda değiştirilemedi. Yeniden deneyebilirsin.';
 }
 
 // Path: pregnancy.stages
@@ -1235,8 +1235,8 @@ class _Translations$pregnancy$stages$stage1$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '1–4. hafta · Başlangıç ve Yerleşme';
-	@override String get body => 'Her şey daha yeni başlıyor. Vücudun minik ama çok önemli değişimlere hazırlanıyor. 💗';
+	@override String get title => '1–4. hafta · Başlangıç';
+	@override String get body => 'Bu haftalarda döllenme ve rahme yerleşme süreci gerçekleşebilir. Gebelik haftası son adet başlangıcından itibaren hesaplanır.';
 }
 
 // Path: pregnancy.stages.stage2
@@ -1246,8 +1246,8 @@ class _Translations$pregnancy$stages$stage2$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '5–8. hafta · Temeller Atılıyor';
-	@override String get body => 'Minik gelişmeler hızla devam ediyor. Sen de vücudundaki değişimleri biraz daha fazla hissetmeye başlayabilirsin.';
+	@override String get title => '5–8. hafta · Erken gelişim';
+	@override String get body => 'Embriyonun temel organ ve sistemleri bu haftalarda gelişmeye başlar. Yaşanan belirtiler kişiden kişiye değişebilir.';
 }
 
 // Path: pregnancy.stages.stage3
@@ -1257,8 +1257,8 @@ class _Translations$pregnancy$stages$stage3$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '9–13. hafta · Fetal Döneme Geçiş';
-	@override String get body => 'İlk haftaların büyük kısmını geride bıraktın. Bebeğin her geçen gün biraz daha belirginleşiyor. ✨';
+	@override String get title => '9–13. hafta · Fetal döneme geçiş';
+	@override String get body => 'Bu dönemde fetüsün organları ve vücut yapıları gelişmeye devam eder.';
 }
 
 // Path: pregnancy.stages.stage4
@@ -1268,8 +1268,8 @@ class _Translations$pregnancy$stages$stage4$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '14–17. hafta · Hızlı Büyüme';
-	@override String get body => 'Bebeğin hızla büyürken sen de hamileliğinin yeni dönemine alışmaya devam ediyorsun.';
+	@override String get title => '14–17. hafta · Büyüme';
+	@override String get body => 'Fetüsün büyümesi ve hareket gelişimi bu haftalarda devam eder.';
 }
 
 // Path: pregnancy.stages.stage5
@@ -1279,8 +1279,8 @@ class _Translations$pregnancy$stages$stage5$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '18–22. hafta · İlk Hareketler';
-	@override String get body => 'O minik hareketleri hissetmeye başlayabileceğin çok özel haftalardasın. 🫶';
+	@override String get title => '18–22. hafta · Hareketler';
+	@override String get body => 'Fetal hareketler bu haftalarda fark edilebilir; ilk fark edilme zamanı kişiden kişiye değişir.';
 }
 
 // Path: pregnancy.stages.stage6
@@ -1290,8 +1290,8 @@ class _Translations$pregnancy$stages$stage6$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '23–27. hafta · Güçlenme';
-	@override String get body => 'Bebeğinin hareketleri artık daha belirgin olabilir. İçeride küçük ama oldukça hareketli bir dünya var.';
+	@override String get title => '23–27. hafta · Gelişim';
+	@override String get body => 'Fetüsün hareketleri ve organ gelişimi bu dönemde devam eder.';
 }
 
 // Path: pregnancy.stages.stage7
@@ -1302,7 +1302,7 @@ class _Translations$pregnancy$stages$stage7$tr extends Translations$pregnancy$st
 
 	// Translations
 	@override String get title => '28–31. hafta · Olgunlaşma';
-	@override String get body => 'Bebeğin büyümeye ve güçlenmeye devam ediyor. Buluşmanıza doğru güzel güzel ilerliyorsunuz. 🤍';
+	@override String get body => 'Fetüs büyümeye devam eder; akciğer ve sinir sistemi gelişimi sürer.';
 }
 
 // Path: pregnancy.stages.stage8
@@ -1312,8 +1312,8 @@ class _Translations$pregnancy$stages$stage8$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '32–35. hafta · Doğuma Hazırlık';
-	@override String get body => 'Artık sonlara yaklaşıyorsunuz. Bebeğin doğum sonrası hayata hazırlanırken senin vücudun da onunla birlikte hazırlanıyor.';
+	@override String get title => '32–35. hafta · Doğuma hazırlık';
+	@override String get body => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür.';
 }
 
 // Path: pregnancy.stages.stage9
@@ -1323,8 +1323,8 @@ class _Translations$pregnancy$stages$stage9$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '36–40+ hafta · Son Haftalar';
-	@override String get body => 'Buluşma zamanı giderek yaklaşıyor. Bu son haftalarda kendine biraz daha nazik davranmayı unutma. 🌷';
+	@override String get title => '36–40+ hafta · Son haftalar';
+	@override String get body => 'Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin.';
 }
 
 // Path: auth.auth.actionCard.account
@@ -2038,12 +2038,12 @@ extension on TranslationsTr {
 			'options.dischargeSymptoms.burning' => 'Yanma',
 			'options.dischargeSymptoms.painful_urination' => 'İdrar yaparken ağrı',
 			'options.dischargeSymptoms.pelvic_lower_abdominal_pain' => 'Pelvik / alt karın ağrısı',
-			'options.dosageOptions.1_count' => '1 Adet',
-			'options.dosageOptions.2_count' => '2 Adet',
-			'options.dosageOptions.3_count' => '3 Adet',
-			'options.dosageOptions.4_count' => '4 Adet',
-			'options.dosageOptions.5_count' => '5 Adet',
-			'options.dosageOptions.6_count' => '6 Adet',
+			'options.dosageOptions.1_count' => '1 adet',
+			'options.dosageOptions.2_count' => '2 adet',
+			'options.dosageOptions.3_count' => '3 adet',
+			'options.dosageOptions.4_count' => '4 adet',
+			'options.dosageOptions.5_count' => '5 adet',
+			'options.dosageOptions.6_count' => '6 adet',
 			'options.shortWeekdays.mon' => 'Pzt',
 			'options.shortWeekdays.tue' => 'Sal',
 			'options.shortWeekdays.wed' => 'Çar',
@@ -2061,7 +2061,7 @@ extension on TranslationsTr {
 			'options.articleTopics.nutrition' => 'Beslenme',
 			'options.articleTopics.exercise' => 'Egzersiz',
 			'options.articleTopics.womens_health' => 'Kadın Sağlığı',
-			'options.articleTopics.mood' => 'Ruh Hali',
+			'options.articleTopics.mood' => 'Ruh hâli',
 			'options.articleTopics.sleep' => 'Uyku',
 			'options.articleTopics.general_health' => 'Genel Sağlık',
 			'options.defaultMedications.parol' => 'Parol',
@@ -2084,7 +2084,7 @@ extension on TranslationsTr {
 			'options.calendarWeekdayInitials.s' => 'C',
 			'options.calendarWeekdayInitials.s_2' => 'P',
 			'pregnancy.common.testTitle' => 'Hamilelik testi',
-			'pregnancy.common.testHint' => 'Testler beklenen adetin ilk gününden itibaren daha güvenilirdir. Adet tarihini bilmiyorsan korunmasız ilişkiden en az 21 gün sonra test yap.',
+			'pregnancy.common.testHint' => 'Testler beklenen adetin ilk gününden itibaren daha güvenilir sonuç verebilir. Adet tarihini bilmiyorsan korunmasız ilişkiden en az 21 gün sonra test yapabilirsin.',
 			'pregnancy.common.testPositiveAction' => 'Hamileyim',
 			'pregnancy.common.positiveTestRecorded' => 'Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.',
 			'pregnancy.common.badge' => 'GEBELİK',
@@ -2094,75 +2094,75 @@ extension on TranslationsTr {
 			'pregnancy.common.estimateCombined' => 'Son adet ve cinsel ilişki kayıtlarına göre tahmini',
 			'pregnancy.common.estimateLastPeriod' => 'Son adet başlangıcına göre tahmini',
 			'pregnancy.common.estimateSexualActivity' => 'Cinsel ilişki kaydına göre yaklaşık tahmin',
-			'pregnancy.common.estimateUnavailable' => 'Haftayı hesaplamak için son adet tarihini veya cinsel ilişki kaydını ekle.',
+			'pregnancy.common.estimateUnavailable' => 'Gebelik haftası için son adet tarihi veya cinsel ilişki kaydı gerekiyor.',
 			'pregnancy.common.infoComingSoon' => 'Haftalık bilgilendirici içerikler yakında',
-			'pregnancy.common.estimatedDueDate' => 'Tahmini buluşma tarihi: {date}',
-			'pregnancy.fertility.insightTitle' => 'Tahmini verimli dönemin başladı',
-			'pregnancy.fertility.insightBody' => 'Döngü kayıtlarına göre tahmini verimli dönemdesin. Vücut sinyallerini ve akıntı değişimlerini kaydetmen, kendi örüntülerini görmene yardımcı olabilir. Takvim tahmini ovülasyonu doğrulamaz.',
+			'pregnancy.common.estimatedDueDate' => 'Tahmini doğum tarihi: {date}',
+			'pregnancy.fertility.insightTitle' => 'Tahmini ovülasyon dönemi',
+			'pregnancy.fertility.insightBody' => 'Döngü kayıtlarına göre tahmini ovülasyon döneminde olabilirsin. İstersen akıntı gibi vücut sinyallerini kaydedebilirsin. Takvim tahmini ovülasyonu doğrulamaz.',
 			'pregnancy.modes.getPregnant' => 'Hamile kal',
-			'pregnancy.modes.getPregnantSubtitle' => 'Döngü takibi ve verimli dönem içgörüleri',
+			'pregnancy.modes.getPregnantSubtitle' => 'Döngü takibi ve tahmini ovülasyon bilgileri',
 			'pregnancy.modes.pregnant' => 'Hamileyim',
-			'pregnancy.modes.pregnantSubtitle' => 'Gebelik yolculuğu',
+			'pregnancy.modes.pregnantSubtitle' => 'Gebelik takibi',
 			'pregnancy.modes.changeConfirmationTitle' => 'Modunu değiştirmek istiyor musun?',
 			'pregnancy.modes.changeConfirmationBody' => 'Takip tercihin {mode} olarak değiştirilecek. Kayıtların silinmeyecek.',
 			'pregnancy.modes.changeAction' => 'Evet, değiştir',
-			'pregnancy.modes.changeFailed' => 'Mod şu anda değiştirilemedi. Tekrar dene.',
-			'pregnancy.stages.stage1.title' => '1–4. hafta · Başlangıç ve Yerleşme',
-			'pregnancy.stages.stage1.body' => 'Her şey daha yeni başlıyor. Vücudun minik ama çok önemli değişimlere hazırlanıyor. 💗',
-			'pregnancy.stages.stage2.title' => '5–8. hafta · Temeller Atılıyor',
-			'pregnancy.stages.stage2.body' => 'Minik gelişmeler hızla devam ediyor. Sen de vücudundaki değişimleri biraz daha fazla hissetmeye başlayabilirsin.',
-			'pregnancy.stages.stage3.title' => '9–13. hafta · Fetal Döneme Geçiş',
-			'pregnancy.stages.stage3.body' => 'İlk haftaların büyük kısmını geride bıraktın. Bebeğin her geçen gün biraz daha belirginleşiyor. ✨',
-			'pregnancy.stages.stage4.title' => '14–17. hafta · Hızlı Büyüme',
-			'pregnancy.stages.stage4.body' => 'Bebeğin hızla büyürken sen de hamileliğinin yeni dönemine alışmaya devam ediyorsun.',
-			'pregnancy.stages.stage5.title' => '18–22. hafta · İlk Hareketler',
-			'pregnancy.stages.stage5.body' => 'O minik hareketleri hissetmeye başlayabileceğin çok özel haftalardasın. 🫶',
-			'pregnancy.stages.stage6.title' => '23–27. hafta · Güçlenme',
-			'pregnancy.stages.stage6.body' => 'Bebeğinin hareketleri artık daha belirgin olabilir. İçeride küçük ama oldukça hareketli bir dünya var.',
+			'pregnancy.modes.changeFailed' => 'Mod şu anda değiştirilemedi. Yeniden deneyebilirsin.',
+			'pregnancy.stages.stage1.title' => '1–4. hafta · Başlangıç',
+			'pregnancy.stages.stage1.body' => 'Bu haftalarda döllenme ve rahme yerleşme süreci gerçekleşebilir. Gebelik haftası son adet başlangıcından itibaren hesaplanır.',
+			'pregnancy.stages.stage2.title' => '5–8. hafta · Erken gelişim',
+			'pregnancy.stages.stage2.body' => 'Embriyonun temel organ ve sistemleri bu haftalarda gelişmeye başlar. Yaşanan belirtiler kişiden kişiye değişebilir.',
+			'pregnancy.stages.stage3.title' => '9–13. hafta · Fetal döneme geçiş',
+			'pregnancy.stages.stage3.body' => 'Bu dönemde fetüsün organları ve vücut yapıları gelişmeye devam eder.',
+			'pregnancy.stages.stage4.title' => '14–17. hafta · Büyüme',
+			'pregnancy.stages.stage4.body' => 'Fetüsün büyümesi ve hareket gelişimi bu haftalarda devam eder.',
+			'pregnancy.stages.stage5.title' => '18–22. hafta · Hareketler',
+			'pregnancy.stages.stage5.body' => 'Fetal hareketler bu haftalarda fark edilebilir; ilk fark edilme zamanı kişiden kişiye değişir.',
+			'pregnancy.stages.stage6.title' => '23–27. hafta · Gelişim',
+			'pregnancy.stages.stage6.body' => 'Fetüsün hareketleri ve organ gelişimi bu dönemde devam eder.',
 			'pregnancy.stages.stage7.title' => '28–31. hafta · Olgunlaşma',
-			'pregnancy.stages.stage7.body' => 'Bebeğin büyümeye ve güçlenmeye devam ediyor. Buluşmanıza doğru güzel güzel ilerliyorsunuz. 🤍',
-			'pregnancy.stages.stage8.title' => '32–35. hafta · Doğuma Hazırlık',
-			'pregnancy.stages.stage8.body' => 'Artık sonlara yaklaşıyorsunuz. Bebeğin doğum sonrası hayata hazırlanırken senin vücudun da onunla birlikte hazırlanıyor.',
-			'pregnancy.stages.stage9.title' => '36–40+ hafta · Son Haftalar',
-			'pregnancy.stages.stage9.body' => 'Buluşma zamanı giderek yaklaşıyor. Bu son haftalarda kendine biraz daha nazik davranmayı unutma. 🌷',
+			'pregnancy.stages.stage7.body' => 'Fetüs büyümeye devam eder; akciğer ve sinir sistemi gelişimi sürer.',
+			'pregnancy.stages.stage8.title' => '32–35. hafta · Doğuma hazırlık',
+			'pregnancy.stages.stage8.body' => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür.',
+			'pregnancy.stages.stage9.title' => '36–40+ hafta · Son haftalar',
+			'pregnancy.stages.stage9.body' => 'Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin.',
 			'premium.pageTitle' => 'Premium',
 			'premium.close' => 'Premium ekranını kapat',
-			'premium.eyebrow' => 'Döngün, daha fazla ayrıntıyla',
-			'premium.heroTitle' => 'Örüntülerini daha net gör',
-			'premium.heroDescription' => 'OMA Premium; kişisel içgörülerini, uzman içeriklerini ve sağlık özetini sakin ve sana özel tek bir alanda buluşturur.',
-			'premium.activeEyebrow' => 'Üyeliğin aktif',
-			'premium.activeTitle' => 'Premium senin için hazır',
-			'premium.activePlanTitle' => ({required Object plan}) => '${plan} senin için hazır',
+			'premium.eyebrow' => 'Döngü kayıtlarında daha fazla ayrıntı',
+			'premium.heroTitle' => 'Daha ayrıntılı kişisel örüntüler',
+			'premium.heroDescription' => 'OMA Premium; kişisel içgörüleri, uzman içeriklerini ve sağlık özetini tek yerde sunar.',
+			'premium.activeEyebrow' => 'Üyeliğin etkin',
+			'premium.activeTitle' => 'Premium özellikleri açık',
+			'premium.activePlanTitle' => ({required Object plan}) => '${plan} özellikleri açık',
 			'premium.activeDescription' => 'Paketindeki ücretli özellikler bu hesapta açık.',
 			'premium.benefitsTitle' => 'Seçtiğin pakette neler var',
-			'premium.benefitsDescription' => 'Her seviyeyi karşılaştır ve sana iyi gelen desteği seç.',
-			'premium.benefitTrackingTitle' => 'Döngü ve iyi yaşam takibi',
-			'premium.benefitTrackingDescription' => 'Takvimini, belirtilerini ve günlük iyi yaşam notlarını bir arada tut.',
+			'premium.benefitsDescription' => 'Paketleri karşılaştırarak ihtiyacına uygun özellikleri seçebilirsin.',
+			'premium.benefitTrackingTitle' => 'Döngü ve günlük kayıt takibi',
+			'premium.benefitTrackingDescription' => 'Takvim, belirti ve günlük sağlık kayıtlarını tek yerde toplar.',
 			'premium.benefitInsightsTitle' => 'Daha derin kişisel içgörüler',
-			'premium.benefitInsightsDescription' => 'Döngün, ruh halin ve günlük kayıtların arasındaki anlamlı bağlantıları gör.',
+			'premium.benefitInsightsDescription' => 'Döngü, ruh hâli ve günlük kayıtlar arasındaki bağlantıları gösterir.',
 			'premium.benefitArticlesTitle' => 'Tüm uzman içerikleri',
-			'premium.benefitArticlesDescription' => 'Her fazı desteklemek için hazırlanan tüm OMA yazılarını oku.',
+			'premium.benefitArticlesDescription' => 'Döngü fazları hakkında hazırlanan tüm OMA yazılarına erişim sağlar.',
 			'premium.benefitReportTitle' => 'Paylaşılabilir doktor raporu',
-			'premium.benefitReportDescription' => 'Döngü ve sağlık kayıtlarını anlaşılır tek bir özette bir araya getir.',
+			'premium.benefitReportDescription' => 'Döngü ve sağlık kayıtlarını anlaşılır bir özette sunar.',
 			'premium.benefitDreamsTitle' => 'Rüya yorumları',
-			'premium.benefitDreamsDescription' => 'Kaydettiğin rüyaların hislerini ve öne çıkan temalarını keşfet.',
-			'premium.plansTitle' => 'Deneyimini seç',
+			'premium.benefitDreamsDescription' => 'Kaydettiğin rüyalardaki öne çıkan temalara yönelik yorumlar sunar.',
+			'premium.plansTitle' => 'Paketleri karşılaştır',
 			'premium.freePlanName' => 'OMA Ücretsiz',
 			'premium.freePlanBadge' => 'Başlangıç',
 			'premium.freePlanPrice' => 'Ücretsiz',
-			'premium.freePlanDescription' => 'Günlük döngü ve iyi yaşam takibi',
+			'premium.freePlanDescription' => 'Günlük döngü ve sağlık kaydı takibi',
 			'premium.plusPlanName' => 'OMA Plus',
 			'premium.plusPlanBadge' => 'En popüler',
 			'premium.plusPlanDescription' => 'Kişisel içgörüler ve tüm uzman içerikleri',
 			'premium.premiumPlanName' => 'OMA Premium',
 			'premium.premiumPlanBadge' => 'Tam erişim',
 			'premium.premiumPlanDescription' => 'Plus\'taki her şeye ek doktor raporu ve rüya yorumları',
-			'premium.activePlanBadge' => 'Aktif plan',
+			'premium.activePlanBadge' => 'Etkin plan',
 			'premium.selectedPlanTitle' => 'Bu pakette bulunanlar',
 			'premium.monthlyBilling' => 'Google Play üzerinden aylık üyelik',
 			'premium.securePurchase' => 'Google Play ile güvenli satın alma',
 			'premium.renewalNote' => 'Otomatik yenilenir. Google Play\'den istediğin zaman iptal edebilirsin.',
-			'premium.signInNote' => 'Premium erişiminin hesabına bağlı kalması için önce giriş yapmalısın.',
+			'premium.signInNote' => 'Giriş yaptığında Premium erişimin hesabına bağlanır.',
 			'premium.statusTitle' => 'Üyelik bilgisi',
 			'premium.back' => 'Tamam',
 			'premium.signIn' => 'Giriş yap ve devam et',
@@ -2172,7 +2172,7 @@ extension on TranslationsTr {
 			'premium.changePlan' => ({required Object price}) => 'Paketi değiştir · ${price}',
 			'premium.currentPlan' => 'Mevcut paketin',
 			'premium.manageSubscription' => 'Google Play\'de yönet',
-			'premium.freeManagementNote' => 'Ücretsiz pakete dönmek için ücretli üyeliğini Google Play\'den iptal et. Erişimin mevcut fatura dönemi sonuna kadar devam eder.',
+			'premium.freeManagementNote' => 'Ücretsiz pakete dönmek için ücretli üyeliğini Google Play\'den iptal etmen gerekir. Erişimin mevcut fatura dönemi sonuna kadar devam eder.',
 			'premium.restore' => 'Satın almayı geri yükle',
 			'premium.googlePlayPrice' => 'Google Play fiyatı',
 			'premium.purchaseUpdateFailed' => ({required Object error}) => 'Satın alma güncellemesi okunamadı: ${error}',
@@ -2181,8 +2181,8 @@ extension on TranslationsTr {
 			'premium.productNotFound' => 'Premium üyeliği Google Play\'de bulunamadı.',
 			'premium.productsNotFound' => 'Ücretli paketlerden biri veya birkaçı Google Play\'de bulunamadı.',
 			'premium.storeConnectionFailed' => ({required Object error}) => 'Google Play\'e bağlanılamadı: ${error}',
-			'premium.loginRequired' => 'Premium\'u başlatmadan önce giriş yapmalısın.',
-			'premium.loginRestoreRequired' => 'Satın almayı geri yüklemeden önce giriş yapmalısın.',
+			'premium.loginRequired' => 'Premium\'u başlatmak için giriş yapman gerekiyor.',
+			'premium.loginRestoreRequired' => 'Satın almayı geri yüklemek için giriş yapman gerekiyor.',
 			'premium.invalidAccount' => 'Premium hesap eşleştirme kimliği geçersiz.',
 			'premium.purchaseScreenFailed' => 'Google Play satın alma ekranı açılamadı.',
 			'premium.purchaseStartFailed' => ({required Object error}) => 'Satın alma başlatılamadı: ${error}',
@@ -2193,10 +2193,10 @@ extension on TranslationsTr {
 			'premium.purchaseCancelled' => 'Satın alma iptal edildi.',
 			'premium.verifyingPurchase' => 'Satın alman güvenli biçimde doğrulanıyor…',
 			'premium.googlePlayOnly' => 'Yalnızca Google Play satın almaları destekleniyor.',
-			'premium.noActivePremium' => 'Aktif bir Premium üyeliği bulunamadı.',
-			'premium.premiumActivated' => 'Premium aktif. OMA Premium\'a hoş geldin.',
-			'premium.membershipActivated' => ({required Object plan}) => '${plan} bu hesapta aktif.',
-			'premium.planChangeNeedsRestore' => 'Mevcut Google Play satın alman yüklenemedi. Paket değiştirmeden önce satın almayı geri yükle.',
+			'premium.noActivePremium' => 'Etkin bir Premium üyeliği bulunamadı.',
+			'premium.premiumActivated' => 'Premium üyeliğin etkinleştirildi.',
+			'premium.membershipActivated' => ({required Object plan}) => '${plan} bu hesapta etkin.',
+			'premium.planChangeNeedsRestore' => 'Mevcut Google Play satın alman yüklenemedi. Paket değişikliği için önce satın almayı geri yüklemen gerekir.',
 			'premium.subscriptionManagementFailed' => 'Google Play üyelik yönetimi açılamadı.',
 			'premium.purchaseVerificationFailed' => ({required Object error}) => 'Satın alma doğrulanamadı: ${error}',
 			_ => null,

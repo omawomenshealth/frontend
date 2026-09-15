@@ -48,6 +48,9 @@ void main() {
     final body = tester.widget<Text>(find.text(AppStrings.phaseMenstrualBody));
     expect(body.maxLines, isNull);
     expect(body.overflow, isNull);
+    expect(find.textContaining('Döngünün 2. günü'), findsOneWidget);
+    expect(find.text('2.'), findsOneWidget);
+    expect(find.text(AppStrings.periodDayLabel), findsOneWidget);
 
     final prediction = tester.widget<Text>(find.text(forecast));
     expect(prediction.maxLines, isNull);
