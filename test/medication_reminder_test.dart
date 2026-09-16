@@ -256,7 +256,7 @@ void main() {
           .value,
       isFalse,
     );
-    expect(find.text('Tekrarlama periyodu'), findsOneWidget);
+    expect(find.text('Tekrarlama sıklığı'), findsOneWidget);
     expect(find.text('Başlangıç tarihi'), findsOneWidget);
     expect(find.text('Bitiş tarihi'), findsOneWidget);
     expect(find.text(AppStrings.dosageCount(1)), findsOneWidget);

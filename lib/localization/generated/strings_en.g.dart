@@ -1732,9 +1732,6 @@ class Translations$home$common$hero$en {
 	/// en: 'CURRENT PHASE'
 	String get currentPhase => 'CURRENT PHASE';
 
-	/// en: 'phase'
-	String get phaseWord => 'phase';
-
 	/// en: 'CYCLE DAY'
 	String get cycleDayLabel => 'CYCLE DAY';
 
@@ -2800,7 +2797,6 @@ extension on Translations {
 			'home.common.insightsPreview.learning' => 'As you add more records, your personal connections become clearer.',
 			'home.common.today' => 'Today',
 			'home.common.hero.currentPhase' => 'CURRENT PHASE',
-			'home.common.hero.phaseWord' => 'phase',
 			'home.common.hero.cycleDayLabel' => 'CYCLE DAY',
 			'home.common.hero.semanticLabel' => '{phase}, cycle day {day}. {message} {detail}',
 			'home.common.hero.periodDayNumber' => '{count}',
@@ -2894,9 +2890,9 @@ extension on Translations {
 			'home.phase.luteal.title' => 'Luteal',
 			'home.phase.luteal.messages.0' => 'You may notice an increase in appetite.',
 			'home.phase.luteal.messages.1' => 'Try not to delay meals for too long.',
+			'home.phase.luteal.messages.2' => 'You may crave more carbohydrates.',
 			_ => null,
 		} ?? switch (path) {
-			'home.phase.luteal.messages.2' => 'You may crave more carbohydrates.',
 			'home.phase.luteal.messages.3' => 'Remember to drink water if you feel bloated.',
 			'home.phase.luteal.messages.4' => 'Very salty foods may increase bloating.',
 			'home.phase.luteal.messages.5' => 'Coffee may affect you differently today.',

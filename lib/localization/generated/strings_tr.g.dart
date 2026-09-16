@@ -477,24 +477,24 @@ class _Translations$premium$tr extends Translations$premium$en {
 	@override String get pageTitle => 'Premium';
 	@override String get close => 'Premium ekranını kapat';
 	@override String get eyebrow => 'Döngü kayıtlarında daha fazla ayrıntı';
-	@override String get heroTitle => 'Daha ayrıntılı kişisel örüntüler';
-	@override String get heroDescription => 'OMA Premium; kişisel içgörüleri, uzman içeriklerini ve sağlık özetini tek yerde sunar.';
+	@override String get heroTitle => 'Kayıtlarına daha yakından bak';
+	@override String get heroDescription => 'Kişisel içgörüler, uzman yazıları ve sağlık özetin bir arada.';
 	@override String get activeEyebrow => 'Üyeliğin etkin';
 	@override String get activeTitle => 'Premium özellikleri açık';
 	@override String activePlanTitle({required Object plan}) => '${plan} özellikleri açık';
 	@override String get activeDescription => 'Paketindeki ücretli özellikler bu hesapta açık.';
-	@override String get benefitsTitle => 'Seçtiğin pakette neler var';
-	@override String get benefitsDescription => 'Paketleri karşılaştırarak ihtiyacına uygun özellikleri seçebilirsin.';
+	@override String get benefitsTitle => 'Paketinde neler var?';
+	@override String get benefitsDescription => 'İhtiyacına uygun paketi seçebilirsin.';
 	@override String get benefitTrackingTitle => 'Döngü ve günlük kayıt takibi';
 	@override String get benefitTrackingDescription => 'Takvim, belirti ve günlük sağlık kayıtlarını tek yerde toplar.';
-	@override String get benefitInsightsTitle => 'Daha derin kişisel içgörüler';
+	@override String get benefitInsightsTitle => 'Ayrıntılı kişisel içgörüler';
 	@override String get benefitInsightsDescription => 'Döngü, ruh hâli ve günlük kayıtlar arasındaki bağlantıları gösterir.';
 	@override String get benefitArticlesTitle => 'Tüm uzman içerikleri';
-	@override String get benefitArticlesDescription => 'Döngü fazları hakkında hazırlanan tüm OMA yazılarına erişim sağlar.';
+	@override String get benefitArticlesDescription => 'Döngü fazları hakkındaki tüm OMA yazıları.';
 	@override String get benefitReportTitle => 'Paylaşılabilir doktor raporu';
 	@override String get benefitReportDescription => 'Döngü ve sağlık kayıtlarını anlaşılır bir özette sunar.';
 	@override String get benefitDreamsTitle => 'Rüya yorumları';
-	@override String get benefitDreamsDescription => 'Kaydettiğin rüyalardaki öne çıkan temalara yönelik yorumlar sunar.';
+	@override String get benefitDreamsDescription => 'Rüyalarındaki öne çıkan temalar hakkında yorumlar.';
 	@override String get plansTitle => 'Paketleri karşılaştır';
 	@override String get freePlanName => 'OMA Ücretsiz';
 	@override String get freePlanBadge => 'Başlangıç';
@@ -1340,7 +1340,7 @@ class _Translations$home$common$hero$tr extends Translations$home$common$hero$en
 
 	// Translations
 	@override String get currentPhase => 'MEVCUT FAZ';
-	@override String get phaseWord => 'faz';
+	String get phaseWord => 'faz';
 	@override String get cycleDayLabel => 'DÖNGÜ GÜNÜ';
 	@override String get semanticLabel => '{phase}, döngünün {day}. günü. {message} {detail}';
 	@override String get periodDayNumber => '{count}.';
@@ -1607,7 +1607,7 @@ class _Translations$pregnancy$stages$stage5$tr extends Translations$pregnancy$st
 
 	// Translations
 	@override String get title => '18–22. hafta · Hareketler';
-	@override String get body => 'Fetal hareketler bu haftalarda fark edilebilir; ilk fark edilme zamanı kişiden kişiye değişir.';
+	@override String get body => 'Bebeğin hareketleri bu haftalarda fark edilebilir. Bu zaman kişiden kişiye değişir.';
 }
 
 // Path: pregnancy.stages.stage6
@@ -1629,7 +1629,7 @@ class _Translations$pregnancy$stages$stage7$tr extends Translations$pregnancy$st
 
 	// Translations
 	@override String get title => '28–31. hafta · Olgunlaşma';
-	@override String get body => 'Fetüs büyümeye devam eder; akciğer ve sinir sistemi gelişimi sürer.';
+	@override String get body => 'Fetüs büyümeye devam eder. Akciğer ve sinir sistemi gelişimi sürer.';
 }
 
 // Path: pregnancy.stages.stage8
@@ -1640,7 +1640,7 @@ class _Translations$pregnancy$stages$stage8$tr extends Translations$pregnancy$st
 
 	// Translations
 	@override String get title => '32–35. hafta · Doğuma hazırlık';
-	@override String get body => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür.';
+	@override String get body => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmaya devam eder.';
 }
 
 // Path: pregnancy.stages.stage9
@@ -2758,36 +2758,36 @@ extension on TranslationsTr {
 			'pregnancy.stages.stage4.title' => '14–17. hafta · Büyüme',
 			'pregnancy.stages.stage4.body' => 'Fetüsün büyümesi ve hareket gelişimi bu haftalarda devam eder.',
 			'pregnancy.stages.stage5.title' => '18–22. hafta · Hareketler',
-			'pregnancy.stages.stage5.body' => 'Fetal hareketler bu haftalarda fark edilebilir; ilk fark edilme zamanı kişiden kişiye değişir.',
+			'pregnancy.stages.stage5.body' => 'Bebeğin hareketleri bu haftalarda fark edilebilir. Bu zaman kişiden kişiye değişir.',
 			'pregnancy.stages.stage6.title' => '23–27. hafta · Gelişim',
 			'pregnancy.stages.stage6.body' => 'Fetüsün hareketleri ve organ gelişimi bu dönemde devam eder.',
 			'pregnancy.stages.stage7.title' => '28–31. hafta · Olgunlaşma',
-			'pregnancy.stages.stage7.body' => 'Fetüs büyümeye devam eder; akciğer ve sinir sistemi gelişimi sürer.',
+			'pregnancy.stages.stage7.body' => 'Fetüs büyümeye devam eder. Akciğer ve sinir sistemi gelişimi sürer.',
 			'pregnancy.stages.stage8.title' => '32–35. hafta · Doğuma hazırlık',
-			'pregnancy.stages.stage8.body' => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür.',
+			'pregnancy.stages.stage8.body' => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmaya devam eder.',
 			'pregnancy.stages.stage9.title' => '36–40+ hafta · Son haftalar',
 			'pregnancy.stages.stage9.body' => 'Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin.',
 			'premium.pageTitle' => 'Premium',
 			'premium.close' => 'Premium ekranını kapat',
 			'premium.eyebrow' => 'Döngü kayıtlarında daha fazla ayrıntı',
-			'premium.heroTitle' => 'Daha ayrıntılı kişisel örüntüler',
-			'premium.heroDescription' => 'OMA Premium; kişisel içgörüleri, uzman içeriklerini ve sağlık özetini tek yerde sunar.',
+			'premium.heroTitle' => 'Kayıtlarına daha yakından bak',
+			'premium.heroDescription' => 'Kişisel içgörüler, uzman yazıları ve sağlık özetin bir arada.',
 			'premium.activeEyebrow' => 'Üyeliğin etkin',
 			'premium.activeTitle' => 'Premium özellikleri açık',
 			'premium.activePlanTitle' => ({required Object plan}) => '${plan} özellikleri açık',
 			'premium.activeDescription' => 'Paketindeki ücretli özellikler bu hesapta açık.',
-			'premium.benefitsTitle' => 'Seçtiğin pakette neler var',
-			'premium.benefitsDescription' => 'Paketleri karşılaştırarak ihtiyacına uygun özellikleri seçebilirsin.',
+			'premium.benefitsTitle' => 'Paketinde neler var?',
+			'premium.benefitsDescription' => 'İhtiyacına uygun paketi seçebilirsin.',
 			'premium.benefitTrackingTitle' => 'Döngü ve günlük kayıt takibi',
 			'premium.benefitTrackingDescription' => 'Takvim, belirti ve günlük sağlık kayıtlarını tek yerde toplar.',
-			'premium.benefitInsightsTitle' => 'Daha derin kişisel içgörüler',
+			'premium.benefitInsightsTitle' => 'Ayrıntılı kişisel içgörüler',
 			'premium.benefitInsightsDescription' => 'Döngü, ruh hâli ve günlük kayıtlar arasındaki bağlantıları gösterir.',
 			'premium.benefitArticlesTitle' => 'Tüm uzman içerikleri',
-			'premium.benefitArticlesDescription' => 'Döngü fazları hakkında hazırlanan tüm OMA yazılarına erişim sağlar.',
+			'premium.benefitArticlesDescription' => 'Döngü fazları hakkındaki tüm OMA yazıları.',
 			'premium.benefitReportTitle' => 'Paylaşılabilir doktor raporu',
 			'premium.benefitReportDescription' => 'Döngü ve sağlık kayıtlarını anlaşılır bir özette sunar.',
 			'premium.benefitDreamsTitle' => 'Rüya yorumları',
-			'premium.benefitDreamsDescription' => 'Kaydettiğin rüyalardaki öne çıkan temalara yönelik yorumlar sunar.',
+			'premium.benefitDreamsDescription' => 'Rüyalarındaki öne çıkan temalar hakkında yorumlar.',
 			'premium.plansTitle' => 'Paketleri karşılaştır',
 			'premium.freePlanName' => 'OMA Ücretsiz',
 			'premium.freePlanBadge' => 'Başlangıç',
