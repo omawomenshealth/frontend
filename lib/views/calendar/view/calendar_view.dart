@@ -11,7 +11,7 @@ import '../../../core/utils/daily_log_formatters.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../data/models/period_log_model.dart';
-import '../../dashboard/viewmodel/dashboard_view_model.dart';
+import '../../../features/home/viewmodel/dashboard_view_model.dart';
 import '../../dashboard/widgets/daily_log_sheet.dart';
 import '../../profile/viewmodel/profile_view_model.dart';
 import '../viewmodel/calendar_view_model.dart';

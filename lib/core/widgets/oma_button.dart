@@ -27,6 +27,8 @@ class OmaButton extends StatelessWidget {
     this.trailingIcon,
     this.leadingIcon,
     this.isLoading = false,
+    this.backgroundColor,
+    this.foregroundColor,
   });
 
   final String label;
@@ -42,6 +44,8 @@ class OmaButton extends StatelessWidget {
   /// bir spinner'a bırakır ama buton rengi/boyutu değişmez — bu sayede
   /// yükleme sırasında düzen (layout) zıplaması olmaz.
   final bool isLoading;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   /// Kullanıcı etkileşimine açık mı (dokunma amaçlı).
   bool get _interactive => onPressed != null && !isLoading;
@@ -167,12 +171,16 @@ class OmaButton extends StatelessWidget {
 
     return switch (variant) {
       OmaButtonVariant.primary => FilledButton.styleFrom(
-          backgroundColor: OmaColors.primary,
-          foregroundColor: OmaColors.primaryForeground,
+          backgroundColor: backgroundColor ?? OmaColors.primary,
+          foregroundColor: foregroundColor ?? OmaColors.primaryForeground,
           disabledBackgroundColor:
-              keepColorsWhileLoading ? OmaColors.primary : null,
+            keepColorsWhileLoading
+              ? backgroundColor ?? OmaColors.primary
+              : null,
           disabledForegroundColor:
-              keepColorsWhileLoading ? OmaColors.primaryForeground : null,
+            keepColorsWhileLoading
+              ? foregroundColor ?? OmaColors.primaryForeground
+              : null,
           minimumSize: Size.fromHeight(_height),
           padding: _padding,
           shape: const StadiumBorder(),
@@ -242,6 +250,8 @@ class OmaButton extends StatelessWidget {
   }
 
   Color get _foregroundColor {
+    if (foregroundColor != null) return foregroundColor!;
+
     return switch (variant) {
       OmaButtonVariant.primary => OmaColors.primaryForeground,
       OmaButtonVariant.secondary => OmaColors.primary,
@@ -281,5 +291,48 @@ class OmaButton extends StatelessWidget {
       OmaButtonSize.medium => 17,
       OmaButtonSize.large => 18,
     };
+  }
+}
+
+/// OMA tasarım token'larını kullanan, yalnızca ikon içeren eylem butonu.
+class OmaIconButton extends StatelessWidget {
+  const OmaIconButton({
+    super.key,
+    required this.icon,
+    required this.onPressed,
+    required this.semanticLabel,
+    this.size = 46,
+    this.iconSize = 20,
+    this.foregroundColor,
+    this.backgroundColor,
+    this.borderColor,
+  });
+
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final String semanticLabel;
+  final double size;
+  final double iconSize;
+  final Color? foregroundColor;
+  final Color? backgroundColor;
+  final Color? borderColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: IconButton(
+        onPressed: onPressed,
+        tooltip: semanticLabel,
+        style: IconButton.styleFrom(
+          fixedSize: Size.square(size),
+          foregroundColor: foregroundColor ?? OmaColors.primary,
+          backgroundColor: backgroundColor ?? OmaColors.primary.withValues(alpha: 0.12),
+          side: borderColor == null ? null : BorderSide(color: borderColor!),
+        ),
+        icon: Icon(icon, size: iconSize),
+      ),
+    );
   }
 }

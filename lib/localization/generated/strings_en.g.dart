@@ -42,6 +42,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	// Translations
 	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
 	late final Translations$catalogs$en catalogs = Translations$catalogs$en.internal(_root);
+	late final Translations$home$en home = Translations$home$en.internal(_root);
 	late final Translations$onboarding$en onboarding = Translations$onboarding$en.internal(_root);
 	late final Translations$options$en options = Translations$options$en.internal(_root);
 	late final Translations$pregnancy$en pregnancy = Translations$pregnancy$en.internal(_root);
@@ -70,6 +71,18 @@ class Translations$catalogs$en {
 	late final Translations$catalogs$medicationIngredients$en medicationIngredients = Translations$catalogs$medicationIngredients$en.internal(_root);
 	late final Translations$catalogs$supplements$en supplements = Translations$catalogs$supplements$en.internal(_root);
 	late final Translations$catalogs$skincare$en skincare = Translations$catalogs$skincare$en.internal(_root);
+}
+
+// Path: home
+class Translations$home$en {
+	Translations$home$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$home$common$en common = Translations$home$common$en.internal(_root);
+	late final Translations$home$phase$en phase = Translations$home$phase$en.internal(_root);
+	late final Translations$home$pregnancy$en pregnancy = Translations$home$pregnancy$en.internal(_root);
 }
 
 // Path: onboarding
@@ -1140,6 +1153,118 @@ class Translations$catalogs$skincare$en {
 	};
 }
 
+// Path: home.common
+class Translations$home$common$en {
+	Translations$home$common$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$home$common$header$en header = Translations$home$common$header$en.internal(_root);
+	late final Translations$home$common$quickLogs$en quickLogs = Translations$home$common$quickLogs$en.internal(_root);
+	late final Translations$home$common$insightsPreview$en insightsPreview = Translations$home$common$insightsPreview$en.internal(_root);
+
+	/// en: 'Today'
+	String get today => 'Today';
+
+	/// en: 'low'
+	String get forecastConfidenceLow => 'low';
+
+	/// en: 'medium'
+	String get forecastConfidenceMedium => 'medium';
+
+	/// en: 'high'
+	String get forecastConfidenceHigh => 'high';
+
+	/// en: 'Period prediction: $range · $confidence confidence'
+	String periodPredictionSummary({required Object range, required Object confidence}) => 'Period prediction: ${range} · ${confidence} confidence';
+
+	/// en: 'Period prediction: $range · Add more data for more accurate results'
+	String periodPredictionLowConfidenceSummary({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results';
+
+	/// en: 'Something went wrong'
+	String get error => 'Something went wrong';
+
+	/// en: 'Daily logs cannot be added for future dates.'
+	String get futureLogNotAllowed => 'Daily logs cannot be added for future dates.';
+}
+
+// Path: home.phase
+class Translations$home$phase$en {
+	Translations$home$phase$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Cycle day {count}'
+	String get cycleDay => 'Cycle day {count}';
+
+	/// en: 'Log period'
+	String get periodLogAction => 'Log period';
+
+	/// en: '{count}'
+	String get periodDayNumber => '{count}';
+
+	/// en: 'days of period'
+	String get periodDayLabel => 'days of period';
+
+	/// en: 'days to period'
+	String get daysToPeriodLabel => 'days to period';
+
+	/// en: 'See more about this phase'
+	String get readBodyChanges => 'See more about this phase';
+
+	late final Translations$home$phase$menstrual$en menstrual = Translations$home$phase$menstrual$en.internal(_root);
+	late final Translations$home$phase$follicular$en follicular = Translations$home$phase$follicular$en.internal(_root);
+	late final Translations$home$phase$ovulation$en ovulation = Translations$home$phase$ovulation$en.internal(_root);
+	late final Translations$home$phase$luteal$en luteal = Translations$home$phase$luteal$en.internal(_root);
+}
+
+// Path: home.pregnancy
+class Translations$home$pregnancy$en {
+	Translations$home$pregnancy$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Positive test recorded: {date} · This alone does not determine the pregnancy week.'
+	String get positiveTestRecorded => 'Positive test recorded: {date} · This alone does not determine the pregnancy week.';
+
+	/// en: 'PREGNANCY'
+	String get badge => 'PREGNANCY';
+
+	/// en: 'ESTIMATED PREGNANCY WEEK'
+	String get estimatedWeek => 'ESTIMATED PREGNANCY WEEK';
+
+	/// en: 'weeks'
+	String get weekLabel => 'weeks';
+
+	/// en: '{week} weeks {day} days'
+	String get weekAndDay => '{week} weeks {day} days';
+
+	/// en: 'Estimated from your last period and sexual activity logs'
+	String get estimateCombined => 'Estimated from your last period and sexual activity logs';
+
+	/// en: 'Estimated from the start of your last period'
+	String get estimateLastPeriod => 'Estimated from the start of your last period';
+
+	/// en: 'Approximate estimate from a sexual activity log'
+	String get estimateSexualActivity => 'Approximate estimate from a sexual activity log';
+
+	/// en: 'Add your last period date or a sexual activity log to estimate the week.'
+	String get estimateUnavailable => 'Add your last period date or a sexual activity log to estimate the week.';
+
+	/// en: 'Weekly guidance is coming soon'
+	String get infoComingSoon => 'Weekly guidance is coming soon';
+
+	/// en: 'Estimated due date: {date}'
+	String get estimatedDueDate => 'Estimated due date: {date}';
+
+	late final Translations$home$pregnancy$stages$en stages = Translations$home$pregnancy$stages$en.internal(_root);
+}
+
 // Path: onboarding.common
 class Translations$onboarding$common$en {
 	Translations$onboarding$common$en.internal(this._root);
@@ -1516,6 +1641,157 @@ class Translations$auth$auth$actionCard$en {
 	late final Translations$auth$auth$actionCard$offline$en offline = Translations$auth$auth$actionCard$offline$en.internal(_root);
 }
 
+// Path: home.common.header
+class Translations$home$common$header$en {
+	Translations$home$common$header$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$home$common$header$greeting$en greeting = Translations$home$common$header$greeting$en.internal(_root);
+	late final Translations$home$common$header$date$en date = Translations$home$common$header$date$en.internal(_root);
+}
+
+// Path: home.common.quickLogs
+class Translations$home$common$quickLogs$en {
+	Translations$home$common$quickLogs$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Quick Logs'
+	String get title => 'Quick Logs';
+
+	/// en: 'Log your activities quickly'
+	String get caption => 'Log your activities quickly';
+
+	late final Translations$home$common$quickLogs$buttons$en buttons = Translations$home$common$quickLogs$buttons$en.internal(_root);
+}
+
+// Path: home.common.insightsPreview
+class Translations$home$common$insightsPreview$en {
+	Translations$home$common$insightsPreview$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'OMA CONNECTS YOUR DATA'
+	String get eyebrow => 'OMA CONNECTS YOUR DATA';
+
+	/// en: 'My Daily Insights'
+	String get title => 'My Daily Insights';
+
+	/// en: 'View all ›'
+	String get viewAll => 'View all ›';
+
+	/// en: 'As you add more records, your personal connections become clearer.'
+	String get learning => 'As you add more records, your personal connections become clearer.';
+}
+
+// Path: home.phase.menstrual
+class Translations$home$phase$menstrual$en {
+	Translations$home$phase$menstrual$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Menstrual phase'
+	String get label => 'Menstrual phase';
+
+	/// en: 'You can slow down today'
+	String get headline => 'You can slow\ndown today';
+
+	/// en: 'Your energy and comfort needs can change during period days. If it feels good, make room for rest, warmth and gentle movement. Resting and gentle movement like walking may be suitable for this time.'
+	String get body => 'Your energy and comfort needs can change during period days. If it feels good, make room for rest, warmth and gentle movement. Resting and gentle movement like walking may be suitable for this time.';
+
+	/// en: 'Estimated chance of pregnancy is lower'
+	String get fertility => 'Estimated chance of pregnancy is lower';
+}
+
+// Path: home.phase.follicular
+class Translations$home$phase$follicular$en {
+	Translations$home$phase$follicular$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Follicular phase'
+	String get label => 'Follicular phase';
+
+	/// en: 'Notice your energy as it shifts'
+	String get headline => 'Notice your energy\nas it shifts';
+
+	/// en: 'Your energy or sociability may rise in this phase, or it may feel much the same. Shape your plans around how you feel today.'
+	String get body => 'Your energy or sociability may rise in this phase, or it may feel much the same. Shape your plans around how you feel today.';
+
+	/// en: 'Estimated chance of pregnancy is rising'
+	String get fertility => 'Estimated chance of pregnancy is rising';
+}
+
+// Path: home.phase.ovulation
+class Translations$home$phase$ovulation$en {
+	Translations$home$phase$ovulation$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Estimated ovulation window'
+	String get label => 'Estimated ovulation window';
+
+	/// en: 'How are you feeling today?'
+	String get headline => 'How are you\nfeeling today?';
+
+	/// en: 'Energy, desire and social feelings can shift around estimated ovulation days. A calendar estimate cannot replace your own experience.'
+	String get body => 'Energy, desire and social feelings can shift around estimated ovulation days. A calendar estimate cannot replace your own experience.';
+
+	/// en: 'Estimated chance of pregnancy is higher'
+	String get fertility => 'Estimated chance of pregnancy is higher';
+}
+
+// Path: home.phase.luteal
+class Translations$home$phase$luteal$en {
+	Translations$home$phase$luteal$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Luteal phase'
+	String get label => 'Luteal phase';
+
+	/// en: 'Soften your pace a little'
+	String get headline => 'Soften your\npace a little';
+
+	/// en: 'As your period approaches, your energy, focus and comfort needs may change. Choose the pace that feels right today.'
+	String get body => 'As your period approaches, your energy, focus and comfort needs may change. Choose the pace that feels right today.';
+
+	/// en: 'Estimated chance of pregnancy is lower'
+	String get fertility => 'Estimated chance of pregnancy is lower';
+}
+
+// Path: home.pregnancy.stages
+class Translations$home$pregnancy$stages$en {
+	Translations$home$pregnancy$stages$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$home$pregnancy$stages$stage1$en stage1 = Translations$home$pregnancy$stages$stage1$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage2$en stage2 = Translations$home$pregnancy$stages$stage2$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage3$en stage3 = Translations$home$pregnancy$stages$stage3$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage4$en stage4 = Translations$home$pregnancy$stages$stage4$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage5$en stage5 = Translations$home$pregnancy$stages$stage5$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage6$en stage6 = Translations$home$pregnancy$stages$stage6$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage7$en stage7 = Translations$home$pregnancy$stages$stage7$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage8$en stage8 = Translations$home$pregnancy$stages$stage8$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage9$en stage9 = Translations$home$pregnancy$stages$stage9$en.internal(_root);
+}
+
 // Path: onboarding.wellbeing.moodOptions
 class Translations$onboarding$wellbeing$moodOptions$en {
 	Translations$onboarding$wellbeing$moodOptions$en.internal(this._root);
@@ -1736,6 +2012,198 @@ class Translations$auth$auth$actionCard$offline$en {
 
 	/// en: 'Your data is stored only on this phone, and no account is created.'
 	String get description => 'Your data is stored only on this phone, and no account is created.';
+}
+
+// Path: home.common.header.greeting
+class Translations$home$common$header$greeting$en {
+	Translations$home$common$header$greeting$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'You'
+	String get nameFallback => 'You';
+
+	/// en: 'Good morning'
+	String get morning => 'Good morning';
+
+	/// en: 'Good afternoon'
+	String get afternoon => 'Good afternoon';
+
+	/// en: 'Good evening'
+	String get evening => 'Good evening';
+}
+
+// Path: home.common.header.date
+class Translations$home$common$header$date$en {
+	Translations$home$common$header$date$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Calendar'
+	String get calendar => 'Calendar';
+}
+
+// Path: home.common.quickLogs.buttons
+class Translations$home$common$quickLogs$buttons$en {
+	Translations$home$common$quickLogs$buttons$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Nutrition'
+	String get nutrition => 'Nutrition';
+
+	/// en: 'Symptom'
+	String get symptom => 'Symptom';
+
+	/// en: 'Mood'
+	String get mood => 'Mood';
+
+	/// en: 'Medication'
+	String get medication => 'Medication';
+
+	/// en: 'Skincare'
+	String get skincare => 'Skincare';
+}
+
+// Path: home.pregnancy.stages.stage1
+class Translations$home$pregnancy$stages$stage1$en {
+	Translations$home$pregnancy$stages$stage1$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 1–4 · Beginning and Implantation'
+	String get title => 'Weeks 1–4 · Beginning and Implantation';
+
+	/// en: 'Everything is just beginning. Your body is preparing for tiny but important changes. 💗'
+	String get body => 'Everything is just beginning. Your body is preparing for tiny but important changes. 💗';
+}
+
+// Path: home.pregnancy.stages.stage2
+class Translations$home$pregnancy$stages$stage2$en {
+	Translations$home$pregnancy$stages$stage2$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 5–8 · Foundations Are Forming'
+	String get title => 'Weeks 5–8 · Foundations Are Forming';
+
+	/// en: 'Small developments are moving quickly. You may also begin to notice more changes in your body.'
+	String get body => 'Small developments are moving quickly. You may also begin to notice more changes in your body.';
+}
+
+// Path: home.pregnancy.stages.stage3
+class Translations$home$pregnancy$stages$stage3$en {
+	Translations$home$pregnancy$stages$stage3$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 9–13 · Moving Into the Fetal Period'
+	String get title => 'Weeks 9–13 · Moving Into the Fetal Period';
+
+	/// en: 'You have moved through most of the earliest weeks. Your baby becomes a little more distinct each day. ✨'
+	String get body => 'You have moved through most of the earliest weeks. Your baby becomes a little more distinct each day. ✨';
+}
+
+// Path: home.pregnancy.stages.stage4
+class Translations$home$pregnancy$stages$stage4$en {
+	Translations$home$pregnancy$stages$stage4$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 14–17 · Rapid Growth'
+	String get title => 'Weeks 14–17 · Rapid Growth';
+
+	/// en: 'As your baby grows quickly, you are continuing to settle into this new stage of pregnancy.'
+	String get body => 'As your baby grows quickly, you are continuing to settle into this new stage of pregnancy.';
+}
+
+// Path: home.pregnancy.stages.stage5
+class Translations$home$pregnancy$stages$stage5$en {
+	Translations$home$pregnancy$stages$stage5$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 18–22 · First Movements'
+	String get title => 'Weeks 18–22 · First Movements';
+
+	/// en: 'These are special weeks when you may begin to notice those tiny movements. 🫶'
+	String get body => 'These are special weeks when you may begin to notice those tiny movements. 🫶';
+}
+
+// Path: home.pregnancy.stages.stage6
+class Translations$home$pregnancy$stages$stage6$en {
+	Translations$home$pregnancy$stages$stage6$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 23–27 · Growing Stronger'
+	String get title => 'Weeks 23–27 · Growing Stronger';
+
+	/// en: 'Your baby’s movements may now feel more distinct. There is a small but very active world inside.'
+	String get body => 'Your baby’s movements may now feel more distinct. There is a small but very active world inside.';
+}
+
+// Path: home.pregnancy.stages.stage7
+class Translations$home$pregnancy$stages$stage7$en {
+	Translations$home$pregnancy$stages$stage7$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 28–31 · Maturing'
+	String get title => 'Weeks 28–31 · Maturing';
+
+	/// en: 'Your baby continues to grow and gain strength. You are moving gently toward meeting each other. 🤍'
+	String get body => 'Your baby continues to grow and gain strength. You are moving gently toward meeting each other. 🤍';
+}
+
+// Path: home.pregnancy.stages.stage8
+class Translations$home$pregnancy$stages$stage8$en {
+	Translations$home$pregnancy$stages$stage8$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 32–35 · Preparing for Birth'
+	String get title => 'Weeks 32–35 · Preparing for Birth';
+
+	/// en: 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.'
+	String get body => 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.';
+}
+
+// Path: home.pregnancy.stages.stage9
+class Translations$home$pregnancy$stages$stage9$en {
+	Translations$home$pregnancy$stages$stage9$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 36–40+ · Final Weeks'
+	String get title => 'Weeks 36–40+ · Final Weeks';
+
+	/// en: 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷'
+	String get body => 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -2145,6 +2613,81 @@ extension on Translations {
 			'catalogs.skincare.items.peptides' => 'Peptides',
 			'catalogs.skincare.items.resveratrol' => 'Resveratrol',
 			'catalogs.skincare.items.retinol_retinal' => 'Retinol / Retinal',
+			'home.common.header.greeting.nameFallback' => 'You',
+			'home.common.header.greeting.morning' => 'Good morning',
+			'home.common.header.greeting.afternoon' => 'Good afternoon',
+			'home.common.header.greeting.evening' => 'Good evening',
+			'home.common.header.date.calendar' => 'Calendar',
+			'home.common.quickLogs.title' => 'Quick Logs',
+			'home.common.quickLogs.caption' => 'Log your activities quickly',
+			'home.common.quickLogs.buttons.nutrition' => 'Nutrition',
+			'home.common.quickLogs.buttons.symptom' => 'Symptom',
+			'home.common.quickLogs.buttons.mood' => 'Mood',
+			'home.common.quickLogs.buttons.medication' => 'Medication',
+			'home.common.quickLogs.buttons.skincare' => 'Skincare',
+			'home.common.insightsPreview.eyebrow' => 'OMA CONNECTS YOUR DATA',
+			'home.common.insightsPreview.title' => 'My Daily Insights',
+			'home.common.insightsPreview.viewAll' => 'View all ›',
+			'home.common.insightsPreview.learning' => 'As you add more records, your personal connections become clearer.',
+			'home.common.today' => 'Today',
+			'home.common.forecastConfidenceLow' => 'low',
+			'home.common.forecastConfidenceMedium' => 'medium',
+			'home.common.forecastConfidenceHigh' => 'high',
+			'home.common.periodPredictionSummary' => ({required Object range, required Object confidence}) => 'Period prediction: ${range} · ${confidence} confidence',
+			'home.common.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results',
+			'home.common.error' => 'Something went wrong',
+			'home.common.futureLogNotAllowed' => 'Daily logs cannot be added for future dates.',
+			'home.phase.cycleDay' => 'Cycle day {count}',
+			'home.phase.periodLogAction' => 'Log period',
+			'home.phase.periodDayNumber' => '{count}',
+			'home.phase.periodDayLabel' => 'days of period',
+			'home.phase.daysToPeriodLabel' => 'days to period',
+			'home.phase.readBodyChanges' => 'See more about this phase',
+			'home.phase.menstrual.label' => 'Menstrual phase',
+			'home.phase.menstrual.headline' => 'You can slow\ndown today',
+			'home.phase.menstrual.body' => 'Your energy and comfort needs can change during period days. If it feels good, make room for rest, warmth and gentle movement. Resting and gentle movement like walking may be suitable for this time.',
+			'home.phase.menstrual.fertility' => 'Estimated chance of pregnancy is lower',
+			'home.phase.follicular.label' => 'Follicular phase',
+			'home.phase.follicular.headline' => 'Notice your energy\nas it shifts',
+			'home.phase.follicular.body' => 'Your energy or sociability may rise in this phase, or it may feel much the same. Shape your plans around how you feel today.',
+			'home.phase.follicular.fertility' => 'Estimated chance of pregnancy is rising',
+			'home.phase.ovulation.label' => 'Estimated ovulation window',
+			'home.phase.ovulation.headline' => 'How are you\nfeeling today?',
+			'home.phase.ovulation.body' => 'Energy, desire and social feelings can shift around estimated ovulation days. A calendar estimate cannot replace your own experience.',
+			'home.phase.ovulation.fertility' => 'Estimated chance of pregnancy is higher',
+			'home.phase.luteal.label' => 'Luteal phase',
+			'home.phase.luteal.headline' => 'Soften your\npace a little',
+			'home.phase.luteal.body' => 'As your period approaches, your energy, focus and comfort needs may change. Choose the pace that feels right today.',
+			'home.phase.luteal.fertility' => 'Estimated chance of pregnancy is lower',
+			'home.pregnancy.positiveTestRecorded' => 'Positive test recorded: {date} · This alone does not determine the pregnancy week.',
+			'home.pregnancy.badge' => 'PREGNANCY',
+			'home.pregnancy.estimatedWeek' => 'ESTIMATED PREGNANCY WEEK',
+			'home.pregnancy.weekLabel' => 'weeks',
+			'home.pregnancy.weekAndDay' => '{week} weeks {day} days',
+			'home.pregnancy.estimateCombined' => 'Estimated from your last period and sexual activity logs',
+			'home.pregnancy.estimateLastPeriod' => 'Estimated from the start of your last period',
+			'home.pregnancy.estimateSexualActivity' => 'Approximate estimate from a sexual activity log',
+			'home.pregnancy.estimateUnavailable' => 'Add your last period date or a sexual activity log to estimate the week.',
+			'home.pregnancy.infoComingSoon' => 'Weekly guidance is coming soon',
+			'home.pregnancy.estimatedDueDate' => 'Estimated due date: {date}',
+			'home.pregnancy.stages.stage1.title' => 'Weeks 1–4 · Beginning and Implantation',
+			'home.pregnancy.stages.stage1.body' => 'Everything is just beginning. Your body is preparing for tiny but important changes. 💗',
+			'home.pregnancy.stages.stage2.title' => 'Weeks 5–8 · Foundations Are Forming',
+			'home.pregnancy.stages.stage2.body' => 'Small developments are moving quickly. You may also begin to notice more changes in your body.',
+			'home.pregnancy.stages.stage3.title' => 'Weeks 9–13 · Moving Into the Fetal Period',
+			'home.pregnancy.stages.stage3.body' => 'You have moved through most of the earliest weeks. Your baby becomes a little more distinct each day. ✨',
+			'home.pregnancy.stages.stage4.title' => 'Weeks 14–17 · Rapid Growth',
+			'home.pregnancy.stages.stage4.body' => 'As your baby grows quickly, you are continuing to settle into this new stage of pregnancy.',
+			'home.pregnancy.stages.stage5.title' => 'Weeks 18–22 · First Movements',
+			'home.pregnancy.stages.stage5.body' => 'These are special weeks when you may begin to notice those tiny movements. 🫶',
+			'home.pregnancy.stages.stage6.title' => 'Weeks 23–27 · Growing Stronger',
+			'home.pregnancy.stages.stage6.body' => 'Your baby’s movements may now feel more distinct. There is a small but very active world inside.',
+			'home.pregnancy.stages.stage7.title' => 'Weeks 28–31 · Maturing',
+			'home.pregnancy.stages.stage7.body' => 'Your baby continues to grow and gain strength. You are moving gently toward meeting each other. 🤍',
+			'home.pregnancy.stages.stage8.title' => 'Weeks 32–35 · Preparing for Birth',
+			'home.pregnancy.stages.stage8.body' => 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.',
+			'home.pregnancy.stages.stage9.title' => 'Weeks 36–40+ · Final Weeks',
+			'home.pregnancy.stages.stage9.body' => 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷',
 			'onboarding.common.skipForNow' => 'Skip these questions for now',
 			'onboarding.common.next' => 'Continue',
 			'onboarding.common.finish' => 'Finish',
@@ -2183,6 +2726,8 @@ extension on Translations {
 			'onboarding.prompt.review' => 'When you\'re ready, let\'s begin at your own pace. Oma is here for your cycle and wellbeing.',
 			'onboarding.review.title' => 'Great',
 			'onboarding.review.titleWithName' => ({required Object name}) => 'I\'m here with you, ${name}',
+			_ => null,
+		} ?? switch (path) {
 			'onboarding.review.subtitle' => 'Your profile is ready. Ready to begin?',
 			'onboarding.review.conditionsLabel' => 'Health conditions you\'d like me to know',
 			'onboarding.review.noConditions' => 'You haven\'t added a health condition yet',
@@ -2258,8 +2803,6 @@ extension on Translations {
 			'options.moodCheckInOptions.low' => 'Low',
 			'options.moodCheckInOptions.sensitive' => 'Sensitive',
 			'options.moodCheckInOptions.neutral' => 'Neutral',
-			_ => null,
-		} ?? switch (path) {
 			'options.moodCheckInOptions.good' => 'Good',
 			'options.moodCheckInOptions.great' => 'Great',
 			'options.moodCompanionOptions.by_myself' => 'By myself',

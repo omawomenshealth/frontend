@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../utils/period_calculator.dart';
+
 /// Oma tasarım token'ları (web'deki src/styles.css karşılığı).
 class OmaColors {
+  static const scaffoldBackground = background;
   static const background = Color(0xFFFBF6EF); // surface-warm
   static const backgroundAlt = Color(0xFFF5EDE2);
   static const card = Color(0xFFFFFDF9);
@@ -13,6 +16,18 @@ class OmaColors {
   static const primaryForeground = Color(0xFFFFFDF9);
   static const plum = Color(0xFF7A5468);
   static const plumForeground = Color(0xFFFFF6F1);
+  static const periodPrimary = Color(0xFFC0606E);
+  static const periodLight = Color(0xFFF7E5E7);
+  static const ovulation = Color(0xFF8A72B0);
+  static const lutealDark = Color(0xFF9A762B);
+
+  static Color forCyclePhase(CyclePhase? phase) => switch (phase) {
+    CyclePhase.menstrual => periodPrimary,
+    CyclePhase.follicular => primary,
+    CyclePhase.ovulation => ovulation,
+    CyclePhase.luteal => lutealDark,
+    null => primary,
+  };
 
   // Hata / uyarı durumları için sıcak paletle uyumlu tonlar.
   // (Örn. giriş ekranındaki hata banner'ı, form validasyonu.)

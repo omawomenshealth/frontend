@@ -1,0 +1,32 @@
+{
+  "cycleDay": "Döngünün {count}. günü",
+  "periodLogAction": "Adet gir",
+  "periodDayNumber": "{count}.",
+  "periodDayLabel": "gün",
+  "daysToPeriodLabel": "gün kaldı",
+  "readBodyChanges": "Bu faz hakkında daha fazla gör",
+  "menstrual": {
+    "label": "Adet dönemi",
+    "headline": "Adetinin ilk\ngünlerindesin",
+    "body": "Bu günlerde enerji seviyende veya rahatlık ihtiyacında değişiklikler olabilir. İhtiyacın varsa daha sık mola verebilir, sana iyi geliyorsa hafif hareket edebilirsin.",
+    "fertility": "Tahmini gebelik ihtimali düşük"
+  },
+  "follicular": {
+    "label": "Foliküler faz",
+    "headline": "Foliküler\nfazdasın",
+    "body": "Bu fazda enerji seviyende veya günlük ihtiyaçlarında değişiklikler olabilir. Planlarını kendi gözlemlerine göre düzenleyebilirsin.",
+    "fertility": "Tahmini gebelik ihtimali artıyor"
+  },
+  "ovulation": {
+    "label": "Tahmini ovülasyon aralığı",
+    "headline": "Tahmini ovülasyon\ndönemindesin",
+    "body": "Takvim verilerine göre ovülasyon döneminde olabilirsin. Akıntı gibi vücut sinyallerini kaydedebilirsin; bu tahmin ovülasyonu doğrulamaz.",
+    "fertility": "Tahmini gebelik ihtimali yüksek"
+  },
+  "luteal": {
+    "label": "Luteal faz",
+    "headline": "Adetin\nyaklaşabilir",
+    "body": "Adet öncesinde enerji, odak ve rahatlık ihtiyacı kişiden kişiye değişebilir. İhtiyacın varsa kısa molalar verebilir veya yapacaklarını daha küçük adımlara bölebilirsin.",
+    "fertility": "Tahmini gebelik ihtimali düşük"
+  }
+}

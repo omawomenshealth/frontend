@@ -49,7 +49,7 @@ class SyncService {
       }
 
       if (!await _upload(local.data)) return false;
-      return _storage.setLastSyncTime(_nowIso());
+      return await _storage.setLastSyncTime(_nowIso());
     } catch (error) {
       debugPrint('Yedekleme hatası: $error');
       return false;
@@ -113,7 +113,7 @@ class SyncService {
       // Ağ/sunucu hataları downloadSync tarafından istisna olarak iletilir ve
       // hiçbir zaman bu dala girmez.
       if (cloud.settings == null) {
-        return backupToCloud();
+        return await backupToCloud();
       }
 
       _requireSameAccount(local);

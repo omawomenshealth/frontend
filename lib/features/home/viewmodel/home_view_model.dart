@@ -15,7 +15,7 @@ import '../../../application/cycle_prediction/cycle_prediction_coordinator.dart'
 import '../../../domain/cycle/models/cycle_prediction.dart';
 
 /// Dashboard iş mantığı.
-class DashboardViewModel extends ChangeNotifier {
+class HomeViewModel extends ChangeNotifier {
   final LocalStorageService _storage;
   final NotificationService? _notifications;
   final SyncService? _sync;
@@ -25,7 +25,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   static const int _previewInsightLimit = 2;
 
-  DashboardViewModel(
+  HomeViewModel(
     this._storage, [
     this._notifications,
     CyclePredictionCoordinator? cyclePredictions,

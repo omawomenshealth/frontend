@@ -20,7 +20,7 @@ import 'shell/home_shell.dart';
 import 'views/auth/view/auth_view.dart';
 import 'views/auth/viewmodel/auth_view_model.dart';
 import 'views/calendar/viewmodel/calendar_view_model.dart';
-import 'views/dashboard/viewmodel/dashboard_view_model.dart';
+import 'features/home/viewmodel/dashboard_view_model.dart';
 import 'views/insights/viewmodel/insights_view_model.dart';
 import 'views/onboarding/view/onboarding_view.dart';
 import 'views/onboarding/viewmodel/onboarding_view_model.dart';

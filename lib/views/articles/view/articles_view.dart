@@ -9,7 +9,7 @@ import '../../../core/widgets/oma_toast.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/premium_purchase_service.dart';
 import '../../../localization/generated/strings.g.dart';
-import '../../dashboard/viewmodel/dashboard_view_model.dart';
+import '../../../features/home/viewmodel/dashboard_view_model.dart';
 import '../model/article_model.dart';
 import '../widgets/premium_paywall.dart';
 import 'article_detail_view.dart';

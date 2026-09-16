@@ -18,7 +18,7 @@ import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/premium_purchase_service.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
-import '../../dashboard/viewmodel/dashboard_view_model.dart';
+import '../../../features/home/viewmodel/dashboard_view_model.dart';
 import '../../dashboard/widgets/medication_reminder_section.dart';
 import '../../articles/widgets/premium_paywall.dart';
 

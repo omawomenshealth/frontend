@@ -6,7 +6,7 @@ import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/sync_service.dart';
-import 'package:app_proje_a/views/dashboard/viewmodel/dashboard_view_model.dart';
+import 'package:app_proje_a/features/home/viewmodel/dashboard_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

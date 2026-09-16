@@ -2,39 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/constants/color_constants.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/widgets/oma_toast.dart';
+import '../../../core/widgets/oma_theme.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../domain/cycle/models/cycle_prediction.dart';
-import '../../../features/home/view/widgets/index.dart';
 import '../../../localization/generated/strings.g.dart';
 import '../../../views/calendar/view/calendar_view.dart' as cal;
 import '../../../views/calendar/viewmodel/calendar_view_model.dart';
 import '../../../views/insights/view/insights_view.dart';
 import '../../../views/profile/viewmodel/profile_view_model.dart';
-import '../../../features/home/viewmodel/dashboard_view_model.dart';
+import '../viewmodel/home_view_model.dart';
 import '../../../views/dashboard/widgets/daily_log_sheet.dart';
 import '../../../views/dashboard/widgets/medication_reminder_section.dart';
+import 'widgets/index.dart';
 
 /// Oma's daily home screen, adapted from the exported mobile design while
 /// retaining the existing Flutter data and logging flows.
-class DashboardView extends StatelessWidget {
+class HomeView extends StatelessWidget {
   final VoidCallback? onOpenInsights;
 
-  const DashboardView({super.key, this.onOpenInsights});
+  const HomeView({super.key, this.onOpenInsights});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DashboardViewModel>(
+    return Consumer<HomeViewModel>(
       builder: (context, vm, _) {
         if (vm.isLoading) {
           return const Scaffold(
-            backgroundColor: AppColors.scaffoldBackground,
+            backgroundColor: OmaColors.scaffoldBackground,
             body: Center(child: CircularProgressIndicator()),
           );
         }
@@ -44,8 +44,8 @@ class DashboardView extends StatelessWidget {
             calculator?.phaseAt(vm.selectedDate) ?? CyclePhase.follicular;
         final trackingMode = vm.settings?.trackingMode ?? TrackingMode.cycle;
         final accent = trackingMode == TrackingMode.pregnant
-            ? AppColors.secondaryDark
-            : AppColors.forCyclePhase(phase);
+            ? OmaColors.plum
+            : OmaColors.forCyclePhase(phase);
         final cycleDay = _cycleDay(calculator, vm.selectedDate);
         final periodCount = phase == CyclePhase.menstrual
             ? cycleDay
@@ -53,7 +53,7 @@ class DashboardView extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: Color.lerp(
-            AppColors.scaffoldBackground,
+            OmaColors.scaffoldBackground,
             accent,
             0.035,
           ),
@@ -224,7 +224,7 @@ class DashboardView extends StatelessWidget {
 
   String? _forecastSummary(
     BuildContext context,
-    DashboardViewModel vm,
+    HomeViewModel vm,
   ) {
     final strings = context.t.home.common;
     final forecast = vm.cycleForecast;
@@ -250,7 +250,7 @@ class DashboardView extends StatelessWidget {
 
   void _showDailyLogSheet(
     BuildContext context,
-    DashboardViewModel vm, {
+    HomeViewModel vm, {
     int initialIndex = 0,
     bool isSingleTab = false,
   }) {
@@ -278,7 +278,7 @@ class DashboardView extends StatelessWidget {
       builder: (context) => DailyLogSheet(
         initialLog: vm.initialLogForSection(section),
         settings: vm.settings!,
-        themeColor: AppColors.forCyclePhase(
+        themeColor: OmaColors.forCyclePhase(
           vm.periodCalculator?.phaseAt(vm.selectedDate),
         ),
         initialTabIndex: initialIndex,
