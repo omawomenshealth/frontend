@@ -120,12 +120,11 @@ void main() {
     expect(AppStrings.localizeStoredValue('Balanced'), 'Orta');
     expect(
       AppStrings.insightRecordingSummaryBody(loggedDays: 8, spanDays: 14),
-      'Son 14 günlük aralıkta 8 farklı güne kayıt ekledin.',
+      'Son 14 günde 8 güne kayıt ekledin.',
     );
     expect(
       AppStrings.insightFrequentMoodBody(label: 'Yorgun', count: 5, total: 8),
-      'Ruh hâli kaydı bulunan 8 günün 5 tanesinde “Yorgun” seçeneği '
-      'işaretlendi.',
+      'Ruh hâli kaydettiğin 8 günün 5 tanesinde “Yorgun” seçtin.',
     );
     expect(AppStrings.insightEvidenceCycles(3), 'Hesaplanan döngü: 3');
     expect(

@@ -815,28 +815,28 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.appSlogan: 'Döngü ve sağlık kayıtların tek yerde',
   _TextKey.home: 'Ana Sayfa',
   _TextKey.insights: 'İçgörüler',
-  _TextKey.insightsSubtitle: 'Kayıtlarından oluşturulan kişisel özetler',
+  _TextKey.insightsSubtitle: 'Kayıtlarından kısa özetler',
   _TextKey.insightsPrivacyNote:
-      'Bu özetler yalnızca cihazındaki kayıtlar, sabit kurallar ve istatistiklerle oluşturulur; üretken yapay zekâ kullanılmaz.',
+      'Özetler cihazındaki kayıtlar üzerinden hesaplanır. Üretken yapay zekâ kullanılmaz.',
   _TextKey.insightsEmptyTitle: 'Henüz yeterli kayıt yok',
   _TextKey.insightsEmptyDescription:
       'Kayıt ekledikçe kişisel özetler burada görünür.',
   _TextKey.insightsDisclaimer:
-      'Bu özetler tanı değildir; yalnızca kayıtlarındaki birlikte görülme durumlarını gösterir. Süren, kötüleşen veya seni endişelendiren bir değişiklik için sağlık profesyoneliyle görüşebilirsin.',
+      'Özetler, hangi kayıtların birlikte görüldüğünü gösterir. Tanı koymaz. Süren, kötüleşen veya seni endişelendiren bir değişiklik varsa bir sağlık profesyoneliyle görüşebilirsin.',
   _TextKey.personalInsightsPreviewTitle: 'Sana özel içgörüler',
   _TextKey.viewAllInsights: 'Tümünü gör',
   _TextKey.insightDataBuildingTitle: 'Karşılaştırma için kayıt gerekiyor',
   _TextKey.insightDataBuildingBody:
-      'Şu anda {count} kayıtlı gün var. Karşılaştırma için en az 3 kayıtlı gün gerekir.',
+      '{count} güne kayıt ekledin. Karşılaştırma için en az 3 gün gerekiyor.',
   _TextKey.insightRecordingSummaryTitle: 'Kayıt özeti',
   _TextKey.insightRecordingSummaryBody:
-      'Son {spanDays} günlük aralıkta {loggedDays} farklı güne kayıt ekledin.',
+      'Son {spanDays} günde {loggedDays} güne kayıt ekledin.',
   _TextKey.insightCycleLengthTitle: 'Son döngü süresi',
   _TextKey.insightCycleLengthBody:
       'Kaydettiğin son iki adet başlangıcı arasında {length} gün var.',
   _TextKey.insightCycleVariationTitle: 'Döngü süresi aralığı',
   _TextKey.insightCycleVariationBody:
-      'Hesaplanabilen son {count} döngün {min}-{max} gün arasında değişti.',
+      'Kayıtlarına göre son {count} döngün {min}–{max} gün sürdü.',
   _TextKey.insightCycleTimingReviewTitle: 'Son döngü süresi farklı',
   _TextKey.insightCycleTimingReviewBody:
       'Son iki adet başlangıcın arasında {length} gün vardı. Tek bir kayıt nedenini göstermez. Bu süre alışılmadıksa veya yeniden görülürse bir sağlık profesyoneliyle görüşebilirsin.',
@@ -848,7 +848,7 @@ const Map<_TextKey, String> _turkishTexts = {
       'Döngü süresini hesaplamak için en az iki adet başlangıcı gerekir.',
   _TextKey.insightPeriodSymptomTitle: 'Adet günlerinde tekrar eden bir belirti',
   _TextKey.insightPeriodSymptomBody:
-      '{label}, kaydettiğin {total} adet döneminin {count} tanesinde görüldü. Belirti şiddeti ve akış kayıtları dönemleri karşılaştırmaya yardımcı olabilir.',
+      '{total} adet döneminin {count} tanesinde “{label}” kaydettin.',
   _TextKey.insightPeriodDurationReviewTitle: 'Son adet süresi',
   _TextKey.insightPeriodDurationReviewBody:
       'Son tamamlanan adet kaydın {duration} gün sürdü{comparison}. Tek kayıt nedenini göstermez. Süre alışılmadıksa, 7 günü aşıyorsa veya yeniden görülürse bir sağlık profesyoneliyle görüşebilirsin.',
@@ -856,7 +856,7 @@ const Map<_TextKey, String> _turkishTexts = {
       '; önceki tamamlanmış kayıtlarının tipik süresi {comparison} gündü',
   _TextKey.insightFrequentMoodTitle: 'En sık kaydedilen ruh hâli',
   _TextKey.insightFrequentMoodBody:
-      'Ruh hâli kaydı bulunan {total} günün {count} tanesinde “{label}” seçeneği işaretlendi.',
+      'Ruh hâli kaydettiğin {total} günün {count} tanesinde “{label}” seçtin.',
   _TextKey.insightRecurringSymptomTitle: 'Sık tekrarlayan bir belirti',
   _TextKey.insightRecurringSymptomBody:
       '{label}, kayıt eklediğin {total} günün {count} tanesinde göründü.',
@@ -874,13 +874,13 @@ const Map<_TextKey, String> _turkishTexts = {
       '“{phase}” için {withTotal} belirti kaydının {withEvent} tanesinde “{symptom}” seçildi (%{withPercent}). Diğer fazlardaki {withoutTotal} karşılaştırılabilir kayıtta oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
   _TextKey.insightMoodSymptomTitle: 'Ruh hâli ve belirti kaydı',
   _TextKey.insightMoodSymptomBody:
-      '“{mood}” seçeneği {withTotal} günde işaretlendi; bu günlerin {withEvent} tanesinde “{symptom}” kaydı bulunuyor (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
+      '“{mood}” kaydettiğin {withTotal} günün {withEvent} tanesinde “{symptom}” kaydı var (%{withPercent}). Karşılaştırılan diğer {withoutTotal} günde oran %{withoutPercent}. Biri diğerinin nedeni olmayabilir.',
   _TextKey.insightMoodFoodTitle: 'Ruh hâli ve besin kaydı',
   _TextKey.insightMoodFoodBody:
-      '“{mood}” seçeneği {withTotal} günde işaretlendi; bu günlerin {withEvent} tanesinde “{food}” kaydı bulunuyor (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
+      '“{mood}” kaydettiğin {withTotal} günün {withEvent} tanesinde “{food}” kaydı var (%{withPercent}). Karşılaştırılan diğer {withoutTotal} günde oran %{withoutPercent}. Biri diğerinin nedeni olmayabilir.',
   _TextKey.insightMoodCravingTitle: 'Ruh hâli ve aşerme kaydı',
   _TextKey.insightMoodCravingBody:
-      '“{mood}” seçeneği {withTotal} günde işaretlendi; bu günlerin {withEvent} tanesinde “{craving}” isteği bulunuyor (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
+      '“{mood}” kaydettiğin {withTotal} günün {withEvent} tanesinde “{craving}” isteği kaydettin (%{withPercent}). Karşılaştırılan diğer {withoutTotal} günde oran %{withoutPercent}. Biri diğerinin nedeni olmayabilir.',
   _TextKey.insightFoodBowelTitle: 'Besin ve sindirim kaydı',
   _TextKey.insightFoodBowelSameDayBody:
       '“{food}” {withTotal} günde kaydedildi; bu günlerin {withEvent} tanesinde “{bowel}” kaydı bulunuyor (%{withPercent}). “{food}” olmayan {withoutTotal} karşılaştırılabilir günde oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
@@ -888,10 +888,10 @@ const Map<_TextKey, String> _turkishTexts = {
       '“{food}” {withTotal} günde kaydedildi; bu kayıtların {withEvent} tanesinden sonraki gün “{bowel}” görüldü (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir kayıtta oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
   _TextKey.insightMoodPlaceTitle: 'Ruh hâli ve yer kaydı',
   _TextKey.insightMoodPlaceBody:
-      '“{mood}” seçeneği {withTotal} günde işaretlendi; bu günlerin {withEvent} tanesinde yer olarak “{place}” seçildi (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
+      '“{mood}” kaydettiğin {withTotal} günün {withEvent} tanesinde “{place}” seçtin (%{withPercent}). Karşılaştırılan diğer {withoutTotal} günde oran %{withoutPercent}. Bu, bulunduğun yerin ruh hâlini belirlediğini göstermez.',
   _TextKey.insightMoodCompanionTitle: 'Ruh hâli ve kişi kaydı',
   _TextKey.insightMoodCompanionBody:
-      '“{mood}” seçeneği {withTotal} günde işaretlendi; bu günlerin {withEvent} tanesinde “{companion}” seçildi (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir günde oran %{withoutPercent}. Bu, kişi hakkında bir yargı veya neden-sonuç ilişkisi göstermez.',
+      '“{mood}” kaydettiğin {withTotal} günün {withEvent} tanesinde “{companion}” seçtin (%{withPercent}). Karşılaştırılan diğer {withoutTotal} günde oran %{withoutPercent}. Bu, kişinin ruh hâlini belirlediğini göstermez.',
   _TextKey.insightStressCompanionTitle: 'Stres ve kişi kaydı',
   _TextKey.insightStressCompanionBody:
       'Stres {withTotal} günde kaydedildi; bu günlerin {withEvent} tanesinde “{companion}” seçildi (%{withPercent}). Stres olmayan {withoutTotal} karşılaştırılabilir günde oran %{withoutPercent}. Bu, kişi hakkında bir yargı veya neden-sonuç ilişkisi göstermez.',
@@ -903,14 +903,14 @@ const Map<_TextKey, String> _turkishTexts = {
       'Stres {withTotal} günde kaydedildi; bu günlerin {withEvent} tanesinde “{food}” kaydı bulunuyor (%{withPercent}). Stres olmayan {withoutTotal} karşılaştırılabilir günde oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
   _TextKey.insightAssociationTitle: 'Aynı gün görülen kayıtlar',
   _TextKey.insightAssociationSameDayBody:
-      '“{primary}” {withTotal} günde kaydedildi; bu günlerin {withEvent} tanesinde “{secondary}” kaydı bulunuyor (%{withPercent}). “{primary}” olmayan {withoutTotal} karşılaştırılabilir günde oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
+      '“{primary}” kaydı olan {withTotal} günün {withEvent} tanesinde “{secondary}” kaydı var (%{withPercent}). Bu kaydın olmadığı {withoutTotal} günde oran %{withoutPercent}. Biri diğerinin nedeni olmayabilir.',
   _TextKey.insightAssociationNextDayBody:
       '“{primary}” {withTotal} günde kaydedildi; bu kayıtların {withEvent} tanesinden sonraki gün “{secondary}” görüldü (%{withPercent}). Diğer {withoutTotal} karşılaştırılabilir kayıtta oran %{withoutPercent}. Bu, neden-sonuç ilişkisi göstermez.',
   _TextKey.insightFoodObservationTitle: 'İlk besin ve sindirim eşleşmesi',
   _TextKey.insightFoodObservationBody:
       '{primary} ile {secondary} ilk kez aynı kayıtta görüldü. Tek kayıt, besin hassasiyetini veya neden-sonuç ilişkisini göstermez.',
   _TextKey.insightFoodPatternBuildingTitle:
-      'Bu besin ve sindirim eşleşmesi tekrar ediyor',
+      'Tekrarlayan besin ve sindirim kaydı',
   _TextKey.insightFoodPatternBuildingBody:
       '{primary} bulunan {withTotal} günün {withEvent} tanesinde {secondary} kaydedildi. Bu eşleşme, besin hassasiyetini veya neden-sonuç ilişkisini tek başına göstermez.',
   _TextKey.insightFoodSensitivityTitle:
@@ -921,8 +921,7 @@ const Map<_TextKey, String> _turkishTexts = {
       'Aynı günlerin kayıtlarında {contexts} sık görüldü. Karşılaştırma bu bilgilerden etkilenebilir.',
   _TextKey.insightContextTrackNext:
       'İstersen öğün içeriği, sindirim belirtisi, su, kafein, ruh hâli ve döngü günü kayıtlarını da ekleyebilirsin.',
-  _TextKey.insightMedicationSkipAssociationTitle:
-      'Atlanan dozun ertesi gününde görünen bir bağlantı',
+  _TextKey.insightMedicationSkipAssociationTitle: 'Atlanan dozdan sonraki gün',
   _TextKey.insightMedicationSkipAssociationBody:
       '{primary} için “atlandı” dediğin {withTotal} günün {withEvent} tanesinden sonraki gün {secondary} kaydedildi (%{withPercent}). “Alındı” dediğin {withoutTotal} karşılaştırılabilir günde bu oran %{withoutPercent}. Bu yalnızca bir ilişki; ilacın etkisini veya neden-sonuç bağını göstermez.',
   _TextKey.insightMedicationAdherenceTitle: 'Planlanan doz özeti',
@@ -956,7 +955,7 @@ const Map<_TextKey, String> _turkishTexts = {
       'Karşılaştırılabilir gün: {count} • {confidence}',
   _TextKey.insightEvidenceDays: 'Kayıtlı gün: {count}',
   _TextKey.insightEvidenceCycles: 'Hesaplanan döngü: {count}',
-  _TextKey.insightEvidenceEntries: 'İşaretleme girişi: {count}',
+  _TextKey.insightEvidenceEntries: 'İşaretleme: {count}',
   _TextKey.insightEvidenceRecords: 'Kayıt: {count}',
   _TextKey.insightNotificationTitle: 'Yeni bir OMA içgörüsü hazır',
   _TextKey.insightNotificationBody:
@@ -984,7 +983,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.exploreLutealDescription: 'Luteal faza yönelik içerikler',
   _TextKey.exploreMovement: 'Hareket',
   _TextKey.exploreRituals: 'Ritüeller',
-  _TextKey.exploreNourish: 'Beslen',
+  _TextKey.exploreNourish: 'Beslenme',
   _TextKey.exploreReads: 'Okumalar',
   _TextKey.exploreEnergy: 'Enerji',
   _TextKey.exploreSleep: 'Uyku',
@@ -1013,29 +1012,29 @@ const Map<_TextKey, String> _turkishTexts = {
       'Bugünkü kayıtlarında incelemek istediğin konuyu seçebilirsin.',
   _TextKey.phaseMenstrualHeadline: 'Adetinin ilk\ngünlerindesin',
   _TextKey.phaseMenstrualBody:
-      'Bu günlerde enerji seviyende veya rahatlık ihtiyacında değişiklikler olabilir. İhtiyacın varsa daha sık mola verebilir, sana iyi geliyorsa hafif hareket edebilirsin.',
+      'Adet günleri kişiden kişiye farklı geçebilir. İhtiyacın varsa mola verebilir, sana iyi geliyorsa hafif hareket edebilirsin.',
   _TextKey.phaseMenstrualFertility: 'Tahmini gebelik ihtimali düşük',
   _TextKey.phaseFollicularHeadline: 'Foliküler\nfazdasın',
   _TextKey.phaseFollicularBody:
-      'Bu fazda enerji seviyende veya günlük ihtiyaçlarında değişiklikler olabilir. Planlarını kendi gözlemlerine göre düzenleyebilirsin.',
+      'Bu dönemi nasıl geçirdiğini günlük kayıtlarınla takip edebilirsin.',
   _TextKey.phaseFollicularFertility: 'Tahmini gebelik ihtimali artıyor',
   _TextKey.phaseOvulationHeadline: 'Tahmini ovülasyon\ndönemindesin',
   _TextKey.phaseOvulationBody:
-      'Takvim verilerine göre ovülasyon döneminde olabilirsin. Akıntı gibi vücut sinyallerini kaydedebilirsin; bu tahmin ovülasyonu doğrulamaz.',
+      'Takvim tahmini ovülasyonu doğrulamaz. İstersen akıntı gibi gözlemlediğin değişiklikleri kaydedebilirsin.',
   _TextKey.phaseOvulationFertility: 'Tahmini gebelik ihtimali yüksek',
   _TextKey.phaseLutealHeadline: 'Adetin\nyaklaşabilir',
   _TextKey.phaseLutealBody:
-      'Adet öncesinde enerji, odak ve rahatlık ihtiyacı kişiden kişiye değişebilir. İhtiyacın varsa kısa molalar verebilir veya yapacaklarını daha küçük adımlara bölebilirsin.',
+      'Adet öncesi değişiklikler herkeste aynı olmaz. İstersen bu günlerde gözlemlediklerini kaydedebilirsin.',
   _TextKey.phaseLutealFertility: 'Tahmini gebelik ihtimali düşük',
   _TextKey.readBodyChanges: 'Bu faz hakkında daha fazla gör',
   _TextKey.periodDayCount: 'gün',
   _TextKey.daysToPeriodCount: 'gün kaldı',
   _TextKey.profileCurrentMode: 'Takip tercihin',
   _TextKey.profileCycleTrack: 'Döngü takibim',
-  _TextKey.profileSymptomPatterns: 'Belirti örüntülerin',
+  _TextKey.profileSymptomPatterns: 'Tekrarlayan belirtilerin',
   _TextKey.profileSupportTitle: 'OMA desteği',
   _TextKey.profileSupportDescription:
-      'Profil, döngü ve ilaç ayarlarını bu sayfadaki ilgili satırlardan düzenleyebilirsin. Sağlık kayıtlarının özeti için Doktor Raporu bölümünü kullan.',
+      'Bilgilerini bu sayfadan düzenleyebilirsin. Sağlık kayıtlarının özeti Doktor Raporu bölümünde.',
   _TextKey.profilePremiumTitle: 'OMA Premium',
   _TextKey.gotIt: 'Anladım',
   _TextKey.completeCycleDetails: 'Döngü bilgilerini tamamla',
@@ -1156,17 +1155,17 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.addDailyLog: 'Günlük kayıt ekle',
   _TextKey.logPeriodQuestion: 'Bugünkü kanama yoğunluğu nasıl?',
   _TextKey.logPeriodHint:
-      'Yoğunluğu kaydetmen, OMA’nın sonraki döngünü daha doğru tahmin etmesine yardımcı olur.',
+      'Kanama yoğunluğunu kaydederek adet dönemlerini karşılaştırabilirsin.',
   _TextKey.logNutritionQuestion: 'Bugün nasıl beslendin?',
   _TextKey.logNutritionHint:
-      'Kısa bir kayıt yeterli; OMA zamanla beslenme, enerji ve ruh hâli kayıtların arasındaki bağlantıları karşılaştırır.',
+      'Öğünlerini ve sonrasında gözlemlediklerini kaydedebilirsin.',
   _TextKey.logMedicationQuestion: 'Bugün ilaç veya takviye kullandın mı?',
   _TextKey.logMedicationHint:
       'İlaç, takviye, doz ve hatırlatmalarını tek yerde düzenleyebilirsin.',
   _TextKey.medicationTime: 'Saat',
   _TextKey.medicationDose: 'Doz',
   _TextKey.medicationStomachState: 'Aç / tok',
-  _TextKey.medicationTakenStatus: 'Alındı durumu',
+  _TextKey.medicationTakenStatus: 'Kullanım durumu',
   _TextKey.medicationLogEmptyHint:
       'İlaç, takviye veya hatırlatıcı eklemek için + düğmesini kullanabilirsin.',
   _TextKey.logMoodQuestion: 'Şu anda nasıl hissediyorsun?',
@@ -1174,10 +1173,10 @@ const Map<_TextKey, String> _turkishTexts = {
       'Şu anki durumuna en yakın seçeneği işaretleyebilirsin.',
   _TextKey.logAnythingElse: 'Başka bir gözlem eklemek ister misin?',
   _TextKey.logHydration: 'Bugün içtiğin su miktarı',
-  _TextKey.savePeriod: 'Adet kaydını kaydet',
+  _TextKey.savePeriod: 'Adeti kaydet',
   _TextKey.saveNutrition: 'Beslenmeyi kaydet',
-  _TextKey.saveMedication: 'Rutini kaydet',
-  _TextKey.saveMoment: 'Bu anı kaydet',
+  _TextKey.saveMedication: 'İlaç kaydını kaydet',
+  _TextKey.saveMoment: 'Ruh hâlini kaydet',
   _TextKey.continueAction: 'Devam et',
   _TextKey.mealsToday: 'Bugünkü öğünlerin',
   _TextKey.mealsFeel: 'Nasıl beslendin?',
@@ -1213,7 +1212,7 @@ const Map<_TextKey, String> _turkishTexts = {
       'İhtiyacın varsa kısa bir mola verebilir veya işlerini küçük adımlara bölebilirsin.',
   _TextKey.moodWhoWith: 'Kiminleydin?',
   _TextKey.moodCompanionTrackingHint:
-      'Belirli bir kişiyi takip etmek istersen + ile adını bir kez ekle. Sonraki kayıtlarda aynı adı yeniden seçebilirsin.',
+      'İstersen + ile isim ekleyebilir, sonraki kayıtlarda yeniden seçebilirsin.',
   _TextKey.moodWhere: 'Neredeydin?',
   _TextKey.todaysStatus: 'Bugünün durumu',
   _TextKey.noLogAdded: 'Henüz kayıt eklenmedi',
@@ -1230,13 +1229,13 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.startReading: 'Okumaya başla',
   _TextKey.todaysLogs: '📋 Bugünün kayıtları',
   _TextKey.datedLogs: '📋 {date} tarihli kayıtlar',
-  _TextKey.noLogForDate: 'Bu tarih için henüz bir kayıt girilmemiş.',
+  _TextKey.noLogForDate: 'Bu tarihte henüz kayıt yok.',
   _TextKey.mood: 'Ruh hâli',
   _TextKey.nutrition: 'Beslenme',
   _TextKey.nutritionStatus: 'Beslenme durumu',
   _TextKey.dailyFactors: 'Günlük etkenler',
   _TextKey.dailyFactorsHint:
-      'Bu alan isteğe bağlıdır. Düzenli kayıtlar kişisel bağlantıları karşılaştırmaya yardımcı olur.',
+      'İstersen gününü etkileyen başka bilgileri ekleyebilirsin.',
   _TextKey.waterIntake: 'Su tüketimi',
   _TextKey.milliliters: '{value} ml',
   _TextKey.servingCount: '{count} porsiyon',
@@ -1271,17 +1270,15 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.notesHint: 'Bugünle ilgili eklemek istediğin bir not...',
   _TextKey.selectLogTime: 'Kayıt saatini seç',
   _TextKey.pastLogTimeQuestion: 'Bu kayda saat eklemek ister misin?',
-  _TextKey.pastLogTimeHint:
-      'Saat isteğe bağlıdır. Saat eklemeden de bu güne kayıt yapabilirsin.',
+  _TextKey.pastLogTimeHint: 'Saat eklemeden de kaydedebilirsin.',
   _TextKey.addTime: 'Saat ekle',
   _TextKey.saveWithoutTime: 'Saat olmadan kaydet',
   _TextKey.timeNotAdded: 'Saat eklenmedi',
   _TextKey.logSaveFailed: 'Kayıt kaydedilemedi. Yeniden deneyebilirsin.',
   _TextKey.futureLogNotAllowed: 'Gelecek tarihlere günlük kayıt eklenemez.',
-  _TextKey.savePeriodBeforeSymptomsTitle:
-      'Belirti kaydı için adet bilgisi gerekiyor',
+  _TextKey.savePeriodBeforeSymptomsTitle: 'Adet kaydın kaydedilsin mi?',
   _TextKey.savePeriodBeforeSymptomsBody:
-      'Belirti bölümüne geçmeden önce bu adet kaydı kaydedilecek.',
+      'Devam ettiğinde adet kaydın kaydedilir ve belirti bölümü açılır.',
   _TextKey.saveAndContinue: 'Kaydet ve devam et',
   _TextKey.supplementExample: 'Örn: D Vitamini',
   _TextKey.medicationExample: 'Örn: 500 mg Parol',
@@ -1331,7 +1328,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.recordedPeriod: 'Kayıtlı adet',
   _TextKey.predictedPeriod: 'Tahmini adet',
   _TextKey.fertileDays: 'Tahmini ovülasyon günleri',
-  _TextKey.noLogsForDay: 'Bu gün için kayıt yok',
+  _TextKey.noLogsForDay: 'Seçilen günde kayıt yok',
   _TextKey.viewDetails: 'Detayları gör',
   _TextKey.period: 'Adet',
   _TextKey.all: 'Tümü',
@@ -1342,12 +1339,12 @@ const Map<_TextKey, String> _turkishTexts = {
       'Yazılar yüklenemedi. Bağlantını kontrol edip yeniden deneyebilirsin.',
   _TextKey.articleLoadFailed: 'Yazı yüklenemedi. Yeniden deneyebilirsin.',
   _TextKey.noArticlesForTopic: 'Bu konuda henüz yazı yok',
-  _TextKey.articleNotPublished: 'Bu yazı henüz yayınlanmadı.',
+  _TextKey.articleNotPublished: 'Bu yazı henüz yayımlanmadı.',
   _TextKey.healthTeam: 'OMA Sağlık Ekibi',
   _TextKey.generalInformation: 'Genel bilgilendirme',
   _TextKey.generalHealth: 'Genel Sağlık',
   _TextKey.shortSummary: 'Kısa Özet',
-  _TextKey.premiumActive: 'Premium üyeliğin aktif',
+  _TextKey.premiumActive: 'Premium üyeliğin etkin',
   _TextKey.unlockExpertArticles: 'Tüm uzman yazılarını aç',
   _TextKey.premiumAccessDescription:
       'Bir ücretsiz yazının yanında tüm Premium sağlık içeriklerine erişebilirsin. Üyeliğin Google Play hesabın üzerinden yönetilir.',
@@ -1358,7 +1355,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.becomePremium: 'Premium ol • {price}',
   _TextKey.restorePurchase: 'Satın almayı geri yükle',
   _TextKey.googlePlayPrice: 'Google Play fiyatı',
-  _TextKey.googleConnect: 'Google ile Bağlan',
+  _TextKey.googleConnect: 'Google ile bağlan',
   _TextKey.developerMode: 'Geliştirici Modu (Test)',
   _TextKey.testUser: 'Test Kullanıcısı',
   _TextKey.developerTestLogin: 'Geliştirici Test Girişi',
@@ -1366,15 +1363,15 @@ const Map<_TextKey, String> _turkishTexts = {
       'Google Console ayarların tamamlanmadan veya yerel emülatörde eşitlemeyi test etmek için bu modu kullanabilirsin.',
   _TextKey.syncCouldNotComplete:
       'Eşitleme tamamlanamadı. Yeniden deneyebilirsin.',
-  _TextKey.cloudBackupFound: 'Bulut Yedeği Bulundu',
+  _TextKey.cloudBackupFound: 'Bulut yedeği bulundu',
   _TextKey.cloudBackupQuestion:
       'Giriş yaptığın hesaba ait şifreli bir bulut yedeği bulundu. Nasıl devam etmek istersin?',
   _TextKey.cloudBackupOptions:
-      '• Birleştir: Cihazdaki yerel veriler ile bulut verilerini tarihlerine göre harmanlar.\n'
-      '• Geri Yükle: Cihazdaki verileri siler ve buluttaki yedeği telefona yazar.\n'
-      '• Üzerine Yaz: Buluttaki yedeği siler ve cihazdaki verileri buluta yükler.',
-  _TextKey.restore: 'Geri Yükle',
-  _TextKey.overwrite: 'Üzerine Yaz',
+      '• Birleştir: Cihazdaki ve buluttaki kayıtları tarihlerine göre birleştirir.\n'
+      '• Geri yükle: Cihazdaki verileri silip buluttaki yedeği yükler.\n'
+      '• Üzerine yaz: Buluttaki yedeği silip cihazdaki verileri yükler.',
+  _TextKey.restore: 'Geri yükle',
+  _TextKey.overwrite: 'Üzerine yaz',
   _TextKey.merge: 'Birleştir',
   _TextKey.googleTokenMissing: 'Google kimlik doğrulama belirteci alınamadı.',
   _TextKey.syncProtectedError:
@@ -1385,7 +1382,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.cloudBackupError: 'Bulut yedekleme hatası: {error}',
   _TextKey.doctorReport: 'Doktor Raporu',
   _TextKey.doctorReportDescription:
-      'Sağlık kayıtlarını doktorunla paylaşabileceğin okunabilir bir raporda görüntüleyebilirsin.',
+      'Sağlık kayıtlarını tek raporda görebilir ve doktorunla paylaşabilirsin.',
   _TextKey.viewAndShareReport: 'Raporu Görüntüle ve Paylaş',
   _TextKey.downloadOrSharePdf: 'PDF Olarak İndir / Paylaş',
   _TextKey.copyAsText: 'Metin Olarak Kopyala',
@@ -1396,25 +1393,24 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.nickname: 'İsim / hitap',
   _TextKey.weightHeight: 'Kilo / Boy',
   _TextKey.smoking: 'Sigara Kullanımı',
-  _TextKey.noConditions: 'Bulunmamaktadır',
+  _TextKey.noConditions: 'Kayıt yok',
   _TextKey.lastBloodValues: 'Son Kan Değerlerin',
   _TextKey.womenHealthSummary: 'Kadın Sağlığı ve Adet Döngüsü Özeti',
   _TextKey.averageCycleLength: 'Ort. Döngü Süresi',
   _TextKey.averagePeriodLength: 'Ort. Adet Kanaması',
   _TextKey.gynecologicalDiseases: 'Jinekolojik Hastalıklar',
   _TextKey.dailyHealthLogs: 'Günlük Sağlık Kayıtları (Son 15 Kayıt)',
-  _TextKey.noHealthLogs:
-      'Henüz kaydedilmiş günlük sağlık kaydı bulunmamaktadır.',
+  _TextKey.noHealthLogs: 'Henüz günlük sağlık kaydı yok.',
   _TextKey.savedDoctorNotes: 'Kaydedilen Doktor/Genel Notları',
   _TextKey.date: 'Tarih',
   _TextKey.medicationAndSupplement: 'İlaç ve Takviye',
   _TextKey.noBleeding: 'Kanama Yok',
   _TextKey.bleeding: 'Kanamalı',
   _TextKey.generalNote: 'Genel Not',
-  _TextKey.noSavedNotes: 'Eklenmiş özel not bulunmamaktadır.',
+  _TextKey.noSavedNotes: 'Henüz not eklenmedi.',
   _TextKey.reportCopied:
-      'Rapor kopyalandı. Doktoruna mesajlaşma uygulamasıyla gönderebilirsin.',
-  _TextKey.pdfCreationError: 'PDF oluşturulurken hata: {error}',
+      'Rapor kopyalandı. İstersen doktorunla paylaşabilirsin.',
+  _TextKey.pdfCreationError: 'PDF oluşturulamadı: {error}',
   _TextKey.basicInformationEdit: 'Temel bilgileri düzenle',
   _TextKey.womenHealthEdit: 'Kadın sağlığı bilgilerini düzenle',
   _TextKey.medicationSupplementEdit: 'İlaç ve takviyeleri düzenle',
@@ -1428,43 +1424,43 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.offlineCloudDisabled: 'Çevrimdışı çalışılıyor (bulut kapalı)',
   _TextKey.lastSync: 'Son eşitleme',
   _TextKey.account: 'Hesap',
-  _TextKey.neverSynced: 'Hiç senkronize edilmedi',
+  _TextKey.neverSynced: 'Henüz eşitlenmedi',
   _TextKey.syncSuccessful: 'Eşitleme tamamlandı.',
   _TextKey.syncFailed: 'Eşitleme başarısız oldu.',
   _TextKey.syncInternetFailed:
       'Eşitleme başarısız oldu. İnternet bağlantını kontrol edip yeniden deneyebilirsin.',
   _TextKey.syncing: 'Eşitleniyor...',
-  _TextKey.syncNow: 'Şimdi Eşitle',
-  _TextKey.logout: 'Çıkış Yap',
-  _TextKey.privacyCenter: 'Gizlilik Merkezi',
-  _TextKey.privacyNotice: 'Gizlilik Bildirimi',
-  _TextKey.healthCloudConsent: 'Sağlık Verisi Bulut Rızası',
-  _TextKey.consentActive: 'Açık rıza aktif',
+  _TextKey.syncNow: 'Şimdi eşitle',
+  _TextKey.logout: 'Çıkış yap',
+  _TextKey.privacyCenter: 'Gizlilik merkezi',
+  _TextKey.privacyNotice: 'Gizlilik bildirimi',
+  _TextKey.healthCloudConsent: 'Sağlık verileri için bulut izni',
+  _TextKey.consentActive: 'Açık rıza verildi',
   _TextKey.consentInactive: 'Açık rıza verilmemiş veya güncel değil',
-  _TextKey.grantConsent: 'Açık Rıza Ver',
-  _TextKey.withdrawConsent: 'Rızamı Geri Çek',
+  _TextKey.grantConsent: 'Açık rıza ver',
+  _TextKey.withdrawConsent: 'Rızamı geri çek',
   _TextKey.withdrawConsentWarning:
       'Rızanı geri çekersen buluttaki sağlık kayıtların silinir. Hesabın ve satın alma kaydın açık kalır; bu cihazdaki yerel verilerin silinmez.',
   _TextKey.cloudDataDeletedLocalRemains:
-      'Bulut sağlık verileri silindi. Bu cihazdaki yerel kayıtlar korunuyor.',
+      'Buluttaki sağlık verilerin silindi. Bu cihazdaki kayıtların duruyor.',
   _TextKey.exportMyData: 'Verilerimi JSON Olarak Dışa Aktar',
   _TextKey.exportReady: 'JSON dışa aktarma dosyası hazırlandı.',
   _TextKey.privacyActionFailed:
       'Gizlilik işlemi tamamlanamadı. Yeniden deneyebilirsin.',
   _TextKey.consentExplanation:
       'Döngü, belirti, ilaç ve takviye kayıtların sağlık verisidir. Bulut eşitlemesi için bu veriler şifrelenerek sunucuda işlenir. Rıza isteğe bağlıdır ve istediğin zaman geri çekilebilir.',
-  _TextKey.continueOffline: 'Bulut Eşitlemeden Devam Et',
-  _TextKey.deleteAccountAndData: 'Hesabımı ve Verilerimi Sil',
-  _TextKey.deleteLocalData: 'Bu Cihazdaki Verilerimi Sil',
-  _TextKey.deletionWarningTitle: 'Veriler Kalıcı Olarak Silinecek',
+  _TextKey.continueOffline: 'Bulut eşitlemeden devam et',
+  _TextKey.deleteAccountAndData: 'Hesabımı ve verilerimi sil',
+  _TextKey.deleteLocalData: 'Bu cihazdaki verilerimi sil',
+  _TextKey.deletionWarningTitle: 'Verilerin kalıcı olarak silinecek',
   _TextKey.deletionWarningCloud:
       'Profilin, sağlık kayıtların, ilaç ve takviye listelerin, bulut yedeğin ve hesap bağlantın kalıcı olarak silinir. Bu işlem geri alınamaz. Google Play aboneliğin otomatik iptal olmaz; aboneliği ayrıca Play Store üzerinden yönetmen gerekir.',
   _TextKey.deletionWarningLocal:
       'Bu cihazdaki profilin ve sağlık kayıtların kalıcı olarak silinir. Bu işlem geri alınamaz.',
-  _TextKey.continueDeletion: 'Devam Et',
-  _TextKey.finalDeletionTitle: 'Son Onay',
+  _TextKey.continueDeletion: 'Devam et',
+  _TextKey.finalDeletionTitle: 'Silmeyi onayla',
   _TextKey.finalDeletionDescription:
-      'Yanlışlıkla silmeyi önlemek için hesabının e-posta adresini aşağıya eksiksiz yaz.',
+      'Silmeyi onaylamak için hesabının e-posta adresi gerekiyor.',
   _TextKey.confirmationEmailHint: 'Hesap e-posta adresi',
   _TextKey.confirmationEmailMismatch: 'E-posta adresi hesapla eşleşmiyor.',
   _TextKey.deletingData: 'Veriler siliniyor...',
@@ -1474,14 +1470,14 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.deletionSuccessful: 'Hesabın ve verilerin kalıcı olarak silindi.',
   _TextKey.localDeletionSuccessful: 'Bu cihazdaki verilerin silindi.',
   _TextKey.connectAccountDescription:
-      'Uygulama silindiğinde veya başka bir cihaza geçtiğinde verilerini korumak için Google hesabını bağlayabilirsin.',
-  _TextKey.loginConnectAccount: 'Giriş Yap / Hesap Bağla',
-  _TextKey.logoutQuestion: 'Çıkış Yapılsın mı?',
+      'Google hesabını bağlayıp bulut yedeği oluşturarak kayıtlarına başka cihazlardan erişebilirsin.',
+  _TextKey.loginConnectAccount: 'Giriş yap / hesap bağla',
+  _TextKey.logoutQuestion: 'Çıkış yapılsın mı?',
   _TextKey.logoutDescription:
       'Hesabından çıkış yaptığında bu cihazdaki verilerin temizlenir. Bulut eşitlemen tamamsa daha sonra yeniden giriş yaparak verilerini geri yükleyebilirsin.',
-  _TextKey.logoutAndClear: 'Çıkış Yap ve Temizle',
+  _TextKey.logoutAndClear: 'Çıkış yap ve temizle',
   _TextKey.localStorageNotInitialized:
-      'Yerel depolama henüz başlatılmadı. init() metodunu çağırın.',
+      'Cihazdaki kayıtlara şu anda erişilemiyor.',
   _TextKey.invalidServerResponse: 'Sunucudan geçersiz yanıt alındı.',
   _TextKey.loginServerError: 'Giriş yapılamadı. Sunucu hata kodu: {code}',
   _TextKey.connectionError: 'Bağlantı hatası: {error}',
@@ -1531,7 +1527,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.notificationTime: 'Bildirim saati',
   _TextKey.selectAtLeastOneNotificationTime:
       'En az bir bildirim saati seçmelisin.',
-  _TextKey.repeatPeriod: 'Tekrarlama periyodu',
+  _TextKey.repeatPeriod: 'Tekrarlama sıklığı',
   _TextKey.everyDay: 'Her gün',
   _TextKey.selectedDays: 'Seçili günler',
   _TextKey.startDate: 'Başlangıç tarihi',
@@ -1557,7 +1553,7 @@ const Map<_TextKey, String> _turkishTexts = {
       '{dose} dozunu alma zamanı. Yanıtını OMA’da kaydedebilirsin.',
   _TextKey.privateReminderNotificationTitle: 'OMA hatırlatıcısı',
   _TextKey.privateReminderNotificationBody:
-      'Planladığın bir sağlık hatırlatıcısının zamanı geldi.',
+      'Planladığın hatırlatıcının zamanı geldi.',
   _TextKey.notificationScheduled: 'Bildirim cihazda planlandı',
   _TextKey.notificationNotScheduled: 'Bildirim cihazda planlanmadı',
   _TextKey.reminderChannelName: 'İlaç ve takviye hatırlatıcıları',
@@ -1577,15 +1573,14 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.reminderSummaryDays: '{days} • {time}',
   _TextKey.reminderDateRange: '{start} – {end}',
   _TextKey.reminderDeliveryNote:
-      'OMA bildirimi cihazda planlar. Telefon sistemi bildirimin ekranda gösterildiğini doğrulamadığı için “alındı” yalnızca sen yanıt verdiğinde kaydedilir. İzin ve pil ayarları bildirim saatini etkileyebilir.',
+      'Doz, yalnızca sen işaretlediğinde “alındı” olarak kaydedilir. Telefonun bildirim izinleri ve pil ayarları hatırlatma saatini etkileyebilir.',
   _TextKey.responseSaved: 'Doz yanıtı kaydedildi.',
   _TextKey.emptyMedicationList: 'Henüz eklenmemiş',
   _TextKey.searchFoods: 'Yiyecek veya kategori ara',
   _TextKey.searchMedications: 'İlaç veya etken madde ara',
   _TextKey.searchSupplements: 'Takviye ara',
   _TextKey.searchSkincare: 'İçerik ara',
-  _TextKey.smartSearchHint:
-      'Yazdığın ürün görünmese bile doğru kategori bulunur.',
+  _TextKey.smartSearchHint: 'Ürün adıyla da kategori arayabilirsin.',
   _TextKey.noSearchResults: 'Eşleşen bir sonuç bulunamadı.',
   _TextKey.addSnack: 'Yeni atıştırmalık ekle',
   _TextKey.snackNumber: 'Atıştırmalık {number}',
@@ -1596,7 +1591,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.skincareRoutine: 'Cilt bakım rutinin',
   _TextKey.skincareQuestion: 'Bugün cilt bakım rutinin nasıldı?',
   _TextKey.skincareHint:
-      'Ürün adı yerine içerikleri seç; OMA zamanla cildindeki değişimleri takip etsin.',
+      'Kullandığın içerikleri ve cildinde gözlemlediklerini kaydedebilirsin.',
   _TextKey.medicationQuestion: 'Bugün hangi ilaçları kullandın?',
   _TextKey.supplementQuestion: 'Bugün hangi takviyeleri kullandın?',
   _TextKey.supplementPageHint:
@@ -1613,10 +1608,10 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.ongoingRoutine: 'Sürekli / bitiş yok',
   _TextKey.medicationUsagePlanQuestion: 'Bu ilacı ne kadar süre kullanacaksın?',
   _TextKey.medicationUsagePlanHint:
-      'Kısa kür veya uzun süreli kullanım planını şimdi belirleyebilirsin. Hatırlatıcı isteğe bağlıdır.',
+      'Kullanım süresini kaydedebilir, istersen hatırlatıcı ekleyebilirsin.',
   _TextKey.setUsagePlan: 'Kullanım planını belirle',
   _TextKey.savedForLater:
-      'Kaydedildi; sonraki girişlerde yeniden seçebilirsin.',
+      'Kaydedildi. Sonraki kayıtlarda yeniden seçebilirsin.',
   _TextKey.addCustomWomenDisease: 'Kadın hastalığı ekle',
   _TextKey.addCustomChronicDisease: 'Kronik hastalık ekle',
   _TextKey.conditionName: 'Hastalık adı',
@@ -1630,7 +1625,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.deleteDayPeriod: 'Bu günün adet kaydını sil',
   _TextKey.deletePeriodConfirmationTitle: 'Adet kaydı silinsin mi?',
   _TextKey.deletePeriodConfirmationBody:
-      'Bu güne ait adet bilgisi kaldırılacak. Diğer günlük kayıtların korunacak.',
+      'Seçilen günün adet kaydı silinir. Diğer kayıtların korunur.',
   _TextKey.confirm: 'Onayla',
   _TextKey.periodEntryDeleted: 'Adet kaydı silindi.',
   _TextKey.periodDeleteFailed: 'Adet kaydı silinemedi. Yeniden deneyebilirsin.',
@@ -1650,7 +1645,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.premiumDoctorReportInsightTitle:
       'Kayıtların doktor görüşmesine hazır',
   _TextKey.premiumDoctorReportInsightBody:
-      'Düzenli girişlerin anlamlı bir özet oluşturdu. OMA Premium ile doktor raporunu PDF olarak hazırlayabilirsin.',
+      'OMA Premium ile sağlık kayıtlarını PDF raporu olarak paylaşabilirsin.',
   _TextKey.biotinInsightTitle:
       'Biotin bazı kan testi sonuçlarını etkileyebilir',
   _TextKey.biotinInsightBody:
@@ -1734,16 +1729,15 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.goodDream: 'İyi rüya',
   _TextKey.nightmare: 'Kabus',
   _TextKey.dreamSaved: 'Rüyan kaydedildi',
-  _TextKey.dreamPremiumOffer:
-      'Rüya tabiri özelliği için Premium paketimize göz atabilirsin.',
+  _TextKey.dreamPremiumOffer: 'Rüya yorumları Premium paketinde yer alır.',
   _TextKey.explorePremium: 'Premium pakete göz at',
   _TextKey.notNow: 'Şimdi değil',
-  _TextKey.exploreDreamInterpretation: 'Rüya tabirini keşfet',
+  _TextKey.exploreDreamInterpretation: 'Rüya yorumlarını gör',
   _TextKey.dreamPremiumDescription:
-      'Rüyalarını kaydetmeye devam et; Premium ile rüya tabiri özelliklerine eriş.',
+      'Premium ile kaydettiğin rüyaların yorumlarını görebilirsin.',
   _TextKey.myDreams: 'Rüyalarım',
   _TextKey.privateDreamJournalDescription:
-      'Burası senin özel rüya günlüğün. Rüyaların iznin olmadan okunmaz veya işlenmez.',
+      'Rüya notların iznin olmadan okunmaz veya işlenmez.',
   _TextKey.nightmaresVisible: 'Kabuslar görünür',
   _TextKey.nightmaresHiddenOne: '{count} kabus gizli',
   _TextKey.nightmaresHiddenMany: '{count} kabus gizli',
@@ -1757,7 +1751,7 @@ const Map<_TextKey, String> _turkishTexts = {
   _TextKey.catalogCategoryCountOne: '{count} kategori',
   _TextKey.catalogCategoryCountMany: '{count} kategori',
   _TextKey.activeIngredientOptional: 'Etken madde (isteğe bağlı)',
-  _TextKey.fiveMore: '5 daha',
+  _TextKey.fiveMore: '5 tane daha',
   _TextKey.reportFileName: 'oma_saglik_raporu',
 };
 
