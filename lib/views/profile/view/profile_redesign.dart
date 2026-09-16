@@ -9,7 +9,7 @@ class ProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    return Consumer2<ProfileViewModel, DashboardViewModel>(
+    return Consumer2<ProfileViewModel, HomeViewModel>(
       builder: (context, profile, dashboard, _) {
         if (profile.isLoading) {
           return const Scaffold(
@@ -698,7 +698,7 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
       );
       return;
     }
-    await context.read<DashboardViewModel>().loadData();
+    await context.read<HomeViewModel>().loadData();
     if (!context.mounted) return;
     await context.read<CalendarViewModel>().loadData();
   }
@@ -706,7 +706,7 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
 
 class _CycleOverviewCard extends StatelessWidget {
   final ProfileViewModel profile;
-  final DashboardViewModel dashboard;
+  final HomeViewModel dashboard;
   final Color accent;
   final VoidCallback onEdit;
 

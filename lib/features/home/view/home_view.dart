@@ -82,7 +82,8 @@ class HomeView extends StatelessWidget {
                       onDateSelected: vm.selectDate,
                       periodCalculator: calculator,
                     ),
-                    if (!vm.selectedDate.isSameDay(AppTime.now)) ...[
+                    /*
+                    if (vm.selectedDate.isSameDay(AppTime.now)) ...[
                       const SizedBox(height: 9),
                       Align(
                         alignment: Alignment.centerRight,
@@ -97,6 +98,7 @@ class HomeView extends StatelessWidget {
                         ),
                       ),
                     ],
+                    */
                     const SizedBox(height: 20),
                     HomeHeroSection(
                       trackingMode: trackingMode,

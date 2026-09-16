@@ -11,7 +11,7 @@ import '../../../core/utils/daily_log_formatters.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../data/models/period_log_model.dart';
-import '../../../features/home/viewmodel/dashboard_view_model.dart';
+import '../../../features/home/viewmodel/home_view_model.dart';
 import '../../dashboard/widgets/daily_log_sheet.dart';
 import '../../profile/viewmodel/profile_view_model.dart';
 import '../viewmodel/calendar_view_model.dart';
@@ -410,7 +410,7 @@ class _CalendarViewState extends State<CalendarView> {
         .read<CalendarViewModel>()
         .applyPeriodDayChanges(changes);
     if (!mounted) return;
-    if (success) await context.read<DashboardViewModel>().loadData();
+    if (success) await context.read<HomeViewModel>().loadData();
     if (!mounted) return;
 
     setState(() {
@@ -951,8 +951,8 @@ Future<void> _showDailyLogEditor(
     );
     return;
   }
-  final dashboardVm = context.read<DashboardViewModel>();
-  final settings = calendarVm.settings ?? dashboardVm.settings;
+  final homeVm = context.read<HomeViewModel>();
+  final settings = calendarVm.settings ?? homeVm.settings;
   if (settings == null) {
     OmaToast.show(
       context,
@@ -975,29 +975,29 @@ Future<void> _showDailyLogEditor(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (_) => DailyLogSheet(
-      initialLog: dashboardVm.initialLogForSection(section, date: date),
+      initialLog: homeVm.initialLogForSection(section, date: date),
       settings: settings,
       themeColor: initialIndex == 0
           ? AppColors.periodPrimary
           : AppColors.forCyclePhase(
-              dashboardVm.periodCalculator?.phaseAt(date),
+              homeVm.periodCalculator?.phaseAt(date),
             ),
       initialTabIndex: initialIndex == 4 ? 5 : initialIndex,
       isSingleTab: true,
       onSettingsChanged: () async {
         context.read<ProfileViewModel>().loadSettings();
-        await dashboardVm.loadData();
+        await homeVm.loadData();
         await calendarVm.loadData();
       },
       onSave: (log) async {
         final success = log.flowIntensity != null
-            ? await dashboardVm.recordPeriodAndRecalculate(log)
-            : await dashboardVm.saveLog(log);
+            ? await homeVm.recordPeriodAndRecalculate(log)
+            : await homeVm.saveLog(log);
         if (success) await calendarVm.loadData();
         return success;
       },
       onDeletePeriod: (date) async {
-        final success = await dashboardVm.deletePeriodForDate(date);
+        final success = await homeVm.deletePeriodForDate(date);
         if (success) await calendarVm.loadData();
         return success;
       },

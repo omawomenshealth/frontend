@@ -7,7 +7,7 @@ import 'package:app_proje_a/data/models/medication_identity_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
-import 'package:app_proje_a/features/home/viewmodel/dashboard_view_model.dart';
+import 'package:app_proje_a/features/home/viewmodel/home_view_model.dart';
 import 'package:app_proje_a/views/dashboard/widgets/daily_log_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -49,7 +49,7 @@ void main() {
     );
     await storage.saveDailyLog(existing);
 
-    final viewModel = DashboardViewModel(storage);
+    final viewModel = HomeViewModel(storage);
     await viewModel.loadData();
 
     final reopened = viewModel.initialLogForSection(

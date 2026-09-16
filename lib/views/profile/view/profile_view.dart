@@ -18,7 +18,7 @@ import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/premium_purchase_service.dart';
 import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
-import '../../../features/home/viewmodel/dashboard_view_model.dart';
+import '../../../features/home/viewmodel/home_view_model.dart';
 import '../../dashboard/widgets/medication_reminder_section.dart';
 import '../../articles/widgets/premium_paywall.dart';
 
@@ -440,7 +440,7 @@ class _ProfileMechanics extends StatelessWidget {
           await vm.saveSettings();
           // Dashboard ve Takvimi de güncelle
           if (ctx.mounted) {
-            ctx.read<DashboardViewModel>().loadData();
+            ctx.read<HomeViewModel>().loadData();
             ctx.read<CalendarViewModel>().loadData();
             Navigator.pop(ctx);
           }
@@ -610,7 +610,7 @@ class _ProfileMechanics extends StatelessWidget {
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {
-            ctx.read<DashboardViewModel>().loadData();
+            ctx.read<HomeViewModel>().loadData();
             ctx.read<CalendarViewModel>().loadData();
             Navigator.pop(ctx);
           }
@@ -791,7 +791,7 @@ class _ProfileMechanics extends StatelessWidget {
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {
-            ctx.read<DashboardViewModel>().loadData();
+            ctx.read<HomeViewModel>().loadData();
             ctx.read<CalendarViewModel>().loadData();
             Navigator.pop(ctx);
           }
@@ -887,7 +887,7 @@ class _ProfileMechanics extends StatelessWidget {
                   availableItems: medicationNames,
                   itemIdentities: medicationIdentities,
                   color: AppColors.medicationPrimary,
-                  onChanged: () => ctx2.read<DashboardViewModel>().loadData(),
+                  onChanged: () => ctx2.read<HomeViewModel>().loadData(),
                 ),
                 const SizedBox(height: 20),
 
@@ -942,7 +942,7 @@ class _ProfileMechanics extends StatelessWidget {
                   itemType: MedicationPlanItemType.supplement,
                   availableItems: supplementNames,
                   color: AppColors.success,
-                  onChanged: () => ctx2.read<DashboardViewModel>().loadData(),
+                  onChanged: () => ctx2.read<HomeViewModel>().loadData(),
                 ),
                 const SizedBox(height: 20),
 
@@ -1005,7 +1005,7 @@ class _ProfileMechanics extends StatelessWidget {
                   itemType: MedicationPlanItemType.skincare,
                   availableItems: skincareNames,
                   color: AppColors.skincarePrimary,
-                  onChanged: () => ctx2.read<DashboardViewModel>().loadData(),
+                  onChanged: () => ctx2.read<HomeViewModel>().loadData(),
                 ),
               ],
             );
@@ -1228,7 +1228,7 @@ class _ProfileMechanics extends StatelessWidget {
                                     : Icons.error_outline_rounded,
                               );
                               // Diğer görünümleri yenile
-                              context.read<DashboardViewModel>().loadData();
+                              context.read<HomeViewModel>().loadData();
                               context.read<CalendarViewModel>().loadData();
                             }
                           },

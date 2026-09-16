@@ -11,7 +11,7 @@ import 'package:app_proje_a/data/services/notification_service.dart';
 import 'package:app_proje_a/data/services/premium_purchase_service.dart';
 import 'package:app_proje_a/data/services/sync_service.dart';
 import 'package:app_proje_a/views/calendar/viewmodel/calendar_view_model.dart';
-import 'package:app_proje_a/features/home/viewmodel/dashboard_view_model.dart';
+import 'package:app_proje_a/features/home/viewmodel/home_view_model.dart';
 import 'package:app_proje_a/views/profile/view/profile_view.dart';
 import 'package:app_proje_a/views/profile/viewmodel/profile_view_model.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +70,7 @@ void main() {
           Provider<NotificationService>.value(value: notifications),
           ChangeNotifierProvider<PremiumPurchaseService>.value(value: premium),
           ChangeNotifierProvider<ProfileViewModel>.value(value: profile),
-          ChangeNotifierProvider(create: (_) => DashboardViewModel(storage)),
+          ChangeNotifierProvider(create: (_) => HomeViewModel(storage)),
           ChangeNotifierProvider(create: (_) => CalendarViewModel(storage)),
         ],
         child: MaterialApp(
