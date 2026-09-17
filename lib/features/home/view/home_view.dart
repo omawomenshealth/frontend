@@ -86,6 +86,7 @@ class HomeView extends StatelessWidget {
                       selectedDate: vm.selectedDate,
                       accent: accent,
                       onCalendarTap: () => _openCalendar(context),
+                      onNotificationTap: _onNotificationView,
                     ),
 
                     const SizedBox(height: 22),
@@ -171,6 +172,9 @@ class HomeView extends StatelessWidget {
       },
     );
   }
+
+  // Placeholder until the notifications screen is connected.
+  void _onNotificationView() {}
 
   void _openCalendar(BuildContext context) {
     Navigator.push(
