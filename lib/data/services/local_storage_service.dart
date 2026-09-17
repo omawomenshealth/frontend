@@ -11,6 +11,7 @@ import '../../core/utils/cycle_rules.dart';
 import '../../core/constants/app_strings.dart';
 import '../../features/cycle/models/cycle_prediction.dart';
 import '../../features/cycle/services/bleeding_episode_builder.dart';
+import '../../features/notifications/model/notification_entry.dart';
 import 'local_encrypted_store.dart';
 
 /// Sağlık ve oturum verilerini AES-256-GCM şifreli SharedPreferences zarfları
@@ -51,6 +52,7 @@ class LocalStorageService {
   static const String _medicationDoseRecordsKey = 'medication_dose_records';
   static const String _insightNotificationHistoryKey =
       'insight_notification_history';
+  static const String _notificationInboxKey = 'notification_inbox_v1';
   static const String _cycleForecastSnapshotKey = 'cycle_forecast_snapshot_v1';
   static const String _syncDeletionMarkersKey = 'sync_deletion_markers_v1';
 
@@ -359,6 +361,7 @@ class LocalStorageService {
       key == _medicationReminderPlansKey ||
       key == _medicationDoseRecordsKey ||
       key == _insightNotificationHistoryKey ||
+      key == _notificationInboxKey ||
       key == _cycleForecastSnapshotKey ||
       key == _syncDeletionMarkersKey ||
       key.startsWith(_logPrefix);
@@ -994,6 +997,28 @@ class LocalStorageService {
     return _p.clear();
   }
 
+  List<NotificationEntry> loadNotificationEntries() {
+    final raw = _p.getString(_notificationInboxKey);
+    if (raw == null) return [];
+    try {
+      final values = jsonDecode(raw);
+      if (values is! List) return [];
+      return values
+          .whereType<Map<String, dynamic>>()
+          .map(NotificationEntry.fromJson)
+          .whereType<NotificationEntry>()
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<bool> saveNotificationEntries(List<NotificationEntry> entries) =>
+      _p.setString(
+        _notificationInboxKey,
+        jsonEncode(entries.map((entry) => entry.toJson()).toList()),
+      );
+
   /// Sync must never delete authentication, device preferences or the key.
   Future<bool> clearSyncedData() => _p.removeWhere(
     (key) =>
@@ -1005,6 +1030,7 @@ class LocalStorageService {
         key == _allSkincareKey ||
         key == _medicationReminderPlansKey ||
         key == _medicationDoseRecordsKey ||
+        key == _notificationInboxKey ||
         key == _cycleForecastSnapshotKey ||
         key == _authLastSyncKey,
   );

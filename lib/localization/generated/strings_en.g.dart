@@ -44,6 +44,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
 	late final Translations$catalogs$en catalogs = Translations$catalogs$en.internal(_root);
 	late final Translations$home$en home = Translations$home$en.internal(_root);
+	late final Translations$notifications$en notifications = Translations$notifications$en.internal(_root);
 	late final Translations$onboarding$en onboarding = Translations$onboarding$en.internal(_root);
 	late final Translations$options$en options = Translations$options$en.internal(_root);
 	late final Translations$pregnancy$en pregnancy = Translations$pregnancy$en.internal(_root);
@@ -84,6 +85,16 @@ class Translations$home$en {
 	late final Translations$home$common$en common = Translations$home$common$en.internal(_root);
 	late final Translations$home$phase$en phase = Translations$home$phase$en.internal(_root);
 	late final Translations$home$pregnancy$en pregnancy = Translations$home$pregnancy$en.internal(_root);
+}
+
+// Path: notifications
+class Translations$notifications$en {
+	Translations$notifications$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$notifications$common$en common = Translations$notifications$common$en.internal(_root);
 }
 
 // Path: onboarding
@@ -1234,6 +1245,57 @@ class Translations$home$pregnancy$en {
 	late final Translations$home$pregnancy$stages$en stages = Translations$home$pregnancy$stages$en.internal(_root);
 }
 
+// Path: notifications.common
+class Translations$notifications$common$en {
+	Translations$notifications$common$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Notifications'
+	String get title => 'Notifications';
+
+	/// en: 'App messages and log activity appear here.'
+	String get subtitle => 'App messages and log activity appear here.';
+
+	/// en: 'App'
+	String get appTab => 'App';
+
+	/// en: 'Logs'
+	String get logTab => 'Logs';
+
+	/// en: 'No app messages yet'
+	String get appEmptyTitle => 'No app messages yet';
+
+	/// en: 'New messages will appear here.'
+	String get appEmptyDescription => 'New messages will appear here.';
+
+	/// en: 'No log activity yet'
+	String get logEmptyTitle => 'No log activity yet';
+
+	/// en: 'Your saved daily entries will appear here.'
+	String get logEmptyDescription => 'Your saved daily entries will appear here.';
+
+	/// en: '$category saved'
+	String logSaved({required Object category}) => '${category} saved';
+
+	/// en: 'Your entry for $date: $details'
+	String logDetail({required Object date, required Object details}) => 'Your entry for ${date}: ${details}';
+
+	/// en: 'An entry was saved for this section.'
+	String get logNoDetail => 'An entry was saved for this section.';
+
+	/// en: 'PERIOD LOG'
+	String get periodEntry => 'PERIOD LOG';
+
+	/// en: 'Flow'
+	String get periodFlow => 'Flow';
+
+	/// en: 'Symptoms'
+	String get periodSymptoms => 'Symptoms';
+}
+
 // Path: onboarding.common
 class Translations$onboarding$common$en {
 	Translations$onboarding$common$en.internal(this._root);
@@ -1705,6 +1767,12 @@ class Translations$home$common$hero$en {
 
 	/// en: 'Period prediction: $range · Add more data for more accurate results'
 	String periodPredictionLowConfidenceSummary({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results';
+
+	/// en: 'Start tracking your cycle'
+	String get emptyTitle => 'Start tracking your cycle';
+
+	/// en: 'Log your last period to see your phase and predictions here.'
+	String get emptyMessage => 'Log your last period to see your phase and predictions here.';
 }
 
 // Path: home.phase.menstrual
@@ -2744,6 +2812,8 @@ extension on Translations {
 			'home.common.hero.forecastConfidenceHigh' => 'high',
 			'home.common.hero.periodPredictionSummary' => ({required Object range, required Object confidence}) => 'Period prediction: ${range} · ${confidence} confidence',
 			'home.common.hero.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results',
+			'home.common.hero.emptyTitle' => 'Start tracking your cycle',
+			'home.common.hero.emptyMessage' => 'Log your last period to see your phase and predictions here.',
 			'home.common.error' => 'Something went wrong',
 			'home.common.futureLogNotAllowed' => 'Daily logs cannot be added for future dates.',
 			'home.phase.menstrual.title' => 'Menstrual',
@@ -2824,10 +2894,10 @@ extension on Translations {
 			'home.phase.luteal.title' => 'Luteal',
 			'home.phase.luteal.messages.0' => 'You may notice an increase in appetite.',
 			'home.phase.luteal.messages.1' => 'Try not to delay meals for too long.',
-			'home.phase.luteal.messages.2' => 'You may crave more carbohydrates.',
-			'home.phase.luteal.messages.3' => 'Remember to drink water if you feel bloated.',
 			_ => null,
 		} ?? switch (path) {
+			'home.phase.luteal.messages.2' => 'You may crave more carbohydrates.',
+			'home.phase.luteal.messages.3' => 'Remember to drink water if you feel bloated.',
 			'home.phase.luteal.messages.4' => 'Very salty foods may increase bloating.',
 			'home.phase.luteal.messages.5' => 'Coffee may affect you differently today.',
 			'home.phase.luteal.messages.6' => 'You may notice that your sleep feels more sensitive.',
@@ -2877,6 +2947,20 @@ extension on Translations {
 			'home.pregnancy.stages.stage8.body' => 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.',
 			'home.pregnancy.stages.stage9.title' => 'Weeks 36–40+ · Final Weeks',
 			'home.pregnancy.stages.stage9.body' => 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷',
+			'notifications.common.title' => 'Notifications',
+			'notifications.common.subtitle' => 'App messages and log activity appear here.',
+			'notifications.common.appTab' => 'App',
+			'notifications.common.logTab' => 'Logs',
+			'notifications.common.appEmptyTitle' => 'No app messages yet',
+			'notifications.common.appEmptyDescription' => 'New messages will appear here.',
+			'notifications.common.logEmptyTitle' => 'No log activity yet',
+			'notifications.common.logEmptyDescription' => 'Your saved daily entries will appear here.',
+			'notifications.common.logSaved' => ({required Object category}) => '${category} saved',
+			'notifications.common.logDetail' => ({required Object date, required Object details}) => 'Your entry for ${date}: ${details}',
+			'notifications.common.logNoDetail' => 'An entry was saved for this section.',
+			'notifications.common.periodEntry' => 'PERIOD LOG',
+			'notifications.common.periodFlow' => 'Flow',
+			'notifications.common.periodSymptoms' => 'Symptoms',
 			'onboarding.common.skipForNow' => 'Skip these questions for now',
 			'onboarding.common.next' => 'Continue',
 			'onboarding.common.finish' => 'Finish',

@@ -66,7 +66,7 @@ class PhaseHeroCard extends StatelessWidget {
           .replaceAll('{message}', message)
           .replaceAll('{detail}', detail),
       child: Container(
-        height: 480,
+        height: 408,
         width: double.infinity,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -83,7 +83,7 @@ class PhaseHeroCard extends StatelessWidget {
           children: [
             PhaseArtwork(palette: palette),
             Padding(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
               child: Column(
                 children: [
                   Expanded(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
@@ -13,6 +14,9 @@ import '../../../data/models/medication_identity_model.dart';
 import '../../../data/models/user_settings_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/notification_service.dart';
+import '../../../features/notifications/model/notification_entry.dart';
+import '../../../features/notifications/viewmodel/notification_inbox.dart';
+import '../../../localization/generated/strings.g.dart';
 import 'medication_reminder_section.dart';
 import 'tracking_catalog_selector.dart';
 import '../../articles/widgets/premium_paywall.dart';
@@ -3856,7 +3860,13 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         await _persistStructuredMedicationSelections();
         if (!mounted) return true;
       }
-      OmaToast.show(context, title: AppStrings.dailyLogSaved);
+      await _recordLogNotification(preparedLog);
+      if (!mounted) return true;
+      OmaToast.show(
+        context,
+        title: AppStrings.dailyLogSaved,
+        addToInbox: false,
+      );
       final savedDream =
           _logType == 2 &&
           _dreamRemembered == true &&
@@ -3876,6 +3886,51 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       );
       return false;
     }
+  }
+
+  Future<void> _recordLogNotification(DailyLog log) async {
+    final home = context.t.home.common;
+    final notifications = context.t.notifications.common;
+    final category = switch (_logType) {
+      0 => home.quickLogs.buttons.period,
+      1 => home.quickLogs.buttons.nutrition,
+      2 => home.quickLogs.buttons.symptom,
+      3 => home.quickLogs.buttons.mood,
+      4 => home.quickLogs.buttons.medication,
+      _ => home.quickLogs.buttons.skincare,
+    };
+    final values = switch (_logType) {
+      0 => [if (log.flowIntensity != null) log.flowIntensity!, ...log.symptoms],
+      1 => [
+        ...log.mealTypes,
+        if (log.waterIntakeMl != null) '${log.waterIntakeMl} ml',
+      ],
+      2 => log.symptoms,
+      3 => [if (log.mood != null) log.mood!],
+      4 => [
+        ...log.medications.map((entry) => entry.displayName),
+        ...log.supplements.map((entry) => entry.displayName),
+      ],
+      _ => log.skincare,
+    };
+    final details = values.isEmpty
+        ? notifications.logNoDetail
+        : values.map(AppStrings.localizeStoredValue).join(', ');
+    final date = DateFormat.yMMMd(
+      Localizations.localeOf(context).toString(),
+    ).format(log.date);
+    await context.read<NotificationInbox>().add(
+      type: NotificationEntryType.log,
+      title: notifications.logSaved(category: category),
+      description: notifications.logDetail(date: date, details: details),
+      periodDetails: _logType == 0
+          ? PeriodNotificationDetails(
+              date: log.date,
+              flow: log.flowIntensity,
+              symptoms: log.symptoms,
+            )
+          : null,
+    );
   }
 
   Future<void> _persistStructuredMedicationSelections() async {

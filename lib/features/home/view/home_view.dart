@@ -16,6 +16,7 @@ import '../../../views/dashboard/widgets/daily_log_sheet.dart';
 import '../../../views/dashboard/widgets/medication_reminder_section.dart';
 import '../../../views/insights/view/insights_view.dart';
 import '../../../views/profile/viewmodel/profile_view_model.dart';
+import '../../notifications/view/notifications_view.dart';
 import '../viewmodel/home_view_model.dart';
 import 'widgets/index.dart';
 
@@ -26,10 +27,7 @@ import 'widgets/index.dart';
 class HomeView extends StatelessWidget {
   final VoidCallback? onOpenInsights;
 
-  const HomeView({
-    super.key,
-    this.onOpenInsights,
-  });
+  const HomeView({super.key, this.onOpenInsights});
 
   @override
   Widget build(BuildContext context) {
@@ -38,20 +36,16 @@ class HomeView extends StatelessWidget {
         if (vm.isLoading) {
           return const Scaffold(
             backgroundColor: OmaColors.scaffoldBackground,
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
         final calculator = vm.periodCalculator;
 
         final phase =
-            calculator?.phaseAt(vm.selectedDate) ??
-            CyclePhase.follicular;
+            calculator?.phaseAt(vm.selectedDate) ?? CyclePhase.follicular;
 
-        final trackingMode =
-            vm.settings?.trackingMode ?? TrackingMode.cycle;
+        final trackingMode = vm.settings?.trackingMode ?? TrackingMode.cycle;
 
         final accent = trackingMode == TrackingMode.pregnant
             ? OmaColors.plum
@@ -72,12 +66,7 @@ class HomeView extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(
                   parent: BouncingScrollPhysics(),
                 ),
-                padding: const EdgeInsets.fromLTRB(
-                  16,
-                  12,
-                  16,
-                  132,
-                ),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 132),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -86,7 +75,7 @@ class HomeView extends StatelessWidget {
                       selectedDate: vm.selectedDate,
                       accent: accent,
                       onCalendarTap: () => _openCalendar(context),
-                      onNotificationTap: _onNotificationView,
+                      onNotificationTap: () => _onNotificationView(context),
                     ),
 
                     const SizedBox(height: 22),
@@ -97,18 +86,17 @@ class HomeView extends StatelessWidget {
                       periodCalculator: calculator,
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 14),
 
                     HomeHeroSection(
                       trackingMode: trackingMode,
                       pregnancyEstimate: vm.pregnancyEstimate,
-                      positiveTestDate:
-                          vm.settings?.pregnancyTestPositiveDate,
+                      positiveTestDate: vm.settings?.pregnancyTestPositiveDate,
                       cycleData: vm.cycleHeroData,
                       onOpenInsights: () => _openInsights(context),
                     ),
 
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
 
                     QuickLogs(
                       accent: accent,
@@ -156,13 +144,10 @@ class HomeView extends StatelessWidget {
                       insights: vm.personalInsights,
                       accent: accent,
                       onViewAll: () => _openInsights(context),
-                      onInsightTap: (insight) =>
-                          _openInsight(context, insight),
+                      onInsightTap: (insight) => _openInsight(context, insight),
                     ),
 
-                    TodaysMedicationDosesCard(
-                      color: accent,
-                    ),
+                    TodaysMedicationDosesCard(color: accent),
                   ],
                 ),
               ),
@@ -173,15 +158,17 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  // Placeholder until the notifications screen is connected.
-  void _onNotificationView() {}
+  void _onNotificationView(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const NotificationsView()),
+    );
+  }
 
   void _openCalendar(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const cal.CalendarView(),
-      ),
+      MaterialPageRoute(builder: (_) => const cal.CalendarView()),
     );
   }
 
@@ -193,23 +180,14 @@ class HomeView extends StatelessWidget {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const InsightsView(),
-      ),
+      MaterialPageRoute(builder: (_) => const InsightsView()),
     );
   }
 
-  void _openInsight(
-    BuildContext context,
-    PersonalInsight insight,
-  ) {
+  void _openInsight(BuildContext context, PersonalInsight insight) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => InsightsView(
-          initialInsight: insight,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => InsightsView(initialInsight: insight)),
     );
   }
 
@@ -260,21 +238,16 @@ class HomeView extends StatelessWidget {
               : await vm.saveLog(log);
 
           if (success && context.mounted) {
-            await context
-                .read<CalendarViewModel>()
-                .loadData();
+            await context.read<CalendarViewModel>().loadData();
           }
 
           return success;
         },
         onDeletePeriod: (date) async {
-          final success =
-              await vm.deletePeriodForDate(date);
+          final success = await vm.deletePeriodForDate(date);
 
           if (success && context.mounted) {
-            await context
-                .read<CalendarViewModel>()
-                .loadData();
+            await context.read<CalendarViewModel>().loadData();
           }
 
           return success;

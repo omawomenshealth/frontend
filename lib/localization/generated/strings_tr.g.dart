@@ -42,6 +42,7 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$auth$tr auth = _Translations$auth$tr._(_root);
 	@override late final _Translations$catalogs$tr catalogs = _Translations$catalogs$tr._(_root);
 	@override late final _Translations$home$tr home = _Translations$home$tr._(_root);
+	@override late final _Translations$notifications$tr notifications = _Translations$notifications$tr._(_root);
 	@override late final _Translations$onboarding$tr onboarding = _Translations$onboarding$tr._(_root);
 	@override late final _Translations$options$tr options = _Translations$options$tr._(_root);
 	@override late final _Translations$pregnancy$tr pregnancy = _Translations$pregnancy$tr._(_root);
@@ -82,6 +83,16 @@ class _Translations$home$tr extends Translations$home$en {
 	@override late final _Translations$home$common$tr common = _Translations$home$common$tr._(_root);
 	@override late final _Translations$home$phase$tr phase = _Translations$home$phase$tr._(_root);
 	@override late final _Translations$home$pregnancy$tr pregnancy = _Translations$home$pregnancy$tr._(_root);
+}
+
+// Path: notifications
+class _Translations$notifications$tr extends Translations$notifications$en {
+	_Translations$notifications$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$notifications$common$tr common = _Translations$notifications$common$tr._(_root);
 }
 
 // Path: onboarding
@@ -1052,6 +1063,29 @@ class _Translations$home$pregnancy$tr extends Translations$home$pregnancy$en {
 	@override late final _Translations$home$pregnancy$stages$tr stages = _Translations$home$pregnancy$stages$tr._(_root);
 }
 
+// Path: notifications.common
+class _Translations$notifications$common$tr extends Translations$notifications$common$en {
+	_Translations$notifications$common$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Bildirimler';
+	@override String get subtitle => 'Uygulama mesajların ve kayıt etkinliklerin burada.';
+	@override String get appTab => 'Uygulama';
+	@override String get logTab => 'Kayıtlar';
+	@override String get appEmptyTitle => 'Henüz uygulama mesajı yok';
+	@override String get appEmptyDescription => 'Yeni mesajlar burada görünecek.';
+	@override String get logEmptyTitle => 'Henüz kayıt etkinliği yok';
+	@override String get logEmptyDescription => 'Kaydettiğin günlük girişleri burada göreceksin.';
+	@override String logSaved({required Object category}) => '${category} kaydedildi';
+	@override String logDetail({required Object date, required Object details}) => '${date} tarihli kaydın: ${details}';
+	@override String get logNoDetail => 'Bu bölüm için kayıt oluşturuldu.';
+	@override String get periodEntry => 'ADET KAYDI';
+	@override String get periodFlow => 'Akış';
+	@override String get periodSymptoms => 'Belirtiler';
+}
+
 // Path: onboarding.common
 class _Translations$onboarding$common$tr extends Translations$onboarding$common$en {
 	_Translations$onboarding$common$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -1318,6 +1352,8 @@ class _Translations$home$common$hero$tr extends Translations$home$common$hero$en
 	@override String get forecastConfidenceHigh => 'yüksek';
 	@override String periodPredictionSummary({required Object range, required Object confidence}) => 'Sonraki adet tahmini: ${range} · Tahmin güveni: ${confidence}';
 	@override String periodPredictionLowConfidenceSummary({required Object range}) => 'Sonraki adet tahmini: ${range}\nKayıt ekledikçe tahminler daha kişisel hale gelir.';
+	@override String get emptyTitle => 'Döngünü takip etmeye başla';
+	@override String get emptyMessage => 'Fazını ve tahminlerini burada görmek için son adet tarihini kaydet.';
 }
 
 // Path: home.phase.menstrual
@@ -2216,6 +2252,8 @@ extension on TranslationsTr {
 			'home.common.hero.forecastConfidenceHigh' => 'yüksek',
 			'home.common.hero.periodPredictionSummary' => ({required Object range, required Object confidence}) => 'Sonraki adet tahmini: ${range} · Tahmin güveni: ${confidence}',
 			'home.common.hero.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Sonraki adet tahmini: ${range}\nKayıt ekledikçe tahminler daha kişisel hale gelir.',
+			'home.common.hero.emptyTitle' => 'Döngünü takip etmeye başla',
+			'home.common.hero.emptyMessage' => 'Fazını ve tahminlerini burada görmek için son adet tarihini kaydet.',
 			'home.common.error' => 'Bir şeyler ters gitti',
 			'home.common.futureLogNotAllowed' => 'Gelecek tarihlere günlük kayıt eklenemez.',
 			'home.phase.menstrual.title' => 'Menstrüel',
@@ -2297,10 +2335,10 @@ extension on TranslationsTr {
 			'home.phase.luteal.messages.0' => 'İştahının arttığını fark edebilirsin.',
 			'home.phase.luteal.messages.1' => 'Öğünleri çok geciktirmemeye çalış.',
 			'home.phase.luteal.messages.2' => 'Karbonhidrat isteğin artabilir.',
-			'home.phase.luteal.messages.3' => 'Şişkinlik hissediyorsan su içmeyi unutma.',
-			'home.phase.luteal.messages.4' => 'Çok tuzlu yiyecekler şişkinliği artırabilir.',
 			_ => null,
 		} ?? switch (path) {
+			'home.phase.luteal.messages.3' => 'Şişkinlik hissediyorsan su içmeyi unutma.',
+			'home.phase.luteal.messages.4' => 'Çok tuzlu yiyecekler şişkinliği artırabilir.',
 			'home.phase.luteal.messages.5' => 'Kahve bugün seni her zamankinden farklı etkileyebilir.',
 			'home.phase.luteal.messages.6' => 'Uykunun biraz daha hassaslaştığını fark edebilirsin.',
 			'home.phase.luteal.messages.7' => 'Yoğun egzersiz bugün daha zor gelebilir.',
@@ -2349,6 +2387,20 @@ extension on TranslationsTr {
 			'home.pregnancy.stages.stage8.body' => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür.',
 			'home.pregnancy.stages.stage9.title' => '36–40+ hafta · Son haftalar',
 			'home.pregnancy.stages.stage9.body' => 'Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin.',
+			'notifications.common.title' => 'Bildirimler',
+			'notifications.common.subtitle' => 'Uygulama mesajların ve kayıt etkinliklerin burada.',
+			'notifications.common.appTab' => 'Uygulama',
+			'notifications.common.logTab' => 'Kayıtlar',
+			'notifications.common.appEmptyTitle' => 'Henüz uygulama mesajı yok',
+			'notifications.common.appEmptyDescription' => 'Yeni mesajlar burada görünecek.',
+			'notifications.common.logEmptyTitle' => 'Henüz kayıt etkinliği yok',
+			'notifications.common.logEmptyDescription' => 'Kaydettiğin günlük girişleri burada göreceksin.',
+			'notifications.common.logSaved' => ({required Object category}) => '${category} kaydedildi',
+			'notifications.common.logDetail' => ({required Object date, required Object details}) => '${date} tarihli kaydın: ${details}',
+			'notifications.common.logNoDetail' => 'Bu bölüm için kayıt oluşturuldu.',
+			'notifications.common.periodEntry' => 'ADET KAYDI',
+			'notifications.common.periodFlow' => 'Akış',
+			'notifications.common.periodSymptoms' => 'Belirtiler',
 			'onboarding.common.skipForNow' => 'Bu soruları şimdilik geç',
 			'onboarding.common.next' => 'Devam et',
 			'onboarding.common.finish' => 'Bitir',

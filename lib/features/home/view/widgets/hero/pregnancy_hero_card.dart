@@ -57,7 +57,7 @@ class PregnancyHeroCard extends StatelessWidget {
           '${presentation.title}. ${presentation.body}. $source',
       child: Container(
         width: double.infinity,
-        constraints: const BoxConstraints(minHeight: 440),
+        constraints: const BoxConstraints(minHeight: 408),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: presentation.softColor,
@@ -95,7 +95,7 @@ class PregnancyHeroCard extends StatelessWidget {
             ),
             Padding(
               padding:
-                  const EdgeInsets.fromLTRB(24, 22, 24, 24),
+                  const EdgeInsets.fromLTRB(24, 18, 24, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -123,7 +123,7 @@ class PregnancyHeroCard extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 70),
+                  const SizedBox(height: 42),
 
                   Text(
                     week == null
@@ -158,7 +158,7 @@ class PregnancyHeroCard extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 13),
+                  const SizedBox(height: 10),
 
                   SizedBox(
                     width: 310,
@@ -173,7 +173,7 @@ class PregnancyHeroCard extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 11),
+                  const SizedBox(height: 8),
 
                   _PregnancyInfoLine(
                     icon: Icons.calculate_outlined,
@@ -199,7 +199,7 @@ class PregnancyHeroCard extends StatelessWidget {
                     ),
                   ],
 
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
 
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,

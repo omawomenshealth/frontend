@@ -42,7 +42,9 @@
     "forecastConfidenceMedium": "orta",
     "forecastConfidenceHigh": "yüksek",
     "periodPredictionSummary": "Sonraki adet tahmini: $range · Tahmin güveni: $confidence",
-    "periodPredictionLowConfidenceSummary": "Sonraki adet tahmini: $range\nKayıt ekledikçe tahminler daha kişisel hale gelir."
+    "periodPredictionLowConfidenceSummary": "Sonraki adet tahmini: $range\nKayıt ekledikçe tahminler daha kişisel hale gelir.",
+    "emptyTitle": "Döngünü takip etmeye başla",
+    "emptyMessage": "Fazını ve tahminlerini burada görmek için son adet tarihini kaydet."
   },
   "error": "Bir şeyler ters gitti",
   "futureLogNotAllowed": "Gelecek tarihlere günlük kayıt eklenemez."

@@ -42,7 +42,9 @@
     "forecastConfidenceMedium": "medium",
     "forecastConfidenceHigh": "high",
     "periodPredictionSummary": "Period prediction: $range · $confidence confidence",
-    "periodPredictionLowConfidenceSummary": "Period prediction: $range · Add more data for more accurate results"
+    "periodPredictionLowConfidenceSummary": "Period prediction: $range · Add more data for more accurate results",
+    "emptyTitle": "Start tracking your cycle",
+    "emptyMessage": "Log your last period to see your phase and predictions here."
   },
   "error": "Something went wrong",
   "futureLogNotAllowed": "Daily logs cannot be added for future dates."

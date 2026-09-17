@@ -59,12 +59,12 @@ class PhaseContent extends StatelessWidget {
             height: 0.92,
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
         OmaDivider(
           width: 26,
           color: palette.accent.withValues(alpha: 0.45),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
         Text(
           '$message\n$detail',
           textAlign: TextAlign.center,
@@ -75,7 +75,7 @@ class PhaseContent extends StatelessWidget {
           ),
         ),
         if (periodValue != null) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
           OmaBadge.label(
             '$periodValue $periodUnitLabel'.toUpperCase(),
             foreground: palette.accent,

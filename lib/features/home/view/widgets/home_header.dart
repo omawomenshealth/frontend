@@ -79,10 +79,7 @@ class HomeHeader extends StatelessWidget {
                     style: OmaText.display(
                       34,
                       color: OmaColors.foreground,
-                    ).copyWith(
-                      fontWeight: FontWeight.w500,
-                      height: 1.02,
-                    ),
+                    ).copyWith(fontWeight: FontWeight.w500, height: 1.02),
                   ),
                 ],
               ),
@@ -101,10 +98,7 @@ class HomeHeader extends StatelessWidget {
                   style: OmaText.display(
                     26,
                     color: OmaColors.foreground,
-                  ).copyWith(
-                    fontWeight: FontWeight.w600,
-                    height: 1,
-                  ),
+                  ).copyWith(fontWeight: FontWeight.w600, height: 1),
                 ),
                 const SizedBox(width: 5),
                 Text(
@@ -138,7 +132,7 @@ class HomeHeader extends StatelessWidget {
                   key: const ValueKey('home_notification_button'),
                   icon: Icons.notifications_none_rounded,
                   onPressed: onNotificationTap,
-                  semanticLabel: 'Notifications',
+                  semanticLabel: context.t.notifications.common.title,
                   foregroundColor: accent,
                   backgroundColor: OmaColors.backgroundAlt,
                   borderColor: accent.withValues(alpha: 0.34),

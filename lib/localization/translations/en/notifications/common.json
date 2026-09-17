@@ -1,0 +1,16 @@
+{
+  "title": "Notifications",
+  "subtitle": "App messages and log activity appear here.",
+  "appTab": "App",
+  "logTab": "Logs",
+  "appEmptyTitle": "No app messages yet",
+  "appEmptyDescription": "New messages will appear here.",
+  "logEmptyTitle": "No log activity yet",
+  "logEmptyDescription": "Your saved daily entries will appear here.",
+  "logSaved": "$category saved",
+  "logDetail": "Your entry for $date: $details",
+  "logNoDetail": "An entry was saved for this section.",
+  "periodEntry": "PERIOD LOG",
+  "periodFlow": "Flow",
+  "periodSymptoms": "Symptoms"
+}

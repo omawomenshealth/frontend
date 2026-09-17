@@ -16,6 +16,7 @@ import 'data/services/notification_service.dart';
 import 'data/services/premium_purchase_service.dart';
 import 'data/services/sync_service.dart';
 import 'features/home/viewmodel/home_view_model.dart';
+import 'features/notifications/viewmodel/notification_inbox.dart';
 import 'localization/generated/strings.g.dart';
 import 'shell/home_shell.dart';
 import 'views/auth/view/auth_view.dart';
@@ -161,6 +162,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return MultiProvider(
       providers: [
         Provider<LocalStorageService>.value(value: widget.storage),
+        ChangeNotifierProvider(
+          create: (_) => NotificationInbox(widget.storage),
+        ),
         Provider<NotificationService>.value(value: reminders),
         Provider<ApiService>.value(value: apiService),
         Provider<SyncService>.value(value: syncService),
