@@ -9,7 +9,6 @@ import '../viewmodel/auth_view_model.dart';
 import 'widgets/auth_brand_header.dart';
 import 'widgets/auth_action_card.dart';
 
-
 /// Giriş ekranı — Google Sign-In, Simüle giriş ve giriş yapmadan devam etme seçenekleri.
 ///
 /// İş mantığı aynıdır; yalnızca görsel dil `WelcomePage` ile aynı Oma
@@ -34,11 +33,20 @@ class _AuthViewState extends State<AuthView>
             backgroundColor: Colors.transparent,
             body: Stack(
               children: [
-                const Positioned.fill(child: OmaBackground(seed: 1)),
+                const Positioned.fill(
+                  child: OmaBackground(
+                    seed: 1,
+                    spotCount: 3,
+                    minSize: 94,
+                    maxSize: 128,
+                  ),
+                ),
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 16),
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                     child: Column(
                       children: [
                         Expanded(
@@ -51,7 +59,8 @@ class _AuthViewState extends State<AuthView>
                           animation: riseAt(0.2),
                           child: AuthActionCard(
                             vm: vm,
-                            onGoogleLogin: () => _handleGoogleLogin(context, vm),
+                            onGoogleLogin: () =>
+                                _handleGoogleLogin(context, vm),
                             onContinueWithoutAccount: () =>
                                 _navigateToOnboarding(context),
                           ),
@@ -205,7 +214,11 @@ class _AuthViewState extends State<AuthView>
             variant: OmaButtonVariant.outline,
             onPressed: () async {
               Navigator.pop(ctx);
-              await _resolveAndNavigate(context, vm, SyncConflictAction.restore);
+              await _resolveAndNavigate(
+                context,
+                vm,
+                SyncConflictAction.restore,
+              );
             },
           ),
           const SizedBox(height: 10),

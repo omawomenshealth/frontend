@@ -6,51 +6,67 @@ import '../constants/image_constants.dart';
 
 /// Sayfa arkasında hafifçe salınan dekoratif çiçekler.
 ///
-/// Konumlar sabit bir liste yerine `seed` değerinden üretilir; farklı
-/// ekran/kartlara farklı bir dizilim vermek için farklı bir `seed` yeterlidir.
+/// Çiçekler `seed` değerine göre kenarlarda farklı noktalara dağılır.
 class OmaBackground extends StatelessWidget {
   const OmaBackground({
     super.key,
     this.seed = 0,
-    this.spotCount = 5,
+    this.spotCount = 3,
     this.minSize = 60,
     this.maxSize = 88,
+    this.bloomAssets = ImageConstants.decorativeBlooms,
   });
 
   final int seed;
   final int spotCount;
   final double minSize;
   final double maxSize;
+  final List<String> bloomAssets;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final pool = ImageConstants.decorativeBlooms;
+    final pool = bloomAssets;
     final random = Random(seed);
+    final sides = List.generate(spotCount, (index) => index.isEven)
+      ..shuffle(random);
+    final centers = <Offset>[];
 
     return IgnorePointer(
       child: Stack(
         children: [
           for (var i = 0; i < spotCount; i++)
-            _buildSpot(i, size, pool, random),
+            _buildSpot(i, size, pool, random, sides[i], centers),
         ],
       ),
     );
   }
 
-  Widget _buildSpot(int index, Size size, List<String> pool, Random random) {
-    final band = index / spotCount;
-    final verticalJitter = random.nextDouble() * (1 / spotCount);
-    final onLeft = index.isEven;
-    final edgeOffset = random.nextDouble() * 0.05 * size.width;
+  Widget _buildSpot(
+    int index,
+    Size size,
+    List<String> pool,
+    Random random,
+    bool onLeft,
+    List<Offset> centers,
+  ) {
+    final bloomSize = minSize + random.nextDouble() * (maxSize - minSize);
+    late Offset center;
+    for (var attempt = 0; attempt < 32; attempt++) {
+      center = Offset(
+        (onLeft ? 0.03 : 0.74) + random.nextDouble() * 0.23,
+        0.07 + random.nextDouble() * 0.86,
+      );
+      if (centers.every((other) => (center - other).distance >= 0.22)) break;
+    }
+    centers.add(center);
 
     return Positioned(
-      top: (band + verticalJitter) * size.height,
-      left: onLeft ? edgeOffset - 0.02 * size.width : null,
-      right: onLeft ? null : edgeOffset,
+      top: center.dy * size.height - bloomSize / 2,
+      left: center.dx * size.width - bloomSize / 2,
       child: _SwayBloom(
         asset: pool[(seed * spotCount + index) % pool.length],
-        size: minSize + random.nextDouble() * (maxSize - minSize),
+        size: bloomSize,
         rotation: (random.nextDouble() - 0.5) * 0.6,
         delay: Duration(milliseconds: index * 150),
         duration: Duration(milliseconds: 7000 + index * 800),
@@ -80,8 +96,10 @@ class _SwayBloom extends StatefulWidget {
 
 class _SwayBloomState extends State<_SwayBloom>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: widget.duration);
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: widget.duration,
+  );
 
   @override
   void initState() {

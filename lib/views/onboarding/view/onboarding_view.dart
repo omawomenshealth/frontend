@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/color_constants.dart';
+import '../../../core/constants/image_constants.dart';
 import '../../../core/widgets/oma_background.dart';
 import '../../../localization/generated/strings.g.dart';
 import '../controller/onboarding_controller.dart';
@@ -73,7 +74,10 @@ class _OnboardingViewState extends State<OnboardingView> {
               child: OmaBackground(
                 key: ValueKey('onboarding_background_${vm.currentPage}'),
                 seed: vm.currentPage,
-                spotCount: 10,
+                spotCount: 3,
+                minSize: 94,
+                maxSize: 128,
+                bloomAssets: ImageConstants.decorativeBlooms,
               ),
             ),
             SafeArea(
