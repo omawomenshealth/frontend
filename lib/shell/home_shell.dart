@@ -129,7 +129,6 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
     return OmaBottomNavigation(
       currentIndex: _currentIndex,
       onTap: _selectPage,
-      activeColor: activeColor,
       onOmaTap: () => _showOmaSheet(context, activeColor),
       items: _navigationItems,
     );
