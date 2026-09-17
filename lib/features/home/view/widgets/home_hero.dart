@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/pregnancy_calculator.dart';
+import '../../../../core/widgets/oma_theme.dart';
 import '../../../../data/models/user_settings_model.dart';
+import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/cycle_hero_data.dart';
 import 'hero/phase_hero_card.dart';
 import 'hero/pregnancy_hero_card.dart';
@@ -36,13 +38,60 @@ class HomeHeroSection extends StatelessWidget {
           positiveTestDate: positiveTestDate,
         ),
 
-      _ => PhaseHeroCard(
+      _ when cycleData != null => PhaseHeroCard(
           key: ValueKey(
             'dashboard_phase_${cycleData!.phase.name}',
           ),
           data: cycleData!,
           onOpenInsights: onOpenInsights,
         ),
+
+      _ => const _HeroEmptyState(
+          key: ValueKey('dashboard_hero_empty'),
+        ),
     };
+  }
+}
+
+/// Henüz döngü verisi (son adet tarihi) girilmemişken gösterilen kart.
+class _HeroEmptyState extends StatelessWidget {
+  const _HeroEmptyState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = context.t.home.common.hero;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: OmaColors.border),
+        color: OmaColors.card,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.spa_outlined,
+            color: OmaColors.primary,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            strings.emptyTitle,
+            style: OmaText.display(18, style: FontStyle.normal),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            strings.emptyMessage,
+            style: OmaText.body(
+              14,
+              color: OmaColors.muted,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
