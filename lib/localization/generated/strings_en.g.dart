@@ -1718,11 +1718,34 @@ class Translations$home$phase$menstrual$en {
 	/// en: 'Menstrual'
 	String get title => 'Menstrual';
 
-	/// en: 'A quiet moment to turn inward.'
-	String get message => 'A quiet moment to turn inward.';
-
-	/// en: 'Rest is its own kind of renewal.'
-	String get detail => 'Rest is its own kind of renewal.';
+	List<String> get messages => [
+		'Your energy may be a little lower today.',
+		'Warmth may ease cramps in your belly or back.',
+		'It is okay to rest if you do not feel like moving.',
+		'Remember to drink water today; your muscles need it.',
+		'Try including iron-rich foods in your meals.',
+		'Your sleep pattern may shift a little during these days.',
+		'Remember to change your period product regularly.',
+		'Fragrance-free products may feel better if you are sensitive.',
+		'Comfortable, breathable clothes may feel better today.',
+		'Do not feel guilty if you are craving something sweet.',
+		'Write a small note about how you feel this month.',
+		'Do not ignore pain that makes daily life difficult.',
+	];
+	List<String> get details => [
+		'Lighten your plans to match your energy.',
+		'A warm shower or hot water bottle may help.',
+		'If you feel well, a short walk or gentle stretch may help.',
+		'Keeping a bottle nearby can help on busy days.',
+		'Meat, eggs, legumes and leafy greens can be good choices.',
+		'A calmer evening and a regular bedtime may help.',
+		'Follow the product guidance for hygienic changes.',
+		'Scented hygiene products can irritate some people.',
+		'Cotton and slightly looser underwear may feel more comfortable.',
+		'Pair what you want with something filling so you stay satisfied longer.',
+		'Tracking pain, energy and sleep can help you notice your pattern.',
+		'Consider speaking with a health professional about severe or unusual symptoms.',
+	];
 }
 
 // Path: home.phase.follicular
@@ -1736,11 +1759,34 @@ class Translations$home$phase$follicular$en {
 	/// en: 'Follicular'
 	String get title => 'Follicular';
 
-	/// en: 'Your energy is beginning to bloom.'
-	String get message => 'Your energy is beginning to bloom.';
-
-	/// en: 'A lovely time to follow your curiosity.'
-	String get detail => 'A lovely time to follow your curiosity.';
+	List<String> get messages => [
+		'You may notice your energy slowly increasing.',
+		'Your mind may feel a little clearer today.',
+		'You may feel more ready to move.',
+		'You may have energy to start something new.',
+		'Socializing may feel easier today.',
+		'Even with more energy, do not neglect sleep.',
+		'Your appetite may be a little lower on some days.',
+		'Try adding more color to your plate.',
+		'High energy does not mean you must fill your whole day.',
+		'You may notice changes in your discharge.',
+		'Try writing down your energy today.',
+		'If you feel well, you can make good use of it.',
+	];
+	List<String> get details => [
+		'You may feel ready to return to something you have delayed.',
+		'Planning or focused tasks may feel easier today.',
+		'Choose a walk, run, Pilates or another movement you enjoy.',
+		'Try a small plan you have had in mind for a while.',
+		'It may be a good day to make plans with someone you want to see.',
+		'Regular sleep gives you a steady foundation, even on good days.',
+		'Try to eat regularly and avoid skipping meals.',
+		'Different vegetables and fruits are an easy way to add variety.',
+		'Choosing a pace that feels good is enough.',
+		'Clearer, more elastic discharge can be normal as ovulation approaches.',
+		'After a few cycles, it may be easier to spot your more active days.',
+		'Start a task, workout or plan you have been wanting to do.',
+	];
 }
 
 // Path: home.phase.ovulation
@@ -1754,11 +1800,34 @@ class Translations$home$phase$ovulation$en {
 	/// en: 'Ovulation'
 	String get title => 'Ovulation';
 
-	/// en: 'A bright moment to feel your power.'
-	String get message => 'A bright moment to feel your power.';
-
-	/// en: 'Connect with what makes you glow.'
-	String get detail => 'Connect with what makes you glow.';
+	List<String> get messages => [
+		'You may feel more energetic today.',
+		'You may feel a little more social.',
+		'You may feel stronger during exercise.',
+		'Remember water if you have a busy day.',
+		'Choose meals that help keep your energy steady.',
+		'You may notice clearer, more elastic discharge.',
+		'You may feel mild sensitivity in your lower abdomen.',
+		'Ovulation may not happen on the same day every month.',
+		'You may notice an increase in libido.',
+		'Communication may feel easier today.',
+		'You can note small changes in your body.',
+		'It is okay if you do not feel especially energetic.',
+	];
+	List<String> get details => [
+		'Use this energy for an activity you enjoy.',
+		'Meeting friends or going out may feel more enjoyable today.',
+		'If you feel well, continue your usual workout or choose something livelier.',
+		'Regular hydration is a helpful habit on active days.',
+		'A balance of protein, vegetables, whole grains and healthy fats can help.',
+		'This can be a natural change around ovulation.',
+		'It may be brief and mild; keep track of pain that is severe or ongoing.',
+		'Treat the calendar date as an estimate, not a certainty.',
+		'Hormonal changes can bring differences like this during this phase.',
+		'Choose a time when you feel ready for a conversation you have delayed.',
+		'Tracking discharge, energy, libido or mild pain can reveal your pattern.',
+		'People experience ovulation differently, so follow how you feel.',
+	];
 }
 
 // Path: home.phase.luteal
@@ -1772,11 +1841,34 @@ class Translations$home$phase$luteal$en {
 	/// en: 'Luteal'
 	String get title => 'Luteal';
 
-	/// en: 'Slow down and honour your rhythm.'
-	String get message => 'Slow down and honour your rhythm.';
-
-	/// en: 'Make space for what matters most.'
-	String get detail => 'Make space for what matters most.';
+	List<String> get messages => [
+		'You may notice an increase in appetite.',
+		'Try not to delay meals for too long.',
+		'You may crave more carbohydrates.',
+		'Remember to drink water if you feel bloated.',
+		'Very salty foods may increase bloating.',
+		'Coffee may affect you differently today.',
+		'You may notice that your sleep feels more sensitive.',
+		'Intense exercise may feel harder today.',
+		'Focusing may feel a little more difficult on some days.',
+		'You may tire a little more quickly today.',
+		'Your digestion may feel a little slower.',
+		'Try tracking premenstrual symptoms for a few months.',
+	];
+	List<String> get details => [
+		'Protein and fiber at meals may help you feel full longer.',
+		'Going too long without food can increase tiredness and cravings.',
+		'Try filling options such as oats, whole grains or potatoes.',
+		'Regular water intake can also support digestion.',
+		'Try eating a little less salt on days you feel bloated.',
+		'Reduce the amount or try a drink such as matcha if sleep or tension is affected.',
+		'A calmer evening can make it easier to fall asleep.',
+		'Choose an easier option such as walking, yoga or gentle stretching.',
+		'Breaking large tasks into smaller parts can make starting easier.',
+		'Plan short breaks into your day.',
+		'Water and fiber may be especially helpful during these days.',
+		'Noticing repeated changes can make your cycle easier to understand.',
+	];
 }
 
 // Path: home.pregnancy.stages
@@ -2655,17 +2747,107 @@ extension on Translations {
 			'home.common.error' => 'Something went wrong',
 			'home.common.futureLogNotAllowed' => 'Daily logs cannot be added for future dates.',
 			'home.phase.menstrual.title' => 'Menstrual',
-			'home.phase.menstrual.message' => 'A quiet moment to turn inward.',
-			'home.phase.menstrual.detail' => 'Rest is its own kind of renewal.',
+			'home.phase.menstrual.messages.0' => 'Your energy may be a little lower today.',
+			'home.phase.menstrual.messages.1' => 'Warmth may ease cramps in your belly or back.',
+			'home.phase.menstrual.messages.2' => 'It is okay to rest if you do not feel like moving.',
+			'home.phase.menstrual.messages.3' => 'Remember to drink water today; your muscles need it.',
+			'home.phase.menstrual.messages.4' => 'Try including iron-rich foods in your meals.',
+			'home.phase.menstrual.messages.5' => 'Your sleep pattern may shift a little during these days.',
+			'home.phase.menstrual.messages.6' => 'Remember to change your period product regularly.',
+			'home.phase.menstrual.messages.7' => 'Fragrance-free products may feel better if you are sensitive.',
+			'home.phase.menstrual.messages.8' => 'Comfortable, breathable clothes may feel better today.',
+			'home.phase.menstrual.messages.9' => 'Do not feel guilty if you are craving something sweet.',
+			'home.phase.menstrual.messages.10' => 'Write a small note about how you feel this month.',
+			'home.phase.menstrual.messages.11' => 'Do not ignore pain that makes daily life difficult.',
+			'home.phase.menstrual.details.0' => 'Lighten your plans to match your energy.',
+			'home.phase.menstrual.details.1' => 'A warm shower or hot water bottle may help.',
+			'home.phase.menstrual.details.2' => 'If you feel well, a short walk or gentle stretch may help.',
+			'home.phase.menstrual.details.3' => 'Keeping a bottle nearby can help on busy days.',
+			'home.phase.menstrual.details.4' => 'Meat, eggs, legumes and leafy greens can be good choices.',
+			'home.phase.menstrual.details.5' => 'A calmer evening and a regular bedtime may help.',
+			'home.phase.menstrual.details.6' => 'Follow the product guidance for hygienic changes.',
+			'home.phase.menstrual.details.7' => 'Scented hygiene products can irritate some people.',
+			'home.phase.menstrual.details.8' => 'Cotton and slightly looser underwear may feel more comfortable.',
+			'home.phase.menstrual.details.9' => 'Pair what you want with something filling so you stay satisfied longer.',
+			'home.phase.menstrual.details.10' => 'Tracking pain, energy and sleep can help you notice your pattern.',
+			'home.phase.menstrual.details.11' => 'Consider speaking with a health professional about severe or unusual symptoms.',
 			'home.phase.follicular.title' => 'Follicular',
-			'home.phase.follicular.message' => 'Your energy is beginning to bloom.',
-			'home.phase.follicular.detail' => 'A lovely time to follow your curiosity.',
+			'home.phase.follicular.messages.0' => 'You may notice your energy slowly increasing.',
+			'home.phase.follicular.messages.1' => 'Your mind may feel a little clearer today.',
+			'home.phase.follicular.messages.2' => 'You may feel more ready to move.',
+			'home.phase.follicular.messages.3' => 'You may have energy to start something new.',
+			'home.phase.follicular.messages.4' => 'Socializing may feel easier today.',
+			'home.phase.follicular.messages.5' => 'Even with more energy, do not neglect sleep.',
+			'home.phase.follicular.messages.6' => 'Your appetite may be a little lower on some days.',
+			'home.phase.follicular.messages.7' => 'Try adding more color to your plate.',
+			'home.phase.follicular.messages.8' => 'High energy does not mean you must fill your whole day.',
+			'home.phase.follicular.messages.9' => 'You may notice changes in your discharge.',
+			'home.phase.follicular.messages.10' => 'Try writing down your energy today.',
+			'home.phase.follicular.messages.11' => 'If you feel well, you can make good use of it.',
+			'home.phase.follicular.details.0' => 'You may feel ready to return to something you have delayed.',
+			'home.phase.follicular.details.1' => 'Planning or focused tasks may feel easier today.',
+			'home.phase.follicular.details.2' => 'Choose a walk, run, Pilates or another movement you enjoy.',
+			'home.phase.follicular.details.3' => 'Try a small plan you have had in mind for a while.',
+			'home.phase.follicular.details.4' => 'It may be a good day to make plans with someone you want to see.',
+			'home.phase.follicular.details.5' => 'Regular sleep gives you a steady foundation, even on good days.',
+			'home.phase.follicular.details.6' => 'Try to eat regularly and avoid skipping meals.',
+			'home.phase.follicular.details.7' => 'Different vegetables and fruits are an easy way to add variety.',
+			'home.phase.follicular.details.8' => 'Choosing a pace that feels good is enough.',
+			'home.phase.follicular.details.9' => 'Clearer, more elastic discharge can be normal as ovulation approaches.',
+			'home.phase.follicular.details.10' => 'After a few cycles, it may be easier to spot your more active days.',
+			'home.phase.follicular.details.11' => 'Start a task, workout or plan you have been wanting to do.',
 			'home.phase.ovulation.title' => 'Ovulation',
-			'home.phase.ovulation.message' => 'A bright moment to feel your power.',
-			'home.phase.ovulation.detail' => 'Connect with what makes you glow.',
+			'home.phase.ovulation.messages.0' => 'You may feel more energetic today.',
+			'home.phase.ovulation.messages.1' => 'You may feel a little more social.',
+			'home.phase.ovulation.messages.2' => 'You may feel stronger during exercise.',
+			'home.phase.ovulation.messages.3' => 'Remember water if you have a busy day.',
+			'home.phase.ovulation.messages.4' => 'Choose meals that help keep your energy steady.',
+			'home.phase.ovulation.messages.5' => 'You may notice clearer, more elastic discharge.',
+			'home.phase.ovulation.messages.6' => 'You may feel mild sensitivity in your lower abdomen.',
+			'home.phase.ovulation.messages.7' => 'Ovulation may not happen on the same day every month.',
+			'home.phase.ovulation.messages.8' => 'You may notice an increase in libido.',
+			'home.phase.ovulation.messages.9' => 'Communication may feel easier today.',
+			'home.phase.ovulation.messages.10' => 'You can note small changes in your body.',
+			'home.phase.ovulation.messages.11' => 'It is okay if you do not feel especially energetic.',
+			'home.phase.ovulation.details.0' => 'Use this energy for an activity you enjoy.',
+			'home.phase.ovulation.details.1' => 'Meeting friends or going out may feel more enjoyable today.',
+			'home.phase.ovulation.details.2' => 'If you feel well, continue your usual workout or choose something livelier.',
+			'home.phase.ovulation.details.3' => 'Regular hydration is a helpful habit on active days.',
+			'home.phase.ovulation.details.4' => 'A balance of protein, vegetables, whole grains and healthy fats can help.',
+			'home.phase.ovulation.details.5' => 'This can be a natural change around ovulation.',
+			'home.phase.ovulation.details.6' => 'It may be brief and mild; keep track of pain that is severe or ongoing.',
+			'home.phase.ovulation.details.7' => 'Treat the calendar date as an estimate, not a certainty.',
+			'home.phase.ovulation.details.8' => 'Hormonal changes can bring differences like this during this phase.',
+			'home.phase.ovulation.details.9' => 'Choose a time when you feel ready for a conversation you have delayed.',
+			'home.phase.ovulation.details.10' => 'Tracking discharge, energy, libido or mild pain can reveal your pattern.',
+			'home.phase.ovulation.details.11' => 'People experience ovulation differently, so follow how you feel.',
 			'home.phase.luteal.title' => 'Luteal',
-			'home.phase.luteal.message' => 'Slow down and honour your rhythm.',
-			'home.phase.luteal.detail' => 'Make space for what matters most.',
+			'home.phase.luteal.messages.0' => 'You may notice an increase in appetite.',
+			'home.phase.luteal.messages.1' => 'Try not to delay meals for too long.',
+			'home.phase.luteal.messages.2' => 'You may crave more carbohydrates.',
+			'home.phase.luteal.messages.3' => 'Remember to drink water if you feel bloated.',
+			_ => null,
+		} ?? switch (path) {
+			'home.phase.luteal.messages.4' => 'Very salty foods may increase bloating.',
+			'home.phase.luteal.messages.5' => 'Coffee may affect you differently today.',
+			'home.phase.luteal.messages.6' => 'You may notice that your sleep feels more sensitive.',
+			'home.phase.luteal.messages.7' => 'Intense exercise may feel harder today.',
+			'home.phase.luteal.messages.8' => 'Focusing may feel a little more difficult on some days.',
+			'home.phase.luteal.messages.9' => 'You may tire a little more quickly today.',
+			'home.phase.luteal.messages.10' => 'Your digestion may feel a little slower.',
+			'home.phase.luteal.messages.11' => 'Try tracking premenstrual symptoms for a few months.',
+			'home.phase.luteal.details.0' => 'Protein and fiber at meals may help you feel full longer.',
+			'home.phase.luteal.details.1' => 'Going too long without food can increase tiredness and cravings.',
+			'home.phase.luteal.details.2' => 'Try filling options such as oats, whole grains or potatoes.',
+			'home.phase.luteal.details.3' => 'Regular water intake can also support digestion.',
+			'home.phase.luteal.details.4' => 'Try eating a little less salt on days you feel bloated.',
+			'home.phase.luteal.details.5' => 'Reduce the amount or try a drink such as matcha if sleep or tension is affected.',
+			'home.phase.luteal.details.6' => 'A calmer evening can make it easier to fall asleep.',
+			'home.phase.luteal.details.7' => 'Choose an easier option such as walking, yoga or gentle stretching.',
+			'home.phase.luteal.details.8' => 'Breaking large tasks into smaller parts can make starting easier.',
+			'home.phase.luteal.details.9' => 'Plan short breaks into your day.',
+			'home.phase.luteal.details.10' => 'Water and fiber may be especially helpful during these days.',
+			'home.phase.luteal.details.11' => 'Noticing repeated changes can make your cycle easier to understand.',
 			'home.pregnancy.positiveTestRecorded' => 'Positive test recorded: {date} · This alone does not determine the pregnancy week.',
 			'home.pregnancy.badge' => 'PREGNANCY',
 			'home.pregnancy.estimatedWeek' => 'ESTIMATED PREGNANCY WEEK',
@@ -2734,8 +2916,6 @@ extension on Translations {
 			'onboarding.review.title' => 'Great',
 			'onboarding.review.titleWithName' => ({required Object name}) => 'I\'m here with you, ${name}',
 			'onboarding.review.subtitle' => 'Your profile is ready. Ready to begin?',
-			_ => null,
-		} ?? switch (path) {
 			'onboarding.review.conditionsLabel' => 'Health conditions you\'d like me to know',
 			'onboarding.review.noConditions' => 'You haven\'t added a health condition yet',
 			'onboarding.review.cycleLabel' => 'Your cycle details',

@@ -24,28 +24,32 @@ class PhaseHeroCard extends StatelessWidget {
     final heroStrings = context.t.home.common.hero;
     final phaseStrings = context.t.home.phase;
 
-    final (title, message, detail) = switch (data.phase) {
+    final (title, messages, details) = switch (data.phase) {
       CyclePhase.menstrual => (
-          phaseStrings.menstrual.title,
-          phaseStrings.menstrual.message,
-          phaseStrings.menstrual.detail,
-        ),
+        phaseStrings.menstrual.title,
+        phaseStrings.menstrual.messages,
+        phaseStrings.menstrual.details,
+      ),
       CyclePhase.follicular => (
-          phaseStrings.follicular.title,
-          phaseStrings.follicular.message,
-          phaseStrings.follicular.detail,
-        ),
+        phaseStrings.follicular.title,
+        phaseStrings.follicular.messages,
+        phaseStrings.follicular.details,
+      ),
       CyclePhase.ovulation => (
-          phaseStrings.ovulation.title,
-          phaseStrings.ovulation.message,
-          phaseStrings.ovulation.detail,
-        ),
+        phaseStrings.ovulation.title,
+        phaseStrings.ovulation.messages,
+        phaseStrings.ovulation.details,
+      ),
       CyclePhase.luteal => (
-          phaseStrings.luteal.title,
-          phaseStrings.luteal.message,
-          phaseStrings.luteal.detail,
-        ),
+        phaseStrings.luteal.title,
+        phaseStrings.luteal.messages,
+        phaseStrings.luteal.details,
+      ),
     };
+    final tipIndex =
+        (data.cycleDay - 1 + data.phase.index * 5) % messages.length;
+    final message = messages[tipIndex];
+    final detail = details[tipIndex];
 
     final periodUnitLabel = data.isMenstrual
         ? heroStrings.periodDayLabel
@@ -71,18 +75,13 @@ class PhaseHeroCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              OmaColors.card,
-              palette.soft,
-            ],
+            colors: [OmaColors.card, palette.soft],
           ),
           boxShadow: OmaShadows.lift,
         ),
         child: Stack(
           children: [
-            PhaseArtwork(
-              palette: palette,
-            ),
+            PhaseArtwork(palette: palette),
             Padding(
               padding: const EdgeInsets.all(22),
               child: Column(

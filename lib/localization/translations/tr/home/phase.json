@@ -1,22 +1,126 @@
 {
   "menstrual": {
     "title": "Menstrüel",
-    "message": "Kendine dönmek için sakin bir an.",
-    "detail": "Dinlenmek de yenilenmenin bir parçası."
+    "messages": [
+      "Enerjin bugün diğer günlere göre biraz daha düşük olabilir.",
+      "Karnında veya belinde ağrı varsa sıcaklık rahatlatabilir.",
+      "Hareket etmek istemiyorsan dinlenebilirsin.",
+      "Bugün su içmeyi unutma, kaslarının suya ihtiyacı var.",
+      "Demir kaybını minimumda tutmak için öğünlerinde demir içeren besinlere yer verebilirsin.",
+      "Uyku düzenin bu günlerde biraz değişebilir.",
+      "Pedini, tamponunu veya menstrual kabını düzenli değiştirmeyi unutma.",
+      "Hassasiyet hissedersen kokusuz ürünleri tercih edebilirsin.",
+      "Rahat ve nefes alan kıyafetler bugün daha konforlu gelebilir.",
+      "Tatlı isteğin arttıysa kendini suçlu hissetme.",
+      "Bu ay nasıl hissettiğini küçük bir notla kaydet.",
+      "Ağrın günlük hayatını zorlaştırıyorsa bunu görmezden gelme."
+    ],
+    "details": [
+      "Yapacaklarını enerjine göre biraz hafifletebilirsin.",
+      "Ilık bir duş ya da sıcak su torbası iyi gelebilir.",
+      "İyi hissediyorsan kısa bir yürüyüş veya hafif esneme iyi gelebilir.",
+      "Özellikle yoğun olduğun günlerde yanında bir şişe bulundurmak işini kolaylaştırabilir.",
+      "Et, yumurta, kuru baklagiller ve yeşil yapraklı sebzeler iyi seçenekler olabilir.",
+      "Akşamı daha sakin geçirmek ve benzer saatlerde uyumaya hazırlanmak yardımcı olabilir.",
+      "Uzun süre aynı ürünü kullanmak yerine ürünün kullanım önerilerine göre değişim yapman hijyen açısından önemlidir.",
+      "Parfümlü hijyen ürünleri bazı kişilerde tahrişe neden olabilir.",
+      "Özellikle pamuklu ve biraz geniş bir iç çamaşırı tercih edebilirsin.",
+      "Canın ne istiyorsa onu yerken yanına daha doyurucu bir şey eklemek seni daha uzun süre tok tutabilir, enerji ihtiyacını atlama.",
+      "Ağrı, enerji ve uyku gibi detayları takip etmek zamanla kendi düzenini fark etmene yardımcı olabilir.",
+      "Şiddetli veya alışık olmadığın belirtilerde bir sağlık profesyoneline danışmak iyi olur."
+    ]
   },
   "follicular": {
     "title": "Foliküler",
-    "message": "Enerjin yeniden canlanmaya başlıyor.",
-    "detail": "Merakının peşinden gitmek için güzel bir zaman."
+    "messages": [
+      "Enerjinin yavaş yavaş arttığını fark edebilirsin.",
+      "Bugün kafan biraz daha açık hissedebilir.",
+      "Hareket etmek için daha istekli olabilirsin.",
+      "Yeni bir şeye başlamak için enerjin olabilir.",
+      "Sosyalleşmek bugün daha kolay gelebilir.",
+      "Enerjin artsa da uykunu ihmal etme.",
+      "İştahın bazı günler biraz daha düşük olabilir.",
+      "Tabağına biraz renk ekleyebilirsin.",
+      "Enerjin yüksek diye gününü tamamen doldurmak zorunda değilsin.",
+      "Akıntındaki değişiklikleri fark edebilirsin.",
+      "Bugünkü enerjini not etmeyi deneyebilirsin.",
+      "Kendini iyi hissediyorsan bunu değerlendirebilirsin."
+    ],
+    "details": [
+      "Bir süredir ertelediğin bir işe dönmek için uygun hissedebilirsin.",
+      "Planlama veya dikkat isteyen işleri bugün yapmak daha kolay gelebilir.",
+      "Yürüyüş, koşu, pilates veya sevdiğin başka bir egzersizi seçebilirsin.",
+      "Uzun zamandır aklında olan küçük bir planı bugün deneyebilirsin.",
+      "Görüşmek istediğin biri varsa plan yapmak için güzel bir gün olabilir.",
+      "İyi hissettiğin günlerde bile düzenli uyku sana iyi bir temel sağlar.",
+      "Çok aç hissetmesen bile düzenli ve dengeli bir şekilde beslenmeye ve öğünleri atlamamaya çalış.",
+      "Farklı sebze ve meyveler günlük beslenmeni çeşitlendirmenin kolay bir yolu.",
+      "İyi hissettiğin tempoyu seçmen yeterli.",
+      "Ovulasyon yaklaştıkça daha berrak ve esnek bir yapı görülmesi normal olabilir.",
+      "Birkaç döngü sonra hangi günlerde daha hareketli olduğunu görmek kolaylaşabilir.",
+      "Yapmak istediğin bir iş, spor veya plan varsa bugün ona başlayabilirsin."
+    ]
   },
   "ovulation": {
     "title": "Ovulasyon",
-    "message": "Kendindeki gücü hissetmek için canlı bir dönem.",
-    "detail": "Sana iyi hissettiren şeylerle bağ kur."
+    "messages": [
+      "Bugün kendini daha enerjik hissedebilirsin.",
+      "Sosyalleşme isteğin biraz artabilir.",
+      "Egzersizde kendini daha güçlü hissedebilirsin.",
+      "Yoğun bir gün geçiriyorsan suyu unutma.",
+      "Enerjini dengede tutacak öğünler seçebilirsin.",
+      "Akıntının daha berrak ve esnek olduğunu fark edebilirsin.",
+      "Alt karında hafif bir hassasiyet hissedebilirsin.",
+      "Ovulasyon her ay aynı güne denk gelmeyebilir.",
+      "Libidonda bir artış fark edebilirsin.",
+      "Bugün iletişim kurmak daha kolay gelebilir.",
+      "Vücudundaki küçük değişiklikleri not edebilirsin.",
+      "Kendini çok enerjik hissetmiyorsan bunda da bir sorun yok."
+    ],
+    "details": [
+      "Bu enerjiyi sevdiğin bir aktiviteye ayırabilirsin.",
+      "Arkadaşlarınla görüşmek veya dışarı çıkmak bugün daha keyifli gelebilir.",
+      "İyi hissediyorsan alıştığın antrenmana devam edebilir veya biraz daha hareketli bir şey seçebilirsin.",
+      "Özellikle hareketli günlerde düzenli su içmek iyi bir alışkanlık.",
+      "Protein, sebze, tam tahıl ve sağlıklı yağları birlikte ve dengeli tüketmek önemli.",
+      "Bu, ovulasyon döneminde görülebilen doğal değişikliklerden biri.",
+      "Hafif ve kısa süreli olabilir; şiddetli veya devam eden ağrıyı ise takip etmek önemli.",
+      "Takvimde gördüğün günü kesin tarih değil, bir tahmin olarak düşün.",
+      "Bu dönemde hormonal değişimlerle birlikte böyle farklılıklar görülebilir.",
+      "Uzun zamandır ertelediğin bir konuşma varsa kendini hazır hissettiğin zamanı seçebilirsin.",
+      "Akıntı, enerji, libido veya hafif ağrı gibi belirtiler kendi düzenini tanımana yardımcı olabilir.",
+      "Ovulasyon herkeste aynı belirtilerle geçmez; o gün nasıl hissediyorsan ona göre hareket edebilirsin."
+    ]
   },
   "luteal": {
     "title": "Luteal",
-    "message": "Yavaşla ve kendi ritmine kulak ver.",
-    "detail": "Senin için önemli olan şeylere alan aç."
+    "messages": [
+      "İştahının arttığını fark edebilirsin.",
+      "Öğünleri çok geciktirmemeye çalış.",
+      "Karbonhidrat isteğin artabilir.",
+      "Şişkinlik hissediyorsan su içmeyi unutma.",
+      "Çok tuzlu yiyecekler şişkinliği artırabilir.",
+      "Kahve bugün seni her zamankinden farklı etkileyebilir.",
+      "Uykunun biraz daha hassaslaştığını fark edebilirsin.",
+      "Yoğun egzersiz bugün daha zor gelebilir.",
+      "Odaklanmak bazı günler biraz daha zor olabilir.",
+      "Bugün biraz daha çabuk yorulabilirsin.",
+      "Sindirimin biraz yavaşlamış gibi hissedilebilir.",
+      "Adet öncesi belirtilerini birkaç ay takip etmeyi dene."
+    ],
+    "details": [
+      "Öğünlerinde protein ve lifli besinlere yer vermek daha uzun süre tok kalmana yardımcı olabilir.",
+      "Uzun süre aç kalmak bazı günlerde yorgunluğu ve atıştırma isteğini artırabilir.",
+      "Yulaf, tam tahıllar veya patates gibi daha doyurucu seçenekleri de deneyebilirsin.",
+      "Gün boyunca düzenli su içmek sindirime de yardımcı olabilir.",
+      "Özellikle kendini şişkin hissettiğin günlerde biraz daha az tuz tüketmeyi deneyebilirsin.",
+      "Uykun bozuluyorsa veya kendini daha gergin hissediyorsan miktarını azaltmayı veya yerine matcha gibi bir içecek koymayı deneyebilirsin.",
+      "Akşam saatlerini daha sakin geçirmek uykuya geçişi kolaylaştırabilir.",
+      "Öyleyse yürüyüş, yoga veya hafif esneme gibi daha rahat bir seçenek seçebilirsin.",
+      "Büyük işleri daha küçük parçalara bölmek başlamayı kolaylaştırabilir.",
+      "Gününü planlarken araya kısa molalar koyabilirsin.",
+      "Su içmek ve lifli besinlere yer vermek bu günlerde özellikle önemli olabilir.",
+      "Aynı günlerde tekrar eden değişiklikleri görmek kendi döngünü anlamanı kolaylaştırabilir."
+    ]
   }
 }

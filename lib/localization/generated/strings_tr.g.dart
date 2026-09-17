@@ -1328,8 +1328,34 @@ class _Translations$home$phase$menstrual$tr extends Translations$home$phase$mens
 
 	// Translations
 	@override String get title => 'Menstrüel';
-	@override String get message => 'Kendine dönmek için sakin bir an.';
-	@override String get detail => 'Dinlenmek de yenilenmenin bir parçası.';
+	@override List<String> get messages => [
+		'Enerjin bugün diğer günlere göre biraz daha düşük olabilir.',
+		'Karnında veya belinde ağrı varsa sıcaklık rahatlatabilir.',
+		'Hareket etmek istemiyorsan dinlenebilirsin.',
+		'Bugün su içmeyi unutma, kaslarının suya ihtiyacı var.',
+		'Demir kaybını minimumda tutmak için öğünlerinde demir içeren besinlere yer verebilirsin.',
+		'Uyku düzenin bu günlerde biraz değişebilir.',
+		'Pedini, tamponunu veya menstrual kabını düzenli değiştirmeyi unutma.',
+		'Hassasiyet hissedersen kokusuz ürünleri tercih edebilirsin.',
+		'Rahat ve nefes alan kıyafetler bugün daha konforlu gelebilir.',
+		'Tatlı isteğin arttıysa kendini suçlu hissetme.',
+		'Bu ay nasıl hissettiğini küçük bir notla kaydet.',
+		'Ağrın günlük hayatını zorlaştırıyorsa bunu görmezden gelme.',
+	];
+	@override List<String> get details => [
+		'Yapacaklarını enerjine göre biraz hafifletebilirsin.',
+		'Ilık bir duş ya da sıcak su torbası iyi gelebilir.',
+		'İyi hissediyorsan kısa bir yürüyüş veya hafif esneme iyi gelebilir.',
+		'Özellikle yoğun olduğun günlerde yanında bir şişe bulundurmak işini kolaylaştırabilir.',
+		'Et, yumurta, kuru baklagiller ve yeşil yapraklı sebzeler iyi seçenekler olabilir.',
+		'Akşamı daha sakin geçirmek ve benzer saatlerde uyumaya hazırlanmak yardımcı olabilir.',
+		'Uzun süre aynı ürünü kullanmak yerine ürünün kullanım önerilerine göre değişim yapman hijyen açısından önemlidir.',
+		'Parfümlü hijyen ürünleri bazı kişilerde tahrişe neden olabilir.',
+		'Özellikle pamuklu ve biraz geniş bir iç çamaşırı tercih edebilirsin.',
+		'Canın ne istiyorsa onu yerken yanına daha doyurucu bir şey eklemek seni daha uzun süre tok tutabilir, enerji ihtiyacını atlama.',
+		'Ağrı, enerji ve uyku gibi detayları takip etmek zamanla kendi düzenini fark etmene yardımcı olabilir.',
+		'Şiddetli veya alışık olmadığın belirtilerde bir sağlık profesyoneline danışmak iyi olur.',
+	];
 }
 
 // Path: home.phase.follicular
@@ -1340,8 +1366,34 @@ class _Translations$home$phase$follicular$tr extends Translations$home$phase$fol
 
 	// Translations
 	@override String get title => 'Foliküler';
-	@override String get message => 'Enerjin yeniden canlanmaya başlıyor.';
-	@override String get detail => 'Merakının peşinden gitmek için güzel bir zaman.';
+	@override List<String> get messages => [
+		'Enerjinin yavaş yavaş arttığını fark edebilirsin.',
+		'Bugün kafan biraz daha açık hissedebilir.',
+		'Hareket etmek için daha istekli olabilirsin.',
+		'Yeni bir şeye başlamak için enerjin olabilir.',
+		'Sosyalleşmek bugün daha kolay gelebilir.',
+		'Enerjin artsa da uykunu ihmal etme.',
+		'İştahın bazı günler biraz daha düşük olabilir.',
+		'Tabağına biraz renk ekleyebilirsin.',
+		'Enerjin yüksek diye gününü tamamen doldurmak zorunda değilsin.',
+		'Akıntındaki değişiklikleri fark edebilirsin.',
+		'Bugünkü enerjini not etmeyi deneyebilirsin.',
+		'Kendini iyi hissediyorsan bunu değerlendirebilirsin.',
+	];
+	@override List<String> get details => [
+		'Bir süredir ertelediğin bir işe dönmek için uygun hissedebilirsin.',
+		'Planlama veya dikkat isteyen işleri bugün yapmak daha kolay gelebilir.',
+		'Yürüyüş, koşu, pilates veya sevdiğin başka bir egzersizi seçebilirsin.',
+		'Uzun zamandır aklında olan küçük bir planı bugün deneyebilirsin.',
+		'Görüşmek istediğin biri varsa plan yapmak için güzel bir gün olabilir.',
+		'İyi hissettiğin günlerde bile düzenli uyku sana iyi bir temel sağlar.',
+		'Çok aç hissetmesen bile düzenli ve dengeli bir şekilde beslenmeye ve öğünleri atlamamaya çalış.',
+		'Farklı sebze ve meyveler günlük beslenmeni çeşitlendirmenin kolay bir yolu.',
+		'İyi hissettiğin tempoyu seçmen yeterli.',
+		'Ovulasyon yaklaştıkça daha berrak ve esnek bir yapı görülmesi normal olabilir.',
+		'Birkaç döngü sonra hangi günlerde daha hareketli olduğunu görmek kolaylaşabilir.',
+		'Yapmak istediğin bir iş, spor veya plan varsa bugün ona başlayabilirsin.',
+	];
 }
 
 // Path: home.phase.ovulation
@@ -1352,8 +1404,34 @@ class _Translations$home$phase$ovulation$tr extends Translations$home$phase$ovul
 
 	// Translations
 	@override String get title => 'Ovulasyon';
-	@override String get message => 'Kendindeki gücü hissetmek için canlı bir dönem.';
-	@override String get detail => 'Sana iyi hissettiren şeylerle bağ kur.';
+	@override List<String> get messages => [
+		'Bugün kendini daha enerjik hissedebilirsin.',
+		'Sosyalleşme isteğin biraz artabilir.',
+		'Egzersizde kendini daha güçlü hissedebilirsin.',
+		'Yoğun bir gün geçiriyorsan suyu unutma.',
+		'Enerjini dengede tutacak öğünler seçebilirsin.',
+		'Akıntının daha berrak ve esnek olduğunu fark edebilirsin.',
+		'Alt karında hafif bir hassasiyet hissedebilirsin.',
+		'Ovulasyon her ay aynı güne denk gelmeyebilir.',
+		'Libidonda bir artış fark edebilirsin.',
+		'Bugün iletişim kurmak daha kolay gelebilir.',
+		'Vücudundaki küçük değişiklikleri not edebilirsin.',
+		'Kendini çok enerjik hissetmiyorsan bunda da bir sorun yok.',
+	];
+	@override List<String> get details => [
+		'Bu enerjiyi sevdiğin bir aktiviteye ayırabilirsin.',
+		'Arkadaşlarınla görüşmek veya dışarı çıkmak bugün daha keyifli gelebilir.',
+		'İyi hissediyorsan alıştığın antrenmana devam edebilir veya biraz daha hareketli bir şey seçebilirsin.',
+		'Özellikle hareketli günlerde düzenli su içmek iyi bir alışkanlık.',
+		'Protein, sebze, tam tahıl ve sağlıklı yağları birlikte ve dengeli tüketmek önemli.',
+		'Bu, ovulasyon döneminde görülebilen doğal değişikliklerden biri.',
+		'Hafif ve kısa süreli olabilir; şiddetli veya devam eden ağrıyı ise takip etmek önemli.',
+		'Takvimde gördüğün günü kesin tarih değil, bir tahmin olarak düşün.',
+		'Bu dönemde hormonal değişimlerle birlikte böyle farklılıklar görülebilir.',
+		'Uzun zamandır ertelediğin bir konuşma varsa kendini hazır hissettiğin zamanı seçebilirsin.',
+		'Akıntı, enerji, libido veya hafif ağrı gibi belirtiler kendi düzenini tanımana yardımcı olabilir.',
+		'Ovulasyon herkeste aynı belirtilerle geçmez; o gün nasıl hissediyorsan ona göre hareket edebilirsin.',
+	];
 }
 
 // Path: home.phase.luteal
@@ -1364,8 +1442,34 @@ class _Translations$home$phase$luteal$tr extends Translations$home$phase$luteal$
 
 	// Translations
 	@override String get title => 'Luteal';
-	@override String get message => 'Yavaşla ve kendi ritmine kulak ver.';
-	@override String get detail => 'Senin için önemli olan şeylere alan aç.';
+	@override List<String> get messages => [
+		'İştahının arttığını fark edebilirsin.',
+		'Öğünleri çok geciktirmemeye çalış.',
+		'Karbonhidrat isteğin artabilir.',
+		'Şişkinlik hissediyorsan su içmeyi unutma.',
+		'Çok tuzlu yiyecekler şişkinliği artırabilir.',
+		'Kahve bugün seni her zamankinden farklı etkileyebilir.',
+		'Uykunun biraz daha hassaslaştığını fark edebilirsin.',
+		'Yoğun egzersiz bugün daha zor gelebilir.',
+		'Odaklanmak bazı günler biraz daha zor olabilir.',
+		'Bugün biraz daha çabuk yorulabilirsin.',
+		'Sindirimin biraz yavaşlamış gibi hissedilebilir.',
+		'Adet öncesi belirtilerini birkaç ay takip etmeyi dene.',
+	];
+	@override List<String> get details => [
+		'Öğünlerinde protein ve lifli besinlere yer vermek daha uzun süre tok kalmana yardımcı olabilir.',
+		'Uzun süre aç kalmak bazı günlerde yorgunluğu ve atıştırma isteğini artırabilir.',
+		'Yulaf, tam tahıllar veya patates gibi daha doyurucu seçenekleri de deneyebilirsin.',
+		'Gün boyunca düzenli su içmek sindirime de yardımcı olabilir.',
+		'Özellikle kendini şişkin hissettiğin günlerde biraz daha az tuz tüketmeyi deneyebilirsin.',
+		'Uykun bozuluyorsa veya kendini daha gergin hissediyorsan miktarını azaltmayı veya yerine matcha gibi bir içecek koymayı deneyebilirsin.',
+		'Akşam saatlerini daha sakin geçirmek uykuya geçişi kolaylaştırabilir.',
+		'Öyleyse yürüyüş, yoga veya hafif esneme gibi daha rahat bir seçenek seçebilirsin.',
+		'Büyük işleri daha küçük parçalara bölmek başlamayı kolaylaştırabilir.',
+		'Gününü planlarken araya kısa molalar koyabilirsin.',
+		'Su içmek ve lifli besinlere yer vermek bu günlerde özellikle önemli olabilir.',
+		'Aynı günlerde tekrar eden değişiklikleri görmek kendi döngünü anlamanı kolaylaştırabilir.',
+	];
 }
 
 // Path: home.pregnancy.stages
@@ -2115,17 +2219,107 @@ extension on TranslationsTr {
 			'home.common.error' => 'Bir şeyler ters gitti',
 			'home.common.futureLogNotAllowed' => 'Gelecek tarihlere günlük kayıt eklenemez.',
 			'home.phase.menstrual.title' => 'Menstrüel',
-			'home.phase.menstrual.message' => 'Kendine dönmek için sakin bir an.',
-			'home.phase.menstrual.detail' => 'Dinlenmek de yenilenmenin bir parçası.',
+			'home.phase.menstrual.messages.0' => 'Enerjin bugün diğer günlere göre biraz daha düşük olabilir.',
+			'home.phase.menstrual.messages.1' => 'Karnında veya belinde ağrı varsa sıcaklık rahatlatabilir.',
+			'home.phase.menstrual.messages.2' => 'Hareket etmek istemiyorsan dinlenebilirsin.',
+			'home.phase.menstrual.messages.3' => 'Bugün su içmeyi unutma, kaslarının suya ihtiyacı var.',
+			'home.phase.menstrual.messages.4' => 'Demir kaybını minimumda tutmak için öğünlerinde demir içeren besinlere yer verebilirsin.',
+			'home.phase.menstrual.messages.5' => 'Uyku düzenin bu günlerde biraz değişebilir.',
+			'home.phase.menstrual.messages.6' => 'Pedini, tamponunu veya menstrual kabını düzenli değiştirmeyi unutma.',
+			'home.phase.menstrual.messages.7' => 'Hassasiyet hissedersen kokusuz ürünleri tercih edebilirsin.',
+			'home.phase.menstrual.messages.8' => 'Rahat ve nefes alan kıyafetler bugün daha konforlu gelebilir.',
+			'home.phase.menstrual.messages.9' => 'Tatlı isteğin arttıysa kendini suçlu hissetme.',
+			'home.phase.menstrual.messages.10' => 'Bu ay nasıl hissettiğini küçük bir notla kaydet.',
+			'home.phase.menstrual.messages.11' => 'Ağrın günlük hayatını zorlaştırıyorsa bunu görmezden gelme.',
+			'home.phase.menstrual.details.0' => 'Yapacaklarını enerjine göre biraz hafifletebilirsin.',
+			'home.phase.menstrual.details.1' => 'Ilık bir duş ya da sıcak su torbası iyi gelebilir.',
+			'home.phase.menstrual.details.2' => 'İyi hissediyorsan kısa bir yürüyüş veya hafif esneme iyi gelebilir.',
+			'home.phase.menstrual.details.3' => 'Özellikle yoğun olduğun günlerde yanında bir şişe bulundurmak işini kolaylaştırabilir.',
+			'home.phase.menstrual.details.4' => 'Et, yumurta, kuru baklagiller ve yeşil yapraklı sebzeler iyi seçenekler olabilir.',
+			'home.phase.menstrual.details.5' => 'Akşamı daha sakin geçirmek ve benzer saatlerde uyumaya hazırlanmak yardımcı olabilir.',
+			'home.phase.menstrual.details.6' => 'Uzun süre aynı ürünü kullanmak yerine ürünün kullanım önerilerine göre değişim yapman hijyen açısından önemlidir.',
+			'home.phase.menstrual.details.7' => 'Parfümlü hijyen ürünleri bazı kişilerde tahrişe neden olabilir.',
+			'home.phase.menstrual.details.8' => 'Özellikle pamuklu ve biraz geniş bir iç çamaşırı tercih edebilirsin.',
+			'home.phase.menstrual.details.9' => 'Canın ne istiyorsa onu yerken yanına daha doyurucu bir şey eklemek seni daha uzun süre tok tutabilir, enerji ihtiyacını atlama.',
+			'home.phase.menstrual.details.10' => 'Ağrı, enerji ve uyku gibi detayları takip etmek zamanla kendi düzenini fark etmene yardımcı olabilir.',
+			'home.phase.menstrual.details.11' => 'Şiddetli veya alışık olmadığın belirtilerde bir sağlık profesyoneline danışmak iyi olur.',
 			'home.phase.follicular.title' => 'Foliküler',
-			'home.phase.follicular.message' => 'Enerjin yeniden canlanmaya başlıyor.',
-			'home.phase.follicular.detail' => 'Merakının peşinden gitmek için güzel bir zaman.',
+			'home.phase.follicular.messages.0' => 'Enerjinin yavaş yavaş arttığını fark edebilirsin.',
+			'home.phase.follicular.messages.1' => 'Bugün kafan biraz daha açık hissedebilir.',
+			'home.phase.follicular.messages.2' => 'Hareket etmek için daha istekli olabilirsin.',
+			'home.phase.follicular.messages.3' => 'Yeni bir şeye başlamak için enerjin olabilir.',
+			'home.phase.follicular.messages.4' => 'Sosyalleşmek bugün daha kolay gelebilir.',
+			'home.phase.follicular.messages.5' => 'Enerjin artsa da uykunu ihmal etme.',
+			'home.phase.follicular.messages.6' => 'İştahın bazı günler biraz daha düşük olabilir.',
+			'home.phase.follicular.messages.7' => 'Tabağına biraz renk ekleyebilirsin.',
+			'home.phase.follicular.messages.8' => 'Enerjin yüksek diye gününü tamamen doldurmak zorunda değilsin.',
+			'home.phase.follicular.messages.9' => 'Akıntındaki değişiklikleri fark edebilirsin.',
+			'home.phase.follicular.messages.10' => 'Bugünkü enerjini not etmeyi deneyebilirsin.',
+			'home.phase.follicular.messages.11' => 'Kendini iyi hissediyorsan bunu değerlendirebilirsin.',
+			'home.phase.follicular.details.0' => 'Bir süredir ertelediğin bir işe dönmek için uygun hissedebilirsin.',
+			'home.phase.follicular.details.1' => 'Planlama veya dikkat isteyen işleri bugün yapmak daha kolay gelebilir.',
+			'home.phase.follicular.details.2' => 'Yürüyüş, koşu, pilates veya sevdiğin başka bir egzersizi seçebilirsin.',
+			'home.phase.follicular.details.3' => 'Uzun zamandır aklında olan küçük bir planı bugün deneyebilirsin.',
+			'home.phase.follicular.details.4' => 'Görüşmek istediğin biri varsa plan yapmak için güzel bir gün olabilir.',
+			'home.phase.follicular.details.5' => 'İyi hissettiğin günlerde bile düzenli uyku sana iyi bir temel sağlar.',
+			'home.phase.follicular.details.6' => 'Çok aç hissetmesen bile düzenli ve dengeli bir şekilde beslenmeye ve öğünleri atlamamaya çalış.',
+			'home.phase.follicular.details.7' => 'Farklı sebze ve meyveler günlük beslenmeni çeşitlendirmenin kolay bir yolu.',
+			'home.phase.follicular.details.8' => 'İyi hissettiğin tempoyu seçmen yeterli.',
+			'home.phase.follicular.details.9' => 'Ovulasyon yaklaştıkça daha berrak ve esnek bir yapı görülmesi normal olabilir.',
+			'home.phase.follicular.details.10' => 'Birkaç döngü sonra hangi günlerde daha hareketli olduğunu görmek kolaylaşabilir.',
+			'home.phase.follicular.details.11' => 'Yapmak istediğin bir iş, spor veya plan varsa bugün ona başlayabilirsin.',
 			'home.phase.ovulation.title' => 'Ovulasyon',
-			'home.phase.ovulation.message' => 'Kendindeki gücü hissetmek için canlı bir dönem.',
-			'home.phase.ovulation.detail' => 'Sana iyi hissettiren şeylerle bağ kur.',
+			'home.phase.ovulation.messages.0' => 'Bugün kendini daha enerjik hissedebilirsin.',
+			'home.phase.ovulation.messages.1' => 'Sosyalleşme isteğin biraz artabilir.',
+			'home.phase.ovulation.messages.2' => 'Egzersizde kendini daha güçlü hissedebilirsin.',
+			'home.phase.ovulation.messages.3' => 'Yoğun bir gün geçiriyorsan suyu unutma.',
+			'home.phase.ovulation.messages.4' => 'Enerjini dengede tutacak öğünler seçebilirsin.',
+			'home.phase.ovulation.messages.5' => 'Akıntının daha berrak ve esnek olduğunu fark edebilirsin.',
+			'home.phase.ovulation.messages.6' => 'Alt karında hafif bir hassasiyet hissedebilirsin.',
+			'home.phase.ovulation.messages.7' => 'Ovulasyon her ay aynı güne denk gelmeyebilir.',
+			'home.phase.ovulation.messages.8' => 'Libidonda bir artış fark edebilirsin.',
+			'home.phase.ovulation.messages.9' => 'Bugün iletişim kurmak daha kolay gelebilir.',
+			'home.phase.ovulation.messages.10' => 'Vücudundaki küçük değişiklikleri not edebilirsin.',
+			'home.phase.ovulation.messages.11' => 'Kendini çok enerjik hissetmiyorsan bunda da bir sorun yok.',
+			'home.phase.ovulation.details.0' => 'Bu enerjiyi sevdiğin bir aktiviteye ayırabilirsin.',
+			'home.phase.ovulation.details.1' => 'Arkadaşlarınla görüşmek veya dışarı çıkmak bugün daha keyifli gelebilir.',
+			'home.phase.ovulation.details.2' => 'İyi hissediyorsan alıştığın antrenmana devam edebilir veya biraz daha hareketli bir şey seçebilirsin.',
+			'home.phase.ovulation.details.3' => 'Özellikle hareketli günlerde düzenli su içmek iyi bir alışkanlık.',
+			'home.phase.ovulation.details.4' => 'Protein, sebze, tam tahıl ve sağlıklı yağları birlikte ve dengeli tüketmek önemli.',
+			'home.phase.ovulation.details.5' => 'Bu, ovulasyon döneminde görülebilen doğal değişikliklerden biri.',
+			'home.phase.ovulation.details.6' => 'Hafif ve kısa süreli olabilir; şiddetli veya devam eden ağrıyı ise takip etmek önemli.',
+			'home.phase.ovulation.details.7' => 'Takvimde gördüğün günü kesin tarih değil, bir tahmin olarak düşün.',
+			'home.phase.ovulation.details.8' => 'Bu dönemde hormonal değişimlerle birlikte böyle farklılıklar görülebilir.',
+			'home.phase.ovulation.details.9' => 'Uzun zamandır ertelediğin bir konuşma varsa kendini hazır hissettiğin zamanı seçebilirsin.',
+			'home.phase.ovulation.details.10' => 'Akıntı, enerji, libido veya hafif ağrı gibi belirtiler kendi düzenini tanımana yardımcı olabilir.',
+			'home.phase.ovulation.details.11' => 'Ovulasyon herkeste aynı belirtilerle geçmez; o gün nasıl hissediyorsan ona göre hareket edebilirsin.',
 			'home.phase.luteal.title' => 'Luteal',
-			'home.phase.luteal.message' => 'Yavaşla ve kendi ritmine kulak ver.',
-			'home.phase.luteal.detail' => 'Senin için önemli olan şeylere alan aç.',
+			'home.phase.luteal.messages.0' => 'İştahının arttığını fark edebilirsin.',
+			'home.phase.luteal.messages.1' => 'Öğünleri çok geciktirmemeye çalış.',
+			'home.phase.luteal.messages.2' => 'Karbonhidrat isteğin artabilir.',
+			'home.phase.luteal.messages.3' => 'Şişkinlik hissediyorsan su içmeyi unutma.',
+			'home.phase.luteal.messages.4' => 'Çok tuzlu yiyecekler şişkinliği artırabilir.',
+			_ => null,
+		} ?? switch (path) {
+			'home.phase.luteal.messages.5' => 'Kahve bugün seni her zamankinden farklı etkileyebilir.',
+			'home.phase.luteal.messages.6' => 'Uykunun biraz daha hassaslaştığını fark edebilirsin.',
+			'home.phase.luteal.messages.7' => 'Yoğun egzersiz bugün daha zor gelebilir.',
+			'home.phase.luteal.messages.8' => 'Odaklanmak bazı günler biraz daha zor olabilir.',
+			'home.phase.luteal.messages.9' => 'Bugün biraz daha çabuk yorulabilirsin.',
+			'home.phase.luteal.messages.10' => 'Sindirimin biraz yavaşlamış gibi hissedilebilir.',
+			'home.phase.luteal.messages.11' => 'Adet öncesi belirtilerini birkaç ay takip etmeyi dene.',
+			'home.phase.luteal.details.0' => 'Öğünlerinde protein ve lifli besinlere yer vermek daha uzun süre tok kalmana yardımcı olabilir.',
+			'home.phase.luteal.details.1' => 'Uzun süre aç kalmak bazı günlerde yorgunluğu ve atıştırma isteğini artırabilir.',
+			'home.phase.luteal.details.2' => 'Yulaf, tam tahıllar veya patates gibi daha doyurucu seçenekleri de deneyebilirsin.',
+			'home.phase.luteal.details.3' => 'Gün boyunca düzenli su içmek sindirime de yardımcı olabilir.',
+			'home.phase.luteal.details.4' => 'Özellikle kendini şişkin hissettiğin günlerde biraz daha az tuz tüketmeyi deneyebilirsin.',
+			'home.phase.luteal.details.5' => 'Uykun bozuluyorsa veya kendini daha gergin hissediyorsan miktarını azaltmayı veya yerine matcha gibi bir içecek koymayı deneyebilirsin.',
+			'home.phase.luteal.details.6' => 'Akşam saatlerini daha sakin geçirmek uykuya geçişi kolaylaştırabilir.',
+			'home.phase.luteal.details.7' => 'Öyleyse yürüyüş, yoga veya hafif esneme gibi daha rahat bir seçenek seçebilirsin.',
+			'home.phase.luteal.details.8' => 'Büyük işleri daha küçük parçalara bölmek başlamayı kolaylaştırabilir.',
+			'home.phase.luteal.details.9' => 'Gününü planlarken araya kısa molalar koyabilirsin.',
+			'home.phase.luteal.details.10' => 'Su içmek ve lifli besinlere yer vermek bu günlerde özellikle önemli olabilir.',
+			'home.phase.luteal.details.11' => 'Aynı günlerde tekrar eden değişiklikleri görmek kendi döngünü anlamanı kolaylaştırabilir.',
 			'home.pregnancy.positiveTestRecorded' => 'Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.',
 			'home.pregnancy.badge' => 'GEBELİK',
 			'home.pregnancy.estimatedWeek' => 'TAHMİNİ GEBELİK HAFTASI',
@@ -2195,8 +2389,6 @@ extension on TranslationsTr {
 			'onboarding.review.titleWithName' => ({required Object name}) => 'Yanındayım, ${name}',
 			'onboarding.review.subtitle' => 'Profilin hazır. Başlamaya hazır mısın?',
 			'onboarding.review.conditionsLabel' => 'Bilmemi istediğin sağlık durumları',
-			_ => null,
-		} ?? switch (path) {
 			'onboarding.review.noConditions' => 'Henüz bir sağlık durumu eklemedin',
 			'onboarding.review.cycleLabel' => 'Döngü bilgilerin',
 			'onboarding.review.dayCount' => ({required Object days}) => '${days} gün',

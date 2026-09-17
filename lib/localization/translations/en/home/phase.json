@@ -1,22 +1,126 @@
 {
   "menstrual": {
     "title": "Menstrual",
-    "message": "A quiet moment to turn inward.",
-    "detail": "Rest is its own kind of renewal."
+    "messages": [
+      "Your energy may be a little lower today.",
+      "Warmth may ease cramps in your belly or back.",
+      "It is okay to rest if you do not feel like moving.",
+      "Remember to drink water today; your muscles need it.",
+      "Try including iron-rich foods in your meals.",
+      "Your sleep pattern may shift a little during these days.",
+      "Remember to change your period product regularly.",
+      "Fragrance-free products may feel better if you are sensitive.",
+      "Comfortable, breathable clothes may feel better today.",
+      "Do not feel guilty if you are craving something sweet.",
+      "Write a small note about how you feel this month.",
+      "Do not ignore pain that makes daily life difficult."
+    ],
+    "details": [
+      "Lighten your plans to match your energy.",
+      "A warm shower or hot water bottle may help.",
+      "If you feel well, a short walk or gentle stretch may help.",
+      "Keeping a bottle nearby can help on busy days.",
+      "Meat, eggs, legumes and leafy greens can be good choices.",
+      "A calmer evening and a regular bedtime may help.",
+      "Follow the product guidance for hygienic changes.",
+      "Scented hygiene products can irritate some people.",
+      "Cotton and slightly looser underwear may feel more comfortable.",
+      "Pair what you want with something filling so you stay satisfied longer.",
+      "Tracking pain, energy and sleep can help you notice your pattern.",
+      "Consider speaking with a health professional about severe or unusual symptoms."
+    ]
   },
   "follicular": {
     "title": "Follicular",
-    "message": "Your energy is beginning to bloom.",
-    "detail": "A lovely time to follow your curiosity."
+    "messages": [
+      "You may notice your energy slowly increasing.",
+      "Your mind may feel a little clearer today.",
+      "You may feel more ready to move.",
+      "You may have energy to start something new.",
+      "Socializing may feel easier today.",
+      "Even with more energy, do not neglect sleep.",
+      "Your appetite may be a little lower on some days.",
+      "Try adding more color to your plate.",
+      "High energy does not mean you must fill your whole day.",
+      "You may notice changes in your discharge.",
+      "Try writing down your energy today.",
+      "If you feel well, you can make good use of it."
+    ],
+    "details": [
+      "You may feel ready to return to something you have delayed.",
+      "Planning or focused tasks may feel easier today.",
+      "Choose a walk, run, Pilates or another movement you enjoy.",
+      "Try a small plan you have had in mind for a while.",
+      "It may be a good day to make plans with someone you want to see.",
+      "Regular sleep gives you a steady foundation, even on good days.",
+      "Try to eat regularly and avoid skipping meals.",
+      "Different vegetables and fruits are an easy way to add variety.",
+      "Choosing a pace that feels good is enough.",
+      "Clearer, more elastic discharge can be normal as ovulation approaches.",
+      "After a few cycles, it may be easier to spot your more active days.",
+      "Start a task, workout or plan you have been wanting to do."
+    ]
   },
   "ovulation": {
     "title": "Ovulation",
-    "message": "A bright moment to feel your power.",
-    "detail": "Connect with what makes you glow."
+    "messages": [
+      "You may feel more energetic today.",
+      "You may feel a little more social.",
+      "You may feel stronger during exercise.",
+      "Remember water if you have a busy day.",
+      "Choose meals that help keep your energy steady.",
+      "You may notice clearer, more elastic discharge.",
+      "You may feel mild sensitivity in your lower abdomen.",
+      "Ovulation may not happen on the same day every month.",
+      "You may notice an increase in libido.",
+      "Communication may feel easier today.",
+      "You can note small changes in your body.",
+      "It is okay if you do not feel especially energetic."
+    ],
+    "details": [
+      "Use this energy for an activity you enjoy.",
+      "Meeting friends or going out may feel more enjoyable today.",
+      "If you feel well, continue your usual workout or choose something livelier.",
+      "Regular hydration is a helpful habit on active days.",
+      "A balance of protein, vegetables, whole grains and healthy fats can help.",
+      "This can be a natural change around ovulation.",
+      "It may be brief and mild; keep track of pain that is severe or ongoing.",
+      "Treat the calendar date as an estimate, not a certainty.",
+      "Hormonal changes can bring differences like this during this phase.",
+      "Choose a time when you feel ready for a conversation you have delayed.",
+      "Tracking discharge, energy, libido or mild pain can reveal your pattern.",
+      "People experience ovulation differently, so follow how you feel."
+    ]
   },
   "luteal": {
     "title": "Luteal",
-    "message": "Slow down and honour your rhythm.",
-    "detail": "Make space for what matters most."
+    "messages": [
+      "You may notice an increase in appetite.",
+      "Try not to delay meals for too long.",
+      "You may crave more carbohydrates.",
+      "Remember to drink water if you feel bloated.",
+      "Very salty foods may increase bloating.",
+      "Coffee may affect you differently today.",
+      "You may notice that your sleep feels more sensitive.",
+      "Intense exercise may feel harder today.",
+      "Focusing may feel a little more difficult on some days.",
+      "You may tire a little more quickly today.",
+      "Your digestion may feel a little slower.",
+      "Try tracking premenstrual symptoms for a few months."
+    ],
+    "details": [
+      "Protein and fiber at meals may help you feel full longer.",
+      "Going too long without food can increase tiredness and cravings.",
+      "Try filling options such as oats, whole grains or potatoes.",
+      "Regular water intake can also support digestion.",
+      "Try eating a little less salt on days you feel bloated.",
+      "Reduce the amount or try a drink such as matcha if sleep or tension is affected.",
+      "A calmer evening can make it easier to fall asleep.",
+      "Choose an easier option such as walking, yoga or gentle stretching.",
+      "Breaking large tasks into smaller parts can make starting easier.",
+      "Plan short breaks into your day.",
+      "Water and fiber may be especially helpful during these days.",
+      "Noticing repeated changes can make your cycle easier to understand."
+    ]
   }
 }
