@@ -37,13 +37,13 @@
     "periodDayNumber": "{count}",
     "periodDayLabel": "days of period",
     "daysToPeriodLabel": "days to period",
-    "readBodyChanges": "See more about this phase"
+    "readBodyChanges": "See more about this phase",
+    "forecastConfidenceLow": "low",
+    "forecastConfidenceMedium": "medium",
+    "forecastConfidenceHigh": "high",
+    "periodPredictionSummary": "Period prediction: $range · $confidence confidence",
+    "periodPredictionLowConfidenceSummary": "Period prediction: $range · Add more data for more accurate results"
   },
-  "forecastConfidenceLow": "low",
-  "forecastConfidenceMedium": "medium",
-  "forecastConfidenceHigh": "high",
-  "periodPredictionSummary": "Period prediction: $range · $confidence confidence",
-  "periodPredictionLowConfidenceSummary": "Period prediction: $range · Add more data for more accurate results",
   "error": "Something went wrong",
   "futureLogNotAllowed": "Daily logs cannot be added for future dates."
   

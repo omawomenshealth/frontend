@@ -1,6 +1,6 @@
-import 'package:app_proje_a/domain/cycle/models/cycle_prediction.dart';
-import 'package:app_proje_a/domain/cycle/prediction/probabilistic_cycle_prediction_engine.dart';
-import 'package:app_proje_a/domain/cycle/services/cycle_history_builder.dart';
+import 'package:app_proje_a/features/cycle/models/cycle_prediction.dart';
+import 'package:app_proje_a/features/cycle/prediction/probabilistic_cycle_prediction_engine.dart';
+import 'package:app_proje_a/features/cycle/services/cycle_history_builder.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

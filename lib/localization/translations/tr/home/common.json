@@ -37,13 +37,13 @@
     "periodDayNumber": "{count}.",
     "periodDayLabel": "gün",
     "daysToPeriodLabel": "gün kaldı",
-    "readBodyChanges": "Bu faz hakkında daha fazla gör"
+    "readBodyChanges": "Bu faz hakkında daha fazla gör",
+    "forecastConfidenceLow": "düşük",
+    "forecastConfidenceMedium": "orta",
+    "forecastConfidenceHigh": "yüksek",
+    "periodPredictionSummary": "Sonraki adet tahmini: $range · Tahmin güveni: $confidence",
+    "periodPredictionLowConfidenceSummary": "Sonraki adet tahmini: $range\nKayıt ekledikçe tahminler daha kişisel hale gelir."
   },
-  "forecastConfidenceLow": "düşük",
-  "forecastConfidenceMedium": "orta",
-  "forecastConfidenceHigh": "yüksek",
-  "periodPredictionSummary": "Sonraki adet tahmini: $range · Tahmin güveni: $confidence",
-  "periodPredictionLowConfidenceSummary": "Sonraki adet tahmini: $range\nKayıt ekledikçe tahminler daha kişisel hale gelir.",
   "error": "Bir şeyler ters gitti",
   "futureLogNotAllowed": "Gelecek tarihlere günlük kayıt eklenemez."
   

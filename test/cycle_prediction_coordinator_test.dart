@@ -5,7 +5,7 @@ import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
-import 'package:app_proje_a/domain/cycle/models/cycle_prediction.dart';
+import 'package:app_proje_a/features/cycle/models/cycle_prediction.dart';
 import 'package:app_proje_a/views/calendar/viewmodel/calendar_view_model.dart';
 import 'package:app_proje_a/features/home/viewmodel/home_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';

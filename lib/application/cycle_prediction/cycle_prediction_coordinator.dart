@@ -5,11 +5,11 @@ import '../../core/utils/app_time.dart';
 import '../../data/models/user_settings_model.dart';
 import '../../data/repositories/cycle_forecast_snapshot_store.dart';
 import '../../data/services/local_storage_service.dart';
-import '../../domain/cycle/models/cycle_prediction.dart';
-import '../../domain/cycle/prediction/cycle_prediction_engine.dart';
-import '../../domain/cycle/prediction/probabilistic_cycle_prediction_engine.dart';
-import '../../domain/cycle/services/bleeding_episode_builder.dart';
-import '../../domain/cycle/services/cycle_history_builder.dart';
+import '../../features/cycle/models/cycle_prediction.dart';
+import '../../features/cycle/prediction/cycle_prediction_engine.dart';
+import '../../features/cycle/prediction/probabilistic_cycle_prediction_engine.dart';
+import '../../features/cycle/services/bleeding_episode_builder.dart';
+import '../../features/cycle/services/cycle_history_builder.dart';
 
 /// Ham loglardan tek, sürümlenmiş tahmin snapshot'ı üretir. Dashboard ve
 /// Calendar aynı coordinator örneğini kullandığında aynı inputHash için aynı

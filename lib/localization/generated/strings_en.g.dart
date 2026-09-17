@@ -1170,21 +1170,6 @@ class Translations$home$common$en {
 
 	late final Translations$home$common$hero$en hero = Translations$home$common$hero$en.internal(_root);
 
-	/// en: 'low'
-	String get forecastConfidenceLow => 'low';
-
-	/// en: 'medium'
-	String get forecastConfidenceMedium => 'medium';
-
-	/// en: 'high'
-	String get forecastConfidenceHigh => 'high';
-
-	/// en: 'Period prediction: $range · $confidence confidence'
-	String periodPredictionSummary({required Object range, required Object confidence}) => 'Period prediction: ${range} · ${confidence} confidence';
-
-	/// en: 'Period prediction: $range · Add more data for more accurate results'
-	String periodPredictionLowConfidenceSummary({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results';
-
 	/// en: 'Something went wrong'
 	String get error => 'Something went wrong';
 
@@ -1705,6 +1690,21 @@ class Translations$home$common$hero$en {
 
 	/// en: 'See more about this phase'
 	String get readBodyChanges => 'See more about this phase';
+
+	/// en: 'low'
+	String get forecastConfidenceLow => 'low';
+
+	/// en: 'medium'
+	String get forecastConfidenceMedium => 'medium';
+
+	/// en: 'high'
+	String get forecastConfidenceHigh => 'high';
+
+	/// en: 'Period prediction: $range · $confidence confidence'
+	String periodPredictionSummary({required Object range, required Object confidence}) => 'Period prediction: ${range} · ${confidence} confidence';
+
+	/// en: 'Period prediction: $range · Add more data for more accurate results'
+	String periodPredictionLowConfidenceSummary({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results';
 }
 
 // Path: home.phase.menstrual
@@ -1723,18 +1723,6 @@ class Translations$home$phase$menstrual$en {
 
 	/// en: 'Rest is its own kind of renewal.'
 	String get detail => 'Rest is its own kind of renewal.';
-
-	/// en: 'Menstrual phase'
-	String get label => 'Menstrual phase';
-
-	/// en: 'You can slow down today'
-	String get headline => 'You can slow\ndown today';
-
-	/// en: 'Your energy and comfort needs can change during period days. If it feels good, make room for rest, warmth and gentle movement. Resting and gentle movement like walking may be suitable for this time.'
-	String get body => 'Your energy and comfort needs can change during period days. If it feels good, make room for rest, warmth and gentle movement. Resting and gentle movement like walking may be suitable for this time.';
-
-	/// en: 'Estimated chance of pregnancy is lower'
-	String get fertility => 'Estimated chance of pregnancy is lower';
 }
 
 // Path: home.phase.follicular
@@ -1753,18 +1741,6 @@ class Translations$home$phase$follicular$en {
 
 	/// en: 'A lovely time to follow your curiosity.'
 	String get detail => 'A lovely time to follow your curiosity.';
-
-	/// en: 'Follicular phase'
-	String get label => 'Follicular phase';
-
-	/// en: 'Notice your energy as it shifts'
-	String get headline => 'Notice your energy\nas it shifts';
-
-	/// en: 'Your energy or sociability may rise in this phase, or it may feel much the same. Shape your plans around how you feel today.'
-	String get body => 'Your energy or sociability may rise in this phase, or it may feel much the same. Shape your plans around how you feel today.';
-
-	/// en: 'Estimated chance of pregnancy is rising'
-	String get fertility => 'Estimated chance of pregnancy is rising';
 }
 
 // Path: home.phase.ovulation
@@ -1783,18 +1759,6 @@ class Translations$home$phase$ovulation$en {
 
 	/// en: 'Connect with what makes you glow.'
 	String get detail => 'Connect with what makes you glow.';
-
-	/// en: 'Estimated ovulation window'
-	String get label => 'Estimated ovulation window';
-
-	/// en: 'How are you feeling today?'
-	String get headline => 'How are you\nfeeling today?';
-
-	/// en: 'Energy, desire and social feelings can shift around estimated ovulation days. A calendar estimate cannot replace your own experience.'
-	String get body => 'Energy, desire and social feelings can shift around estimated ovulation days. A calendar estimate cannot replace your own experience.';
-
-	/// en: 'Estimated chance of pregnancy is higher'
-	String get fertility => 'Estimated chance of pregnancy is higher';
 }
 
 // Path: home.phase.luteal
@@ -1813,18 +1777,6 @@ class Translations$home$phase$luteal$en {
 
 	/// en: 'Make space for what matters most.'
 	String get detail => 'Make space for what matters most.';
-
-	/// en: 'Luteal phase'
-	String get label => 'Luteal phase';
-
-	/// en: 'Soften your pace a little'
-	String get headline => 'Soften your\npace a little';
-
-	/// en: 'As your period approaches, your energy, focus and comfort needs may change. Choose the pace that feels right today.'
-	String get body => 'As your period approaches, your energy, focus and comfort needs may change. Choose the pace that feels right today.';
-
-	/// en: 'Estimated chance of pregnancy is lower'
-	String get fertility => 'Estimated chance of pregnancy is lower';
 }
 
 // Path: home.pregnancy.stages
@@ -2695,41 +2647,25 @@ extension on Translations {
 			'home.common.hero.periodDayLabel' => 'days of period',
 			'home.common.hero.daysToPeriodLabel' => 'days to period',
 			'home.common.hero.readBodyChanges' => 'See more about this phase',
-			'home.common.forecastConfidenceLow' => 'low',
-			'home.common.forecastConfidenceMedium' => 'medium',
-			'home.common.forecastConfidenceHigh' => 'high',
-			'home.common.periodPredictionSummary' => ({required Object range, required Object confidence}) => 'Period prediction: ${range} · ${confidence} confidence',
-			'home.common.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results',
+			'home.common.hero.forecastConfidenceLow' => 'low',
+			'home.common.hero.forecastConfidenceMedium' => 'medium',
+			'home.common.hero.forecastConfidenceHigh' => 'high',
+			'home.common.hero.periodPredictionSummary' => ({required Object range, required Object confidence}) => 'Period prediction: ${range} · ${confidence} confidence',
+			'home.common.hero.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results',
 			'home.common.error' => 'Something went wrong',
 			'home.common.futureLogNotAllowed' => 'Daily logs cannot be added for future dates.',
 			'home.phase.menstrual.title' => 'Menstrual',
 			'home.phase.menstrual.message' => 'A quiet moment to turn inward.',
 			'home.phase.menstrual.detail' => 'Rest is its own kind of renewal.',
-			'home.phase.menstrual.label' => 'Menstrual phase',
-			'home.phase.menstrual.headline' => 'You can slow\ndown today',
-			'home.phase.menstrual.body' => 'Your energy and comfort needs can change during period days. If it feels good, make room for rest, warmth and gentle movement. Resting and gentle movement like walking may be suitable for this time.',
-			'home.phase.menstrual.fertility' => 'Estimated chance of pregnancy is lower',
 			'home.phase.follicular.title' => 'Follicular',
 			'home.phase.follicular.message' => 'Your energy is beginning to bloom.',
 			'home.phase.follicular.detail' => 'A lovely time to follow your curiosity.',
-			'home.phase.follicular.label' => 'Follicular phase',
-			'home.phase.follicular.headline' => 'Notice your energy\nas it shifts',
-			'home.phase.follicular.body' => 'Your energy or sociability may rise in this phase, or it may feel much the same. Shape your plans around how you feel today.',
-			'home.phase.follicular.fertility' => 'Estimated chance of pregnancy is rising',
 			'home.phase.ovulation.title' => 'Ovulation',
 			'home.phase.ovulation.message' => 'A bright moment to feel your power.',
 			'home.phase.ovulation.detail' => 'Connect with what makes you glow.',
-			'home.phase.ovulation.label' => 'Estimated ovulation window',
-			'home.phase.ovulation.headline' => 'How are you\nfeeling today?',
-			'home.phase.ovulation.body' => 'Energy, desire and social feelings can shift around estimated ovulation days. A calendar estimate cannot replace your own experience.',
-			'home.phase.ovulation.fertility' => 'Estimated chance of pregnancy is higher',
 			'home.phase.luteal.title' => 'Luteal',
 			'home.phase.luteal.message' => 'Slow down and honour your rhythm.',
 			'home.phase.luteal.detail' => 'Make space for what matters most.',
-			'home.phase.luteal.label' => 'Luteal phase',
-			'home.phase.luteal.headline' => 'Soften your\npace a little',
-			'home.phase.luteal.body' => 'As your period approaches, your energy, focus and comfort needs may change. Choose the pace that feels right today.',
-			'home.phase.luteal.fertility' => 'Estimated chance of pregnancy is lower',
 			'home.pregnancy.positiveTestRecorded' => 'Positive test recorded: {date} · This alone does not determine the pregnancy week.',
 			'home.pregnancy.badge' => 'PREGNANCY',
 			'home.pregnancy.estimatedWeek' => 'ESTIMATED PREGNANCY WEEK',
@@ -2782,8 +2718,6 @@ extension on Translations {
 			'onboarding.health_profile.smokingFormer' => 'I quit',
 			'onboarding.health_profile.knownConditions' => 'Is there a health condition you\'d like me to know about?',
 			'onboarding.health_profile.addCondition' => 'Add',
-			_ => null,
-		} ?? switch (path) {
 			'onboarding.introduction.title' => 'Let\'s get to know you',
 			'onboarding.introduction.name' => 'Your name',
 			'onboarding.introduction.nameHint' => 'What should I call you?',
@@ -2800,6 +2734,8 @@ extension on Translations {
 			'onboarding.review.title' => 'Great',
 			'onboarding.review.titleWithName' => ({required Object name}) => 'I\'m here with you, ${name}',
 			'onboarding.review.subtitle' => 'Your profile is ready. Ready to begin?',
+			_ => null,
+		} ?? switch (path) {
 			'onboarding.review.conditionsLabel' => 'Health conditions you\'d like me to know',
 			'onboarding.review.noConditions' => 'You haven\'t added a health condition yet',
 			'onboarding.review.cycleLabel' => 'Your cycle details',

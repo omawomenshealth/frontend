@@ -1014,11 +1014,6 @@ class _Translations$home$common$tr extends Translations$home$common$en {
 	@override late final _Translations$home$common$insightsPreview$tr insightsPreview = _Translations$home$common$insightsPreview$tr._(_root);
 	@override String get today => 'Bugün';
 	@override late final _Translations$home$common$hero$tr hero = _Translations$home$common$hero$tr._(_root);
-	@override String get forecastConfidenceLow => 'düşük';
-	@override String get forecastConfidenceMedium => 'orta';
-	@override String get forecastConfidenceHigh => 'yüksek';
-	@override String periodPredictionSummary({required Object range, required Object confidence}) => 'Sonraki adet tahmini: ${range} · Tahmin güveni: ${confidence}';
-	@override String periodPredictionLowConfidenceSummary({required Object range}) => 'Sonraki adet tahmini: ${range}\nKayıt ekledikçe tahminler daha kişisel hale gelir.';
 	@override String get error => 'Bir şeyler ters gitti';
 	@override String get futureLogNotAllowed => 'Gelecek tarihlere günlük kayıt eklenemez.';
 }
@@ -1318,6 +1313,11 @@ class _Translations$home$common$hero$tr extends Translations$home$common$hero$en
 	@override String get periodDayLabel => 'gün';
 	@override String get daysToPeriodLabel => 'gün kaldı';
 	@override String get readBodyChanges => 'Bu faz hakkında daha fazla gör';
+	@override String get forecastConfidenceLow => 'düşük';
+	@override String get forecastConfidenceMedium => 'orta';
+	@override String get forecastConfidenceHigh => 'yüksek';
+	@override String periodPredictionSummary({required Object range, required Object confidence}) => 'Sonraki adet tahmini: ${range} · Tahmin güveni: ${confidence}';
+	@override String periodPredictionLowConfidenceSummary({required Object range}) => 'Sonraki adet tahmini: ${range}\nKayıt ekledikçe tahminler daha kişisel hale gelir.';
 }
 
 // Path: home.phase.menstrual
@@ -1330,10 +1330,6 @@ class _Translations$home$phase$menstrual$tr extends Translations$home$phase$mens
 	@override String get title => 'Menstrüel';
 	@override String get message => 'Kendine dönmek için sakin bir an.';
 	@override String get detail => 'Dinlenmek de yenilenmenin bir parçası.';
-	@override String get label => 'Menstrüel faz';
-	@override String get headline => 'Bugün biraz\nyavaşlayabilirsin';
-	@override String get body => 'Menstrüel fazda enerjin ve rahatlık ihtiyaçların değişebilir. Sana iyi geliyorsa dinlenmeye, sıcaklığa ve hafif hareketlere yer açabilirsin. Yürüyüş gibi hafif hareketler bu dönem için uygun olabilir.';
-	@override String get fertility => 'Tahmini gebelik olasılığı daha düşük';
 }
 
 // Path: home.phase.follicular
@@ -1346,10 +1342,6 @@ class _Translations$home$phase$follicular$tr extends Translations$home$phase$fol
 	@override String get title => 'Foliküler';
 	@override String get message => 'Enerjin yeniden canlanmaya başlıyor.';
 	@override String get detail => 'Merakının peşinden gitmek için güzel bir zaman.';
-	@override String get label => 'Foliküler faz';
-	@override String get headline => 'Enerjindeki\ndeğişimi fark et';
-	@override String get body => 'Foliküler fazda enerjin veya sosyalleşme isteğin artabilir ya da pek değişmeyebilir. Planlarını bugün nasıl hissettiğine göre şekillendirebilirsin.';
-	@override String get fertility => 'Tahmini gebelik olasılığı artıyor';
 }
 
 // Path: home.phase.ovulation
@@ -1362,10 +1354,6 @@ class _Translations$home$phase$ovulation$tr extends Translations$home$phase$ovul
 	@override String get title => 'Ovulasyon';
 	@override String get message => 'Kendindeki gücü hissetmek için canlı bir dönem.';
 	@override String get detail => 'Sana iyi hissettiren şeylerle bağ kur.';
-	@override String get label => 'Tahmini ovulasyon dönemi';
-	@override String get headline => 'Bugün kendini\nnasıl hissediyorsun?';
-	@override String get body => 'Tahmini ovulasyon günlerinde enerji, cinsel istek ve sosyalleşme isteği değişebilir. Takvime dayalı bir tahmin, kendi deneyiminin yerini tutmaz.';
-	@override String get fertility => 'Tahmini gebelik olasılığı daha yüksek';
 }
 
 // Path: home.phase.luteal
@@ -1378,10 +1366,6 @@ class _Translations$home$phase$luteal$tr extends Translations$home$phase$luteal$
 	@override String get title => 'Luteal';
 	@override String get message => 'Yavaşla ve kendi ritmine kulak ver.';
 	@override String get detail => 'Senin için önemli olan şeylere alan aç.';
-	@override String get label => 'Luteal faz';
-	@override String get headline => 'Temponu biraz\nyavaşlat';
-	@override String get body => 'Luteal fazda, menstrüel dönem yaklaşırken enerjin, odaklanman ve rahatlık ihtiyaçların değişebilir. Bugün sana iyi gelen tempoyu seçebilirsin.';
-	@override String get fertility => 'Tahmini gebelik olasılığı daha düşük';
 }
 
 // Path: home.pregnancy.stages
@@ -2123,41 +2107,25 @@ extension on TranslationsTr {
 			'home.common.hero.periodDayLabel' => 'gün',
 			'home.common.hero.daysToPeriodLabel' => 'gün kaldı',
 			'home.common.hero.readBodyChanges' => 'Bu faz hakkında daha fazla gör',
-			'home.common.forecastConfidenceLow' => 'düşük',
-			'home.common.forecastConfidenceMedium' => 'orta',
-			'home.common.forecastConfidenceHigh' => 'yüksek',
-			'home.common.periodPredictionSummary' => ({required Object range, required Object confidence}) => 'Sonraki adet tahmini: ${range} · Tahmin güveni: ${confidence}',
-			'home.common.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Sonraki adet tahmini: ${range}\nKayıt ekledikçe tahminler daha kişisel hale gelir.',
+			'home.common.hero.forecastConfidenceLow' => 'düşük',
+			'home.common.hero.forecastConfidenceMedium' => 'orta',
+			'home.common.hero.forecastConfidenceHigh' => 'yüksek',
+			'home.common.hero.periodPredictionSummary' => ({required Object range, required Object confidence}) => 'Sonraki adet tahmini: ${range} · Tahmin güveni: ${confidence}',
+			'home.common.hero.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Sonraki adet tahmini: ${range}\nKayıt ekledikçe tahminler daha kişisel hale gelir.',
 			'home.common.error' => 'Bir şeyler ters gitti',
 			'home.common.futureLogNotAllowed' => 'Gelecek tarihlere günlük kayıt eklenemez.',
 			'home.phase.menstrual.title' => 'Menstrüel',
 			'home.phase.menstrual.message' => 'Kendine dönmek için sakin bir an.',
 			'home.phase.menstrual.detail' => 'Dinlenmek de yenilenmenin bir parçası.',
-			'home.phase.menstrual.label' => 'Menstrüel faz',
-			'home.phase.menstrual.headline' => 'Bugün biraz\nyavaşlayabilirsin',
-			'home.phase.menstrual.body' => 'Menstrüel fazda enerjin ve rahatlık ihtiyaçların değişebilir. Sana iyi geliyorsa dinlenmeye, sıcaklığa ve hafif hareketlere yer açabilirsin. Yürüyüş gibi hafif hareketler bu dönem için uygun olabilir.',
-			'home.phase.menstrual.fertility' => 'Tahmini gebelik olasılığı daha düşük',
 			'home.phase.follicular.title' => 'Foliküler',
 			'home.phase.follicular.message' => 'Enerjin yeniden canlanmaya başlıyor.',
 			'home.phase.follicular.detail' => 'Merakının peşinden gitmek için güzel bir zaman.',
-			'home.phase.follicular.label' => 'Foliküler faz',
-			'home.phase.follicular.headline' => 'Enerjindeki\ndeğişimi fark et',
-			'home.phase.follicular.body' => 'Foliküler fazda enerjin veya sosyalleşme isteğin artabilir ya da pek değişmeyebilir. Planlarını bugün nasıl hissettiğine göre şekillendirebilirsin.',
-			'home.phase.follicular.fertility' => 'Tahmini gebelik olasılığı artıyor',
 			'home.phase.ovulation.title' => 'Ovulasyon',
 			'home.phase.ovulation.message' => 'Kendindeki gücü hissetmek için canlı bir dönem.',
 			'home.phase.ovulation.detail' => 'Sana iyi hissettiren şeylerle bağ kur.',
-			'home.phase.ovulation.label' => 'Tahmini ovulasyon dönemi',
-			'home.phase.ovulation.headline' => 'Bugün kendini\nnasıl hissediyorsun?',
-			'home.phase.ovulation.body' => 'Tahmini ovulasyon günlerinde enerji, cinsel istek ve sosyalleşme isteği değişebilir. Takvime dayalı bir tahmin, kendi deneyiminin yerini tutmaz.',
-			'home.phase.ovulation.fertility' => 'Tahmini gebelik olasılığı daha yüksek',
 			'home.phase.luteal.title' => 'Luteal',
 			'home.phase.luteal.message' => 'Yavaşla ve kendi ritmine kulak ver.',
 			'home.phase.luteal.detail' => 'Senin için önemli olan şeylere alan aç.',
-			'home.phase.luteal.label' => 'Luteal faz',
-			'home.phase.luteal.headline' => 'Temponu biraz\nyavaşlat',
-			'home.phase.luteal.body' => 'Luteal fazda, menstrüel dönem yaklaşırken enerjin, odaklanman ve rahatlık ihtiyaçların değişebilir. Bugün sana iyi gelen tempoyu seçebilirsin.',
-			'home.phase.luteal.fertility' => 'Tahmini gebelik olasılığı daha düşük',
 			'home.pregnancy.positiveTestRecorded' => 'Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.',
 			'home.pregnancy.badge' => 'GEBELİK',
 			'home.pregnancy.estimatedWeek' => 'TAHMİNİ GEBELİK HAFTASI',
@@ -2211,8 +2179,6 @@ extension on TranslationsTr {
 			'onboarding.health_profile.knownConditions' => 'Bilmemi istediğin bir sağlık durumun var mı?',
 			'onboarding.health_profile.addCondition' => 'Ekle',
 			'onboarding.introduction.title' => 'Seni tanıyalım',
-			_ => null,
-		} ?? switch (path) {
 			'onboarding.introduction.name' => 'Adın',
 			'onboarding.introduction.nameHint' => 'Sana nasıl seslenelim?',
 			'onboarding.introduction.birthDate' => 'Doğum tarihin',
@@ -2229,6 +2195,8 @@ extension on TranslationsTr {
 			'onboarding.review.titleWithName' => ({required Object name}) => 'Yanındayım, ${name}',
 			'onboarding.review.subtitle' => 'Profilin hazır. Başlamaya hazır mısın?',
 			'onboarding.review.conditionsLabel' => 'Bilmemi istediğin sağlık durumları',
+			_ => null,
+		} ?? switch (path) {
 			'onboarding.review.noConditions' => 'Henüz bir sağlık durumu eklemedin',
 			'onboarding.review.cycleLabel' => 'Döngü bilgilerin',
 			'onboarding.review.dayCount' => ({required Object days}) => '${days} gün',

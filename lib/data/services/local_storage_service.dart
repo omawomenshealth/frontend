@@ -9,8 +9,8 @@ import '../../core/utils/date_extensions.dart';
 import '../../core/utils/app_time.dart';
 import '../../core/utils/cycle_rules.dart';
 import '../../core/constants/app_strings.dart';
-import '../../domain/cycle/models/cycle_prediction.dart';
-import '../../domain/cycle/services/bleeding_episode_builder.dart';
+import '../../features/cycle/models/cycle_prediction.dart';
+import '../../features/cycle/services/bleeding_episode_builder.dart';
 import 'local_encrypted_store.dart';
 
 /// Sağlık ve oturum verilerini AES-256-GCM şifreli SharedPreferences zarfları
