@@ -20,20 +20,21 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	Translations({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.en,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <en>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	dynamic operator[](String key) => $meta.getTranslation(key);
+	dynamic operator[](String key) => _meta.getTranslation(key);
 
 	late final Translations _root = this; // ignore: unused_field
 
@@ -1167,6 +1168,8 @@ class Translations$home$common$en {
 	/// en: 'Today'
 	String get today => 'Today';
 
+	late final Translations$home$common$hero$en hero = Translations$home$common$hero$en.internal(_root);
+
 	/// en: 'low'
 	String get forecastConfidenceLow => 'low';
 
@@ -1196,25 +1199,6 @@ class Translations$home$phase$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
-
-	/// en: 'Cycle day {count}'
-	String get cycleDay => 'Cycle day {count}';
-
-	/// en: 'Log period'
-	String get periodLogAction => 'Log period';
-
-	/// en: '{count}'
-	String get periodDayNumber => '{count}';
-
-	/// en: 'days of period'
-	String get periodDayLabel => 'days of period';
-
-	/// en: 'days to period'
-	String get daysToPeriodLabel => 'days to period';
-
-	/// en: 'See more about this phase'
-	String get readBodyChanges => 'See more about this phase';
-
 	late final Translations$home$phase$menstrual$en menstrual = Translations$home$phase$menstrual$en.internal(_root);
 	late final Translations$home$phase$follicular$en follicular = Translations$home$phase$follicular$en.internal(_root);
 	late final Translations$home$phase$ovulation$en ovulation = Translations$home$phase$ovulation$en.internal(_root);
@@ -1690,6 +1674,39 @@ class Translations$home$common$insightsPreview$en {
 	String get learning => 'As you add more records, your personal connections become clearer.';
 }
 
+// Path: home.common.hero
+class Translations$home$common$hero$en {
+	Translations$home$common$hero$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'CURRENT PHASE'
+	String get currentPhase => 'CURRENT PHASE';
+
+	/// en: 'phase'
+	String get phaseWord => 'phase';
+
+	/// en: 'CYCLE DAY'
+	String get cycleDayLabel => 'CYCLE DAY';
+
+	/// en: '{phase}, cycle day {day}. {message} {detail}'
+	String get semanticLabel => '{phase}, cycle day {day}. {message} {detail}';
+
+	/// en: '{count}'
+	String get periodDayNumber => '{count}';
+
+	/// en: 'days of period'
+	String get periodDayLabel => 'days of period';
+
+	/// en: 'days to period'
+	String get daysToPeriodLabel => 'days to period';
+
+	/// en: 'See more about this phase'
+	String get readBodyChanges => 'See more about this phase';
+}
+
 // Path: home.phase.menstrual
 class Translations$home$phase$menstrual$en {
 	Translations$home$phase$menstrual$en.internal(this._root);
@@ -1697,6 +1714,15 @@ class Translations$home$phase$menstrual$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Menstrual'
+	String get title => 'Menstrual';
+
+	/// en: 'A quiet moment to turn inward.'
+	String get message => 'A quiet moment to turn inward.';
+
+	/// en: 'Rest is its own kind of renewal.'
+	String get detail => 'Rest is its own kind of renewal.';
 
 	/// en: 'Menstrual phase'
 	String get label => 'Menstrual phase';
@@ -1719,6 +1745,15 @@ class Translations$home$phase$follicular$en {
 
 	// Translations
 
+	/// en: 'Follicular'
+	String get title => 'Follicular';
+
+	/// en: 'Your energy is beginning to bloom.'
+	String get message => 'Your energy is beginning to bloom.';
+
+	/// en: 'A lovely time to follow your curiosity.'
+	String get detail => 'A lovely time to follow your curiosity.';
+
 	/// en: 'Follicular phase'
 	String get label => 'Follicular phase';
 
@@ -1740,6 +1775,15 @@ class Translations$home$phase$ovulation$en {
 
 	// Translations
 
+	/// en: 'Ovulation'
+	String get title => 'Ovulation';
+
+	/// en: 'A bright moment to feel your power.'
+	String get message => 'A bright moment to feel your power.';
+
+	/// en: 'Connect with what makes you glow.'
+	String get detail => 'Connect with what makes you glow.';
+
 	/// en: 'Estimated ovulation window'
 	String get label => 'Estimated ovulation window';
 
@@ -1760,6 +1804,15 @@ class Translations$home$phase$luteal$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Luteal'
+	String get title => 'Luteal';
+
+	/// en: 'Slow down and honour your rhythm.'
+	String get message => 'Slow down and honour your rhythm.';
+
+	/// en: 'Make space for what matters most.'
+	String get detail => 'Make space for what matters most.';
 
 	/// en: 'Luteal phase'
 	String get label => 'Luteal phase';
@@ -2057,6 +2110,9 @@ class Translations$home$common$quickLogs$buttons$en {
 
 	/// en: 'Nutrition'
 	String get nutrition => 'Nutrition';
+
+	/// en: 'Period'
+	String get period => 'Period';
 
 	/// en: 'Symptom'
 	String get symptom => 'Symptom';
@@ -2621,6 +2677,7 @@ extension on Translations {
 			'home.common.quickLogs.title' => 'Quick Logs',
 			'home.common.quickLogs.caption' => 'Log your activities quickly',
 			'home.common.quickLogs.buttons.nutrition' => 'Nutrition',
+			'home.common.quickLogs.buttons.period' => 'Period',
 			'home.common.quickLogs.buttons.symptom' => 'Symptom',
 			'home.common.quickLogs.buttons.mood' => 'Mood',
 			'home.common.quickLogs.buttons.medication' => 'Medication',
@@ -2630,6 +2687,14 @@ extension on Translations {
 			'home.common.insightsPreview.viewAll' => 'View all ›',
 			'home.common.insightsPreview.learning' => 'As you add more records, your personal connections become clearer.',
 			'home.common.today' => 'Today',
+			'home.common.hero.currentPhase' => 'CURRENT PHASE',
+			'home.common.hero.phaseWord' => 'phase',
+			'home.common.hero.cycleDayLabel' => 'CYCLE DAY',
+			'home.common.hero.semanticLabel' => '{phase}, cycle day {day}. {message} {detail}',
+			'home.common.hero.periodDayNumber' => '{count}',
+			'home.common.hero.periodDayLabel' => 'days of period',
+			'home.common.hero.daysToPeriodLabel' => 'days to period',
+			'home.common.hero.readBodyChanges' => 'See more about this phase',
 			'home.common.forecastConfidenceLow' => 'low',
 			'home.common.forecastConfidenceMedium' => 'medium',
 			'home.common.forecastConfidenceHigh' => 'high',
@@ -2637,24 +2702,30 @@ extension on Translations {
 			'home.common.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results',
 			'home.common.error' => 'Something went wrong',
 			'home.common.futureLogNotAllowed' => 'Daily logs cannot be added for future dates.',
-			'home.phase.cycleDay' => 'Cycle day {count}',
-			'home.phase.periodLogAction' => 'Log period',
-			'home.phase.periodDayNumber' => '{count}',
-			'home.phase.periodDayLabel' => 'days of period',
-			'home.phase.daysToPeriodLabel' => 'days to period',
-			'home.phase.readBodyChanges' => 'See more about this phase',
+			'home.phase.menstrual.title' => 'Menstrual',
+			'home.phase.menstrual.message' => 'A quiet moment to turn inward.',
+			'home.phase.menstrual.detail' => 'Rest is its own kind of renewal.',
 			'home.phase.menstrual.label' => 'Menstrual phase',
 			'home.phase.menstrual.headline' => 'You can slow\ndown today',
 			'home.phase.menstrual.body' => 'Your energy and comfort needs can change during period days. If it feels good, make room for rest, warmth and gentle movement. Resting and gentle movement like walking may be suitable for this time.',
 			'home.phase.menstrual.fertility' => 'Estimated chance of pregnancy is lower',
+			'home.phase.follicular.title' => 'Follicular',
+			'home.phase.follicular.message' => 'Your energy is beginning to bloom.',
+			'home.phase.follicular.detail' => 'A lovely time to follow your curiosity.',
 			'home.phase.follicular.label' => 'Follicular phase',
 			'home.phase.follicular.headline' => 'Notice your energy\nas it shifts',
 			'home.phase.follicular.body' => 'Your energy or sociability may rise in this phase, or it may feel much the same. Shape your plans around how you feel today.',
 			'home.phase.follicular.fertility' => 'Estimated chance of pregnancy is rising',
+			'home.phase.ovulation.title' => 'Ovulation',
+			'home.phase.ovulation.message' => 'A bright moment to feel your power.',
+			'home.phase.ovulation.detail' => 'Connect with what makes you glow.',
 			'home.phase.ovulation.label' => 'Estimated ovulation window',
 			'home.phase.ovulation.headline' => 'How are you\nfeeling today?',
 			'home.phase.ovulation.body' => 'Energy, desire and social feelings can shift around estimated ovulation days. A calendar estimate cannot replace your own experience.',
 			'home.phase.ovulation.fertility' => 'Estimated chance of pregnancy is higher',
+			'home.phase.luteal.title' => 'Luteal',
+			'home.phase.luteal.message' => 'Slow down and honour your rhythm.',
+			'home.phase.luteal.detail' => 'Make space for what matters most.',
 			'home.phase.luteal.label' => 'Luteal phase',
 			'home.phase.luteal.headline' => 'Soften your\npace a little',
 			'home.phase.luteal.body' => 'As your period approaches, your energy, focus and comfort needs may change. Choose the pace that feels right today.',
@@ -2711,6 +2782,8 @@ extension on Translations {
 			'onboarding.health_profile.smokingFormer' => 'I quit',
 			'onboarding.health_profile.knownConditions' => 'Is there a health condition you\'d like me to know about?',
 			'onboarding.health_profile.addCondition' => 'Add',
+			_ => null,
+		} ?? switch (path) {
 			'onboarding.introduction.title' => 'Let\'s get to know you',
 			'onboarding.introduction.name' => 'Your name',
 			'onboarding.introduction.nameHint' => 'What should I call you?',
@@ -2726,8 +2799,6 @@ extension on Translations {
 			'onboarding.prompt.review' => 'When you\'re ready, let\'s begin at your own pace. Oma is here for your cycle and wellbeing.',
 			'onboarding.review.title' => 'Great',
 			'onboarding.review.titleWithName' => ({required Object name}) => 'I\'m here with you, ${name}',
-			_ => null,
-		} ?? switch (path) {
 			'onboarding.review.subtitle' => 'Your profile is ready. Ready to begin?',
 			'onboarding.review.conditionsLabel' => 'Health conditions you\'d like me to know',
 			'onboarding.review.noConditions' => 'You haven\'t added a health condition yet',

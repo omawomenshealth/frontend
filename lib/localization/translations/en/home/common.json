@@ -15,6 +15,7 @@
     "caption": "Log your activities quickly",
     "buttons": {
       "nutrition": "Nutrition",
+      "period": "Period",
       "symptom": "Symptom",
       "mood": "Mood",
       "medication": "Medication",
@@ -28,6 +29,16 @@
     "learning": "As you add more records, your personal connections become clearer."
   },
   "today": "Today",
+  "hero": {
+    "currentPhase": "CURRENT PHASE",
+    "phaseWord": "phase",
+    "cycleDayLabel": "CYCLE DAY",
+    "semanticLabel": "{phase}, cycle day {day}. {message} {detail}",
+    "periodDayNumber": "{count}",
+    "periodDayLabel": "days of period",
+    "daysToPeriodLabel": "days to period",
+    "readBodyChanges": "See more about this phase"
+  },
   "forecastConfidenceLow": "low",
   "forecastConfidenceMedium": "medium",
   "forecastConfidenceHigh": "high",

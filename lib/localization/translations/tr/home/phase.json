@@ -1,32 +1,38 @@
 {
-  "cycleDay": "Döngünün {count}. günü",
-  "periodLogAction": "Adet gir",
-  "periodDayNumber": "{count}.",
-  "periodDayLabel": "gün",
-  "daysToPeriodLabel": "gün kaldı",
-  "readBodyChanges": "Bu faz hakkında daha fazla gör",
   "menstrual": {
-    "label": "Adet dönemi",
-    "headline": "Adetinin ilk\ngünlerindesin",
-    "body": "Bu günlerde enerji seviyende veya rahatlık ihtiyacında değişiklikler olabilir. İhtiyacın varsa daha sık mola verebilir, sana iyi geliyorsa hafif hareket edebilirsin.",
-    "fertility": "Tahmini gebelik ihtimali düşük"
+    "title": "Menstrüel",
+    "message": "Kendine dönmek için sakin bir an.",
+    "detail": "Dinlenmek de yenilenmenin bir parçası.",
+    "label": "Menstrüel faz",
+    "headline": "Bugün biraz\nyavaşlayabilirsin",
+    "body": "Menstrüel fazda enerjin ve rahatlık ihtiyaçların değişebilir. Sana iyi geliyorsa dinlenmeye, sıcaklığa ve hafif hareketlere yer açabilirsin. Yürüyüş gibi hafif hareketler bu dönem için uygun olabilir.",
+    "fertility": "Tahmini gebelik olasılığı daha düşük"
   },
   "follicular": {
+    "title": "Foliküler",
+    "message": "Enerjin yeniden canlanmaya başlıyor.",
+    "detail": "Merakının peşinden gitmek için güzel bir zaman.",
     "label": "Foliküler faz",
-    "headline": "Foliküler\nfazdasın",
-    "body": "Bu fazda enerji seviyende veya günlük ihtiyaçlarında değişiklikler olabilir. Planlarını kendi gözlemlerine göre düzenleyebilirsin.",
-    "fertility": "Tahmini gebelik ihtimali artıyor"
+    "headline": "Enerjindeki\ndeğişimi fark et",
+    "body": "Foliküler fazda enerjin veya sosyalleşme isteğin artabilir ya da pek değişmeyebilir. Planlarını bugün nasıl hissettiğine göre şekillendirebilirsin.",
+    "fertility": "Tahmini gebelik olasılığı artıyor"
   },
   "ovulation": {
-    "label": "Tahmini ovülasyon aralığı",
-    "headline": "Tahmini ovülasyon\ndönemindesin",
-    "body": "Takvim verilerine göre ovülasyon döneminde olabilirsin. Akıntı gibi vücut sinyallerini kaydedebilirsin; bu tahmin ovülasyonu doğrulamaz.",
-    "fertility": "Tahmini gebelik ihtimali yüksek"
+    "title": "Ovulasyon",
+    "message": "Kendindeki gücü hissetmek için canlı bir dönem.",
+    "detail": "Sana iyi hissettiren şeylerle bağ kur.",
+    "label": "Tahmini ovulasyon dönemi",
+    "headline": "Bugün kendini\nnasıl hissediyorsun?",
+    "body": "Tahmini ovulasyon günlerinde enerji, cinsel istek ve sosyalleşme isteği değişebilir. Takvime dayalı bir tahmin, kendi deneyiminin yerini tutmaz.",
+    "fertility": "Tahmini gebelik olasılığı daha yüksek"
   },
   "luteal": {
+    "title": "Luteal",
+    "message": "Yavaşla ve kendi ritmine kulak ver.",
+    "detail": "Senin için önemli olan şeylere alan aç.",
     "label": "Luteal faz",
-    "headline": "Adetin\nyaklaşabilir",
-    "body": "Adet öncesinde enerji, odak ve rahatlık ihtiyacı kişiden kişiye değişebilir. İhtiyacın varsa kısa molalar verebilir veya yapacaklarını daha küçük adımlara bölebilirsin.",
-    "fertility": "Tahmini gebelik ihtimali düşük"
+    "headline": "Temponu biraz\nyavaşlat",
+    "body": "Luteal fazda, menstrüel dönem yaklaşırken enerjin, odaklanman ve rahatlık ihtiyaçların değişebilir. Bugün sana iyi gelen tempoyu seçebilirsin.",
+    "fertility": "Tahmini gebelik olasılığı daha düşük"
   }
 }

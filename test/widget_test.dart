@@ -8,7 +8,7 @@ import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/main.dart';
-import 'package:app_proje_a/views/dashboard/widgets/phase_hero_card.dart';
+import 'package:app_proje_a/features/home/view/widgets/hero/phase_hero_card.dart';
 import 'package:app_proje_a/views/insights/view/insights_view.dart';
 import 'package:app_proje_a/shell/home_shell.dart';
 

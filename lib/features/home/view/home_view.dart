@@ -47,9 +47,9 @@ class HomeView extends StatelessWidget {
             ? OmaColors.plum
             : OmaColors.forCyclePhase(phase);
         final cycleDay = _cycleDay(calculator, vm.selectedDate);
-        final periodCount = phase == CyclePhase.menstrual
-            ? cycleDay
-            : _daysToPeriod(calculator, vm.selectedDate, cycleDay);
+        final daysUntilPeriod = phase != CyclePhase.menstrual
+            ? _daysToPeriod(calculator, vm.selectedDate, cycleDay)
+            : null;
 
         return Scaffold(
           backgroundColor: Color.lerp(
@@ -103,23 +103,23 @@ class HomeView extends StatelessWidget {
                     HomeHeroSection(
                       trackingMode: trackingMode,
                       pregnancyEstimate: vm.pregnancyEstimate,
-                      positiveTestDate:
-                          vm.settings?.pregnancyTestPositiveDate,
+                      positiveTestDate: vm.settings?.pregnancyTestPositiveDate,
                       phase: phase,
                       cycleDay: cycleDay,
-                      periodCount: periodCount,
-                        forecastSummary: _forecastSummary(context, vm),
+                      cycleLength: 28,
+                      daysUntilPeriod: daysUntilPeriod,
+                      forecastSummary: _forecastSummary(context, vm),
                       onOpenInsights: () => _openInsights(context),
+                    ),
+                    const SizedBox(height: 30),
+                    QuickLogs(
+                      accent: accent,
                       onPeriodTap: () => _showDailyLogSheet(
                         context,
                         vm,
                         initialIndex: 0,
                         isSingleTab: true,
                       ),
-                      ),
-                    const SizedBox(height: 30),
-                      QuickLogs(
-                        accent: accent,
                       onNutritionTap: () => _showDailyLogSheet(
                         context,
                         vm,
@@ -156,8 +156,7 @@ class HomeView extends StatelessWidget {
                       insights: vm.personalInsights,
                       accent: accent,
                       onViewAll: () => _openInsights(context),
-                      onInsightTap: (insight) =>
-                          _openInsight(context, insight),
+                      onInsightTap: (insight) => _openInsight(context, insight),
                     ),
                     TodaysMedicationDosesCard(color: accent),
                   ],
@@ -224,10 +223,7 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  String? _forecastSummary(
-    BuildContext context,
-    HomeViewModel vm,
-  ) {
+  String? _forecastSummary(BuildContext context, HomeViewModel vm) {
     final strings = context.t.home.common;
     final forecast = vm.cycleForecast;
     if (forecast == null) return null;
@@ -309,4 +305,3 @@ class HomeView extends StatelessWidget {
     );
   }
 }
-

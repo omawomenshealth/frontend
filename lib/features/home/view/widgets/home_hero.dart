@@ -9,20 +9,18 @@ import 'hero/pregnancy_hero_card.dart';
 /// Dashboard'un ana hero bölümü.
 ///
 /// Kullanıcının takip moduna göre döngü veya gebelik kartını gösterir.
-/// Kartların kendi görsel ve presentation logic'i ilgili hero widget'larında
-/// yönetilir.
 class HomeHeroSection extends StatelessWidget {
   final TrackingMode trackingMode;
 
-  // Döngü modu
+  // Cycle
   final CyclePhase phase;
   final int cycleDay;
-  final int periodCount;
+  final int cycleLength;
   final String? forecastSummary;
+  final int? daysUntilPeriod;
   final VoidCallback onOpenInsights;
-  final VoidCallback onPeriodTap;
 
-  // Gebelik modu
+  // Pregnancy
   final PregnancyEstimate? pregnancyEstimate;
   final DateTime? positiveTestDate;
 
@@ -31,9 +29,9 @@ class HomeHeroSection extends StatelessWidget {
     required this.trackingMode,
     required this.phase,
     required this.cycleDay,
-    required this.periodCount,
+    required this.cycleLength,
     required this.onOpenInsights,
-    required this.onPeriodTap,
+    required this.daysUntilPeriod,
     this.forecastSummary,
     this.pregnancyEstimate,
     this.positiveTestDate,
@@ -47,14 +45,15 @@ class HomeHeroSection extends StatelessWidget {
           estimate: pregnancyEstimate,
           positiveTestDate: positiveTestDate,
         ),
+
       _ => PhaseHeroCard(
-          key: const ValueKey('dashboard_phase_hero'),
+          key: ValueKey('dashboard_phase_${phase.name}'),
           phase: phase,
           cycleDay: cycleDay,
-          periodCount: periodCount,
+          cycleLength: cycleLength,
           forecastSummary: forecastSummary,
+          daysUntilPeriod: daysUntilPeriod,
           onOpenInsights: onOpenInsights,
-          onPeriodTap: onPeriodTap,
         ),
     };
   }

@@ -12,7 +12,15 @@
   },
   "quickLogs": {
     "title": "Hızlı Kayıtlar",
-    "caption": "Aktivitelerinizi hızlıca kaydedin"
+    "caption": "Aktivitelerinizi hızlıca kaydedin",
+    "buttons": {
+      "nutrition": "Beslenme",
+      "period": "Adet",
+      "symptom": "Belirti",
+      "mood": "Ruh hali",
+      "medication": "İlaç",
+      "skincare": "Cilt bakımı"
+    }
   },
   "insightsPreview": {
     "eyebrow": "OMA VERİLERİNİ BİRBİRİNE BAĞLAR",
@@ -21,6 +29,16 @@
     "learning": "Kayıtlar arttıkça kişisel bağlantılar daha net hesaplanır."
   },
   "today": "Bugün",
+  "hero": {
+    "currentPhase": "MEVCUT FAZ",
+    "phaseWord": "faz",
+    "cycleDayLabel": "DÖNGÜ GÜNÜ",
+    "semanticLabel": "{phase}, döngünün {day}. günü. {message} {detail}",
+    "periodDayNumber": "{count}.",
+    "periodDayLabel": "gün",
+    "daysToPeriodLabel": "gün kaldı",
+    "readBodyChanges": "Bu faz hakkında daha fazla gör"
+  },
   "forecastConfidenceLow": "düşük",
   "forecastConfidenceMedium": "orta",
   "forecastConfidenceHigh": "yüksek",

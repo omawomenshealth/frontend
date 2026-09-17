@@ -1,29 +1,35 @@
 {
-  "cycleDay": "Cycle day {count}",
-  "periodLogAction": "Log period",
-  "periodDayNumber": "{count}",
-  "periodDayLabel": "days of period",
-  "daysToPeriodLabel": "days to period",
-  "readBodyChanges": "See more about this phase",
   "menstrual": {
+    "title": "Menstrual",
+    "message": "A quiet moment to turn inward.",
+    "detail": "Rest is its own kind of renewal.",
     "label": "Menstrual phase",
     "headline": "You can slow\ndown today",
     "body": "Your energy and comfort needs can change during period days. If it feels good, make room for rest, warmth and gentle movement. Resting and gentle movement like walking may be suitable for this time.",
     "fertility": "Estimated chance of pregnancy is lower"
   },
   "follicular": {
+    "title": "Follicular",
+    "message": "Your energy is beginning to bloom.",
+    "detail": "A lovely time to follow your curiosity.",
     "label": "Follicular phase",
     "headline": "Notice your energy\nas it shifts",
     "body": "Your energy or sociability may rise in this phase, or it may feel much the same. Shape your plans around how you feel today.",
     "fertility": "Estimated chance of pregnancy is rising"
   },
   "ovulation": {
+    "title": "Ovulation",
+    "message": "A bright moment to feel your power.",
+    "detail": "Connect with what makes you glow.",
     "label": "Estimated ovulation window",
     "headline": "How are you\nfeeling today?",
     "body": "Energy, desire and social feelings can shift around estimated ovulation days. A calendar estimate cannot replace your own experience.",
     "fertility": "Estimated chance of pregnancy is higher"
   },
   "luteal": {
+    "title": "Luteal",
+    "message": "Slow down and honour your rhythm.",
+    "detail": "Make space for what matters most.",
     "label": "Luteal phase",
     "headline": "Soften your\npace a little",
     "body": "As your period approaches, your energy, focus and comfort needs may change. Choose the pace that feels right today.",

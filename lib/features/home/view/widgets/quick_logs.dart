@@ -9,6 +9,7 @@ import '../../../../localization/generated/strings.g.dart';
 /// erişim sağlar. Sheet açma ve kayıt işlemleri parent tarafından yönetilir.
 class QuickLogs extends StatelessWidget {
   final Color accent;
+  final VoidCallback onPeriodTap;
   final VoidCallback onNutritionTap;
   final VoidCallback onSymptomTap;
   final VoidCallback onMoodTap;
@@ -18,6 +19,7 @@ class QuickLogs extends StatelessWidget {
   const QuickLogs({
     super.key,
     required this.accent,
+    required this.onPeriodTap,
     required this.onNutritionTap,
     required this.onSymptomTap,
     required this.onMoodTap,
@@ -30,9 +32,16 @@ class QuickLogs extends StatelessWidget {
     final strings = context.t.home;
 
     final logBackground =
-      Color.lerp(OmaColors.card, accent, 0.15) ?? OmaColors.card;
+        Color.lerp(OmaColors.card, accent, 0.15) ?? OmaColors.card;
 
     final logs = [
+      _QuickLog(
+        label: strings.common.quickLogs.buttons.period,
+        icon: Icons.water_drop_outlined,
+        foreground: accent,
+        background: logBackground,
+        onTap: onPeriodTap,
+      ),
       _QuickLog(
         label: strings.common.quickLogs.buttons.nutrition,
         icon: Icons.restaurant_menu_rounded,
@@ -80,8 +89,7 @@ class QuickLogs extends StatelessWidget {
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, constraints) {
-            final visualSize =
-                (constraints.maxWidth / logs.length - 6).clamp(
+            final visualSize = (constraints.maxWidth / logs.length - 6).clamp(
               48.0,
               64.0,
             );
@@ -91,10 +99,7 @@ class QuickLogs extends StatelessWidget {
               children: [
                 for (final log in logs)
                   Expanded(
-                    child: _QuickLogButton(
-                      log: log,
-                      visualSize: visualSize,
-                    ),
+                    child: _QuickLogButton(log: log, visualSize: visualSize),
                   ),
               ],
             );
@@ -109,10 +114,7 @@ class _SectionHeader extends StatelessWidget {
   final String title;
   final String caption;
 
-  const _SectionHeader({
-    required this.title,
-    required this.caption,
-  });
+  const _SectionHeader({required this.title, required this.caption});
 
   @override
   Widget build(BuildContext context) {
@@ -127,10 +129,7 @@ class _SectionHeader extends StatelessWidget {
               25,
               style: FontStyle.normal,
               color: OmaColors.foreground,
-            ).copyWith(
-              fontWeight: FontWeight.w500,
-              letterSpacing: -0.4,
-            ),
+            ).copyWith(fontWeight: FontWeight.w500, letterSpacing: -0.4),
           ),
         ),
         Text(
@@ -138,9 +137,7 @@ class _SectionHeader extends StatelessWidget {
           style: OmaText.caption(
             color: OmaColors.muted,
             weight: FontWeight.w500,
-          ).copyWith(
-            fontSize: 10.5,
-          ),
+          ).copyWith(fontSize: 10.5),
         ),
       ],
     );
@@ -151,10 +148,7 @@ class _QuickLogButton extends StatefulWidget {
   final _QuickLog log;
   final double visualSize;
 
-  const _QuickLogButton({
-    required this.log,
-    required this.visualSize,
-  });
+  const _QuickLogButton({required this.log, required this.visualSize});
 
   @override
   State<_QuickLogButton> createState() => _QuickLogButtonState();
