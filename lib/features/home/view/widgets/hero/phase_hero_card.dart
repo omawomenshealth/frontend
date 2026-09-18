@@ -83,7 +83,7 @@ class PhaseHeroCard extends StatelessWidget {
           children: [
             PhaseArtwork(palette: palette),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
               child: Column(
                 children: [
                   Expanded(

@@ -46,17 +46,7 @@ class PhaseContent extends StatelessWidget {
           ).copyWith(
             height: 0.92,
             letterSpacing: -1.4,
-            color: OmaColors.foreground,
-          ),
-        ),
-        Text(
-          context.t.home.common.hero.phaseWord,
-          textAlign: TextAlign.center,
-          style: OmaText.display(
-            44,
             color: palette.accent,
-          ).copyWith(
-            height: 0.92,
           ),
         ),
         const SizedBox(height: 10),

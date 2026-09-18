@@ -31,7 +31,6 @@
   "today": "Today",
   "hero": {
     "currentPhase": "CURRENT PHASE",
-    "phaseWord": "phase",
     "cycleDayLabel": "CYCLE DAY",
     "semanticLabel": "{phase}, cycle day {day}. {message} {detail}",
     "periodDayNumber": "{count}",
