@@ -30,14 +30,14 @@ class DoctorReportView extends StatelessWidget {
     final allLogs = _groupLogsByDay(rawLogs);
 
     return Scaffold(
-      backgroundColor: OmaPalette.background,
+      backgroundColor: context.omaTheme.background,
       appBar: AppBar(
         title: Text(
           AppStrings.doctorReport,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: Colors.white,
-        foregroundColor: OmaPalette.foreground,
+        foregroundColor: context.omaTheme.foreground,
         elevation: 0.5,
         actions: [
           IconButton(
@@ -80,19 +80,19 @@ class DoctorReportView extends StatelessWidget {
                       children: [
                         Text(
                           AppStrings.personalHealthReport,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
-                            color: OmaPalette.primary,
+                            color: context.omaTheme.primary,
                             letterSpacing: 1.1,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           AppStrings.reportDateLine(AppTime.now.toDotFormat()),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: OmaPalette.muted,
+                            color: context.omaTheme.muted,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -103,7 +103,7 @@ class DoctorReportView extends StatelessWidget {
                             allLogs,
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: OmaPalette.primary,
+                            backgroundColor: context.omaTheme.primary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -116,7 +116,7 @@ class DoctorReportView extends StatelessWidget {
                           icon: const Icon(Icons.picture_as_pdf, size: 16),
                           label: Text(
                             AppStrings.downloadOrSharePdf,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
@@ -131,14 +131,14 @@ class DoctorReportView extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: OmaPalette.primary.withValues(alpha: 0.1),
+                      color: context.omaTheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       AppStrings.medicalSummary,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: OmaPalette.primary,
+                        color: context.omaTheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -146,32 +146,37 @@ class DoctorReportView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              const Divider(thickness: 1.5, color: Color(0xFFEEEEEE)),
+              Divider(thickness: 1.5, color: Color(0xFFEEEEEE)),
               const SizedBox(height: 16),
 
               // ── BÖLÜM 1: KİŞİSEL BİLGİLER ───────────────────────────
-              _sectionHeader('📋 ${AppStrings.userBasicInformation}'),
+              _sectionHeader(context, '📋 ${AppStrings.userBasicInformation}'),
               _infoRow(
+                context,
                 AppStrings.nickname,
                 settings.userName.isNotEmpty
                     ? settings.userName
                     : AppStrings.notSpecified,
               ),
               _infoRow(
+                context,
                 AppStrings.age,
                 settings.age?.toString() ?? AppStrings.notSpecified,
               ),
               _infoRow(
+                context,
                 AppStrings.weightHeight,
                 '${settings.weight ?? "-"} kg / ${settings.height ?? "-"} cm',
               ),
               _infoRow(
+                context,
                 AppStrings.smoking,
                 settings.smokingStatus == SmokingStatus.current
                     ? '${AppStrings.yes}${settings.smokingYears != null && settings.smokingYears! > 0 ? " (${AppStrings.yearsSmoking(settings.smokingYears!)})" : ""}'
                     : AppStrings.no,
               ),
               _infoRow(
+                context,
                 AppStrings.chronicDiseases,
                 settings.chronicDiseases.isNotEmpty
                     ? settings.chronicDiseases
@@ -181,39 +186,46 @@ class DoctorReportView extends StatelessWidget {
               ),
               if (_hasLaboratoryResults(settings))
                 _infoRow(
+                  context,
                   AppStrings.lastBloodValues,
                   _formatLaboratoryResults(settings),
                 ),
               const SizedBox(height: 24),
 
               // ── BÖLÜM 2: DÖNGÜ ÖZETİ ────────────────────────────────
-              _sectionHeader('🩸 ${AppStrings.womenHealthSummary}'),
+              _sectionHeader(context, '🩸 ${AppStrings.womenHealthSummary}'),
               _infoRow(
+                context,
                 AppStrings.averageCycleLength,
                 AppStrings.dayCount(settings.averageCycleLength),
               ),
               _infoRow(
+                context,
                 AppStrings.averagePeriodLength,
                 AppStrings.dayCount(settings.averagePeriodLength),
               ),
               _infoRow(
+                context,
                 AppStrings.lastPeriodDate,
                 settings.lastPeriodDate != null
                     ? settings.lastPeriodDate!.toDotFormat()
                     : AppStrings.notSpecified,
               ),
               _infoRow(
+                context,
                 AppStrings.menopauseStatus,
                 _menopauseLabel(settings.menopauseStatus),
               ),
               if (settings.birthControlMethod != null &&
                   settings.birthControlMethod!.isNotEmpty)
                 _infoRow(
+                  context,
                   AppStrings.birthControl,
                   AppStrings.localizeStoredValue(settings.birthControlMethod!),
                 ),
               if (settings.womenDiseases.isNotEmpty)
                 _infoRow(
+                  context,
                   AppStrings.gynecologicalDiseases,
                   settings.womenDiseases
                       .map(AppStrings.localizeStoredValue)
@@ -222,7 +234,7 @@ class DoctorReportView extends StatelessWidget {
               const SizedBox(height: 24),
 
               // ── BÖLÜM 3: GÜNLÜK KAYITLAR TABLOSU ─────────────────────
-              _sectionHeader('📅 ${AppStrings.dailyHealthLogs}'),
+              _sectionHeader(context, '📅 ${AppStrings.dailyHealthLogs}'),
               const SizedBox(height: 8),
               if (allLogs.isEmpty)
                 Padding(
@@ -230,15 +242,15 @@ class DoctorReportView extends StatelessWidget {
                   child: Center(
                     child: Text(
                       AppStrings.noHealthLogs,
-                      style: const TextStyle(
-                        color: OmaPalette.muted,
+                      style: TextStyle(
+                        color: context.omaTheme.muted,
                         fontSize: 13,
                       ),
                     ),
                   ),
                 )
               else
-                _buildLogsTable(allLogs.take(15).toList()),
+                _buildLogsTable(context, allLogs.take(15).toList()),
             ],
           ),
         ),
@@ -330,21 +342,21 @@ class DoctorReportView extends StatelessWidget {
 
   // ── Yardımcı Widget'lar ───────────────────────────────────────────────
 
-  Widget _sectionHeader(String title) {
+  Widget _sectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
-          color: OmaPalette.foreground,
+          color: context.omaTheme.foreground,
         ),
       ),
     );
   }
 
-  Widget _infoRow(String label, String value) {
+  Widget _infoRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -354,19 +366,16 @@ class DoctorReportView extends StatelessWidget {
             width: 140,
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: OmaPalette.muted,
-              ),
+              style: TextStyle(fontSize: 13, color: context.omaTheme.muted),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: OmaPalette.foreground,
+                color: context.omaTheme.foreground,
               ),
             ),
           ),
@@ -375,7 +384,10 @@ class DoctorReportView extends StatelessWidget {
     );
   }
 
-  Widget _buildLogsTable(List<List<DailyLog>> dayGroupedLogs) {
+  Widget _buildLogsTable(
+    BuildContext context,
+    List<List<DailyLog>> dayGroupedLogs,
+  ) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFE5E5E5)),
@@ -393,46 +405,31 @@ class DoctorReportView extends StatelessWidget {
               DataColumn(
                 label: Text(
                   AppStrings.date,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.period,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.nutrition,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.medicationsSupplementsAndSkincare,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.mood,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
@@ -576,7 +573,7 @@ class DoctorReportView extends StatelessWidget {
 
               return DataRow(
                 cells: [
-                  DataCell(Text(dateStr, style: const TextStyle(fontSize: 11))),
+                  DataCell(Text(dateStr, style: TextStyle(fontSize: 11))),
                   DataCell(
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -588,7 +585,7 @@ class DoctorReportView extends StatelessWidget {
                             fontSize: 11,
                             color: isBleeding
                                 ? Colors.red.shade700
-                                : OmaPalette.muted,
+                                : context.omaTheme.muted,
                             fontWeight: isBleeding
                                 ? FontWeight.bold
                                 : FontWeight.normal,
@@ -604,7 +601,7 @@ class DoctorReportView extends StatelessWidget {
                         width: 120,
                         child: Text(
                           beslenmeText,
-                          style: const TextStyle(fontSize: 11),
+                          style: TextStyle(fontSize: 11),
                         ),
                       ),
                     ),
@@ -614,10 +611,7 @@ class DoctorReportView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: SizedBox(
                         width: 140,
-                        child: Text(
-                          ilacText,
-                          style: const TextStyle(fontSize: 11),
-                        ),
+                        child: Text(ilacText, style: TextStyle(fontSize: 11)),
                       ),
                     ),
                   ),
@@ -626,10 +620,7 @@ class DoctorReportView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: SizedBox(
                         width: 150,
-                        child: Text(
-                          moodText,
-                          style: const TextStyle(fontSize: 11),
-                        ),
+                        child: Text(moodText, style: TextStyle(fontSize: 11)),
                       ),
                     ),
                   ),

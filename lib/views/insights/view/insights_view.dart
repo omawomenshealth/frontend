@@ -18,7 +18,7 @@ class InsightsListView extends StatelessWidget {
     return Consumer<InsightsViewModel>(
       builder: (context, vm, _) {
         return Scaffold(
-          backgroundColor: OmaPalette.background,
+          backgroundColor: context.omaTheme.background,
           body: SafeArea(
             child: RefreshIndicator(
               onRefresh: vm.loadData,
@@ -27,7 +27,7 @@ class InsightsListView extends StatelessWidget {
                 slivers: [
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
-                    sliver: SliverToBoxAdapter(child: _buildHeader()),
+                    sliver: SliverToBoxAdapter(child: _buildHeader(context)),
                   ),
                   if (vm.isLoading && vm.insights.isEmpty)
                     const SliverFillRemaining(
@@ -37,7 +37,7 @@ class InsightsListView extends StatelessWidget {
                   else if (vm.insights.isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,
-                      child: _buildEmptyState(),
+                      child: _buildEmptyState(context),
                     )
                   else ...[
                     SliverPadding(
@@ -51,7 +51,9 @@ class InsightsListView extends StatelessWidget {
                     ),
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 110),
-                      sliver: SliverToBoxAdapter(child: _buildDisclaimer()),
+                      sliver: SliverToBoxAdapter(
+                        child: _buildDisclaimer(context),
+                      ),
                     ),
                   ],
                 ],
@@ -63,7 +65,7 @@ class InsightsListView extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -77,28 +79,28 @@ class InsightsListView extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: OmaPalette.card.withValues(alpha: 0.75),
+            color: context.omaTheme.surface.withValues(alpha: 0.75),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: OmaPalette.primary.withValues(alpha: 0.16),
+              color: context.omaTheme.primary.withValues(alpha: 0.16),
             ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
+              Icon(
                 Icons.phone_android_rounded,
                 size: 19,
-                color: OmaPalette.primary,
+                color: context.omaTheme.primary,
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   AppStrings.insightsPrivacyNote,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     height: 1.45,
-                    color: OmaPalette.muted,
+                    color: context.omaTheme.muted,
                   ),
                 ),
               ),
@@ -109,7 +111,7 @@ class InsightsListView extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(32, 20, 32, 120),
       child: Column(
@@ -132,20 +134,20 @@ class InsightsListView extends StatelessWidget {
           Text(
             AppStrings.insightsEmptyTitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: OmaPalette.foreground,
+              color: context.omaTheme.foreground,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             AppStrings.insightsEmptyDescription,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               height: 1.5,
-              color: OmaPalette.muted,
+              color: context.omaTheme.muted,
             ),
           ),
         ],
@@ -153,7 +155,7 @@ class InsightsListView extends StatelessWidget {
     );
   }
 
-  Widget _buildDisclaimer() {
+  Widget _buildDisclaimer(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -166,7 +168,7 @@ class InsightsListView extends StatelessWidget {
         Expanded(
           child: Text(
             AppStrings.insightsDisclaimer,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               height: 1.45,
               color: OmaPalette.textHint,
@@ -186,7 +188,7 @@ class PersonalInsightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final presentation = _InsightPresentation.from(insight);
+    final presentation = _InsightPresentation.from(insight, context.omaTheme);
     final card = Container(
       key: ValueKey('personal_insight_${insight.id}'),
       width: double.infinity,
@@ -230,10 +232,10 @@ class PersonalInsightCard extends StatelessWidget {
                   presentation.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: OmaPalette.foreground,
+                    color: context.omaTheme.foreground,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -241,10 +243,10 @@ class PersonalInsightCard extends StatelessWidget {
                   presentation.body,
                   maxLines: 4,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     height: 1.45,
-                    color: OmaPalette.muted,
+                    color: context.omaTheme.muted,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -354,7 +356,7 @@ class _InsightPresentation {
     required this.color,
   });
 
-  factory _InsightPresentation.from(PersonalInsight insight) {
+  factory _InsightPresentation.from(PersonalInsight insight, OmaTheme theme) {
     final primary = insight.primaryLabel == null
         ? ''
         : AppStrings.localizeInsightFeature(insight.primaryLabel!);
@@ -383,7 +385,7 @@ class _InsightPresentation {
           spanDays: insight.comparisonValue!,
         );
         icon = Icons.calendar_view_month_rounded;
-        color = OmaPalette.primary;
+        color = theme.primary;
       case PersonalInsightKind.cycleLength:
         title = AppStrings.insightCycleLengthTitle;
         body = AppStrings.insightCycleLengthBody(insight.value!);
@@ -578,7 +580,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.place_outlined;
-        color = OmaPalette.primaryDark;
+        color = theme.primaryStrong;
       case PersonalInsightKind.moodCompanionAssociation:
         title = AppStrings.insightMoodCompanionTitle;
         body = AppStrings.insightMoodCompanionBody(
@@ -594,7 +596,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.people_alt_outlined;
-        color = OmaPalette.primary;
+        color = theme.primary;
       case PersonalInsightKind.stressCompanionAssociation:
         title = AppStrings.insightStressCompanionTitle;
         body = AppStrings.insightStressCompanionBody(
@@ -656,7 +658,7 @@ class _InsightPresentation {
           lagDays: insight.lagDays!,
         );
         icon = Icons.account_tree_outlined;
-        color = OmaPalette.primaryDark;
+        color = theme.primaryStrong;
       case PersonalInsightKind.foodObservationStarted:
         title = AppStrings.insightFoodObservationTitle;
         body =

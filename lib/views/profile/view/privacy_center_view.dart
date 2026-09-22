@@ -180,13 +180,13 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                         const SizedBox(height: 12),
                         Text(
                           AppStrings.cloudSyncPrivacyNotice,
-                          style: const TextStyle(height: 1.5),
+                          style: TextStyle(height: 1.5),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           '${AppStrings.privacyNotice}: $_noticeVersion',
-                          style: const TextStyle(
-                            color: OmaPalette.muted,
+                          style: TextStyle(
+                            color: context.omaTheme.muted,
                             fontSize: 12,
                           ),
                         ),
@@ -214,7 +214,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                                   : Icons.info_outline,
                               color: _granted
                                   ? Colors.green
-                                  : OmaPalette.muted,
+                                  : context.omaTheme.muted,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -261,7 +261,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                   const SizedBox(height: 14),
                   Text(
                     _error!,
-                    style: const TextStyle(color: Colors.redAccent),
+                    style: TextStyle(color: Colors.redAccent),
                     textAlign: TextAlign.center,
                   ),
                 ],

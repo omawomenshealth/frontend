@@ -45,7 +45,7 @@ class _PremiumViewState extends State<PremiumView> {
             _selectedTier ??
             (service.hasPaidAccess ? service.tier : MembershipTier.plus);
         return Scaffold(
-          backgroundColor: OmaPalette.background,
+          backgroundColor: context.omaTheme.background,
           appBar: AppBar(
             automaticallyImplyLeading: false,
             title: Text(strings.pageTitle),
@@ -185,8 +185,12 @@ class _PremiumHero extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              OmaPalette.primaryDark,
-              Color.lerp(OmaPalette.primaryDark, OmaPalette.ovulationDark, 0.32)!,
+              context.omaTheme.primaryStrong,
+              Color.lerp(
+                context.omaTheme.primaryStrong,
+                OmaPalette.ovulationDark,
+                0.32,
+              )!,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -194,7 +198,7 @@ class _PremiumHero extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: OmaPalette.primaryDark.withValues(alpha: 0.18),
+              color: context.omaTheme.primaryStrong.withValues(alpha: 0.18),
               blurRadius: 28,
               offset: const Offset(0, 12),
             ),
@@ -309,14 +313,14 @@ class _BenefitsCard extends StatelessWidget {
         Icons.calendar_month_outlined,
         strings.benefitTrackingTitle,
         strings.benefitTrackingDescription,
-        OmaPalette.primary,
+        context.omaTheme.primary,
         MembershipTier.free,
       ),
       (
         Icons.hub_outlined,
         strings.benefitInsightsTitle,
         strings.benefitInsightsDescription,
-        OmaPalette.primary,
+        context.omaTheme.primary,
         MembershipTier.plus,
       ),
       (
@@ -344,9 +348,9 @@ class _BenefitsCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: OmaPalette.border),
+        border: Border.all(color: context.omaTheme.border),
       ),
       child: Column(
         children: [
@@ -359,7 +363,7 @@ class _BenefitsCard extends StatelessWidget {
               included: selectedTier.includes(benefits[index].$5),
             ),
             if (index != benefits.length - 1)
-              const Divider(indent: 76, endIndent: 18),
+              Divider(indent: 76, endIndent: 18),
           ],
         ],
       ),
@@ -411,7 +415,7 @@ class _BenefitItem extends StatelessWidget {
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: OmaPalette.muted,
+                      color: context.omaTheme.muted,
                     ),
                   ),
                 ],
@@ -424,7 +428,9 @@ class _BenefitItem extends StatelessWidget {
                 included
                     ? Icons.check_circle_rounded
                     : Icons.lock_outline_rounded,
-                color: included ? OmaPalette.primary : OmaPalette.textHint,
+                color: included
+                    ? context.omaTheme.primary
+                    : OmaPalette.textHint,
                 size: 19,
               ),
             ),
@@ -459,7 +465,9 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = isSelected ? OmaPalette.primaryDark : OmaPalette.border;
+    final borderColor = isSelected
+        ? context.omaTheme.primaryStrong
+        : context.omaTheme.border;
 
     return Semantics(
       button: true,
@@ -473,14 +481,16 @@ class _PlanCard extends StatelessWidget {
           padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
             color: isSelected
-                ? OmaPalette.primaryLight
-                : OmaPalette.card,
+                ? context.omaTheme.primarySoft
+                : context.omaTheme.surface,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: borderColor, width: isSelected ? 1.5 : 1),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: OmaPalette.primaryDark.withValues(alpha: 0.08),
+                      color: context.omaTheme.primaryStrong.withValues(
+                        alpha: 0.08,
+                      ),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -495,8 +505,8 @@ class _PlanCard extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? OmaPalette.primaryDark
-                      : OmaPalette.surfaceMuted,
+                      ? context.omaTheme.primaryStrong
+                      : context.omaTheme.surfaceMuted,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: borderColor.withValues(alpha: 0.55),
@@ -504,7 +514,7 @@ class _PlanCard extends StatelessWidget {
                 ),
                 child: Icon(
                   icon,
-                  color: isSelected ? Colors.white : OmaPalette.muted,
+                  color: isSelected ? Colors.white : context.omaTheme.muted,
                   size: 21,
                 ),
               ),
@@ -529,7 +539,9 @@ class _PlanCard extends StatelessWidget {
                             maxLines: 2,
                             textAlign: TextAlign.end,
                             style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(color: OmaPalette.primaryDark),
+                                ?.copyWith(
+                                  color: context.omaTheme.primaryStrong,
+                                ),
                           ),
                         ),
                       ],
@@ -545,8 +557,8 @@ class _PlanCard extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? OmaPalette.primaryDark
-                                : OmaPalette.surfaceMuted,
+                                ? context.omaTheme.primaryStrong
+                                : context.omaTheme.surfaceMuted,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -554,7 +566,7 @@ class _PlanCard extends StatelessWidget {
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white
-                                  : OmaPalette.muted,
+                                  : context.omaTheme.muted,
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
                             ),
@@ -566,7 +578,7 @@ class _PlanCard extends StatelessWidget {
                     Text(
                       description,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: OmaPalette.muted,
+                        color: context.omaTheme.muted,
                       ),
                     ),
                     if (supportingText != null) ...[
@@ -574,7 +586,7 @@ class _PlanCard extends StatelessWidget {
                       Text(
                         supportingText!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: OmaPalette.primaryDark,
+                          color: context.omaTheme.primaryStrong,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -647,9 +659,9 @@ class _PremiumActionBar extends StatelessWidget {
     final strings = t.premium;
 
     return Material(
-      color: OmaPalette.card,
+      color: context.omaTheme.surface,
       elevation: 10,
-      shadowColor: OmaPalette.primaryDark.withValues(alpha: 0.14),
+      shadowColor: context.omaTheme.primaryStrong.withValues(alpha: 0.14),
       child: SafeArea(
         top: false,
         minimum: const EdgeInsets.fromLTRB(20, 14, 20, 14),

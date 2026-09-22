@@ -38,9 +38,9 @@ class _DreamsViewState extends State<DreamsView> {
               .toList(growable: false);
 
     return Scaffold(
-      backgroundColor: OmaPalette.background,
+      backgroundColor: context.omaTheme.background,
       appBar: AppBar(
-        backgroundColor: OmaPalette.background,
+        backgroundColor: context.omaTheme.background,
         title: Text(AppStrings.myDreams),
       ),
       body: SafeArea(
@@ -69,8 +69,8 @@ class _DreamsViewState extends State<DreamsView> {
                   Expanded(
                     child: Text(
                       AppStrings.privateDreamJournalDescription,
-                      style: const TextStyle(
-                        color: OmaPalette.muted,
+                      style: TextStyle(
+                        color: context.omaTheme.muted,
                         fontSize: 12,
                         height: 1.4,
                       ),
@@ -84,9 +84,9 @@ class _DreamsViewState extends State<DreamsView> {
               Container(
                 padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
                 decoration: BoxDecoration(
-                  color: OmaPalette.card,
+                  color: context.omaTheme.surface,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: OmaPalette.border),
+                  border: Border.all(color: context.omaTheme.border),
                 ),
                 child: Row(
                   children: [
@@ -103,8 +103,8 @@ class _DreamsViewState extends State<DreamsView> {
                         _showNightmares
                             ? AppStrings.nightmaresVisible
                             : AppStrings.nightmaresHidden(nightmareCount),
-                        style: const TextStyle(
-                          color: OmaPalette.muted,
+                        style: TextStyle(
+                          color: context.omaTheme.muted,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -136,9 +136,9 @@ class _DreamsViewState extends State<DreamsView> {
                   vertical: 42,
                 ),
                 decoration: BoxDecoration(
-                  color: OmaPalette.card,
+                  color: context.omaTheme.surface,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: OmaPalette.border),
+                  border: Border.all(color: context.omaTheme.border),
                 ),
                 child: Column(
                   children: [
@@ -153,7 +153,7 @@ class _DreamsViewState extends State<DreamsView> {
                           ? AppStrings.nightmaresCurrentlyHidden
                           : AppStrings.noDreamSavedYet,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: OmaPalette.muted),
+                      style: TextStyle(color: context.omaTheme.muted),
                     ),
                   ],
                 ),
@@ -183,7 +183,7 @@ class _DreamCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: tone.withValues(alpha: 0.28)),
         boxShadow: [
@@ -236,8 +236,8 @@ class _DreamCard extends StatelessWidget {
           const SizedBox(height: 11),
           Text(
             dream.dreamNote!.trim(),
-            style: const TextStyle(
-              color: OmaPalette.foreground,
+            style: TextStyle(
+              color: context.omaTheme.foreground,
               fontSize: 14,
               height: 1.5,
             ),

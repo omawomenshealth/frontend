@@ -43,8 +43,7 @@ const _blooms = <_Bloom>[
   _Bloom('assets/images/decorative/blooms/bloom-01.png', 0.78, 0.62, 80, -16),
 ];
 
-class _SplashViewState extends State<SplashView>
-    with TickerProviderStateMixin {
+class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
   late final AnimationController _intro;
   late final AnimationController _exit;
 
@@ -83,7 +82,7 @@ class _SplashViewState extends State<SplashView>
     final screen = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      backgroundColor: OmaPalette.background,
+      backgroundColor: context.omaTheme.background,
       body: AnimatedBuilder(
         animation: Listenable.merge([_intro, _exit]),
         builder: (context, _) => Opacity(
@@ -121,7 +120,10 @@ class _SplashViewState extends State<SplashView>
                           child: Text(
                             'Sağlığını kendi ritminde takip et',
                             textAlign: TextAlign.center,
-                            style: OmaText.body(14, color: OmaPalette.muted),
+                            style: OmaText.body(
+                              14,
+                              color: context.omaTheme.muted,
+                            ),
                           ),
                         ),
                       ],

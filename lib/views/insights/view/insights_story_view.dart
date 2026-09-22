@@ -135,7 +135,10 @@ class _InsightsViewState extends State<InsightsView>
                           return _InsightStoryPage(
                             key: ValueKey('insight_story_page_${insight.id}'),
                             insight: insight,
-                            presentation: _InsightPresentation.from(insight),
+                            presentation: _InsightPresentation.from(
+                              insight,
+                              context.omaTheme,
+                            ),
                             accent: accent,
                           );
                         },
@@ -380,8 +383,8 @@ class _InsightStoryPage extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             presentation.title,
-            style: const TextStyle(
-              color: OmaPalette.foreground,
+            style: TextStyle(
+              color: context.omaTheme.foreground,
               fontFamily: 'CormorantGaramond',
               fontSize: 42,
               height: 1.02,
@@ -392,8 +395,8 @@ class _InsightStoryPage extends StatelessWidget {
           const SizedBox(height: 18),
           Text(
             presentation.body,
-            style: const TextStyle(
-              color: OmaPalette.muted,
+            style: TextStyle(
+              color: context.omaTheme.muted,
               fontFamily: 'Karla',
               fontSize: 14,
               height: 1.55,
@@ -426,10 +429,10 @@ class _InsightStoryPage extends StatelessWidget {
                   ),
                 ),
                 if (item != chain.length - 1)
-                  const Icon(
+                  Icon(
                     Icons.arrow_forward_rounded,
                     size: 15,
-                    color: OmaPalette.muted,
+                    color: context.omaTheme.muted,
                   ),
               ],
             ],
@@ -459,8 +462,8 @@ class _InsightStoryPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   presentation.evidence,
-                  style: const TextStyle(
-                    color: OmaPalette.muted,
+                  style: TextStyle(
+                    color: context.omaTheme.muted,
                     fontFamily: 'Karla',
                     fontSize: 12.5,
                     height: 1.45,
@@ -470,7 +473,7 @@ class _InsightStoryPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   AppStrings.insightsDisclaimer,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: OmaPalette.textHint,
                     fontFamily: 'Karla',
                     fontSize: 10.5,
@@ -623,7 +626,7 @@ class _StoryNavigation extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18),
                 ),
-                textStyle: const TextStyle(
+                textStyle: TextStyle(
                   fontFamily: 'Karla',
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -672,22 +675,22 @@ class _EmptyInsightStory extends StatelessWidget {
           Text(
             AppStrings.insightsEmptyTitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'CormorantGaramond',
               fontSize: 32,
               fontWeight: FontWeight.w600,
-              color: OmaPalette.foreground,
+              color: context.omaTheme.foreground,
             ),
           ),
           const SizedBox(height: 10),
           Text(
             AppStrings.insightsEmptyDescription,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Karla',
               fontSize: 13,
               height: 1.5,
-              color: OmaPalette.muted,
+              color: context.omaTheme.muted,
             ),
           ),
           const SizedBox(height: 24),
