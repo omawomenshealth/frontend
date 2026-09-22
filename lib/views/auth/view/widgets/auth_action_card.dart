@@ -25,8 +25,8 @@ class AuthActionCard extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 384),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
-        border: Border.all(color: OmaPalette.border),
+        color: context.omaTheme.surface,
+        border: Border.all(color: context.omaTheme.border),
         borderRadius: BorderRadius.circular(26),
         boxShadow: OmaShadows.soft,
       ),
@@ -35,10 +35,7 @@ class AuthActionCard extends StatelessWidget {
           Text(
             t.auth.actionCard.account.description,
             textAlign: TextAlign.center,
-            style: OmaText.body(
-              13,
-              color: OmaPalette.muted,
-            ),
+            style: OmaText.body(13, color: context.omaTheme.muted),
           ),
           const SizedBox(height: 16),
 
@@ -61,10 +58,7 @@ class AuthActionCard extends StatelessWidget {
                       child: Text(
                         vm.errorMessage!,
                         textAlign: TextAlign.center,
-                        style: OmaText.body(
-                          12.5,
-                          color: OmaPalette.error,
-                        ),
+                        style: OmaText.body(12.5, color: OmaPalette.error),
                       ),
                     ),
                   ),
@@ -109,10 +103,7 @@ class AuthActionCard extends StatelessWidget {
           Text(
             t.auth.actionCard.offline.description,
             textAlign: TextAlign.center,
-            style: OmaText.body(
-              11.5,
-              color: OmaPalette.muted,
-            ),
+            style: OmaText.body(11.5, color: context.omaTheme.muted),
           ),
         ],
       ),
@@ -129,28 +120,15 @@ class _OrDivider extends StatelessWidget {
 
     return Row(
       children: [
-        const Expanded(
-          child: Divider(
-            color: OmaPalette.border,
-            height: 1,
-          ),
-        ),
+        Expanded(child: Divider(color: context.omaTheme.border, height: 1)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             t.auth.actionCard.alternativeLabel,
-            style: OmaText.body(
-              11.5,
-              color: OmaPalette.muted,
-            ),
+            style: OmaText.body(11.5, color: context.omaTheme.muted),
           ),
         ),
-        const Expanded(
-          child: Divider(
-            color: OmaPalette.border,
-            height: 1,
-          ),
-        ),
+        Expanded(child: Divider(color: context.omaTheme.border, height: 1)),
       ],
     );
   }

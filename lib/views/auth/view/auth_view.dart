@@ -118,7 +118,7 @@ class _AuthViewState extends State<AuthView>
           title: AppStrings.healthCloudConsent,
           content: Text(
             AppStrings.consentExplanation,
-            style: OmaText.body(13.5, color: OmaPalette.muted),
+            style: OmaText.body(13.5, color: context.omaTheme.muted),
           ),
           actions: [
             OmaButton(
@@ -199,12 +199,12 @@ class _AuthViewState extends State<AuthView>
           children: [
             Text(
               AppStrings.cloudBackupQuestion,
-              style: OmaText.body(14, color: OmaPalette.foreground),
+              style: OmaText.body(14, color: context.omaTheme.foreground),
             ),
             const SizedBox(height: 12),
             Text(
               AppStrings.cloudBackupOptions,
-              style: OmaText.body(12, color: OmaPalette.muted),
+              style: OmaText.body(12, color: context.omaTheme.muted),
             ),
           ],
         ),
@@ -254,11 +254,11 @@ class _PrivacyNote extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.shield_outlined, size: 14, color: OmaPalette.muted),
+        Icon(Icons.shield_outlined, size: 14, color: context.omaTheme.muted),
         const SizedBox(width: 6),
         Text(
           t.auth.privacyNote,
-          style: OmaText.body(12, color: OmaPalette.muted),
+          style: OmaText.body(12, color: context.omaTheme.muted),
         ),
       ],
     );

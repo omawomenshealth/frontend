@@ -38,10 +38,7 @@ class OnboardingFooter extends StatelessWidget {
           Text(
             common.swipeToContinue,
             textAlign: TextAlign.center,
-            style: OmaText.body(
-              12,
-              color: OmaPalette.muted,
-            ),
+            style: OmaText.body(12, color: context.omaTheme.muted),
           )
         else if (isSkippable)
           OmaButton(

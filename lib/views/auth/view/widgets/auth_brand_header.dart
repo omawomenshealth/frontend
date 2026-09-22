@@ -16,18 +16,12 @@ class AuthBrandHeader extends StatelessWidget {
       children: [
         const OmaLogo(),
         const SizedBox(height: 20),
-        Text(
-          t.auth.intro.title,
-          style: OmaText.display(44),
-        ),
+        Text(t.auth.intro.title, style: OmaText.display(44)),
         const SizedBox(height: 8),
         Text(
           t.auth.intro.description,
           textAlign: TextAlign.center,
-          style: OmaText.body(
-            13.5,
-            color: OmaPalette.muted,
-          ),
+          style: OmaText.body(13.5, color: context.omaTheme.muted),
         ),
       ],
     );

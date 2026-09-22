@@ -94,10 +94,10 @@ class _BirthDateField extends StatelessWidget {
         suffixIcon: IconButton(
           tooltip: introduction.chooseFromCalendar,
           onPressed: onPickBirthDate,
-          icon: const Icon(
+          icon: Icon(
             Icons.calendar_today_outlined,
             size: 18,
-            color: OmaPalette.muted,
+            color: context.omaTheme.muted,
           ),
         ),
       ),

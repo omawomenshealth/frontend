@@ -39,10 +39,7 @@ class OnboardingCard extends StatelessWidget {
     };
 
     return TweenAnimationBuilder<Offset>(
-      tween: Tween<Offset>(
-        begin: beginOffset,
-        end: Offset.zero,
-      ),
+      tween: Tween<Offset>(begin: beginOffset, end: Offset.zero),
       duration: duration,
       curve: Curves.easeOutCubic,
       builder: (context, offset, child) {
@@ -60,10 +57,7 @@ class OnboardingCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.92),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: const Color(0xFFE3DFD7),
-              width: 1,
-            ),
+            border: Border.all(color: const Color(0xFFE3DFD7), width: 1),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x1A5E5A52),
@@ -82,14 +76,13 @@ class OnboardingCard extends StatelessWidget {
                   11,
                   weight: FontWeight.w500,
                   letterSpacing: 1.6,
-                  color: OmaPalette.muted,
+                  color: context.omaTheme.muted,
                 ),
               ),
               const SizedBox(height: 16),
               for (int i = 0; i < children.length; i++) ...[
                 children[i],
-                if (i < children.length - 1)
-                  SizedBox(height: itemSpacing),
+                if (i < children.length - 1) SizedBox(height: itemSpacing),
               ],
             ],
           ),

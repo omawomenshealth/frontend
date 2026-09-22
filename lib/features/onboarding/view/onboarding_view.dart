@@ -60,7 +60,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: OmaPalette.background,
+      backgroundColor: context.omaTheme.background,
       body: PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) {

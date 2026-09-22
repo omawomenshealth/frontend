@@ -23,10 +23,10 @@ class _NotificationsViewState extends State<NotificationsView> {
     final labels = context.t.notifications.common;
     final entries = context.watch<NotificationInbox>().entriesFor(_selected);
     final isApp = _selected == NotificationEntryType.app;
-    final accent = isApp ? OmaPalette.plum : OmaPalette.primary;
+    final accent = isApp ? OmaPalette.plum : context.omaTheme.primary;
 
     return Scaffold(
-      backgroundColor: OmaPalette.background,
+      backgroundColor: context.omaTheme.background,
       body: OmaSurface(
         child: SafeArea(
           child: Column(
@@ -42,7 +42,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                       ).backButtonTooltip,
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.arrow_back_rounded),
-                      color: OmaPalette.foreground,
+                      color: context.omaTheme.foreground,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -61,7 +61,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                 padding: const EdgeInsets.fromLTRB(24, 12, 24, 22),
                 child: Text(
                   labels.subtitle,
-                  style: OmaText.body(13, color: OmaPalette.muted),
+                  style: OmaText.body(13, color: context.omaTheme.muted),
                 ),
               ),
               Padding(
@@ -69,9 +69,9 @@ class _NotificationsViewState extends State<NotificationsView> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: OmaPalette.backgroundAlt,
+                    color: context.omaTheme.backgroundAlt,
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: OmaPalette.border),
+                    border: Border.all(color: context.omaTheme.border),
                   ),
                   child: Row(
                     children: [
@@ -130,7 +130,10 @@ class _NotificationsViewState extends State<NotificationsView> {
                                     ? labels.appEmptyDescription
                                     : labels.logEmptyDescription,
                                 textAlign: TextAlign.center,
-                                style: OmaText.body(13, color: OmaPalette.muted),
+                                style: OmaText.body(
+                                  13,
+                                  color: context.omaTheme.muted,
+                                ),
                               ),
                             ],
                           ),
@@ -155,7 +158,7 @@ class _NotificationsViewState extends State<NotificationsView> {
     final selected = _selected == type;
     final accent = type == NotificationEntryType.app
         ? OmaPalette.plum
-        : OmaPalette.primary;
+        : context.omaTheme.primary;
     return Expanded(
       child: InkWell(
         key: ValueKey('notification_tab_${type.name}'),
@@ -165,14 +168,18 @@ class _NotificationsViewState extends State<NotificationsView> {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           decoration: BoxDecoration(
-            color: selected ? OmaPalette.card : Colors.transparent,
+            color: selected ? context.omaTheme.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(14),
             boxShadow: selected ? OmaShadows.soft : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 17, color: selected ? accent : OmaPalette.muted),
+              Icon(
+                icon,
+                size: 17,
+                color: selected ? accent : context.omaTheme.muted,
+              ),
               const SizedBox(width: 7),
               Flexible(
                 child: Text(
@@ -182,7 +189,9 @@ class _NotificationsViewState extends State<NotificationsView> {
                   style: OmaText.body(
                     13,
                     weight: selected ? FontWeight.w600 : FontWeight.w500,
-                    color: selected ? OmaPalette.foreground : OmaPalette.muted,
+                    color: selected
+                        ? context.omaTheme.foreground
+                        : context.omaTheme.muted,
                   ),
                 ),
               ),
@@ -202,9 +211,9 @@ class _NotificationsViewState extends State<NotificationsView> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: OmaPalette.border),
+        border: Border.all(color: context.omaTheme.border),
         boxShadow: OmaShadows.soft,
       ),
       child: Row(
@@ -238,13 +247,13 @@ class _NotificationsViewState extends State<NotificationsView> {
                   const SizedBox(height: 4),
                   Text(
                     entry.description!,
-                    style: OmaText.body(12, color: OmaPalette.muted),
+                    style: OmaText.body(12, color: context.omaTheme.muted),
                   ),
                 ],
                 const SizedBox(height: 9),
                 Text(
                   DateFormat('d MMM y · HH:mm', locale).format(entry.createdAt),
-                  style: OmaText.caption(color: OmaPalette.muted),
+                  style: OmaText.caption(color: context.omaTheme.muted),
                 ),
               ],
             ),
@@ -271,10 +280,10 @@ class _NotificationsViewState extends State<NotificationsView> {
       key: const ValueKey('period_notification_card'),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [OmaPalette.periodLight, OmaPalette.card],
+          colors: [OmaPalette.periodLight, context.omaTheme.surface],
         ),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
@@ -314,19 +323,16 @@ class _NotificationsViewState extends State<NotificationsView> {
               ),
               Text(
                 DateFormat.Hm(locale).format(entry.createdAt),
-                style: OmaText.caption(color: OmaPalette.muted),
+                style: OmaText.caption(color: context.omaTheme.muted),
               ),
             ],
           ),
           const SizedBox(height: 15),
-          Text(
-            entry.title,
-            style: OmaText.body(17, weight: FontWeight.w700),
-          ),
+          Text(entry.title, style: OmaText.body(17, weight: FontWeight.w700)),
           const SizedBox(height: 2),
           Text(
             DateFormat.yMMMMd(locale).format(details.date),
-            style: OmaText.body(12, color: OmaPalette.muted),
+            style: OmaText.body(12, color: context.omaTheme.muted),
           ),
           if (flow != null && flow.isNotEmpty) ...[
             const SizedBox(height: 15),
@@ -334,7 +340,7 @@ class _NotificationsViewState extends State<NotificationsView> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
               decoration: BoxDecoration(
-                color: OmaPalette.card.withValues(alpha: 0.88),
+                color: context.omaTheme.surface.withValues(alpha: 0.88),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: OmaPalette.periodPrimary.withValues(alpha: 0.13),
@@ -344,7 +350,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                 children: [
                   Text(
                     labels.periodFlow,
-                    style: OmaText.body(12, color: OmaPalette.muted),
+                    style: OmaText.body(12, color: context.omaTheme.muted),
                   ),
                   const Spacer(),
                   Flexible(
@@ -366,7 +372,7 @@ class _NotificationsViewState extends State<NotificationsView> {
             const SizedBox(height: 14),
             Text(
               labels.periodSymptoms,
-              style: OmaText.body(11, color: OmaPalette.muted),
+              style: OmaText.body(11, color: context.omaTheme.muted),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -380,7 +386,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: OmaPalette.card,
+                      color: context.omaTheme.surface,
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(
                         color: OmaPalette.periodPrimary.withValues(alpha: 0.2),
@@ -388,7 +394,10 @@ class _NotificationsViewState extends State<NotificationsView> {
                     ),
                     child: Text(
                       symptom,
-                      style: OmaText.body(11, color: OmaPalette.foreground),
+                      style: OmaText.body(
+                        11,
+                        color: context.omaTheme.foreground,
+                      ),
                     ),
                   ),
               ],

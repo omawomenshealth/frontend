@@ -23,13 +23,13 @@ class OnboardingPrompt extends StatelessWidget {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: OmaPalette.primary.withValues(alpha: 0.12),
+            color: context.omaTheme.primary.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.auto_awesome_rounded,
             size: 16,
-            color: OmaPalette.primary,
+            color: context.omaTheme.primary,
           ),
         ),
         const SizedBox(width: 12),
@@ -39,7 +39,7 @@ class OnboardingPrompt extends StatelessWidget {
             style: GoogleFonts.dmSans(
               fontSize: 14,
               height: 1.6,
-              color: OmaPalette.foreground.withValues(alpha: 0.9),
+              color: context.omaTheme.foreground.withValues(alpha: 0.9),
             ),
           ),
         ),
@@ -50,18 +50,12 @@ class OnboardingPrompt extends StatelessWidget {
       return row;
     }
 
-    return _Rise(
-      key: ValueKey(message),
-      child: row,
-    );
+    return _Rise(key: ValueKey(message), child: row);
   }
 }
 
 class _Rise extends StatefulWidget {
-  const _Rise({
-    super.key,
-    required this.child,
-  });
+  const _Rise({super.key, required this.child});
 
   final Widget child;
 
@@ -69,8 +63,7 @@ class _Rise extends StatefulWidget {
   State<_Rise> createState() => _RiseState();
 }
 
-class _RiseState extends State<_Rise>
-    with SingleTickerProviderStateMixin {
+class _RiseState extends State<_Rise> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 450),
