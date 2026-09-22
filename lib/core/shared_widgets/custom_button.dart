@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/oma_theme.dart';
+import '../theme/oma_theme.dart';
 
 /// Gradient arka planlı, scale animasyonlu özel buton.
 class CustomButton extends StatefulWidget {
@@ -7,7 +7,7 @@ class CustomButton extends StatefulWidget {
   final VoidCallback onPressed;
   final Gradient? gradient;
   final Color? backgroundColor;
-  final Color textColor;
+  final Color? textColor;
   final double? width;
   final double height;
   final IconData? icon;
@@ -20,7 +20,7 @@ class CustomButton extends StatefulWidget {
     required this.onPressed,
     this.gradient,
     this.backgroundColor,
-    this.textColor = OmaColors.textOnPrimary,
+    this.textColor,
     this.width,
     this.height = 52,
     this.icon,
@@ -58,6 +58,9 @@ class _CustomButtonState extends State<CustomButton>
 
   @override
   Widget build(BuildContext context) {
+    final oma = context.omaTheme;
+    final buttonColor = widget.backgroundColor ?? oma.primary;
+    final contentColor = widget.textColor ?? oma.onPrimary;
     return ScaleTransition(
       scale: _scaleAnimation,
       child: GestureDetector(
@@ -73,18 +76,17 @@ class _CustomButtonState extends State<CustomButton>
           height: widget.height,
           decoration: widget.isOutlined
               ? BoxDecoration(
-                  color: OmaColors.surface,
+                  color: oma.surface,
                   borderRadius: BorderRadius.circular(99),
-                  border: Border.all(
-                    color: widget.backgroundColor ?? OmaColors.primary,
-                    width: 1.2,
-                  ),
+                  border: Border.all(color: buttonColor, width: 1.2),
                 )
               : BoxDecoration(
                   gradient:
                       widget.gradient ??
                       (widget.backgroundColor == null
-                          ? OmaColors.primaryGradient
+                          ? LinearGradient(
+                              colors: [oma.primary, oma.primaryStrong],
+                            )
                           : null),
                   color: widget.gradient == null
                       ? widget.backgroundColor
@@ -92,8 +94,7 @@ class _CustomButtonState extends State<CustomButton>
                   borderRadius: BorderRadius.circular(99),
                   boxShadow: [
                     BoxShadow(
-                      color: (widget.backgroundColor ?? OmaColors.primary)
-                          .withValues(alpha: 0.16),
+                      color: buttonColor.withValues(alpha: 0.16),
                       blurRadius: 14,
                       offset: const Offset(0, 5),
                     ),
@@ -105,9 +106,7 @@ class _CustomButtonState extends State<CustomButton>
                     width: 24,
                     height: 24,
                     child: CircularProgressIndicator(
-                      color: widget.isOutlined
-                          ? OmaColors.primary
-                          : widget.textColor,
+                      color: widget.isOutlined ? oma.primary : contentColor,
                       strokeWidth: 2.5,
                     ),
                   )
@@ -121,8 +120,8 @@ class _CustomButtonState extends State<CustomButton>
                           Icon(
                             widget.icon,
                             color: widget.isOutlined
-                                ? (widget.backgroundColor ?? OmaColors.primary)
-                                : widget.textColor,
+                                ? buttonColor
+                                : contentColor,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
@@ -135,9 +134,8 @@ class _CustomButtonState extends State<CustomButton>
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: widget.isOutlined
-                                  ? (widget.backgroundColor ??
-                                        OmaColors.primary)
-                                  : widget.textColor,
+                                  ? buttonColor
+                                  : contentColor,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.3,

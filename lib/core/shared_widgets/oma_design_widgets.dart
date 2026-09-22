@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/oma_theme.dart';
+import '../theme/oma_theme.dart';
 
 class OmaSoftCard extends StatelessWidget {
   final Widget child;
@@ -28,7 +28,7 @@ class OmaSoftCard extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: gradient == null ? (color ?? OmaColors.surface) : null,
+        color: gradient == null ? (color ?? context.omaTheme.surface) : null,
         gradient: gradient,
         borderRadius: BorderRadius.circular(radius),
         border: border,
@@ -74,6 +74,7 @@ class OmaPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final oma = context.omaTheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -81,10 +82,10 @@ class OmaPageHeader extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: OmaColors.primaryLight,
+            color: oma.primarySoft,
             borderRadius: BorderRadius.circular(15),
           ),
-          child: Icon(icon, size: 21, color: OmaColors.primaryDark),
+          child: Icon(icon, size: 21, color: oma.primaryStrong),
         ),
         const SizedBox(width: 13),
         Expanded(
@@ -119,6 +120,7 @@ class OmaSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final oma = context.omaTheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -129,8 +131,8 @@ class OmaSectionHeader extends StatelessWidget {
               if (eyebrow != null) ...[
                 Text(
                   eyebrow!.toUpperCase(),
-                  style: const TextStyle(
-                    color: OmaColors.primary,
+                  style: TextStyle(
+                    color: oma.primary,
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 2.2,

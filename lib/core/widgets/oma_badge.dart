@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'oma_theme.dart';
+import '../theme/oma_theme.dart';
 
 enum OmaBadgeLabelVariant { standard, eyebrow }
 
@@ -69,10 +69,10 @@ class OmaBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foregroundColor = foreground ?? OmaColors.primary;
+    final oma = context.omaTheme;
+    final foregroundColor = foreground ?? oma.primary;
 
-    final backgroundColor =
-        background ?? OmaColors.primary.withValues(alpha: 0.12);
+    final backgroundColor = background ?? oma.primarySoft;
 
     if (isIconOnly) {
       return Container(

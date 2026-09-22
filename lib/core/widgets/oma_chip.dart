@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'oma_theme.dart';
+import '../theme/oma_theme.dart';
 
 /// Seçilebilir yuvarlak etiket.
 class OmaChip extends StatelessWidget {
@@ -19,46 +19,30 @@ class OmaChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final oma = context.omaTheme;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 10,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: selected
-              ? OmaColors.primary.withValues(alpha: 0.10)
-              : OmaColors.card,
-          border: Border.all(
-            color: selected
-                ? OmaColors.primary
-                : OmaColors.border,
-          ),
+          color: selected ? oma.primarySoft : oma.surface,
+          border: Border.all(color: selected ? oma.primary : oma.border),
           borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (showCheck && selected) ...[
-              const Icon(
-                Icons.check,
-                size: 14,
-                color: OmaColors.primary,
-              ),
+              Icon(Icons.check, size: 14, color: oma.primary),
               const SizedBox(width: 6),
             ],
             Text(
               label,
               style: OmaText.body(
                 14,
-                weight: selected
-                    ? FontWeight.w500
-                    : FontWeight.w400,
-                color: selected
-                    ? OmaColors.primary
-                    : OmaColors.muted,
+                weight: selected ? FontWeight.w500 : FontWeight.w400,
+                color: selected ? oma.primary : oma.muted,
               ),
             ),
           ],
@@ -69,19 +53,12 @@ class OmaChip extends StatelessWidget {
 }
 
 class OmaChipWrap extends StatelessWidget {
-  const OmaChipWrap({
-    super.key,
-    required this.children,
-  });
+  const OmaChipWrap({super.key, required this.children});
 
   final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: children,
-    );
+    return Wrap(spacing: 8, runSpacing: 8, children: children);
   }
 }

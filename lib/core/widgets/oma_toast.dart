@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import './oma_theme.dart';
+import '../theme/oma_theme.dart';
 import '../../features/notifications/model/notification_entry.dart';
 import '../../features/notifications/viewmodel/notification_inbox.dart';
 
@@ -111,6 +111,7 @@ class _OmaToastWidgetState extends State<_OmaToastWidget>
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
+    final oma = context.omaTheme;
 
     return Positioned(
       top: media.padding.top + 12,
@@ -133,10 +134,10 @@ class _OmaToastWidgetState extends State<_OmaToastWidget>
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      color: OmaColors.card.withValues(alpha: 0.96),
+                      color: oma.surface.withValues(alpha: 0.96),
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: OmaColors.border.withValues(alpha: 0.7),
+                        color: oma.border.withValues(alpha: 0.7),
                       ),
                       boxShadow: OmaShadows.soft,
                     ),
@@ -147,14 +148,10 @@ class _OmaToastWidgetState extends State<_OmaToastWidget>
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: OmaColors.plum.withValues(alpha: 0.12),
+                            color: oma.accentSoft,
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            widget.icon,
-                            size: 16,
-                            color: OmaColors.plum,
-                          ),
+                          child: Icon(widget.icon, size: 16, color: oma.accent),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -172,10 +169,7 @@ class _OmaToastWidgetState extends State<_OmaToastWidget>
                                 const SizedBox(height: 3),
                                 Text(
                                   widget.description!,
-                                  style: OmaText.body(
-                                    12,
-                                    color: OmaColors.muted,
-                                  ),
+                                  style: OmaText.body(12, color: oma.muted),
                                 ),
                               ],
                             ],

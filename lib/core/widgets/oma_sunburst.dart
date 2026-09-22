@@ -2,31 +2,25 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'oma_theme.dart';
+import '../theme/oma_theme.dart';
 
 class OmaSunburst extends StatelessWidget {
-  const OmaSunburst({
-    super.key,
-    this.size = 34,
-    this.color = OmaColors.primary,
-  });
+  const OmaSunburst({super.key, this.size = 34, this.color});
 
   final double size;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size.square(size),
-      painter: _SunburstPainter(color: color),
+      painter: _SunburstPainter(color: color ?? context.omaTheme.primary),
     );
   }
 }
 
 class _SunburstPainter extends CustomPainter {
-  const _SunburstPainter({
-    required this.color,
-  });
+  const _SunburstPainter({required this.color});
 
   final Color color;
 

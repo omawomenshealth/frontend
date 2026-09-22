@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../constants/app_strings.dart';
-import '../widgets/oma_theme.dart';
+import '../theme/oma_theme.dart';
 import '../../data/models/lab_result_model.dart';
 
 /// İlk giriş ve profil ekranında ortak kullanılan yapılandırılmış laboratuvar
@@ -10,7 +10,7 @@ class LabResultsForm extends StatefulWidget {
   final Map<String, LabResult> initialResults;
   final DateTime? initialTestDate;
   final bool? initialFasting;
-  final Color accent;
+  final Color? accent;
   final ValueChanged<Map<String, LabResult>> onResultsChanged;
   final ValueChanged<DateTime?> onTestDateChanged;
   final ValueChanged<bool?> onFastingChanged;
@@ -20,7 +20,7 @@ class LabResultsForm extends StatefulWidget {
     this.initialResults = const {},
     this.initialTestDate,
     this.initialFasting,
-    this.accent = OmaColors.primary,
+    this.accent,
     required this.onResultsChanged,
     required this.onTestDateChanged,
     required this.onFastingChanged,
@@ -109,26 +109,27 @@ class _LabResultsFormState extends State<LabResultsForm> {
 
   @override
   Widget build(BuildContext context) {
+    final accent = widget.accent ?? context.omaTheme.primary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: widget.accent.withValues(alpha: 0.07),
+            color: accent.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: widget.accent.withValues(alpha: 0.18)),
+            border: Border.all(color: accent.withValues(alpha: 0.18)),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline_rounded, color: widget.accent, size: 20),
+              Icon(Icons.info_outline_rounded, color: accent, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   AppStrings.laboratoryEntryDisclaimer,
-                  style: const TextStyle(
-                    color: OmaColors.textSecondary,
+                  style: TextStyle(
+                    color: context.omaTheme.muted,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -144,7 +145,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
             hintText: AppStrings.searchLaboratoryValue,
-            prefixIcon: Icon(Icons.search_rounded, color: widget.accent),
+            prefixIcon: Icon(Icons.search_rounded, color: accent),
             suffixIcon: _searchController.text.isEmpty
                 ? null
                 : IconButton(
@@ -169,15 +170,15 @@ class _LabResultsFormState extends State<LabResultsForm> {
               count: LabTestCatalog.forGroup(group)
                   .where((definition) => _results.containsKey(definition.id))
                   .length,
-              accent: widget.accent,
+              accent: accent,
               initiallyExpanded:
                   _searchController.text.trim().isNotEmpty ||
                   LabTestCatalog.forGroup(
                     group,
                   ).any((definition) => _results.containsKey(definition.id)),
-              children: _definitionsForGroup(
-                group,
-              ).map(_buildResultField).toList(),
+              children: _definitionsForGroup(group)
+                  .map((definition) => _buildResultField(context, definition))
+                  .toList(),
             ),
             const SizedBox(height: 10),
           ],
@@ -199,25 +200,27 @@ class _LabResultsFormState extends State<LabResultsForm> {
   }
 
   Widget _buildContextFields(BuildContext context) {
+    final oma = context.omaTheme;
+    final accent = widget.accent ?? oma.primary;
     final dateLabel = _testDate == null
         ? AppStrings.noTestDateSelected
         : MaterialLocalizations.of(context).formatMediumDate(_testDate!);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: OmaColors.surface,
+        color: oma.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: OmaColors.outline),
+        border: Border.all(color: oma.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             AppStrings.testDetails,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: OmaColors.textPrimary,
+              color: oma.foreground,
             ),
           ),
           const SizedBox(height: 10),
@@ -230,10 +233,8 @@ class _LabResultsFormState extends State<LabResultsForm> {
                   icon: const Icon(Icons.calendar_month_outlined, size: 18),
                   label: Text(dateLabel, overflow: TextOverflow.ellipsis),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: widget.accent,
-                    side: BorderSide(
-                      color: widget.accent.withValues(alpha: 0.35),
-                    ),
+                    foregroundColor: accent,
+                    side: BorderSide(color: accent.withValues(alpha: 0.35)),
                   ),
                 ),
               ),
@@ -250,19 +251,16 @@ class _LabResultsFormState extends State<LabResultsForm> {
           const SizedBox(height: 8),
           Text(
             AppStrings.fastingSampleQuestion,
-            style: const TextStyle(
-              fontSize: 12,
-              color: OmaColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 12, color: oma.muted),
           ),
           const SizedBox(height: 7),
           Wrap(
             spacing: 7,
             runSpacing: 7,
             children: [
-              _fastingChip(true, AppStrings.yes),
-              _fastingChip(false, AppStrings.no),
-              _fastingChip(null, AppStrings.doNotKnow),
+              _fastingChip(context, true, AppStrings.yes),
+              _fastingChip(context, false, AppStrings.no),
+              _fastingChip(context, null, AppStrings.doNotKnow),
             ],
           ),
         ],
@@ -270,17 +268,17 @@ class _LabResultsFormState extends State<LabResultsForm> {
     );
   }
 
-  Widget _fastingChip(bool? value, String label) {
+  Widget _fastingChip(BuildContext context, bool? value, String label) {
+    final oma = context.omaTheme;
+    final accent = widget.accent ?? oma.primary;
     final selected = _fasting == value;
     return ChoiceChip(
       key: ValueKey('lab_fasting_${value ?? 'unknown'}'),
       label: Text(label),
       selected: selected,
-      selectedColor: widget.accent.withValues(alpha: 0.14),
+      selectedColor: accent.withValues(alpha: 0.14),
       side: BorderSide(
-        color: selected
-            ? widget.accent.withValues(alpha: 0.55)
-            : OmaColors.outline,
+        color: selected ? accent.withValues(alpha: 0.55) : oma.border,
       ),
       onSelected: (_) {
         setState(() => _fasting = value);
@@ -289,7 +287,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
     );
   }
 
-  Widget _buildResultField(LabTestDefinition definition) {
+  Widget _buildResultField(BuildContext context, LabTestDefinition definition) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
@@ -297,10 +295,10 @@ class _LabResultsFormState extends State<LabResultsForm> {
         children: [
           Text(
             definition.label(_isTurkish),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: OmaColors.textPrimary,
+              color: context.omaTheme.foreground,
             ),
           ),
           const SizedBox(height: 6),
@@ -378,11 +376,12 @@ class _LabGroupTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final oma = context.omaTheme;
     return Material(
-      color: OmaColors.surface,
+      color: oma.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: OmaColors.outline),
+        side: BorderSide(color: oma.border),
       ),
       clipBehavior: Clip.antiAlias,
       child: Theme(
@@ -390,15 +389,15 @@ class _LabGroupTile extends StatelessWidget {
         child: ExpansionTile(
           initiallyExpanded: initiallyExpanded,
           iconColor: accent,
-          collapsedIconColor: OmaColors.textSecondary,
+          collapsedIconColor: oma.muted,
           tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
           childrenPadding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
           title: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: OmaColors.textPrimary,
+              color: oma.foreground,
             ),
           ),
           subtitle: count == 0

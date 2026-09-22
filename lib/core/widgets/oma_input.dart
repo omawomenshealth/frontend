@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'oma_theme.dart';
+import '../theme/oma_theme.dart';
 
 class OmaInput extends StatelessWidget {
   const OmaInput({
@@ -46,20 +46,13 @@ class OmaInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const radius = BorderRadius.all(
-      Radius.circular(18),
-    );
+    final oma = context.omaTheme;
+    const radius = BorderRadius.all(Radius.circular(18));
 
-    OutlineInputBorder border(
-      Color color, [
-      double width = 1,
-    ]) {
+    OutlineInputBorder border(Color color, [double width = 1]) {
       return OutlineInputBorder(
         borderRadius: radius,
-        borderSide: BorderSide(
-          color: color,
-          width: width,
-        ),
+        borderSide: BorderSide(color: color, width: width),
       );
     }
 
@@ -75,20 +68,14 @@ class OmaInput extends StatelessWidget {
       onTap: onTap,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
-      style: OmaText.body(
-        14,
-        color: OmaColors.foreground,
-      ),
-      cursorColor: OmaColors.primary,
+      style: OmaText.body(14, color: oma.foreground),
+      cursorColor: oma.primary,
       decoration: InputDecoration(
         filled: true,
-        fillColor: OmaColors.card,
+        fillColor: oma.surface,
 
         hintText: hintText,
-        hintStyle: OmaText.body(
-          14,
-          color: OmaColors.muted,
-        ),
+        hintStyle: OmaText.body(14, color: oma.muted),
 
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
@@ -99,22 +86,13 @@ class OmaInput extends StatelessWidget {
           vertical: 14,
         ),
 
-        enabledBorder: border(
-          OmaColors.border,
-        ),
+        enabledBorder: border(oma.border),
 
-        focusedBorder: border(
-          OmaColors.primary,
-          1.4,
-        ),
+        focusedBorder: border(oma.primary, 1.4),
 
-        disabledBorder: border(
-          OmaColors.border.withValues(alpha: 0.5),
-        ),
+        disabledBorder: border(oma.border.withValues(alpha: 0.5)),
 
-        border: border(
-          OmaColors.border,
-        ),
+        border: border(oma.border),
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'oma_theme.dart';
+import '../theme/oma_theme.dart';
 
 class OmaDivider extends StatelessWidget {
   final double width;
@@ -18,6 +18,6 @@ class OmaDivider extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
     width: width,
     height: height,
-    child: ColoredBox(color: color ?? OmaColors.border),
+    child: ColoredBox(color: color ?? context.omaTheme.border),
   );
 }
