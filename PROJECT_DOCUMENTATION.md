@@ -218,7 +218,7 @@ Bu modeller:
 ### Auth / Onboarding
 
 - [lib/views/auth](lib/views/auth)
-- [lib/views/onboarding](lib/views/onboarding)
+- [lib/features/onboarding](lib/features/onboarding)
 - İlk kullanıcı deneyimi ve erişim kontrolünü yönetir.
 
 ## 9) Hızlı başlangıç

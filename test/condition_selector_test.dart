@@ -5,7 +5,7 @@ import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/sync_service.dart';
-import 'package:app_proje_a/views/onboarding/viewmodel/onboarding_view_model.dart';
+import 'package:app_proje_a/features/onboarding/viewmodel/onboarding_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
