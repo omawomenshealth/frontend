@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 import '../../../../data/models/personal_insight_model.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../../../views/insights/view/insights_view.dart';
@@ -28,6 +28,7 @@ class InsightsPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.t.home.common.insightsPreview;
+    final theme = context.omaTheme;
 
     return Column(
       key: const ValueKey('dashboard_personal_insights'),
@@ -38,10 +39,7 @@ class InsightsPreview extends StatelessWidget {
           style: OmaText.label(
             color: accent,
             weight: FontWeight.w800,
-          ).copyWith(
-            fontSize: 9,
-            letterSpacing: 1.8,
-          ),
+          ).copyWith(fontSize: 9, letterSpacing: 1.8),
         ),
         const SizedBox(height: 5),
         Row(
@@ -54,18 +52,15 @@ class InsightsPreview extends StatelessWidget {
                 style: OmaText.display(
                   29,
                   style: FontStyle.normal,
-                  color: OmaColors.foreground,
-                ).copyWith(
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: -0.7,
-                ),
+                  color: theme.foreground,
+                ).copyWith(fontWeight: FontWeight.w500, letterSpacing: -0.7),
               ),
             ),
             TextButton(
               key: const ValueKey('dashboard_view_all_insights'),
               onPressed: onViewAll,
               style: TextButton.styleFrom(
-                foregroundColor: OmaColors.muted,
+                foregroundColor: theme.muted,
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 visualDensity: VisualDensity.compact,
               ),
@@ -106,27 +101,23 @@ class InsightsPreview extends StatelessWidget {
 class _InsightPlaceholder extends StatelessWidget {
   final Color accent;
 
-  const _InsightPlaceholder({
-    required this.accent,
-  });
+  const _InsightPlaceholder({required this.accent});
 
   @override
   Widget build(BuildContext context) {
     final strings = context.t.home.common.insightsPreview;
+    final theme = context.omaTheme;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Color.lerp(accent, OmaColors.card, 0.86),
+        color: Color.lerp(accent, theme.surface, 0.86),
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.auto_awesome_outlined,
-            color: accent,
-          ),
+          Icon(Icons.auto_awesome_outlined, color: accent),
           const SizedBox(width: 13),
           Expanded(
             child: Text(
@@ -134,7 +125,7 @@ class _InsightPlaceholder extends StatelessWidget {
               style: OmaText.body(
                 13,
                 weight: FontWeight.w500,
-                color: OmaColors.muted,
+                color: theme.muted,
                 height: 1.45,
               ),
             ),

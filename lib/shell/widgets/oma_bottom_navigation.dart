@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/widgets/oma_theme.dart';
+import '../../core/theme/oma_theme.dart';
 import '../../core/widgets/oma_sunburst.dart';
 
 class OmaBottomNavigation extends StatelessWidget {
@@ -21,8 +21,9 @@ class OmaBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
     final surfaceColor =
-        Color.lerp(OmaColors.card, activeColor, 0.06) ?? OmaColors.card;
+        Color.lerp(theme.surface, activeColor, 0.06) ?? theme.surface;
 
     return SafeArea(
       top: false,
@@ -46,7 +47,7 @@ class OmaBottomNavigation extends StatelessWidget {
                 elevation: 0,
                 type: BottomNavigationBarType.fixed,
                 selectedItemColor: activeColor,
-                unselectedItemColor: OmaColors.muted,
+                unselectedItemColor: theme.muted,
                 iconSize: 20,
                 selectedFontSize: 10.5,
                 unselectedFontSize: 10.5,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/pregnancy_calculator.dart';
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 import '../../../../data/models/user_settings_model.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/cycle_hero_data.dart';
@@ -33,22 +33,18 @@ class HomeHeroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (trackingMode) {
       TrackingMode.pregnant => PregnancyHeroCard(
-          key: const ValueKey('dashboard_pregnancy_hero'),
-          estimate: pregnancyEstimate,
-          positiveTestDate: positiveTestDate,
-        ),
+        key: const ValueKey('dashboard_pregnancy_hero'),
+        estimate: pregnancyEstimate,
+        positiveTestDate: positiveTestDate,
+      ),
 
       _ when cycleData != null => PhaseHeroCard(
-          key: ValueKey(
-            'dashboard_phase_${cycleData!.phase.name}',
-          ),
-          data: cycleData!,
-          onOpenInsights: onOpenInsights,
-        ),
+        key: ValueKey('dashboard_phase_${cycleData!.phase.name}'),
+        data: cycleData!,
+        onOpenInsights: onOpenInsights,
+      ),
 
-      _ => const _HeroEmptyState(
-          key: ValueKey('dashboard_hero_empty'),
-        ),
+      _ => const _HeroEmptyState(key: ValueKey('dashboard_hero_empty')),
     };
   }
 }
@@ -60,22 +56,20 @@ class _HeroEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.t.home.common.hero;
+    final theme = context.omaTheme;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: OmaColors.border),
-        color: OmaColors.card,
+        border: Border.all(color: theme.border),
+        color: theme.surface,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.spa_outlined,
-            color: OmaColors.primary,
-          ),
+          Icon(Icons.spa_outlined, color: theme.primary),
           const SizedBox(height: 8),
           Text(
             strings.emptyTitle,
@@ -84,11 +78,7 @@ class _HeroEmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             strings.emptyMessage,
-            style: OmaText.body(
-              14,
-              color: OmaColors.muted,
-              height: 1.4,
-            ),
+            style: OmaText.body(14, color: theme.muted, height: 1.4),
           ),
         ],
       ),

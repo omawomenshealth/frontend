@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 import '../../../../core/utils/app_time.dart';
 import '../../../../core/utils/date_extensions.dart';
 import '../../../../core/utils/period_calculator.dart';
@@ -75,10 +75,11 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
     return Container(
       height: 94,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.96),
+        color: theme.surface.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
@@ -136,7 +137,8 @@ class _DayButton extends StatelessWidget {
     final selected = date.isSameDay(selectedDate);
     final today = date.isSameDay(AppTime.now);
     final phase = periodCalculator?.phaseAt(date);
-    final phaseColor = _phaseColor(phase);
+    final theme = context.omaTheme;
+    final phaseColor = _phaseColor(phase, theme.primary);
     final isPredictedPeriod =
         periodCalculator != null && periodCalculator!.isInPeriod(date);
 
@@ -153,8 +155,8 @@ class _DayButton extends StatelessWidget {
             Text(
               AppStrings.shortWeekdays[date.weekday - 1].toUpperCase(),
               maxLines: 1,
-              style: const TextStyle(
-                color: OmaColors.textSecondary,
+              style: TextStyle(
+                color: theme.muted,
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.05,
@@ -182,8 +184,8 @@ class _DayButton extends StatelessWidget {
                   color: selected
                       ? Colors.white
                       : isPredictedPeriod
-                      ? OmaColors.periodPrimary
-                      : OmaColors.textPrimary,
+                      ? OmaPalette.periodPrimary
+                      : theme.foreground,
                   fontSize: 13,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
                 ),
@@ -195,13 +197,8 @@ class _DayButton extends StatelessWidget {
     );
   }
 
-  Color _phaseColor(CyclePhase? phase) {
-    return switch (phase) {
-      CyclePhase.menstrual => OmaColors.periodPrimary,
-      CyclePhase.follicular => OmaColors.primary,
-      CyclePhase.ovulation => OmaColors.ovulation,
-      CyclePhase.luteal => OmaColors.lutealDark,
-      null => OmaColors.primary,
-    };
+  Color _phaseColor(CyclePhase? phase, Color fallback) {
+    if (phase == null) return fallback;
+    return OmaCycleSchemes.forPhase(phase).primary;
   }
 }

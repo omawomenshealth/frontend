@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../core/constants/app_strings.dart';
-import '../core/widgets/oma_theme.dart';
-import '../data/models/user_settings_model.dart';
+import '../core/theme/oma_theme.dart';
 import '../data/services/notification_service.dart';
 import '../views/articles/view/articles_view.dart';
 import '../views/calendar/viewmodel/calendar_view_model.dart';
@@ -71,16 +70,7 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    final home = context.watch<HomeViewModel>();
-    final calculator = home.periodCalculator;
-    final visiblePhase = _currentIndex == 0
-        ? calculator?.phaseAt(home.selectedDate)
-        : calculator?.currentPhase;
-    final activeColor =
-        _currentIndex == 0 &&
-            home.settings?.trackingMode == TrackingMode.pregnant
-        ? OmaColors.plum
-        : OmaColors.forCyclePhase(visiblePhase);
+    final activeColor = context.omaTheme.primary;
 
     return Scaffold(
       extendBody: true,

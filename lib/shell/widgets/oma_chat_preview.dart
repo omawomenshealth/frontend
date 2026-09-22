@@ -11,6 +11,7 @@ class OmaTalkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 4, 24, 28),
@@ -37,7 +38,7 @@ class OmaTalkPreview extends StatelessWidget {
             Text(
               'OMA ile günlük deneyimlerini konuşabileceğin alan '
               'yakında burada olacak.',
-              style: OmaText.body(14, color: OmaColors.muted),
+              style: OmaText.body(14, color: theme.muted),
             ),
             const SizedBox(height: 18),
             Wrap(
@@ -56,10 +57,10 @@ class OmaTalkPreview extends StatelessWidget {
                       horizontal: 13,
                       vertical: 9,
                     ),
-                    foreground: OmaColors.primary.withValues(alpha: 0.72),
-                    background: OmaColors.primary.withValues(alpha: 0.07),
+                    foreground: theme.primary.withValues(alpha: 0.72),
+                    background: theme.primary.withValues(alpha: 0.07),
                     border: Border.all(
-                      color: OmaColors.primary.withValues(alpha: 0.22),
+                      color: theme.primary.withValues(alpha: 0.22),
                     ),
                     borderRadius: 20,
                   ),
