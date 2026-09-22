@@ -128,7 +128,7 @@ Bu servis:
 ### 4.5 Sabitler ve tema
 
 - [lib/core/constants/app_strings.dart](lib/core/constants/app_strings.dart)
-- [lib/core/widgets/oma_theme.dart](lib/core/widgets/oma_theme.dart)
+- [lib/core/theme/oma_theme.dart](lib/core/theme/oma_theme.dart)
 - [lib/core/theme/app_theme.dart](lib/core/theme/app_theme.dart)
 
 Bu klasörler:

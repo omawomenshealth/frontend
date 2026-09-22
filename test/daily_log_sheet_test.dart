@@ -1,5 +1,5 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
-import 'package:app_proje_a/core/widgets/oma_theme.dart';
+import 'package:app_proje_a/core/theme/oma_theme.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/core/utils/date_extensions.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
@@ -811,7 +811,7 @@ void main() {
   testWidgets('Belirti menüsü ana ekran temasını tek renk olarak kullanır', (
     tester,
   ) async {
-    const themeTone = OmaColors.ovulation;
+    const themeTone = OmaPalette.ovulation;
     await _pumpLogSheet(tester, initialIndex: 2, themeColor: themeTone);
 
     for (var index = 0; index < 4; index++) {
@@ -870,7 +870,7 @@ void main() {
     await _pumpLogSheet(
       tester,
       initialIndex: 0,
-      themeColor: OmaColors.ovulation,
+      themeColor: OmaPalette.ovulation,
     );
 
     final saveButton = tester.widget<FilledButton>(
@@ -878,14 +878,14 @@ void main() {
     );
     expect(
       saveButton.style!.backgroundColor!.resolve({}),
-      OmaColors.periodPrimary,
+      OmaPalette.periodPrimary,
     );
   });
 
   testWidgets('Beslenme ve kimleydin menüleri aynı tek tema rengini kullanır', (
     tester,
   ) async {
-    const themeTone = OmaColors.ovulation;
+    const themeTone = OmaPalette.ovulation;
     await _pumpLogSheet(tester, initialIndex: 1, themeColor: themeTone);
 
     for (var index = 0; index < 4; index++) {
@@ -915,7 +915,7 @@ void main() {
       final material = tester.widget<Material>(
         find.descendant(of: choice, matching: find.byType(Material)).first,
       );
-      expect(material.color, Color.lerp(OmaColors.surface, themeTone, 0.09));
+      expect(material.color, Color.lerp(OmaPalette.card, themeTone, 0.09));
     }
 
     final moodSave = tester.widget<FilledButton>(
@@ -1665,7 +1665,7 @@ Future<_LogHarness> _pumpLogSheet(
   required int initialIndex,
   DailyLog? initialLog,
   UserSettings? settings,
-  Color themeColor = OmaColors.primary,
+  Color themeColor = OmaPalette.primary,
 }) async {
   tester.view.physicalSize = const Size(360, 800);
   tester.view.devicePixelRatio = 1;

@@ -1,5 +1,5 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
-import 'package:app_proje_a/core/widgets/oma_theme.dart';
+import 'package:app_proje_a/core/theme/oma_theme.dart';
 import 'package:app_proje_a/data/models/medication_reminder_model.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
@@ -228,7 +228,7 @@ void main() {
               child: MedicationReminderSection(
                 itemType: MedicationPlanItemType.medication,
                 availableItems: ['Parol'],
-                color: OmaColors.medicationPrimary,
+                color: OmaPalette.medicationPrimary,
               ),
             ),
           ),
@@ -361,7 +361,7 @@ void main() {
       value: storage,
       child: MaterialApp(
         home: Scaffold(
-          body: TodaysMedicationDosesCard(color: OmaColors.medicationPrimary),
+          body: TodaysMedicationDosesCard(color: OmaPalette.medicationPrimary),
         ),
       ),
     );

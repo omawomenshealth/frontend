@@ -1,5 +1,5 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
-import 'package:app_proje_a/core/widgets/oma_theme.dart';
+import 'package:app_proje_a/core/theme/oma_theme.dart';
 import 'package:app_proje_a/core/shared_widgets/condition_selector.dart';
 import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
@@ -76,7 +76,7 @@ class _ConditionHarnessState extends State<_ConditionHarness> {
         body: ConditionSelector(
           catalogItems: AppStrings.chronicDiseasesList,
           selectedItems: _selected,
-          color: OmaColors.primary,
+          color: OmaPalette.primary,
           addDialogTitle: AppStrings.addCustomChronicDisease,
           addButtonKey: 'test_add_chronic_disease',
           onToggle: (_) {},

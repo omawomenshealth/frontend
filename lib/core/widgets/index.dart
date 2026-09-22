@@ -7,6 +7,6 @@ export 'oma_multi_select.dart';
 export 'oma_form_field.dart';
 export 'oma_button.dart';
 export 'oma_divider.dart';
-export 'oma_theme.dart';
+export '../theme/oma_theme.dart';
 export 'oma_toast.dart';
 export 'oma_sunburst.dart';

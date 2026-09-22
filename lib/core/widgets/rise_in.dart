@@ -32,9 +32,9 @@ mixin RiseAnimationMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   )..forward();
 
   Animation<double> riseAt(double delay) => CurvedAnimation(
-        parent: riseController,
-        curve: Interval(delay, 1, curve: Curves.easeOutCubic),
-      );
+    parent: riseController,
+    curve: Interval(delay, 1, curve: Curves.easeOutCubic),
+  );
 
   @override
   void dispose() {
