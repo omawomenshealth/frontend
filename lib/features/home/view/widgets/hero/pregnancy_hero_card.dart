@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/constants/image_constants.dart';
 import '../../../../../core/utils/pregnancy_calculator.dart';
-import '../../../../../core/widgets/oma_theme.dart';
+import '../../../../../core/theme/oma_theme.dart';
 import '../../../../../localization/generated/strings.g.dart';
 
 class PregnancyHeroCard extends StatelessWidget {
@@ -26,34 +26,32 @@ class PregnancyHeroCard extends StatelessWidget {
     final week = estimate?.displayWeek;
 
     final source = switch (estimate?.source) {
-      PregnancyEstimateSource.combined =>
-        strings.estimateCombined,
-      PregnancyEstimateSource.lastPeriod =>
-        strings.estimateLastPeriod,
-      PregnancyEstimateSource.sexualActivity =>
-        strings.estimateSexualActivity,
+      PregnancyEstimateSource.combined => strings.estimateCombined,
+      PregnancyEstimateSource.lastPeriod => strings.estimateLastPeriod,
+      PregnancyEstimateSource.sexualActivity => strings.estimateSexualActivity,
       null => strings.estimateUnavailable,
     };
 
     final dueDate = estimate == null
         ? null
         : strings.estimatedDueDate.replaceAll(
-          '{date}',
-          MaterialLocalizations.of(context)
-            .formatMediumDate(estimate!.estimatedDueDate),
+            '{date}',
+            MaterialLocalizations.of(
+              context,
+            ).formatMediumDate(estimate!.estimatedDueDate),
           );
 
     final positiveTest = positiveTestDate == null
         ? null
         : strings.positiveTestRecorded.replaceAll(
-          '{date}',
-          MaterialLocalizations.of(context)
-            .formatMediumDate(positiveTestDate!),
+            '{date}',
+            MaterialLocalizations.of(
+              context,
+            ).formatMediumDate(positiveTestDate!),
           );
 
     return Semantics(
-      label:
-          '${presentation.title}. ${presentation.body}. $source',
+      label: '${presentation.title}. ${presentation.body}. $source',
       child: Container(
         width: double.infinity,
         constraints: const BoxConstraints(minHeight: 408),
@@ -76,8 +74,7 @@ class PregnancyHeroCard extends StatelessWidget {
                     presentation.assetPath,
                     fit: BoxFit.contain,
                     alignment: Alignment.topRight,
-                    errorBuilder: (_, _, _) =>
-                        const SizedBox.shrink(),
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
                   ),
                 ),
               ),
@@ -87,21 +84,18 @@ class PregnancyHeroCard extends StatelessWidget {
               bottom: 94,
               child: Icon(
                 Icons.local_florist_outlined,
-                color:
-                    presentation.color.withValues(alpha: 0.16),
+                color: presentation.color.withValues(alpha: 0.16),
                 size: 54,
               ),
             ),
             Padding(
-              padding:
-                  const EdgeInsets.fromLTRB(24, 18, 24, 20),
+              padding: const EdgeInsets.fromLTRB(24, 18, 24, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color:
-                          Colors.white.withValues(alpha: 0.72),
+                      color: Colors.white.withValues(alpha: 0.72),
                       borderRadius: BorderRadius.circular(99),
                     ),
                     child: Padding(
@@ -114,10 +108,7 @@ class PregnancyHeroCard extends StatelessWidget {
                         style: OmaText.label(
                           color: presentation.color,
                           weight: FontWeight.w800,
-                        ).copyWith(
-                          fontSize: 9,
-                          letterSpacing: 1.35,
-                        ),
+                        ).copyWith(fontSize: 9, letterSpacing: 1.35),
                       ),
                     ),
                   ),
@@ -128,16 +119,11 @@ class PregnancyHeroCard extends StatelessWidget {
                     week == null
                         ? strings.estimatedWeek
                         : '${strings.estimatedWeek} · '
-                            '${strings.weekAndDay
-                                .replaceAll('{week}', '${estimate!.completedWeeks}')
-                                .replaceAll('{day}', '${estimate!.dayOfWeek}')}',
+                              '${strings.weekAndDay.replaceAll('{week}', '${estimate!.completedWeeks}').replaceAll('{day}', '${estimate!.dayOfWeek}')}',
                     style: OmaText.label(
                       color: presentation.color,
                       weight: FontWeight.w800,
-                    ).copyWith(
-                      fontSize: 10.5,
-                      letterSpacing: 0.45,
-                    ),
+                    ).copyWith(fontSize: 10.5, letterSpacing: 0.45),
                   ),
 
                   const SizedBox(height: 5),
@@ -146,14 +132,12 @@ class PregnancyHeroCard extends StatelessWidget {
                     width: 300,
                     child: Text(
                       presentation.title,
-                      style: OmaText.display(
-                        31,
-                        color: presentation.color,
-                      ).copyWith(
-                        fontWeight: FontWeight.w600,
-                        height: 1.02,
-                        letterSpacing: -0.8,
-                      ),
+                      style: OmaText.display(31, color: presentation.color)
+                          .copyWith(
+                            fontWeight: FontWeight.w600,
+                            height: 1.02,
+                            letterSpacing: -0.8,
+                          ),
                     ),
                   ),
 
@@ -166,7 +150,7 @@ class PregnancyHeroCard extends StatelessWidget {
                       style: OmaText.body(
                         13,
                         weight: FontWeight.w500,
-                        color: OmaColors.muted,
+                        color: context.omaTheme.muted,
                         height: 1.5,
                       ),
                     ),
@@ -205,16 +189,13 @@ class PregnancyHeroCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Container(
-                          padding:
-                              const EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                             horizontal: 13,
                             vertical: 11,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white
-                                .withValues(alpha: 0.72),
-                            borderRadius:
-                                BorderRadius.circular(18),
+                            color: Colors.white.withValues(alpha: 0.72),
+                            borderRadius: BorderRadius.circular(18),
                           ),
                           child: Row(
                             children: [
@@ -228,11 +209,9 @@ class PregnancyHeroCard extends StatelessWidget {
                                 child: Text(
                                   strings.infoComingSoon,
                                   style: OmaText.caption(
-                                    color: OmaColors.muted,
+                                    color: context.omaTheme.muted,
                                     weight: FontWeight.w700,
-                                  ).copyWith(
-                                    fontSize: 10.5,
-                                  ),
+                                  ).copyWith(fontSize: 10.5),
                                 ),
                               ),
                             ],
@@ -271,21 +250,15 @@ class _PregnancyInfoLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: color,
-          size: 14,
-        ),
+        Icon(icon, color: color, size: 14),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
             text,
             style: OmaText.caption(
-              color: OmaColors.muted,
+              color: context.omaTheme.muted,
               weight: FontWeight.w600,
-            ).copyWith(
-              fontSize: 10.5,
-            ),
+            ).copyWith(fontSize: 10.5),
           ),
         ),
       ],
@@ -297,10 +270,7 @@ class _PregnancyWeekBadge extends StatelessWidget {
   final Color color;
   final int? week;
 
-  const _PregnancyWeekBadge({
-    required this.color,
-    required this.week,
-  });
+  const _PregnancyWeekBadge({required this.color, required this.week});
 
   @override
   Widget build(BuildContext context) {
@@ -310,23 +280,17 @@ class _PregnancyWeekBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.82),
         shape: BoxShape.circle,
-        border: Border.all(
-          color: color,
-          width: 1.6,
-        ),
+        border: Border.all(color: color, width: 1.6),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             week?.toString() ?? '—',
-              style: OmaText.display(
-                22,
-                color: color,
-              ).copyWith(
-                height: 0.95,
-                fontWeight: FontWeight.w600,
-            ),
+            style: OmaText.display(
+              22,
+              color: color,
+            ).copyWith(height: 0.95, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 3),
           Text(
@@ -335,7 +299,7 @@ class _PregnancyWeekBadge extends StatelessWidget {
             style: OmaText.body(
               8,
               weight: FontWeight.w700,
-              color: OmaColors.muted,
+              color: context.omaTheme.muted,
             ),
           ),
         ],
@@ -359,27 +323,24 @@ class _PregnancyPresentation {
     required this.body,
   });
 
-  factory _PregnancyPresentation.forWeek(
-    int week,
-    BuildContext context,
-  ) {
+  factory _PregnancyPresentation.forWeek(int week, BuildContext context) {
     final index = PregnancyStage.forWeek(week).index;
     final stages = context.t.home.pregnancy.stages;
 
     final colors = [
-      OmaColors.periodPrimary,
-      OmaColors.primary,
-      OmaColors.ovulation,
-      OmaColors.lutealDark,
-      OmaColors.secondaryDark,
-      OmaColors.primaryDark,
-      OmaColors.ovulation,
-      OmaColors.periodPrimary,
-      OmaColors.primaryDark,
+      OmaPalette.periodPrimary,
+      OmaPalette.primary,
+      OmaPalette.ovulation,
+      OmaPalette.lutealDark,
+      OmaPalette.ovulationDark,
+      OmaPalette.primaryDark,
+      OmaPalette.ovulation,
+      OmaPalette.periodPrimary,
+      OmaPalette.primaryDark,
     ];
 
     final softColors = [
-      OmaColors.periodLight,
+      OmaPalette.periodLight,
       const Color(0xFFEAF0E5),
       const Color(0xFFECE7F3),
       const Color(0xFFFFF3D9),

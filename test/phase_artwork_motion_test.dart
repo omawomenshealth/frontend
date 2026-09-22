@@ -1,11 +1,11 @@
 import 'package:app_proje_a/core/utils/period_calculator.dart';
-import 'package:app_proje_a/core/widgets/oma_theme.dart';
+import 'package:app_proje_a/core/theme/oma_theme.dart';
 import 'package:app_proje_a/features/home/view/widgets/hero/phase/phase_artwork.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final palette = OmaPhaseStyle.forPhase(CyclePhase.menstrual);
+  final presentation = OmaPhasePresentation.forPhase(CyclePhase.menstrual);
 
   testWidgets('uses four illustrated blooms from the active phase', (
     tester,
@@ -17,7 +17,9 @@ void main() {
             body: SizedBox(
               width: 320,
               height: 408,
-              child: PhaseArtwork(palette: OmaPhaseStyle.forPhase(phase)),
+              child: PhaseArtwork(
+                presentation: OmaPhasePresentation.forPhase(phase),
+              ),
             ),
           ),
         ),
@@ -54,7 +56,7 @@ void main() {
           body: SizedBox(
             width: 320,
             height: 408,
-            child: PhaseArtwork(palette: palette),
+            child: PhaseArtwork(presentation: presentation),
           ),
         ),
       ),
@@ -82,7 +84,7 @@ void main() {
             body: SizedBox(
               width: 320,
               height: 408,
-              child: PhaseArtwork(palette: palette),
+              child: PhaseArtwork(presentation: presentation),
             ),
           ),
         ),
