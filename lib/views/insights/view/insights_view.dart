@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../core/shared_widgets/oma_design_widgets.dart';
-import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/personal_insight_model.dart';
-import '../../../features/home/viewmodel/home_view_model.dart';
 import '../viewmodel/insights_view_model.dart';
 
 part 'insights_story_view.dart';
@@ -20,7 +18,7 @@ class InsightsListView extends StatelessWidget {
     return Consumer<InsightsViewModel>(
       builder: (context, vm, _) {
         return Scaffold(
-          backgroundColor: OmaColors.scaffoldBackground,
+          backgroundColor: OmaPalette.background,
           body: SafeArea(
             child: RefreshIndicator(
               onRefresh: vm.loadData,
@@ -79,10 +77,10 @@ class InsightsListView extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: OmaColors.surface.withValues(alpha: 0.75),
+            color: OmaPalette.card.withValues(alpha: 0.75),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: OmaColors.primary.withValues(alpha: 0.16),
+              color: OmaPalette.primary.withValues(alpha: 0.16),
             ),
           ),
           child: Row(
@@ -91,7 +89,7 @@ class InsightsListView extends StatelessWidget {
               const Icon(
                 Icons.phone_android_rounded,
                 size: 19,
-                color: OmaColors.primary,
+                color: OmaPalette.primary,
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -100,7 +98,7 @@ class InsightsListView extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12,
                     height: 1.45,
-                    color: OmaColors.textSecondary,
+                    color: OmaPalette.muted,
                   ),
                 ),
               ),
@@ -121,13 +119,13 @@ class InsightsListView extends StatelessWidget {
             width: 82,
             height: 82,
             decoration: BoxDecoration(
-              color: OmaColors.secondary.withValues(alpha: 0.15),
+              color: OmaPalette.ovulation.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.insights_rounded,
               size: 42,
-              color: OmaColors.secondaryDark,
+              color: OmaPalette.ovulationDark,
             ),
           ),
           const SizedBox(height: 20),
@@ -137,7 +135,7 @@ class InsightsListView extends StatelessWidget {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: OmaColors.textPrimary,
+              color: OmaPalette.foreground,
             ),
           ),
           const SizedBox(height: 8),
@@ -147,7 +145,7 @@ class InsightsListView extends StatelessWidget {
             style: const TextStyle(
               fontSize: 13,
               height: 1.5,
-              color: OmaColors.textSecondary,
+              color: OmaPalette.muted,
             ),
           ),
         ],
@@ -162,7 +160,7 @@ class InsightsListView extends StatelessWidget {
         const Icon(
           Icons.info_outline_rounded,
           size: 17,
-          color: OmaColors.textHint,
+          color: OmaPalette.textHint,
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -171,7 +169,7 @@ class InsightsListView extends StatelessWidget {
             style: const TextStyle(
               fontSize: 11,
               height: 1.45,
-              color: OmaColors.textHint,
+              color: OmaPalette.textHint,
             ),
           ),
         ),
@@ -235,7 +233,7 @@ class PersonalInsightCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -246,7 +244,7 @@ class PersonalInsightCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     height: 1.45,
-                    color: OmaColors.textSecondary,
+                    color: OmaPalette.muted,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -377,7 +375,7 @@ class _InsightPresentation {
         title = AppStrings.insightDataBuildingTitle;
         body = AppStrings.insightDataBuildingBody(insight.value!);
         icon = Icons.hourglass_top_rounded;
-        color = OmaColors.info;
+        color = OmaPalette.info;
       case PersonalInsightKind.recordingSummary:
         title = AppStrings.insightRecordingSummaryTitle;
         body = AppStrings.insightRecordingSummaryBody(
@@ -385,12 +383,12 @@ class _InsightPresentation {
           spanDays: insight.comparisonValue!,
         );
         icon = Icons.calendar_view_month_rounded;
-        color = OmaColors.primary;
+        color = OmaPalette.primary;
       case PersonalInsightKind.cycleLength:
         title = AppStrings.insightCycleLengthTitle;
         body = AppStrings.insightCycleLengthBody(insight.value!);
         icon = Icons.autorenew_rounded;
-        color = OmaColors.periodPrimary;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.cycleVariation:
         title = AppStrings.insightCycleVariationTitle;
         body = AppStrings.insightCycleVariationBody(
@@ -399,22 +397,22 @@ class _InsightPresentation {
           max: insight.comparisonValue!,
         );
         icon = Icons.show_chart_rounded;
-        color = OmaColors.luteal;
+        color = OmaPalette.luteal;
       case PersonalInsightKind.cycleTimingReview:
         title = AppStrings.insightCycleTimingReviewTitle;
         body = AppStrings.insightCycleTimingReviewBody(insight.value!);
         icon = Icons.event_repeat_rounded;
-        color = OmaColors.warning;
+        color = OmaPalette.warning;
       case PersonalInsightKind.periodDuration:
         title = AppStrings.insightPeriodDurationTitle;
         body = AppStrings.insightPeriodDurationBody(insight.value!);
         icon = Icons.water_drop_rounded;
-        color = OmaColors.periodFlow;
+        color = OmaPalette.periodFlow;
       case PersonalInsightKind.periodTrackingStarted:
         title = AppStrings.insightPeriodTrackingTitle;
         body = AppStrings.insightPeriodTrackingBody;
         icon = Icons.bookmark_added_outlined;
-        color = OmaColors.periodPrimary;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.periodSymptomPattern:
         title = AppStrings.insightPeriodSymptomTitle;
         body = AppStrings.insightPeriodSymptomBody(
@@ -423,7 +421,7 @@ class _InsightPresentation {
           total: insight.total!,
         );
         icon = Icons.monitor_heart_outlined;
-        color = OmaColors.periodPrimary;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.periodDurationReview:
         title = AppStrings.insightPeriodDurationReviewTitle;
         body = AppStrings.insightPeriodDurationReviewBody(
@@ -431,7 +429,7 @@ class _InsightPresentation {
           comparison: insight.comparisonValue,
         );
         icon = Icons.timelapse_rounded;
-        color = OmaColors.warning;
+        color = OmaPalette.warning;
       case PersonalInsightKind.frequentMood:
         title = AppStrings.insightFrequentMoodTitle;
         body = AppStrings.insightFrequentMoodBody(
@@ -440,7 +438,7 @@ class _InsightPresentation {
           total: insight.total!,
         );
         icon = Icons.mood_rounded;
-        color = OmaColors.secondaryDark;
+        color = OmaPalette.ovulationDark;
       case PersonalInsightKind.recurringSymptom:
         title = AppStrings.insightRecurringSymptomTitle;
         body = AppStrings.insightRecurringSymptomBody(
@@ -449,7 +447,7 @@ class _InsightPresentation {
           total: insight.total!,
         );
         icon = Icons.healing_rounded;
-        color = OmaColors.accent;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.symptomMoodCooccurrence:
         title = AppStrings.insightSymptomMoodTitle;
         body = AppStrings.insightSymptomMoodBody(
@@ -458,7 +456,7 @@ class _InsightPresentation {
           count: insight.value!,
         );
         icon = Icons.join_inner_rounded;
-        color = OmaColors.secondaryDark;
+        color = OmaPalette.ovulationDark;
       case PersonalInsightKind.symptomBleedingCooccurrence:
         title = AppStrings.insightSymptomBleedingTitle;
         body = AppStrings.insightSymptomBleedingBody(
@@ -467,7 +465,7 @@ class _InsightPresentation {
           total: insight.total!,
         );
         icon = Icons.bubble_chart_rounded;
-        color = OmaColors.periodPrimary;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.moodCyclePhaseAssociation:
         title = AppStrings.insightMoodCyclePhaseTitle;
         body = AppStrings.insightMoodCyclePhaseBody(
@@ -483,7 +481,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.donut_large_rounded;
-        color = OmaColors.luteal;
+        color = OmaPalette.luteal;
       case PersonalInsightKind.symptomCyclePhaseAssociation:
         title = AppStrings.insightSymptomCyclePhaseTitle;
         body = AppStrings.insightSymptomCyclePhaseBody(
@@ -499,7 +497,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.monitor_heart_outlined;
-        color = OmaColors.periodPrimary;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.moodSymptomAssociation:
         title = AppStrings.insightMoodSymptomTitle;
         body = AppStrings.insightMoodSymptomBody(
@@ -515,7 +513,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.psychology_alt_outlined;
-        color = OmaColors.accent;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.moodFoodAssociation:
         title = AppStrings.insightMoodFoodTitle;
         body = AppStrings.insightMoodFoodBody(
@@ -531,7 +529,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.restaurant_menu_rounded;
-        color = OmaColors.secondaryDark;
+        color = OmaPalette.ovulationDark;
       case PersonalInsightKind.moodCravingAssociation:
         title = AppStrings.insightMoodCravingTitle;
         body = AppStrings.insightMoodCravingBody(
@@ -547,7 +545,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.icecream_outlined;
-        color = OmaColors.secondary;
+        color = OmaPalette.ovulation;
       case PersonalInsightKind.foodBowelAssociation:
         title = AppStrings.insightFoodBowelTitle;
         body = AppStrings.insightFoodBowelBody(
@@ -564,7 +562,7 @@ class _InsightPresentation {
           lagDays: insight.lagDays!,
         );
         icon = Icons.waves_rounded;
-        color = OmaColors.info;
+        color = OmaPalette.info;
       case PersonalInsightKind.moodPlaceAssociation:
         title = AppStrings.insightMoodPlaceTitle;
         body = AppStrings.insightMoodPlaceBody(
@@ -580,7 +578,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.place_outlined;
-        color = OmaColors.primaryDark;
+        color = OmaPalette.primaryDark;
       case PersonalInsightKind.moodCompanionAssociation:
         title = AppStrings.insightMoodCompanionTitle;
         body = AppStrings.insightMoodCompanionBody(
@@ -596,7 +594,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.people_alt_outlined;
-        color = OmaColors.primary;
+        color = OmaPalette.primary;
       case PersonalInsightKind.stressCompanionAssociation:
         title = AppStrings.insightStressCompanionTitle;
         body = AppStrings.insightStressCompanionBody(
@@ -611,7 +609,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.people_alt_outlined;
-        color = OmaColors.accent;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.stressCravingAssociation:
         title = AppStrings.insightStressCravingTitle;
         body = AppStrings.insightStressCravingBody(
@@ -626,7 +624,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.icecream_outlined;
-        color = OmaColors.secondary;
+        color = OmaPalette.ovulation;
       case PersonalInsightKind.stressFoodAssociation:
         title = AppStrings.insightStressFoodTitle;
         body = AppStrings.insightStressFoodBody(
@@ -641,7 +639,7 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.restaurant_menu_rounded;
-        color = OmaColors.secondaryDark;
+        color = OmaPalette.ovulationDark;
       case PersonalInsightKind.structuredAssociation:
         title = AppStrings.insightAssociationTitle;
         body = AppStrings.insightAssociationBody(
@@ -658,28 +656,28 @@ class _InsightPresentation {
           lagDays: insight.lagDays!,
         );
         icon = Icons.account_tree_outlined;
-        color = OmaColors.primaryDark;
+        color = OmaPalette.primaryDark;
       case PersonalInsightKind.foodObservationStarted:
         title = AppStrings.insightFoodObservationTitle;
         body =
             '${AppStrings.insightFoodObservationBody(primary: primary, secondary: secondary)} '
             '${AppStrings.insightContextNote(contexts)}';
         icon = Icons.search_rounded;
-        color = OmaColors.secondaryDark;
+        color = OmaPalette.ovulationDark;
       case PersonalInsightKind.foodPatternBuilding:
         title = AppStrings.insightFoodPatternBuildingTitle;
         body =
             '${AppStrings.insightFoodPatternBuildingBody(primary: primary, secondary: secondary, withEvent: insight.withEventCount!, withTotal: insight.withTotal!)} '
             '${AppStrings.insightContextNote(contexts)}';
         icon = Icons.hub_outlined;
-        color = OmaColors.secondaryDark;
+        color = OmaPalette.ovulationDark;
       case PersonalInsightKind.foodSensitivityAssociation:
         title = AppStrings.insightFoodSensitivityTitle;
         body =
             '${AppStrings.insightFoodSensitivityBody(primary: primary, secondary: secondary, withEvent: insight.withEventCount!, withTotal: insight.withTotal!, withoutTotal: insight.withoutTotal!, withPercent: _percentage(insight.withEventCount!, insight.withTotal!), withoutPercent: _percentage(insight.withoutEventCount!, insight.withoutTotal!))} '
             '${AppStrings.insightContextNote(contexts)}';
         icon = Icons.food_bank_outlined;
-        color = OmaColors.warning;
+        color = OmaPalette.warning;
       case PersonalInsightKind.medicationAdherence:
         title = AppStrings.insightMedicationAdherenceTitle;
         body = AppStrings.insightMedicationAdherenceBody(
@@ -687,7 +685,7 @@ class _InsightPresentation {
           total: insight.total!,
         );
         icon = Icons.medication_outlined;
-        color = OmaColors.medicationPrimary;
+        color = OmaPalette.medicationPrimary;
       case PersonalInsightKind.medicationSkipSymptomAssociation:
         title = AppStrings.insightMedicationSkipAssociationTitle;
         body = AppStrings.insightMedicationSkipAssociationBody(
@@ -703,17 +701,17 @@ class _InsightPresentation {
           ),
         );
         icon = Icons.medication_liquid_outlined;
-        color = OmaColors.accent;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.biotinLabInteraction:
         title = AppStrings.biotinInsightTitle;
         body = AppStrings.biotinInsightBody;
         icon = Icons.science_outlined;
-        color = OmaColors.warning;
+        color = OmaPalette.warning;
       case PersonalInsightKind.doctorReportPremiumReady:
         title = AppStrings.premiumDoctorReportInsightTitle;
         body = AppStrings.premiumDoctorReportInsightBody;
         icon = Icons.workspace_premium_outlined;
-        color = OmaColors.insightGold;
+        color = OmaPalette.insightGold;
       case PersonalInsightKind.dischargeBaselineObservation:
         title = AppStrings.insightDischargeBaselineTitle;
         body = AppStrings.insightDischargeBaselineBody(
@@ -721,7 +719,7 @@ class _InsightPresentation {
           consistency: secondary.isEmpty ? null : secondary,
         );
         icon = Icons.water_drop_outlined;
-        color = OmaColors.info;
+        color = OmaPalette.info;
       case PersonalInsightKind.fertileDischargeSignal:
         title = AppStrings.insightFertileDischargeTitle;
         body = AppStrings.insightFertileDischargeBody(
@@ -729,17 +727,17 @@ class _InsightPresentation {
           consistency: secondary,
         );
         icon = Icons.spa_outlined;
-        color = OmaColors.ovulation;
+        color = OmaPalette.ovulation;
       case PersonalInsightKind.menstrualDischargeContext:
         title = AppStrings.insightMenstrualDischargeTitle;
         body = AppStrings.insightMenstrualDischargeBody(primary);
         icon = Icons.water_drop_outlined;
-        color = OmaColors.periodPrimary;
+        color = OmaPalette.periodPrimary;
       case PersonalInsightKind.dischargeHealthNotice:
         title = AppStrings.insightDischargeHealthTitle;
         body = AppStrings.insightDischargeHealthBody;
         icon = Icons.health_and_safety_outlined;
-        color = OmaColors.warning;
+        color = OmaPalette.warning;
       case PersonalInsightKind.sexualAfterFeelingPattern:
         title = AppStrings.insightSexualAfterPatternTitle;
         body = AppStrings.insightSexualAfterPatternBody(
@@ -748,17 +746,17 @@ class _InsightPresentation {
           total: insight.total!,
         );
         icon = Icons.favorite_outline_rounded;
-        color = OmaColors.secondaryDark;
+        color = OmaPalette.ovulationDark;
       case PersonalInsightKind.unprotectedFertileWindowNotice:
         title = AppStrings.insightUnprotectedFertileTitle;
         body = AppStrings.insightUnprotectedFertileBody;
         icon = Icons.health_and_safety_outlined;
-        color = OmaColors.warning;
+        color = OmaPalette.warning;
       case PersonalInsightKind.fertileWindowFocus:
         title = AppStrings.insightFertilityFocusTitle;
         body = AppStrings.insightFertilityFocusBody;
         icon = Icons.favorite_outline_rounded;
-        color = OmaColors.ovulation;
+        color = OmaPalette.ovulation;
     }
 
     return _InsightPresentation(

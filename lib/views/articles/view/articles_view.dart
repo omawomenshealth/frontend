@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/image_constants.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/widgets/oma_toast.dart';
@@ -182,13 +182,16 @@ class _ArticlesViewState extends State<ArticlesView> {
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    final calculator = context.watch<HomeViewModel>().periodCalculator;
-    final phase = calculator?.currentPhase ?? CyclePhase.follicular;
-    final accent = _phaseColor(phase);
+    final home = context.watch<HomeViewModel>();
+    final phase =
+        home.periodCalculator?.phaseAt(home.selectedDate) ??
+        CyclePhase.follicular;
+    final theme = context.omaTheme;
+    final accent = theme.primary;
     final membershipTier = context.watch<PremiumPurchaseService>().tier;
 
     return Scaffold(
-      backgroundColor: Color.lerp(OmaColors.scaffoldBackground, accent, 0.028),
+      backgroundColor: Color.lerp(theme.background, accent, 0.028),
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -354,7 +357,7 @@ class _ArticlesViewState extends State<ArticlesView> {
                   child: Text(
                     localizedTopic,
                     style: const TextStyle(
-                      color: OmaColors.textPrimary,
+                      color: OmaPalette.foreground,
                       fontFamily: 'CormorantGaramond',
                       fontSize: 27,
                       height: 1,
@@ -475,15 +478,6 @@ class _ArticlesViewState extends State<ArticlesView> {
       _ => true,
     };
   }
-
-  Color _phaseColor(CyclePhase phase) {
-    return switch (phase) {
-      CyclePhase.menstrual => OmaColors.periodPrimary,
-      CyclePhase.follicular => OmaColors.primary,
-      CyclePhase.ovulation => OmaColors.ovulation,
-      CyclePhase.luteal => OmaColors.lutealDark,
-    };
-  }
 }
 
 class _ExploreSearchHeader extends StatelessWidget {
@@ -529,18 +523,18 @@ class _ExploreSearchHeader extends StatelessWidget {
                 onChanged: onChanged,
                 textInputAction: TextInputAction.search,
                 style: const TextStyle(
-                  color: OmaColors.textPrimary,
+                  color: OmaPalette.foreground,
                   fontSize: 13,
                 ),
                 decoration: InputDecoration(
                   hintText: AppStrings.exploreSearchHint,
                   hintStyle: const TextStyle(
-                    color: OmaColors.textHint,
+                    color: OmaPalette.textHint,
                     fontSize: 12.5,
                   ),
                   prefixIcon: const Icon(
                     Icons.search_rounded,
-                    color: OmaColors.textHint,
+                    color: OmaPalette.textHint,
                     size: 20,
                   ),
                   filled: false,
@@ -558,7 +552,7 @@ class _ExploreSearchHeader extends StatelessWidget {
             onPressed: onToggleSaved,
             style: IconButton.styleFrom(
               fixedSize: const Size(48, 48),
-              foregroundColor: savedOnly ? Colors.white : OmaColors.textPrimary,
+              foregroundColor: savedOnly ? Colors.white : OmaPalette.foreground,
               backgroundColor: savedOnly
                   ? accent
                   : Colors.white.withValues(alpha: 0.95),
@@ -622,7 +616,7 @@ class _ExploreHero extends StatelessWidget {
                 Text(
                   AppStrings.explorePhaseDays(phaseName),
                   style: const TextStyle(
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                     fontFamily: 'CormorantGaramond',
                     fontSize: 34,
                     height: 1,
@@ -634,7 +628,7 @@ class _ExploreHero extends StatelessWidget {
                 Text(
                   fertility,
                   style: const TextStyle(
-                    color: OmaColors.textSecondary,
+                    color: OmaPalette.muted,
                     fontSize: 12.5,
                     height: 1.3,
                   ),
@@ -725,7 +719,7 @@ class _QuickTopicButton extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: OmaColors.textSecondary,
+                  color: OmaPalette.muted,
                   fontSize: 8,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.8,
@@ -804,7 +798,7 @@ class _EditorialArticleCard extends StatelessWidget {
                       minimumSize: const Size(34, 34),
                       padding: EdgeInsets.zero,
                       backgroundColor: Colors.white.withValues(alpha: 0.78),
-                      foregroundColor: OmaColors.textPrimary,
+                      foregroundColor: OmaPalette.foreground,
                     ),
                     icon: Icon(
                       saved
@@ -927,7 +921,7 @@ class _RitualArticleRow extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: OmaColors.textPrimary,
+                        color: OmaPalette.foreground,
                         fontFamily: 'CormorantGaramond',
                         fontSize: 19,
                         height: 1.05,
@@ -941,7 +935,7 @@ class _RitualArticleRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: OmaColors.textSecondary,
+                        color: OmaPalette.muted,
                         fontSize: 10.5,
                       ),
                     ),
@@ -960,7 +954,7 @@ class _RitualArticleRow extends StatelessWidget {
                   article.canAccess
                       ? Icons.chevron_right_rounded
                       : Icons.lock_outline_rounded,
-                  color: OmaColors.textHint,
+                  color: OmaPalette.textHint,
                   size: 21,
                 ),
             ],
@@ -995,10 +989,7 @@ class _ErrorState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: OmaColors.textSecondary,
-                height: 1.45,
-              ),
+              style: const TextStyle(color: OmaPalette.muted, height: 1.45),
             ),
             const SizedBox(height: 18),
             FilledButton.icon(
@@ -1049,7 +1040,7 @@ class _EmptyArticlesState extends StatelessWidget {
                 : AppStrings.noArticlesForTopic,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: OmaColors.textSecondary,
+              color: OmaPalette.muted,
               fontSize: 13,
               height: 1.4,
             ),
