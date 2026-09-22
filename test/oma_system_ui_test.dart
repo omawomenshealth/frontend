@@ -37,12 +37,22 @@ void main() {
       );
 
       expect(region.value.systemNavigationBarColor, oma.background);
+      expect(region.value.statusBarColor, oma.background);
       expect(region.value.systemNavigationBarDividerColor, oma.border);
       expect(
         region.value.systemNavigationBarIconBrightness,
         brightness == Brightness.dark ? Brightness.light : Brightness.dark,
       );
       expect(region.value.systemNavigationBarContrastEnforced, isFalse);
+
+      final systemBarBackground = tester.widget<ColoredBox>(
+        find.descendant(
+          of: find.byType(OmaSystemUi),
+          matching: find.byType(ColoredBox),
+        ),
+      );
+      expect(systemBarBackground.color, oma.background);
+      expect(tester.widget<SafeArea>(find.byType(SafeArea)).top, isFalse);
 
     }
   });

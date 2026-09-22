@@ -16,7 +16,7 @@ class OmaSystemUi extends StatelessWidget {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+        statusBarColor: theme.background,
         statusBarIconBrightness: iconBrightness,
         statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         systemStatusBarContrastEnforced: false,
@@ -25,7 +25,10 @@ class OmaSystemUi extends StatelessWidget {
         systemNavigationBarIconBrightness: iconBrightness,
         systemNavigationBarContrastEnforced: false,
       ),
-      child: child,
+      child: ColoredBox(
+        color: theme.background,
+        child: SafeArea(top: false, child: child),
+      ),
     );
   }
 }
