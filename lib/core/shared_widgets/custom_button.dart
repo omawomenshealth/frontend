@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/color_constants.dart';
+import '../widgets/oma_theme.dart';
 
 /// Gradient arka planlı, scale animasyonlu özel buton.
 class CustomButton extends StatefulWidget {
@@ -20,7 +20,7 @@ class CustomButton extends StatefulWidget {
     required this.onPressed,
     this.gradient,
     this.backgroundColor,
-    this.textColor = AppColors.textOnPrimary,
+    this.textColor = OmaColors.textOnPrimary,
     this.width,
     this.height = 52,
     this.icon,
@@ -73,10 +73,10 @@ class _CustomButtonState extends State<CustomButton>
           height: widget.height,
           decoration: widget.isOutlined
               ? BoxDecoration(
-                  color: AppColors.surface,
+                  color: OmaColors.surface,
                   borderRadius: BorderRadius.circular(99),
                   border: Border.all(
-                    color: widget.backgroundColor ?? AppColors.primary,
+                    color: widget.backgroundColor ?? OmaColors.primary,
                     width: 1.2,
                   ),
                 )
@@ -84,7 +84,7 @@ class _CustomButtonState extends State<CustomButton>
                   gradient:
                       widget.gradient ??
                       (widget.backgroundColor == null
-                          ? AppColors.primaryGradient
+                          ? OmaColors.primaryGradient
                           : null),
                   color: widget.gradient == null
                       ? widget.backgroundColor
@@ -92,7 +92,7 @@ class _CustomButtonState extends State<CustomButton>
                   borderRadius: BorderRadius.circular(99),
                   boxShadow: [
                     BoxShadow(
-                      color: (widget.backgroundColor ?? AppColors.primary)
+                      color: (widget.backgroundColor ?? OmaColors.primary)
                           .withValues(alpha: 0.16),
                       blurRadius: 14,
                       offset: const Offset(0, 5),
@@ -106,7 +106,7 @@ class _CustomButtonState extends State<CustomButton>
                     height: 24,
                     child: CircularProgressIndicator(
                       color: widget.isOutlined
-                          ? AppColors.primary
+                          ? OmaColors.primary
                           : widget.textColor,
                       strokeWidth: 2.5,
                     ),
@@ -121,7 +121,7 @@ class _CustomButtonState extends State<CustomButton>
                           Icon(
                             widget.icon,
                             color: widget.isOutlined
-                                ? (widget.backgroundColor ?? AppColors.primary)
+                                ? (widget.backgroundColor ?? OmaColors.primary)
                                 : widget.textColor,
                             size: 20,
                           ),
@@ -136,7 +136,7 @@ class _CustomButtonState extends State<CustomButton>
                             style: TextStyle(
                               color: widget.isOutlined
                                   ? (widget.backgroundColor ??
-                                        AppColors.primary)
+                                        OmaColors.primary)
                                   : widget.textColor,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

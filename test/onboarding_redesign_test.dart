@@ -8,7 +8,7 @@ import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/sync_service.dart';
 import 'package:app_proje_a/localization/generated/strings.g.dart';
 import 'package:app_proje_a/features/onboarding/view/onboarding_view.dart';
-import 'package:app_proje_a/features/onboarding/view/pages/onboarding_preview_page.dart';
+import 'package:app_proje_a/features/onboarding/view/pages/preview_page.dart';
 import 'package:app_proje_a/core/widgets/oma_background.dart';
 import 'package:app_proje_a/core/constants/image_constants.dart';
 import 'package:app_proje_a/core/widgets/oma_chip.dart';
@@ -103,7 +103,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: AppStrings.supportedLocales,
-          home: Scaffold(body: OnboardingPreviewPage(vm: vm)),
+          home: Scaffold(body: PreviewPage(vm: vm)),
         ),
       ),
     );

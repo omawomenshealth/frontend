@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../constants/app_strings.dart';
-import '../constants/color_constants.dart';
+import '../widgets/oma_theme.dart';
 import '../../data/models/lab_result_model.dart';
 
 /// İlk giriş ve profil ekranında ortak kullanılan yapılandırılmış laboratuvar
@@ -20,7 +20,7 @@ class LabResultsForm extends StatefulWidget {
     this.initialResults = const {},
     this.initialTestDate,
     this.initialFasting,
-    this.accent = AppColors.primary,
+    this.accent = OmaColors.primary,
     required this.onResultsChanged,
     required this.onTestDateChanged,
     required this.onFastingChanged,
@@ -128,7 +128,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
                 child: Text(
                   AppStrings.laboratoryEntryDisclaimer,
                   style: const TextStyle(
-                    color: AppColors.textSecondary,
+                    color: OmaColors.textSecondary,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -205,9 +205,9 @@ class _LabResultsFormState extends State<LabResultsForm> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: OmaColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: OmaColors.outline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,7 +217,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: OmaColors.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
@@ -252,7 +252,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
             AppStrings.fastingSampleQuestion,
             style: const TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: OmaColors.textSecondary,
             ),
           ),
           const SizedBox(height: 7),
@@ -280,7 +280,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
       side: BorderSide(
         color: selected
             ? widget.accent.withValues(alpha: 0.55)
-            : AppColors.outline,
+            : OmaColors.outline,
       ),
       onSelected: (_) {
         setState(() => _fasting = value);
@@ -300,7 +300,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: OmaColors.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -379,10 +379,10 @@ class _LabGroupTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surface,
+      color: OmaColors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.outline),
+        side: const BorderSide(color: OmaColors.outline),
       ),
       clipBehavior: Clip.antiAlias,
       child: Theme(
@@ -390,7 +390,7 @@ class _LabGroupTile extends StatelessWidget {
         child: ExpansionTile(
           initiallyExpanded: initiallyExpanded,
           iconColor: accent,
-          collapsedIconColor: AppColors.textSecondary,
+          collapsedIconColor: OmaColors.textSecondary,
           tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
           childrenPadding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
           title: Text(
@@ -398,7 +398,7 @@ class _LabGroupTile extends StatelessWidget {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: OmaColors.textPrimary,
             ),
           ),
           subtitle: count == 0

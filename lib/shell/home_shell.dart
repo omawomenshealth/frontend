@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../core/constants/app_strings.dart';
-import '../core/constants/color_constants.dart';
+import '../core/widgets/oma_theme.dart';
 import '../data/services/notification_service.dart';
 import '../views/articles/view/articles_view.dart';
 import '../views/calendar/viewmodel/calendar_view_model.dart';
@@ -76,10 +76,10 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
         .periodCalculator
         ?.currentPhaseIndex;
     final activeColor = switch (phaseIndex) {
-      0 => AppColors.periodPrimary,
-      2 => AppColors.ovulation,
-      3 => AppColors.lutealDark,
-      _ => AppColors.primary,
+      0 => OmaColors.periodPrimary,
+      2 => OmaColors.ovulation,
+      3 => OmaColors.lutealDark,
+      _ => OmaColors.primary,
     };
 
     return Scaffold(

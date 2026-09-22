@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/color_constants.dart';
+import '../../../../core/widgets/oma_theme.dart';
 import '../../../../localization/generated/strings.g.dart';
 
 class OnboardingSelectionSheet extends StatelessWidget {
@@ -25,7 +25,7 @@ class OnboardingSelectionSheet extends StatelessWidget {
       heightFactor: 0.92,
       child: Container(
         decoration: const BoxDecoration(
-          color: AppColors.scaffoldBackground,
+          color: OmaColors.scaffoldBackground,
           borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
         ),
         child: Column(

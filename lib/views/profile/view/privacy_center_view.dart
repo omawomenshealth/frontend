@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/color_constants.dart';
+import '../../../core/widgets/oma_theme.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../core/widgets/oma_toast.dart';
@@ -186,7 +186,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                         Text(
                           '${AppStrings.privacyNotice}: $_noticeVersion',
                           style: const TextStyle(
-                            color: AppColors.textSecondary,
+                            color: OmaColors.textSecondary,
                             fontSize: 12,
                           ),
                         ),
@@ -214,7 +214,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                                   : Icons.info_outline,
                               color: _granted
                                   ? Colors.green
-                                  : AppColors.textSecondary,
+                                  : OmaColors.textSecondary,
                             ),
                             const SizedBox(width: 8),
                             Expanded(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/color_constants.dart';
+import '../../../core/widgets/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/services/local_storage_service.dart';
 
@@ -22,10 +22,10 @@ class CycleInsightsCard extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: OmaColors.outline),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.08),
+            color: OmaColors.primary.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -42,7 +42,7 @@ class CycleInsightsCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: OmaColors.textPrimary,
                 ),
               ),
             ],
@@ -90,7 +90,7 @@ class CycleInsightsCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.06),
+              color: OmaColors.primary.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -98,7 +98,7 @@ class CycleInsightsCard extends StatelessWidget {
                 Icon(
                   Icons.info_outline_rounded,
                   size: 16,
-                  color: AppColors.primary.withValues(alpha: 0.7),
+                  color: OmaColors.primary.withValues(alpha: 0.7),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -111,7 +111,7 @@ class CycleInsightsCard extends StatelessWidget {
                         : AppStrings.cycleStatisticsHint,
                     style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textSecondary.withValues(alpha: 0.8),
+                      color: OmaColors.textSecondary.withValues(alpha: 0.8),
                     ),
                   ),
                 ),
@@ -145,7 +145,7 @@ class CycleInsightsCard extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSecondary.withValues(alpha: 0.8),
+                    color: OmaColors.textSecondary.withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -154,7 +154,7 @@ class CycleInsightsCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: OmaColors.textPrimary,
                   ),
                 ),
               ],
@@ -170,7 +170,7 @@ class CycleInsightsCard extends StatelessWidget {
                 child: Icon(
                   Icons.info_outline,
                   size: 18,
-                  color: AppColors.textHint.withValues(alpha: 0.6),
+                  color: OmaColors.textHint.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: 6),
@@ -199,7 +199,7 @@ class CycleInsightsCard extends StatelessWidget {
 
   Widget _divider() {
     return Divider(
-      color: AppColors.textHint.withValues(alpha: 0.15),
+      color: OmaColors.textHint.withValues(alpha: 0.15),
       height: 1,
     );
   }
@@ -236,7 +236,7 @@ class CycleInsightsCard extends StatelessWidget {
           width: 22,
           height: 22,
           decoration: BoxDecoration(
-            color: AppColors.textHint.withValues(alpha: 0.3),
+            color: OmaColors.textHint.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.remove, size: 14, color: Colors.white),
@@ -251,7 +251,7 @@ class CycleInsightsCard extends StatelessWidget {
       case CycleStatus.abnormal:
         return const Color(0xFFFF9800);
       case CycleStatus.noData:
-        return AppColors.textHint;
+        return OmaColors.textHint;
     }
   }
 

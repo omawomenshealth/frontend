@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/color_constants.dart';
+import '../../../core/widgets/oma_theme.dart';
 import '../../../core/constants/image_constants.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/widgets/oma_toast.dart';
@@ -188,7 +188,7 @@ class _ArticlesViewState extends State<ArticlesView> {
     final membershipTier = context.watch<PremiumPurchaseService>().tier;
 
     return Scaffold(
-      backgroundColor: Color.lerp(AppColors.scaffoldBackground, accent, 0.028),
+      backgroundColor: Color.lerp(OmaColors.scaffoldBackground, accent, 0.028),
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -354,7 +354,7 @@ class _ArticlesViewState extends State<ArticlesView> {
                   child: Text(
                     localizedTopic,
                     style: const TextStyle(
-                      color: AppColors.textPrimary,
+                      color: OmaColors.textPrimary,
                       fontFamily: 'CormorantGaramond',
                       fontSize: 27,
                       height: 1,
@@ -478,10 +478,10 @@ class _ArticlesViewState extends State<ArticlesView> {
 
   Color _phaseColor(CyclePhase phase) {
     return switch (phase) {
-      CyclePhase.menstrual => AppColors.periodPrimary,
-      CyclePhase.follicular => AppColors.primary,
-      CyclePhase.ovulation => AppColors.ovulation,
-      CyclePhase.luteal => AppColors.lutealDark,
+      CyclePhase.menstrual => OmaColors.periodPrimary,
+      CyclePhase.follicular => OmaColors.primary,
+      CyclePhase.ovulation => OmaColors.ovulation,
+      CyclePhase.luteal => OmaColors.lutealDark,
     };
   }
 }
@@ -529,18 +529,18 @@ class _ExploreSearchHeader extends StatelessWidget {
                 onChanged: onChanged,
                 textInputAction: TextInputAction.search,
                 style: const TextStyle(
-                  color: AppColors.textPrimary,
+                  color: OmaColors.textPrimary,
                   fontSize: 13,
                 ),
                 decoration: InputDecoration(
                   hintText: AppStrings.exploreSearchHint,
                   hintStyle: const TextStyle(
-                    color: AppColors.textHint,
+                    color: OmaColors.textHint,
                     fontSize: 12.5,
                   ),
                   prefixIcon: const Icon(
                     Icons.search_rounded,
-                    color: AppColors.textHint,
+                    color: OmaColors.textHint,
                     size: 20,
                   ),
                   filled: false,
@@ -558,7 +558,7 @@ class _ExploreSearchHeader extends StatelessWidget {
             onPressed: onToggleSaved,
             style: IconButton.styleFrom(
               fixedSize: const Size(48, 48),
-              foregroundColor: savedOnly ? Colors.white : AppColors.textPrimary,
+              foregroundColor: savedOnly ? Colors.white : OmaColors.textPrimary,
               backgroundColor: savedOnly
                   ? accent
                   : Colors.white.withValues(alpha: 0.95),
@@ -622,7 +622,7 @@ class _ExploreHero extends StatelessWidget {
                 Text(
                   AppStrings.explorePhaseDays(phaseName),
                   style: const TextStyle(
-                    color: AppColors.textPrimary,
+                    color: OmaColors.textPrimary,
                     fontFamily: 'CormorantGaramond',
                     fontSize: 34,
                     height: 1,
@@ -634,7 +634,7 @@ class _ExploreHero extends StatelessWidget {
                 Text(
                   fertility,
                   style: const TextStyle(
-                    color: AppColors.textSecondary,
+                    color: OmaColors.textSecondary,
                     fontSize: 12.5,
                     height: 1.3,
                   ),
@@ -725,7 +725,7 @@ class _QuickTopicButton extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: AppColors.textSecondary,
+                  color: OmaColors.textSecondary,
                   fontSize: 8,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.8,
@@ -804,7 +804,7 @@ class _EditorialArticleCard extends StatelessWidget {
                       minimumSize: const Size(34, 34),
                       padding: EdgeInsets.zero,
                       backgroundColor: Colors.white.withValues(alpha: 0.78),
-                      foregroundColor: AppColors.textPrimary,
+                      foregroundColor: OmaColors.textPrimary,
                     ),
                     icon: Icon(
                       saved
@@ -927,7 +927,7 @@ class _RitualArticleRow extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: AppColors.textPrimary,
+                        color: OmaColors.textPrimary,
                         fontFamily: 'CormorantGaramond',
                         fontSize: 19,
                         height: 1.05,
@@ -941,7 +941,7 @@ class _RitualArticleRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: AppColors.textSecondary,
+                        color: OmaColors.textSecondary,
                         fontSize: 10.5,
                       ),
                     ),
@@ -960,7 +960,7 @@ class _RitualArticleRow extends StatelessWidget {
                   article.canAccess
                       ? Icons.chevron_right_rounded
                       : Icons.lock_outline_rounded,
-                  color: AppColors.textHint,
+                  color: OmaColors.textHint,
                   size: 21,
                 ),
             ],
@@ -996,7 +996,7 @@ class _ErrorState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: AppColors.textSecondary,
+                color: OmaColors.textSecondary,
                 height: 1.45,
               ),
             ),
@@ -1049,7 +1049,7 @@ class _EmptyArticlesState extends StatelessWidget {
                 : AppStrings.noArticlesForTopic,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: AppColors.textSecondary,
+              color: OmaColors.textSecondary,
               fontSize: 13,
               height: 1.4,
             ),

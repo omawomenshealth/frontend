@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/constants/color_constants.dart';
 import '../../../../../core/constants/image_constants.dart';
 import '../../../../../core/utils/pregnancy_calculator.dart';
 import '../../../../../core/widgets/oma_theme.dart';
@@ -368,19 +367,19 @@ class _PregnancyPresentation {
     final stages = context.t.home.pregnancy.stages;
 
     final colors = [
-      AppColors.periodPrimary,
-      AppColors.primary,
-      AppColors.ovulation,
-      AppColors.lutealDark,
-      AppColors.secondaryDark,
-      AppColors.primaryDark,
-      AppColors.ovulation,
-      AppColors.periodPrimary,
-      AppColors.primaryDark,
+      OmaColors.periodPrimary,
+      OmaColors.primary,
+      OmaColors.ovulation,
+      OmaColors.lutealDark,
+      OmaColors.secondaryDark,
+      OmaColors.primaryDark,
+      OmaColors.ovulation,
+      OmaColors.periodPrimary,
+      OmaColors.primaryDark,
     ];
 
     final softColors = [
-      AppColors.periodLight,
+      OmaColors.periodLight,
       const Color(0xFFEAF0E5),
       const Color(0xFFECE7F3),
       const Color(0xFFFFF3D9),

@@ -234,10 +234,10 @@ class _InsightsViewState extends State<InsightsView>
 
   Color _phaseColor(CyclePhase phase) {
     return switch (phase) {
-      CyclePhase.menstrual => AppColors.periodPrimary,
-      CyclePhase.follicular => AppColors.primary,
-      CyclePhase.ovulation => AppColors.ovulation,
-      CyclePhase.luteal => AppColors.lutealDark,
+      CyclePhase.menstrual => OmaColors.periodPrimary,
+      CyclePhase.follicular => OmaColors.primary,
+      CyclePhase.ovulation => OmaColors.ovulation,
+      CyclePhase.luteal => OmaColors.lutealDark,
     };
   }
 }
@@ -391,7 +391,7 @@ class _InsightStoryPage extends StatelessWidget {
           Text(
             presentation.title,
             style: const TextStyle(
-              color: AppColors.textPrimary,
+              color: OmaColors.textPrimary,
               fontFamily: 'CormorantGaramond',
               fontSize: 42,
               height: 1.02,
@@ -403,7 +403,7 @@ class _InsightStoryPage extends StatelessWidget {
           Text(
             presentation.body,
             style: const TextStyle(
-              color: AppColors.textSecondary,
+              color: OmaColors.textSecondary,
               fontFamily: 'Karla',
               fontSize: 14,
               height: 1.55,
@@ -439,7 +439,7 @@ class _InsightStoryPage extends StatelessWidget {
                   const Icon(
                     Icons.arrow_forward_rounded,
                     size: 15,
-                    color: AppColors.textSecondary,
+                    color: OmaColors.textSecondary,
                   ),
               ],
             ],
@@ -470,7 +470,7 @@ class _InsightStoryPage extends StatelessWidget {
                 Text(
                   presentation.evidence,
                   style: const TextStyle(
-                    color: AppColors.textSecondary,
+                    color: OmaColors.textSecondary,
                     fontFamily: 'Karla',
                     fontSize: 12.5,
                     height: 1.45,
@@ -481,7 +481,7 @@ class _InsightStoryPage extends StatelessWidget {
                 Text(
                   AppStrings.insightsDisclaimer,
                   style: const TextStyle(
-                    color: AppColors.textHint,
+                    color: OmaColors.textHint,
                     fontFamily: 'Karla',
                     fontSize: 10.5,
                     height: 1.4,
@@ -686,7 +686,7 @@ class _EmptyInsightStory extends StatelessWidget {
               fontFamily: 'CormorantGaramond',
               fontSize: 32,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: OmaColors.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
@@ -697,7 +697,7 @@ class _EmptyInsightStory extends StatelessWidget {
               fontFamily: 'Karla',
               fontSize: 13,
               height: 1.5,
-              color: AppColors.textSecondary,
+              color: OmaColors.textSecondary,
             ),
           ),
           const SizedBox(height: 24),

@@ -1,5 +1,5 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
-import 'package:app_proje_a/core/constants/color_constants.dart';
+import 'package:app_proje_a/core/widgets/oma_theme.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/models/lab_result_model.dart';
@@ -182,7 +182,7 @@ void main() {
       find.byKey(const ValueKey('profile_edit_sheet')),
     );
     final decoration = sheet.decoration! as BoxDecoration;
-    expect(decoration.color, AppColors.scaffoldBackground);
+    expect(decoration.color, OmaColors.scaffoldBackground);
     expect(
       find.byKey(const ValueKey('profile_add_chronic_disease')),
       findsOneWidget,

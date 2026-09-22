@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/color_constants.dart';
+import '../../../core/widgets/oma_theme.dart';
 
 /// Beslenme, ilaç, takviye ve cilt bakımı için ortak akıllı katalog seçicisi.
 class TrackingCatalogSelector extends StatefulWidget {
@@ -93,7 +93,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                     icon: const Icon(Icons.close_rounded),
                   ),
             filled: true,
-            fillColor: AppColors.surface,
+            fillColor: OmaColors.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(22),
               borderSide: BorderSide(
@@ -123,7 +123,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                 child: Text(
                   AppStrings.smartSearchHint,
                   style: const TextStyle(
-                    color: AppColors.textSecondary,
+                    color: OmaColors.textSecondary,
                     fontSize: 10.5,
                     height: 1.35,
                   ),
@@ -178,7 +178,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                   side: BorderSide(
                     color: widget.selected.contains(item)
                         ? widget.color
-                        : AppColors.outline,
+                        : OmaColors.outline,
                   ),
                   onSelected: (_) => widget.onToggle(item),
                 ),
@@ -271,7 +271,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
       key: const ValueKey('catalog_category_group'),
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: OmaColors.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: widget.color.withValues(alpha: 0.34)),
       ),
@@ -309,7 +309,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: OmaColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -317,7 +317,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                             AppStrings.catalogCategoryCount(categories.length),
                             style: const TextStyle(
                               fontSize: 10.5,
-                              color: AppColors.textSecondary,
+                              color: OmaColors.textSecondary,
                             ),
                           ),
                         ],
@@ -369,12 +369,12 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
       decoration: BoxDecoration(
         color: selectedCount > 0
             ? widget.color.withValues(alpha: 0.08)
-            : AppColors.surface,
+            : OmaColors.surface,
         borderRadius: BorderRadius.circular(19),
         border: Border.all(
           color: selectedCount > 0
               ? widget.color.withValues(alpha: 0.55)
-              : AppColors.outline,
+              : OmaColors.outline,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -405,7 +405,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                       child: Text(
                         entry.key,
                         style: const TextStyle(
-                          color: AppColors.textPrimary,
+                          color: OmaColors.textPrimary,
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           height: 1.25,
@@ -503,7 +503,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
         selected: selected,
         selectedColor: widget.color.withValues(alpha: 0.13),
         checkmarkColor: widget.color,
-        side: BorderSide(color: selected ? widget.color : AppColors.outline),
+        side: BorderSide(color: selected ? widget.color : OmaColors.outline),
         onSelected: (_) => widget.onToggle(item),
       );
     }
@@ -522,7 +522,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
               selectedColor: widget.color.withValues(alpha: 0.13),
               checkmarkColor: widget.color,
               side: BorderSide(
-                color: selected ? widget.color : AppColors.outline,
+                color: selected ? widget.color : OmaColors.outline,
               ),
               onSelected: (_) {
                 setState(() {
@@ -586,7 +586,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                   side: BorderSide(
                     color: selectedDetail == detail
                         ? widget.color
-                        : AppColors.outline,
+                        : OmaColors.outline,
                   ),
                   onSelected: (_) =>
                       (widget.onItemSelected ?? _defaultItemSelection)(
@@ -670,7 +670,7 @@ class _EmptyResult extends StatelessWidget {
       child: Text(
         AppStrings.noSearchResults,
         textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+        style: const TextStyle(color: OmaColors.textSecondary, fontSize: 12),
       ),
     );
   }

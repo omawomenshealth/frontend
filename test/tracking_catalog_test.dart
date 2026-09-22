@@ -1,5 +1,5 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
-import 'package:app_proje_a/core/constants/color_constants.dart';
+import 'package:app_proje_a/core/widgets/oma_theme.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/medication_identity_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
@@ -157,7 +157,7 @@ void main() {
   testWidgets('ana sayfa adet disinda tam bes hizli kayit gosterir', (
     tester,
   ) async {
-    const cycleTone = AppColors.ovulation;
+    const cycleTone = OmaColors.ovulation;
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -219,7 +219,7 @@ void main() {
             searchHint: AppStrings.searchSkincare,
             categories: AppStrings.skincareCatalog,
             selected: <String>{},
-            color: AppColors.skincarePrimary,
+            color: OmaColors.skincarePrimary,
             icon: Icons.spa_outlined,
             showSmartSearchHint: false,
             onToggle: (_) {},
@@ -261,7 +261,7 @@ void main() {
             categories: AppStrings.nutritionCatalog,
             hiddenAliases: AppStrings.hiddenFoodSearchAliases,
             selected: <String>{},
-            color: AppColors.primary,
+            color: OmaColors.primary,
             icon: Icons.restaurant_menu_rounded,
             onToggle: (_) {},
           ),
@@ -297,7 +297,7 @@ void main() {
             },
             itemDetails: AppStrings.medicationActiveIngredients,
             selected: <String>{},
-            color: AppColors.medicationPrimary,
+            color: OmaColors.medicationPrimary,
             icon: Icons.medication_outlined,
             onToggle: (_) {},
             onItemSelected: (group, detail) {
@@ -436,7 +436,7 @@ void main() {
   testWidgets('ilac ve takviye ayni ekranda tek kayitla saklanir', (
     tester,
   ) async {
-    const cycleTone = AppColors.ovulation;
+    const cycleTone = OmaColors.ovulation;
     final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
     await storage.init();
     final settings = UserSettings(

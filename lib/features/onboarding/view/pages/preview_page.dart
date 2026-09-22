@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/constants/color_constants.dart';
 import '../../../../core/constants/image_constants.dart';
-import '../../../../core/theme/oma_typography.dart';
+import '../../../../core/widgets/oma_theme.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 
 const _readyPlum = Color(0xFF7A4F63);
 const _readyPlumSoft = Color(0x1A7A4F63);
 
-class OnboardingPreviewPage extends StatelessWidget {
+class PreviewPage extends StatelessWidget {
   final OnboardingViewModel vm;
 
-  const OnboardingPreviewPage({
-    super.key,
-    required this.vm,
-  });
+  const PreviewPage({super.key, required this.vm});
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +29,7 @@ class OnboardingPreviewPage extends StatelessWidget {
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 32,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 448),
           child: Column(
@@ -49,7 +42,7 @@ class OnboardingPreviewPage extends StatelessWidget {
                   height: 80,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppColors.surface.withValues(alpha: 0.86),
+                    color: OmaColors.surface.withValues(alpha: 0.86),
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: const [
                       BoxShadow(
@@ -67,14 +60,9 @@ class OnboardingPreviewPage extends StatelessWidget {
               const SizedBox(height: 24),
 
               Text(
-                name.isEmpty
-                    ? review.title
-                    : review.titleWithName(name: name),
+                name.isEmpty ? review.title : review.titleWithName(name: name),
                 textAlign: TextAlign.center,
-                style: OmaTypography.display(
-                  size: 32,
-                  weight: FontWeight.w600,
-                ),
+                style: OmaText.display(32, weight: FontWeight.w600),
               ),
 
               const SizedBox(height: 12),
@@ -82,17 +70,16 @@ class OnboardingPreviewPage extends StatelessWidget {
               Text(
                 review.subtitle,
                 textAlign: TextAlign.center,
-                style: OmaTypography.body(
-                  color: AppColors.textSecondary,
+                style: OmaText.body(
+                  14,
+                  color: OmaColors.textSecondary,
                   height: 1.45,
                 ),
               ),
 
               const SizedBox(height: 24),
 
-              _PreviewNote(
-                message: context.t.onboarding.prompt.review,
-              ),
+              _PreviewNote(message: context.t.onboarding.prompt.review),
 
               const SizedBox(height: 24),
 
@@ -103,9 +90,7 @@ class OnboardingPreviewPage extends StatelessWidget {
 
               _PreviewSummary(
                 label: review.cycleLabel,
-                value: review.dayCount(
-                  days: vm.averageCycleLength,
-                ),
+                value: review.dayCount(days: vm.averageCycleLength),
               ),
 
               _PreviewSummary(
@@ -115,9 +100,7 @@ class OnboardingPreviewPage extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              _PreviewPrivacy(
-                label: review.deviceEncryptionNote,
-              ),
+              _PreviewPrivacy(label: review.deviceEncryptionNote),
             ],
           ),
         ),
@@ -129,9 +112,7 @@ class OnboardingPreviewPage extends StatelessWidget {
 class _PreviewNote extends StatelessWidget {
   final String message;
 
-  const _PreviewNote({
-    required this.message,
-  });
+  const _PreviewNote({required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -154,13 +135,7 @@ class _PreviewNote extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              message,
-              style: OmaTypography.body(
-                size: 12,
-                color: _readyPlum,
-              ),
-            ),
+            child: Text(message, style: OmaText.body(12, color: _readyPlum)),
           ),
         ],
       ),
@@ -171,9 +146,7 @@ class _PreviewNote extends StatelessWidget {
 class _PreviewPrivacy extends StatelessWidget {
   final String label;
 
-  const _PreviewPrivacy({
-    required this.label,
-  });
+  const _PreviewPrivacy({required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +155,7 @@ class _PreviewPrivacy extends StatelessWidget {
       children: [
         const Icon(
           Icons.favorite_border_rounded,
-          color: AppColors.textSecondary,
+          color: OmaColors.textSecondary,
           size: 16,
         ),
         const SizedBox(width: 8),
@@ -190,10 +163,7 @@ class _PreviewPrivacy extends StatelessWidget {
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: OmaTypography.body(
-              size: 12,
-              color: AppColors.textSecondary,
-            ),
+            style: OmaText.body(12, color: OmaColors.textSecondary),
           ),
         ),
       ],
@@ -205,10 +175,7 @@ class _PreviewSummary extends StatelessWidget {
   final String label;
   final String value;
 
-  const _PreviewSummary({
-    required this.label,
-    required this.value,
-  });
+  const _PreviewSummary({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -216,12 +183,9 @@ class _PreviewSummary extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.8),
+          color: OmaColors.surface.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -231,10 +195,7 @@ class _PreviewSummary extends StatelessWidget {
               child: Text(
                 label,
                 textAlign: TextAlign.start,
-                style: OmaTypography.body(
-                  size: 12,
-                  color: AppColors.textSecondary,
-                ),
+                style: OmaText.body(12, color: OmaColors.textSecondary),
               ),
             ),
             const SizedBox(width: 12),
@@ -242,10 +203,7 @@ class _PreviewSummary extends StatelessWidget {
               child: Text(
                 value,
                 textAlign: TextAlign.end,
-                style: OmaTypography.body(
-                  size: 12,
-                  weight: FontWeight.w600,
-                ),
+                style: OmaText.body(12, weight: FontWeight.w600),
               ),
             ),
           ],

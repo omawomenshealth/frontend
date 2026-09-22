@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/constants/color_constants.dart';
+import '../../../../core/widgets/oma_theme.dart';
 import '../../../../core/utils/app_time.dart';
 import '../../../../core/utils/date_extensions.dart';
 import '../../../../core/utils/period_calculator.dart';
@@ -154,7 +154,7 @@ class _DayButton extends StatelessWidget {
               AppStrings.shortWeekdays[date.weekday - 1].toUpperCase(),
               maxLines: 1,
               style: const TextStyle(
-                color: AppColors.textSecondary,
+                color: OmaColors.textSecondary,
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.05,
@@ -182,8 +182,8 @@ class _DayButton extends StatelessWidget {
                   color: selected
                       ? Colors.white
                       : isPredictedPeriod
-                      ? AppColors.periodPrimary
-                      : AppColors.textPrimary,
+                      ? OmaColors.periodPrimary
+                      : OmaColors.textPrimary,
                   fontSize: 13,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
                 ),
@@ -197,11 +197,11 @@ class _DayButton extends StatelessWidget {
 
   Color _phaseColor(CyclePhase? phase) {
     return switch (phase) {
-      CyclePhase.menstrual => AppColors.periodPrimary,
-      CyclePhase.follicular => AppColors.primary,
-      CyclePhase.ovulation => AppColors.ovulation,
-      CyclePhase.luteal => AppColors.lutealDark,
-      null => AppColors.primary,
+      CyclePhase.menstrual => OmaColors.periodPrimary,
+      CyclePhase.follicular => OmaColors.primary,
+      CyclePhase.ovulation => OmaColors.ovulation,
+      CyclePhase.luteal => OmaColors.lutealDark,
+      null => OmaColors.primary,
     };
   }
 }

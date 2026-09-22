@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
 
-import '../constants/color_constants.dart';
+import '../widgets/oma_theme.dart';
 
 class AppTheme {
   AppTheme._();
 
   static ThemeData get lightTheme {
     const scheme = ColorScheme.light(
-      primary: AppColors.primary,
-      onPrimary: AppColors.textOnPrimary,
-      primaryContainer: AppColors.primaryLight,
-      onPrimaryContainer: AppColors.primaryDark,
-      secondary: AppColors.secondary,
+      primary: OmaColors.primary,
+      onPrimary: OmaColors.textOnPrimary,
+      primaryContainer: OmaColors.primaryLight,
+      onPrimaryContainer: OmaColors.primaryDark,
+      secondary: OmaColors.secondary,
       onSecondary: Colors.white,
-      secondaryContainer: AppColors.secondaryLight,
-      onSecondaryContainer: AppColors.secondaryDark,
-      surface: AppColors.surface,
-      onSurface: AppColors.textPrimary,
-      error: AppColors.error,
-      outline: AppColors.outline,
+      secondaryContainer: OmaColors.secondaryLight,
+      onSecondaryContainer: OmaColors.secondaryDark,
+      surface: OmaColors.surface,
+      onSurface: OmaColors.textPrimary,
+      error: OmaColors.error,
+      outline: OmaColors.outline,
     );
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: scheme,
-      primaryColor: AppColors.primary,
-      scaffoldBackgroundColor: AppColors.scaffoldBackground,
+      primaryColor: OmaColors.primary,
+      scaffoldBackgroundColor: OmaColors.scaffoldBackground,
       fontFamily: 'Karla',
       splashFactory: InkSparkle.splashFactory,
       textTheme: const TextTheme(
         headlineLarge: TextStyle(
-          color: AppColors.textPrimary,
+          color: OmaColors.textPrimary,
           fontFamily: 'CormorantGaramond',
           fontSize: 30,
           height: 1.12,
@@ -39,7 +39,7 @@ class AppTheme {
           letterSpacing: -0.7,
         ),
         headlineMedium: TextStyle(
-          color: AppColors.textPrimary,
+          color: OmaColors.textPrimary,
           fontFamily: 'CormorantGaramond',
           fontSize: 24,
           height: 1.2,
@@ -47,54 +47,54 @@ class AppTheme {
           letterSpacing: -0.35,
         ),
         titleLarge: TextStyle(
-          color: AppColors.textPrimary,
+          color: OmaColors.textPrimary,
           fontFamily: 'CormorantGaramond',
           fontSize: 20,
           height: 1.25,
           fontWeight: FontWeight.w700,
         ),
         titleMedium: TextStyle(
-          color: AppColors.textPrimary,
+          color: OmaColors.textPrimary,
           fontSize: 16,
           height: 1.35,
           fontWeight: FontWeight.w700,
         ),
         bodyLarge: TextStyle(
-          color: AppColors.textSecondary,
+          color: OmaColors.textSecondary,
           fontSize: 16,
           height: 1.5,
         ),
         bodyMedium: TextStyle(
-          color: AppColors.textSecondary,
+          color: OmaColors.textSecondary,
           fontSize: 14,
           height: 1.5,
         ),
         bodySmall: TextStyle(
-          color: AppColors.textHint,
+          color: OmaColors.textHint,
           fontSize: 12,
           height: 1.45,
         ),
         labelLarge: TextStyle(
-          color: AppColors.primaryDark,
+          color: OmaColors.primaryDark,
           fontSize: 14,
           fontWeight: FontWeight.w700,
         ),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.scaffoldBackground,
+        backgroundColor: OmaColors.scaffoldBackground,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
-          color: AppColors.textPrimary,
+          color: OmaColors.textPrimary,
           fontFamily: 'CormorantGaramond',
           fontSize: 20,
           fontWeight: FontWeight.w700,
         ),
-        iconTheme: IconThemeData(color: AppColors.primaryDark),
+        iconTheme: IconThemeData(color: OmaColors.primaryDark),
       ),
       cardTheme: CardThemeData(
-        color: AppColors.cardBackground,
+        color: OmaColors.cardBackground,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -102,7 +102,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: OmaColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -112,8 +112,8 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryDark,
-          side: const BorderSide(color: AppColors.primary, width: 1.2),
+          foregroundColor: OmaColors.primaryDark,
+          side: const BorderSide(color: OmaColors.primary, width: 1.2),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
@@ -121,43 +121,43 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primaryDark,
+          foregroundColor: OmaColors.primaryDark,
           textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: OmaColors.surface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 18,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.outline),
+          borderSide: const BorderSide(color: OmaColors.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.outline),
+          borderSide: const BorderSide(color: OmaColors.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.6),
+          borderSide: const BorderSide(color: OmaColors.primary, width: 1.6),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.error, width: 1.4),
+          borderSide: const BorderSide(color: OmaColors.error, width: 1.4),
         ),
-        hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
+        hintStyle: const TextStyle(color: OmaColors.textHint, fontSize: 14),
         labelStyle: const TextStyle(
-          color: AppColors.textSecondary,
+          color: OmaColors.textSecondary,
           fontSize: 14,
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.background,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.primaryDark,
+        backgroundColor: OmaColors.background,
+        selectedItemColor: OmaColors.primary,
+        unselectedItemColor: OmaColors.primaryDark,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
         selectedLabelStyle: TextStyle(
@@ -170,56 +170,56 @@ class AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.background,
+        backgroundColor: OmaColors.background,
         elevation: 0,
-        indicatorColor: AppColors.primaryLight,
+        indicatorColor: OmaColors.primaryLight,
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => IconThemeData(
             color: states.contains(WidgetState.selected)
-                ? AppColors.primary
-                : AppColors.primaryDark,
+                ? OmaColors.primary
+                : OmaColors.primaryDark,
           ),
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.surface,
-        selectedColor: AppColors.primaryLight,
-        labelStyle: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+        backgroundColor: OmaColors.surface,
+        selectedColor: OmaColors.primaryLight,
+        labelStyle: const TextStyle(color: OmaColors.textPrimary, fontSize: 13),
         shape: const StadiumBorder(),
-        side: const BorderSide(color: AppColors.outline),
+        side: const BorderSide(color: OmaColors.outline),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       ),
       sliderTheme: SliderThemeData(
-        activeTrackColor: AppColors.primary,
-        inactiveTrackColor: AppColors.primary.withValues(alpha: 0.18),
-        thumbColor: AppColors.primary,
-        overlayColor: AppColors.primary.withValues(alpha: 0.1),
+        activeTrackColor: OmaColors.primary,
+        inactiveTrackColor: OmaColors.primary.withValues(alpha: 0.18),
+        thumbColor: OmaColors.primary,
+        overlayColor: OmaColors.primary.withValues(alpha: 0.1),
       ),
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? AppColors.primary
+              ? OmaColors.primary
               : Colors.transparent,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       ),
       dividerTheme: const DividerThemeData(
-        color: AppColors.outline,
+        color: OmaColors.outline,
         thickness: 1,
         space: 1,
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.surface,
+        backgroundColor: OmaColors.surface,
         surfaceTintColor: Colors.transparent,
-        modalBackgroundColor: AppColors.surface,
+        modalBackgroundColor: OmaColors.surface,
         showDragHandle: true,
-        dragHandleColor: AppColors.outline,
+        dragHandleColor: OmaColors.outline,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.surface,
+        backgroundColor: OmaColors.surface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),

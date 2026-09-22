@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/color_constants.dart';
+import '../../../core/widgets/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
 import '../model/article_model.dart';
 
@@ -14,7 +14,7 @@ class ArticleDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     AppStrings.of(context);
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: OmaColors.scaffoldBackground,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -29,7 +29,7 @@ class ArticleDetailView extends StatelessWidget {
                   icon: const Icon(
                     Icons.arrow_back_ios_new_rounded,
                     size: 16,
-                    color: AppColors.textPrimary,
+                    color: OmaColors.textPrimary,
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -127,7 +127,7 @@ class ArticleDetailView extends StatelessWidget {
                     Text(
                       AppStrings.articleNotPublished,
                       style: const TextStyle(
-                        color: AppColors.textSecondary,
+                        color: OmaColors.textSecondary,
                         height: 1.6,
                       ),
                     )
@@ -167,14 +167,14 @@ class ArticleDetailView extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: OmaColors.textPrimary,
                 ),
               ),
               Text(
                 AppStrings.generalInformation,
                 style: const TextStyle(
                   fontSize: 11,
-                  color: AppColors.textSecondary,
+                  color: OmaColors.textSecondary,
                 ),
               ),
             ],
@@ -183,7 +183,7 @@ class ArticleDetailView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: OmaColors.surface,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
@@ -209,7 +209,7 @@ class ArticleDetailView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: OmaColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: article.cardColor.withValues(alpha: 0.15),
@@ -243,7 +243,7 @@ class ArticleDetailView extends StatelessWidget {
                     fontFamily: 'CormorantGaramond',
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: OmaColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -252,7 +252,7 @@ class ArticleDetailView extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     height: 1.4,
-                    color: AppColors.textSecondary,
+                    color: OmaColors.textSecondary,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -274,7 +274,7 @@ class ArticleDetailView extends StatelessWidget {
             fontFamily: 'CormorantGaramond',
             fontSize: 23,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: OmaColors.textPrimary,
           ),
         ),
       );
@@ -301,7 +301,7 @@ class ArticleDetailView extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 15,
                   height: 1.6,
-                  color: AppColors.textSecondary,
+                  color: OmaColors.textSecondary,
                 ),
               ),
             ),
@@ -317,7 +317,7 @@ class ArticleDetailView extends StatelessWidget {
         style: const TextStyle(
           fontSize: 15,
           height: 1.6,
-          color: AppColors.textSecondary,
+          color: OmaColors.textSecondary,
         ),
       ),
     );

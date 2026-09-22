@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/constants/color_constants.dart';
+import '../../../../core/widgets/oma_theme.dart';
 import '../../../../core/widgets/oma_toast.dart';
 import '../../../../data/models/medication_identity_model.dart';
 import '../../../../data/models/medication_reminder_model.dart';
@@ -132,7 +132,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
         key: const ValueKey('dashboard_planned_doses'),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: OmaColors.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: widget.color.withValues(alpha: 0.20)),
         ),
@@ -145,7 +145,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                 fontFamily: 'CormorantGaramond',
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: OmaColors.textPrimary,
               ),
             ),
             const SizedBox(height: 10),
@@ -166,17 +166,17 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
             : AppStrings.doseUpcoming,
     };
     final statusColor = switch (dose.status) {
-      MedicationDoseResponseStatus.taken => AppColors.success,
-      MedicationDoseResponseStatus.skipped => AppColors.error,
+      MedicationDoseResponseStatus.taken => OmaColors.success,
+      MedicationDoseResponseStatus.skipped => OmaColors.error,
       null =>
-        dose.scheduledAt.isBefore(now) ? AppColors.warning : AppColors.info,
+        dose.scheduledAt.isBefore(now) ? OmaColors.warning : OmaColors.info,
     };
 
     return Container(
       margin: const EdgeInsets.only(bottom: 9),
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
-        color: AppColors.scaffoldBackground,
+        color: OmaColors.scaffoldBackground,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
@@ -203,7 +203,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                 size: 17,
                 color: dose.notificationScheduled
                     ? widget.color
-                    : AppColors.textHint,
+                    : OmaColors.textHint,
               ),
               const SizedBox(width: 6),
               Container(
@@ -232,11 +232,11 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                   icon: const Icon(Icons.check_rounded, size: 17),
                   label: Text(AppStrings.doseTaken),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.success,
-                    side: const BorderSide(color: AppColors.success),
+                    foregroundColor: OmaColors.success,
+                    side: const BorderSide(color: OmaColors.success),
                     backgroundColor:
                         dose.status == MedicationDoseResponseStatus.taken
-                        ? AppColors.success.withValues(alpha: 0.12)
+                        ? OmaColors.success.withValues(alpha: 0.12)
                         : null,
                   ),
                 ),
@@ -249,11 +249,11 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                   icon: const Icon(Icons.close_rounded, size: 17),
                   label: Text(AppStrings.doseSkipped),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.error),
+                    foregroundColor: OmaColors.error,
+                    side: const BorderSide(color: OmaColors.error),
                     backgroundColor:
                         dose.status == MedicationDoseResponseStatus.skipped
-                        ? AppColors.error.withValues(alpha: 0.10)
+                        ? OmaColors.error.withValues(alpha: 0.10)
                         : null,
                   ),
                 ),
@@ -317,7 +317,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: OmaColors.surface,
       builder: (_) => Theme(
         data: baseTheme.copyWith(
           colorScheme: baseTheme.colorScheme.copyWith(primary: widget.color),
@@ -431,7 +431,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: OmaColors.textPrimary,
                 ),
               ),
             ),
@@ -454,7 +454,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
           Text(
             AppStrings.noReminderPlans,
             style: const TextStyle(
-              color: AppColors.textSecondary,
+              color: OmaColors.textSecondary,
               fontSize: 13,
             ),
           )
@@ -464,7 +464,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppColors.info.withValues(alpha: 0.12),
+            color: OmaColors.info.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
@@ -473,7 +473,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
               const Icon(
                 Icons.info_outline_rounded,
                 size: 17,
-                color: AppColors.textSecondary,
+                color: OmaColors.textSecondary,
               ),
               const SizedBox(width: 7),
               Expanded(
@@ -482,7 +482,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
                   style: const TextStyle(
                     fontSize: 11.5,
                     height: 1.35,
-                    color: AppColors.textSecondary,
+                    color: OmaColors.textSecondary,
                   ),
                 ),
               ),
@@ -529,7 +529,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
                   '${plan.dosage}',
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: OmaColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 3),
@@ -537,14 +537,14 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
                   schedule,
                   style: const TextStyle(
                     fontSize: 12.5,
-                    color: AppColors.textSecondary,
+                    color: OmaColors.textSecondary,
                   ),
                 ),
                 Text(
                   range,
                   style: const TextStyle(
                     fontSize: 11.5,
-                    color: AppColors.textHint,
+                    color: OmaColors.textHint,
                   ),
                 ),
               ],
@@ -808,7 +808,7 @@ class _MedicationReminderFormSheetState
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: OmaColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -881,7 +881,7 @@ class _MedicationReminderFormSheetState
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: OmaColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -989,16 +989,16 @@ class _MedicationReminderFormSheetState
       key: ValueKey('reminder_time_slot_$index'),
       padding: const EdgeInsets.fromLTRB(12, 5, 4, 5),
       decoration: BoxDecoration(
-        color: AppColors.scaffoldBackground,
+        color: OmaColors.scaffoldBackground,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: OmaColors.outline),
       ),
       child: Row(
         children: [
           const Icon(
             Icons.schedule_rounded,
             size: 19,
-            color: AppColors.textSecondary,
+            color: OmaColors.textSecondary,
           ),
           const SizedBox(width: 9),
           Expanded(
@@ -1009,7 +1009,7 @@ class _MedicationReminderFormSheetState
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: OmaColors.textPrimary,
               ),
             ),
           ),
