@@ -1,0 +1,16 @@
+{
+  "title": "Bildirimler",
+  "subtitle": "Uygulama mesajların ve kayıt etkinliklerin burada.",
+  "appTab": "Uygulama",
+  "logTab": "Kayıtlar",
+  "appEmptyTitle": "Henüz uygulama mesajı yok",
+  "appEmptyDescription": "Yeni mesajlar burada görünecek.",
+  "logEmptyTitle": "Henüz kayıt etkinliği yok",
+  "logEmptyDescription": "Kaydettiğin günlük girişleri burada göreceksin.",
+  "logSaved": "$category kaydedildi",
+  "logDetail": "$date tarihli kaydın: $details",
+  "logNoDetail": "Bu bölüm için kayıt oluşturuldu.",
+  "periodEntry": "ADET KAYDI",
+  "periodFlow": "Akış",
+  "periodSymptoms": "Belirtiler"
+}

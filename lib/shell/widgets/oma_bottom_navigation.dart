@@ -8,14 +8,12 @@ class OmaBottomNavigation extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTap,
-    required this.activeColor,
     required this.onOmaTap,
     required this.items,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
-  final Color activeColor;
   final VoidCallback onOmaTap;
   final List<BottomNavigationBarItem> items;
 
@@ -42,7 +40,7 @@ class OmaBottomNavigation extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 type: BottomNavigationBarType.fixed,
-                selectedItemColor: activeColor,
+                selectedItemColor: OmaColors.primary,
                 unselectedItemColor: OmaColors.muted,
                 iconSize: 20,
                 selectedFontSize: 10.5,
@@ -72,7 +70,7 @@ class OmaBottomNavigation extends StatelessWidget {
                   boxShadow: OmaShadows.soft,
                 ),
                 child: const Center(
-                  child: OmaSunburst(size: 34),
+                  child: OmaSunburst(size: 34, color: OmaColors.primary),
                 ),
               ),
             ),

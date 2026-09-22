@@ -6,7 +6,7 @@ import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/premium_purchase_service.dart';
 import 'package:app_proje_a/views/articles/view/articles_view.dart';
-import 'package:app_proje_a/views/dashboard/viewmodel/dashboard_view_model.dart';
+import 'package:app_proje_a/features/home/viewmodel/home_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -40,7 +40,7 @@ void main() {
         providers: [
           Provider<ApiService>.value(value: api),
           ChangeNotifierProvider<PremiumPurchaseService>.value(value: premium),
-          ChangeNotifierProvider(create: (_) => DashboardViewModel(storage)),
+          ChangeNotifierProvider(create: (_) => HomeViewModel(storage)),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

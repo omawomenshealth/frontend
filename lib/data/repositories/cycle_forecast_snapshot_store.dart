@@ -1,4 +1,4 @@
-import '../../domain/cycle/models/cycle_prediction.dart';
+import '../../features/cycle/models/cycle_prediction.dart';
 import '../services/local_storage_service.dart';
 
 /// Tahmin snapshot'ını şifreli yerel store'da tutar. Snapshot türetilmiş veri

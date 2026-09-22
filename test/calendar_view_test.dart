@@ -7,7 +7,7 @@ import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/views/calendar/view/calendar_view.dart';
 import 'package:app_proje_a/views/calendar/viewmodel/calendar_view_model.dart';
-import 'package:app_proje_a/views/dashboard/viewmodel/dashboard_view_model.dart';
+import 'package:app_proje_a/features/home/viewmodel/home_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,7 +35,7 @@ void main() {
     );
 
     final calendar = CalendarViewModel(storage);
-    final dashboard = DashboardViewModel(storage);
+    final dashboard = HomeViewModel(storage);
     await calendar.loadData();
     await dashboard.loadData();
 
@@ -204,7 +204,7 @@ void main() {
     );
 
     final calendar = CalendarViewModel(storage);
-    final dashboard = DashboardViewModel(storage);
+    final dashboard = HomeViewModel(storage);
     await calendar.loadData();
     await dashboard.loadData();
 
@@ -386,7 +386,7 @@ void main() {
       ),
     );
     final calendar = CalendarViewModel(storage);
-    final dashboard = DashboardViewModel(storage);
+    final dashboard = HomeViewModel(storage);
     await calendar.loadData();
     await dashboard.loadData();
 

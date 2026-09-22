@@ -77,7 +77,7 @@ class _InsightsViewState extends State<InsightsView>
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    final calculator = context.watch<DashboardViewModel>().periodCalculator;
+    final calculator = context.watch<HomeViewModel>().periodCalculator;
     final phase = calculator?.currentPhase ?? CyclePhase.follicular;
     final accent = _phaseColor(phase);
 

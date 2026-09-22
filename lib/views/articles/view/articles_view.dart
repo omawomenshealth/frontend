@@ -8,8 +8,8 @@ import '../../../core/utils/period_calculator.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../data/services/api_service.dart';
 import '../../../data/services/premium_purchase_service.dart';
+import '../../../features/home/viewmodel/home_view_model.dart';
 import '../../../localization/generated/strings.g.dart';
-import '../../dashboard/viewmodel/dashboard_view_model.dart';
 import '../model/article_model.dart';
 import '../widgets/premium_paywall.dart';
 import 'article_detail_view.dart';
@@ -182,7 +182,7 @@ class _ArticlesViewState extends State<ArticlesView> {
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    final calculator = context.watch<DashboardViewModel>().periodCalculator;
+    final calculator = context.watch<HomeViewModel>().periodCalculator;
     final phase = calculator?.currentPhase ?? CyclePhase.follicular;
     final accent = _phaseColor(phase);
     final membershipTier = context.watch<PremiumPurchaseService>().tier;

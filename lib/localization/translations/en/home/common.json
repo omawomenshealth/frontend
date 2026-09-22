@@ -1,0 +1,51 @@
+{
+  "header": {
+    "greeting": {
+      "nameFallback": "You",
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "date": {
+      "calendar": "Calendar"
+    }
+  },
+  "quickLogs": {
+    "title": "Quick Logs",
+    "caption": "Log your activities quickly",
+    "buttons": {
+      "nutrition": "Nutrition",
+      "period": "Period",
+      "symptom": "Symptom",
+      "mood": "Mood",
+      "medication": "Medication",
+      "skincare": "Skincare"
+    }
+  },
+  "insightsPreview": {
+    "eyebrow": "OMA CONNECTS YOUR DATA",
+    "title": "My Daily Insights",
+    "viewAll": "View all ›",
+    "learning": "As you add more records, your personal connections become clearer."
+  },
+  "today": "Today",
+  "hero": {
+    "currentPhase": "CURRENT PHASE",
+    "cycleDayLabel": "CYCLE DAY",
+    "semanticLabel": "{phase}, cycle day {day}. {message} {detail}",
+    "periodDayNumber": "{count}",
+    "periodDayLabel": "days of period",
+    "daysToPeriodLabel": "days to period",
+    "readBodyChanges": "See more about this phase",
+    "forecastConfidenceLow": "low",
+    "forecastConfidenceMedium": "medium",
+    "forecastConfidenceHigh": "high",
+    "periodPredictionSummary": "Period prediction: $range · $confidence confidence",
+    "periodPredictionLowConfidenceSummary": "Period prediction: $range · Add more data for more accurate results",
+    "emptyTitle": "Start tracking your cycle",
+    "emptyMessage": "Log your last period to see your phase and predictions here."
+  },
+  "error": "Something went wrong",
+  "futureLogNotAllowed": "Daily logs cannot be added for future dates."
+  
+}

@@ -1,0 +1,51 @@
+{
+  "positiveTestRecorded": "Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.",
+  "badge": "GEBELİK",
+  "estimatedWeek": "TAHMİNİ GEBELİK HAFTASI",
+  "weekLabel": "haftalık",
+  "weekAndDay": "{week} hafta {day} gün",
+  "estimateCombined": "Son adet ve cinsel ilişki kayıtlarına göre tahmini",
+  "estimateLastPeriod": "Son adet başlangıcına göre tahmini",
+  "estimateSexualActivity": "Cinsel ilişki kaydına göre yaklaşık tahmin",
+  "estimateUnavailable": "Gebelik haftası için son adet tarihi veya cinsel ilişki kaydı gerekiyor.",
+  "infoComingSoon": "Haftalık bilgilendirici içerikler yakında",
+  "estimatedDueDate": "Tahmini doğum tarihi: {date}",
+  "stages": {
+    "stage1": {
+      "title": "1–4. hafta · Başlangıç",
+      "body": "Bu haftalarda döllenme ve rahme yerleşme süreci gerçekleşebilir. Gebelik haftası son adet başlangıcından itibaren hesaplanır."
+    },
+    "stage2": {
+      "title": "5–8. hafta · Erken gelişim",
+      "body": "Embriyonun temel organ ve sistemleri bu haftalarda gelişmeye başlar. Yaşanan belirtiler kişiden kişiye değişebilir."
+    },
+    "stage3": {
+      "title": "9–13. hafta · Fetal döneme geçiş",
+      "body": "Bu dönemde fetüsün organları ve vücut yapıları gelişmeye devam eder."
+    },
+    "stage4": {
+      "title": "14–17. hafta · Büyüme",
+      "body": "Fetüsün büyümesi ve hareket gelişimi bu haftalarda devam eder."
+    },
+    "stage5": {
+      "title": "18–22. hafta · Hareketler",
+      "body": "Fetal hareketler bu haftalarda fark edilebilir; ilk fark edilme zamanı kişiden kişiye değişir."
+    },
+    "stage6": {
+      "title": "23–27. hafta · Gelişim",
+      "body": "Fetüsün hareketleri ve organ gelişimi bu dönemde devam eder."
+    },
+    "stage7": {
+      "title": "28–31. hafta · Olgunlaşma",
+      "body": "Fetüs büyümeye devam eder; akciğer ve sinir sistemi gelişimi sürer."
+    },
+    "stage8": {
+      "title": "32–35. hafta · Doğuma hazırlık",
+      "body": "Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür."
+    },
+    "stage9": {
+      "title": "36–40+ hafta · Son haftalar",
+      "body": "Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin."
+    }
+  }
+}

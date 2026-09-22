@@ -20,20 +20,21 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	Translations({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.en,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <en>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	dynamic operator[](String key) => $meta.getTranslation(key);
+	dynamic operator[](String key) => _meta.getTranslation(key);
 
 	late final Translations _root = this; // ignore: unused_field
 
@@ -42,6 +43,8 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	// Translations
 	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
 	late final Translations$catalogs$en catalogs = Translations$catalogs$en.internal(_root);
+	late final Translations$home$en home = Translations$home$en.internal(_root);
+	late final Translations$notifications$en notifications = Translations$notifications$en.internal(_root);
 	late final Translations$onboarding$en onboarding = Translations$onboarding$en.internal(_root);
 	late final Translations$options$en options = Translations$options$en.internal(_root);
 	late final Translations$pregnancy$en pregnancy = Translations$pregnancy$en.internal(_root);
@@ -70,6 +73,28 @@ class Translations$catalogs$en {
 	late final Translations$catalogs$medicationIngredients$en medicationIngredients = Translations$catalogs$medicationIngredients$en.internal(_root);
 	late final Translations$catalogs$supplements$en supplements = Translations$catalogs$supplements$en.internal(_root);
 	late final Translations$catalogs$skincare$en skincare = Translations$catalogs$skincare$en.internal(_root);
+}
+
+// Path: home
+class Translations$home$en {
+	Translations$home$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$home$common$en common = Translations$home$common$en.internal(_root);
+	late final Translations$home$phase$en phase = Translations$home$phase$en.internal(_root);
+	late final Translations$home$pregnancy$en pregnancy = Translations$home$pregnancy$en.internal(_root);
+}
+
+// Path: notifications
+class Translations$notifications$en {
+	Translations$notifications$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$notifications$common$en common = Translations$notifications$common$en.internal(_root);
 }
 
 // Path: onboarding
@@ -1140,6 +1165,137 @@ class Translations$catalogs$skincare$en {
 	};
 }
 
+// Path: home.common
+class Translations$home$common$en {
+	Translations$home$common$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$home$common$header$en header = Translations$home$common$header$en.internal(_root);
+	late final Translations$home$common$quickLogs$en quickLogs = Translations$home$common$quickLogs$en.internal(_root);
+	late final Translations$home$common$insightsPreview$en insightsPreview = Translations$home$common$insightsPreview$en.internal(_root);
+
+	/// en: 'Today'
+	String get today => 'Today';
+
+	late final Translations$home$common$hero$en hero = Translations$home$common$hero$en.internal(_root);
+
+	/// en: 'Something went wrong'
+	String get error => 'Something went wrong';
+
+	/// en: 'Daily logs cannot be added for future dates.'
+	String get futureLogNotAllowed => 'Daily logs cannot be added for future dates.';
+}
+
+// Path: home.phase
+class Translations$home$phase$en {
+	Translations$home$phase$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$home$phase$menstrual$en menstrual = Translations$home$phase$menstrual$en.internal(_root);
+	late final Translations$home$phase$follicular$en follicular = Translations$home$phase$follicular$en.internal(_root);
+	late final Translations$home$phase$ovulation$en ovulation = Translations$home$phase$ovulation$en.internal(_root);
+	late final Translations$home$phase$luteal$en luteal = Translations$home$phase$luteal$en.internal(_root);
+}
+
+// Path: home.pregnancy
+class Translations$home$pregnancy$en {
+	Translations$home$pregnancy$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Positive test recorded: {date} · This alone does not determine the pregnancy week.'
+	String get positiveTestRecorded => 'Positive test recorded: {date} · This alone does not determine the pregnancy week.';
+
+	/// en: 'PREGNANCY'
+	String get badge => 'PREGNANCY';
+
+	/// en: 'ESTIMATED PREGNANCY WEEK'
+	String get estimatedWeek => 'ESTIMATED PREGNANCY WEEK';
+
+	/// en: 'weeks'
+	String get weekLabel => 'weeks';
+
+	/// en: '{week} weeks {day} days'
+	String get weekAndDay => '{week} weeks {day} days';
+
+	/// en: 'Estimated from your last period and sexual activity logs'
+	String get estimateCombined => 'Estimated from your last period and sexual activity logs';
+
+	/// en: 'Estimated from the start of your last period'
+	String get estimateLastPeriod => 'Estimated from the start of your last period';
+
+	/// en: 'Approximate estimate from a sexual activity log'
+	String get estimateSexualActivity => 'Approximate estimate from a sexual activity log';
+
+	/// en: 'Add your last period date or a sexual activity log to estimate the week.'
+	String get estimateUnavailable => 'Add your last period date or a sexual activity log to estimate the week.';
+
+	/// en: 'Weekly guidance is coming soon'
+	String get infoComingSoon => 'Weekly guidance is coming soon';
+
+	/// en: 'Estimated due date: {date}'
+	String get estimatedDueDate => 'Estimated due date: {date}';
+
+	late final Translations$home$pregnancy$stages$en stages = Translations$home$pregnancy$stages$en.internal(_root);
+}
+
+// Path: notifications.common
+class Translations$notifications$common$en {
+	Translations$notifications$common$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Notifications'
+	String get title => 'Notifications';
+
+	/// en: 'App messages and log activity appear here.'
+	String get subtitle => 'App messages and log activity appear here.';
+
+	/// en: 'App'
+	String get appTab => 'App';
+
+	/// en: 'Logs'
+	String get logTab => 'Logs';
+
+	/// en: 'No app messages yet'
+	String get appEmptyTitle => 'No app messages yet';
+
+	/// en: 'New messages will appear here.'
+	String get appEmptyDescription => 'New messages will appear here.';
+
+	/// en: 'No log activity yet'
+	String get logEmptyTitle => 'No log activity yet';
+
+	/// en: 'Your saved daily entries will appear here.'
+	String get logEmptyDescription => 'Your saved daily entries will appear here.';
+
+	/// en: '$category saved'
+	String logSaved({required Object category}) => '${category} saved';
+
+	/// en: 'Your entry for $date: $details'
+	String logDetail({required Object date, required Object details}) => 'Your entry for ${date}: ${details}';
+
+	/// en: 'An entry was saved for this section.'
+	String get logNoDetail => 'An entry was saved for this section.';
+
+	/// en: 'PERIOD LOG'
+	String get periodEntry => 'PERIOD LOG';
+
+	/// en: 'Flow'
+	String get periodFlow => 'Flow';
+
+	/// en: 'Symptoms'
+	String get periodSymptoms => 'Symptoms';
+}
+
 // Path: onboarding.common
 class Translations$onboarding$common$en {
 	Translations$onboarding$common$en.internal(this._root);
@@ -1516,6 +1672,291 @@ class Translations$auth$auth$actionCard$en {
 	late final Translations$auth$auth$actionCard$offline$en offline = Translations$auth$auth$actionCard$offline$en.internal(_root);
 }
 
+// Path: home.common.header
+class Translations$home$common$header$en {
+	Translations$home$common$header$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$home$common$header$greeting$en greeting = Translations$home$common$header$greeting$en.internal(_root);
+	late final Translations$home$common$header$date$en date = Translations$home$common$header$date$en.internal(_root);
+}
+
+// Path: home.common.quickLogs
+class Translations$home$common$quickLogs$en {
+	Translations$home$common$quickLogs$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Quick Logs'
+	String get title => 'Quick Logs';
+
+	/// en: 'Log your activities quickly'
+	String get caption => 'Log your activities quickly';
+
+	late final Translations$home$common$quickLogs$buttons$en buttons = Translations$home$common$quickLogs$buttons$en.internal(_root);
+}
+
+// Path: home.common.insightsPreview
+class Translations$home$common$insightsPreview$en {
+	Translations$home$common$insightsPreview$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'OMA CONNECTS YOUR DATA'
+	String get eyebrow => 'OMA CONNECTS YOUR DATA';
+
+	/// en: 'My Daily Insights'
+	String get title => 'My Daily Insights';
+
+	/// en: 'View all ›'
+	String get viewAll => 'View all ›';
+
+	/// en: 'As you add more records, your personal connections become clearer.'
+	String get learning => 'As you add more records, your personal connections become clearer.';
+}
+
+// Path: home.common.hero
+class Translations$home$common$hero$en {
+	Translations$home$common$hero$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'CURRENT PHASE'
+	String get currentPhase => 'CURRENT PHASE';
+
+	/// en: 'phase'
+	String get phaseWord => 'phase';
+
+	/// en: 'CYCLE DAY'
+	String get cycleDayLabel => 'CYCLE DAY';
+
+	/// en: '{phase}, cycle day {day}. {message} {detail}'
+	String get semanticLabel => '{phase}, cycle day {day}. {message} {detail}';
+
+	/// en: '{count}'
+	String get periodDayNumber => '{count}';
+
+	/// en: 'days of period'
+	String get periodDayLabel => 'days of period';
+
+	/// en: 'days to period'
+	String get daysToPeriodLabel => 'days to period';
+
+	/// en: 'See more about this phase'
+	String get readBodyChanges => 'See more about this phase';
+
+	/// en: 'low'
+	String get forecastConfidenceLow => 'low';
+
+	/// en: 'medium'
+	String get forecastConfidenceMedium => 'medium';
+
+	/// en: 'high'
+	String get forecastConfidenceHigh => 'high';
+
+	/// en: 'Period prediction: $range · $confidence confidence'
+	String periodPredictionSummary({required Object range, required Object confidence}) => 'Period prediction: ${range} · ${confidence} confidence';
+
+	/// en: 'Period prediction: $range · Add more data for more accurate results'
+	String periodPredictionLowConfidenceSummary({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results';
+
+	/// en: 'Start tracking your cycle'
+	String get emptyTitle => 'Start tracking your cycle';
+
+	/// en: 'Log your last period to see your phase and predictions here.'
+	String get emptyMessage => 'Log your last period to see your phase and predictions here.';
+}
+
+// Path: home.phase.menstrual
+class Translations$home$phase$menstrual$en {
+	Translations$home$phase$menstrual$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Menstrual'
+	String get title => 'Menstrual';
+
+	List<String> get messages => [
+		'Your energy may be a little lower today.',
+		'Warmth may ease cramps in your belly or back.',
+		'It is okay to rest if you do not feel like moving.',
+		'Remember to drink water today; your muscles need it.',
+		'Try including iron-rich foods in your meals.',
+		'Your sleep pattern may shift a little during these days.',
+		'Remember to change your period product regularly.',
+		'Fragrance-free products may feel better if you are sensitive.',
+		'Comfortable, breathable clothes may feel better today.',
+		'Do not feel guilty if you are craving something sweet.',
+		'Write a small note about how you feel this month.',
+		'Do not ignore pain that makes daily life difficult.',
+	];
+	List<String> get details => [
+		'Lighten your plans to match your energy.',
+		'A warm shower or hot water bottle may help.',
+		'If you feel well, a short walk or gentle stretch may help.',
+		'Keeping a bottle nearby can help on busy days.',
+		'Meat, eggs, legumes and leafy greens can be good choices.',
+		'A calmer evening and a regular bedtime may help.',
+		'Follow the product guidance for hygienic changes.',
+		'Scented hygiene products can irritate some people.',
+		'Cotton and slightly looser underwear may feel more comfortable.',
+		'Pair what you want with something filling so you stay satisfied longer.',
+		'Tracking pain, energy and sleep can help you notice your pattern.',
+		'Consider speaking with a health professional about severe or unusual symptoms.',
+	];
+}
+
+// Path: home.phase.follicular
+class Translations$home$phase$follicular$en {
+	Translations$home$phase$follicular$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Follicular'
+	String get title => 'Follicular';
+
+	List<String> get messages => [
+		'You may notice your energy slowly increasing.',
+		'Your mind may feel a little clearer today.',
+		'You may feel more ready to move.',
+		'You may have energy to start something new.',
+		'Socializing may feel easier today.',
+		'Even with more energy, do not neglect sleep.',
+		'Your appetite may be a little lower on some days.',
+		'Try adding more color to your plate.',
+		'High energy does not mean you must fill your whole day.',
+		'You may notice changes in your discharge.',
+		'Try writing down your energy today.',
+		'If you feel well, you can make good use of it.',
+	];
+	List<String> get details => [
+		'You may feel ready to return to something you have delayed.',
+		'Planning or focused tasks may feel easier today.',
+		'Choose a walk, run, Pilates or another movement you enjoy.',
+		'Try a small plan you have had in mind for a while.',
+		'It may be a good day to make plans with someone you want to see.',
+		'Regular sleep gives you a steady foundation, even on good days.',
+		'Try to eat regularly and avoid skipping meals.',
+		'Different vegetables and fruits are an easy way to add variety.',
+		'Choosing a pace that feels good is enough.',
+		'Clearer, more elastic discharge can be normal as ovulation approaches.',
+		'After a few cycles, it may be easier to spot your more active days.',
+		'Start a task, workout or plan you have been wanting to do.',
+	];
+}
+
+// Path: home.phase.ovulation
+class Translations$home$phase$ovulation$en {
+	Translations$home$phase$ovulation$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Ovulation'
+	String get title => 'Ovulation';
+
+	List<String> get messages => [
+		'You may feel more energetic today.',
+		'You may feel a little more social.',
+		'You may feel stronger during exercise.',
+		'Remember water if you have a busy day.',
+		'Choose meals that help keep your energy steady.',
+		'You may notice clearer, more elastic discharge.',
+		'You may feel mild sensitivity in your lower abdomen.',
+		'Ovulation may not happen on the same day every month.',
+		'You may notice an increase in libido.',
+		'Communication may feel easier today.',
+		'You can note small changes in your body.',
+		'It is okay if you do not feel especially energetic.',
+	];
+	List<String> get details => [
+		'Use this energy for an activity you enjoy.',
+		'Meeting friends or going out may feel more enjoyable today.',
+		'If you feel well, continue your usual workout or choose something livelier.',
+		'Regular hydration is a helpful habit on active days.',
+		'A balance of protein, vegetables, whole grains and healthy fats can help.',
+		'This can be a natural change around ovulation.',
+		'It may be brief and mild; keep track of pain that is severe or ongoing.',
+		'Treat the calendar date as an estimate, not a certainty.',
+		'Hormonal changes can bring differences like this during this phase.',
+		'Choose a time when you feel ready for a conversation you have delayed.',
+		'Tracking discharge, energy, libido or mild pain can reveal your pattern.',
+		'People experience ovulation differently, so follow how you feel.',
+	];
+}
+
+// Path: home.phase.luteal
+class Translations$home$phase$luteal$en {
+	Translations$home$phase$luteal$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Luteal'
+	String get title => 'Luteal';
+
+	List<String> get messages => [
+		'You may notice an increase in appetite.',
+		'Try not to delay meals for too long.',
+		'You may crave more carbohydrates.',
+		'Remember to drink water if you feel bloated.',
+		'Very salty foods may increase bloating.',
+		'Coffee may affect you differently today.',
+		'You may notice that your sleep feels more sensitive.',
+		'Intense exercise may feel harder today.',
+		'Focusing may feel a little more difficult on some days.',
+		'You may tire a little more quickly today.',
+		'Your digestion may feel a little slower.',
+		'Try tracking premenstrual symptoms for a few months.',
+	];
+	List<String> get details => [
+		'Protein and fiber at meals may help you feel full longer.',
+		'Going too long without food can increase tiredness and cravings.',
+		'Try filling options such as oats, whole grains or potatoes.',
+		'Regular water intake can also support digestion.',
+		'Try eating a little less salt on days you feel bloated.',
+		'Reduce the amount or try a drink such as matcha if sleep or tension is affected.',
+		'A calmer evening can make it easier to fall asleep.',
+		'Choose an easier option such as walking, yoga or gentle stretching.',
+		'Breaking large tasks into smaller parts can make starting easier.',
+		'Plan short breaks into your day.',
+		'Water and fiber may be especially helpful during these days.',
+		'Noticing repeated changes can make your cycle easier to understand.',
+	];
+}
+
+// Path: home.pregnancy.stages
+class Translations$home$pregnancy$stages$en {
+	Translations$home$pregnancy$stages$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$home$pregnancy$stages$stage1$en stage1 = Translations$home$pregnancy$stages$stage1$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage2$en stage2 = Translations$home$pregnancy$stages$stage2$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage3$en stage3 = Translations$home$pregnancy$stages$stage3$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage4$en stage4 = Translations$home$pregnancy$stages$stage4$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage5$en stage5 = Translations$home$pregnancy$stages$stage5$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage6$en stage6 = Translations$home$pregnancy$stages$stage6$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage7$en stage7 = Translations$home$pregnancy$stages$stage7$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage8$en stage8 = Translations$home$pregnancy$stages$stage8$en.internal(_root);
+	late final Translations$home$pregnancy$stages$stage9$en stage9 = Translations$home$pregnancy$stages$stage9$en.internal(_root);
+}
+
 // Path: onboarding.wellbeing.moodOptions
 class Translations$onboarding$wellbeing$moodOptions$en {
 	Translations$onboarding$wellbeing$moodOptions$en.internal(this._root);
@@ -1736,6 +2177,201 @@ class Translations$auth$auth$actionCard$offline$en {
 
 	/// en: 'Your data is stored only on this phone, and no account is created.'
 	String get description => 'Your data is stored only on this phone, and no account is created.';
+}
+
+// Path: home.common.header.greeting
+class Translations$home$common$header$greeting$en {
+	Translations$home$common$header$greeting$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'You'
+	String get nameFallback => 'You';
+
+	/// en: 'Good morning'
+	String get morning => 'Good morning';
+
+	/// en: 'Good afternoon'
+	String get afternoon => 'Good afternoon';
+
+	/// en: 'Good evening'
+	String get evening => 'Good evening';
+}
+
+// Path: home.common.header.date
+class Translations$home$common$header$date$en {
+	Translations$home$common$header$date$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Calendar'
+	String get calendar => 'Calendar';
+}
+
+// Path: home.common.quickLogs.buttons
+class Translations$home$common$quickLogs$buttons$en {
+	Translations$home$common$quickLogs$buttons$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Nutrition'
+	String get nutrition => 'Nutrition';
+
+	/// en: 'Period'
+	String get period => 'Period';
+
+	/// en: 'Symptom'
+	String get symptom => 'Symptom';
+
+	/// en: 'Mood'
+	String get mood => 'Mood';
+
+	/// en: 'Medication'
+	String get medication => 'Medication';
+
+	/// en: 'Skincare'
+	String get skincare => 'Skincare';
+}
+
+// Path: home.pregnancy.stages.stage1
+class Translations$home$pregnancy$stages$stage1$en {
+	Translations$home$pregnancy$stages$stage1$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 1–4 · Beginning and Implantation'
+	String get title => 'Weeks 1–4 · Beginning and Implantation';
+
+	/// en: 'Everything is just beginning. Your body is preparing for tiny but important changes. 💗'
+	String get body => 'Everything is just beginning. Your body is preparing for tiny but important changes. 💗';
+}
+
+// Path: home.pregnancy.stages.stage2
+class Translations$home$pregnancy$stages$stage2$en {
+	Translations$home$pregnancy$stages$stage2$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 5–8 · Foundations Are Forming'
+	String get title => 'Weeks 5–8 · Foundations Are Forming';
+
+	/// en: 'Small developments are moving quickly. You may also begin to notice more changes in your body.'
+	String get body => 'Small developments are moving quickly. You may also begin to notice more changes in your body.';
+}
+
+// Path: home.pregnancy.stages.stage3
+class Translations$home$pregnancy$stages$stage3$en {
+	Translations$home$pregnancy$stages$stage3$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 9–13 · Moving Into the Fetal Period'
+	String get title => 'Weeks 9–13 · Moving Into the Fetal Period';
+
+	/// en: 'You have moved through most of the earliest weeks. Your baby becomes a little more distinct each day. ✨'
+	String get body => 'You have moved through most of the earliest weeks. Your baby becomes a little more distinct each day. ✨';
+}
+
+// Path: home.pregnancy.stages.stage4
+class Translations$home$pregnancy$stages$stage4$en {
+	Translations$home$pregnancy$stages$stage4$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 14–17 · Rapid Growth'
+	String get title => 'Weeks 14–17 · Rapid Growth';
+
+	/// en: 'As your baby grows quickly, you are continuing to settle into this new stage of pregnancy.'
+	String get body => 'As your baby grows quickly, you are continuing to settle into this new stage of pregnancy.';
+}
+
+// Path: home.pregnancy.stages.stage5
+class Translations$home$pregnancy$stages$stage5$en {
+	Translations$home$pregnancy$stages$stage5$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 18–22 · First Movements'
+	String get title => 'Weeks 18–22 · First Movements';
+
+	/// en: 'These are special weeks when you may begin to notice those tiny movements. 🫶'
+	String get body => 'These are special weeks when you may begin to notice those tiny movements. 🫶';
+}
+
+// Path: home.pregnancy.stages.stage6
+class Translations$home$pregnancy$stages$stage6$en {
+	Translations$home$pregnancy$stages$stage6$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 23–27 · Growing Stronger'
+	String get title => 'Weeks 23–27 · Growing Stronger';
+
+	/// en: 'Your baby’s movements may now feel more distinct. There is a small but very active world inside.'
+	String get body => 'Your baby’s movements may now feel more distinct. There is a small but very active world inside.';
+}
+
+// Path: home.pregnancy.stages.stage7
+class Translations$home$pregnancy$stages$stage7$en {
+	Translations$home$pregnancy$stages$stage7$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 28–31 · Maturing'
+	String get title => 'Weeks 28–31 · Maturing';
+
+	/// en: 'Your baby continues to grow and gain strength. You are moving gently toward meeting each other. 🤍'
+	String get body => 'Your baby continues to grow and gain strength. You are moving gently toward meeting each other. 🤍';
+}
+
+// Path: home.pregnancy.stages.stage8
+class Translations$home$pregnancy$stages$stage8$en {
+	Translations$home$pregnancy$stages$stage8$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 32–35 · Preparing for Birth'
+	String get title => 'Weeks 32–35 · Preparing for Birth';
+
+	/// en: 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.'
+	String get body => 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.';
+}
+
+// Path: home.pregnancy.stages.stage9
+class Translations$home$pregnancy$stages$stage9$en {
+	Translations$home$pregnancy$stages$stage9$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Weeks 36–40+ · Final Weeks'
+	String get title => 'Weeks 36–40+ · Final Weeks';
+
+	/// en: 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷'
+	String get body => 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -2145,6 +2781,186 @@ extension on Translations {
 			'catalogs.skincare.items.peptides' => 'Peptides',
 			'catalogs.skincare.items.resveratrol' => 'Resveratrol',
 			'catalogs.skincare.items.retinol_retinal' => 'Retinol / Retinal',
+			'home.common.header.greeting.nameFallback' => 'You',
+			'home.common.header.greeting.morning' => 'Good morning',
+			'home.common.header.greeting.afternoon' => 'Good afternoon',
+			'home.common.header.greeting.evening' => 'Good evening',
+			'home.common.header.date.calendar' => 'Calendar',
+			'home.common.quickLogs.title' => 'Quick Logs',
+			'home.common.quickLogs.caption' => 'Log your activities quickly',
+			'home.common.quickLogs.buttons.nutrition' => 'Nutrition',
+			'home.common.quickLogs.buttons.period' => 'Period',
+			'home.common.quickLogs.buttons.symptom' => 'Symptom',
+			'home.common.quickLogs.buttons.mood' => 'Mood',
+			'home.common.quickLogs.buttons.medication' => 'Medication',
+			'home.common.quickLogs.buttons.skincare' => 'Skincare',
+			'home.common.insightsPreview.eyebrow' => 'OMA CONNECTS YOUR DATA',
+			'home.common.insightsPreview.title' => 'My Daily Insights',
+			'home.common.insightsPreview.viewAll' => 'View all ›',
+			'home.common.insightsPreview.learning' => 'As you add more records, your personal connections become clearer.',
+			'home.common.today' => 'Today',
+			'home.common.hero.currentPhase' => 'CURRENT PHASE',
+			'home.common.hero.phaseWord' => 'phase',
+			'home.common.hero.cycleDayLabel' => 'CYCLE DAY',
+			'home.common.hero.semanticLabel' => '{phase}, cycle day {day}. {message} {detail}',
+			'home.common.hero.periodDayNumber' => '{count}',
+			'home.common.hero.periodDayLabel' => 'days of period',
+			'home.common.hero.daysToPeriodLabel' => 'days to period',
+			'home.common.hero.readBodyChanges' => 'See more about this phase',
+			'home.common.hero.forecastConfidenceLow' => 'low',
+			'home.common.hero.forecastConfidenceMedium' => 'medium',
+			'home.common.hero.forecastConfidenceHigh' => 'high',
+			'home.common.hero.periodPredictionSummary' => ({required Object range, required Object confidence}) => 'Period prediction: ${range} · ${confidence} confidence',
+			'home.common.hero.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Period prediction: ${range} · Add more data for more accurate results',
+			'home.common.hero.emptyTitle' => 'Start tracking your cycle',
+			'home.common.hero.emptyMessage' => 'Log your last period to see your phase and predictions here.',
+			'home.common.error' => 'Something went wrong',
+			'home.common.futureLogNotAllowed' => 'Daily logs cannot be added for future dates.',
+			'home.phase.menstrual.title' => 'Menstrual',
+			'home.phase.menstrual.messages.0' => 'Your energy may be a little lower today.',
+			'home.phase.menstrual.messages.1' => 'Warmth may ease cramps in your belly or back.',
+			'home.phase.menstrual.messages.2' => 'It is okay to rest if you do not feel like moving.',
+			'home.phase.menstrual.messages.3' => 'Remember to drink water today; your muscles need it.',
+			'home.phase.menstrual.messages.4' => 'Try including iron-rich foods in your meals.',
+			'home.phase.menstrual.messages.5' => 'Your sleep pattern may shift a little during these days.',
+			'home.phase.menstrual.messages.6' => 'Remember to change your period product regularly.',
+			'home.phase.menstrual.messages.7' => 'Fragrance-free products may feel better if you are sensitive.',
+			'home.phase.menstrual.messages.8' => 'Comfortable, breathable clothes may feel better today.',
+			'home.phase.menstrual.messages.9' => 'Do not feel guilty if you are craving something sweet.',
+			'home.phase.menstrual.messages.10' => 'Write a small note about how you feel this month.',
+			'home.phase.menstrual.messages.11' => 'Do not ignore pain that makes daily life difficult.',
+			'home.phase.menstrual.details.0' => 'Lighten your plans to match your energy.',
+			'home.phase.menstrual.details.1' => 'A warm shower or hot water bottle may help.',
+			'home.phase.menstrual.details.2' => 'If you feel well, a short walk or gentle stretch may help.',
+			'home.phase.menstrual.details.3' => 'Keeping a bottle nearby can help on busy days.',
+			'home.phase.menstrual.details.4' => 'Meat, eggs, legumes and leafy greens can be good choices.',
+			'home.phase.menstrual.details.5' => 'A calmer evening and a regular bedtime may help.',
+			'home.phase.menstrual.details.6' => 'Follow the product guidance for hygienic changes.',
+			'home.phase.menstrual.details.7' => 'Scented hygiene products can irritate some people.',
+			'home.phase.menstrual.details.8' => 'Cotton and slightly looser underwear may feel more comfortable.',
+			'home.phase.menstrual.details.9' => 'Pair what you want with something filling so you stay satisfied longer.',
+			'home.phase.menstrual.details.10' => 'Tracking pain, energy and sleep can help you notice your pattern.',
+			'home.phase.menstrual.details.11' => 'Consider speaking with a health professional about severe or unusual symptoms.',
+			'home.phase.follicular.title' => 'Follicular',
+			'home.phase.follicular.messages.0' => 'You may notice your energy slowly increasing.',
+			'home.phase.follicular.messages.1' => 'Your mind may feel a little clearer today.',
+			'home.phase.follicular.messages.2' => 'You may feel more ready to move.',
+			'home.phase.follicular.messages.3' => 'You may have energy to start something new.',
+			'home.phase.follicular.messages.4' => 'Socializing may feel easier today.',
+			'home.phase.follicular.messages.5' => 'Even with more energy, do not neglect sleep.',
+			'home.phase.follicular.messages.6' => 'Your appetite may be a little lower on some days.',
+			'home.phase.follicular.messages.7' => 'Try adding more color to your plate.',
+			'home.phase.follicular.messages.8' => 'High energy does not mean you must fill your whole day.',
+			'home.phase.follicular.messages.9' => 'You may notice changes in your discharge.',
+			'home.phase.follicular.messages.10' => 'Try writing down your energy today.',
+			'home.phase.follicular.messages.11' => 'If you feel well, you can make good use of it.',
+			'home.phase.follicular.details.0' => 'You may feel ready to return to something you have delayed.',
+			'home.phase.follicular.details.1' => 'Planning or focused tasks may feel easier today.',
+			'home.phase.follicular.details.2' => 'Choose a walk, run, Pilates or another movement you enjoy.',
+			'home.phase.follicular.details.3' => 'Try a small plan you have had in mind for a while.',
+			'home.phase.follicular.details.4' => 'It may be a good day to make plans with someone you want to see.',
+			'home.phase.follicular.details.5' => 'Regular sleep gives you a steady foundation, even on good days.',
+			'home.phase.follicular.details.6' => 'Try to eat regularly and avoid skipping meals.',
+			'home.phase.follicular.details.7' => 'Different vegetables and fruits are an easy way to add variety.',
+			'home.phase.follicular.details.8' => 'Choosing a pace that feels good is enough.',
+			'home.phase.follicular.details.9' => 'Clearer, more elastic discharge can be normal as ovulation approaches.',
+			'home.phase.follicular.details.10' => 'After a few cycles, it may be easier to spot your more active days.',
+			'home.phase.follicular.details.11' => 'Start a task, workout or plan you have been wanting to do.',
+			'home.phase.ovulation.title' => 'Ovulation',
+			'home.phase.ovulation.messages.0' => 'You may feel more energetic today.',
+			'home.phase.ovulation.messages.1' => 'You may feel a little more social.',
+			'home.phase.ovulation.messages.2' => 'You may feel stronger during exercise.',
+			'home.phase.ovulation.messages.3' => 'Remember water if you have a busy day.',
+			'home.phase.ovulation.messages.4' => 'Choose meals that help keep your energy steady.',
+			'home.phase.ovulation.messages.5' => 'You may notice clearer, more elastic discharge.',
+			'home.phase.ovulation.messages.6' => 'You may feel mild sensitivity in your lower abdomen.',
+			'home.phase.ovulation.messages.7' => 'Ovulation may not happen on the same day every month.',
+			'home.phase.ovulation.messages.8' => 'You may notice an increase in libido.',
+			'home.phase.ovulation.messages.9' => 'Communication may feel easier today.',
+			'home.phase.ovulation.messages.10' => 'You can note small changes in your body.',
+			'home.phase.ovulation.messages.11' => 'It is okay if you do not feel especially energetic.',
+			'home.phase.ovulation.details.0' => 'Use this energy for an activity you enjoy.',
+			'home.phase.ovulation.details.1' => 'Meeting friends or going out may feel more enjoyable today.',
+			'home.phase.ovulation.details.2' => 'If you feel well, continue your usual workout or choose something livelier.',
+			'home.phase.ovulation.details.3' => 'Regular hydration is a helpful habit on active days.',
+			'home.phase.ovulation.details.4' => 'A balance of protein, vegetables, whole grains and healthy fats can help.',
+			'home.phase.ovulation.details.5' => 'This can be a natural change around ovulation.',
+			'home.phase.ovulation.details.6' => 'It may be brief and mild; keep track of pain that is severe or ongoing.',
+			'home.phase.ovulation.details.7' => 'Treat the calendar date as an estimate, not a certainty.',
+			'home.phase.ovulation.details.8' => 'Hormonal changes can bring differences like this during this phase.',
+			'home.phase.ovulation.details.9' => 'Choose a time when you feel ready for a conversation you have delayed.',
+			'home.phase.ovulation.details.10' => 'Tracking discharge, energy, libido or mild pain can reveal your pattern.',
+			'home.phase.ovulation.details.11' => 'People experience ovulation differently, so follow how you feel.',
+			'home.phase.luteal.title' => 'Luteal',
+			'home.phase.luteal.messages.0' => 'You may notice an increase in appetite.',
+			'home.phase.luteal.messages.1' => 'Try not to delay meals for too long.',
+			_ => null,
+		} ?? switch (path) {
+			'home.phase.luteal.messages.2' => 'You may crave more carbohydrates.',
+			'home.phase.luteal.messages.3' => 'Remember to drink water if you feel bloated.',
+			'home.phase.luteal.messages.4' => 'Very salty foods may increase bloating.',
+			'home.phase.luteal.messages.5' => 'Coffee may affect you differently today.',
+			'home.phase.luteal.messages.6' => 'You may notice that your sleep feels more sensitive.',
+			'home.phase.luteal.messages.7' => 'Intense exercise may feel harder today.',
+			'home.phase.luteal.messages.8' => 'Focusing may feel a little more difficult on some days.',
+			'home.phase.luteal.messages.9' => 'You may tire a little more quickly today.',
+			'home.phase.luteal.messages.10' => 'Your digestion may feel a little slower.',
+			'home.phase.luteal.messages.11' => 'Try tracking premenstrual symptoms for a few months.',
+			'home.phase.luteal.details.0' => 'Protein and fiber at meals may help you feel full longer.',
+			'home.phase.luteal.details.1' => 'Going too long without food can increase tiredness and cravings.',
+			'home.phase.luteal.details.2' => 'Try filling options such as oats, whole grains or potatoes.',
+			'home.phase.luteal.details.3' => 'Regular water intake can also support digestion.',
+			'home.phase.luteal.details.4' => 'Try eating a little less salt on days you feel bloated.',
+			'home.phase.luteal.details.5' => 'Reduce the amount or try a drink such as matcha if sleep or tension is affected.',
+			'home.phase.luteal.details.6' => 'A calmer evening can make it easier to fall asleep.',
+			'home.phase.luteal.details.7' => 'Choose an easier option such as walking, yoga or gentle stretching.',
+			'home.phase.luteal.details.8' => 'Breaking large tasks into smaller parts can make starting easier.',
+			'home.phase.luteal.details.9' => 'Plan short breaks into your day.',
+			'home.phase.luteal.details.10' => 'Water and fiber may be especially helpful during these days.',
+			'home.phase.luteal.details.11' => 'Noticing repeated changes can make your cycle easier to understand.',
+			'home.pregnancy.positiveTestRecorded' => 'Positive test recorded: {date} · This alone does not determine the pregnancy week.',
+			'home.pregnancy.badge' => 'PREGNANCY',
+			'home.pregnancy.estimatedWeek' => 'ESTIMATED PREGNANCY WEEK',
+			'home.pregnancy.weekLabel' => 'weeks',
+			'home.pregnancy.weekAndDay' => '{week} weeks {day} days',
+			'home.pregnancy.estimateCombined' => 'Estimated from your last period and sexual activity logs',
+			'home.pregnancy.estimateLastPeriod' => 'Estimated from the start of your last period',
+			'home.pregnancy.estimateSexualActivity' => 'Approximate estimate from a sexual activity log',
+			'home.pregnancy.estimateUnavailable' => 'Add your last period date or a sexual activity log to estimate the week.',
+			'home.pregnancy.infoComingSoon' => 'Weekly guidance is coming soon',
+			'home.pregnancy.estimatedDueDate' => 'Estimated due date: {date}',
+			'home.pregnancy.stages.stage1.title' => 'Weeks 1–4 · Beginning and Implantation',
+			'home.pregnancy.stages.stage1.body' => 'Everything is just beginning. Your body is preparing for tiny but important changes. 💗',
+			'home.pregnancy.stages.stage2.title' => 'Weeks 5–8 · Foundations Are Forming',
+			'home.pregnancy.stages.stage2.body' => 'Small developments are moving quickly. You may also begin to notice more changes in your body.',
+			'home.pregnancy.stages.stage3.title' => 'Weeks 9–13 · Moving Into the Fetal Period',
+			'home.pregnancy.stages.stage3.body' => 'You have moved through most of the earliest weeks. Your baby becomes a little more distinct each day. ✨',
+			'home.pregnancy.stages.stage4.title' => 'Weeks 14–17 · Rapid Growth',
+			'home.pregnancy.stages.stage4.body' => 'As your baby grows quickly, you are continuing to settle into this new stage of pregnancy.',
+			'home.pregnancy.stages.stage5.title' => 'Weeks 18–22 · First Movements',
+			'home.pregnancy.stages.stage5.body' => 'These are special weeks when you may begin to notice those tiny movements. 🫶',
+			'home.pregnancy.stages.stage6.title' => 'Weeks 23–27 · Growing Stronger',
+			'home.pregnancy.stages.stage6.body' => 'Your baby’s movements may now feel more distinct. There is a small but very active world inside.',
+			'home.pregnancy.stages.stage7.title' => 'Weeks 28–31 · Maturing',
+			'home.pregnancy.stages.stage7.body' => 'Your baby continues to grow and gain strength. You are moving gently toward meeting each other. 🤍',
+			'home.pregnancy.stages.stage8.title' => 'Weeks 32–35 · Preparing for Birth',
+			'home.pregnancy.stages.stage8.body' => 'You are getting closer. As your baby prepares for life after birth, your body is preparing too.',
+			'home.pregnancy.stages.stage9.title' => 'Weeks 36–40+ · Final Weeks',
+			'home.pregnancy.stages.stage9.body' => 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷',
+			'notifications.common.title' => 'Notifications',
+			'notifications.common.subtitle' => 'App messages and log activity appear here.',
+			'notifications.common.appTab' => 'App',
+			'notifications.common.logTab' => 'Logs',
+			'notifications.common.appEmptyTitle' => 'No app messages yet',
+			'notifications.common.appEmptyDescription' => 'New messages will appear here.',
+			'notifications.common.logEmptyTitle' => 'No log activity yet',
+			'notifications.common.logEmptyDescription' => 'Your saved daily entries will appear here.',
+			'notifications.common.logSaved' => ({required Object category}) => '${category} saved',
+			'notifications.common.logDetail' => ({required Object date, required Object details}) => 'Your entry for ${date}: ${details}',
+			'notifications.common.logNoDetail' => 'An entry was saved for this section.',
+			'notifications.common.periodEntry' => 'PERIOD LOG',
+			'notifications.common.periodFlow' => 'Flow',
+			'notifications.common.periodSymptoms' => 'Symptoms',
 			'onboarding.common.skipForNow' => 'Skip these questions for now',
 			'onboarding.common.next' => 'Continue',
 			'onboarding.common.finish' => 'Finish',
@@ -2258,8 +3074,6 @@ extension on Translations {
 			'options.moodCheckInOptions.low' => 'Low',
 			'options.moodCheckInOptions.sensitive' => 'Sensitive',
 			'options.moodCheckInOptions.neutral' => 'Neutral',
-			_ => null,
-		} ?? switch (path) {
 			'options.moodCheckInOptions.good' => 'Good',
 			'options.moodCheckInOptions.great' => 'Great',
 			'options.moodCompanionOptions.by_myself' => 'By myself',

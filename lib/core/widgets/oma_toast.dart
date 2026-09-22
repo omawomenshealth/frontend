@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import './oma_theme.dart';
+import '../../features/notifications/model/notification_entry.dart';
+import '../../features/notifications/viewmodel/notification_inbox.dart';
 
 /// "Kaydedildi" bildirimi — web'deki sonner toast'ın Flutter karşılığı.
 ///
@@ -16,7 +19,18 @@ class OmaToast {
     String? description,
     IconData icon = Icons.check_rounded,
     Duration duration = const Duration(seconds: 3),
+    bool addToInbox = true,
   }) {
+    if (addToInbox) {
+      // Toasts can also be used in isolated widget previews without providers.
+      try {
+        context.read<NotificationInbox>().add(
+          type: NotificationEntryType.app,
+          title: title,
+          description: description,
+        );
+      } on ProviderNotFoundException catch (_) {}
+    }
     final overlay = Overlay.of(context, rootOverlay: true);
     late OverlayEntry entry;
 

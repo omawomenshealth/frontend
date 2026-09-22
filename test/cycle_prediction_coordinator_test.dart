@@ -5,9 +5,9 @@ import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
-import 'package:app_proje_a/domain/cycle/models/cycle_prediction.dart';
+import 'package:app_proje_a/features/cycle/models/cycle_prediction.dart';
 import 'package:app_proje_a/views/calendar/viewmodel/calendar_view_model.dart';
-import 'package:app_proje_a/views/dashboard/viewmodel/dashboard_view_model.dart';
+import 'package:app_proje_a/features/home/viewmodel/home_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,7 +58,7 @@ void main() {
   test('Dashboard ve Calendar aynı coordinator snapshotını tüketir', () async {
     await _seedRegularHistory(storage);
     final coordinator = CyclePredictionCoordinator(storage);
-    final dashboard = DashboardViewModel(storage, null, coordinator);
+    final dashboard = HomeViewModel(storage, null, coordinator);
     final calendar = CalendarViewModel(storage, coordinator);
 
     await dashboard.loadData();

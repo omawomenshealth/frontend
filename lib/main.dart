@@ -15,12 +15,13 @@ import 'data/services/local_storage_service.dart';
 import 'data/services/notification_service.dart';
 import 'data/services/premium_purchase_service.dart';
 import 'data/services/sync_service.dart';
+import 'features/home/viewmodel/home_view_model.dart';
+import 'features/notifications/viewmodel/notification_inbox.dart';
 import 'localization/generated/strings.g.dart';
 import 'shell/home_shell.dart';
 import 'views/auth/view/auth_view.dart';
 import 'views/auth/viewmodel/auth_view_model.dart';
 import 'views/calendar/viewmodel/calendar_view_model.dart';
-import 'views/dashboard/viewmodel/dashboard_view_model.dart';
 import 'views/insights/viewmodel/insights_view_model.dart';
 import 'views/onboarding/view/onboarding_view.dart';
 import 'views/onboarding/viewmodel/onboarding_view_model.dart';
@@ -161,6 +162,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return MultiProvider(
       providers: [
         Provider<LocalStorageService>.value(value: widget.storage),
+        ChangeNotifierProvider(
+          create: (_) => NotificationInbox(widget.storage),
+        ),
         Provider<NotificationService>.value(value: reminders),
         Provider<ApiService>.value(value: apiService),
         Provider<SyncService>.value(value: syncService),
@@ -178,7 +182,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) => OnboardingViewModel(widget.storage, syncService),
         ),
         ChangeNotifierProvider(
-          create: (_) => DashboardViewModel(
+          create: (_) => HomeViewModel(
             widget.storage,
             reminders,
             _cyclePredictions,

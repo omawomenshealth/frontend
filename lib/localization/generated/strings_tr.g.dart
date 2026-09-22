@@ -16,22 +16,22 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsTr({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.tr,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ),
 		  super(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
-		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <tr>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
+	@override dynamic operator[](String key) => _meta.getTranslation(key) ?? super[key];
 
 	late final TranslationsTr _root = this; // ignore: unused_field
 
@@ -41,6 +41,8 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	// Translations
 	@override late final _Translations$auth$tr auth = _Translations$auth$tr._(_root);
 	@override late final _Translations$catalogs$tr catalogs = _Translations$catalogs$tr._(_root);
+	@override late final _Translations$home$tr home = _Translations$home$tr._(_root);
+	@override late final _Translations$notifications$tr notifications = _Translations$notifications$tr._(_root);
 	@override late final _Translations$onboarding$tr onboarding = _Translations$onboarding$tr._(_root);
 	@override late final _Translations$options$tr options = _Translations$options$tr._(_root);
 	@override late final _Translations$pregnancy$tr pregnancy = _Translations$pregnancy$tr._(_root);
@@ -69,6 +71,28 @@ class _Translations$catalogs$tr extends Translations$catalogs$en {
 	@override late final _Translations$catalogs$medicationIngredients$tr medicationIngredients = _Translations$catalogs$medicationIngredients$tr._(_root);
 	@override late final _Translations$catalogs$supplements$tr supplements = _Translations$catalogs$supplements$tr._(_root);
 	@override late final _Translations$catalogs$skincare$tr skincare = _Translations$catalogs$skincare$tr._(_root);
+}
+
+// Path: home
+class _Translations$home$tr extends Translations$home$en {
+	_Translations$home$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$home$common$tr common = _Translations$home$common$tr._(_root);
+	@override late final _Translations$home$phase$tr phase = _Translations$home$phase$tr._(_root);
+	@override late final _Translations$home$pregnancy$tr pregnancy = _Translations$home$pregnancy$tr._(_root);
+}
+
+// Path: notifications
+class _Translations$notifications$tr extends Translations$notifications$en {
+	_Translations$notifications$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$notifications$common$tr common = _Translations$notifications$common$tr._(_root);
 }
 
 // Path: onboarding
@@ -370,12 +394,12 @@ class _Translations$options$tr extends Translations$options$en {
 		'pelvic_lower_abdominal_pain': 'Pelvik / alt karın ağrısı',
 	};
 	@override Map<String, String> get dosageOptions => {
-		'1_count': '1 Adet',
-		'2_count': '2 Adet',
-		'3_count': '3 Adet',
-		'4_count': '4 Adet',
-		'5_count': '5 Adet',
-		'6_count': '6 Adet',
+		'1_count': '1 adet',
+		'2_count': '2 adet',
+		'3_count': '3 adet',
+		'4_count': '4 adet',
+		'5_count': '5 adet',
+		'6_count': '6 adet',
 	};
 	@override Map<String, String> get shortWeekdays => {
 		'mon': 'Pzt',
@@ -399,7 +423,7 @@ class _Translations$options$tr extends Translations$options$en {
 		'nutrition': 'Beslenme',
 		'exercise': 'Egzersiz',
 		'womens_health': 'Kadın Sağlığı',
-		'mood': 'Ruh Hali',
+		'mood': 'Ruh hâli',
 		'sleep': 'Uyku',
 		'general_health': 'Genel Sağlık',
 	};
@@ -452,42 +476,42 @@ class _Translations$premium$tr extends Translations$premium$en {
 	// Translations
 	@override String get pageTitle => 'Premium';
 	@override String get close => 'Premium ekranını kapat';
-	@override String get eyebrow => 'Döngün, daha fazla ayrıntıyla';
-	@override String get heroTitle => 'Örüntülerini daha net gör';
-	@override String get heroDescription => 'OMA Premium; kişisel içgörülerini, uzman içeriklerini ve sağlık özetini sakin ve sana özel tek bir alanda buluşturur.';
-	@override String get activeEyebrow => 'Üyeliğin aktif';
-	@override String get activeTitle => 'Premium senin için hazır';
-	@override String activePlanTitle({required Object plan}) => '${plan} senin için hazır';
+	@override String get eyebrow => 'Döngü kayıtlarında daha fazla ayrıntı';
+	@override String get heroTitle => 'Daha ayrıntılı kişisel örüntüler';
+	@override String get heroDescription => 'OMA Premium; kişisel içgörüleri, uzman içeriklerini ve sağlık özetini tek yerde sunar.';
+	@override String get activeEyebrow => 'Üyeliğin etkin';
+	@override String get activeTitle => 'Premium özellikleri açık';
+	@override String activePlanTitle({required Object plan}) => '${plan} özellikleri açık';
 	@override String get activeDescription => 'Paketindeki ücretli özellikler bu hesapta açık.';
 	@override String get benefitsTitle => 'Seçtiğin pakette neler var';
-	@override String get benefitsDescription => 'Her seviyeyi karşılaştır ve sana iyi gelen desteği seç.';
-	@override String get benefitTrackingTitle => 'Döngü ve iyi yaşam takibi';
-	@override String get benefitTrackingDescription => 'Takvimini, belirtilerini ve günlük iyi yaşam notlarını bir arada tut.';
+	@override String get benefitsDescription => 'Paketleri karşılaştırarak ihtiyacına uygun özellikleri seçebilirsin.';
+	@override String get benefitTrackingTitle => 'Döngü ve günlük kayıt takibi';
+	@override String get benefitTrackingDescription => 'Takvim, belirti ve günlük sağlık kayıtlarını tek yerde toplar.';
 	@override String get benefitInsightsTitle => 'Daha derin kişisel içgörüler';
-	@override String get benefitInsightsDescription => 'Döngün, ruh halin ve günlük kayıtların arasındaki anlamlı bağlantıları gör.';
+	@override String get benefitInsightsDescription => 'Döngü, ruh hâli ve günlük kayıtlar arasındaki bağlantıları gösterir.';
 	@override String get benefitArticlesTitle => 'Tüm uzman içerikleri';
-	@override String get benefitArticlesDescription => 'Her fazı desteklemek için hazırlanan tüm OMA yazılarını oku.';
+	@override String get benefitArticlesDescription => 'Döngü fazları hakkında hazırlanan tüm OMA yazılarına erişim sağlar.';
 	@override String get benefitReportTitle => 'Paylaşılabilir doktor raporu';
-	@override String get benefitReportDescription => 'Döngü ve sağlık kayıtlarını anlaşılır tek bir özette bir araya getir.';
+	@override String get benefitReportDescription => 'Döngü ve sağlık kayıtlarını anlaşılır bir özette sunar.';
 	@override String get benefitDreamsTitle => 'Rüya yorumları';
-	@override String get benefitDreamsDescription => 'Kaydettiğin rüyaların hislerini ve öne çıkan temalarını keşfet.';
-	@override String get plansTitle => 'Deneyimini seç';
+	@override String get benefitDreamsDescription => 'Kaydettiğin rüyalardaki öne çıkan temalara yönelik yorumlar sunar.';
+	@override String get plansTitle => 'Paketleri karşılaştır';
 	@override String get freePlanName => 'OMA Ücretsiz';
 	@override String get freePlanBadge => 'Başlangıç';
 	@override String get freePlanPrice => 'Ücretsiz';
-	@override String get freePlanDescription => 'Günlük döngü ve iyi yaşam takibi';
+	@override String get freePlanDescription => 'Günlük döngü ve sağlık kaydı takibi';
 	@override String get plusPlanName => 'OMA Plus';
 	@override String get plusPlanBadge => 'En popüler';
 	@override String get plusPlanDescription => 'Kişisel içgörüler ve tüm uzman içerikleri';
 	@override String get premiumPlanName => 'OMA Premium';
 	@override String get premiumPlanBadge => 'Tam erişim';
 	@override String get premiumPlanDescription => 'Plus\'taki her şeye ek doktor raporu ve rüya yorumları';
-	@override String get activePlanBadge => 'Aktif plan';
+	@override String get activePlanBadge => 'Etkin plan';
 	@override String get selectedPlanTitle => 'Bu pakette bulunanlar';
 	@override String get monthlyBilling => 'Google Play üzerinden aylık üyelik';
 	@override String get securePurchase => 'Google Play ile güvenli satın alma';
 	@override String get renewalNote => 'Otomatik yenilenir. Google Play\'den istediğin zaman iptal edebilirsin.';
-	@override String get signInNote => 'Premium erişiminin hesabına bağlı kalması için önce giriş yapmalısın.';
+	@override String get signInNote => 'Giriş yaptığında Premium erişimin hesabına bağlanır.';
 	@override String get statusTitle => 'Üyelik bilgisi';
 	@override String get back => 'Tamam';
 	@override String get signIn => 'Giriş yap ve devam et';
@@ -497,7 +521,7 @@ class _Translations$premium$tr extends Translations$premium$en {
 	@override String changePlan({required Object price}) => 'Paketi değiştir · ${price}';
 	@override String get currentPlan => 'Mevcut paketin';
 	@override String get manageSubscription => 'Google Play\'de yönet';
-	@override String get freeManagementNote => 'Ücretsiz pakete dönmek için ücretli üyeliğini Google Play\'den iptal et. Erişimin mevcut fatura dönemi sonuna kadar devam eder.';
+	@override String get freeManagementNote => 'Ücretsiz pakete dönmek için ücretli üyeliğini Google Play\'den iptal etmen gerekir. Erişimin mevcut fatura dönemi sonuna kadar devam eder.';
 	@override String get restore => 'Satın almayı geri yükle';
 	@override String get googlePlayPrice => 'Google Play fiyatı';
 	@override String purchaseUpdateFailed({required Object error}) => 'Satın alma güncellemesi okunamadı: ${error}';
@@ -506,8 +530,8 @@ class _Translations$premium$tr extends Translations$premium$en {
 	@override String get productNotFound => 'Premium üyeliği Google Play\'de bulunamadı.';
 	@override String get productsNotFound => 'Ücretli paketlerden biri veya birkaçı Google Play\'de bulunamadı.';
 	@override String storeConnectionFailed({required Object error}) => 'Google Play\'e bağlanılamadı: ${error}';
-	@override String get loginRequired => 'Premium\'u başlatmadan önce giriş yapmalısın.';
-	@override String get loginRestoreRequired => 'Satın almayı geri yüklemeden önce giriş yapmalısın.';
+	@override String get loginRequired => 'Premium\'u başlatmak için giriş yapman gerekiyor.';
+	@override String get loginRestoreRequired => 'Satın almayı geri yüklemek için giriş yapman gerekiyor.';
 	@override String get invalidAccount => 'Premium hesap eşleştirme kimliği geçersiz.';
 	@override String get purchaseScreenFailed => 'Google Play satın alma ekranı açılamadı.';
 	@override String purchaseStartFailed({required Object error}) => 'Satın alma başlatılamadı: ${error}';
@@ -518,10 +542,10 @@ class _Translations$premium$tr extends Translations$premium$en {
 	@override String get purchaseCancelled => 'Satın alma iptal edildi.';
 	@override String get verifyingPurchase => 'Satın alman güvenli biçimde doğrulanıyor…';
 	@override String get googlePlayOnly => 'Yalnızca Google Play satın almaları destekleniyor.';
-	@override String get noActivePremium => 'Aktif bir Premium üyeliği bulunamadı.';
-	@override String get premiumActivated => 'Premium aktif. OMA Premium\'a hoş geldin.';
-	@override String membershipActivated({required Object plan}) => '${plan} bu hesapta aktif.';
-	@override String get planChangeNeedsRestore => 'Mevcut Google Play satın alman yüklenemedi. Paket değiştirmeden önce satın almayı geri yükle.';
+	@override String get noActivePremium => 'Etkin bir Premium üyeliği bulunamadı.';
+	@override String get premiumActivated => 'Premium üyeliğin etkinleştirildi.';
+	@override String membershipActivated({required Object plan}) => '${plan} bu hesapta etkin.';
+	@override String get planChangeNeedsRestore => 'Mevcut Google Play satın alman yüklenemedi. Paket değişikliği için önce satın almayı geri yüklemen gerekir.';
 	@override String get subscriptionManagementFailed => 'Google Play üyelik yönetimi açılamadı.';
 	@override String purchaseVerificationFailed({required Object error}) => 'Satın alma doğrulanamadı: ${error}';
 }
@@ -989,6 +1013,79 @@ class _Translations$catalogs$skincare$tr extends Translations$catalogs$skincare$
 	};
 }
 
+// Path: home.common
+class _Translations$home$common$tr extends Translations$home$common$en {
+	_Translations$home$common$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$home$common$header$tr header = _Translations$home$common$header$tr._(_root);
+	@override late final _Translations$home$common$quickLogs$tr quickLogs = _Translations$home$common$quickLogs$tr._(_root);
+	@override late final _Translations$home$common$insightsPreview$tr insightsPreview = _Translations$home$common$insightsPreview$tr._(_root);
+	@override String get today => 'Bugün';
+	@override late final _Translations$home$common$hero$tr hero = _Translations$home$common$hero$tr._(_root);
+	@override String get error => 'Bir şeyler ters gitti';
+	@override String get futureLogNotAllowed => 'Gelecek tarihlere günlük kayıt eklenemez.';
+}
+
+// Path: home.phase
+class _Translations$home$phase$tr extends Translations$home$phase$en {
+	_Translations$home$phase$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$home$phase$menstrual$tr menstrual = _Translations$home$phase$menstrual$tr._(_root);
+	@override late final _Translations$home$phase$follicular$tr follicular = _Translations$home$phase$follicular$tr._(_root);
+	@override late final _Translations$home$phase$ovulation$tr ovulation = _Translations$home$phase$ovulation$tr._(_root);
+	@override late final _Translations$home$phase$luteal$tr luteal = _Translations$home$phase$luteal$tr._(_root);
+}
+
+// Path: home.pregnancy
+class _Translations$home$pregnancy$tr extends Translations$home$pregnancy$en {
+	_Translations$home$pregnancy$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get positiveTestRecorded => 'Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.';
+	@override String get badge => 'GEBELİK';
+	@override String get estimatedWeek => 'TAHMİNİ GEBELİK HAFTASI';
+	@override String get weekLabel => 'haftalık';
+	@override String get weekAndDay => '{week} hafta {day} gün';
+	@override String get estimateCombined => 'Son adet ve cinsel ilişki kayıtlarına göre tahmini';
+	@override String get estimateLastPeriod => 'Son adet başlangıcına göre tahmini';
+	@override String get estimateSexualActivity => 'Cinsel ilişki kaydına göre yaklaşık tahmin';
+	@override String get estimateUnavailable => 'Gebelik haftası için son adet tarihi veya cinsel ilişki kaydı gerekiyor.';
+	@override String get infoComingSoon => 'Haftalık bilgilendirici içerikler yakında';
+	@override String get estimatedDueDate => 'Tahmini doğum tarihi: {date}';
+	@override late final _Translations$home$pregnancy$stages$tr stages = _Translations$home$pregnancy$stages$tr._(_root);
+}
+
+// Path: notifications.common
+class _Translations$notifications$common$tr extends Translations$notifications$common$en {
+	_Translations$notifications$common$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Bildirimler';
+	@override String get subtitle => 'Uygulama mesajların ve kayıt etkinliklerin burada.';
+	@override String get appTab => 'Uygulama';
+	@override String get logTab => 'Kayıtlar';
+	@override String get appEmptyTitle => 'Henüz uygulama mesajı yok';
+	@override String get appEmptyDescription => 'Yeni mesajlar burada görünecek.';
+	@override String get logEmptyTitle => 'Henüz kayıt etkinliği yok';
+	@override String get logEmptyDescription => 'Kaydettiğin günlük girişleri burada göreceksin.';
+	@override String logSaved({required Object category}) => '${category} kaydedildi';
+	@override String logDetail({required Object date, required Object details}) => '${date} tarihli kaydın: ${details}';
+	@override String get logNoDetail => 'Bu bölüm için kayıt oluşturuldu.';
+	@override String get periodEntry => 'ADET KAYDI';
+	@override String get periodFlow => 'Akış';
+	@override String get periodSymptoms => 'Belirtiler';
+}
+
 // Path: onboarding.common
 class _Translations$onboarding$common$tr extends Translations$onboarding$common$en {
 	_Translations$onboarding$common$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -1115,7 +1212,7 @@ class _Translations$pregnancy$common$tr extends Translations$pregnancy$common$en
 
 	// Translations
 	@override String get testTitle => 'Hamilelik testi';
-	@override String get testHint => 'Testler beklenen adetin ilk gününden itibaren daha güvenilirdir. Adet tarihini bilmiyorsan korunmasız ilişkiden en az 21 gün sonra test yap.';
+	@override String get testHint => 'Testler beklenen adetin ilk gününden itibaren daha güvenilir sonuç verebilir. Adet tarihini bilmiyorsan korunmasız ilişkiden en az 21 gün sonra test yapabilirsin.';
 	@override String get testPositiveAction => 'Hamileyim';
 	@override String get positiveTestRecorded => 'Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.';
 	@override String get badge => 'GEBELİK';
@@ -1125,9 +1222,9 @@ class _Translations$pregnancy$common$tr extends Translations$pregnancy$common$en
 	@override String get estimateCombined => 'Son adet ve cinsel ilişki kayıtlarına göre tahmini';
 	@override String get estimateLastPeriod => 'Son adet başlangıcına göre tahmini';
 	@override String get estimateSexualActivity => 'Cinsel ilişki kaydına göre yaklaşık tahmin';
-	@override String get estimateUnavailable => 'Haftayı hesaplamak için son adet tarihini veya cinsel ilişki kaydını ekle.';
+	@override String get estimateUnavailable => 'Gebelik haftası için son adet tarihi veya cinsel ilişki kaydı gerekiyor.';
 	@override String get infoComingSoon => 'Haftalık bilgilendirici içerikler yakında';
-	@override String get estimatedDueDate => 'Tahmini buluşma tarihi: {date}';
+	@override String get estimatedDueDate => 'Tahmini doğum tarihi: {date}';
 }
 
 // Path: pregnancy.fertility
@@ -1137,8 +1234,8 @@ class _Translations$pregnancy$fertility$tr extends Translations$pregnancy$fertil
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get insightTitle => 'Tahmini verimli dönemin başladı';
-	@override String get insightBody => 'Döngü kayıtlarına göre tahmini verimli dönemdesin. Vücut sinyallerini ve akıntı değişimlerini kaydetmen, kendi örüntülerini görmene yardımcı olabilir. Takvim tahmini ovülasyonu doğrulamaz.';
+	@override String get insightTitle => 'Tahmini ovülasyon dönemi';
+	@override String get insightBody => 'Döngü kayıtlarına göre tahmini ovülasyon döneminde olabilirsin. İstersen akıntı gibi vücut sinyallerini kaydedebilirsin. Takvim tahmini ovülasyonu doğrulamaz.';
 }
 
 // Path: pregnancy.modes
@@ -1149,13 +1246,13 @@ class _Translations$pregnancy$modes$tr extends Translations$pregnancy$modes$en {
 
 	// Translations
 	@override String get getPregnant => 'Hamile kal';
-	@override String get getPregnantSubtitle => 'Döngü takibi ve verimli dönem içgörüleri';
+	@override String get getPregnantSubtitle => 'Döngü takibi ve tahmini ovülasyon bilgileri';
 	@override String get pregnant => 'Hamileyim';
-	@override String get pregnantSubtitle => 'Gebelik yolculuğu';
+	@override String get pregnantSubtitle => 'Gebelik takibi';
 	@override String get changeConfirmationTitle => 'Modunu değiştirmek istiyor musun?';
 	@override String get changeConfirmationBody => 'Takip tercihin {mode} olarak değiştirilecek. Kayıtların silinmeyecek.';
 	@override String get changeAction => 'Evet, değiştir';
-	@override String get changeFailed => 'Mod şu anda değiştirilemedi. Tekrar dene.';
+	@override String get changeFailed => 'Mod şu anda değiştirilemedi. Yeniden deneyebilirsin.';
 }
 
 // Path: pregnancy.stages
@@ -1199,6 +1296,236 @@ class _Translations$auth$auth$actionCard$tr extends Translations$auth$auth$actio
 	@override late final _Translations$auth$auth$actionCard$offline$tr offline = _Translations$auth$auth$actionCard$offline$tr._(_root);
 }
 
+// Path: home.common.header
+class _Translations$home$common$header$tr extends Translations$home$common$header$en {
+	_Translations$home$common$header$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$home$common$header$greeting$tr greeting = _Translations$home$common$header$greeting$tr._(_root);
+	@override late final _Translations$home$common$header$date$tr date = _Translations$home$common$header$date$tr._(_root);
+}
+
+// Path: home.common.quickLogs
+class _Translations$home$common$quickLogs$tr extends Translations$home$common$quickLogs$en {
+	_Translations$home$common$quickLogs$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Hızlı Kayıtlar';
+	@override String get caption => 'Aktivitelerinizi hızlıca kaydedin';
+	@override late final _Translations$home$common$quickLogs$buttons$tr buttons = _Translations$home$common$quickLogs$buttons$tr._(_root);
+}
+
+// Path: home.common.insightsPreview
+class _Translations$home$common$insightsPreview$tr extends Translations$home$common$insightsPreview$en {
+	_Translations$home$common$insightsPreview$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get eyebrow => 'OMA VERİLERİNİ BİRBİRİNE BAĞLAR';
+	@override String get title => 'Günlük İçgörülerim';
+	@override String get viewAll => 'Tümünü gör ›';
+	@override String get learning => 'Kayıtlar arttıkça kişisel bağlantılar daha net hesaplanır.';
+}
+
+// Path: home.common.hero
+class _Translations$home$common$hero$tr extends Translations$home$common$hero$en {
+	_Translations$home$common$hero$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get currentPhase => 'MEVCUT FAZ';
+	@override String get phaseWord => 'faz';
+	@override String get cycleDayLabel => 'DÖNGÜ GÜNÜ';
+	@override String get semanticLabel => '{phase}, döngünün {day}. günü. {message} {detail}';
+	@override String get periodDayNumber => '{count}.';
+	@override String get periodDayLabel => 'gün';
+	@override String get daysToPeriodLabel => 'gün kaldı';
+	@override String get readBodyChanges => 'Bu faz hakkında daha fazla gör';
+	@override String get forecastConfidenceLow => 'düşük';
+	@override String get forecastConfidenceMedium => 'orta';
+	@override String get forecastConfidenceHigh => 'yüksek';
+	@override String periodPredictionSummary({required Object range, required Object confidence}) => 'Sonraki adet tahmini: ${range} · Tahmin güveni: ${confidence}';
+	@override String periodPredictionLowConfidenceSummary({required Object range}) => 'Sonraki adet tahmini: ${range}\nKayıt ekledikçe tahminler daha kişisel hale gelir.';
+	@override String get emptyTitle => 'Döngünü takip etmeye başla';
+	@override String get emptyMessage => 'Fazını ve tahminlerini burada görmek için son adet tarihini kaydet.';
+}
+
+// Path: home.phase.menstrual
+class _Translations$home$phase$menstrual$tr extends Translations$home$phase$menstrual$en {
+	_Translations$home$phase$menstrual$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Menstrüel';
+	@override List<String> get messages => [
+		'Enerjin bugün diğer günlere göre biraz daha düşük olabilir.',
+		'Karnında veya belinde ağrı varsa sıcaklık rahatlatabilir.',
+		'Hareket etmek istemiyorsan dinlenebilirsin.',
+		'Bugün su içmeyi unutma, kaslarının suya ihtiyacı var.',
+		'Demir kaybını minimumda tutmak için öğünlerinde demir içeren besinlere yer verebilirsin.',
+		'Uyku düzenin bu günlerde biraz değişebilir.',
+		'Pedini, tamponunu veya menstrual kabını düzenli değiştirmeyi unutma.',
+		'Hassasiyet hissedersen kokusuz ürünleri tercih edebilirsin.',
+		'Rahat ve nefes alan kıyafetler bugün daha konforlu gelebilir.',
+		'Tatlı isteğin arttıysa kendini suçlu hissetme.',
+		'Bu ay nasıl hissettiğini küçük bir notla kaydet.',
+		'Ağrın günlük hayatını zorlaştırıyorsa bunu görmezden gelme.',
+	];
+	@override List<String> get details => [
+		'Yapacaklarını enerjine göre biraz hafifletebilirsin.',
+		'Ilık bir duş ya da sıcak su torbası iyi gelebilir.',
+		'İyi hissediyorsan kısa bir yürüyüş veya hafif esneme iyi gelebilir.',
+		'Özellikle yoğun olduğun günlerde yanında bir şişe bulundurmak işini kolaylaştırabilir.',
+		'Et, yumurta, kuru baklagiller ve yeşil yapraklı sebzeler iyi seçenekler olabilir.',
+		'Akşamı daha sakin geçirmek ve benzer saatlerde uyumaya hazırlanmak yardımcı olabilir.',
+		'Uzun süre aynı ürünü kullanmak yerine ürünün kullanım önerilerine göre değişim yapman hijyen açısından önemlidir.',
+		'Parfümlü hijyen ürünleri bazı kişilerde tahrişe neden olabilir.',
+		'Özellikle pamuklu ve biraz geniş bir iç çamaşırı tercih edebilirsin.',
+		'Canın ne istiyorsa onu yerken yanına daha doyurucu bir şey eklemek seni daha uzun süre tok tutabilir, enerji ihtiyacını atlama.',
+		'Ağrı, enerji ve uyku gibi detayları takip etmek zamanla kendi düzenini fark etmene yardımcı olabilir.',
+		'Şiddetli veya alışık olmadığın belirtilerde bir sağlık profesyoneline danışmak iyi olur.',
+	];
+}
+
+// Path: home.phase.follicular
+class _Translations$home$phase$follicular$tr extends Translations$home$phase$follicular$en {
+	_Translations$home$phase$follicular$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Foliküler';
+	@override List<String> get messages => [
+		'Enerjinin yavaş yavaş arttığını fark edebilirsin.',
+		'Bugün kafan biraz daha açık hissedebilir.',
+		'Hareket etmek için daha istekli olabilirsin.',
+		'Yeni bir şeye başlamak için enerjin olabilir.',
+		'Sosyalleşmek bugün daha kolay gelebilir.',
+		'Enerjin artsa da uykunu ihmal etme.',
+		'İştahın bazı günler biraz daha düşük olabilir.',
+		'Tabağına biraz renk ekleyebilirsin.',
+		'Enerjin yüksek diye gününü tamamen doldurmak zorunda değilsin.',
+		'Akıntındaki değişiklikleri fark edebilirsin.',
+		'Bugünkü enerjini not etmeyi deneyebilirsin.',
+		'Kendini iyi hissediyorsan bunu değerlendirebilirsin.',
+	];
+	@override List<String> get details => [
+		'Bir süredir ertelediğin bir işe dönmek için uygun hissedebilirsin.',
+		'Planlama veya dikkat isteyen işleri bugün yapmak daha kolay gelebilir.',
+		'Yürüyüş, koşu, pilates veya sevdiğin başka bir egzersizi seçebilirsin.',
+		'Uzun zamandır aklında olan küçük bir planı bugün deneyebilirsin.',
+		'Görüşmek istediğin biri varsa plan yapmak için güzel bir gün olabilir.',
+		'İyi hissettiğin günlerde bile düzenli uyku sana iyi bir temel sağlar.',
+		'Çok aç hissetmesen bile düzenli ve dengeli bir şekilde beslenmeye ve öğünleri atlamamaya çalış.',
+		'Farklı sebze ve meyveler günlük beslenmeni çeşitlendirmenin kolay bir yolu.',
+		'İyi hissettiğin tempoyu seçmen yeterli.',
+		'Ovulasyon yaklaştıkça daha berrak ve esnek bir yapı görülmesi normal olabilir.',
+		'Birkaç döngü sonra hangi günlerde daha hareketli olduğunu görmek kolaylaşabilir.',
+		'Yapmak istediğin bir iş, spor veya plan varsa bugün ona başlayabilirsin.',
+	];
+}
+
+// Path: home.phase.ovulation
+class _Translations$home$phase$ovulation$tr extends Translations$home$phase$ovulation$en {
+	_Translations$home$phase$ovulation$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Ovulasyon';
+	@override List<String> get messages => [
+		'Bugün kendini daha enerjik hissedebilirsin.',
+		'Sosyalleşme isteğin biraz artabilir.',
+		'Egzersizde kendini daha güçlü hissedebilirsin.',
+		'Yoğun bir gün geçiriyorsan suyu unutma.',
+		'Enerjini dengede tutacak öğünler seçebilirsin.',
+		'Akıntının daha berrak ve esnek olduğunu fark edebilirsin.',
+		'Alt karında hafif bir hassasiyet hissedebilirsin.',
+		'Ovulasyon her ay aynı güne denk gelmeyebilir.',
+		'Libidonda bir artış fark edebilirsin.',
+		'Bugün iletişim kurmak daha kolay gelebilir.',
+		'Vücudundaki küçük değişiklikleri not edebilirsin.',
+		'Kendini çok enerjik hissetmiyorsan bunda da bir sorun yok.',
+	];
+	@override List<String> get details => [
+		'Bu enerjiyi sevdiğin bir aktiviteye ayırabilirsin.',
+		'Arkadaşlarınla görüşmek veya dışarı çıkmak bugün daha keyifli gelebilir.',
+		'İyi hissediyorsan alıştığın antrenmana devam edebilir veya biraz daha hareketli bir şey seçebilirsin.',
+		'Özellikle hareketli günlerde düzenli su içmek iyi bir alışkanlık.',
+		'Protein, sebze, tam tahıl ve sağlıklı yağları birlikte ve dengeli tüketmek önemli.',
+		'Bu, ovulasyon döneminde görülebilen doğal değişikliklerden biri.',
+		'Hafif ve kısa süreli olabilir; şiddetli veya devam eden ağrıyı ise takip etmek önemli.',
+		'Takvimde gördüğün günü kesin tarih değil, bir tahmin olarak düşün.',
+		'Bu dönemde hormonal değişimlerle birlikte böyle farklılıklar görülebilir.',
+		'Uzun zamandır ertelediğin bir konuşma varsa kendini hazır hissettiğin zamanı seçebilirsin.',
+		'Akıntı, enerji, libido veya hafif ağrı gibi belirtiler kendi düzenini tanımana yardımcı olabilir.',
+		'Ovulasyon herkeste aynı belirtilerle geçmez; o gün nasıl hissediyorsan ona göre hareket edebilirsin.',
+	];
+}
+
+// Path: home.phase.luteal
+class _Translations$home$phase$luteal$tr extends Translations$home$phase$luteal$en {
+	_Translations$home$phase$luteal$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Luteal';
+	@override List<String> get messages => [
+		'İştahının arttığını fark edebilirsin.',
+		'Öğünleri çok geciktirmemeye çalış.',
+		'Karbonhidrat isteğin artabilir.',
+		'Şişkinlik hissediyorsan su içmeyi unutma.',
+		'Çok tuzlu yiyecekler şişkinliği artırabilir.',
+		'Kahve bugün seni her zamankinden farklı etkileyebilir.',
+		'Uykunun biraz daha hassaslaştığını fark edebilirsin.',
+		'Yoğun egzersiz bugün daha zor gelebilir.',
+		'Odaklanmak bazı günler biraz daha zor olabilir.',
+		'Bugün biraz daha çabuk yorulabilirsin.',
+		'Sindirimin biraz yavaşlamış gibi hissedilebilir.',
+		'Adet öncesi belirtilerini birkaç ay takip etmeyi dene.',
+	];
+	@override List<String> get details => [
+		'Öğünlerinde protein ve lifli besinlere yer vermek daha uzun süre tok kalmana yardımcı olabilir.',
+		'Uzun süre aç kalmak bazı günlerde yorgunluğu ve atıştırma isteğini artırabilir.',
+		'Yulaf, tam tahıllar veya patates gibi daha doyurucu seçenekleri de deneyebilirsin.',
+		'Gün boyunca düzenli su içmek sindirime de yardımcı olabilir.',
+		'Özellikle kendini şişkin hissettiğin günlerde biraz daha az tuz tüketmeyi deneyebilirsin.',
+		'Uykun bozuluyorsa veya kendini daha gergin hissediyorsan miktarını azaltmayı veya yerine matcha gibi bir içecek koymayı deneyebilirsin.',
+		'Akşam saatlerini daha sakin geçirmek uykuya geçişi kolaylaştırabilir.',
+		'Öyleyse yürüyüş, yoga veya hafif esneme gibi daha rahat bir seçenek seçebilirsin.',
+		'Büyük işleri daha küçük parçalara bölmek başlamayı kolaylaştırabilir.',
+		'Gününü planlarken araya kısa molalar koyabilirsin.',
+		'Su içmek ve lifli besinlere yer vermek bu günlerde özellikle önemli olabilir.',
+		'Aynı günlerde tekrar eden değişiklikleri görmek kendi döngünü anlamanı kolaylaştırabilir.',
+	];
+}
+
+// Path: home.pregnancy.stages
+class _Translations$home$pregnancy$stages$tr extends Translations$home$pregnancy$stages$en {
+	_Translations$home$pregnancy$stages$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$home$pregnancy$stages$stage1$tr stage1 = _Translations$home$pregnancy$stages$stage1$tr._(_root);
+	@override late final _Translations$home$pregnancy$stages$stage2$tr stage2 = _Translations$home$pregnancy$stages$stage2$tr._(_root);
+	@override late final _Translations$home$pregnancy$stages$stage3$tr stage3 = _Translations$home$pregnancy$stages$stage3$tr._(_root);
+	@override late final _Translations$home$pregnancy$stages$stage4$tr stage4 = _Translations$home$pregnancy$stages$stage4$tr._(_root);
+	@override late final _Translations$home$pregnancy$stages$stage5$tr stage5 = _Translations$home$pregnancy$stages$stage5$tr._(_root);
+	@override late final _Translations$home$pregnancy$stages$stage6$tr stage6 = _Translations$home$pregnancy$stages$stage6$tr._(_root);
+	@override late final _Translations$home$pregnancy$stages$stage7$tr stage7 = _Translations$home$pregnancy$stages$stage7$tr._(_root);
+	@override late final _Translations$home$pregnancy$stages$stage8$tr stage8 = _Translations$home$pregnancy$stages$stage8$tr._(_root);
+	@override late final _Translations$home$pregnancy$stages$stage9$tr stage9 = _Translations$home$pregnancy$stages$stage9$tr._(_root);
+}
+
 // Path: onboarding.wellbeing.moodOptions
 class _Translations$onboarding$wellbeing$moodOptions$tr extends Translations$onboarding$wellbeing$moodOptions$en {
 	_Translations$onboarding$wellbeing$moodOptions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -1235,8 +1562,8 @@ class _Translations$pregnancy$stages$stage1$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '1–4. hafta · Başlangıç ve Yerleşme';
-	@override String get body => 'Her şey daha yeni başlıyor. Vücudun minik ama çok önemli değişimlere hazırlanıyor. 💗';
+	@override String get title => '1–4. hafta · Başlangıç';
+	@override String get body => 'Bu haftalarda döllenme ve rahme yerleşme süreci gerçekleşebilir. Gebelik haftası son adet başlangıcından itibaren hesaplanır.';
 }
 
 // Path: pregnancy.stages.stage2
@@ -1246,8 +1573,8 @@ class _Translations$pregnancy$stages$stage2$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '5–8. hafta · Temeller Atılıyor';
-	@override String get body => 'Minik gelişmeler hızla devam ediyor. Sen de vücudundaki değişimleri biraz daha fazla hissetmeye başlayabilirsin.';
+	@override String get title => '5–8. hafta · Erken gelişim';
+	@override String get body => 'Embriyonun temel organ ve sistemleri bu haftalarda gelişmeye başlar. Yaşanan belirtiler kişiden kişiye değişebilir.';
 }
 
 // Path: pregnancy.stages.stage3
@@ -1257,8 +1584,8 @@ class _Translations$pregnancy$stages$stage3$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '9–13. hafta · Fetal Döneme Geçiş';
-	@override String get body => 'İlk haftaların büyük kısmını geride bıraktın. Bebeğin her geçen gün biraz daha belirginleşiyor. ✨';
+	@override String get title => '9–13. hafta · Fetal döneme geçiş';
+	@override String get body => 'Bu dönemde fetüsün organları ve vücut yapıları gelişmeye devam eder.';
 }
 
 // Path: pregnancy.stages.stage4
@@ -1268,8 +1595,8 @@ class _Translations$pregnancy$stages$stage4$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '14–17. hafta · Hızlı Büyüme';
-	@override String get body => 'Bebeğin hızla büyürken sen de hamileliğinin yeni dönemine alışmaya devam ediyorsun.';
+	@override String get title => '14–17. hafta · Büyüme';
+	@override String get body => 'Fetüsün büyümesi ve hareket gelişimi bu haftalarda devam eder.';
 }
 
 // Path: pregnancy.stages.stage5
@@ -1279,8 +1606,8 @@ class _Translations$pregnancy$stages$stage5$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '18–22. hafta · İlk Hareketler';
-	@override String get body => 'O minik hareketleri hissetmeye başlayabileceğin çok özel haftalardasın. 🫶';
+	@override String get title => '18–22. hafta · Hareketler';
+	@override String get body => 'Fetal hareketler bu haftalarda fark edilebilir; ilk fark edilme zamanı kişiden kişiye değişir.';
 }
 
 // Path: pregnancy.stages.stage6
@@ -1290,8 +1617,8 @@ class _Translations$pregnancy$stages$stage6$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '23–27. hafta · Güçlenme';
-	@override String get body => 'Bebeğinin hareketleri artık daha belirgin olabilir. İçeride küçük ama oldukça hareketli bir dünya var.';
+	@override String get title => '23–27. hafta · Gelişim';
+	@override String get body => 'Fetüsün hareketleri ve organ gelişimi bu dönemde devam eder.';
 }
 
 // Path: pregnancy.stages.stage7
@@ -1302,7 +1629,7 @@ class _Translations$pregnancy$stages$stage7$tr extends Translations$pregnancy$st
 
 	// Translations
 	@override String get title => '28–31. hafta · Olgunlaşma';
-	@override String get body => 'Bebeğin büyümeye ve güçlenmeye devam ediyor. Buluşmanıza doğru güzel güzel ilerliyorsunuz. 🤍';
+	@override String get body => 'Fetüs büyümeye devam eder; akciğer ve sinir sistemi gelişimi sürer.';
 }
 
 // Path: pregnancy.stages.stage8
@@ -1312,8 +1639,8 @@ class _Translations$pregnancy$stages$stage8$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '32–35. hafta · Doğuma Hazırlık';
-	@override String get body => 'Artık sonlara yaklaşıyorsunuz. Bebeğin doğum sonrası hayata hazırlanırken senin vücudun da onunla birlikte hazırlanıyor.';
+	@override String get title => '32–35. hafta · Doğuma hazırlık';
+	@override String get body => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür.';
 }
 
 // Path: pregnancy.stages.stage9
@@ -1323,8 +1650,8 @@ class _Translations$pregnancy$stages$stage9$tr extends Translations$pregnancy$st
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '36–40+ hafta · Son Haftalar';
-	@override String get body => 'Buluşma zamanı giderek yaklaşıyor. Bu son haftalarda kendine biraz daha nazik davranmayı unutma. 🌷';
+	@override String get title => '36–40+ hafta · Son haftalar';
+	@override String get body => 'Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin.';
 }
 
 // Path: auth.auth.actionCard.account
@@ -1349,6 +1676,143 @@ class _Translations$auth$auth$actionCard$offline$tr extends Translations$auth$au
 	// Translations
 	@override String get kContinue => 'Hesapsız devam et';
 	@override String get description => 'Verilerin yalnızca bu telefonda saklanır ve hesap oluşturulmaz.';
+}
+
+// Path: home.common.header.greeting
+class _Translations$home$common$header$greeting$tr extends Translations$home$common$header$greeting$en {
+	_Translations$home$common$header$greeting$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get nameFallback => 'Sen';
+	@override String get morning => 'Günaydın';
+	@override String get afternoon => 'İyi günler';
+	@override String get evening => 'İyi akşamlar';
+}
+
+// Path: home.common.header.date
+class _Translations$home$common$header$date$tr extends Translations$home$common$header$date$en {
+	_Translations$home$common$header$date$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get calendar => 'Takvim';
+}
+
+// Path: home.common.quickLogs.buttons
+class _Translations$home$common$quickLogs$buttons$tr extends Translations$home$common$quickLogs$buttons$en {
+	_Translations$home$common$quickLogs$buttons$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get nutrition => 'Beslenme';
+	@override String get period => 'Adet';
+	@override String get symptom => 'Belirti';
+	@override String get mood => 'Ruh hali';
+	@override String get medication => 'İlaç';
+	@override String get skincare => 'Cilt bakımı';
+}
+
+// Path: home.pregnancy.stages.stage1
+class _Translations$home$pregnancy$stages$stage1$tr extends Translations$home$pregnancy$stages$stage1$en {
+	_Translations$home$pregnancy$stages$stage1$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '1–4. hafta · Başlangıç';
+	@override String get body => 'Bu haftalarda döllenme ve rahme yerleşme süreci gerçekleşebilir. Gebelik haftası son adet başlangıcından itibaren hesaplanır.';
+}
+
+// Path: home.pregnancy.stages.stage2
+class _Translations$home$pregnancy$stages$stage2$tr extends Translations$home$pregnancy$stages$stage2$en {
+	_Translations$home$pregnancy$stages$stage2$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '5–8. hafta · Erken gelişim';
+	@override String get body => 'Embriyonun temel organ ve sistemleri bu haftalarda gelişmeye başlar. Yaşanan belirtiler kişiden kişiye değişebilir.';
+}
+
+// Path: home.pregnancy.stages.stage3
+class _Translations$home$pregnancy$stages$stage3$tr extends Translations$home$pregnancy$stages$stage3$en {
+	_Translations$home$pregnancy$stages$stage3$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '9–13. hafta · Fetal döneme geçiş';
+	@override String get body => 'Bu dönemde fetüsün organları ve vücut yapıları gelişmeye devam eder.';
+}
+
+// Path: home.pregnancy.stages.stage4
+class _Translations$home$pregnancy$stages$stage4$tr extends Translations$home$pregnancy$stages$stage4$en {
+	_Translations$home$pregnancy$stages$stage4$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '14–17. hafta · Büyüme';
+	@override String get body => 'Fetüsün büyümesi ve hareket gelişimi bu haftalarda devam eder.';
+}
+
+// Path: home.pregnancy.stages.stage5
+class _Translations$home$pregnancy$stages$stage5$tr extends Translations$home$pregnancy$stages$stage5$en {
+	_Translations$home$pregnancy$stages$stage5$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '18–22. hafta · Hareketler';
+	@override String get body => 'Fetal hareketler bu haftalarda fark edilebilir; ilk fark edilme zamanı kişiden kişiye değişir.';
+}
+
+// Path: home.pregnancy.stages.stage6
+class _Translations$home$pregnancy$stages$stage6$tr extends Translations$home$pregnancy$stages$stage6$en {
+	_Translations$home$pregnancy$stages$stage6$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '23–27. hafta · Gelişim';
+	@override String get body => 'Fetüsün hareketleri ve organ gelişimi bu dönemde devam eder.';
+}
+
+// Path: home.pregnancy.stages.stage7
+class _Translations$home$pregnancy$stages$stage7$tr extends Translations$home$pregnancy$stages$stage7$en {
+	_Translations$home$pregnancy$stages$stage7$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '28–31. hafta · Olgunlaşma';
+	@override String get body => 'Fetüs büyümeye devam eder; akciğer ve sinir sistemi gelişimi sürer.';
+}
+
+// Path: home.pregnancy.stages.stage8
+class _Translations$home$pregnancy$stages$stage8$tr extends Translations$home$pregnancy$stages$stage8$en {
+	_Translations$home$pregnancy$stages$stage8$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '32–35. hafta · Doğuma hazırlık';
+	@override String get body => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür.';
+}
+
+// Path: home.pregnancy.stages.stage9
+class _Translations$home$pregnancy$stages$stage9$tr extends Translations$home$pregnancy$stages$stage9$en {
+	_Translations$home$pregnancy$stages$stage9$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '36–40+ hafta · Son haftalar';
+	@override String get body => 'Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin.';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -1757,6 +2221,186 @@ extension on TranslationsTr {
 			'catalogs.skincare.items.peptides' => 'Peptitler',
 			'catalogs.skincare.items.resveratrol' => 'Resveratrol',
 			'catalogs.skincare.items.retinol_retinal' => 'Retinol / Retinal',
+			'home.common.header.greeting.nameFallback' => 'Sen',
+			'home.common.header.greeting.morning' => 'Günaydın',
+			'home.common.header.greeting.afternoon' => 'İyi günler',
+			'home.common.header.greeting.evening' => 'İyi akşamlar',
+			'home.common.header.date.calendar' => 'Takvim',
+			'home.common.quickLogs.title' => 'Hızlı Kayıtlar',
+			'home.common.quickLogs.caption' => 'Aktivitelerinizi hızlıca kaydedin',
+			'home.common.quickLogs.buttons.nutrition' => 'Beslenme',
+			'home.common.quickLogs.buttons.period' => 'Adet',
+			'home.common.quickLogs.buttons.symptom' => 'Belirti',
+			'home.common.quickLogs.buttons.mood' => 'Ruh hali',
+			'home.common.quickLogs.buttons.medication' => 'İlaç',
+			'home.common.quickLogs.buttons.skincare' => 'Cilt bakımı',
+			'home.common.insightsPreview.eyebrow' => 'OMA VERİLERİNİ BİRBİRİNE BAĞLAR',
+			'home.common.insightsPreview.title' => 'Günlük İçgörülerim',
+			'home.common.insightsPreview.viewAll' => 'Tümünü gör ›',
+			'home.common.insightsPreview.learning' => 'Kayıtlar arttıkça kişisel bağlantılar daha net hesaplanır.',
+			'home.common.today' => 'Bugün',
+			'home.common.hero.currentPhase' => 'MEVCUT FAZ',
+			'home.common.hero.phaseWord' => 'faz',
+			'home.common.hero.cycleDayLabel' => 'DÖNGÜ GÜNÜ',
+			'home.common.hero.semanticLabel' => '{phase}, döngünün {day}. günü. {message} {detail}',
+			'home.common.hero.periodDayNumber' => '{count}.',
+			'home.common.hero.periodDayLabel' => 'gün',
+			'home.common.hero.daysToPeriodLabel' => 'gün kaldı',
+			'home.common.hero.readBodyChanges' => 'Bu faz hakkında daha fazla gör',
+			'home.common.hero.forecastConfidenceLow' => 'düşük',
+			'home.common.hero.forecastConfidenceMedium' => 'orta',
+			'home.common.hero.forecastConfidenceHigh' => 'yüksek',
+			'home.common.hero.periodPredictionSummary' => ({required Object range, required Object confidence}) => 'Sonraki adet tahmini: ${range} · Tahmin güveni: ${confidence}',
+			'home.common.hero.periodPredictionLowConfidenceSummary' => ({required Object range}) => 'Sonraki adet tahmini: ${range}\nKayıt ekledikçe tahminler daha kişisel hale gelir.',
+			'home.common.hero.emptyTitle' => 'Döngünü takip etmeye başla',
+			'home.common.hero.emptyMessage' => 'Fazını ve tahminlerini burada görmek için son adet tarihini kaydet.',
+			'home.common.error' => 'Bir şeyler ters gitti',
+			'home.common.futureLogNotAllowed' => 'Gelecek tarihlere günlük kayıt eklenemez.',
+			'home.phase.menstrual.title' => 'Menstrüel',
+			'home.phase.menstrual.messages.0' => 'Enerjin bugün diğer günlere göre biraz daha düşük olabilir.',
+			'home.phase.menstrual.messages.1' => 'Karnında veya belinde ağrı varsa sıcaklık rahatlatabilir.',
+			'home.phase.menstrual.messages.2' => 'Hareket etmek istemiyorsan dinlenebilirsin.',
+			'home.phase.menstrual.messages.3' => 'Bugün su içmeyi unutma, kaslarının suya ihtiyacı var.',
+			'home.phase.menstrual.messages.4' => 'Demir kaybını minimumda tutmak için öğünlerinde demir içeren besinlere yer verebilirsin.',
+			'home.phase.menstrual.messages.5' => 'Uyku düzenin bu günlerde biraz değişebilir.',
+			'home.phase.menstrual.messages.6' => 'Pedini, tamponunu veya menstrual kabını düzenli değiştirmeyi unutma.',
+			'home.phase.menstrual.messages.7' => 'Hassasiyet hissedersen kokusuz ürünleri tercih edebilirsin.',
+			'home.phase.menstrual.messages.8' => 'Rahat ve nefes alan kıyafetler bugün daha konforlu gelebilir.',
+			'home.phase.menstrual.messages.9' => 'Tatlı isteğin arttıysa kendini suçlu hissetme.',
+			'home.phase.menstrual.messages.10' => 'Bu ay nasıl hissettiğini küçük bir notla kaydet.',
+			'home.phase.menstrual.messages.11' => 'Ağrın günlük hayatını zorlaştırıyorsa bunu görmezden gelme.',
+			'home.phase.menstrual.details.0' => 'Yapacaklarını enerjine göre biraz hafifletebilirsin.',
+			'home.phase.menstrual.details.1' => 'Ilık bir duş ya da sıcak su torbası iyi gelebilir.',
+			'home.phase.menstrual.details.2' => 'İyi hissediyorsan kısa bir yürüyüş veya hafif esneme iyi gelebilir.',
+			'home.phase.menstrual.details.3' => 'Özellikle yoğun olduğun günlerde yanında bir şişe bulundurmak işini kolaylaştırabilir.',
+			'home.phase.menstrual.details.4' => 'Et, yumurta, kuru baklagiller ve yeşil yapraklı sebzeler iyi seçenekler olabilir.',
+			'home.phase.menstrual.details.5' => 'Akşamı daha sakin geçirmek ve benzer saatlerde uyumaya hazırlanmak yardımcı olabilir.',
+			'home.phase.menstrual.details.6' => 'Uzun süre aynı ürünü kullanmak yerine ürünün kullanım önerilerine göre değişim yapman hijyen açısından önemlidir.',
+			'home.phase.menstrual.details.7' => 'Parfümlü hijyen ürünleri bazı kişilerde tahrişe neden olabilir.',
+			'home.phase.menstrual.details.8' => 'Özellikle pamuklu ve biraz geniş bir iç çamaşırı tercih edebilirsin.',
+			'home.phase.menstrual.details.9' => 'Canın ne istiyorsa onu yerken yanına daha doyurucu bir şey eklemek seni daha uzun süre tok tutabilir, enerji ihtiyacını atlama.',
+			'home.phase.menstrual.details.10' => 'Ağrı, enerji ve uyku gibi detayları takip etmek zamanla kendi düzenini fark etmene yardımcı olabilir.',
+			'home.phase.menstrual.details.11' => 'Şiddetli veya alışık olmadığın belirtilerde bir sağlık profesyoneline danışmak iyi olur.',
+			'home.phase.follicular.title' => 'Foliküler',
+			'home.phase.follicular.messages.0' => 'Enerjinin yavaş yavaş arttığını fark edebilirsin.',
+			'home.phase.follicular.messages.1' => 'Bugün kafan biraz daha açık hissedebilir.',
+			'home.phase.follicular.messages.2' => 'Hareket etmek için daha istekli olabilirsin.',
+			'home.phase.follicular.messages.3' => 'Yeni bir şeye başlamak için enerjin olabilir.',
+			'home.phase.follicular.messages.4' => 'Sosyalleşmek bugün daha kolay gelebilir.',
+			'home.phase.follicular.messages.5' => 'Enerjin artsa da uykunu ihmal etme.',
+			'home.phase.follicular.messages.6' => 'İştahın bazı günler biraz daha düşük olabilir.',
+			'home.phase.follicular.messages.7' => 'Tabağına biraz renk ekleyebilirsin.',
+			'home.phase.follicular.messages.8' => 'Enerjin yüksek diye gününü tamamen doldurmak zorunda değilsin.',
+			'home.phase.follicular.messages.9' => 'Akıntındaki değişiklikleri fark edebilirsin.',
+			'home.phase.follicular.messages.10' => 'Bugünkü enerjini not etmeyi deneyebilirsin.',
+			'home.phase.follicular.messages.11' => 'Kendini iyi hissediyorsan bunu değerlendirebilirsin.',
+			'home.phase.follicular.details.0' => 'Bir süredir ertelediğin bir işe dönmek için uygun hissedebilirsin.',
+			'home.phase.follicular.details.1' => 'Planlama veya dikkat isteyen işleri bugün yapmak daha kolay gelebilir.',
+			'home.phase.follicular.details.2' => 'Yürüyüş, koşu, pilates veya sevdiğin başka bir egzersizi seçebilirsin.',
+			'home.phase.follicular.details.3' => 'Uzun zamandır aklında olan küçük bir planı bugün deneyebilirsin.',
+			'home.phase.follicular.details.4' => 'Görüşmek istediğin biri varsa plan yapmak için güzel bir gün olabilir.',
+			'home.phase.follicular.details.5' => 'İyi hissettiğin günlerde bile düzenli uyku sana iyi bir temel sağlar.',
+			'home.phase.follicular.details.6' => 'Çok aç hissetmesen bile düzenli ve dengeli bir şekilde beslenmeye ve öğünleri atlamamaya çalış.',
+			'home.phase.follicular.details.7' => 'Farklı sebze ve meyveler günlük beslenmeni çeşitlendirmenin kolay bir yolu.',
+			'home.phase.follicular.details.8' => 'İyi hissettiğin tempoyu seçmen yeterli.',
+			'home.phase.follicular.details.9' => 'Ovulasyon yaklaştıkça daha berrak ve esnek bir yapı görülmesi normal olabilir.',
+			'home.phase.follicular.details.10' => 'Birkaç döngü sonra hangi günlerde daha hareketli olduğunu görmek kolaylaşabilir.',
+			'home.phase.follicular.details.11' => 'Yapmak istediğin bir iş, spor veya plan varsa bugün ona başlayabilirsin.',
+			'home.phase.ovulation.title' => 'Ovulasyon',
+			'home.phase.ovulation.messages.0' => 'Bugün kendini daha enerjik hissedebilirsin.',
+			'home.phase.ovulation.messages.1' => 'Sosyalleşme isteğin biraz artabilir.',
+			'home.phase.ovulation.messages.2' => 'Egzersizde kendini daha güçlü hissedebilirsin.',
+			'home.phase.ovulation.messages.3' => 'Yoğun bir gün geçiriyorsan suyu unutma.',
+			'home.phase.ovulation.messages.4' => 'Enerjini dengede tutacak öğünler seçebilirsin.',
+			'home.phase.ovulation.messages.5' => 'Akıntının daha berrak ve esnek olduğunu fark edebilirsin.',
+			'home.phase.ovulation.messages.6' => 'Alt karında hafif bir hassasiyet hissedebilirsin.',
+			'home.phase.ovulation.messages.7' => 'Ovulasyon her ay aynı güne denk gelmeyebilir.',
+			'home.phase.ovulation.messages.8' => 'Libidonda bir artış fark edebilirsin.',
+			'home.phase.ovulation.messages.9' => 'Bugün iletişim kurmak daha kolay gelebilir.',
+			'home.phase.ovulation.messages.10' => 'Vücudundaki küçük değişiklikleri not edebilirsin.',
+			'home.phase.ovulation.messages.11' => 'Kendini çok enerjik hissetmiyorsan bunda da bir sorun yok.',
+			'home.phase.ovulation.details.0' => 'Bu enerjiyi sevdiğin bir aktiviteye ayırabilirsin.',
+			'home.phase.ovulation.details.1' => 'Arkadaşlarınla görüşmek veya dışarı çıkmak bugün daha keyifli gelebilir.',
+			'home.phase.ovulation.details.2' => 'İyi hissediyorsan alıştığın antrenmana devam edebilir veya biraz daha hareketli bir şey seçebilirsin.',
+			'home.phase.ovulation.details.3' => 'Özellikle hareketli günlerde düzenli su içmek iyi bir alışkanlık.',
+			'home.phase.ovulation.details.4' => 'Protein, sebze, tam tahıl ve sağlıklı yağları birlikte ve dengeli tüketmek önemli.',
+			'home.phase.ovulation.details.5' => 'Bu, ovulasyon döneminde görülebilen doğal değişikliklerden biri.',
+			'home.phase.ovulation.details.6' => 'Hafif ve kısa süreli olabilir; şiddetli veya devam eden ağrıyı ise takip etmek önemli.',
+			'home.phase.ovulation.details.7' => 'Takvimde gördüğün günü kesin tarih değil, bir tahmin olarak düşün.',
+			'home.phase.ovulation.details.8' => 'Bu dönemde hormonal değişimlerle birlikte böyle farklılıklar görülebilir.',
+			'home.phase.ovulation.details.9' => 'Uzun zamandır ertelediğin bir konuşma varsa kendini hazır hissettiğin zamanı seçebilirsin.',
+			'home.phase.ovulation.details.10' => 'Akıntı, enerji, libido veya hafif ağrı gibi belirtiler kendi düzenini tanımana yardımcı olabilir.',
+			'home.phase.ovulation.details.11' => 'Ovulasyon herkeste aynı belirtilerle geçmez; o gün nasıl hissediyorsan ona göre hareket edebilirsin.',
+			'home.phase.luteal.title' => 'Luteal',
+			'home.phase.luteal.messages.0' => 'İştahının arttığını fark edebilirsin.',
+			'home.phase.luteal.messages.1' => 'Öğünleri çok geciktirmemeye çalış.',
+			'home.phase.luteal.messages.2' => 'Karbonhidrat isteğin artabilir.',
+			_ => null,
+		} ?? switch (path) {
+			'home.phase.luteal.messages.3' => 'Şişkinlik hissediyorsan su içmeyi unutma.',
+			'home.phase.luteal.messages.4' => 'Çok tuzlu yiyecekler şişkinliği artırabilir.',
+			'home.phase.luteal.messages.5' => 'Kahve bugün seni her zamankinden farklı etkileyebilir.',
+			'home.phase.luteal.messages.6' => 'Uykunun biraz daha hassaslaştığını fark edebilirsin.',
+			'home.phase.luteal.messages.7' => 'Yoğun egzersiz bugün daha zor gelebilir.',
+			'home.phase.luteal.messages.8' => 'Odaklanmak bazı günler biraz daha zor olabilir.',
+			'home.phase.luteal.messages.9' => 'Bugün biraz daha çabuk yorulabilirsin.',
+			'home.phase.luteal.messages.10' => 'Sindirimin biraz yavaşlamış gibi hissedilebilir.',
+			'home.phase.luteal.messages.11' => 'Adet öncesi belirtilerini birkaç ay takip etmeyi dene.',
+			'home.phase.luteal.details.0' => 'Öğünlerinde protein ve lifli besinlere yer vermek daha uzun süre tok kalmana yardımcı olabilir.',
+			'home.phase.luteal.details.1' => 'Uzun süre aç kalmak bazı günlerde yorgunluğu ve atıştırma isteğini artırabilir.',
+			'home.phase.luteal.details.2' => 'Yulaf, tam tahıllar veya patates gibi daha doyurucu seçenekleri de deneyebilirsin.',
+			'home.phase.luteal.details.3' => 'Gün boyunca düzenli su içmek sindirime de yardımcı olabilir.',
+			'home.phase.luteal.details.4' => 'Özellikle kendini şişkin hissettiğin günlerde biraz daha az tuz tüketmeyi deneyebilirsin.',
+			'home.phase.luteal.details.5' => 'Uykun bozuluyorsa veya kendini daha gergin hissediyorsan miktarını azaltmayı veya yerine matcha gibi bir içecek koymayı deneyebilirsin.',
+			'home.phase.luteal.details.6' => 'Akşam saatlerini daha sakin geçirmek uykuya geçişi kolaylaştırabilir.',
+			'home.phase.luteal.details.7' => 'Öyleyse yürüyüş, yoga veya hafif esneme gibi daha rahat bir seçenek seçebilirsin.',
+			'home.phase.luteal.details.8' => 'Büyük işleri daha küçük parçalara bölmek başlamayı kolaylaştırabilir.',
+			'home.phase.luteal.details.9' => 'Gününü planlarken araya kısa molalar koyabilirsin.',
+			'home.phase.luteal.details.10' => 'Su içmek ve lifli besinlere yer vermek bu günlerde özellikle önemli olabilir.',
+			'home.phase.luteal.details.11' => 'Aynı günlerde tekrar eden değişiklikleri görmek kendi döngünü anlamanı kolaylaştırabilir.',
+			'home.pregnancy.positiveTestRecorded' => 'Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.',
+			'home.pregnancy.badge' => 'GEBELİK',
+			'home.pregnancy.estimatedWeek' => 'TAHMİNİ GEBELİK HAFTASI',
+			'home.pregnancy.weekLabel' => 'haftalık',
+			'home.pregnancy.weekAndDay' => '{week} hafta {day} gün',
+			'home.pregnancy.estimateCombined' => 'Son adet ve cinsel ilişki kayıtlarına göre tahmini',
+			'home.pregnancy.estimateLastPeriod' => 'Son adet başlangıcına göre tahmini',
+			'home.pregnancy.estimateSexualActivity' => 'Cinsel ilişki kaydına göre yaklaşık tahmin',
+			'home.pregnancy.estimateUnavailable' => 'Gebelik haftası için son adet tarihi veya cinsel ilişki kaydı gerekiyor.',
+			'home.pregnancy.infoComingSoon' => 'Haftalık bilgilendirici içerikler yakında',
+			'home.pregnancy.estimatedDueDate' => 'Tahmini doğum tarihi: {date}',
+			'home.pregnancy.stages.stage1.title' => '1–4. hafta · Başlangıç',
+			'home.pregnancy.stages.stage1.body' => 'Bu haftalarda döllenme ve rahme yerleşme süreci gerçekleşebilir. Gebelik haftası son adet başlangıcından itibaren hesaplanır.',
+			'home.pregnancy.stages.stage2.title' => '5–8. hafta · Erken gelişim',
+			'home.pregnancy.stages.stage2.body' => 'Embriyonun temel organ ve sistemleri bu haftalarda gelişmeye başlar. Yaşanan belirtiler kişiden kişiye değişebilir.',
+			'home.pregnancy.stages.stage3.title' => '9–13. hafta · Fetal döneme geçiş',
+			'home.pregnancy.stages.stage3.body' => 'Bu dönemde fetüsün organları ve vücut yapıları gelişmeye devam eder.',
+			'home.pregnancy.stages.stage4.title' => '14–17. hafta · Büyüme',
+			'home.pregnancy.stages.stage4.body' => 'Fetüsün büyümesi ve hareket gelişimi bu haftalarda devam eder.',
+			'home.pregnancy.stages.stage5.title' => '18–22. hafta · Hareketler',
+			'home.pregnancy.stages.stage5.body' => 'Fetal hareketler bu haftalarda fark edilebilir; ilk fark edilme zamanı kişiden kişiye değişir.',
+			'home.pregnancy.stages.stage6.title' => '23–27. hafta · Gelişim',
+			'home.pregnancy.stages.stage6.body' => 'Fetüsün hareketleri ve organ gelişimi bu dönemde devam eder.',
+			'home.pregnancy.stages.stage7.title' => '28–31. hafta · Olgunlaşma',
+			'home.pregnancy.stages.stage7.body' => 'Fetüs büyümeye devam eder; akciğer ve sinir sistemi gelişimi sürer.',
+			'home.pregnancy.stages.stage8.title' => '32–35. hafta · Doğuma hazırlık',
+			'home.pregnancy.stages.stage8.body' => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür.',
+			'home.pregnancy.stages.stage9.title' => '36–40+ hafta · Son haftalar',
+			'home.pregnancy.stages.stage9.body' => 'Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin.',
+			'notifications.common.title' => 'Bildirimler',
+			'notifications.common.subtitle' => 'Uygulama mesajların ve kayıt etkinliklerin burada.',
+			'notifications.common.appTab' => 'Uygulama',
+			'notifications.common.logTab' => 'Kayıtlar',
+			'notifications.common.appEmptyTitle' => 'Henüz uygulama mesajı yok',
+			'notifications.common.appEmptyDescription' => 'Yeni mesajlar burada görünecek.',
+			'notifications.common.logEmptyTitle' => 'Henüz kayıt etkinliği yok',
+			'notifications.common.logEmptyDescription' => 'Kaydettiğin günlük girişleri burada göreceksin.',
+			'notifications.common.logSaved' => ({required Object category}) => '${category} kaydedildi',
+			'notifications.common.logDetail' => ({required Object date, required Object details}) => '${date} tarihli kaydın: ${details}',
+			'notifications.common.logNoDetail' => 'Bu bölüm için kayıt oluşturuldu.',
+			'notifications.common.periodEntry' => 'ADET KAYDI',
+			'notifications.common.periodFlow' => 'Akış',
+			'notifications.common.periodSymptoms' => 'Belirtiler',
 			'onboarding.common.skipForNow' => 'Bu soruları şimdilik geç',
 			'onboarding.common.next' => 'Devam et',
 			'onboarding.common.finish' => 'Bitir',
@@ -1871,8 +2515,6 @@ extension on TranslationsTr {
 			'options.moodCheckInOptions.sensitive' => 'Hassas',
 			'options.moodCheckInOptions.neutral' => 'Nötr',
 			'options.moodCheckInOptions.good' => 'İyi',
-			_ => null,
-		} ?? switch (path) {
 			'options.moodCheckInOptions.great' => 'Harika',
 			'options.moodCompanionOptions.by_myself' => 'Yalnızdım',
 			'options.moodCompanionOptions.with_my_partner' => 'Partnerimleydim',
@@ -2038,12 +2680,12 @@ extension on TranslationsTr {
 			'options.dischargeSymptoms.burning' => 'Yanma',
 			'options.dischargeSymptoms.painful_urination' => 'İdrar yaparken ağrı',
 			'options.dischargeSymptoms.pelvic_lower_abdominal_pain' => 'Pelvik / alt karın ağrısı',
-			'options.dosageOptions.1_count' => '1 Adet',
-			'options.dosageOptions.2_count' => '2 Adet',
-			'options.dosageOptions.3_count' => '3 Adet',
-			'options.dosageOptions.4_count' => '4 Adet',
-			'options.dosageOptions.5_count' => '5 Adet',
-			'options.dosageOptions.6_count' => '6 Adet',
+			'options.dosageOptions.1_count' => '1 adet',
+			'options.dosageOptions.2_count' => '2 adet',
+			'options.dosageOptions.3_count' => '3 adet',
+			'options.dosageOptions.4_count' => '4 adet',
+			'options.dosageOptions.5_count' => '5 adet',
+			'options.dosageOptions.6_count' => '6 adet',
 			'options.shortWeekdays.mon' => 'Pzt',
 			'options.shortWeekdays.tue' => 'Sal',
 			'options.shortWeekdays.wed' => 'Çar',
@@ -2061,7 +2703,7 @@ extension on TranslationsTr {
 			'options.articleTopics.nutrition' => 'Beslenme',
 			'options.articleTopics.exercise' => 'Egzersiz',
 			'options.articleTopics.womens_health' => 'Kadın Sağlığı',
-			'options.articleTopics.mood' => 'Ruh Hali',
+			'options.articleTopics.mood' => 'Ruh hâli',
 			'options.articleTopics.sleep' => 'Uyku',
 			'options.articleTopics.general_health' => 'Genel Sağlık',
 			'options.defaultMedications.parol' => 'Parol',
@@ -2084,7 +2726,7 @@ extension on TranslationsTr {
 			'options.calendarWeekdayInitials.s' => 'C',
 			'options.calendarWeekdayInitials.s_2' => 'P',
 			'pregnancy.common.testTitle' => 'Hamilelik testi',
-			'pregnancy.common.testHint' => 'Testler beklenen adetin ilk gününden itibaren daha güvenilirdir. Adet tarihini bilmiyorsan korunmasız ilişkiden en az 21 gün sonra test yap.',
+			'pregnancy.common.testHint' => 'Testler beklenen adetin ilk gününden itibaren daha güvenilir sonuç verebilir. Adet tarihini bilmiyorsan korunmasız ilişkiden en az 21 gün sonra test yapabilirsin.',
 			'pregnancy.common.testPositiveAction' => 'Hamileyim',
 			'pregnancy.common.positiveTestRecorded' => 'Pozitif test kaydı: {date} · Tek başına gebelik haftasını belirlemez.',
 			'pregnancy.common.badge' => 'GEBELİK',
@@ -2094,75 +2736,75 @@ extension on TranslationsTr {
 			'pregnancy.common.estimateCombined' => 'Son adet ve cinsel ilişki kayıtlarına göre tahmini',
 			'pregnancy.common.estimateLastPeriod' => 'Son adet başlangıcına göre tahmini',
 			'pregnancy.common.estimateSexualActivity' => 'Cinsel ilişki kaydına göre yaklaşık tahmin',
-			'pregnancy.common.estimateUnavailable' => 'Haftayı hesaplamak için son adet tarihini veya cinsel ilişki kaydını ekle.',
+			'pregnancy.common.estimateUnavailable' => 'Gebelik haftası için son adet tarihi veya cinsel ilişki kaydı gerekiyor.',
 			'pregnancy.common.infoComingSoon' => 'Haftalık bilgilendirici içerikler yakında',
-			'pregnancy.common.estimatedDueDate' => 'Tahmini buluşma tarihi: {date}',
-			'pregnancy.fertility.insightTitle' => 'Tahmini verimli dönemin başladı',
-			'pregnancy.fertility.insightBody' => 'Döngü kayıtlarına göre tahmini verimli dönemdesin. Vücut sinyallerini ve akıntı değişimlerini kaydetmen, kendi örüntülerini görmene yardımcı olabilir. Takvim tahmini ovülasyonu doğrulamaz.',
+			'pregnancy.common.estimatedDueDate' => 'Tahmini doğum tarihi: {date}',
+			'pregnancy.fertility.insightTitle' => 'Tahmini ovülasyon dönemi',
+			'pregnancy.fertility.insightBody' => 'Döngü kayıtlarına göre tahmini ovülasyon döneminde olabilirsin. İstersen akıntı gibi vücut sinyallerini kaydedebilirsin. Takvim tahmini ovülasyonu doğrulamaz.',
 			'pregnancy.modes.getPregnant' => 'Hamile kal',
-			'pregnancy.modes.getPregnantSubtitle' => 'Döngü takibi ve verimli dönem içgörüleri',
+			'pregnancy.modes.getPregnantSubtitle' => 'Döngü takibi ve tahmini ovülasyon bilgileri',
 			'pregnancy.modes.pregnant' => 'Hamileyim',
-			'pregnancy.modes.pregnantSubtitle' => 'Gebelik yolculuğu',
+			'pregnancy.modes.pregnantSubtitle' => 'Gebelik takibi',
 			'pregnancy.modes.changeConfirmationTitle' => 'Modunu değiştirmek istiyor musun?',
 			'pregnancy.modes.changeConfirmationBody' => 'Takip tercihin {mode} olarak değiştirilecek. Kayıtların silinmeyecek.',
 			'pregnancy.modes.changeAction' => 'Evet, değiştir',
-			'pregnancy.modes.changeFailed' => 'Mod şu anda değiştirilemedi. Tekrar dene.',
-			'pregnancy.stages.stage1.title' => '1–4. hafta · Başlangıç ve Yerleşme',
-			'pregnancy.stages.stage1.body' => 'Her şey daha yeni başlıyor. Vücudun minik ama çok önemli değişimlere hazırlanıyor. 💗',
-			'pregnancy.stages.stage2.title' => '5–8. hafta · Temeller Atılıyor',
-			'pregnancy.stages.stage2.body' => 'Minik gelişmeler hızla devam ediyor. Sen de vücudundaki değişimleri biraz daha fazla hissetmeye başlayabilirsin.',
-			'pregnancy.stages.stage3.title' => '9–13. hafta · Fetal Döneme Geçiş',
-			'pregnancy.stages.stage3.body' => 'İlk haftaların büyük kısmını geride bıraktın. Bebeğin her geçen gün biraz daha belirginleşiyor. ✨',
-			'pregnancy.stages.stage4.title' => '14–17. hafta · Hızlı Büyüme',
-			'pregnancy.stages.stage4.body' => 'Bebeğin hızla büyürken sen de hamileliğinin yeni dönemine alışmaya devam ediyorsun.',
-			'pregnancy.stages.stage5.title' => '18–22. hafta · İlk Hareketler',
-			'pregnancy.stages.stage5.body' => 'O minik hareketleri hissetmeye başlayabileceğin çok özel haftalardasın. 🫶',
-			'pregnancy.stages.stage6.title' => '23–27. hafta · Güçlenme',
-			'pregnancy.stages.stage6.body' => 'Bebeğinin hareketleri artık daha belirgin olabilir. İçeride küçük ama oldukça hareketli bir dünya var.',
+			'pregnancy.modes.changeFailed' => 'Mod şu anda değiştirilemedi. Yeniden deneyebilirsin.',
+			'pregnancy.stages.stage1.title' => '1–4. hafta · Başlangıç',
+			'pregnancy.stages.stage1.body' => 'Bu haftalarda döllenme ve rahme yerleşme süreci gerçekleşebilir. Gebelik haftası son adet başlangıcından itibaren hesaplanır.',
+			'pregnancy.stages.stage2.title' => '5–8. hafta · Erken gelişim',
+			'pregnancy.stages.stage2.body' => 'Embriyonun temel organ ve sistemleri bu haftalarda gelişmeye başlar. Yaşanan belirtiler kişiden kişiye değişebilir.',
+			'pregnancy.stages.stage3.title' => '9–13. hafta · Fetal döneme geçiş',
+			'pregnancy.stages.stage3.body' => 'Bu dönemde fetüsün organları ve vücut yapıları gelişmeye devam eder.',
+			'pregnancy.stages.stage4.title' => '14–17. hafta · Büyüme',
+			'pregnancy.stages.stage4.body' => 'Fetüsün büyümesi ve hareket gelişimi bu haftalarda devam eder.',
+			'pregnancy.stages.stage5.title' => '18–22. hafta · Hareketler',
+			'pregnancy.stages.stage5.body' => 'Fetal hareketler bu haftalarda fark edilebilir; ilk fark edilme zamanı kişiden kişiye değişir.',
+			'pregnancy.stages.stage6.title' => '23–27. hafta · Gelişim',
+			'pregnancy.stages.stage6.body' => 'Fetüsün hareketleri ve organ gelişimi bu dönemde devam eder.',
 			'pregnancy.stages.stage7.title' => '28–31. hafta · Olgunlaşma',
-			'pregnancy.stages.stage7.body' => 'Bebeğin büyümeye ve güçlenmeye devam ediyor. Buluşmanıza doğru güzel güzel ilerliyorsunuz. 🤍',
-			'pregnancy.stages.stage8.title' => '32–35. hafta · Doğuma Hazırlık',
-			'pregnancy.stages.stage8.body' => 'Artık sonlara yaklaşıyorsunuz. Bebeğin doğum sonrası hayata hazırlanırken senin vücudun da onunla birlikte hazırlanıyor.',
-			'pregnancy.stages.stage9.title' => '36–40+ hafta · Son Haftalar',
-			'pregnancy.stages.stage9.body' => 'Buluşma zamanı giderek yaklaşıyor. Bu son haftalarda kendine biraz daha nazik davranmayı unutma. 🌷',
+			'pregnancy.stages.stage7.body' => 'Fetüs büyümeye devam eder; akciğer ve sinir sistemi gelişimi sürer.',
+			'pregnancy.stages.stage8.title' => '32–35. hafta · Doğuma hazırlık',
+			'pregnancy.stages.stage8.body' => 'Fetüs kilo almaya ve doğum sonrası yaşama hazırlanmayı sürdürür.',
+			'pregnancy.stages.stage9.title' => '36–40+ hafta · Son haftalar',
+			'pregnancy.stages.stage9.body' => 'Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin.',
 			'premium.pageTitle' => 'Premium',
 			'premium.close' => 'Premium ekranını kapat',
-			'premium.eyebrow' => 'Döngün, daha fazla ayrıntıyla',
-			'premium.heroTitle' => 'Örüntülerini daha net gör',
-			'premium.heroDescription' => 'OMA Premium; kişisel içgörülerini, uzman içeriklerini ve sağlık özetini sakin ve sana özel tek bir alanda buluşturur.',
-			'premium.activeEyebrow' => 'Üyeliğin aktif',
-			'premium.activeTitle' => 'Premium senin için hazır',
-			'premium.activePlanTitle' => ({required Object plan}) => '${plan} senin için hazır',
+			'premium.eyebrow' => 'Döngü kayıtlarında daha fazla ayrıntı',
+			'premium.heroTitle' => 'Daha ayrıntılı kişisel örüntüler',
+			'premium.heroDescription' => 'OMA Premium; kişisel içgörüleri, uzman içeriklerini ve sağlık özetini tek yerde sunar.',
+			'premium.activeEyebrow' => 'Üyeliğin etkin',
+			'premium.activeTitle' => 'Premium özellikleri açık',
+			'premium.activePlanTitle' => ({required Object plan}) => '${plan} özellikleri açık',
 			'premium.activeDescription' => 'Paketindeki ücretli özellikler bu hesapta açık.',
 			'premium.benefitsTitle' => 'Seçtiğin pakette neler var',
-			'premium.benefitsDescription' => 'Her seviyeyi karşılaştır ve sana iyi gelen desteği seç.',
-			'premium.benefitTrackingTitle' => 'Döngü ve iyi yaşam takibi',
-			'premium.benefitTrackingDescription' => 'Takvimini, belirtilerini ve günlük iyi yaşam notlarını bir arada tut.',
+			'premium.benefitsDescription' => 'Paketleri karşılaştırarak ihtiyacına uygun özellikleri seçebilirsin.',
+			'premium.benefitTrackingTitle' => 'Döngü ve günlük kayıt takibi',
+			'premium.benefitTrackingDescription' => 'Takvim, belirti ve günlük sağlık kayıtlarını tek yerde toplar.',
 			'premium.benefitInsightsTitle' => 'Daha derin kişisel içgörüler',
-			'premium.benefitInsightsDescription' => 'Döngün, ruh halin ve günlük kayıtların arasındaki anlamlı bağlantıları gör.',
+			'premium.benefitInsightsDescription' => 'Döngü, ruh hâli ve günlük kayıtlar arasındaki bağlantıları gösterir.',
 			'premium.benefitArticlesTitle' => 'Tüm uzman içerikleri',
-			'premium.benefitArticlesDescription' => 'Her fazı desteklemek için hazırlanan tüm OMA yazılarını oku.',
+			'premium.benefitArticlesDescription' => 'Döngü fazları hakkında hazırlanan tüm OMA yazılarına erişim sağlar.',
 			'premium.benefitReportTitle' => 'Paylaşılabilir doktor raporu',
-			'premium.benefitReportDescription' => 'Döngü ve sağlık kayıtlarını anlaşılır tek bir özette bir araya getir.',
+			'premium.benefitReportDescription' => 'Döngü ve sağlık kayıtlarını anlaşılır bir özette sunar.',
 			'premium.benefitDreamsTitle' => 'Rüya yorumları',
-			'premium.benefitDreamsDescription' => 'Kaydettiğin rüyaların hislerini ve öne çıkan temalarını keşfet.',
-			'premium.plansTitle' => 'Deneyimini seç',
+			'premium.benefitDreamsDescription' => 'Kaydettiğin rüyalardaki öne çıkan temalara yönelik yorumlar sunar.',
+			'premium.plansTitle' => 'Paketleri karşılaştır',
 			'premium.freePlanName' => 'OMA Ücretsiz',
 			'premium.freePlanBadge' => 'Başlangıç',
 			'premium.freePlanPrice' => 'Ücretsiz',
-			'premium.freePlanDescription' => 'Günlük döngü ve iyi yaşam takibi',
+			'premium.freePlanDescription' => 'Günlük döngü ve sağlık kaydı takibi',
 			'premium.plusPlanName' => 'OMA Plus',
 			'premium.plusPlanBadge' => 'En popüler',
 			'premium.plusPlanDescription' => 'Kişisel içgörüler ve tüm uzman içerikleri',
 			'premium.premiumPlanName' => 'OMA Premium',
 			'premium.premiumPlanBadge' => 'Tam erişim',
 			'premium.premiumPlanDescription' => 'Plus\'taki her şeye ek doktor raporu ve rüya yorumları',
-			'premium.activePlanBadge' => 'Aktif plan',
+			'premium.activePlanBadge' => 'Etkin plan',
 			'premium.selectedPlanTitle' => 'Bu pakette bulunanlar',
 			'premium.monthlyBilling' => 'Google Play üzerinden aylık üyelik',
 			'premium.securePurchase' => 'Google Play ile güvenli satın alma',
 			'premium.renewalNote' => 'Otomatik yenilenir. Google Play\'den istediğin zaman iptal edebilirsin.',
-			'premium.signInNote' => 'Premium erişiminin hesabına bağlı kalması için önce giriş yapmalısın.',
+			'premium.signInNote' => 'Giriş yaptığında Premium erişimin hesabına bağlanır.',
 			'premium.statusTitle' => 'Üyelik bilgisi',
 			'premium.back' => 'Tamam',
 			'premium.signIn' => 'Giriş yap ve devam et',
@@ -2172,7 +2814,7 @@ extension on TranslationsTr {
 			'premium.changePlan' => ({required Object price}) => 'Paketi değiştir · ${price}',
 			'premium.currentPlan' => 'Mevcut paketin',
 			'premium.manageSubscription' => 'Google Play\'de yönet',
-			'premium.freeManagementNote' => 'Ücretsiz pakete dönmek için ücretli üyeliğini Google Play\'den iptal et. Erişimin mevcut fatura dönemi sonuna kadar devam eder.',
+			'premium.freeManagementNote' => 'Ücretsiz pakete dönmek için ücretli üyeliğini Google Play\'den iptal etmen gerekir. Erişimin mevcut fatura dönemi sonuna kadar devam eder.',
 			'premium.restore' => 'Satın almayı geri yükle',
 			'premium.googlePlayPrice' => 'Google Play fiyatı',
 			'premium.purchaseUpdateFailed' => ({required Object error}) => 'Satın alma güncellemesi okunamadı: ${error}',
@@ -2181,8 +2823,8 @@ extension on TranslationsTr {
 			'premium.productNotFound' => 'Premium üyeliği Google Play\'de bulunamadı.',
 			'premium.productsNotFound' => 'Ücretli paketlerden biri veya birkaçı Google Play\'de bulunamadı.',
 			'premium.storeConnectionFailed' => ({required Object error}) => 'Google Play\'e bağlanılamadı: ${error}',
-			'premium.loginRequired' => 'Premium\'u başlatmadan önce giriş yapmalısın.',
-			'premium.loginRestoreRequired' => 'Satın almayı geri yüklemeden önce giriş yapmalısın.',
+			'premium.loginRequired' => 'Premium\'u başlatmak için giriş yapman gerekiyor.',
+			'premium.loginRestoreRequired' => 'Satın almayı geri yüklemek için giriş yapman gerekiyor.',
 			'premium.invalidAccount' => 'Premium hesap eşleştirme kimliği geçersiz.',
 			'premium.purchaseScreenFailed' => 'Google Play satın alma ekranı açılamadı.',
 			'premium.purchaseStartFailed' => ({required Object error}) => 'Satın alma başlatılamadı: ${error}',
@@ -2193,10 +2835,10 @@ extension on TranslationsTr {
 			'premium.purchaseCancelled' => 'Satın alma iptal edildi.',
 			'premium.verifyingPurchase' => 'Satın alman güvenli biçimde doğrulanıyor…',
 			'premium.googlePlayOnly' => 'Yalnızca Google Play satın almaları destekleniyor.',
-			'premium.noActivePremium' => 'Aktif bir Premium üyeliği bulunamadı.',
-			'premium.premiumActivated' => 'Premium aktif. OMA Premium\'a hoş geldin.',
-			'premium.membershipActivated' => ({required Object plan}) => '${plan} bu hesapta aktif.',
-			'premium.planChangeNeedsRestore' => 'Mevcut Google Play satın alman yüklenemedi. Paket değiştirmeden önce satın almayı geri yükle.',
+			'premium.noActivePremium' => 'Etkin bir Premium üyeliği bulunamadı.',
+			'premium.premiumActivated' => 'Premium üyeliğin etkinleştirildi.',
+			'premium.membershipActivated' => ({required Object plan}) => '${plan} bu hesapta etkin.',
+			'premium.planChangeNeedsRestore' => 'Mevcut Google Play satın alman yüklenemedi. Paket değişikliği için önce satın almayı geri yüklemen gerekir.',
 			'premium.subscriptionManagementFailed' => 'Google Play üyelik yönetimi açılamadı.',
 			'premium.purchaseVerificationFailed' => ({required Object error}) => 'Satın alma doğrulanamadı: ${error}',
 			_ => null,

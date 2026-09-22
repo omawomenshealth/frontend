@@ -9,22 +9,22 @@ class ImageConstants {
       '$_basePath/features/profile/profile-characters.png';
 
   static const List<String> decorativeBlooms = [
-    '$_basePath/decorative/blooms/bloom-01.png',
-    '$_basePath/decorative/blooms/bloom-02.png',
-    '$_basePath/decorative/blooms/bloom-03.png',
-    '$_basePath/decorative/blooms/bloom-04.png',
-    '$_basePath/decorative/blooms/bloom-05.png',
-    '$_basePath/decorative/blooms/bloom-06.png',
-    '$_basePath/decorative/blooms/bloom-07.png',
-    '$_basePath/decorative/blooms/bloom-08.png',
-    '$_basePath/decorative/blooms/bloom-09.png',
-    '$_basePath/decorative/blooms/bloom-10.png',
-    '$_basePath/decorative/blooms/bloom-11.png',
-    '$_basePath/decorative/blooms/bloom-12.png',
-    '$_basePath/decorative/blooms/bloom-13.png',
-    '$_basePath/decorative/blooms/bloom-14.png',
-    '$_basePath/decorative/blooms/bloom-15.png',
-    '$_basePath/decorative/blooms/bloom-16.png',
+    '$_basePath/decorative/blooms/menstrual/phase_bloom_01.png',
+    '$_basePath/decorative/blooms/follicular/phase_bloom_01.png',
+    '$_basePath/decorative/blooms/ovulation/phase_bloom_01.png',
+    '$_basePath/decorative/blooms/luteal/phase_bloom_01.png',
+    '$_basePath/decorative/blooms/menstrual/phase_bloom_02.png',
+    '$_basePath/decorative/blooms/follicular/phase_bloom_02.png',
+    '$_basePath/decorative/blooms/ovulation/phase_bloom_02.png',
+    '$_basePath/decorative/blooms/luteal/phase_bloom_02.png',
+    '$_basePath/decorative/blooms/menstrual/phase_bloom_03.png',
+    '$_basePath/decorative/blooms/follicular/phase_bloom_03.png',
+    '$_basePath/decorative/blooms/ovulation/phase_bloom_03.png',
+    '$_basePath/decorative/blooms/luteal/phase_bloom_03.png',
+    '$_basePath/decorative/blooms/menstrual/phase_bloom_04.png',
+    '$_basePath/decorative/blooms/follicular/phase_bloom_04.png',
+    '$_basePath/decorative/blooms/ovulation/phase_bloom_04.png',
+    '$_basePath/decorative/blooms/luteal/phase_bloom_04.png',
   ];
 
   static const String articleMovementCover =

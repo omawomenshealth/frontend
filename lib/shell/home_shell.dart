@@ -6,8 +6,8 @@ import '../core/constants/color_constants.dart';
 import '../data/services/notification_service.dart';
 import '../views/articles/view/articles_view.dart';
 import '../views/calendar/viewmodel/calendar_view_model.dart';
-import '../views/dashboard/view/dashboard_view.dart';
-import '../views/dashboard/viewmodel/dashboard_view_model.dart';
+import '../features/home/view/home_view.dart';
+import '../features/home/viewmodel/home_view_model.dart';
 import '../views/insights/view/insights_view.dart';
 import '../views/insights/viewmodel/insights_view_model.dart';
 import '../views/profile/view/profile_view.dart';
@@ -57,7 +57,7 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state != AppLifecycleState.resumed) return;
 
-    context.read<DashboardViewModel>().loadData();
+    context.read<HomeViewModel>().loadData();
     context.read<CalendarViewModel>().loadData();
   }
 
@@ -72,7 +72,7 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     AppStrings.of(context);
     final phaseIndex = context
-        .watch<DashboardViewModel>()
+        .watch<HomeViewModel>()
         .periodCalculator
         ?.currentPhaseIndex;
     final activeColor = switch (phaseIndex) {
@@ -87,7 +87,7 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          DashboardView(onOpenInsights: () => _selectPage(2)),
+          HomeView(onOpenInsights: () => _selectPage(2)),
           const ArticlesView(),
           InsightsView(
             isActive: _currentIndex == 2,
@@ -129,7 +129,6 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
     return OmaBottomNavigation(
       currentIndex: _currentIndex,
       onTap: _selectPage,
-      activeColor: activeColor,
       onOmaTap: () => _showOmaSheet(context, activeColor),
       items: _navigationItems,
     );

@@ -10,6 +10,7 @@ import 'package:app_proje_a/localization/generated/strings.g.dart';
 import 'package:app_proje_a/views/onboarding/view/onboarding_view.dart';
 import 'package:app_proje_a/views/onboarding/view/pages/onboarding_preview_page.dart';
 import 'package:app_proje_a/core/widgets/oma_background.dart';
+import 'package:app_proje_a/core/constants/image_constants.dart';
 import 'package:app_proje_a/core/widgets/oma_chip.dart';
 import 'package:app_proje_a/views/onboarding/viewmodel/onboarding_view_model.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,15 @@ void main() {
         textDirection: TextDirection.ltr,
         child: MediaQuery(
           data: MediaQueryData(size: Size(360, 640)),
-          child: SizedBox.expand(child: OmaBackground(seed: 0)),
+          child: SizedBox.expand(
+            child: OmaBackground(
+              seed: 0,
+              spotCount: 3,
+              minSize: 94,
+              maxSize: 128,
+              bloomAssets: ImageConstants.decorativeBlooms,
+            ),
+          ),
         ),
       ),
     );
@@ -41,14 +50,22 @@ void main() {
         .widgetList<Image>(find.byType(Image))
         .map((image) => (image.image as AssetImage).assetName)
         .toList();
-    expect(firstPageAssets, hasLength(5));
+    expect(firstPageAssets, hasLength(3));
 
     await tester.pumpWidget(
       const Directionality(
         textDirection: TextDirection.ltr,
         child: MediaQuery(
           data: MediaQueryData(size: Size(360, 640)),
-          child: SizedBox.expand(child: OmaBackground(seed: 1)),
+          child: SizedBox.expand(
+            child: OmaBackground(
+              seed: 1,
+              spotCount: 3,
+              minSize: 94,
+              maxSize: 128,
+              bloomAssets: ImageConstants.decorativeBlooms,
+            ),
+          ),
         ),
       ),
     );
@@ -57,8 +74,12 @@ void main() {
         .widgetList<Image>(find.byType(Image))
         .map((image) => (image.image as AssetImage).assetName)
         .toList();
-    expect(secondPageAssets, hasLength(5));
+    expect(secondPageAssets, hasLength(3));
     expect(secondPageAssets, isNot(equals(firstPageAssets)));
+    final visibleAssets = [...firstPageAssets, ...secondPageAssets];
+    for (final phase in ['menstrual', 'follicular', 'ovulation', 'luteal']) {
+      expect(visibleAssets.any((asset) => asset.contains('/$phase/')), isTrue);
+    }
   });
 
   testWidgets('önizleme kartı bilgilerini sağa hizalar', (tester) async {

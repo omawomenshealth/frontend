@@ -8,7 +8,7 @@ import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../application/cycle_prediction/cycle_prediction_coordinator.dart';
-import '../../../domain/cycle/models/cycle_prediction.dart';
+import '../../../features/cycle/models/cycle_prediction.dart';
 
 /// Takvim iş mantığı (Optimize Edilmiş Versiyon)
 class CalendarViewModel extends ChangeNotifier {

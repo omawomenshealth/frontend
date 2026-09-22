@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'oma_theme.dart';
 
+enum OmaBadgeLabelVariant { standard, eyebrow }
+
 class OmaBadge extends StatelessWidget {
   const OmaBadge({
     super.key,
@@ -14,10 +16,11 @@ class OmaBadge extends StatelessWidget {
     this.iconSize,
     this.borderRadius,
     this.border,
+    this.labelVariant = OmaBadgeLabelVariant.standard,
   }) : assert(
-          icon != null || label != null,
-          'OmaBadge requires either an icon or a label.',
-        );
+         icon != null || label != null,
+         'OmaBadge requires either an icon or a label.',
+       );
 
   const OmaBadge.icon({
     super.key,
@@ -29,6 +32,7 @@ class OmaBadge extends StatelessWidget {
     this.iconSize,
     this.borderRadius,
     this.border,
+    this.labelVariant = OmaBadgeLabelVariant.standard,
   }) : label = null;
 
   const OmaBadge.label(
@@ -41,6 +45,7 @@ class OmaBadge extends StatelessWidget {
     this.iconSize,
     this.borderRadius,
     this.border,
+    this.labelVariant = OmaBadgeLabelVariant.standard,
   }) : icon = null;
 
   final IconData? icon;
@@ -58,6 +63,7 @@ class OmaBadge extends StatelessWidget {
   final double? iconSize;
   final double? borderRadius;
   final BoxBorder? border;
+  final OmaBadgeLabelVariant labelVariant;
 
   bool get isIconOnly => icon != null && label == null;
 
@@ -75,9 +81,7 @@ class OmaBadge extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(
-            borderRadius ?? size * 0.34,
-          ),
+          borderRadius: BorderRadius.circular(borderRadius ?? size * 0.34),
         ),
         child: Icon(
           icon,
@@ -87,36 +91,30 @@ class OmaBadge extends StatelessWidget {
       );
     }
 
+    final labelStyle = switch (labelVariant) {
+      OmaBadgeLabelVariant.standard => OmaText.label(color: foregroundColor),
+      OmaBadgeLabelVariant.eyebrow => OmaText.label(
+        color: foregroundColor,
+        weight: FontWeight.w700,
+      ).copyWith(fontSize: 9, letterSpacing: 2.3),
+    };
+
     return Container(
-      padding: padding ??
-          const EdgeInsets.symmetric(
-            horizontal: 9,
-            vertical: 4,
-          ),
+      padding:
+          padding ?? const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(
-          borderRadius ?? 20,
-        ),
+        borderRadius: BorderRadius.circular(borderRadius ?? 20),
         border: border,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(
-              icon,
-              size: iconSize ?? 14,
-              color: foregroundColor,
-            ),
+            Icon(icon, size: iconSize ?? 14, color: foregroundColor),
             const SizedBox(width: 5),
           ],
-          Text(
-            label!,
-            style: OmaText.label(
-              color: foregroundColor,
-            ),
-          ),
+          Text(label!, style: labelStyle),
         ],
       ),
     );

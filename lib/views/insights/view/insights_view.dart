@@ -6,7 +6,7 @@ import '../../../core/constants/color_constants.dart';
 import '../../../core/shared_widgets/oma_design_widgets.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../data/models/personal_insight_model.dart';
-import '../../dashboard/viewmodel/dashboard_view_model.dart';
+import '../../../features/home/viewmodel/home_view_model.dart';
 import '../viewmodel/insights_view_model.dart';
 
 part 'insights_story_view.dart';
