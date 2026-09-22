@@ -29,7 +29,7 @@ class DailyLogSheet extends StatefulWidget {
   final Future<void> Function()? onSettingsChanged;
   final int initialTabIndex;
   final bool isSingleTab;
-  final Color themeColor;
+  final Color? themeColor;
 
   const DailyLogSheet({
     super.key,
@@ -40,7 +40,7 @@ class DailyLogSheet extends StatefulWidget {
     this.onSettingsChanged,
     this.initialTabIndex = 0,
     this.isSingleTab = false,
-    this.themeColor = OmaPalette.primary,
+    this.themeColor,
   });
 
   @override
@@ -297,7 +297,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
 
   Color get _tone => switch (_logType) {
     0 => OmaPalette.periodPrimary,
-    _ => widget.themeColor,
+    _ => widget.themeColor ?? context.omaTheme.primary,
   };
 
   bool get _isMoodContext => _logType == 3 && _moodStep == 2;
@@ -323,8 +323,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       maxChildSize: 0.98,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: OmaPalette.background,
+          decoration: BoxDecoration(
+            color: context.omaTheme.background,
             borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
           ),
           clipBehavior: Clip.antiAlias,
@@ -376,11 +376,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             child: Text(
               meta,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.4,
-                color: OmaPalette.muted,
+                color: context.omaTheme.muted,
               ),
             ),
           ),
@@ -388,9 +388,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: OmaPalette.card,
+              color: context.omaTheme.surface,
               shape: BoxShape.circle,
-              border: Border.all(color: OmaPalette.border),
+              border: Border.all(color: context.omaTheme.border),
             ),
             child: IconButton(
               tooltip: AppStrings.close,
@@ -428,12 +428,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         Text(
           title,
           textAlign: centered ? TextAlign.center : TextAlign.left,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'CormorantGaramond',
             fontSize: 29,
             height: 1.04,
             fontWeight: FontWeight.w600,
-            color: OmaPalette.foreground,
+            color: context.omaTheme.foreground,
           ),
         ),
         if (subtitle != null) ...[
@@ -441,10 +441,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           Text(
             subtitle,
             textAlign: centered ? TextAlign.center : TextAlign.left,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               height: 1.45,
-              color: OmaPalette.muted,
+              color: context.omaTheme.muted,
             ),
           ),
         ],
@@ -514,7 +514,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 10),
         Text(
           AppStrings.flowOptions[_flowIndex],
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'CormorantGaramond',
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -581,7 +581,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               icon: const Icon(Icons.delete_outline_rounded, size: 19),
               label: Text(
                 AppStrings.deletePeriodForDay(_log.date.isToday),
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -602,7 +602,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         Container(
           padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
-            color: OmaPalette.card,
+            color: context.omaTheme.surface,
             borderRadius: BorderRadius.circular(25),
           ),
           child: Column(
@@ -625,7 +625,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         const SizedBox(height: 7),
                         Text(
                           AppStrings.hydrationGlasses(_waterGlasses, 8),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'CormorantGaramond',
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -673,7 +673,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           margin: EdgeInsets.only(right: index == 7 ? 0 : 6),
                           decoration: BoxDecoration(
                             color: filled
-                                ? Color.lerp(OmaPalette.card, _tone, 0.16)
+                                ? Color.lerp(
+                                    context.omaTheme.surface,
+                                    _tone,
+                                    0.16,
+                                  )
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(9),
                             border: Border.all(
@@ -1129,8 +1133,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.92,
         ),
-        decoration: const BoxDecoration(
-          color: OmaPalette.background,
+        decoration: BoxDecoration(
+          color: context.omaTheme.background,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: SingleChildScrollView(
@@ -1165,7 +1169,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             hintText: AppStrings.searchSymptoms,
             prefixIcon: Icon(Icons.search_rounded, size: 19, color: _tone),
             filled: true,
-            fillColor: OmaPalette.card,
+            fillColor: context.omaTheme.surface,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),
@@ -1210,9 +1214,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       key: const ValueKey('pregnancy_test_section'),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: OmaPalette.border),
+        border: Border.all(color: context.omaTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1221,10 +1225,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           const SizedBox(height: 5),
           Text(
             AppStrings.pregnancyTestHint,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               height: 1.35,
-              color: OmaPalette.muted,
+              color: context.omaTheme.muted,
             ),
           ),
           const SizedBox(height: 11),
@@ -1341,7 +1345,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       key: ValueKey('symptom_group_${group.title}'),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: groupTone.withValues(alpha: 0.42)),
       ),
@@ -1399,11 +1403,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         ? _SectionTitle(title)
         : Text(
             title.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.2,
-              color: OmaPalette.muted,
+              color: context.omaTheme.muted,
             ),
           );
     if (customGroup == null) return titleWidget;
@@ -1466,8 +1470,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               selectedType != null &&
               _dreamNoteController.text.trim().isNotEmpty;
           return Container(
-            decoration: const BoxDecoration(
-              color: OmaPalette.card,
+            decoration: BoxDecoration(
+              color: context.omaTheme.surface,
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: SafeArea(
@@ -1488,7 +1492,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         width: 42,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: OmaPalette.border,
+                          color: context.omaTheme.border,
                           borderRadius: BorderRadius.circular(99),
                         ),
                       ),
@@ -1513,10 +1517,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         Expanded(
                           child: Text(
                             AppStrings.saveYourDream,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: OmaPalette.foreground,
+                              color: context.omaTheme.foreground,
                             ),
                           ),
                         ),
@@ -1525,10 +1529,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     const SizedBox(height: 20),
                     Text(
                       AppStrings.dreamTypeQuestion,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: OmaPalette.foreground,
+                        color: context.omaTheme.foreground,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -1572,7 +1576,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       decoration: InputDecoration(
                         hintText: AppStrings.dreamNoteHint,
                         filled: true,
-                        fillColor: OmaPalette.background,
+                        fillColor: context.omaTheme.background,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
                           borderSide: BorderSide(
@@ -1637,9 +1641,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       key: const ValueKey('sexual_activity_card'),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: OmaPalette.border),
+        border: Border.all(color: context.omaTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1648,10 +1652,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           const SizedBox(height: 5),
           Text(
             AppStrings.sexualActivityQuestion,
-            style: const TextStyle(
-              fontSize: 12,
-              color: OmaPalette.muted,
-            ),
+            style: TextStyle(fontSize: 12, color: context.omaTheme.muted),
           ),
           const SizedBox(height: 11),
           _buildTrackingChoices(
@@ -1673,10 +1674,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             const SizedBox(height: 20),
             Text(
               AppStrings.sexualAfterFeelingQuestion,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: OmaPalette.foreground,
+                color: context.omaTheme.foreground,
               ),
             ),
             const SizedBox(height: 9),
@@ -1717,9 +1718,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       key: const ValueKey('vaginal_discharge_card'),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: OmaPalette.border),
+        border: Border.all(color: context.omaTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1728,10 +1729,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           const SizedBox(height: 5),
           Text(
             AppStrings.dischargePresent,
-            style: const TextStyle(
-              fontSize: 12,
-              color: OmaPalette.muted,
-            ),
+            style: TextStyle(fontSize: 12, color: context.omaTheme.muted),
           ),
           const SizedBox(height: 11),
           _buildTrackingChoices(
@@ -1789,11 +1787,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             const SizedBox(height: 18),
             Text(
               AppStrings.dischargeSymptoms.toUpperCase(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.4,
-                color: OmaPalette.muted,
+                color: context.omaTheme.muted,
               ),
             ),
             const SizedBox(height: 9),
@@ -1829,16 +1827,16 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             const SizedBox(height: 15),
             Text(
               AppStrings.dischargeTrackingHint,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 height: 1.45,
-                color: OmaPalette.muted,
+                color: context.omaTheme.muted,
               ),
             ),
             const SizedBox(height: 7),
             Text(
               AppStrings.dischargeMedicalDisclaimer,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 height: 1.4,
                 color: OmaPalette.textHint,
@@ -1925,11 +1923,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       children: [
         Text(
           title.toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 9,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.4,
-            color: OmaPalette.muted,
+            color: context.omaTheme.muted,
           ),
         ),
         const SizedBox(height: 9),
@@ -2174,7 +2172,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Color.lerp(OmaPalette.card, _tone, 0.035),
+        color: Color.lerp(context.omaTheme.surface, _tone, 0.035),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _tone.withValues(alpha: 0.24)),
       ),
@@ -2216,11 +2214,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                               children: [
                                 Text(
                                   AppStrings.medicationAndSupplement,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'CormorantGaramond',
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
-                                    color: OmaPalette.foreground,
+                                    color: context.omaTheme.foreground,
                                   ),
                                 ),
                                 const SizedBox(height: 1),
@@ -2228,9 +2226,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                                   summary,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10.5,
-                                    color: OmaPalette.muted,
+                                    color: context.omaTheme.muted,
                                   ),
                                 ),
                               ],
@@ -2288,10 +2286,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               Expanded(
                 child: Text(
                   AppStrings.medicationLogEmptyHint,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11.5,
                     height: 1.4,
-                    color: OmaPalette.muted,
+                    color: context.omaTheme.muted,
                   ),
                 ),
               ),
@@ -2319,7 +2317,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           const SizedBox(height: 14),
           Text(
             AppStrings.medicationDisclaimer,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               height: 1.4,
               color: OmaPalette.textHint,
@@ -2334,7 +2332,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final tone = _tone;
     final action = await showModalBottomSheet<_MedicationNutritionAction>(
       context: context,
-      backgroundColor: OmaPalette.card,
+      backgroundColor: context.omaTheme.surface,
       showDragHandle: true,
       builder: (sheetContext) => SafeArea(
         child: Padding(
@@ -2533,8 +2531,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         maxChildSize: 0.96,
         expand: false,
         builder: (sheetContext, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: OmaPalette.card,
+          decoration: BoxDecoration(
+            color: context.omaTheme.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: ListView(
@@ -2579,11 +2577,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'CormorantGaramond',
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: OmaPalette.foreground,
+            color: context.omaTheme.foreground,
           ),
         ),
         const SizedBox(height: 8),
@@ -2617,7 +2615,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: expanded || entry.taken
@@ -2663,12 +2661,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'CormorantGaramond',
                                     fontSize: 16,
                                     height: 1.05,
                                     fontWeight: FontWeight.w700,
-                                    color: OmaPalette.foreground,
+                                    color: context.omaTheme.foreground,
                                   ),
                                 ),
                                 const SizedBox(height: 3),
@@ -2677,9 +2675,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                                   '${entry.stomachState}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 9.5,
-                                    color: OmaPalette.muted,
+                                    color: context.omaTheme.muted,
                                   ),
                                 ),
                               ],
@@ -2756,11 +2754,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 children: [
                   Text(
                     AppStrings.medicationTime.toUpperCase(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 8.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.1,
-                      color: OmaPalette.muted,
+                      color: context.omaTheme.muted,
                     ),
                   ),
                   const SizedBox(height: 7),
@@ -2831,10 +2829,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                       Expanded(
                         child: Text(
                           AppStrings.medicationDose,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: OmaPalette.foreground,
+                            color: context.omaTheme.foreground,
                           ),
                         ),
                       ),
@@ -2882,11 +2880,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   const SizedBox(height: 12),
                   Text(
                     AppStrings.medicationStomachState.toUpperCase(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 8.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.1,
-                      color: OmaPalette.muted,
+                      color: context.omaTheme.muted,
                     ),
                   ),
                   const SizedBox(height: 7),
@@ -3030,7 +3028,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: OmaPalette.card,
+      backgroundColor: context.omaTheme.surface,
       builder: (_) => Theme(
         data: baseTheme.copyWith(
           colorScheme: baseTheme.colorScheme.copyWith(primary: _tone),
@@ -3124,7 +3122,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 child: Center(
                   child: Text(
                     AppStrings.moodCheckInEmojis[_moodIndex],
-                    style: const TextStyle(fontSize: 58),
+                    style: TextStyle(fontSize: 58),
                   ),
                 ),
               ),
@@ -3166,7 +3164,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Color.lerp(OmaPalette.card, _tone, 0.09),
+            color: Color.lerp(context.omaTheme.surface, _tone, 0.09),
             borderRadius: BorderRadius.circular(23),
             border: Border.all(color: _tone.withValues(alpha: 0.42)),
           ),
@@ -3185,7 +3183,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               const SizedBox(height: 8),
               Text(
                 AppStrings.moodGentleTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'CormorantGaramond',
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -3194,10 +3192,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               const SizedBox(height: 5),
               Text(
                 AppStrings.moodGentleBody,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11.5,
                   height: 1.45,
-                  color: OmaPalette.muted,
+                  color: context.omaTheme.muted,
                 ),
               ),
             ],
@@ -3222,10 +3220,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           alignment: Alignment.centerLeft,
           child: Text(
             AppStrings.moodCompanionTrackingHint,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11.5,
               height: 1.4,
-              color: OmaPalette.muted,
+              color: context.omaTheme.muted,
             ),
           ),
         ),
@@ -3289,11 +3287,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     final value = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: OmaPalette.card,
+        backgroundColor: context.omaTheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Text(
           companion ? AppStrings.moodWhoWith : AppStrings.moodWhere,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'CormorantGaramond',
             fontSize: 24,
             fontWeight: FontWeight.w700,
@@ -3384,8 +3382,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
         color: selected
-            ? Color.lerp(OmaPalette.card, tone, 0.16)
-            : Color.lerp(OmaPalette.card, tone, 0.045),
+            ? Color.lerp(context.omaTheme.surface, tone, 0.16)
+            : Color.lerp(context.omaTheme.surface, tone, 0.045),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: selected ? tone : tone.withValues(alpha: 0.52),
@@ -3437,7 +3435,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                                 fontWeight: selected
                                     ? FontWeight.w800
                                     : FontWeight.w600,
-                                color: selected ? tone : OmaPalette.foreground,
+                                color: selected
+                                    ? tone
+                                    : context.omaTheme.foreground,
                               ),
                             ),
                           ),
@@ -3490,7 +3490,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(12, 11, 12, 12),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: context.omaTheme.surface,
         border: Border(top: BorderSide(color: tone.withValues(alpha: 0.26))),
       ),
       child: Column(
@@ -3498,11 +3498,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         children: [
           Text(
             AppStrings.whatDidYouEat.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.2,
-              color: OmaPalette.muted,
+              color: context.omaTheme.muted,
             ),
           ),
           const SizedBox(height: 8),
@@ -3524,11 +3524,11 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           const SizedBox(height: 16),
           Text(
             AppStrings.howFeltAfterEating.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.2,
-              color: OmaPalette.muted,
+              color: context.omaTheme.muted,
             ),
           ),
           const SizedBox(height: 8),
@@ -3601,7 +3601,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       top: false,
       child: Container(
         padding: const EdgeInsets.fromLTRB(8, 8, 8, 9),
-        color: OmaPalette.background.withValues(alpha: 0.97),
+        color: context.omaTheme.background.withValues(alpha: 0.97),
         child: SizedBox(
           width: double.infinity,
           height: 57,
@@ -3624,7 +3624,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   )
                 : Text(
                     _actionLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'CormorantGaramond',
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -4041,8 +4041,8 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           24,
           22 + MediaQuery.viewPaddingOf(sheetContext).bottom,
         ),
-        decoration: const BoxDecoration(
-          color: OmaPalette.card,
+        decoration: BoxDecoration(
+          color: context.omaTheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
@@ -4052,7 +4052,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               width: 42,
               height: 4,
               decoration: BoxDecoration(
-                color: OmaPalette.border,
+                color: context.omaTheme.border,
                 borderRadius: BorderRadius.circular(99),
               ),
             ),
@@ -4065,21 +4065,18 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             const SizedBox(height: 12),
             Text(
               AppStrings.dreamSaved,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'CormorantGaramond',
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
-                color: OmaPalette.foreground,
+                color: context.omaTheme.foreground,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               AppStrings.dreamPremiumOffer,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: OmaPalette.muted,
-                height: 1.4,
-              ),
+              style: TextStyle(color: context.omaTheme.muted, height: 1.4),
             ),
             const SizedBox(height: 18),
             SizedBox(
@@ -4130,7 +4127,7 @@ class _SheetHandle extends StatelessWidget {
       height: 4,
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
-        color: OmaPalette.border,
+        color: context.omaTheme.border,
         borderRadius: BorderRadius.circular(2),
       ),
     );
@@ -4146,11 +4143,11 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'CormorantGaramond',
         fontSize: 18,
         fontWeight: FontWeight.w700,
-        color: OmaPalette.foreground,
+        color: context.omaTheme.foreground,
       ),
     );
   }
@@ -4178,8 +4175,8 @@ class _PillChoice extends StatelessWidget {
       color: selected
           ? color
           : colorizeIdle
-          ? Color.lerp(OmaPalette.card, color, 0.09)
-          : OmaPalette.card,
+          ? Color.lerp(context.omaTheme.surface, color, 0.09)
+          : context.omaTheme.surface,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: onTap,
@@ -4194,7 +4191,7 @@ class _PillChoice extends StatelessWidget {
                   ? color
                   : colorizeIdle
                   ? color.withValues(alpha: 0.62)
-                  : OmaPalette.border,
+                  : context.omaTheme.border,
               width: selected || colorizeIdle ? 1.2 : 1,
             ),
           ),
@@ -4204,7 +4201,7 @@ class _PillChoice extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              color: selected ? Colors.white : OmaPalette.foreground,
+              color: selected ? Colors.white : context.omaTheme.foreground,
             ),
           ),
         ),
@@ -4234,7 +4231,7 @@ class _RoundButton extends StatelessWidget {
     return Opacity(
       opacity: enabled ? 1 : 0.35,
       child: Material(
-        color: filled ? color : OmaPalette.card,
+        color: filled ? color : context.omaTheme.surface,
         shape: CircleBorder(
           side: BorderSide(
             color: filled ? color : color.withValues(alpha: 0.38),
@@ -4287,8 +4284,8 @@ class _StepSelector extends StatelessWidget {
                         ? FontWeight.w800
                         : FontWeight.w500,
                     color: entry.key == selectedIndex
-                        ? OmaPalette.foreground
-                        : OmaPalette.muted,
+                        ? context.omaTheme.foreground
+                        : context.omaTheme.muted,
                   ),
                 ),
               ),
@@ -4394,7 +4391,7 @@ class _DreamRecorderTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: selected
             ? color.withValues(alpha: 0.18)
-            : Color.lerp(OmaPalette.card, color, 0.075),
+            : Color.lerp(context.omaTheme.surface, color, 0.075),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: selected ? color : color.withValues(alpha: 0.62),
@@ -4428,10 +4425,10 @@ class _DreamRecorderTile extends StatelessWidget {
                   child: Text(
                     label,
                     maxLines: 2,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w600,
-                      color: OmaPalette.foreground,
+                      color: context.omaTheme.foreground,
                     ),
                   ),
                 ),
@@ -4479,7 +4476,7 @@ class _SymptomTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: selected
                 ? tone.withValues(alpha: 0.18)
-                : Color.lerp(OmaPalette.card, tone, 0.075),
+                : Color.lerp(context.omaTheme.surface, tone, 0.075),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: selected ? tone : tone.withValues(alpha: 0.62),
@@ -4511,10 +4508,10 @@ class _SymptomTile extends StatelessWidget {
                       child: Text(
                         item.label,
                         maxLines: 3,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w600,
-                          color: OmaPalette.foreground,
+                          color: context.omaTheme.foreground,
                         ),
                       ),
                     ),
@@ -4586,7 +4583,7 @@ class _TrackingChoiceTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: selected
             ? color.withValues(alpha: 0.13)
-            : Color.lerp(OmaPalette.card, color, 0.075),
+            : Color.lerp(context.omaTheme.surface, color, 0.075),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: selected ? color : color.withValues(alpha: 0.62),
@@ -4612,7 +4609,7 @@ class _TrackingChoiceTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                      color: selected ? color : OmaPalette.foreground,
+                      color: selected ? color : context.omaTheme.foreground,
                     ),
                   ),
                 ),

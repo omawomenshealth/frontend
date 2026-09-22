@@ -24,10 +24,11 @@ class MedicationChecklistCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: theme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -46,10 +47,10 @@ class MedicationChecklistCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: OmaPalette.foreground,
+                  color: theme.foreground,
                 ),
               ),
               const Spacer(),
@@ -79,7 +80,7 @@ class MedicationChecklistCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               emptyMessage ?? AppStrings.emptyMedicationList,
-              style: const TextStyle(fontSize: 13, color: OmaPalette.textHint),
+              style: TextStyle(fontSize: 13, color: theme.muted),
             ),
           ] else ...[
             const SizedBox(height: 12),
@@ -98,7 +99,7 @@ class MedicationChecklistCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: item.taken
                           ? color.withValues(alpha: 0.08)
-                          : OmaPalette.background,
+                          : theme.background,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: item.taken
@@ -117,7 +118,7 @@ class MedicationChecklistCard extends StatelessWidget {
                             color: item.taken ? color : Colors.transparent,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: item.taken ? color : OmaPalette.textHint,
+                              color: item.taken ? color : theme.muted,
                               width: 1.5,
                             ),
                           ),
@@ -139,8 +140,8 @@ class MedicationChecklistCard extends StatelessWidget {
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: item.taken
-                                  ? OmaPalette.muted
-                                  : OmaPalette.foreground,
+                                  ? theme.muted
+                                  : theme.foreground,
                               decoration: item.taken
                                   ? TextDecoration.lineThrough
                                   : null,
@@ -162,9 +163,9 @@ class MedicationChecklistCard extends StatelessWidget {
                             ),
                             Text(
                               item.stomachState,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
-                                color: OmaPalette.textHint,
+                                color: theme.muted,
                               ),
                             ),
                           ],

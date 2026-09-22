@@ -17,10 +17,11 @@ class MoodSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: OmaPalette.card,
+        color: theme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -61,7 +62,7 @@ class MoodSelectorCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? _getMoodColor(entry.value).withValues(alpha: 0.15)
-                        : OmaPalette.background,
+                        : theme.background,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected
@@ -84,7 +85,7 @@ class MoodSelectorCard extends StatelessWidget {
                               : FontWeight.normal,
                           color: isSelected
                               ? _getMoodColor(entry.value)
-                              : OmaPalette.muted,
+                              : theme.muted,
                         ),
                       ),
                     ],
