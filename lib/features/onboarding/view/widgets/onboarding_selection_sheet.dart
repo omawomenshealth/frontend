@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 import '../../../../localization/generated/strings.g.dart';
 
 class OnboardingSelectionSheet extends StatelessWidget {
@@ -24,8 +24,8 @@ class OnboardingSelectionSheet extends StatelessWidget {
     return FractionallySizedBox(
       heightFactor: 0.92,
       child: Container(
-        decoration: const BoxDecoration(
-          color: OmaColors.scaffoldBackground,
+        decoration: BoxDecoration(
+          color: context.omaTheme.background,
           borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
         ),
         child: Column(
@@ -47,7 +47,7 @@ class OnboardingSelectionSheet extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'CormorantGaramond',
                         fontSize: 23,
                         fontWeight: FontWeight.w700,

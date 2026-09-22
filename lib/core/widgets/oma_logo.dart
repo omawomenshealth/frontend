@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../constants/image_constants.dart';
-import 'oma_theme.dart';
+import '../theme/oma_theme.dart';
 
 class OmaLogo extends StatelessWidget {
   const OmaLogo({super.key});
@@ -13,17 +13,14 @@ class OmaLogo extends StatelessWidget {
       height: 128,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: OmaColors.card,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(28),
         boxShadow: OmaShadows.soft,
       ),
       child: SizedBox(
         width: 96,
         height: 96,
-        child: Image.asset(
-          ImageConstants.logo,
-          fit: BoxFit.contain,
-        ),
+        child: Image.asset(ImageConstants.logo, fit: BoxFit.contain),
       ),
     );
   }

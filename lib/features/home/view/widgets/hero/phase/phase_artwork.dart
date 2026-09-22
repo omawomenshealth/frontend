@@ -2,12 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../../../../../core/widgets/oma_theme.dart';
+import '../../../../../../core/theme/oma_theme.dart';
 
 class PhaseArtwork extends StatefulWidget {
-  final OmaPhaseStyle palette;
+  final OmaPhasePresentation presentation;
 
-  const PhaseArtwork({super.key, required this.palette});
+  const PhaseArtwork({super.key, required this.presentation});
 
   @override
   State<PhaseArtwork> createState() => _PhaseArtworkState();
@@ -15,15 +15,15 @@ class PhaseArtwork extends StatefulWidget {
 
 class _PhaseArtworkState extends State<PhaseArtwork>
     with SingleTickerProviderStateMixin {
-  late List<String> _flowerAssets = _pickFlowerAssets(widget.palette);
+  late List<String> _flowerAssets = _pickFlowerAssets(widget.presentation);
 
-  static List<String> _pickFlowerAssets(OmaPhaseStyle palette) {
-    final folder = switch (palette.number) {
+  static List<String> _pickFlowerAssets(OmaPhasePresentation presentation) {
+    final folder = switch (presentation.number) {
       '01' => 'menstrual',
       '02' => 'follicular',
       '03' => 'ovulation',
       '04' => 'luteal',
-      _ => throw StateError('Unknown phase: ${palette.number}'),
+      _ => throw StateError('Unknown phase: ${presentation.number}'),
     };
     final varieties = List.generate(4, (index) => index + 1)
       ..shuffle(math.Random());
@@ -93,8 +93,8 @@ class _PhaseArtworkState extends State<PhaseArtwork>
   @override
   void didUpdateWidget(covariant PhaseArtwork oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.palette.number != widget.palette.number) {
-      _flowerAssets = _pickFlowerAssets(widget.palette);
+    if (oldWidget.presentation.number != widget.presentation.number) {
+      _flowerAssets = _pickFlowerAssets(widget.presentation);
     }
   }
 

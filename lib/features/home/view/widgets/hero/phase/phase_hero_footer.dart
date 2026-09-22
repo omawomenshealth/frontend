@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../../core/widgets/oma_button.dart';
-import '../../../../../../core/widgets/oma_theme.dart';
+import '../../../../../../core/theme/oma_theme.dart';
 import '../../../../../../localization/generated/strings.g.dart';
 
 class PhaseHeroFooter extends StatelessWidget {
   final int day;
   final int cycleLength;
   final double progress;
-  final OmaPhaseStyle palette;
   final VoidCallback onOpenInsights;
 
   const PhaseHeroFooter({
@@ -16,12 +15,13 @@ class PhaseHeroFooter extends StatelessWidget {
     required this.day,
     required this.cycleLength,
     required this.progress,
-    required this.palette,
     required this.onOpenInsights,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -29,20 +29,14 @@ class PhaseHeroFooter extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            _CycleDayIndicator(
-              day: day,
-              cycleLength: cycleLength,
-              palette: palette,
-            ),
+            _CycleDayIndicator(day: day, cycleLength: cycleLength),
             OmaIconButton(
-              semanticLabel:
-                  context.t.home.common.hero.readBodyChanges,
+              semanticLabel: context.t.home.common.hero.readBodyChanges,
               size: 38,
               iconSize: 19,
-              foregroundColor: palette.accent,
-              backgroundColor:
-                  OmaColors.card.withValues(alpha: 0.75),
-              borderColor: palette.border,
+              foregroundColor: theme.primary,
+              backgroundColor: theme.surface.withValues(alpha: 0.75),
+              borderColor: theme.border,
               onPressed: onOpenInsights,
               icon: Icons.chevron_right,
             ),
@@ -54,10 +48,8 @@ class PhaseHeroFooter extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 3,
-            backgroundColor: palette.border,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              palette.strong,
-            ),
+            backgroundColor: theme.border,
+            valueColor: AlwaysStoppedAnimation<Color>(theme.primaryStrong),
           ),
         ),
       ],
@@ -68,27 +60,21 @@ class PhaseHeroFooter extends StatelessWidget {
 class _CycleDayIndicator extends StatelessWidget {
   final int day;
   final int cycleLength;
-  final OmaPhaseStyle palette;
 
-  const _CycleDayIndicator({
-    required this.day,
-    required this.cycleLength,
-    required this.palette,
-  });
+  const _CycleDayIndicator({required this.day, required this.cycleLength});
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           context.t.home.common.hero.cycleDayLabel,
           style: OmaText.label(
-            color: OmaColors.muted,
-          ).copyWith(
-            fontSize: 9,
-            letterSpacing: 1.4,
-          ),
+            color: theme.muted,
+          ).copyWith(fontSize: 9, letterSpacing: 1.4),
         ),
         const SizedBox(height: 1),
         Row(
@@ -99,20 +85,14 @@ class _CycleDayIndicator extends StatelessWidget {
               style: OmaText.display(
                 34,
                 style: FontStyle.normal,
-                color: palette.dayColor,
+                color: theme.accent,
               ).copyWith(height: 1),
             ),
             Padding(
-              padding: const EdgeInsets.only(
-                left: 1,
-                bottom: 2,
-              ),
+              padding: const EdgeInsets.only(left: 1, bottom: 2),
               child: Text(
                 ' / $cycleLength',
-                style: OmaText.body(
-                  14,
-                  color: OmaColors.muted,
-                ),
+                style: OmaText.body(14, color: theme.muted),
               ),
             ),
           ],

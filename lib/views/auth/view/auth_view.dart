@@ -12,7 +12,7 @@ import 'widgets/auth_action_card.dart';
 /// Giriş ekranı — Google Sign-In, Simüle giriş ve giriş yapmadan devam etme seçenekleri.
 ///
 /// İş mantığı aynıdır; yalnızca görsel dil `WelcomePage` ile aynı Oma
-/// tasarım sistemine (OmaColors / OmaText / OmaButton / OmaSurface)
+/// tasarım sistemine (OmaPalette / OmaText / OmaButton / OmaSurface)
 /// taşınmıştır.
 class AuthView extends StatefulWidget {
   const AuthView({super.key});
@@ -118,7 +118,7 @@ class _AuthViewState extends State<AuthView>
           title: AppStrings.healthCloudConsent,
           content: Text(
             AppStrings.consentExplanation,
-            style: OmaText.body(13.5, color: OmaColors.muted),
+            style: OmaText.body(13.5, color: context.omaTheme.muted),
           ),
           actions: [
             OmaButton(
@@ -199,12 +199,12 @@ class _AuthViewState extends State<AuthView>
           children: [
             Text(
               AppStrings.cloudBackupQuestion,
-              style: OmaText.body(14, color: OmaColors.foreground),
+              style: OmaText.body(14, color: context.omaTheme.foreground),
             ),
             const SizedBox(height: 12),
             Text(
               AppStrings.cloudBackupOptions,
-              style: OmaText.body(12, color: OmaColors.muted),
+              style: OmaText.body(12, color: context.omaTheme.muted),
             ),
           ],
         ),
@@ -254,11 +254,11 @@ class _PrivacyNote extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.shield_outlined, size: 14, color: OmaColors.muted),
+        Icon(Icons.shield_outlined, size: 14, color: context.omaTheme.muted),
         const SizedBox(width: 6),
         Text(
           t.auth.privacyNote,
-          style: OmaText.body(12, color: OmaColors.muted),
+          style: OmaText.body(12, color: context.omaTheme.muted),
         ),
       ],
     );

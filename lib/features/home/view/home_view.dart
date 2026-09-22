@@ -3,8 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
-import '../../../core/utils/period_calculator.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/personal_insight_model.dart';
@@ -34,29 +33,20 @@ class HomeView extends StatelessWidget {
     return Consumer<HomeViewModel>(
       builder: (context, vm, _) {
         if (vm.isLoading) {
-          return const Scaffold(
-            backgroundColor: OmaColors.scaffoldBackground,
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            backgroundColor: context.omaTheme.background,
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
         final calculator = vm.periodCalculator;
 
-        final phase =
-            calculator?.phaseAt(vm.selectedDate) ?? CyclePhase.follicular;
-
         final trackingMode = vm.settings?.trackingMode ?? TrackingMode.cycle;
-
-        final accent = trackingMode == TrackingMode.pregnant
-            ? OmaColors.plum
-            : OmaColors.forCyclePhase(phase);
+        final theme = context.omaTheme;
+        final accent = theme.primary;
 
         return Scaffold(
-          backgroundColor: Color.lerp(
-            OmaColors.scaffoldBackground,
-            accent,
-            0.035,
-          ),
+          backgroundColor: Color.lerp(theme.background, accent, 0.035),
           body: SafeArea(
             bottom: false,
             child: RefreshIndicator(
@@ -223,9 +213,7 @@ class HomeView extends StatelessWidget {
       builder: (context) => DailyLogSheet(
         initialLog: vm.initialLogForSection(section),
         settings: vm.settings!,
-        themeColor: OmaColors.forCyclePhase(
-          vm.periodCalculator?.phaseAt(vm.selectedDate),
-        ),
+        themeColor: context.omaTheme.primary,
         initialTabIndex: initialIndex,
         isSingleTab: isSingleTab,
         onSettingsChanged: () async {

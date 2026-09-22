@@ -1,0 +1,1 @@
+enum OmaMode { cycle, pregnancy }

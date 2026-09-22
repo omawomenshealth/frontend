@@ -21,32 +21,19 @@ class CyclePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final cycle = context.t.onboarding.cycle;
 
-
     return OnboardingCard(
       label: cycle.title,
       children: [
-        _CycleLengthField(
-          vm: vm,
-          cycle: cycle,
-        ),
-        _LastPeriodField(
-          cycle: cycle,
-          onPickLastPeriod: onPickLastPeriod,
-        ),
-        _BirthControlField(
-          vm: vm,
-          cycle: cycle,
-        ),
+        _CycleLengthField(vm: vm, cycle: cycle),
+        _LastPeriodField(cycle: cycle, onPickLastPeriod: onPickLastPeriod),
+        _BirthControlField(vm: vm, cycle: cycle),
       ],
     );
   }
 }
 
 class _CycleLengthField extends StatelessWidget {
-  const _CycleLengthField({
-    required this.vm,
-    required this.cycle,
-  });
+  const _CycleLengthField({required this.vm, required this.cycle});
 
   final OnboardingViewModel vm;
   final dynamic cycle;
@@ -63,19 +50,13 @@ class _CycleLengthField extends StatelessWidget {
               min: 21,
               max: 40,
               divisions: 19,
-              activeColor: OmaColors.primary,
+              activeColor: context.omaTheme.primary,
               onChanged: (value) {
-                vm.setAverageCycleLength(
-                  value.round(),
-                );
+                vm.setAverageCycleLength(value.round());
               },
             ),
           ),
-          Text(
-            cycle.dayCount(
-              days: vm.averageCycleLength,
-            ),
-          ),
+          Text(cycle.dayCount(days: vm.averageCycleLength)),
         ],
       ),
     );
@@ -83,10 +64,7 @@ class _CycleLengthField extends StatelessWidget {
 }
 
 class _LastPeriodField extends StatelessWidget {
-  const _LastPeriodField({
-    required this.cycle,
-    required this.onPickLastPeriod,
-  });
+  const _LastPeriodField({required this.cycle, required this.onPickLastPeriod});
 
   final dynamic cycle;
   final VoidCallback onPickLastPeriod;
@@ -99,16 +77,10 @@ class _LastPeriodField extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         child: OutlinedButton.icon(
-          key: const ValueKey(
-            'onboarding_last_period_days',
-          ),
+          key: const ValueKey('onboarding_last_period_days'),
           onPressed: onPickLastPeriod,
-          icon: const Icon(
-            Icons.date_range_outlined,
-          ),
-          label: Text(
-            cycle.selectLastPeriodDays,
-          ),
+          icon: const Icon(Icons.date_range_outlined),
+          label: Text(cycle.selectLastPeriodDays),
         ),
       ),
     );
@@ -116,10 +88,7 @@ class _LastPeriodField extends StatelessWidget {
 }
 
 class _BirthControlField extends StatelessWidget {
-  const _BirthControlField({
-    required this.vm,
-    required this.cycle,
-  });
+  const _BirthControlField({required this.vm, required this.cycle});
 
   final OnboardingViewModel vm;
   final dynamic cycle;
@@ -134,8 +103,7 @@ class _BirthControlField extends StatelessWidget {
       AppStrings.implant,
     ]);
 
-    final selectedBirthControl =
-        AppStrings.localizeStoredValue(
+    final selectedBirthControl = AppStrings.localizeStoredValue(
       vm.birthControlMethod ?? '',
     );
 

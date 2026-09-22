@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'oma_theme.dart';
-
+import '../theme/oma_theme.dart';
 
 /// Label + field + optional hint.
 ///
@@ -23,24 +22,12 @@ class OmaField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: OmaText.body(
-            14,
-            weight: FontWeight.w500,
-          ),
-        ),
+        Text(label, style: OmaText.body(14, weight: FontWeight.w500)),
         const SizedBox(height: 8),
         child,
         if (hint != null) ...[
           const SizedBox(height: 8),
-          Text(
-            hint!,
-            style: OmaText.body(
-              12,
-              color: OmaColors.muted,
-            ),
-          ),
+          Text(hint!, style: OmaText.body(12, color: context.omaTheme.muted)),
         ],
       ],
     );

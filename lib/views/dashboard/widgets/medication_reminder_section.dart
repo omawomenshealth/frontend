@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 import '../../../../core/widgets/oma_toast.dart';
 import '../../../../data/models/medication_identity_model.dart';
 import '../../../../data/models/medication_reminder_model.dart';
@@ -132,7 +132,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
         key: const ValueKey('dashboard_planned_doses'),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: OmaColors.surface,
+          color: context.omaTheme.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: widget.color.withValues(alpha: 0.20)),
         ),
@@ -141,11 +141,11 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
           children: [
             Text(
               AppStrings.todaysPlannedDoses,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'CormorantGaramond',
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: OmaColors.textPrimary,
+                color: context.omaTheme.foreground,
               ),
             ),
             const SizedBox(height: 10),
@@ -166,17 +166,17 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
             : AppStrings.doseUpcoming,
     };
     final statusColor = switch (dose.status) {
-      MedicationDoseResponseStatus.taken => OmaColors.success,
-      MedicationDoseResponseStatus.skipped => OmaColors.error,
+      MedicationDoseResponseStatus.taken => OmaPalette.success,
+      MedicationDoseResponseStatus.skipped => OmaPalette.error,
       null =>
-        dose.scheduledAt.isBefore(now) ? OmaColors.warning : OmaColors.info,
+        dose.scheduledAt.isBefore(now) ? OmaPalette.warning : OmaPalette.info,
     };
 
     return Container(
       margin: const EdgeInsets.only(bottom: 9),
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
-        color: OmaColors.scaffoldBackground,
+        color: context.omaTheme.background,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
@@ -203,7 +203,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                 size: 17,
                 color: dose.notificationScheduled
                     ? widget.color
-                    : OmaColors.textHint,
+                    : OmaPalette.textHint,
               ),
               const SizedBox(width: 6),
               Container(
@@ -232,11 +232,11 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                   icon: const Icon(Icons.check_rounded, size: 17),
                   label: Text(AppStrings.doseTaken),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: OmaColors.success,
-                    side: const BorderSide(color: OmaColors.success),
+                    foregroundColor: OmaPalette.success,
+                    side: const BorderSide(color: OmaPalette.success),
                     backgroundColor:
                         dose.status == MedicationDoseResponseStatus.taken
-                        ? OmaColors.success.withValues(alpha: 0.12)
+                        ? OmaPalette.success.withValues(alpha: 0.12)
                         : null,
                   ),
                 ),
@@ -249,11 +249,11 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                   icon: const Icon(Icons.close_rounded, size: 17),
                   label: Text(AppStrings.doseSkipped),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: OmaColors.error,
-                    side: const BorderSide(color: OmaColors.error),
+                    foregroundColor: OmaPalette.error,
+                    side: const BorderSide(color: OmaPalette.error),
                     backgroundColor:
                         dose.status == MedicationDoseResponseStatus.skipped
-                        ? OmaColors.error.withValues(alpha: 0.10)
+                        ? OmaPalette.error.withValues(alpha: 0.10)
                         : null,
                   ),
                 ),
@@ -317,7 +317,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: OmaColors.surface,
+      backgroundColor: context.omaTheme.surface,
       builder: (_) => Theme(
         data: baseTheme.copyWith(
           colorScheme: baseTheme.colorScheme.copyWith(primary: widget.color),
@@ -428,10 +428,10 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
             Expanded(
               child: Text(
                 AppStrings.reminderPlans,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: OmaColors.textPrimary,
+                  color: context.omaTheme.foreground,
                 ),
               ),
             ),
@@ -453,10 +453,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
         if (_sectionPlans.isEmpty)
           Text(
             AppStrings.noReminderPlans,
-            style: const TextStyle(
-              color: OmaColors.textSecondary,
-              fontSize: 13,
-            ),
+            style: TextStyle(color: context.omaTheme.muted, fontSize: 13),
           )
         else
           ..._sectionPlans.map(_buildPlanCard),
@@ -464,25 +461,25 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: OmaColors.info.withValues(alpha: 0.12),
+            color: OmaPalette.info.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
+              Icon(
                 Icons.info_outline_rounded,
                 size: 17,
-                color: OmaColors.textSecondary,
+                color: context.omaTheme.muted,
               ),
               const SizedBox(width: 7),
               Expanded(
                 child: Text(
                   AppStrings.reminderDeliveryNote,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11.5,
                     height: 1.35,
-                    color: OmaColors.textSecondary,
+                    color: context.omaTheme.muted,
                   ),
                 ),
               ),
@@ -527,24 +524,24 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
                 Text(
                   '${AppStrings.localizeStoredValue(plan.displayName)} • '
                   '${plan.dosage}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    color: OmaColors.textPrimary,
+                    color: context.omaTheme.foreground,
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   schedule,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
-                    color: OmaColors.textSecondary,
+                    color: context.omaTheme.muted,
                   ),
                 ),
                 Text(
                   range,
                   style: const TextStyle(
                     fontSize: 11.5,
-                    color: OmaColors.textHint,
+                    color: OmaPalette.textHint,
                   ),
                 ),
               ],
@@ -805,10 +802,10 @@ class _MedicationReminderFormSheetState
               const SizedBox(height: 12),
               Text(
                 AppStrings.notificationTime,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: OmaColors.textPrimary,
+                  color: context.omaTheme.foreground,
                 ),
               ),
               const SizedBox(height: 8),
@@ -878,10 +875,10 @@ class _MedicationReminderFormSheetState
               const SizedBox(height: 12),
               Text(
                 AppStrings.usageDurationQuestion,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: OmaColors.textPrimary,
+                  color: context.omaTheme.foreground,
                 ),
               ),
               const SizedBox(height: 8),
@@ -989,27 +986,23 @@ class _MedicationReminderFormSheetState
       key: ValueKey('reminder_time_slot_$index'),
       padding: const EdgeInsets.fromLTRB(12, 5, 4, 5),
       decoration: BoxDecoration(
-        color: OmaColors.scaffoldBackground,
+        color: context.omaTheme.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: OmaColors.outline),
+        border: Border.all(color: context.omaTheme.border),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.schedule_rounded,
-            size: 19,
-            color: OmaColors.textSecondary,
-          ),
+          Icon(Icons.schedule_rounded, size: 19, color: context.omaTheme.muted),
           const SizedBox(width: 9),
           Expanded(
             child: Text(
               index < AppStrings.medicationTimes.length
                   ? AppStrings.medicationTimes[index]
                   : '${AppStrings.medicationTime} ${index + 1}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: OmaColors.textPrimary,
+                color: context.omaTheme.foreground,
               ),
             ),
           ),

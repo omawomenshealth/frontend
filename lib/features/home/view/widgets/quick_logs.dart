@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 import '../../../../localization/generated/strings.g.dart';
 
 /// Home ekranındaki hızlı kayıt bölümü.
@@ -30,9 +30,9 @@ class QuickLogs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.t.home;
+    final theme = context.omaTheme;
 
-    final logBackground =
-        Color.lerp(OmaColors.card, accent, 0.15) ?? OmaColors.card;
+    final logBackground = Color.lerp(theme.surface, accent, 0.15)!;
 
     final logs = [
       _QuickLog(
@@ -118,6 +118,7 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
@@ -128,14 +129,14 @@ class _SectionHeader extends StatelessWidget {
             style: OmaText.display(
               25,
               style: FontStyle.normal,
-              color: OmaColors.foreground,
+              color: theme.foreground,
             ).copyWith(fontWeight: FontWeight.w500, letterSpacing: -0.4),
           ),
         ),
         Text(
           caption,
           style: OmaText.caption(
-            color: OmaColors.muted,
+            color: theme.muted,
             weight: FontWeight.w500,
           ).copyWith(fontSize: 10.5),
         ),
@@ -201,7 +202,7 @@ class _QuickLogButtonState extends State<_QuickLogButton> {
                 style: OmaText.body(
                   9.5,
                   weight: FontWeight.w600,
-                  color: OmaColors.foreground,
+                  color: context.omaTheme.foreground,
                   height: 1.15,
                 ),
               ),

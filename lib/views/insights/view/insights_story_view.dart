@@ -77,9 +77,8 @@ class _InsightsViewState extends State<InsightsView>
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    final calculator = context.watch<HomeViewModel>().periodCalculator;
-    final phase = calculator?.currentPhase ?? CyclePhase.follicular;
-    final accent = _phaseColor(phase);
+    final theme = context.omaTheme;
+    final accent = theme.primary;
 
     return Consumer<InsightsViewModel>(
       builder: (context, viewModel, _) {
@@ -87,15 +86,15 @@ class _InsightsViewState extends State<InsightsView>
         _syncStoryCount(insights.length);
 
         return Scaffold(
-          backgroundColor: Color.lerp(Colors.white, accent, 0.08),
+          backgroundColor: Color.lerp(theme.surface, accent, 0.08),
           body: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color.lerp(Colors.white, accent, 0.035)!,
-                  Color.lerp(Colors.white, accent, 0.20)!,
+                  Color.lerp(theme.surface, accent, 0.035)!,
+                  Color.lerp(theme.surface, accent, 0.20)!,
                 ],
               ),
             ),
@@ -136,7 +135,10 @@ class _InsightsViewState extends State<InsightsView>
                           return _InsightStoryPage(
                             key: ValueKey('insight_story_page_${insight.id}'),
                             insight: insight,
-                            presentation: _InsightPresentation.from(insight),
+                            presentation: _InsightPresentation.from(
+                              insight,
+                              context.omaTheme,
+                            ),
                             accent: accent,
                           );
                         },
@@ -230,15 +232,6 @@ class _InsightsViewState extends State<InsightsView>
       return;
     }
     Navigator.of(context).maybePop();
-  }
-
-  Color _phaseColor(CyclePhase phase) {
-    return switch (phase) {
-      CyclePhase.menstrual => OmaColors.periodPrimary,
-      CyclePhase.follicular => OmaColors.primary,
-      CyclePhase.ovulation => OmaColors.ovulation,
-      CyclePhase.luteal => OmaColors.lutealDark,
-    };
   }
 }
 
@@ -390,8 +383,8 @@ class _InsightStoryPage extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             presentation.title,
-            style: const TextStyle(
-              color: OmaColors.textPrimary,
+            style: TextStyle(
+              color: context.omaTheme.foreground,
               fontFamily: 'CormorantGaramond',
               fontSize: 42,
               height: 1.02,
@@ -402,8 +395,8 @@ class _InsightStoryPage extends StatelessWidget {
           const SizedBox(height: 18),
           Text(
             presentation.body,
-            style: const TextStyle(
-              color: OmaColors.textSecondary,
+            style: TextStyle(
+              color: context.omaTheme.muted,
               fontFamily: 'Karla',
               fontSize: 14,
               height: 1.55,
@@ -436,10 +429,10 @@ class _InsightStoryPage extends StatelessWidget {
                   ),
                 ),
                 if (item != chain.length - 1)
-                  const Icon(
+                  Icon(
                     Icons.arrow_forward_rounded,
                     size: 15,
-                    color: OmaColors.textSecondary,
+                    color: context.omaTheme.muted,
                   ),
               ],
             ],
@@ -469,8 +462,8 @@ class _InsightStoryPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   presentation.evidence,
-                  style: const TextStyle(
-                    color: OmaColors.textSecondary,
+                  style: TextStyle(
+                    color: context.omaTheme.muted,
                     fontFamily: 'Karla',
                     fontSize: 12.5,
                     height: 1.45,
@@ -480,8 +473,8 @@ class _InsightStoryPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   AppStrings.insightsDisclaimer,
-                  style: const TextStyle(
-                    color: OmaColors.textHint,
+                  style: TextStyle(
+                    color: OmaPalette.textHint,
                     fontFamily: 'Karla',
                     fontSize: 10.5,
                     height: 1.4,
@@ -633,7 +626,7 @@ class _StoryNavigation extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18),
                 ),
-                textStyle: const TextStyle(
+                textStyle: TextStyle(
                   fontFamily: 'Karla',
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -682,22 +675,22 @@ class _EmptyInsightStory extends StatelessWidget {
           Text(
             AppStrings.insightsEmptyTitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'CormorantGaramond',
               fontSize: 32,
               fontWeight: FontWeight.w600,
-              color: OmaColors.textPrimary,
+              color: context.omaTheme.foreground,
             ),
           ),
           const SizedBox(height: 10),
           Text(
             AppStrings.insightsEmptyDescription,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Karla',
               fontSize: 13,
               height: 1.5,
-              color: OmaColors.textSecondary,
+              color: context.omaTheme.muted,
             ),
           ),
           const SizedBox(height: 24),

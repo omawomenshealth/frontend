@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../data/services/premium_purchase_service.dart';
 import '../../../localization/generated/strings.g.dart';
 
@@ -45,7 +45,7 @@ class _PremiumViewState extends State<PremiumView> {
             _selectedTier ??
             (service.hasPaidAccess ? service.tier : MembershipTier.plus);
         return Scaffold(
-          backgroundColor: OmaColors.scaffoldBackground,
+          backgroundColor: context.omaTheme.background,
           appBar: AppBar(
             automaticallyImplyLeading: false,
             title: Text(strings.pageTitle),
@@ -185,8 +185,12 @@ class _PremiumHero extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              OmaColors.primaryDark,
-              Color.lerp(OmaColors.primaryDark, OmaColors.secondaryDark, 0.32)!,
+              context.omaTheme.primaryStrong,
+              Color.lerp(
+                context.omaTheme.primaryStrong,
+                OmaPalette.ovulationDark,
+                0.32,
+              )!,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -194,7 +198,7 @@ class _PremiumHero extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: OmaColors.primaryDark.withValues(alpha: 0.18),
+              color: context.omaTheme.primaryStrong.withValues(alpha: 0.18),
               blurRadius: 28,
               offset: const Offset(0, 12),
             ),
@@ -210,7 +214,7 @@ class _PremiumHero extends StatelessWidget {
                 height: 156,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: OmaColors.luteal.withValues(alpha: 0.14),
+                  color: OmaPalette.luteal.withValues(alpha: 0.14),
                 ),
               ),
             ),
@@ -222,7 +226,7 @@ class _PremiumHero extends StatelessWidget {
                 height: 128,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: OmaColors.secondary.withValues(alpha: 0.16),
+                  color: OmaPalette.ovulation.withValues(alpha: 0.16),
                 ),
               ),
             ),
@@ -247,7 +251,7 @@ class _PremiumHero extends StatelessWidget {
                           isActive
                               ? Icons.check_rounded
                               : Icons.auto_awesome_rounded,
-                          color: OmaColors.luteal,
+                          color: OmaPalette.luteal,
                           size: 23,
                         ),
                       ),
@@ -309,44 +313,44 @@ class _BenefitsCard extends StatelessWidget {
         Icons.calendar_month_outlined,
         strings.benefitTrackingTitle,
         strings.benefitTrackingDescription,
-        OmaColors.primary,
+        context.omaTheme.primary,
         MembershipTier.free,
       ),
       (
         Icons.hub_outlined,
         strings.benefitInsightsTitle,
         strings.benefitInsightsDescription,
-        OmaColors.primary,
+        context.omaTheme.primary,
         MembershipTier.plus,
       ),
       (
         Icons.menu_book_outlined,
         strings.benefitArticlesTitle,
         strings.benefitArticlesDescription,
-        OmaColors.secondary,
+        OmaPalette.ovulation,
         MembershipTier.plus,
       ),
       (
         Icons.description_outlined,
         strings.benefitReportTitle,
         strings.benefitReportDescription,
-        OmaColors.info,
+        OmaPalette.info,
         MembershipTier.premium,
       ),
       (
         Icons.nights_stay_outlined,
         strings.benefitDreamsTitle,
         strings.benefitDreamsDescription,
-        OmaColors.insightGold,
+        OmaPalette.insightGold,
         MembershipTier.premium,
       ),
     ];
 
     return Container(
       decoration: BoxDecoration(
-        color: OmaColors.cardBackground,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: OmaColors.outline),
+        border: Border.all(color: context.omaTheme.border),
       ),
       child: Column(
         children: [
@@ -359,7 +363,7 @@ class _BenefitsCard extends StatelessWidget {
               included: selectedTier.includes(benefits[index].$5),
             ),
             if (index != benefits.length - 1)
-              const Divider(indent: 76, endIndent: 18),
+              Divider(indent: 76, endIndent: 18),
           ],
         ],
       ),
@@ -411,7 +415,7 @@ class _BenefitItem extends StatelessWidget {
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: OmaColors.textSecondary,
+                      color: context.omaTheme.muted,
                     ),
                   ),
                 ],
@@ -424,7 +428,9 @@ class _BenefitItem extends StatelessWidget {
                 included
                     ? Icons.check_circle_rounded
                     : Icons.lock_outline_rounded,
-                color: included ? OmaColors.primary : OmaColors.textHint,
+                color: included
+                    ? context.omaTheme.primary
+                    : OmaPalette.textHint,
                 size: 19,
               ),
             ),
@@ -459,7 +465,9 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = isSelected ? OmaColors.primaryDark : OmaColors.outline;
+    final borderColor = isSelected
+        ? context.omaTheme.primaryStrong
+        : context.omaTheme.border;
 
     return Semantics(
       button: true,
@@ -473,14 +481,16 @@ class _PlanCard extends StatelessWidget {
           padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
             color: isSelected
-                ? OmaColors.primaryLight
-                : OmaColors.cardBackground,
+                ? context.omaTheme.primarySoft
+                : context.omaTheme.surface,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: borderColor, width: isSelected ? 1.5 : 1),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: OmaColors.primaryDark.withValues(alpha: 0.08),
+                      color: context.omaTheme.primaryStrong.withValues(
+                        alpha: 0.08,
+                      ),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -495,8 +505,8 @@ class _PlanCard extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? OmaColors.primaryDark
-                      : OmaColors.surfaceMuted,
+                      ? context.omaTheme.primaryStrong
+                      : context.omaTheme.surfaceMuted,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: borderColor.withValues(alpha: 0.55),
@@ -504,7 +514,7 @@ class _PlanCard extends StatelessWidget {
                 ),
                 child: Icon(
                   icon,
-                  color: isSelected ? Colors.white : OmaColors.textSecondary,
+                  color: isSelected ? Colors.white : context.omaTheme.muted,
                   size: 21,
                 ),
               ),
@@ -529,7 +539,9 @@ class _PlanCard extends StatelessWidget {
                             maxLines: 2,
                             textAlign: TextAlign.end,
                             style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(color: OmaColors.primaryDark),
+                                ?.copyWith(
+                                  color: context.omaTheme.primaryStrong,
+                                ),
                           ),
                         ),
                       ],
@@ -545,8 +557,8 @@ class _PlanCard extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? OmaColors.primaryDark
-                                : OmaColors.surfaceMuted,
+                                ? context.omaTheme.primaryStrong
+                                : context.omaTheme.surfaceMuted,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -554,7 +566,7 @@ class _PlanCard extends StatelessWidget {
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white
-                                  : OmaColors.textSecondary,
+                                  : context.omaTheme.muted,
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
                             ),
@@ -566,7 +578,7 @@ class _PlanCard extends StatelessWidget {
                     Text(
                       description,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: OmaColors.textSecondary,
+                        color: context.omaTheme.muted,
                       ),
                     ),
                     if (supportingText != null) ...[
@@ -574,7 +586,7 @@ class _PlanCard extends StatelessWidget {
                       Text(
                         supportingText!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: OmaColors.primaryDark,
+                          color: context.omaTheme.primaryStrong,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -603,16 +615,16 @@ class _StatusCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: OmaColors.tealGradient.colors.first,
+          color: OmaPalette.tealGradient.colors.first,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: OmaColors.info.withValues(alpha: 0.35)),
+          border: Border.all(color: OmaPalette.info.withValues(alpha: 0.35)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Icon(
               Icons.info_outline_rounded,
-              color: OmaColors.info,
+              color: OmaPalette.info,
               size: 20,
             ),
             const SizedBox(width: 10),
@@ -647,9 +659,9 @@ class _PremiumActionBar extends StatelessWidget {
     final strings = t.premium;
 
     return Material(
-      color: OmaColors.surface,
+      color: context.omaTheme.surface,
       elevation: 10,
-      shadowColor: OmaColors.primaryDark.withValues(alpha: 0.14),
+      shadowColor: context.omaTheme.primaryStrong.withValues(alpha: 0.14),
       child: SafeArea(
         top: false,
         minimum: const EdgeInsets.fromLTRB(20, 14, 20, 14),
@@ -662,7 +674,7 @@ class _PremiumActionBar extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.lock_outline_rounded,
-                    color: OmaColors.textHint,
+                    color: OmaPalette.textHint,
                     size: 15,
                   ),
                   const SizedBox(width: 6),

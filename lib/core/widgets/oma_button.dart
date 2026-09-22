@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'oma_theme.dart';
+import '../theme/oma_theme.dart';
 
-enum OmaButtonVariant {
-  primary,
-  secondary,
-  outline,
-  dashed,
-  text,
-}
+enum OmaButtonVariant { primary, secondary, outline, dashed, text }
 
-enum OmaButtonSize {
-  small,
-  medium,
-  large,
-}
+enum OmaButtonSize { small, medium, large }
 
 /// Oma'nın standart eylem butonu.
 class OmaButton extends StatelessWidget {
@@ -57,6 +47,7 @@ class OmaButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final oma = context.omaTheme;
     return Opacity(
       opacity: _visuallyActive ? 1 : 0.4,
       child: Container(
@@ -64,43 +55,38 @@ class OmaButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           boxShadow: _boxShadow(_visuallyActive),
         ),
-        child: _buildButton(),
+        child: _buildButton(oma),
       ),
     );
   }
 
-  Widget _buildButton() {
-    final style = _buttonStyle();
-    final child = _buildChild();
+  Widget _buildButton(OmaTheme oma) {
+    final style = _buttonStyle(oma);
+    final child = _buildChild(oma);
 
     return switch (variant) {
-      OmaButtonVariant.primary ||
-      OmaButtonVariant.secondary =>
-        FilledButton(
-          onPressed: _interactive ? onPressed : null,
-          style: style,
-          child: child,
-        ),
+      OmaButtonVariant.primary || OmaButtonVariant.secondary => FilledButton(
+        onPressed: _interactive ? onPressed : null,
+        style: style,
+        child: child,
+      ),
 
-      OmaButtonVariant.outline ||
-      OmaButtonVariant.dashed =>
-        OutlinedButton(
-          onPressed: _interactive ? onPressed : null,
-          style: style,
-          child: child,
-        ),
+      OmaButtonVariant.outline || OmaButtonVariant.dashed => OutlinedButton(
+        onPressed: _interactive ? onPressed : null,
+        style: style,
+        child: child,
+      ),
 
-      OmaButtonVariant.text =>
-        TextButton(
-          onPressed: _interactive ? onPressed : null,
-          style: style,
-          child: child,
-        ),
+      OmaButtonVariant.text => TextButton(
+        onPressed: _interactive ? onPressed : null,
+        style: style,
+        child: child,
+      ),
     };
   }
 
-  Widget _buildChild() {
-    final content = _buildContent();
+  Widget _buildChild(OmaTheme oma) {
+    final content = _buildContent(oma);
 
     if (!isLoading) return content;
 
@@ -115,23 +101,18 @@ class OmaButton extends StatelessWidget {
           height: _iconSize,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(_foregroundColor),
+            valueColor: AlwaysStoppedAnimation<Color>(_foregroundColor(oma)),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(OmaTheme oma) {
     final children = <Widget>[];
 
     if (leadingIcon != null) {
-      children.add(
-        Icon(
-          leadingIcon,
-          size: _iconSize,
-        ),
-      );
+      children.add(Icon(leadingIcon, size: _iconSize));
       children.add(const SizedBox(width: 10));
     }
 
@@ -141,28 +122,20 @@ class OmaButton extends StatelessWidget {
         style: OmaText.body(
           _fontSize,
           weight: FontWeight.w500,
-          color: _foregroundColor,
+          color: _foregroundColor(oma),
         ),
       ),
     );
 
     if (trailingIcon != null) {
       children.add(const SizedBox(width: 10));
-      children.add(
-        Icon(
-          trailingIcon,
-          size: _iconSize,
-        ),
-      );
+      children.add(Icon(trailingIcon, size: _iconSize));
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: children,
-    );
+    return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
 
-  ButtonStyle _buttonStyle() {
+  ButtonStyle _buttonStyle(OmaTheme oma) {
     // Yükleme sırasında onPressed'i null yaparak dokunmayı engelliyoruz;
     // ama görsel olarak "disabled" (soluk/gri) görünmesini istemiyoruz.
     // Bu yüzden isLoading true iken normal renkleri disabled state'e de
@@ -171,69 +144,58 @@ class OmaButton extends StatelessWidget {
 
     return switch (variant) {
       OmaButtonVariant.primary => FilledButton.styleFrom(
-          backgroundColor: backgroundColor ?? OmaColors.primary,
-          foregroundColor: foregroundColor ?? OmaColors.primaryForeground,
-          disabledBackgroundColor:
-            keepColorsWhileLoading
-              ? backgroundColor ?? OmaColors.primary
-              : null,
-          disabledForegroundColor:
-            keepColorsWhileLoading
-              ? foregroundColor ?? OmaColors.primaryForeground
-              : null,
-          minimumSize: Size.fromHeight(_height),
-          padding: _padding,
-          shape: const StadiumBorder(),
-        ),
+        backgroundColor: backgroundColor ?? oma.primary,
+        foregroundColor: foregroundColor ?? oma.onPrimary,
+        disabledBackgroundColor: keepColorsWhileLoading
+            ? backgroundColor ?? oma.primary
+            : null,
+        disabledForegroundColor: keepColorsWhileLoading
+            ? foregroundColor ?? oma.onPrimary
+            : null,
+        minimumSize: Size.fromHeight(_height),
+        padding: _padding,
+        shape: const StadiumBorder(),
+      ),
 
       OmaButtonVariant.secondary => FilledButton.styleFrom(
-          backgroundColor: OmaColors.card,
-          foregroundColor: OmaColors.primary,
-          disabledBackgroundColor:
-              keepColorsWhileLoading ? OmaColors.card : null,
-          disabledForegroundColor:
-              keepColorsWhileLoading ? OmaColors.primary : null,
-          minimumSize: Size.fromHeight(_height),
-          padding: _padding,
-          shape: const StadiumBorder(),
-        ),
+        backgroundColor: oma.surface,
+        foregroundColor: oma.primary,
+        disabledBackgroundColor: keepColorsWhileLoading ? oma.surface : null,
+        disabledForegroundColor: keepColorsWhileLoading ? oma.primary : null,
+        minimumSize: Size.fromHeight(_height),
+        padding: _padding,
+        shape: const StadiumBorder(),
+      ),
 
       OmaButtonVariant.outline => OutlinedButton.styleFrom(
-          foregroundColor: OmaColors.foreground,
-          disabledForegroundColor:
-              keepColorsWhileLoading ? OmaColors.foreground : null,
-          minimumSize: Size.fromHeight(_height),
-          padding: _padding,
-          shape: const StadiumBorder(),
-          side: BorderSide(
-            color: OmaColors.border,
-          ),
-        ),
+        foregroundColor: oma.foreground,
+        disabledForegroundColor: keepColorsWhileLoading ? oma.foreground : null,
+        minimumSize: Size.fromHeight(_height),
+        padding: _padding,
+        shape: const StadiumBorder(),
+        side: BorderSide(color: oma.border),
+      ),
 
       OmaButtonVariant.dashed => OutlinedButton.styleFrom(
-          foregroundColor: OmaColors.primary,
-          backgroundColor: OmaColors.primary.withValues(alpha: 0.04),
-          disabledForegroundColor:
-              keepColorsWhileLoading ? OmaColors.primary : null,
-          disabledBackgroundColor: keepColorsWhileLoading
-              ? OmaColors.primary.withValues(alpha: 0.04)
-              : null,
-          minimumSize: Size.fromHeight(_height),
-          padding: _padding,
-          shape: const StadiumBorder(),
-          side: BorderSide(
-            color: OmaColors.primary.withValues(alpha: 0.4),
-          ),
-        ),
+        foregroundColor: oma.primary,
+        backgroundColor: oma.primary.withValues(alpha: 0.04),
+        disabledForegroundColor: keepColorsWhileLoading ? oma.primary : null,
+        disabledBackgroundColor: keepColorsWhileLoading
+            ? oma.primary.withValues(alpha: 0.04)
+            : null,
+        minimumSize: Size.fromHeight(_height),
+        padding: _padding,
+        shape: const StadiumBorder(),
+        side: BorderSide(color: oma.primary.withValues(alpha: 0.4)),
+      ),
 
       OmaButtonVariant.text => TextButton.styleFrom(
-          foregroundColor: OmaColors.muted,
-          disabledForegroundColor:
-              keepColorsWhileLoading ? OmaColors.muted : null,
-          minimumSize: Size.fromHeight(_height),
-          padding: _padding,
-          shape: const StadiumBorder(),
-        ),
+        foregroundColor: oma.muted,
+        disabledForegroundColor: keepColorsWhileLoading ? oma.muted : null,
+        minimumSize: Size.fromHeight(_height),
+        padding: _padding,
+        shape: const StadiumBorder(),
+      ),
     };
   }
 
@@ -249,15 +211,15 @@ class OmaButton extends StatelessWidget {
     };
   }
 
-  Color get _foregroundColor {
+  Color _foregroundColor(OmaTheme oma) {
     if (foregroundColor != null) return foregroundColor!;
 
     return switch (variant) {
-      OmaButtonVariant.primary => OmaColors.primaryForeground,
-      OmaButtonVariant.secondary => OmaColors.primary,
-      OmaButtonVariant.outline => OmaColors.foreground,
-      OmaButtonVariant.dashed => OmaColors.primary,
-      OmaButtonVariant.text => OmaColors.muted,
+      OmaButtonVariant.primary => oma.onPrimary,
+      OmaButtonVariant.secondary => oma.primary,
+      OmaButtonVariant.outline => oma.foreground,
+      OmaButtonVariant.dashed => oma.primary,
+      OmaButtonVariant.text => oma.muted,
     };
   }
 
@@ -319,6 +281,7 @@ class OmaIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final oma = context.omaTheme;
     return Semantics(
       button: true,
       label: semanticLabel,
@@ -327,8 +290,8 @@ class OmaIconButton extends StatelessWidget {
         tooltip: semanticLabel,
         style: IconButton.styleFrom(
           fixedSize: Size.square(size),
-          foregroundColor: foregroundColor ?? OmaColors.primary,
-          backgroundColor: backgroundColor ?? OmaColors.primary.withValues(alpha: 0.12),
+          foregroundColor: foregroundColor ?? oma.primary,
+          backgroundColor: backgroundColor ?? oma.primarySoft,
           side: borderColor == null ? null : BorderSide(color: borderColor!),
         ),
         icon: Icon(icon, size: iconSize),

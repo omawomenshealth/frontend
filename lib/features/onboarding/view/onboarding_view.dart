@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/image_constants.dart';
 import '../../../core/widgets/oma_background.dart';
 import '../../../localization/generated/strings.g.dart';
@@ -60,7 +60,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: OmaColors.scaffoldBackground,
+      backgroundColor: context.omaTheme.background,
       body: PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) {

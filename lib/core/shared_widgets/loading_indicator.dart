@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/oma_theme.dart';
+import '../theme/oma_theme.dart';
 
 /// Özel yükleniyor göstergesi — gradient dönen halka.
 class LoadingIndicator extends StatelessWidget {
@@ -19,7 +19,7 @@ class LoadingIndicator extends StatelessWidget {
             width: size,
             height: size,
             child: CircularProgressIndicator(
-              color: color ?? OmaColors.primary,
+              color: color ?? context.omaTheme.primary,
               strokeWidth: 3,
             ),
           ),
@@ -27,7 +27,7 @@ class LoadingIndicator extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               message!,
-              style: TextStyle(color: OmaColors.textSecondary, fontSize: 14),
+              style: TextStyle(color: context.omaTheme.muted, fontSize: 14),
             ),
           ],
         ],

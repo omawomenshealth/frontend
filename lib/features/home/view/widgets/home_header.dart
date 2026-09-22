@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/utils/app_time.dart';
 import '../../../../core/widgets/oma_button.dart';
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 import '../../../../localization/generated/strings.g.dart';
 
 /// Home ekranının üst bölümü:
@@ -31,6 +31,7 @@ class HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.t.home;
+    final theme = context.omaTheme;
     final locale = Localizations.localeOf(context).toString();
 
     final month = DateFormat.MMMM(locale).format(selectedDate);
@@ -66,7 +67,7 @@ class HomeHeader extends StatelessWidget {
                     style: OmaText.body(
                       11,
                       weight: FontWeight.w700,
-                      color: OmaColors.muted,
+                      color: theme.muted,
                       height: 1.2,
                     ),
                   ),
@@ -78,7 +79,7 @@ class HomeHeader extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: OmaText.display(
                       34,
-                      color: OmaColors.foreground,
+                      color: theme.foreground,
                     ).copyWith(fontWeight: FontWeight.w500, height: 1.02),
                   ),
                 ],
@@ -97,14 +98,14 @@ class HomeHeader extends StatelessWidget {
                   '${selectedDate.day}',
                   style: OmaText.display(
                     26,
-                    color: OmaColors.foreground,
+                    color: theme.foreground,
                   ).copyWith(fontWeight: FontWeight.w600, height: 1),
                 ),
                 const SizedBox(width: 5),
                 Text(
                   month,
                   style: OmaText.caption(
-                    color: OmaColors.muted,
+                    color: theme.muted,
                     weight: FontWeight.w500,
                   ),
                 ),
@@ -124,7 +125,7 @@ class HomeHeader extends StatelessWidget {
                   onPressed: onCalendarTap,
                   semanticLabel: t.common.header.date.calendar,
                   foregroundColor: accent,
-                  backgroundColor: OmaColors.backgroundAlt,
+                  backgroundColor: theme.backgroundAlt,
                   borderColor: accent.withValues(alpha: 0.34),
                 ),
                 const SizedBox(width: 8),
@@ -134,7 +135,7 @@ class HomeHeader extends StatelessWidget {
                   onPressed: onNotificationTap,
                   semanticLabel: context.t.notifications.common.title,
                   foregroundColor: accent,
-                  backgroundColor: OmaColors.backgroundAlt,
+                  backgroundColor: theme.backgroundAlt,
                   borderColor: accent.withValues(alpha: 0.34),
                 ),
               ],

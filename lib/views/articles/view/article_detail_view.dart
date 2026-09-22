@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
 import '../model/article_model.dart';
 
@@ -14,7 +14,7 @@ class ArticleDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     AppStrings.of(context);
     return Scaffold(
-      backgroundColor: OmaColors.scaffoldBackground,
+      backgroundColor: context.omaTheme.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -26,10 +26,10 @@ class ArticleDetailView extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: Colors.white.withValues(alpha: 0.84),
                 child: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
                     size: 16,
-                    color: OmaColors.textPrimary,
+                    color: context.omaTheme.foreground,
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -89,7 +89,7 @@ class ArticleDetailView extends StatelessWidget {
                             const SizedBox(height: 12),
                             Text(
                               article.title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'CormorantGaramond',
                                 fontSize: 32,
                                 fontWeight: FontWeight.w600,
@@ -119,20 +119,22 @@ class ArticleDetailView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildAuthorRow(),
+                  _buildAuthorRow(context),
                   const SizedBox(height: 24),
-                  _buildSummaryBox(),
+                  _buildSummaryBox(context),
                   const SizedBox(height: 24),
                   if (article.contentBlocks.isEmpty)
                     Text(
                       AppStrings.articleNotPublished,
-                      style: const TextStyle(
-                        color: OmaColors.textSecondary,
+                      style: TextStyle(
+                        color: context.omaTheme.muted,
                         height: 1.6,
                       ),
                     )
                   else
-                    ...article.contentBlocks.map(_buildContentBlock),
+                    ...article.contentBlocks.map(
+                      (block) => _buildContentBlock(context, block),
+                    ),
                 ],
               ),
             ),
@@ -142,7 +144,7 @@ class ArticleDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildAuthorRow() {
+  Widget _buildAuthorRow(BuildContext context) {
     return Row(
       children: [
         Container(
@@ -164,18 +166,15 @@ class ArticleDetailView extends StatelessWidget {
             children: [
               Text(
                 AppStrings.healthTeam,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: OmaColors.textPrimary,
+                  color: context.omaTheme.foreground,
                 ),
               ),
               Text(
                 AppStrings.generalInformation,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: OmaColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 11, color: context.omaTheme.muted),
               ),
             ],
           ),
@@ -183,7 +182,7 @@ class ArticleDetailView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: OmaColors.surface,
+            color: context.omaTheme.surface,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
@@ -205,11 +204,11 @@ class ArticleDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryBox() {
+  Widget _buildSummaryBox(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: OmaColors.surface,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: article.cardColor.withValues(alpha: 0.15),
@@ -239,20 +238,20 @@ class ArticleDetailView extends StatelessWidget {
               children: [
                 Text(
                   AppStrings.shortSummary,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'CormorantGaramond',
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: OmaColors.textPrimary,
+                    color: context.omaTheme.foreground,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   article.summary,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
-                    color: OmaColors.textSecondary,
+                    color: context.omaTheme.muted,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -264,17 +263,17 @@ class ArticleDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildContentBlock(String block) {
+  Widget _buildContentBlock(BuildContext context, String block) {
     if (block.startsWith('###')) {
       return Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 8),
         child: Text(
           block.replaceFirst('###', '').trim(),
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'CormorantGaramond',
             fontSize: 23,
             fontWeight: FontWeight.w600,
-            color: OmaColors.textPrimary,
+            color: context.omaTheme.foreground,
           ),
         ),
       );
@@ -298,10 +297,10 @@ class ArticleDetailView extends StatelessWidget {
             Expanded(
               child: Text(
                 block.substring(1).trim(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   height: 1.6,
-                  color: OmaColors.textSecondary,
+                  color: context.omaTheme.muted,
                 ),
               ),
             ),
@@ -314,10 +313,10 @@ class ArticleDetailView extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16),
       child: Text(
         block,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           height: 1.6,
-          color: OmaColors.textSecondary,
+          color: context.omaTheme.muted,
         ),
       ),
     );
@@ -347,7 +346,7 @@ class _HeroBadge extends StatelessWidget {
           ],
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w800,
               color: Colors.white,

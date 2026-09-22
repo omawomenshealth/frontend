@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 
 /// Geri butonu + ilerleme çizgileri + sayaç.
 class OnboardingHeader extends StatelessWidget {
@@ -27,14 +27,14 @@ class OnboardingHeader extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: OmaColors.card.withValues(alpha: 0.8),
+              color: context.omaTheme.surface.withValues(alpha: 0.8),
               shape: BoxShape.circle,
               boxShadow: OmaShadows.soft,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back,
               size: 16,
-              color: OmaColors.muted,
+              color: context.omaTheme.muted,
             ),
           ),
         ),
@@ -48,25 +48,21 @@ class OnboardingHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                     child: Stack(
                       children: [
-                        Container(
-                          height: 4,
-                          color: OmaColors.border,
-                        ),
+                        Container(height: 4, color: context.omaTheme.border),
                         AnimatedFractionallySizedBox(
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.easeOut,
                           widthFactor: i <= index ? 1 : 0,
                           child: Container(
                             height: 4,
-                            color: OmaColors.primary,
+                            color: context.omaTheme.primary,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                if (i != safeTotal - 1)
-                  const SizedBox(width: 6),
+                if (i != safeTotal - 1) const SizedBox(width: 6),
               ],
             ],
           ),
@@ -74,10 +70,7 @@ class OnboardingHeader extends StatelessWidget {
         const SizedBox(width: 12),
         Text(
           '${index + 1}/$safeTotal',
-          style: OmaText.body(
-            12,
-            color: OmaColors.muted,
-          ),
+          style: OmaText.body(12, color: context.omaTheme.muted),
         ),
       ],
     );

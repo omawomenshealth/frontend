@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 
 /// Beslenme, ilaç, takviye ve cilt bakımı için ortak akıllı katalog seçicisi.
 class TrackingCatalogSelector extends StatefulWidget {
@@ -93,7 +93,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                     icon: const Icon(Icons.close_rounded),
                   ),
             filled: true,
-            fillColor: OmaColors.surface,
+            fillColor: context.omaTheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(22),
               borderSide: BorderSide(
@@ -122,8 +122,8 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
               Expanded(
                 child: Text(
                   AppStrings.smartSearchHint,
-                  style: const TextStyle(
-                    color: OmaColors.textSecondary,
+                  style: TextStyle(
+                    color: context.omaTheme.muted,
                     fontSize: 10.5,
                     height: 1.35,
                   ),
@@ -178,7 +178,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                   side: BorderSide(
                     color: widget.selected.contains(item)
                         ? widget.color
-                        : OmaColors.outline,
+                        : context.omaTheme.border,
                   ),
                   onSelected: (_) => widget.onToggle(item),
                 ),
@@ -271,7 +271,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
       key: const ValueKey('catalog_category_group'),
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
-        color: OmaColors.surface,
+        color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: widget.color.withValues(alpha: 0.34)),
       ),
@@ -306,18 +306,18 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                           Text(
                             widget.categoryGroupTitle ??
                                 AppStrings.medicationCategories,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
-                              color: OmaColors.textPrimary,
+                              color: context.omaTheme.foreground,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             AppStrings.catalogCategoryCount(categories.length),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10.5,
-                              color: OmaColors.textSecondary,
+                              color: context.omaTheme.muted,
                             ),
                           ),
                         ],
@@ -369,12 +369,12 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
       decoration: BoxDecoration(
         color: selectedCount > 0
             ? widget.color.withValues(alpha: 0.08)
-            : OmaColors.surface,
+            : context.omaTheme.surface,
         borderRadius: BorderRadius.circular(19),
         border: Border.all(
           color: selectedCount > 0
               ? widget.color.withValues(alpha: 0.55)
-              : OmaColors.outline,
+              : context.omaTheme.border,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -404,8 +404,8 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                     Expanded(
                       child: Text(
                         entry.key,
-                        style: const TextStyle(
-                          color: OmaColors.textPrimary,
+                        style: TextStyle(
+                          color: context.omaTheme.foreground,
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           height: 1.25,
@@ -503,7 +503,9 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
         selected: selected,
         selectedColor: widget.color.withValues(alpha: 0.13),
         checkmarkColor: widget.color,
-        side: BorderSide(color: selected ? widget.color : OmaColors.outline),
+        side: BorderSide(
+          color: selected ? widget.color : context.omaTheme.border,
+        ),
         onSelected: (_) => widget.onToggle(item),
       );
     }
@@ -522,7 +524,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
               selectedColor: widget.color.withValues(alpha: 0.13),
               checkmarkColor: widget.color,
               side: BorderSide(
-                color: selected ? widget.color : OmaColors.outline,
+                color: selected ? widget.color : context.omaTheme.border,
               ),
               onSelected: (_) {
                 setState(() {
@@ -586,7 +588,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                   side: BorderSide(
                     color: selectedDetail == detail
                         ? widget.color
-                        : OmaColors.outline,
+                        : context.omaTheme.border,
                   ),
                   onSelected: (_) =>
                       (widget.onItemSelected ?? _defaultItemSelection)(
@@ -670,7 +672,7 @@ class _EmptyResult extends StatelessWidget {
       child: Text(
         AppStrings.noSearchResults,
         textAlign: TextAlign.center,
-        style: const TextStyle(color: OmaColors.textSecondary, fontSize: 12),
+        style: TextStyle(color: context.omaTheme.muted, fontSize: 12),
       ),
     );
   }

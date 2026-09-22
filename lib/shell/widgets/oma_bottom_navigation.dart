@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/widgets/oma_theme.dart';
+import '../../core/theme/oma_theme.dart';
 import '../../core/widgets/oma_sunburst.dart';
 
 class OmaBottomNavigation extends StatelessWidget {
@@ -9,16 +9,22 @@ class OmaBottomNavigation extends StatelessWidget {
     required this.currentIndex,
     required this.onTap,
     required this.onOmaTap,
+    required this.activeColor,
     required this.items,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
   final VoidCallback onOmaTap;
+  final Color activeColor;
   final List<BottomNavigationBarItem> items;
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
+    final surfaceColor =
+        Color.lerp(theme.surface, activeColor, 0.06) ?? theme.surface;
+
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.fromLTRB(14, 0, 14, 12),
@@ -30,7 +36,7 @@ class OmaBottomNavigation extends StatelessWidget {
               height: 70,
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                color: OmaColors.card.withValues(alpha: 0.96),
+                color: surfaceColor.withValues(alpha: 0.96),
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: OmaShadows.soft,
               ),
@@ -40,8 +46,8 @@ class OmaBottomNavigation extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 type: BottomNavigationBarType.fixed,
-                selectedItemColor: OmaColors.primary,
-                unselectedItemColor: OmaColors.muted,
+                selectedItemColor: activeColor,
+                unselectedItemColor: theme.muted,
                 iconSize: 20,
                 selectedFontSize: 10.5,
                 unselectedFontSize: 10.5,
@@ -65,13 +71,11 @@ class OmaBottomNavigation extends StatelessWidget {
                 width: 66,
                 height: 66,
                 decoration: BoxDecoration(
-                  color: OmaColors.card.withValues(alpha: 0.96),
+                  color: surfaceColor.withValues(alpha: 0.96),
                   shape: BoxShape.circle,
                   boxShadow: OmaShadows.soft,
                 ),
-                child: const Center(
-                  child: OmaSunburst(size: 34, color: OmaColors.primary),
-                ),
+                child: Center(child: OmaSunburst(size: 34, color: activeColor)),
               ),
             ),
           ),

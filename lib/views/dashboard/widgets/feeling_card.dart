@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 
 /// Ana ekrandaki tekrar kullanilabilir hizli kayit aksiyonlari.
 class FeelingCard extends StatelessWidget {
@@ -12,7 +12,7 @@ class FeelingCard extends StatelessWidget {
   final VoidCallback? onMedicationTap;
   final VoidCallback? onSkincareTap;
   final bool showPeriod;
-  final Color themeColor;
+  final Color? themeColor;
 
   const FeelingCard({
     super.key,
@@ -23,40 +23,41 @@ class FeelingCard extends StatelessWidget {
     this.onMedicationTap,
     this.onSkincareTap,
     this.showPeriod = true,
-    this.themeColor = OmaColors.primary,
+    this.themeColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final actionBackground =
-        Color.lerp(OmaColors.surface, themeColor, 0.15) ?? OmaColors.surface;
+    final theme = context.omaTheme;
+    final accent = themeColor ?? theme.primary;
+    final actionBackground = Color.lerp(theme.surface, accent, 0.15)!;
     final actions = <_QuickAction>[
       if (showPeriod)
         _QuickAction(
           label: AppStrings.period,
           icon: Icons.water_drop_outlined,
-          foreground: themeColor,
+          foreground: accent,
           background: actionBackground,
           onTap: onPeriodTap,
         ),
       _QuickAction(
         label: AppStrings.nutrition,
         icon: Icons.restaurant_menu_rounded,
-        foreground: themeColor,
+        foreground: accent,
         background: actionBackground,
         onTap: onNutritionTap,
       ),
       _QuickAction(
         label: AppStrings.symptom,
         icon: Icons.medical_information_outlined,
-        foreground: themeColor,
+        foreground: accent,
         background: actionBackground,
         onTap: onSymptomTap,
       ),
       _QuickAction(
         label: AppStrings.mood,
         icon: Icons.mood_outlined,
-        foreground: themeColor,
+        foreground: accent,
         background: actionBackground,
         onTap: onMoodTap,
       ),
@@ -64,7 +65,7 @@ class FeelingCard extends StatelessWidget {
         _QuickAction(
           label: AppStrings.medicationAndSupplement,
           icon: Icons.medication_outlined,
-          foreground: themeColor,
+          foreground: accent,
           background: actionBackground,
           onTap: onMedicationTap!,
         ),
@@ -72,7 +73,7 @@ class FeelingCard extends StatelessWidget {
         _QuickAction(
           label: AppStrings.skincare,
           icon: Icons.spa_outlined,
-          foreground: themeColor,
+          foreground: accent,
           background: actionBackground,
           onTap: onSkincareTap!,
         ),
@@ -155,8 +156,8 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: OmaColors.textPrimary,
+                style: TextStyle(
+                  color: context.omaTheme.foreground,
                   fontSize: 9.5,
                   fontWeight: FontWeight.w600,
                   height: 1.15,

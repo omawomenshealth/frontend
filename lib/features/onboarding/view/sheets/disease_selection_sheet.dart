@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/constants/app_strings.dart';
-import '../../../../../core/widgets/oma_theme.dart';
+import '../../../../../core/theme/oma_theme.dart';
 import '../../utils/onboarding_label_utils.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
@@ -41,7 +41,7 @@ Future<void> showDiseaseSelectionSheet(
         return OnboardingSelectionSheet(
           title: AppStrings.conditions,
           icon: Icons.health_and_safety_outlined,
-          accent: OmaColors.accent,
+          accent: OmaPalette.periodPrimary,
           onSave: () {
             for (final disease in initialSelected.difference(selected)) {
               vm.toggleKnownDisease(disease);
@@ -75,7 +75,7 @@ Future<void> showDiseaseSelectionSheet(
                     FilterChip(
                       label: Text(disease),
                       selected: selected.contains(disease),
-                      selectedColor: OmaColors.accent.withValues(alpha: 0.14),
+                      selectedColor: OmaPalette.periodPrimary.withValues(alpha: 0.14),
                       onSelected: (_) {
                         if (selected.contains(disease)) {
                           selected.remove(disease);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/services/local_storage_service.dart';
 
@@ -13,19 +13,20 @@ class CycleInsightsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.omaTheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFFEF8), Color(0xFFF0F2E7)],
+        gradient: LinearGradient(
+          colors: [theme.surface, theme.primarySoft],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: OmaColors.outline),
+        border: Border.all(color: theme.border),
         boxShadow: [
           BoxShadow(
-            color: OmaColors.primary.withValues(alpha: 0.08),
+            color: theme.primary.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -39,10 +40,10 @@ class CycleInsightsCard extends StatelessWidget {
             children: [
               Text(
                 AppStrings.myCycles,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: OmaColors.textPrimary,
+                  color: theme.foreground,
                 ),
               ),
             ],
@@ -51,6 +52,7 @@ class CycleInsightsCard extends StatelessWidget {
 
           // 1. Önceki döngü süresi
           _buildInsightRow(
+            theme: theme,
             label: AppStrings.previousCycleLength,
             value: insights.previousCycleLength != null
                 ? AppStrings.dayCount(insights.previousCycleLength!)
@@ -60,10 +62,11 @@ class CycleInsightsCard extends StatelessWidget {
             infoText: AppStrings.normalCycleRange,
           ),
 
-          _divider(),
+          _divider(theme),
 
           // 2. Önceki regl süresi
           _buildInsightRow(
+            theme: theme,
             label: AppStrings.previousPeriodLength,
             value: AppStrings.dayCount(insights.previousPeriodLength),
             status: insights.periodStatus,
@@ -71,10 +74,11 @@ class CycleInsightsCard extends StatelessWidget {
             infoText: AppStrings.normalPeriodRange,
           ),
 
-          _divider(),
+          _divider(theme),
 
           // 3. Döngü süresi değişkenliği
           _buildInsightRow(
+            theme: theme,
             label: AppStrings.cycleLengthVariation,
             value:
                 insights.variationMin != null && insights.variationMax != null
@@ -90,7 +94,7 @@ class CycleInsightsCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: OmaColors.primary.withValues(alpha: 0.06),
+              color: theme.primary.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -98,7 +102,7 @@ class CycleInsightsCard extends StatelessWidget {
                 Icon(
                   Icons.info_outline_rounded,
                   size: 16,
-                  color: OmaColors.primary.withValues(alpha: 0.7),
+                  color: theme.primary.withValues(alpha: 0.7),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -111,7 +115,7 @@ class CycleInsightsCard extends StatelessWidget {
                         : AppStrings.cycleStatisticsHint,
                     style: TextStyle(
                       fontSize: 11,
-                      color: OmaColors.textSecondary.withValues(alpha: 0.8),
+                      color: theme.muted.withValues(alpha: 0.8),
                     ),
                   ),
                 ),
@@ -125,6 +129,7 @@ class CycleInsightsCard extends StatelessWidget {
 
   // ── Tek satır istatistik ─────────────────────────────────
   Widget _buildInsightRow({
+    required OmaTheme theme,
     required String label,
     required String value,
     required CycleStatus status,
@@ -145,16 +150,16 @@ class CycleInsightsCard extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 12,
-                    color: OmaColors.textSecondary.withValues(alpha: 0.8),
+                    color: theme.muted.withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: OmaColors.textPrimary,
+                    color: theme.foreground,
                   ),
                 ),
               ],
@@ -170,7 +175,7 @@ class CycleInsightsCard extends StatelessWidget {
                 child: Icon(
                   Icons.info_outline,
                   size: 18,
-                  color: OmaColors.textHint.withValues(alpha: 0.6),
+                  color: theme.muted.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: 6),
@@ -178,14 +183,14 @@ class CycleInsightsCard extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _statusIcon(status),
+                  _statusIcon(status, theme),
                   const SizedBox(width: 6),
                   Text(
                     statusLabel,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: _statusColor(status),
+                      color: _statusColor(status, theme),
                     ),
                   ),
                 ],
@@ -197,15 +202,12 @@ class CycleInsightsCard extends StatelessWidget {
     );
   }
 
-  Widget _divider() {
-    return Divider(
-      color: OmaColors.textHint.withValues(alpha: 0.15),
-      height: 1,
-    );
+  Widget _divider(OmaTheme theme) {
+    return Divider(color: theme.border.withValues(alpha: 0.7), height: 1);
   }
 
   // ── Durum ikonu ──────────────────────────────────────────
-  Widget _statusIcon(CycleStatus status) {
+  Widget _statusIcon(CycleStatus status, OmaTheme theme) {
     switch (status) {
       case CycleStatus.normal:
         return Container(
@@ -236,7 +238,7 @@ class CycleInsightsCard extends StatelessWidget {
           width: 22,
           height: 22,
           decoration: BoxDecoration(
-            color: OmaColors.textHint.withValues(alpha: 0.3),
+            color: theme.muted.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.remove, size: 14, color: Colors.white),
@@ -244,14 +246,14 @@ class CycleInsightsCard extends StatelessWidget {
     }
   }
 
-  Color _statusColor(CycleStatus status) {
+  Color _statusColor(CycleStatus status, OmaTheme theme) {
     switch (status) {
       case CycleStatus.normal:
         return const Color(0xFF4CAF50);
       case CycleStatus.abnormal:
         return const Color(0xFFFF9800);
       case CycleStatus.noData:
-        return OmaColors.textHint;
+        return theme.muted;
     }
   }
 

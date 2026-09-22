@@ -9,7 +9,9 @@ import 'core/config/app_environment.dart';
 import 'core/constants/app_strings.dart';
 import 'core/localization/catalog_localizer.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/oma_theme.dart';
 import 'core/utils/app_time.dart';
+import 'data/models/user_settings_model.dart';
 import 'data/services/api_service.dart';
 import 'data/services/local_storage_service.dart';
 import 'data/services/notification_service.dart';
@@ -204,35 +206,63 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             reminders,
           ),
         ),
+        ChangeNotifierProvider(create: (_) => OmaThemeController()),
       ],
-      child: MaterialApp(
-        navigatorKey: _navigatorKey,
-        onGenerateTitle: (_) => AppStrings.appName,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        localizationsDelegates: const [
-          AppStrings.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: AppStrings.supportedLocales,
-        localeResolutionCallback: (locale, _) {
-          final resolved = AppStrings.resolveLocale(locale);
-          unawaited(LocaleSettings.setLocaleRaw(resolved.languageCode));
-          return resolved;
-        },
-        initialRoute: '/splash',
-        routes: {
-          '/splash': (context) => SplashView(
-            onDone: () => Navigator.of(context).pushReplacementNamed(
-              widget.storage.isOnboardingComplete ? '/home' : '/auth',
-            ),
-          ),
-          '/auth': (context) => const AuthView(),
-          '/onboarding': (context) => const OnboardingView(),
-          '/home': (context) => HomeShell(key: _homeShellKey),
-          '/privacy': (context) => const PrivacyCenterView(),
+      child: Consumer3<HomeViewModel, ProfileViewModel, OmaThemeController>(
+        builder: (context, home, profile, appearance, _) {
+          final trackingMode = profile.isLoading
+              ? home.settings?.trackingMode ?? TrackingMode.cycle
+              : profile.settings.trackingMode;
+          final mode = trackingMode == TrackingMode.pregnant
+              ? OmaMode.pregnancy
+              : OmaMode.cycle;
+          final lightTheme = OmaThemeResolver.resolve(
+            mode: mode,
+            brightness: Brightness.light,
+            selectedDate: home.selectedDate,
+            periodCalculator: home.periodCalculator,
+          );
+          final darkTheme = OmaThemeResolver.resolve(
+            mode: mode,
+            brightness: Brightness.dark,
+            selectedDate: home.selectedDate,
+            periodCalculator: home.periodCalculator,
+          );
+
+          return MaterialApp(
+            navigatorKey: _navigatorKey,
+            onGenerateTitle: (_) => AppStrings.appName,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.fromOmaTheme(lightTheme),
+            darkTheme: AppTheme.fromOmaTheme(darkTheme),
+            themeMode: appearance.themeMode,
+            builder: (context, child) =>
+                OmaSystemUi(child: child ?? const SizedBox.shrink()),
+            localizationsDelegates: const [
+              AppStrings.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppStrings.supportedLocales,
+            localeResolutionCallback: (locale, _) {
+              final resolved = AppStrings.resolveLocale(locale);
+              unawaited(LocaleSettings.setLocaleRaw(resolved.languageCode));
+              return resolved;
+            },
+            initialRoute: '/splash',
+            routes: {
+              '/splash': (context) => SplashView(
+                onDone: () => Navigator.of(context).pushReplacementNamed(
+                  widget.storage.isOnboardingComplete ? '/home' : '/auth',
+                ),
+              ),
+              '/auth': (context) => const AuthView(),
+              '/onboarding': (context) => const OnboardingView(),
+              '/home': (context) => HomeShell(key: _homeShellKey),
+              '/privacy': (context) => const PrivacyCenterView(),
+            },
+          );
         },
       ),
     );
