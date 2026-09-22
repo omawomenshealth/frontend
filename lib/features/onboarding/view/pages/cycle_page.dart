@@ -63,7 +63,7 @@ class _CycleLengthField extends StatelessWidget {
               min: 21,
               max: 40,
               divisions: 19,
-              activeColor: OmaColors.primary,
+              activeColor: OmaPalette.primary,
               onChanged: (value) {
                 vm.setAverageCycleLength(
                   value.round(),

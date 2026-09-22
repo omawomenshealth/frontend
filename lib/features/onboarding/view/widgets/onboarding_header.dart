@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 
 /// Geri butonu + ilerleme çizgileri + sayaç.
 class OnboardingHeader extends StatelessWidget {
@@ -27,14 +27,14 @@ class OnboardingHeader extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: OmaColors.card.withValues(alpha: 0.8),
+              color: OmaPalette.card.withValues(alpha: 0.8),
               shape: BoxShape.circle,
               boxShadow: OmaShadows.soft,
             ),
             child: const Icon(
               Icons.arrow_back,
               size: 16,
-              color: OmaColors.muted,
+              color: OmaPalette.muted,
             ),
           ),
         ),
@@ -50,7 +50,7 @@ class OnboardingHeader extends StatelessWidget {
                       children: [
                         Container(
                           height: 4,
-                          color: OmaColors.border,
+                          color: OmaPalette.border,
                         ),
                         AnimatedFractionallySizedBox(
                           duration: const Duration(milliseconds: 500),
@@ -58,7 +58,7 @@ class OnboardingHeader extends StatelessWidget {
                           widthFactor: i <= index ? 1 : 0,
                           child: Container(
                             height: 4,
-                            color: OmaColors.primary,
+                            color: OmaPalette.primary,
                           ),
                         ),
                       ],
@@ -76,7 +76,7 @@ class OnboardingHeader extends StatelessWidget {
           '${index + 1}/$safeTotal',
           style: OmaText.body(
             12,
-            color: OmaColors.muted,
+            color: OmaPalette.muted,
           ),
         ),
       ],

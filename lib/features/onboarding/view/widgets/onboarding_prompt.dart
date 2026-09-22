@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 
 class OnboardingPrompt extends StatelessWidget {
   const OnboardingPrompt({
@@ -23,13 +23,13 @@ class OnboardingPrompt extends StatelessWidget {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: OmaColors.primary.withValues(alpha: 0.12),
+            color: OmaPalette.primary.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
           child: const Icon(
             Icons.auto_awesome_rounded,
             size: 16,
-            color: OmaColors.primary,
+            color: OmaPalette.primary,
           ),
         ),
         const SizedBox(width: 12),
@@ -39,7 +39,7 @@ class OnboardingPrompt extends StatelessWidget {
             style: GoogleFonts.dmSans(
               fontSize: 14,
               height: 1.6,
-              color: OmaColors.foreground.withValues(alpha: 0.9),
+              color: OmaPalette.foreground.withValues(alpha: 0.9),
             ),
           ),
         ),

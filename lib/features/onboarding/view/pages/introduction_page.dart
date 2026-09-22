@@ -97,7 +97,7 @@ class _BirthDateField extends StatelessWidget {
           icon: const Icon(
             Icons.calendar_today_outlined,
             size: 18,
-            color: OmaColors.muted,
+            color: OmaPalette.muted,
           ),
         ),
       ),

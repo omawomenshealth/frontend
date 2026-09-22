@@ -82,7 +82,7 @@ class OnboardingCard extends StatelessWidget {
                   11,
                   weight: FontWeight.w500,
                   letterSpacing: 1.6,
-                  color: OmaColors.muted,
+                  color: OmaPalette.muted,
                 ),
               ),
               const SizedBox(height: 16),

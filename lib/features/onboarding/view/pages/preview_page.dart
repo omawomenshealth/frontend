@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/image_constants.dart';
-import '../../../../core/widgets/oma_theme.dart';
+import '../../../../core/theme/oma_theme.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 
@@ -42,7 +42,7 @@ class PreviewPage extends StatelessWidget {
                   height: 80,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: OmaColors.surface.withValues(alpha: 0.86),
+                    color: OmaPalette.card.withValues(alpha: 0.86),
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: const [
                       BoxShadow(
@@ -72,7 +72,7 @@ class PreviewPage extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: OmaText.body(
                   14,
-                  color: OmaColors.textSecondary,
+                  color: OmaPalette.muted,
                   height: 1.45,
                 ),
               ),
@@ -155,7 +155,7 @@ class _PreviewPrivacy extends StatelessWidget {
       children: [
         const Icon(
           Icons.favorite_border_rounded,
-          color: OmaColors.textSecondary,
+          color: OmaPalette.muted,
           size: 16,
         ),
         const SizedBox(width: 8),
@@ -163,7 +163,7 @@ class _PreviewPrivacy extends StatelessWidget {
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: OmaText.body(12, color: OmaColors.textSecondary),
+            style: OmaText.body(12, color: OmaPalette.muted),
           ),
         ),
       ],
@@ -185,7 +185,7 @@ class _PreviewSummary extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: OmaColors.surface.withValues(alpha: 0.8),
+          color: OmaPalette.card.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -195,7 +195,7 @@ class _PreviewSummary extends StatelessWidget {
               child: Text(
                 label,
                 textAlign: TextAlign.start,
-                style: OmaText.body(12, color: OmaColors.textSecondary),
+                style: OmaText.body(12, color: OmaPalette.muted),
               ),
             ),
             const SizedBox(width: 12),

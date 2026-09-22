@@ -26,7 +26,7 @@ class AuthBrandHeader extends StatelessWidget {
           textAlign: TextAlign.center,
           style: OmaText.body(
             13.5,
-            color: OmaColors.muted,
+            color: OmaPalette.muted,
           ),
         ),
       ],

@@ -25,8 +25,8 @@ class AuthActionCard extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 384),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: OmaColors.card,
-        border: Border.all(color: OmaColors.border),
+        color: OmaPalette.card,
+        border: Border.all(color: OmaPalette.border),
         borderRadius: BorderRadius.circular(26),
         boxShadow: OmaShadows.soft,
       ),
@@ -37,7 +37,7 @@ class AuthActionCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: OmaText.body(
               13,
-              color: OmaColors.muted,
+              color: OmaPalette.muted,
             ),
           ),
           const SizedBox(height: 16),
@@ -52,10 +52,10 @@ class AuthActionCard extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: OmaColors.errorLight,
+                        color: OmaPalette.errorLight,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: OmaColors.error.withValues(alpha: 0.2),
+                          color: OmaPalette.error.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Text(
@@ -63,7 +63,7 @@ class AuthActionCard extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: OmaText.body(
                           12.5,
-                          color: OmaColors.error,
+                          color: OmaPalette.error,
                         ),
                       ),
                     ),
@@ -111,7 +111,7 @@ class AuthActionCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: OmaText.body(
               11.5,
-              color: OmaColors.muted,
+              color: OmaPalette.muted,
             ),
           ),
         ],
@@ -131,7 +131,7 @@ class _OrDivider extends StatelessWidget {
       children: [
         const Expanded(
           child: Divider(
-            color: OmaColors.border,
+            color: OmaPalette.border,
             height: 1,
           ),
         ),
@@ -141,13 +141,13 @@ class _OrDivider extends StatelessWidget {
             t.auth.actionCard.alternativeLabel,
             style: OmaText.body(
               11.5,
-              color: OmaColors.muted,
+              color: OmaPalette.muted,
             ),
           ),
         ),
         const Expanded(
           child: Divider(
-            color: OmaColors.border,
+            color: OmaPalette.border,
             height: 1,
           ),
         ),

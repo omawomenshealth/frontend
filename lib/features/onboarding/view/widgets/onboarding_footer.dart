@@ -40,7 +40,7 @@ class OnboardingFooter extends StatelessWidget {
             textAlign: TextAlign.center,
             style: OmaText.body(
               12,
-              color: OmaColors.muted,
+              color: OmaPalette.muted,
             ),
           )
         else if (isSkippable)
