@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../core/constants/app_strings.dart';
 import '../core/widgets/oma_theme.dart';
+import '../data/models/user_settings_model.dart';
 import '../data/services/notification_service.dart';
 import '../views/articles/view/articles_view.dart';
 import '../views/calendar/viewmodel/calendar_view_model.dart';
@@ -13,7 +14,6 @@ import '../views/insights/viewmodel/insights_view_model.dart';
 import '../views/profile/view/profile_view.dart';
 import 'widgets/oma_bottom_navigation.dart';
 import 'widgets/oma_chat_preview.dart';
-
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -71,16 +71,16 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     AppStrings.of(context);
-    final phaseIndex = context
-        .watch<HomeViewModel>()
-        .periodCalculator
-        ?.currentPhaseIndex;
-    final activeColor = switch (phaseIndex) {
-      0 => OmaColors.periodPrimary,
-      2 => OmaColors.ovulation,
-      3 => OmaColors.lutealDark,
-      _ => OmaColors.primary,
-    };
+    final home = context.watch<HomeViewModel>();
+    final calculator = home.periodCalculator;
+    final visiblePhase = _currentIndex == 0
+        ? calculator?.phaseAt(home.selectedDate)
+        : calculator?.currentPhase;
+    final activeColor =
+        _currentIndex == 0 &&
+            home.settings?.trackingMode == TrackingMode.pregnant
+        ? OmaColors.plum
+        : OmaColors.forCyclePhase(visiblePhase);
 
     return Scaffold(
       extendBody: true,
@@ -101,27 +101,27 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   }
 
   List<BottomNavigationBarItem> get _navigationItems => [
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.home_outlined),
-          activeIcon: const Icon(Icons.home_rounded),
-          label: AppStrings.home,
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.explore_outlined),
-          activeIcon: const Icon(Icons.explore_rounded),
-          label: AppStrings.explore,
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.auto_awesome_outlined),
-          activeIcon: const Icon(Icons.auto_awesome_rounded),
-          label: AppStrings.insights,
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.circle_outlined),
-          activeIcon: const Icon(Icons.circle),
-          label: AppStrings.profile,
-        ),
-      ];
+    BottomNavigationBarItem(
+      icon: const Icon(Icons.home_outlined),
+      activeIcon: const Icon(Icons.home_rounded),
+      label: AppStrings.home,
+    ),
+    BottomNavigationBarItem(
+      icon: const Icon(Icons.explore_outlined),
+      activeIcon: const Icon(Icons.explore_rounded),
+      label: AppStrings.explore,
+    ),
+    BottomNavigationBarItem(
+      icon: const Icon(Icons.auto_awesome_outlined),
+      activeIcon: const Icon(Icons.auto_awesome_rounded),
+      label: AppStrings.insights,
+    ),
+    BottomNavigationBarItem(
+      icon: const Icon(Icons.circle_outlined),
+      activeIcon: const Icon(Icons.circle),
+      label: AppStrings.profile,
+    ),
+  ];
 
   Widget? _buildBottomNavigation(Color activeColor) {
     if (_currentIndex == 2) return null;
@@ -130,6 +130,7 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
       currentIndex: _currentIndex,
       onTap: _selectPage,
       onOmaTap: () => _showOmaSheet(context, activeColor),
+      activeColor: activeColor,
       items: _navigationItems,
     );
   }
@@ -138,9 +139,7 @@ class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (_) => OmaTalkPreview(
-        accent: accent,
-      ),
+      builder: (_) => OmaTalkPreview(accent: accent),
     );
   }
 }
