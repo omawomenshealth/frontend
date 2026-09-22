@@ -236,6 +236,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             theme: AppTheme.fromOmaTheme(lightTheme),
             darkTheme: AppTheme.fromOmaTheme(darkTheme),
             themeMode: appearance.themeMode,
+            builder: (context, child) =>
+                OmaSystemUi(child: child ?? const SizedBox.shrink()),
             localizationsDelegates: const [
               AppStrings.delegate,
               GlobalMaterialLocalizations.delegate,
