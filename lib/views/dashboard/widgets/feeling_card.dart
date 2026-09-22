@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 
 /// Ana ekrandaki tekrar kullanilabilir hizli kayit aksiyonlari.
 class FeelingCard extends StatelessWidget {
@@ -23,13 +23,13 @@ class FeelingCard extends StatelessWidget {
     this.onMedicationTap,
     this.onSkincareTap,
     this.showPeriod = true,
-    this.themeColor = OmaColors.primary,
+    this.themeColor = OmaPalette.primary,
   });
 
   @override
   Widget build(BuildContext context) {
     final actionBackground =
-        Color.lerp(OmaColors.surface, themeColor, 0.15) ?? OmaColors.surface;
+        Color.lerp(OmaPalette.card, themeColor, 0.15) ?? OmaPalette.card;
     final actions = <_QuickAction>[
       if (showPeriod)
         _QuickAction(
@@ -156,7 +156,7 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: OmaColors.textPrimary,
+                  color: OmaPalette.foreground,
                   fontSize: 9.5,
                   fontWeight: FontWeight.w600,
                   height: 1.15,

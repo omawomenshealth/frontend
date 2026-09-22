@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
 
 /// Emoji tabanlı ruh hali seçici kartı.
@@ -20,7 +20,7 @@ class MoodSelectorCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: OmaColors.surface,
+        color: OmaPalette.card,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -35,7 +35,7 @@ class MoodSelectorCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.mood, color: OmaColors.moodHappy, size: 22),
+              const Icon(Icons.mood, color: OmaPalette.moodHappy, size: 22),
               const SizedBox(width: 8),
               const Spacer(),
               if (selectedEmoji != null)
@@ -61,7 +61,7 @@ class MoodSelectorCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? _getMoodColor(entry.value).withValues(alpha: 0.15)
-                        : OmaColors.background,
+                        : OmaPalette.background,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected
@@ -84,7 +84,7 @@ class MoodSelectorCard extends StatelessWidget {
                               : FontWeight.normal,
                           color: isSelected
                               ? _getMoodColor(entry.value)
-                              : OmaColors.textSecondary,
+                              : OmaPalette.muted,
                         ),
                       ),
                     ],
@@ -101,19 +101,19 @@ class MoodSelectorCard extends StatelessWidget {
   Color _getMoodColor(String emoji) {
     switch (emoji) {
       case '😊':
-        return OmaColors.moodHappy;
+        return OmaPalette.moodHappy;
       case '😌':
-        return OmaColors.moodPeaceful;
+        return OmaPalette.moodPeaceful;
       case '🙂':
       case '⚡':
-        return OmaColors.moodGood;
+        return OmaPalette.moodGood;
       case '😞':
       case '😴':
-        return OmaColors.moodSad;
+        return OmaPalette.moodSad;
       case '😡':
-        return OmaColors.moodAngry;
+        return OmaPalette.moodAngry;
       default:
-        return OmaColors.moodNeutral;
+        return OmaPalette.moodNeutral;
     }
   }
 }
