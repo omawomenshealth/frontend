@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/image_constants.dart';
 import '../../../core/shared_widgets/condition_selector.dart';
@@ -43,7 +43,7 @@ class _ProfileMechanics extends StatelessWidget {
         final s = vm.settings;
 
         return Scaffold(
-          backgroundColor: OmaColors.scaffoldBackground,
+          backgroundColor: OmaPalette.background,
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
@@ -57,11 +57,11 @@ class _ProfileMechanics extends StatelessWidget {
                         width: 56,
                         height: 56,
                         decoration: BoxDecoration(
-                          gradient: OmaColors.primaryGradient,
+                          gradient: OmaPalette.primaryGradient,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: OmaColors.primary.withValues(alpha: 0.3),
+                              color: OmaPalette.primary.withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -92,7 +92,7 @@ class _ProfileMechanics extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: OmaColors.textPrimary,
+                                color: OmaPalette.foreground,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -100,7 +100,7 @@ class _ProfileMechanics extends StatelessWidget {
                               AppStrings.womenHealth,
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: OmaColors.textSecondary,
+                                color: OmaPalette.muted,
                               ),
                             ),
                           ],
@@ -246,7 +246,7 @@ class _ProfileMechanics extends StatelessWidget {
                         AppStrings.doctorReportDescription,
                         style: const TextStyle(
                           fontSize: 13,
-                          color: OmaColors.textSecondary,
+                          color: OmaPalette.muted,
                           height: 1.4,
                         ),
                       ),
@@ -256,7 +256,7 @@ class _ProfileMechanics extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () => _openPremiumDoctorReport(context),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: OmaColors.primary,
+                            backgroundColor: OmaPalette.primary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                               vertical: 12,
@@ -319,12 +319,12 @@ class _ProfileMechanics extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: OmaColors.surface,
+        color: OmaPalette.card,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: OmaColors.outline),
+        border: Border.all(color: OmaPalette.border),
         boxShadow: [
           BoxShadow(
-            color: OmaColors.primary.withValues(alpha: 0.06),
+            color: OmaPalette.primary.withValues(alpha: 0.06),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -340,7 +340,7 @@ class _ProfileMechanics extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: OmaColors.textPrimary,
+                  color: OmaPalette.foreground,
                 ),
               ),
               const Spacer(),
@@ -349,10 +349,10 @@ class _ProfileMechanics extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: OmaColors.primary.withValues(alpha: 0.1),
+                    color: OmaPalette.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, size: 18, color: OmaColors.primary),
+                  child: Icon(icon, size: 18, color: OmaPalette.primary),
                 ),
               ),
             ],
@@ -376,7 +376,7 @@ class _ProfileMechanics extends StatelessWidget {
               label,
               style: const TextStyle(
                 fontSize: 13,
-                color: OmaColors.textSecondary,
+                color: OmaPalette.muted,
               ),
             ),
           ),
@@ -386,7 +386,7 @@ class _ProfileMechanics extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: OmaColors.textPrimary,
+                color: OmaPalette.foreground,
               ),
             ),
           ),
@@ -430,7 +430,7 @@ class _ProfileMechanics extends StatelessWidget {
       builder: (ctx) => _EditSheet(
         title: AppStrings.basicInformationEdit,
         icon: Icons.person_outline_rounded,
-        accent: OmaColors.primary,
+        accent: OmaPalette.primary,
         onSave: () async {
           vm.updateUserName(nameCtrl.text.trim());
           vm.updateWeight(double.tryParse(weightCtrl.text));
@@ -486,7 +486,7 @@ class _ProfileMechanics extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -525,7 +525,7 @@ class _ProfileMechanics extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -536,7 +536,7 @@ class _ProfileMechanics extends StatelessWidget {
                     ...vm.settings.customConditions,
                   }.toList(),
                   selectedItems: vm.knownDiseases,
-                  color: OmaColors.primary,
+                  color: OmaPalette.primary,
                   addDialogTitle: AppStrings.addCondition,
                   addButtonKey: 'profile_add_chronic_disease',
                   onToggle: (disease) {
@@ -559,7 +559,7 @@ class _ProfileMechanics extends StatelessWidget {
   void _showLabResultsSheet(
     BuildContext context,
     ProfileViewModel vm, {
-    Color accent = OmaColors.primary,
+    Color accent = OmaPalette.primary,
   }) {
     var results = Map<String, LabResult>.from(vm.settings.labResults);
     var testDate = vm.settings.labTestDate;
@@ -606,7 +606,7 @@ class _ProfileMechanics extends StatelessWidget {
       builder: (ctx) => _EditSheet(
         title: AppStrings.womenHealthEdit,
         icon: Icons.favorite_border_rounded,
-        accent: OmaColors.periodPrimary,
+        accent: OmaPalette.periodPrimary,
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {
@@ -627,7 +627,7 @@ class _ProfileMechanics extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -673,7 +673,7 @@ class _ProfileMechanics extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -701,19 +701,19 @@ class _ProfileMechanics extends StatelessWidget {
                           vm.updateBirthControlMethod(method);
                           setSheetState(() {});
                         },
-                        backgroundColor: OmaColors.surface,
-                        selectedColor: OmaColors.periodLight,
+                        backgroundColor: OmaPalette.card,
+                        selectedColor: OmaPalette.periodLight,
                         side: BorderSide(
                           color: isSelected
-                              ? OmaColors.periodPrimary
-                              : OmaColors.outline,
+                              ? OmaPalette.periodPrimary
+                              : OmaPalette.border,
                         ),
                         shape: const StadiumBorder(),
                         labelStyle: TextStyle(
                           fontSize: 12,
                           color: isSelected
-                              ? OmaColors.periodPrimary
-                              : OmaColors.textPrimary,
+                              ? OmaPalette.periodPrimary
+                              : OmaPalette.foreground,
                         ),
                       );
                     }),
@@ -722,12 +722,12 @@ class _ProfileMechanics extends StatelessWidget {
                       avatar: const Icon(
                         Icons.add_rounded,
                         size: 17,
-                        color: OmaColors.periodPrimary,
+                        color: OmaPalette.periodPrimary,
                       ),
                       label: Text(AppStrings.add),
-                      backgroundColor: OmaColors.periodLight,
+                      backgroundColor: OmaPalette.periodLight,
                       side: BorderSide(
-                        color: OmaColors.periodPrimary.withValues(alpha: 0.45),
+                        color: OmaPalette.periodPrimary.withValues(alpha: 0.45),
                       ),
                       onPressed: () async {
                         final method = await _promptText(
@@ -787,7 +787,7 @@ class _ProfileMechanics extends StatelessWidget {
       builder: (ctx) => _EditSheet(
         title: AppStrings.medicationSupplementEdit,
         icon: Icons.medication_outlined,
-        accent: OmaColors.medicationPrimary,
+        accent: OmaPalette.medicationPrimary,
         onSave: () async {
           await vm.saveSettings();
           if (ctx.mounted) {
@@ -847,7 +847,7 @@ class _ProfileMechanics extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -863,17 +863,17 @@ class _ProfileMechanics extends StatelessWidget {
                       deleteIcon: const Icon(
                         Icons.close,
                         size: 16,
-                        color: OmaColors.error,
+                        color: OmaPalette.error,
                       ),
                       onDeleted: () {
                         vm.removeMedication(med);
                         setSheetState(() {});
                       },
-                      backgroundColor: OmaColors.medicationPrimary.withValues(
+                      backgroundColor: OmaPalette.medicationPrimary.withValues(
                         alpha: 0.1,
                       ),
                       side: BorderSide(
-                        color: OmaColors.medicationPrimary.withValues(
+                        color: OmaPalette.medicationPrimary.withValues(
                           alpha: 0.28,
                         ),
                       ),
@@ -886,7 +886,7 @@ class _ProfileMechanics extends StatelessWidget {
                   itemType: MedicationPlanItemType.medication,
                   availableItems: medicationNames,
                   itemIdentities: medicationIdentities,
-                  color: OmaColors.medicationPrimary,
+                  color: OmaPalette.medicationPrimary,
                   onChanged: () => ctx2.read<HomeViewModel>().loadData(),
                 ),
                 const SizedBox(height: 20),
@@ -897,7 +897,7 @@ class _ProfileMechanics extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -913,15 +913,15 @@ class _ProfileMechanics extends StatelessWidget {
                       deleteIcon: const Icon(
                         Icons.close,
                         size: 16,
-                        color: OmaColors.error,
+                        color: OmaPalette.error,
                       ),
                       onDeleted: () {
                         vm.removeSupplement(sup);
                         setSheetState(() {});
                       },
-                      backgroundColor: OmaColors.success.withValues(alpha: 0.1),
+                      backgroundColor: OmaPalette.success.withValues(alpha: 0.1),
                       side: BorderSide(
-                        color: OmaColors.success.withValues(alpha: 0.28),
+                        color: OmaPalette.success.withValues(alpha: 0.28),
                       ),
                       shape: const StadiumBorder(),
                     );
@@ -936,12 +936,12 @@ class _ProfileMechanics extends StatelessWidget {
                   vm.addSupplement(canonical);
                   supCtrl.clear();
                   setSheetState(() {});
-                }, color: OmaColors.success),
+                }, color: OmaPalette.success),
                 MedicationReminderSection(
                   key: const ValueKey('profile_supplement_reminders'),
                   itemType: MedicationPlanItemType.supplement,
                   availableItems: supplementNames,
-                  color: OmaColors.success,
+                  color: OmaPalette.success,
                   onChanged: () => ctx2.read<HomeViewModel>().loadData(),
                 ),
                 const SizedBox(height: 20),
@@ -951,7 +951,7 @@ class _ProfileMechanics extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -967,17 +967,17 @@ class _ProfileMechanics extends StatelessWidget {
                       deleteIcon: const Icon(
                         Icons.close,
                         size: 16,
-                        color: OmaColors.error,
+                        color: OmaPalette.error,
                       ),
                       onDeleted: () {
                         vm.removeSkincare(item);
                         setSheetState(() {});
                       },
-                      backgroundColor: OmaColors.skincarePrimary.withValues(
+                      backgroundColor: OmaPalette.skincarePrimary.withValues(
                         alpha: 0.1,
                       ),
                       side: BorderSide(
-                        color: OmaColors.skincarePrimary.withValues(
+                        color: OmaPalette.skincarePrimary.withValues(
                           alpha: 0.28,
                         ),
                       ),
@@ -998,13 +998,13 @@ class _ProfileMechanics extends StatelessWidget {
                     skincareCtrl.clear();
                     setSheetState(() {});
                   },
-                  color: OmaColors.skincarePrimary,
+                  color: OmaPalette.skincarePrimary,
                 ),
                 MedicationReminderSection(
                   key: const ValueKey('profile_skincare_reminders'),
                   itemType: MedicationPlanItemType.skincare,
                   availableItems: skincareNames,
-                  color: OmaColors.skincarePrimary,
+                  color: OmaPalette.skincarePrimary,
                   onChanged: () => ctx2.read<HomeViewModel>().loadData(),
                 ),
               ],
@@ -1032,15 +1032,15 @@ class _ProfileMechanics extends StatelessWidget {
         vm.updateMenopauseStatus(status);
         setSheetState(() {});
       },
-      backgroundColor: OmaColors.surface,
-      selectedColor: OmaColors.periodLight,
+      backgroundColor: OmaPalette.card,
+      selectedColor: OmaPalette.periodLight,
       side: BorderSide(
-        color: isSelected ? OmaColors.periodPrimary : OmaColors.outline,
+        color: isSelected ? OmaPalette.periodPrimary : OmaPalette.border,
       ),
       shape: const StadiumBorder(),
       labelStyle: TextStyle(
         fontSize: 12,
-        color: isSelected ? OmaColors.periodPrimary : OmaColors.textPrimary,
+        color: isSelected ? OmaPalette.periodPrimary : OmaPalette.foreground,
       ),
     );
   }
@@ -1049,7 +1049,7 @@ class _ProfileMechanics extends StatelessWidget {
     TextEditingController ctrl,
     String hint,
     VoidCallback onAdd, {
-    Color color = OmaColors.primary,
+    Color color = OmaPalette.primary,
   }) {
     return Row(
       children: [
@@ -1118,18 +1118,18 @@ class _ProfileMechanics extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
-              ? OmaColors.primary.withValues(alpha: 0.12)
-              : OmaColors.background,
+              ? OmaPalette.primary.withValues(alpha: 0.12)
+              : OmaPalette.background,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isSelected ? OmaColors.primary : OmaColors.outline,
+            color: isSelected ? OmaPalette.primary : OmaPalette.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? OmaColors.primary : OmaColors.textSecondary,
+            color: isSelected ? OmaPalette.primary : OmaPalette.muted,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
@@ -1144,9 +1144,9 @@ class _ProfileMechanics extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: OmaColors.surface,
+        color: OmaPalette.card,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: OmaColors.outline),
+        border: Border.all(color: OmaPalette.border),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF574C44).withValues(alpha: 0.055),
@@ -1162,7 +1162,7 @@ class _ProfileMechanics extends StatelessWidget {
             children: [
               Icon(
                 isLoggedIn ? Icons.cloud_done_rounded : Icons.cloud_off_rounded,
-                color: isLoggedIn ? OmaColors.success : OmaColors.warning,
+                color: isLoggedIn ? OmaPalette.success : OmaPalette.warning,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -1174,7 +1174,7 @@ class _ProfileMechanics extends StatelessWidget {
                     fontFamily: 'Karla',
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: OmaColors.textPrimary,
+                    color: OmaPalette.foreground,
                   ),
                 ),
               ),
@@ -1187,7 +1187,7 @@ class _ProfileMechanics extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: OmaColors.textPrimary,
+                color: OmaPalette.foreground,
               ),
             ),
             const SizedBox(height: 4),
@@ -1195,7 +1195,7 @@ class _ProfileMechanics extends StatelessWidget {
               '${AppStrings.lastSync}: ${vm.lastSyncDisplay}',
               style: const TextStyle(
                 fontSize: 12,
-                color: OmaColors.textSecondary,
+                color: OmaPalette.muted,
               ),
             ),
             if (vm.syncError != null) ...[
@@ -1233,7 +1233,7 @@ class _ProfileMechanics extends StatelessWidget {
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: OmaColors.primary,
+                      backgroundColor: OmaPalette.primary,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1280,7 +1280,7 @@ class _ProfileMechanics extends StatelessWidget {
               AppStrings.connectAccountDescription,
               style: const TextStyle(
                 fontSize: 13,
-                color: OmaColors.textSecondary,
+                color: OmaPalette.muted,
                 height: 1.4,
               ),
             ),
@@ -1292,7 +1292,7 @@ class _ProfileMechanics extends StatelessWidget {
                   Navigator.of(context).pushReplacementNamed('/auth');
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: OmaColors.primary,
+                  backgroundColor: OmaPalette.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
@@ -1589,14 +1589,14 @@ class _EditSheet extends StatelessWidget {
       colorScheme: baseTheme.colorScheme.copyWith(primary: accent),
       inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
         filled: true,
-        fillColor: OmaColors.surface,
+        fillColor: OmaPalette.card,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 14,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: OmaColors.outline),
+          borderSide: const BorderSide(color: OmaPalette.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -1615,13 +1615,13 @@ class _EditSheet extends StatelessWidget {
           child: Container(
             key: const ValueKey('profile_edit_sheet'),
             decoration: BoxDecoration(
-              color: OmaColors.scaffoldBackground,
+              color: OmaPalette.background,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(30),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: OmaColors.textPrimary.withValues(alpha: 0.08),
+                  color: OmaPalette.foreground.withValues(alpha: 0.08),
                   blurRadius: 28,
                   offset: const Offset(0, -8),
                 ),
@@ -1635,7 +1635,7 @@ class _EditSheet extends StatelessWidget {
                   width: 42,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: OmaColors.textHint.withValues(alpha: 0.32),
+                    color: OmaPalette.textHint.withValues(alpha: 0.32),
                     borderRadius: BorderRadius.circular(99),
                   ),
                 ),
@@ -1663,7 +1663,7 @@ class _EditSheet extends StatelessWidget {
                             fontSize: 22,
                             height: 1.1,
                             fontWeight: FontWeight.w700,
-                            color: OmaColors.textPrimary,
+                            color: OmaPalette.foreground,
                           ),
                         ),
                       ),
@@ -1671,9 +1671,9 @@ class _EditSheet extends StatelessWidget {
                         width: 38,
                         height: 38,
                         decoration: BoxDecoration(
-                          color: OmaColors.surface,
+                          color: OmaPalette.card,
                           shape: BoxShape.circle,
-                          border: Border.all(color: OmaColors.outline),
+                          border: Border.all(color: OmaPalette.border),
                         ),
                         child: IconButton(
                           key: const ValueKey('profile_edit_sheet_close'),
@@ -1697,8 +1697,8 @@ class _EditSheet extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
                   decoration: const BoxDecoration(
-                    color: OmaColors.surface,
-                    border: Border(top: BorderSide(color: OmaColors.outline)),
+                    color: OmaPalette.card,
+                    border: Border(top: BorderSide(color: OmaPalette.border)),
                   ),
                   child: SafeArea(
                     top: false,

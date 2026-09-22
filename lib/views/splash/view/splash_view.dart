@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 
 /// Native açılış ekranından sonra gösterilen animasyonlu Oma splash ekranı.
 class SplashView extends StatefulWidget {
@@ -83,7 +83,7 @@ class _SplashViewState extends State<SplashView>
     final screen = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      backgroundColor: OmaColors.background,
+      backgroundColor: OmaPalette.background,
       body: AnimatedBuilder(
         animation: Listenable.merge([_intro, _exit]),
         builder: (context, _) => Opacity(
@@ -121,7 +121,7 @@ class _SplashViewState extends State<SplashView>
                           child: Text(
                             'Sağlığını kendi ritminde takip et',
                             textAlign: TextAlign.center,
-                            style: OmaText.body(14, color: OmaColors.muted),
+                            style: OmaText.body(14, color: OmaPalette.muted),
                           ),
                         ),
                       ],

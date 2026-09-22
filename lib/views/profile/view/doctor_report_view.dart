@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import '../../../core/widgets/oma_theme.dart';
+import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
@@ -30,14 +30,14 @@ class DoctorReportView extends StatelessWidget {
     final allLogs = _groupLogsByDay(rawLogs);
 
     return Scaffold(
-      backgroundColor: OmaColors.scaffoldBackground,
+      backgroundColor: OmaPalette.background,
       appBar: AppBar(
         title: Text(
           AppStrings.doctorReport,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: Colors.white,
-        foregroundColor: OmaColors.textPrimary,
+        foregroundColor: OmaPalette.foreground,
         elevation: 0.5,
         actions: [
           IconButton(
@@ -83,7 +83,7 @@ class DoctorReportView extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
-                            color: OmaColors.primary,
+                            color: OmaPalette.primary,
                             letterSpacing: 1.1,
                           ),
                         ),
@@ -92,7 +92,7 @@ class DoctorReportView extends StatelessWidget {
                           AppStrings.reportDateLine(AppTime.now.toDotFormat()),
                           style: const TextStyle(
                             fontSize: 12,
-                            color: OmaColors.textSecondary,
+                            color: OmaPalette.muted,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -103,7 +103,7 @@ class DoctorReportView extends StatelessWidget {
                             allLogs,
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: OmaColors.primary,
+                            backgroundColor: OmaPalette.primary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -131,14 +131,14 @@ class DoctorReportView extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: OmaColors.primary.withValues(alpha: 0.1),
+                      color: OmaPalette.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       AppStrings.medicalSummary,
                       style: const TextStyle(
                         fontSize: 11,
-                        color: OmaColors.primary,
+                        color: OmaPalette.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -231,7 +231,7 @@ class DoctorReportView extends StatelessWidget {
                     child: Text(
                       AppStrings.noHealthLogs,
                       style: const TextStyle(
-                        color: OmaColors.textSecondary,
+                        color: OmaPalette.muted,
                         fontSize: 13,
                       ),
                     ),
@@ -338,7 +338,7 @@ class DoctorReportView extends StatelessWidget {
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
-          color: OmaColors.textPrimary,
+          color: OmaPalette.foreground,
         ),
       ),
     );
@@ -356,7 +356,7 @@ class DoctorReportView extends StatelessWidget {
               label,
               style: const TextStyle(
                 fontSize: 13,
-                color: OmaColors.textSecondary,
+                color: OmaPalette.muted,
               ),
             ),
           ),
@@ -366,7 +366,7 @@ class DoctorReportView extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: OmaColors.textPrimary,
+                color: OmaPalette.foreground,
               ),
             ),
           ),
@@ -588,7 +588,7 @@ class DoctorReportView extends StatelessWidget {
                             fontSize: 11,
                             color: isBleeding
                                 ? Colors.red.shade700
-                                : OmaColors.textSecondary,
+                                : OmaPalette.muted,
                             fontWeight: isBleeding
                                 ? FontWeight.bold
                                 : FontWeight.normal,
