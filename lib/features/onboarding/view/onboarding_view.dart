@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/image_constants.dart';
-import '../../../core/widgets/oma_background.dart';
+import '../../../core/widgets/oma_bloom_background.dart';
 import '../../../localization/generated/strings.g.dart';
 import '../controller/onboarding_controller.dart';
 import '../utils/onboarding_date_utils.dart';
@@ -71,7 +71,7 @@ class _OnboardingViewState extends State<OnboardingView> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: OmaBackground(
+              child: OmaBloomBackground(
                 key: ValueKey('onboarding_background_${vm.currentPage}'),
                 seed: vm.currentPage,
                 spotCount: 3,

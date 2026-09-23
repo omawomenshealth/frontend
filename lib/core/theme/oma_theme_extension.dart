@@ -16,6 +16,8 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
     required this.onPrimary,
     required this.accent,
     required this.accentSoft,
+    required this.callout,
+    required this.calloutForeground,
     required this.error,
     required this.success,
     required this.warning,
@@ -35,6 +37,8 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
   final Color onPrimary;
   final Color accent;
   final Color accentSoft;
+  final Color callout;
+  final Color calloutForeground;
   final Color error;
   final Color success;
   final Color warning;
@@ -55,6 +59,8 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
     Color? onPrimary,
     Color? accent,
     Color? accentSoft,
+    Color? callout,
+    Color? calloutForeground,
     Color? error,
     Color? success,
     Color? warning,
@@ -74,6 +80,8 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
       onPrimary: onPrimary ?? this.onPrimary,
       accent: accent ?? this.accent,
       accentSoft: accentSoft ?? this.accentSoft,
+      callout: callout ?? this.callout,
+      calloutForeground: calloutForeground ?? this.calloutForeground,
       error: error ?? this.error,
       success: success ?? this.success,
       warning: warning ?? this.warning,
@@ -98,6 +106,12 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
       onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
       accent: Color.lerp(accent, other.accent, t)!,
       accentSoft: Color.lerp(accentSoft, other.accentSoft, t)!,
+      callout: Color.lerp(callout, other.callout, t)!,
+      calloutForeground: Color.lerp(
+        calloutForeground,
+        other.calloutForeground,
+        t,
+      )!,
       error: Color.lerp(error, other.error, t)!,
       success: Color.lerp(success, other.success, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
@@ -127,6 +141,8 @@ extension OmaThemeContext on BuildContext {
       onPrimary: colors.onPrimary,
       accent: colors.secondary,
       accentSoft: colors.secondaryContainer,
+      callout: colors.secondaryContainer,
+      calloutForeground: colors.onSecondaryContainer,
       error: colors.error,
       success: colors.tertiary,
       warning: colors.tertiary,

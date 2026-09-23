@@ -19,6 +19,8 @@ abstract final class OmaPalette {
   static const primaryForeground = Color(0xFFFFFDF9);
   static const plum = Color(0xFF7A5468);
   static const plumForeground = Color(0xFFFFF6F1);
+  static const callout = Color(0x1A7A4F63);
+  static const calloutForeground = Color(0xFF7A4F63);
 
   static const periodPrimary = Color(0xFFC0606E);
   static const periodLight = Color(0xFFF7E5E7);

@@ -9,7 +9,7 @@ import 'package:app_proje_a/data/services/sync_service.dart';
 import 'package:app_proje_a/localization/generated/strings.g.dart';
 import 'package:app_proje_a/features/onboarding/view/onboarding_view.dart';
 import 'package:app_proje_a/features/onboarding/view/pages/preview_page.dart';
-import 'package:app_proje_a/core/widgets/oma_background.dart';
+import 'package:app_proje_a/core/widgets/oma_bloom_background.dart';
 import 'package:app_proje_a/core/constants/image_constants.dart';
 import 'package:app_proje_a/core/widgets/oma_chip.dart';
 import 'package:app_proje_a/features/onboarding/viewmodel/onboarding_view_model.dart';
@@ -34,7 +34,7 @@ void main() {
         child: MediaQuery(
           data: MediaQueryData(size: Size(360, 640)),
           child: SizedBox.expand(
-            child: OmaBackground(
+            child: OmaBloomBackground(
               seed: 0,
               spotCount: 3,
               minSize: 94,
@@ -58,7 +58,7 @@ void main() {
         child: MediaQuery(
           data: MediaQueryData(size: Size(360, 640)),
           child: SizedBox.expand(
-            child: OmaBackground(
+            child: OmaBloomBackground(
               seed: 1,
               spotCount: 3,
               minSize: 94,

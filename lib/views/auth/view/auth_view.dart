@@ -34,7 +34,7 @@ class _AuthViewState extends State<AuthView>
             body: Stack(
               children: [
                 const Positioned.fill(
-                  child: OmaBackground(
+                  child: OmaBloomBackground(
                     seed: 1,
                     spotCount: 3,
                     minSize: 94,
