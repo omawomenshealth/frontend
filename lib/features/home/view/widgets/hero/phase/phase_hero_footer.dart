@@ -89,7 +89,7 @@ class _CycleDayIndicator extends StatelessWidget {
               ).copyWith(height: 1),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 1, bottom: 2),
+              padding: const EdgeInsets.only(left: 1, bottom: OmaSpacing.xxs),
               child: Text(
                 ' / $cycleLength',
                 style: OmaText.body(14, color: theme.muted),

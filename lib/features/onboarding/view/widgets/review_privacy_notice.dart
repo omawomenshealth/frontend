@@ -17,7 +17,7 @@ class ReviewPrivacyNotice extends StatelessWidget {
           color: context.omaTheme.muted,
           size: 16,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: OmaSpacing.sm),
         Flexible(
           child: Text(
             label,

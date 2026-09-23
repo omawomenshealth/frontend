@@ -150,7 +150,7 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
                   size: 22,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               Text(
                 widget.action.label,
                 maxLines: 2,

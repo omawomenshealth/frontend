@@ -23,10 +23,10 @@ class OmaField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: OmaText.body(14, weight: FontWeight.w500)),
-        const SizedBox(height: 8),
+        const SizedBox(height: OmaSpacing.sm),
         child,
         if (hint != null) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           Text(hint!, style: OmaText.body(12, color: context.omaTheme.muted)),
         ],
       ],

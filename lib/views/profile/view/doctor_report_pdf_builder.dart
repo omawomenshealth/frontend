@@ -31,7 +31,7 @@ class DoctorReportPdfBuilder {
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.fromLTRB(32, 32, 32, 38),
+        margin: const pw.EdgeInsets.fromLTRB(OmaSpacing.xxxl, OmaSpacing.xxxl, OmaSpacing.xxxl, 38),
         theme: pw.ThemeData.withFont(
           base: regularFont,
           bold: regularFont,
@@ -69,10 +69,10 @@ class DoctorReportPdfBuilder {
         ),
         build: (context) => [
           pw.Container(
-            padding: const pw.EdgeInsets.fromLTRB(16, 14, 16, 14),
+            padding: const pw.EdgeInsets.fromLTRB(OmaSpacing.lg, 14, OmaSpacing.lg, 14),
             decoration: pw.BoxDecoration(
               color: const PdfColor.fromInt(0xFFF4F6F0),
-              borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+              borderRadius: const pw.BorderRadius.all(pw.Radius.circular(OmaRadius.sm)),
               border: pw.Border.all(color: accent, width: 0.8),
             ),
             child: pw.Row(
@@ -214,7 +214,7 @@ class DoctorReportPdfBuilder {
   pw.Widget _sectionTitle(String title, PdfColor color) {
     return pw.Container(
       width: double.infinity,
-      padding: const pw.EdgeInsets.fromLTRB(8, 5, 8, 5),
+      padding: const pw.EdgeInsets.fromLTRB(OmaSpacing.sm, 5, OmaSpacing.sm, 5),
       decoration: pw.BoxDecoration(
         color: const PdfColor.fromInt(0xFFF7F7F4),
         border: pw.Border(left: pw.BorderSide(color: color, width: 3)),

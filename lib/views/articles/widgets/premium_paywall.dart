@@ -55,13 +55,13 @@ class _PremiumViewState extends State<PremiumView> {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.close_rounded),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
             ],
           ),
           body: CustomScrollView(
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+                padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.sm, OmaSpacing.xl, 28),
                 sliver: SliverList.list(
                   children: [
                     _PremiumHero(
@@ -88,7 +88,7 @@ class _PremiumViewState extends State<PremiumView> {
                       onTap: () =>
                           setState(() => _selectedTier = MembershipTier.free),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: OmaSpacing.md),
                     _PlanCard(
                       key: const ValueKey('premium_plus_plan'),
                       icon: Icons.insights_outlined,
@@ -103,7 +103,7 @@ class _PremiumViewState extends State<PremiumView> {
                       onTap: () =>
                           setState(() => _selectedTier = MembershipTier.plus),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: OmaSpacing.md),
                     _PlanCard(
                       key: const ValueKey('premium_paid_plan'),
                       icon: Icons.auto_awesome_rounded,
@@ -231,7 +231,7 @@ class _PremiumHero extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(22, 24, 22, 26),
+              padding: const EdgeInsets.fromLTRB(22, OmaSpacing.xxl, 22, 26),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -278,7 +278,7 @@ class _PremiumHero extends StatelessWidget {
                       height: 1.04,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: OmaSpacing.md),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 330),
                     child: Text(
@@ -392,7 +392,7 @@ class _BenefitItem extends StatelessWidget {
       duration: const Duration(milliseconds: 180),
       opacity: included ? 1 : 0.48,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 18, 16),
+        padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.lg, 18, OmaSpacing.lg),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -421,7 +421,7 @@ class _BenefitItem extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: OmaSpacing.xs),
             Padding(
               padding: const EdgeInsets.only(top: 11),
               child: Icon(
@@ -483,7 +483,7 @@ class _PlanCard extends StatelessWidget {
             color: isSelected
                 ? context.omaTheme.primarySoft
                 : context.omaTheme.surface,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(OmaRadius.xl),
             border: Border.all(color: borderColor, width: isSelected ? 1.5 : 1),
             boxShadow: isSelected
                 ? [
@@ -532,7 +532,7 @@ class _PlanCard extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: OmaSpacing.sm),
                         Flexible(
                           child: Text(
                             price,
@@ -553,7 +553,7 @@ class _PlanCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 9,
-                            vertical: 4,
+                            vertical: OmaSpacing.xs,
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
@@ -636,7 +636,7 @@ class _StatusCard extends StatelessWidget {
                     t.premium.statusTitle,
                     style: Theme.of(context).textTheme.labelLarge,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: OmaSpacing.xxs),
                   Text(message, style: Theme.of(context).textTheme.bodySmall),
                 ],
               ),
@@ -664,7 +664,7 @@ class _PremiumActionBar extends StatelessWidget {
       shadowColor: context.omaTheme.primaryStrong.withValues(alpha: 0.14),
       child: SafeArea(
         top: false,
-        minimum: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+        minimum: const EdgeInsets.fromLTRB(OmaSpacing.xl, 14, OmaSpacing.xl, 14),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -710,7 +710,7 @@ class _PremiumActionBar extends StatelessWidget {
               ),
             ),
             if (service.isSignedIn) ...[
-              const SizedBox(height: 2),
+              const SizedBox(height: OmaSpacing.xxs),
               Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 6,

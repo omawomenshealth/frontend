@@ -111,7 +111,7 @@ class _CustomButtonState extends State<CustomButton>
                     ),
                   )
                 : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.lg),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -124,7 +124,7 @@ class _CustomButtonState extends State<CustomButton>
                                 : contentColor,
                             size: 20,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: OmaSpacing.sm),
                         ],
                         Flexible(
                           child: Text(

@@ -105,7 +105,7 @@ abstract final class AppTheme {
         color: oma.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OmaRadius.xl)),
         margin: EdgeInsets.zero,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -113,7 +113,7 @@ abstract final class AppTheme {
           backgroundColor: oma.primary,
           foregroundColor: oma.onPrimary,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xxl, vertical: OmaSpacing.lg),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
@@ -122,7 +122,7 @@ abstract final class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: oma.primaryStrong,
           side: BorderSide(color: oma.primary, width: 1.2),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xxl, vertical: OmaSpacing.lg),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
@@ -138,7 +138,7 @@ abstract final class AppTheme {
         fillColor: oma.surface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 18,
-          vertical: 16,
+          vertical: OmaSpacing.lg,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
@@ -227,7 +227,7 @@ abstract final class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: oma.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OmaRadius.xl)),
       ),
     );
   }

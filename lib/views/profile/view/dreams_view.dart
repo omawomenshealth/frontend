@@ -46,10 +46,10 @@ class _DreamsViewState extends State<DreamsView> {
       body: SafeArea(
         top: false,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+          padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.md, OmaSpacing.xl, 28),
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(OmaSpacing.lg),
               decoration: BoxDecoration(
                 color: OmaPalette.ovulation.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(20),
@@ -132,12 +132,12 @@ class _DreamsViewState extends State<DreamsView> {
             if (dreams.isEmpty)
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
+                  horizontal: OmaSpacing.xxl,
                   vertical: 42,
                 ),
                 decoration: BoxDecoration(
                   color: context.omaTheme.surface,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(OmaRadius.xl),
                   border: Border.all(color: context.omaTheme.border),
                 ),
                 child: Column(
@@ -147,7 +147,7 @@ class _DreamsViewState extends State<DreamsView> {
                       color: OmaPalette.ovulation,
                       size: 38,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: OmaSpacing.md),
                     Text(
                       allDreams.isNotEmpty && !_showNightmares
                           ? AppStrings.nightmaresCurrentlyHidden
@@ -161,7 +161,7 @@ class _DreamsViewState extends State<DreamsView> {
             else
               for (final dream in dreams) ...[
                 _DreamCard(dream: dream),
-                const SizedBox(height: 12),
+                const SizedBox(height: OmaSpacing.md),
               ],
           ],
         ),

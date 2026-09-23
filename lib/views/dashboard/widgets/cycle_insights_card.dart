@@ -15,14 +15,14 @@ class CycleInsightsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.omaTheme;
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(OmaSpacing.xl),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [theme.surface, theme.primarySoft],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         border: Border.all(color: theme.border),
         boxShadow: [
           BoxShadow(
@@ -48,7 +48,7 @@ class CycleInsightsCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: OmaSpacing.lg),
 
           // 1. Önceki döngü süresi
           _buildInsightRow(
@@ -90,9 +90,9 @@ class CycleInsightsCard extends StatelessWidget {
           ),
 
           // Kayıt sayısı bilgisi
-          const SizedBox(height: 16),
+          const SizedBox(height: OmaSpacing.lg),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: OmaSpacing.sm),
             decoration: BoxDecoration(
               color: theme.primary.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(10),
@@ -104,7 +104,7 @@ class CycleInsightsCard extends StatelessWidget {
                   size: 16,
                   color: theme.primary.withValues(alpha: 0.7),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: OmaSpacing.sm),
                 Expanded(
                   child: Text(
                     insights.totalCyclesRecorded > 1
@@ -137,7 +137,7 @@ class CycleInsightsCard extends StatelessWidget {
     required String infoText,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: OmaSpacing.md),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -153,7 +153,7 @@ class CycleInsightsCard extends StatelessWidget {
                     color: theme.muted.withValues(alpha: 0.8),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: OmaSpacing.xs),
                 Text(
                   value,
                   style: TextStyle(

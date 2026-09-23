@@ -16,19 +16,19 @@ class OmaCallout extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: oma.callout,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(OmaSpacing.lg),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (icon != null) ...[
               Padding(
-                padding: const EdgeInsets.only(top: 2),
+                padding: const EdgeInsets.only(top: OmaSpacing.xxs),
                 child: Icon(icon, color: oma.calloutForeground, size: 16),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: OmaSpacing.md),
             ],
             Expanded(
               child: DefaultTextStyle(

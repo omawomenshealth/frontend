@@ -78,13 +78,13 @@ class PhaseHeroCard extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [theme.surface, theme.primarySoft],
           ),
-          boxShadow: OmaShadows.lift,
+          boxShadow: OmaShadows.elevated,
         ),
         child: Stack(
           children: [
             PhaseArtwork(presentation: presentation),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+              padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, 18, OmaSpacing.xl, 14),
               child: Column(
                 children: [
                   Expanded(

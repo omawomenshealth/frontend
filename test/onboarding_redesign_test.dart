@@ -12,6 +12,7 @@ import 'package:app_proje_a/features/onboarding/view/pages/preview_page.dart';
 import 'package:app_proje_a/core/widgets/oma_bloom_background.dart';
 import 'package:app_proje_a/core/constants/image_constants.dart';
 import 'package:app_proje_a/core/widgets/oma_chip.dart';
+import 'package:app_proje_a/core/widgets/oma_logo.dart';
 import 'package:app_proje_a/features/onboarding/viewmodel/onboarding_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -113,6 +114,10 @@ void main() {
           .widget<Text>(find.text(t.onboarding.review.guestStorage))
           .textAlign,
       TextAlign.end,
+    );
+    expect(
+      tester.widget<OmaLogo>(find.byType(OmaLogo)).size,
+      OmaLogoSize.compact,
     );
   });
 

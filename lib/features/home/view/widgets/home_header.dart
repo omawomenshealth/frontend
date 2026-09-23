@@ -128,7 +128,7 @@ class HomeHeader extends StatelessWidget {
                   backgroundColor: theme.backgroundAlt,
                   borderColor: accent.withValues(alpha: 0.34),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: OmaSpacing.sm),
                 OmaIconButton(
                   key: const ValueKey('home_notification_button'),
                   icon: Icons.notifications_none_rounded,

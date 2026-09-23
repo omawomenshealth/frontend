@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/constants/image_constants.dart';
 import '../../../../core/theme/oma_theme.dart';
 import '../../../../core/widgets/oma_callout.dart';
+import '../../../../core/widgets/oma_logo.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
@@ -28,35 +28,19 @@ class PreviewPage extends StatelessWidget {
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+        padding: const EdgeInsets.symmetric(
+          horizontal: OmaSpacing.xl,
+          vertical: OmaSpacing.xxxl,
+        ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 448),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: context.omaTheme.surface.withValues(alpha: 0.86),
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x14705F4A),
-                        blurRadius: 24,
-                        offset: Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  alignment: Alignment.center,
-                  child: Image.asset(ImageConstants.logo),
-                ),
-              ),
+              const Center(child: OmaLogo(size: OmaLogoSize.compact)),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: OmaSpacing.xxl),
 
               Text(
                 name.isEmpty ? review.title : review.titleWithName(name: name),
@@ -64,7 +48,7 @@ class PreviewPage extends StatelessWidget {
                 style: OmaText.display(32, weight: FontWeight.w600),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: OmaSpacing.md),
 
               Text(
                 review.subtitle,
@@ -76,37 +60,35 @@ class PreviewPage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: OmaSpacing.xxl),
 
               OmaCallout(
                 icon: Icons.auto_awesome_rounded,
                 child: Text(context.t.onboarding.prompt.review),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: OmaSpacing.xxl),
 
               ReviewSummaryRow(
                 label: review.conditionsLabel,
                 value: conditionSummary,
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
 
               ReviewSummaryRow(
                 label: review.cycleLabel,
                 value: review.dayCount(days: vm.averageCycleLength),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
 
               ReviewSummaryRow(
                 label: review.accountStorageLabel,
                 value: accountStorageSummary,
               ),
 
-              const SizedBox(height: 8),
-
-              const SizedBox(height: 24),
+              const SizedBox(height: OmaSpacing.xxxl),
 
               ReviewPrivacyNotice(label: review.deviceEncryptionNote),
             ],

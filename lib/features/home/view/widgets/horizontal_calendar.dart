@@ -97,7 +97,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
           itemBuilder: (context, page) {
             final monday = _mondayForPage(page);
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+              padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: 13),
               child: Row(
                 children: [
                   for (var index = 0; index < 7; index++)

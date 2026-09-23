@@ -40,7 +40,10 @@ void main() {
     );
     expect(
       contentPadding.padding,
-      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      const EdgeInsets.symmetric(
+        horizontal: OmaSpacing.lg,
+        vertical: OmaSpacing.md,
+      ),
     );
   });
 

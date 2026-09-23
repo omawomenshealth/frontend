@@ -117,7 +117,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: accent.withValues(alpha: 0.07),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(OmaRadius.lg),
             border: Border.all(color: accent.withValues(alpha: 0.18)),
           ),
           child: Row(
@@ -138,7 +138,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: OmaSpacing.lg),
         TextField(
           key: const ValueKey('lab_results_search'),
           controller: _searchController,
@@ -157,9 +157,9 @@ class _LabResultsFormState extends State<LabResultsForm> {
                   ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: OmaSpacing.md),
         _buildContextFields(context),
-        const SizedBox(height: 12),
+        const SizedBox(height: OmaSpacing.md),
         for (final group in LabTestGroup.values)
           if (_definitionsForGroup(group).isNotEmpty) ...[
             _LabGroupTile(
@@ -209,7 +209,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: oma.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
         border: Border.all(color: oma.border),
       ),
       child: Column(
@@ -248,7 +248,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
               ],
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           Text(
             AppStrings.fastingSampleQuestion,
             style: TextStyle(fontSize: 12, color: oma.muted),
@@ -289,7 +289,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
 
   Widget _buildResultField(BuildContext context, LabTestDefinition definition) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: OmaSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -323,7 +323,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
               SizedBox(
                 width: 134,
                 child: DropdownButtonFormField<String>(
@@ -380,7 +380,7 @@ class _LabGroupTile extends StatelessWidget {
     return Material(
       color: oma.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
         side: BorderSide(color: oma.border),
       ),
       clipBehavior: Clip.antiAlias,
@@ -390,8 +390,8 @@ class _LabGroupTile extends StatelessWidget {
           initiallyExpanded: initiallyExpanded,
           iconColor: accent,
           collapsedIconColor: oma.muted,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-          childrenPadding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: OmaSpacing.xxs),
+          childrenPadding: const EdgeInsets.fromLTRB(14, OmaSpacing.xs, 14, OmaSpacing.xs),
           title: Text(
             title,
             style: TextStyle(

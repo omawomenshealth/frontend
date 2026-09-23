@@ -82,7 +82,7 @@ class OmaInput extends StatelessWidget {
         suffixText: suffixText,
 
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
+          horizontal: OmaSpacing.lg,
           vertical: 14,
         ),
 

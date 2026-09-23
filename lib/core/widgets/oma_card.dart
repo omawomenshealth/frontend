@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../theme/oma_theme.dart';
 
-const _cardPadding = EdgeInsets.all(20);
-const _compactCardPadding = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
-const _cardRadius = BorderRadius.all(Radius.circular(24));
+const _cardPadding = EdgeInsets.all(OmaSpacing.xl);
+const _compactCardPadding = EdgeInsets.symmetric(
+  horizontal: OmaSpacing.lg,
+  vertical: OmaSpacing.md,
+);
+const _cardRadius = BorderRadius.all(Radius.circular(OmaRadius.xl));
 
 enum OmaCardContentSize { normal, compact }
 
@@ -59,13 +62,16 @@ class OmaCardHeader extends StatelessWidget {
               children: [
                 title,
                 if (description != null) ...[
-                  const SizedBox(height: 6),
+                  const SizedBox(height: OmaSpacing.sm),
                   description!,
                 ],
               ],
             ),
           ),
-          if (action != null) ...[const SizedBox(width: 12), action!],
+          if (action != null) ...[
+            const SizedBox(width: OmaSpacing.md),
+            action!,
+          ],
         ],
       ),
     );

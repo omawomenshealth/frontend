@@ -14,7 +14,7 @@ class OmaTalkPreview extends StatelessWidget {
     final theme = context.omaTheme;
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 4, 24, 28),
+        padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, OmaSpacing.xs, OmaSpacing.xxl, 28),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,7 +22,7 @@ class OmaTalkPreview extends StatelessWidget {
             Row(
               children: [
                 const OmaSunburst(),
-                const SizedBox(width: 12),
+                const SizedBox(width: OmaSpacing.md),
                 Expanded(
                   child: Row(
                     children: [

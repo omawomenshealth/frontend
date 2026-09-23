@@ -52,7 +52,7 @@ class OmaButton extends StatelessWidget {
       opacity: _visuallyActive ? 1 : 0.4,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(OmaRadius.full),
           boxShadow: _boxShadow(_visuallyActive),
         ),
         child: _buildButton(oma),
@@ -203,7 +203,7 @@ class OmaButton extends StatelessWidget {
     if (!visuallyActive) return null;
 
     return switch (variant) {
-      OmaButtonVariant.primary => OmaShadows.lift,
+      OmaButtonVariant.primary => OmaShadows.elevated,
       OmaButtonVariant.secondary => OmaShadows.soft,
       OmaButtonVariant.outline ||
       OmaButtonVariant.dashed ||
@@ -233,9 +233,9 @@ class OmaButton extends StatelessWidget {
 
   EdgeInsetsGeometry get _padding {
     return switch (size) {
-      OmaButtonSize.small => const EdgeInsets.symmetric(horizontal: 16),
-      OmaButtonSize.medium => const EdgeInsets.symmetric(horizontal: 20),
-      OmaButtonSize.large => const EdgeInsets.symmetric(horizontal: 24),
+      OmaButtonSize.small => const EdgeInsets.symmetric(horizontal: OmaSpacing.lg),
+      OmaButtonSize.medium => const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
+      OmaButtonSize.large => const EdgeInsets.symmetric(horizontal: OmaSpacing.xxl),
     };
   }
 

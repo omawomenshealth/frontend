@@ -60,7 +60,7 @@ class _HeroEmptyState extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl, vertical: 18),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
         border: Border.all(color: theme.border),
@@ -70,7 +70,7 @@ class _HeroEmptyState extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.spa_outlined, color: theme.primary),
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           Text(
             strings.emptyTitle,
             style: OmaText.display(18, style: FontStyle.normal),

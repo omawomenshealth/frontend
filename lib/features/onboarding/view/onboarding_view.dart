@@ -82,12 +82,12 @@ class _OnboardingViewState extends State<OnboardingView> {
             ),
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
+                padding: const EdgeInsets.symmetric(vertical: OmaSpacing.xxl),
                 child: Column(
                   children: [
                     if (!vm.isPreviewPage) ...[
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
                         child: OnboardingHeader(
                           onBack: _goBack,
                           index: vm.currentPage,
@@ -96,7 +96,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                       ),
                       const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
                         child: OnboardingPrompt(
                           message: _promptForPage(context, vm.currentPage),
                         ),
@@ -151,7 +151,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                     ),
 
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
                       child: OnboardingFooter(
                         canContinue: vm.isPreviewPage
                             ? !vm.isSaving

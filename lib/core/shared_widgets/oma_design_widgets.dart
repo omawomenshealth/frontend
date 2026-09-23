@@ -14,7 +14,7 @@ class OmaSoftCard extends StatelessWidget {
   const OmaSoftCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(20),
+    this.padding = const EdgeInsets.all(OmaSpacing.xl),
     this.gradient,
     this.color,
     this.border,
@@ -94,7 +94,7 @@ class OmaPageHeader extends StatelessWidget {
             children: [
               Text(title, style: Theme.of(context).textTheme.headlineMedium),
               if (subtitle != null) ...[
-                const SizedBox(height: 2),
+                const SizedBox(height: OmaSpacing.xxs),
                 Text(subtitle!, style: Theme.of(context).textTheme.bodySmall),
               ],
             ],

@@ -26,7 +26,7 @@ class InsightsListView extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
+                    padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.xxl, OmaSpacing.lg, OmaSpacing.md),
                     sliver: SliverToBoxAdapter(child: _buildHeader(context)),
                   ),
                   if (vm.isLoading && vm.insights.isEmpty)
@@ -41,16 +41,16 @@ class InsightsListView extends StatelessWidget {
                     )
                   else ...[
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.lg),
                       sliver: SliverList.separated(
                         itemCount: vm.insights.length,
                         itemBuilder: (context, index) =>
                             PersonalInsightCard(insight: vm.insights[index]),
-                        separatorBuilder: (_, _) => const SizedBox(height: 12),
+                        separatorBuilder: (_, _) => const SizedBox(height: OmaSpacing.md),
                       ),
                     ),
                     SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 110),
+                      padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.xl, OmaSpacing.xl, 110),
                       sliver: SliverToBoxAdapter(
                         child: _buildDisclaimer(context),
                       ),
@@ -113,7 +113,7 @@ class InsightsListView extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 20, 32, 120),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxxl, OmaSpacing.xl, OmaSpacing.xxxl, 120),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -130,7 +130,7 @@ class InsightsListView extends StatelessWidget {
               color: OmaPalette.ovulationDark,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: OmaSpacing.xl),
           Text(
             AppStrings.insightsEmptyTitle,
             textAlign: TextAlign.center,
@@ -140,7 +140,7 @@ class InsightsListView extends StatelessWidget {
               color: context.omaTheme.foreground,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           Text(
             AppStrings.insightsEmptyDescription,
             textAlign: TextAlign.center,
@@ -164,7 +164,7 @@ class InsightsListView extends StatelessWidget {
           size: 17,
           color: OmaPalette.textHint,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: OmaSpacing.sm),
         Expanded(
           child: Text(
             AppStrings.insightsDisclaimer,
@@ -192,7 +192,7 @@ class PersonalInsightCard extends StatelessWidget {
     final card = Container(
       key: ValueKey('personal_insight_${insight.id}'),
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(OmaSpacing.xl),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -202,7 +202,7 @@ class PersonalInsightCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         boxShadow: [
           BoxShadow(
             color: presentation.color.withValues(alpha: 0.12),
@@ -249,7 +249,7 @@ class PersonalInsightCard extends StatelessWidget {
                     color: context.omaTheme.muted,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: OmaSpacing.md),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(

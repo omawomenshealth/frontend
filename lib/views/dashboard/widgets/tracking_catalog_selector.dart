@@ -113,7 +113,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
           ),
         ),
         if (widget.showSmartSearchHint) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -133,7 +133,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
           ),
         ],
         if (widget.selected.isNotEmpty) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: OmaSpacing.lg),
           Wrap(
             spacing: 7,
             runSpacing: 7,
@@ -164,7 +164,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
               letterSpacing: 1.3,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           Wrap(
             spacing: 7,
             runSpacing: 7,
@@ -193,7 +193,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
         else
           for (final entry in categories.entries) ...[
             _buildCategory(entry, forceExpanded: query.isNotEmpty),
-            const SizedBox(height: 8),
+            const SizedBox(height: OmaSpacing.sm),
           ],
         if (widget.onAdd != null || widget.onReminder != null) ...[
           const SizedBox(height: 10),
@@ -294,7 +294,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                       height: 38,
                       decoration: BoxDecoration(
                         color: widget.color.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(OmaRadius.md),
                       ),
                       child: Icon(widget.icon, size: 19, color: widget.color),
                     ),
@@ -312,7 +312,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                               color: context.omaTheme.foreground,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: OmaSpacing.xxs),
                           Text(
                             AppStrings.catalogCategoryCount(categories.length),
                             style: TextStyle(
@@ -340,13 +340,13 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
             duration: const Duration(milliseconds: 180),
             child: _categoryGroupExpanded
                 ? Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                    padding: const EdgeInsets.fromLTRB(10, OmaSpacing.none, 10, 10),
                     child: Column(
                       children: [
                         for (final entry in categories.entries) ...[
                           _buildCategory(entry, forceExpanded: false),
                           if (entry.key != categories.keys.last)
-                            const SizedBox(height: 8),
+                            const SizedBox(height: OmaSpacing.sm),
                         ],
                       ],
                     ),
@@ -388,7 +388,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                 if (!_expanded.remove(entry.key)) _expanded.add(entry.key);
               }),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+                padding: const EdgeInsets.fromLTRB(14, OmaSpacing.md, 10, OmaSpacing.md),
                 child: Row(
                   children: [
                     Container(
@@ -448,7 +448,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
             child: expanded
                 ? Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(12, 2, 12, 13),
+                    padding: const EdgeInsets.fromLTRB(OmaSpacing.md, OmaSpacing.xxs, OmaSpacing.md, 13),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -462,7 +462,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                         ),
                         if (widget.showAddInCategories &&
                             widget.onAdd != null) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: OmaSpacing.sm),
                           TextButton.icon(
                             key: ValueKey('catalog_category_add_${entry.key}'),
                             onPressed: widget.onAdd,
@@ -560,7 +560,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
     final selectedDetail = _selectedDetail(item);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 7, 0, 4),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, 7, OmaSpacing.none, OmaSpacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

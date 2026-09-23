@@ -23,7 +23,7 @@ class ReviewSummaryRow extends StatelessWidget {
                 style: OmaText.body(12, color: context.omaTheme.muted),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: OmaSpacing.md),
             Expanded(
               child: Text(
                 value,

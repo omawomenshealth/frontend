@@ -24,7 +24,7 @@ class LoadingIndicator extends StatelessWidget {
             ),
           ),
           if (message != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: OmaSpacing.lg),
             Text(
               message!,
               style: TextStyle(color: context.omaTheme.muted, fontSize: 14),

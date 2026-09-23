@@ -19,7 +19,7 @@ class OnboardingPrompt extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: const EdgeInsets.only(top: 2),
+          margin: const EdgeInsets.only(top: OmaSpacing.xxs),
           width: 32,
           height: 32,
           decoration: BoxDecoration(
@@ -32,7 +32,7 @@ class OnboardingPrompt extends StatelessWidget {
             color: context.omaTheme.primary,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: OmaSpacing.md),
         Expanded(
           child: Text(
             message,

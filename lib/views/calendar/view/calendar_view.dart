@@ -126,7 +126,7 @@ class _CalendarViewState extends State<CalendarView> {
   Widget _buildQuickPeriodSelectionHint() {
     return Container(
       key: const ValueKey('calendar_quick_period_hint'),
-      margin: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+      margin: const EdgeInsets.fromLTRB(18, OmaSpacing.none, 18, OmaSpacing.sm),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
       decoration: BoxDecoration(
         color: OmaPalette.periodLight.withValues(alpha: 0.58),
@@ -142,7 +142,7 @@ class _CalendarViewState extends State<CalendarView> {
             size: 18,
             color: OmaPalette.periodPrimary,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: OmaSpacing.sm),
           Expanded(
             child: Text(
               AppStrings.quickPeriodSelectHint,
@@ -173,7 +173,7 @@ class _CalendarViewState extends State<CalendarView> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.md, OmaSpacing.sm, OmaSpacing.md, OmaSpacing.md),
       child: Row(
         children: [
           SizedBox(
@@ -480,7 +480,7 @@ class _WeekdayStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: 10),
       decoration: BoxDecoration(
         border: Border.symmetric(
           horizontal: BorderSide(color: context.omaTheme.border),
@@ -530,7 +530,7 @@ class _MonthGrid extends StatelessWidget {
     final cellCount = compact ? 42 : ((populatedCells + 6) ~/ 7) * 7;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: OmaSpacing.xs),
       child: GridView.builder(
         shrinkWrap: true,
         primary: false,
@@ -698,7 +698,7 @@ class _CalendarDayCell extends StatelessWidget {
       );
     } else if (!quickSelectionMode && isSelected && !isToday) {
       dayCircle = Container(
-        padding: const EdgeInsets.all(2),
+        padding: const EdgeInsets.all(OmaSpacing.xxs),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(color: OmaPalette.periodPrimary, width: 1.4),
@@ -744,7 +744,7 @@ class _CalendarDayCell extends StatelessWidget {
             else
               dayCircle,
             if (isToday || hasLog) ...[
-              const SizedBox(height: 2),
+              const SizedBox(height: OmaSpacing.xxs),
               Container(
                 key: ValueKey('calendar_log_marker_${day.toStorageKey()}'),
                 width: 4,
@@ -830,7 +830,7 @@ class _CalendarLegendSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+        padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, OmaSpacing.md, OmaSpacing.xxl, 28),
         decoration: BoxDecoration(
           color: context.omaTheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
@@ -840,7 +840,7 @@ class _CalendarLegendSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Center(child: _SheetHandle()),
-            const SizedBox(height: 20),
+            const SizedBox(height: OmaSpacing.xl),
             Text(
               AppStrings.calendarLegend,
               style: TextStyle(
@@ -872,7 +872,7 @@ class _CalendarLegendSheet extends StatelessWidget {
               color: context.omaTheme.primary,
               label: AppStrings.fertileDays,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: OmaSpacing.sm),
             Text(
               AppStrings.phasePredictionDisclaimer,
               style: TextStyle(
@@ -917,7 +917,7 @@ class _LegendRow extends StatelessWidget {
       child: Row(
         children: [
           marker,
-          const SizedBox(width: 12),
+          const SizedBox(width: OmaSpacing.md),
           Expanded(
             child: Text(
               label,
@@ -1066,13 +1066,13 @@ Future<void> _showDailyLogTypePicker(
     showDragHandle: true,
     builder: (sheetContext) => SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 4, 18, 18),
+        padding: const EdgeInsets.fromLTRB(18, OmaSpacing.xs, 18, 18),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 4, 8, 10),
+              padding: const EdgeInsets.fromLTRB(OmaSpacing.sm, OmaSpacing.xs, OmaSpacing.sm, 10),
               child: Text(
                 AppStrings.addDailyLog,
                 style: TextStyle(
@@ -1120,7 +1120,7 @@ class _DayDetailSection extends StatelessWidget {
         final canLog = !selectedDay.dateOnly.isAfter(AppTime.now.dateOnly);
 
         return Container(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.md, OmaSpacing.xl, OmaSpacing.xl),
           decoration: BoxDecoration(
             color: context.omaTheme.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
@@ -1148,7 +1148,7 @@ class _DayDetailSection extends StatelessWidget {
                     ),
                   ),
                   if (isPeriod) ...[
-                    const SizedBox(width: 8),
+                    const SizedBox(width: OmaSpacing.sm),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -1166,7 +1166,7 @@ class _DayDetailSection extends StatelessWidget {
                             size: 14,
                             color: OmaPalette.periodPrimary,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: OmaSpacing.xs),
                           Text(
                             AppStrings.period,
                             style: TextStyle(
@@ -1267,7 +1267,7 @@ class _DailyLogDetails extends StatelessWidget {
         const SizedBox(height: 10),
         for (final detail in details)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.only(bottom: OmaSpacing.sm),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -165,7 +165,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(OmaSpacing.xl),
               children: [
                 Card(
                   child: Padding(
@@ -177,12 +177,12 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                           AppStrings.privacyNotice,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         Text(
                           AppStrings.cloudSyncPrivacyNotice,
                           style: TextStyle(height: 1.5),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         Text(
                           '${AppStrings.privacyNotice}: $_noticeVersion',
                           style: TextStyle(
@@ -205,7 +205,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                           AppStrings.healthCloudConsent,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: OmaSpacing.sm),
                         Row(
                           children: [
                             Icon(
@@ -216,7 +216,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                                   ? Colors.green
                                   : context.omaTheme.muted,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: OmaSpacing.sm),
                             Expanded(
                               child: Text(
                                 _granted

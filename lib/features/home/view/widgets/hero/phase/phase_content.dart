@@ -59,7 +59,7 @@ class PhaseContent extends StatelessWidget {
             '$periodValue $periodUnitLabel'.toUpperCase(),
             foreground: theme.primary,
             background: theme.surface.withValues(alpha: 0.75),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: 7),
             borderRadius: 100,
             border: Border.all(color: theme.border),
           ),

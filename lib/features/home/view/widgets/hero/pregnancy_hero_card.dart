@@ -89,7 +89,7 @@ class PregnancyHeroCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 18, 24, 20),
+              padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, 18, OmaSpacing.xxl, OmaSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -100,7 +100,7 @@ class PregnancyHeroCard extends StatelessWidget {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: OmaSpacing.md,
                         vertical: 7,
                       ),
                       child: Text(
@@ -156,7 +156,7 @@ class PregnancyHeroCard extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: OmaSpacing.sm),
 
                   _PregnancyInfoLine(
                     icon: Icons.calculate_outlined,
@@ -204,7 +204,7 @@ class PregnancyHeroCard extends StatelessWidget {
                                 color: presentation.color,
                                 size: 16,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: OmaSpacing.sm),
                               Expanded(
                                 child: Text(
                                   strings.infoComingSoon,
@@ -218,7 +218,7 @@ class PregnancyHeroCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: OmaSpacing.md),
                       _PregnancyWeekBadge(
                         color: presentation.color,
                         week: week,

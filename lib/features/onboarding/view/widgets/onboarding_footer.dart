@@ -33,7 +33,7 @@ class OnboardingFooter extends StatelessWidget {
           label: isLast ? common.finish : common.next,
           onPressed: canContinue ? onContinue : null,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: OmaSpacing.md),
         if (isFirst)
           Text(
             common.swipeToContinue,

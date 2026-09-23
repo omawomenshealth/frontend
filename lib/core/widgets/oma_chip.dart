@@ -28,7 +28,7 @@ class OmaChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? oma.primarySoft : oma.surface,
           border: Border.all(color: selected ? oma.primary : oma.border),
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(OmaRadius.full),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

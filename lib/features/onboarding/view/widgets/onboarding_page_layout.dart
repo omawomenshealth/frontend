@@ -11,7 +11,7 @@ class OnboardingPageLayout extends StatelessWidget {
     required this.children,
     this.motion = OnboardingDeckMotion.none,
     this.duration = const Duration(milliseconds: 350),
-    this.margin = const EdgeInsets.symmetric(horizontal: 20),
+    this.margin = const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
     this.itemSpacing = 8,
   });
 
@@ -45,7 +45,7 @@ class OnboardingPageLayout extends StatelessWidget {
                       color: context.omaTheme.muted,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: OmaSpacing.lg),
                   for (int i = 0; i < children.length; i++) ...[
                     children[i],
                     if (i < children.length - 1) SizedBox(height: itemSpacing),

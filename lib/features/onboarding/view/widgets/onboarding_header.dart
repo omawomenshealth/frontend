@@ -38,14 +38,14 @@ class OnboardingHeader extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: OmaSpacing.md),
         Expanded(
           child: Row(
             children: [
               for (var i = 0; i < safeTotal; i++) ...[
                 Expanded(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(OmaRadius.full),
                     child: Stack(
                       children: [
                         Container(height: 4, color: context.omaTheme.border),
@@ -67,7 +67,7 @@ class OnboardingHeader extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: OmaSpacing.md),
         Text(
           '${index + 1}/$safeTotal',
           style: OmaText.body(12, color: context.omaTheme.muted),

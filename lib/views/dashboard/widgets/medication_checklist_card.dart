@@ -26,17 +26,11 @@ class MedicationChecklistCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.omaTheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(OmaSpacing.lg),
       decoration: BoxDecoration(
         color: theme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
+        boxShadow: OmaShadows.subtle,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +38,7 @@ class MedicationChecklistCard extends StatelessWidget {
           Row(
             children: [
               Icon(icon, color: color, size: 22),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
               Text(
                 title,
                 style: TextStyle(
@@ -58,8 +52,8 @@ class MedicationChecklistCard extends StatelessWidget {
               if (items.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
+                    horizontal: OmaSpacing.sm,
+                    vertical: OmaSpacing.xxs,
                   ),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
@@ -77,13 +71,13 @@ class MedicationChecklistCard extends StatelessWidget {
             ],
           ),
           if (items.isEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: OmaSpacing.md),
             Text(
               emptyMessage ?? AppStrings.emptyMedicationList,
               style: TextStyle(fontSize: 13, color: theme.muted),
             ),
           ] else ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: OmaSpacing.md),
             ...List.generate(items.length, (index) {
               final item = items[index];
               return Padding(
@@ -93,7 +87,7 @@ class MedicationChecklistCard extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
+                      horizontal: OmaSpacing.md,
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
@@ -130,7 +124,7 @@ class MedicationChecklistCard extends StatelessWidget {
                                 )
                               : null,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: OmaSpacing.md),
 
                         // İlaç/Takviye adı
                         Expanded(

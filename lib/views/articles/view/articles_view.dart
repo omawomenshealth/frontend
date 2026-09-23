@@ -373,7 +373,7 @@ class _ArticlesViewState extends State<ArticlesView> {
                   }),
                   style: TextButton.styleFrom(
                     foregroundColor: accent,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xs),
                     visualDensity: VisualDensity.compact,
                   ),
                   child: Text(
@@ -388,7 +388,7 @@ class _ArticlesViewState extends State<ArticlesView> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: OmaSpacing.lg),
           if (useRows)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -607,7 +607,7 @@ class _ExploreHero extends StatelessWidget {
     };
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 18, 22, 0),
+      padding: const EdgeInsets.fromLTRB(22, 18, 22, OmaSpacing.none),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -649,7 +649,7 @@ class _ExploreHero extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.auto_awesome_rounded, color: accent, size: 13),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: OmaSpacing.xs),
                   Text(
                     membershipTier == MembershipTier.premium
                         ? t.premium.premiumPlanName
@@ -715,7 +715,7 @@ class _QuickTopicButton extends StatelessWidget {
                   size: 26,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               Text(
                 label.toUpperCase(),
                 maxLines: 1,
@@ -844,7 +844,7 @@ class _EditorialArticleCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: OmaSpacing.xs),
                       Text(
                         article.title,
                         maxLines: 3,
@@ -944,7 +944,7 @@ class _RitualArticleRow extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
               if (isOpening)
                 const SizedBox(
                   width: 20,
@@ -1023,7 +1023,7 @@ class _EmptyArticlesState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 58, 32, 20),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxxl, 58, OmaSpacing.xxxl, OmaSpacing.xl),
       child: Column(
         children: [
           Icon(

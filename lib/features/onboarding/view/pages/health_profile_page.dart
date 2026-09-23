@@ -82,7 +82,7 @@ class _BodyMeasurementsField extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: OmaSpacing.lg),
         Expanded(
           child: OmaField(
             label: healthProfile.weight,
@@ -180,7 +180,7 @@ class _KnownConditionsField extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           OmaChip(
             label: healthProfile.addCondition,
             showCheck: false,

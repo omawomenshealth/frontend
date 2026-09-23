@@ -15,9 +15,9 @@ class AuthBrandHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const OmaLogo(),
-        const SizedBox(height: 20),
+        const SizedBox(height: OmaSpacing.xl),
         Text(t.auth.intro.title, style: OmaText.display(44)),
-        const SizedBox(height: 8),
+        const SizedBox(height: OmaSpacing.sm),
         Text(
           t.auth.intro.description,
           textAlign: TextAlign.center,

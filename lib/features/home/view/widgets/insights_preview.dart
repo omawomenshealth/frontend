@@ -79,7 +79,7 @@ class InsightsPreview extends StatelessWidget {
               clipBehavior: Clip.none,
               physics: const BouncingScrollPhysics(),
               itemCount: insights.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              separatorBuilder: (_, _) => const SizedBox(width: OmaSpacing.md),
               itemBuilder: (context, index) {
                 final insight = insights[index];
 

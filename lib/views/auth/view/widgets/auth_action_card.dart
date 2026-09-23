@@ -23,7 +23,7 @@ class AuthActionCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(maxWidth: 384),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(OmaSpacing.xl),
       decoration: BoxDecoration(
         color: context.omaTheme.surface,
         border: Border.all(color: context.omaTheme.border),
@@ -37,7 +37,7 @@ class AuthActionCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: OmaText.body(13, color: context.omaTheme.muted),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: OmaSpacing.lg),
 
           AnimatedSize(
             duration: const Duration(milliseconds: 180),
@@ -47,7 +47,7 @@ class AuthActionCard extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 14),
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(OmaSpacing.md),
                       decoration: BoxDecoration(
                         color: OmaPalette.errorLight,
                         borderRadius: BorderRadius.circular(14),
@@ -87,10 +87,10 @@ class AuthActionCard extends StatelessWidget {
             onPressed: null,
             variant: OmaButtonVariant.outline,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: OmaSpacing.lg),
 
           const _OrDivider(),
-          const SizedBox(height: 16),
+          const SizedBox(height: OmaSpacing.lg),
 
           OmaButton(
             label: t.auth.actionCard.offline.kContinue,
@@ -122,7 +122,7 @@ class _OrDivider extends StatelessWidget {
       children: [
         Expanded(child: Divider(color: context.omaTheme.border, height: 1)),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md),
           child: Text(
             t.auth.actionCard.alternativeLabel,
             style: OmaText.body(11.5, color: context.omaTheme.muted),
