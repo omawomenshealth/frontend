@@ -44,7 +44,7 @@ class PhaseHeroFooter extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         ClipRRect(
-          borderRadius: BorderRadius.circular(9),
+          borderRadius: BorderRadius.circular(OmaRadius.sm),
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 3,
@@ -92,7 +92,7 @@ class _CycleDayIndicator extends StatelessWidget {
               padding: const EdgeInsets.only(left: 1, bottom: OmaSpacing.xxs),
               child: Text(
                 ' / $cycleLength',
-                style: OmaText.body(14, color: theme.muted),
+                style: OmaText.body(OmaTypeScale.body, color: theme.muted),
               ),
             ),
           ],

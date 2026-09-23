@@ -28,7 +28,7 @@ class OmaCard extends StatelessWidget {
         color: oma.surface,
         border: Border.all(color: oma.border),
         borderRadius: _cardRadius,
-        boxShadow: OmaShadows.soft,
+        boxShadow: oma.softShadow,
       ),
       child: child,
     );
@@ -108,7 +108,7 @@ class OmaCardDescription extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       data,
-      style: OmaText.body(14, color: context.omaTheme.muted, height: 1.4),
+      style: OmaText.body(OmaTypeScale.body, color: context.omaTheme.muted, height: 1.4),
     );
   }
 }

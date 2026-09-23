@@ -25,9 +25,9 @@ class OmaDialog extends StatelessWidget {
         padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           color: oma.surface,
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(OmaRadius.xl),
           border: Border.all(color: oma.border),
-          boxShadow: OmaShadows.soft,
+          boxShadow: oma.softShadow,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

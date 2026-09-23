@@ -29,7 +29,7 @@ class OnboardingHeader extends StatelessWidget {
             decoration: BoxDecoration(
               color: context.omaTheme.surface.withValues(alpha: 0.8),
               shape: BoxShape.circle,
-              boxShadow: OmaShadows.soft,
+              boxShadow: context.omaTheme.softShadow,
             ),
             child: Icon(
               Icons.arrow_back,
@@ -70,7 +70,7 @@ class OnboardingHeader extends StatelessWidget {
         const SizedBox(width: OmaSpacing.md),
         Text(
           '${index + 1}/$safeTotal',
-          style: OmaText.body(12, color: context.omaTheme.muted),
+          style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
         ),
       ],
     );

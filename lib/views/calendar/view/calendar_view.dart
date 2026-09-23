@@ -130,7 +130,7 @@ class _CalendarViewState extends State<CalendarView> {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
       decoration: BoxDecoration(
         color: OmaPalette.periodLight.withValues(alpha: 0.58),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
         border: Border.all(
           color: OmaPalette.periodPrimary.withValues(alpha: 0.28),
         ),
@@ -147,7 +147,7 @@ class _CalendarViewState extends State<CalendarView> {
             child: Text(
               AppStrings.quickPeriodSelectHint,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: OmaTypeScale.caption,
                 fontWeight: FontWeight.w700,
                 color: OmaPalette.periodPrimary,
               ),
@@ -198,7 +198,7 @@ class _CalendarViewState extends State<CalendarView> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'CormorantGaramond',
-                    fontSize: 24,
+                    fontSize: OmaTypeScale.heading,
                     height: 1,
                     fontWeight: FontWeight.w700,
                     color: context.omaTheme.foreground,
@@ -314,13 +314,7 @@ class _CalendarViewState extends State<CalendarView> {
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: OmaPalette.periodPrimary.withValues(alpha: 0.34),
-            blurRadius: 28,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        boxShadow: OmaShadows.elevated(OmaPalette.periodPrimary),
       ),
       child: FilledButton.icon(
         key: const ValueKey('calendar_period_edit_button'),
@@ -334,7 +328,7 @@ class _CalendarViewState extends State<CalendarView> {
           disabledBackgroundColor: OmaPalette.periodPrimary.withValues(
             alpha: 0.52,
           ),
-          foregroundColor: Colors.white,
+          foregroundColor: context.omaTheme.onPrimary,
           padding: const EdgeInsets.symmetric(vertical: 15),
           shape: const StadiumBorder(),
         ),
@@ -343,7 +337,7 @@ class _CalendarViewState extends State<CalendarView> {
                 dimension: 18,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  color: OmaPalette.onMedia,
                 ),
               )
             : Icon(
@@ -596,7 +590,7 @@ class _CalendarDayCell extends StatelessWidget {
         context,
         size: circleSize,
         color: OmaPalette.periodPrimary,
-        textColor: Colors.white,
+        textColor: OmaPalette.onMedia,
       );
     } else if (isPredictedPeriod) {
       dayCircle = CustomPaint(
@@ -641,14 +635,14 @@ class _CalendarDayCell extends StatelessWidget {
             context,
             size: circleSize,
             color: OmaPalette.periodPrimary,
-            textColor: Colors.white,
+            textColor: OmaPalette.onMedia,
           ),
           const Positioned(
             right: -2,
             top: -2,
             child: CircleAvatar(
               radius: 6.5,
-              backgroundColor: Colors.white,
+              backgroundColor: OmaPalette.onMedia,
               child: Icon(
                 Icons.add_rounded,
                 size: 11,
@@ -670,7 +664,11 @@ class _CalendarDayCell extends StatelessWidget {
             child: CircleAvatar(
               radius: 6.5,
               backgroundColor: OmaPalette.periodPrimary,
-              child: Icon(Icons.remove_rounded, size: 11, color: Colors.white),
+              child: Icon(
+                Icons.remove_rounded,
+                size: 11,
+                color: OmaPalette.onMedia,
+              ),
             ),
           ),
         ],
@@ -686,7 +684,7 @@ class _CalendarDayCell extends StatelessWidget {
             top: -2,
             child: CircleAvatar(
               radius: 6.5,
-              backgroundColor: Colors.white,
+              backgroundColor: OmaPalette.onMedia,
               child: Icon(
                 Icons.remove_rounded,
                 size: 11,
@@ -876,7 +874,7 @@ class _CalendarLegendSheet extends StatelessWidget {
             Text(
               AppStrings.phasePredictionDisclaimer,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: OmaTypeScale.caption,
                 height: 1.45,
                 color: context.omaTheme.muted,
               ),
@@ -922,7 +920,7 @@ class _LegendRow extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: OmaTypeScale.body,
                 fontWeight: FontWeight.w600,
                 color: context.omaTheme.foreground,
               ),
@@ -1077,7 +1075,7 @@ Future<void> _showDailyLogTypePicker(
                 AppStrings.addDailyLog,
                 style: TextStyle(
                   fontFamily: 'CormorantGaramond',
-                  fontSize: 24,
+                  fontSize: OmaTypeScale.heading,
                   fontWeight: FontWeight.w700,
                   color: context.omaTheme.foreground,
                 ),
@@ -1086,7 +1084,7 @@ Future<void> _showDailyLogTypePicker(
             for (var index = 0; index < options.length; index++)
               ListTile(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
                 leading: CircleAvatar(
                   backgroundColor: options[index].color.withValues(alpha: 0.12),
@@ -1156,7 +1154,7 @@ class _DayDetailSection extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: OmaPalette.periodLight,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(OmaRadius.xl),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -1170,7 +1168,7 @@ class _DayDetailSection extends StatelessWidget {
                           Text(
                             AppStrings.period,
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: OmaTypeScale.caption,
                               fontWeight: FontWeight.w700,
                               color: OmaPalette.periodPrimary,
                             ),
@@ -1190,7 +1188,7 @@ class _DayDetailSection extends StatelessWidget {
                       : null,
                   style: FilledButton.styleFrom(
                     backgroundColor: context.omaTheme.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: context.omaTheme.onPrimary,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 11,
@@ -1217,7 +1215,7 @@ class _DayDetailSection extends StatelessWidget {
                         Text(
                           AppStrings.noLogsForDay,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: OmaTypeScale.body,
                             color: OmaPalette.textHint,
                           ),
                         ),

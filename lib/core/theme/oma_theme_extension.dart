@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'tokens/oma_shadows.dart';
+
 @immutable
 class OmaTheme extends ThemeExtension<OmaTheme> {
   const OmaTheme({
@@ -18,6 +20,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
     required this.accentSoft,
     required this.callout,
     required this.calloutForeground,
+    required this.shadow,
     required this.error,
     required this.success,
     required this.warning,
@@ -39,10 +42,16 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
   final Color accentSoft;
   final Color callout;
   final Color calloutForeground;
+  final Color shadow;
   final Color error;
   final Color success;
   final Color warning;
   final Color info;
+
+  List<BoxShadow> get subtleShadow => OmaShadows.subtle(shadow);
+  List<BoxShadow> get softShadow => OmaShadows.soft(shadow);
+  List<BoxShadow> get elevatedShadow => OmaShadows.elevated(shadow);
+  List<BoxShadow> get topSheetShadow => OmaShadows.topSheet(shadow);
 
   @override
   OmaTheme copyWith({
@@ -61,6 +70,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
     Color? accentSoft,
     Color? callout,
     Color? calloutForeground,
+    Color? shadow,
     Color? error,
     Color? success,
     Color? warning,
@@ -82,6 +92,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
       accentSoft: accentSoft ?? this.accentSoft,
       callout: callout ?? this.callout,
       calloutForeground: calloutForeground ?? this.calloutForeground,
+      shadow: shadow ?? this.shadow,
       error: error ?? this.error,
       success: success ?? this.success,
       warning: warning ?? this.warning,
@@ -112,6 +123,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
         other.calloutForeground,
         t,
       )!,
+      shadow: Color.lerp(shadow, other.shadow, t)!,
       error: Color.lerp(error, other.error, t)!,
       success: Color.lerp(success, other.success, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
@@ -143,6 +155,7 @@ extension OmaThemeContext on BuildContext {
       accentSoft: colors.secondaryContainer,
       callout: colors.secondaryContainer,
       calloutForeground: colors.onSecondaryContainer,
+      shadow: colors.shadow,
       error: colors.error,
       success: colors.tertiary,
       warning: colors.tertiary,

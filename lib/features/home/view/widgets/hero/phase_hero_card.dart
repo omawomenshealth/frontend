@@ -71,14 +71,14 @@ class PhaseHeroCard extends StatelessWidget {
         width: double.infinity,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(OmaRadius.xl),
           border: Border.all(color: theme.border),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [theme.surface, theme.primarySoft],
           ),
-          boxShadow: OmaShadows.elevated,
+          boxShadow: theme.elevatedShadow,
         ),
         child: Stack(
           children: [

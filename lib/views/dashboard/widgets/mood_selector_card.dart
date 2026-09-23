@@ -23,7 +23,7 @@ class MoodSelectorCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.surface,
         borderRadius: BorderRadius.circular(OmaRadius.lg),
-        boxShadow: OmaShadows.subtle,
+        boxShadow: theme.subtleShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,7 +34,7 @@ class MoodSelectorCard extends StatelessWidget {
               const SizedBox(width: OmaSpacing.sm),
               const Spacer(),
               if (selectedEmoji != null)
-                Text(selectedEmoji!, style: const TextStyle(fontSize: 24)),
+                Text(selectedEmoji!, style: const TextStyle(fontSize: OmaTypeScale.heading)),
             ],
           ),
           const SizedBox(height: OmaSpacing.lg),
@@ -57,7 +57,7 @@ class MoodSelectorCard extends StatelessWidget {
                     color: isSelected
                         ? _getMoodColor(entry.value).withValues(alpha: 0.15)
                         : theme.background,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(OmaRadius.xl),
                     border: Border.all(
                       color: isSelected
                           ? _getMoodColor(entry.value)

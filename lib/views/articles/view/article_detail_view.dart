@@ -24,7 +24,7 @@ class ArticleDetailView extends StatelessWidget {
             leading: Padding(
               padding: const EdgeInsets.all(OmaSpacing.sm),
               child: CircleAvatar(
-                backgroundColor: Colors.white.withValues(alpha: 0.84),
+                backgroundColor: OmaPalette.onMedia.withValues(alpha: 0.84),
                 child: IconButton(
                   icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
@@ -54,7 +54,9 @@ class ArticleDetailView extends StatelessWidget {
                       top: -30,
                       child: CircleAvatar(
                         radius: 100,
-                        backgroundColor: Colors.white.withValues(alpha: 0.1),
+                        backgroundColor: OmaPalette.onMedia.withValues(
+                          alpha: 0.1,
+                        ),
                       ),
                     ),
                     Positioned(
@@ -62,7 +64,9 @@ class ArticleDetailView extends StatelessWidget {
                       bottom: -20,
                       child: CircleAvatar(
                         radius: 80,
-                        backgroundColor: Colors.white.withValues(alpha: 0.08),
+                        backgroundColor: OmaPalette.onMedia.withValues(
+                          alpha: 0.08,
+                        ),
                       ),
                     ),
                     SafeArea(
@@ -91,15 +95,15 @@ class ArticleDetailView extends StatelessWidget {
                               article.title,
                               style: TextStyle(
                                 fontFamily: 'CormorantGaramond',
-                                fontSize: 32,
+                                fontSize: OmaTypeScale.display,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: OmaPalette.onMedia,
                                 height: 1.02,
                                 shadows: [
                                   Shadow(
                                     offset: Offset(0, 2),
                                     blurRadius: 4,
-                                    color: Colors.black26,
+                                    color: OmaPalette.mediaScrimMedium,
                                   ),
                                 ],
                               ),
@@ -183,7 +187,7 @@ class ArticleDetailView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: context.omaTheme.surface,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(OmaRadius.sm),
           ),
           child: Row(
             children: [
@@ -192,7 +196,7 @@ class ArticleDetailView extends StatelessWidget {
               Text(
                 AppStrings.readTimeMinutes(article.readTimeMinutes),
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: OmaTypeScale.caption,
                   fontWeight: FontWeight.w600,
                   color: article.cardColor,
                 ),
@@ -240,7 +244,7 @@ class ArticleDetailView extends StatelessWidget {
                   AppStrings.shortSummary,
                   style: TextStyle(
                     fontFamily: 'CormorantGaramond',
-                    fontSize: 20,
+                    fontSize: OmaTypeScale.title,
                     fontWeight: FontWeight.w600,
                     color: context.omaTheme.foreground,
                   ),
@@ -288,7 +292,7 @@ class ArticleDetailView extends StatelessWidget {
             Text(
               '•',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: OmaTypeScale.bodyLarge,
                 fontWeight: FontWeight.bold,
                 color: article.cardColor,
               ),
@@ -334,22 +338,22 @@ class _HeroBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: OmaSpacing.xs),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.25),
+        color: OmaPalette.onMedia.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(OmaRadius.md),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, color: Colors.white, size: 13),
+            Icon(icon, color: OmaPalette.onMedia, size: 13),
             const SizedBox(width: OmaSpacing.xs),
           ],
           Text(
             label,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: OmaTypeScale.micro,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: OmaPalette.onMedia,
               letterSpacing: 0.8,
             ),
           ),

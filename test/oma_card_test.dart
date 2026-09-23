@@ -55,7 +55,7 @@ void main() {
     expect(card.clipBehavior, Clip.antiAlias);
     expect(decoration.color, oma.surface);
     expect(decoration.border!.top.color, oma.border);
-    expect(decoration.boxShadow, OmaShadows.soft);
+    expect(decoration.boxShadow, oma.softShadow);
 
     expect(
       tester.widget<Text>(find.text('Cycle overview')).style!.color,

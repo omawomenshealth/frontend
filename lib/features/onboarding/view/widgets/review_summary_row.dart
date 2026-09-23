@@ -20,7 +20,7 @@ class ReviewSummaryRow extends StatelessWidget {
               child: Text(
                 label,
                 textAlign: TextAlign.start,
-                style: OmaText.body(12, color: context.omaTheme.muted),
+                style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
               ),
             ),
             const SizedBox(width: OmaSpacing.md),
@@ -28,7 +28,7 @@ class ReviewSummaryRow extends StatelessWidget {
               child: Text(
                 value,
                 textAlign: TextAlign.end,
-                style: OmaText.body(12, weight: FontWeight.w600),
+                style: OmaText.body(OmaTypeScale.caption, weight: FontWeight.w600),
               ),
             ),
           ],

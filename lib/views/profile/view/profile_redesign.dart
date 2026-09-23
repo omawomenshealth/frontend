@@ -221,7 +221,7 @@ class _ProfileHero extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color.lerp(accent, Colors.white, 0.82)!,
+            Color.lerp(accent, context.omaTheme.surface, 0.82)!,
             Color.lerp(accent, context.omaTheme.background, 0.90)!,
           ],
           begin: Alignment.topCenter,
@@ -286,7 +286,7 @@ class _ProfileHero extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Karla',
-                            fontSize: 12,
+                            fontSize: OmaTypeScale.caption,
                             fontWeight: FontWeight.w600,
                             color: Color.lerp(
                               context.omaTheme.muted,
@@ -361,7 +361,9 @@ class _RoundIconButton extends StatelessWidget {
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: Colors.white.withValues(alpha: compact ? 0.72 : 0.84),
+        color: context.omaTheme.surface.withValues(
+          alpha: compact ? 0.72 : 0.84,
+        ),
         shape: const CircleBorder(),
         child: InkWell(
           customBorder: const CircleBorder(),
@@ -387,7 +389,7 @@ class _PremiumProfileCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         onTap: () => showPremiumPaywall(context),
         child: Ink(
           width: double.infinity,
@@ -395,20 +397,14 @@ class _PremiumProfileCard extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.lerp(accent, Colors.white, 0.20)!,
+                Color.lerp(accent, context.omaTheme.onPrimary, 0.20)!,
                 Color.lerp(accent, context.omaTheme.primaryStrong, 0.15)!,
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(25),
-            boxShadow: [
-              BoxShadow(
-                color: accent.withValues(alpha: 0.18),
-                blurRadius: 22,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(OmaRadius.xl),
+            boxShadow: OmaShadows.elevated(accent),
           ),
           child: Row(
             children: [
@@ -416,12 +412,12 @@ class _PremiumProfileCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.22),
+                  color: context.omaTheme.onPrimary.withValues(alpha: 0.22),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.workspace_premium_rounded,
-                  color: Colors.white,
+                  color: OmaPalette.onMedia,
                   size: 27,
                 ),
               ),
@@ -436,7 +432,7 @@ class _PremiumProfileCard extends StatelessWidget {
                         fontFamily: 'CormorantGaramond',
                         fontSize: 21,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: context.omaTheme.onPrimary,
                       ),
                     ),
                     const SizedBox(height: OmaSpacing.xxs),
@@ -444,10 +440,12 @@ class _PremiumProfileCard extends StatelessWidget {
                       AppStrings.profilePremiumDescription,
                       style: TextStyle(
                         fontFamily: 'Karla',
-                        fontSize: 12,
+                        fontSize: OmaTypeScale.caption,
                         height: 1.25,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.86),
+                        color: context.omaTheme.onPrimary.withValues(
+                          alpha: 0.86,
+                        ),
                       ),
                     ),
                   ],
@@ -456,7 +454,7 @@ class _PremiumProfileCard extends StatelessWidget {
               const SizedBox(width: OmaSpacing.sm),
               const Icon(
                 Icons.chevron_right_rounded,
-                color: Colors.white,
+                color: OmaPalette.onMedia,
                 size: 26,
               ),
             ],
@@ -482,7 +480,7 @@ class _SectionTitle extends StatelessWidget {
             text,
             style: TextStyle(
               fontFamily: 'CormorantGaramond',
-              fontSize: 24,
+              fontSize: OmaTypeScale.heading,
               height: 1,
               fontWeight: FontWeight.w700,
               color: context.omaTheme.foreground,
@@ -562,7 +560,7 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
                             key: ValueKey(
                               'profile_mode_${options[index].mode.name}',
                             ),
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(OmaRadius.lg),
                             onTap: options[index].enabled
                                 ? () => _selectMode(
                                     context,
@@ -581,7 +579,7 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
                                 color: selected == index
                                     ? widget.accent.withValues(alpha: 0.11)
                                     : Colors.transparent,
-                                borderRadius: BorderRadius.circular(18),
+                                borderRadius: BorderRadius.circular(OmaRadius.lg),
                               ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -817,7 +815,7 @@ class _LabResultsCard extends StatelessWidget {
             if (availableDefinitions.isEmpty)
               InkWell(
                 key: const ValueKey('profile_lab_results_empty'),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(OmaRadius.lg),
                 onTap: onEdit,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: OmaSpacing.xs),
@@ -842,7 +840,7 @@ class _LabResultsCard extends StatelessWidget {
                           AppStrings.emptyLaboratoryResultsHint,
                           style: TextStyle(
                             fontFamily: 'Karla',
-                            fontSize: 12,
+                            fontSize: OmaTypeScale.caption,
                             height: 1.35,
                             color: context.omaTheme.muted,
                           ),
@@ -915,7 +913,7 @@ class _LabMetaChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(99),
+        borderRadius: BorderRadius.circular(OmaRadius.full),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -955,7 +953,7 @@ class _LabResultRow extends StatelessWidget {
               definition.label(AppStrings.isTurkish),
               style: TextStyle(
                 fontFamily: 'Karla',
-                fontSize: 12,
+                fontSize: OmaTypeScale.caption,
                 color: context.omaTheme.muted,
               ),
             ),
@@ -1018,7 +1016,7 @@ class _CycleMetric extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontFamily: 'Karla',
-                    fontSize: 12,
+                    fontSize: OmaTypeScale.caption,
                     color: context.omaTheme.muted,
                   ),
                 ),
@@ -1042,13 +1040,13 @@ class _CycleMetric extends StatelessWidget {
               color: (badgePositive ? OmaPalette.success : accent).withValues(
                 alpha: 0.10,
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(OmaRadius.xl),
             ),
             child: Text(
               badge,
               style: TextStyle(
                 fontFamily: 'Karla',
-                fontSize: 10,
+                fontSize: OmaTypeScale.micro,
                 fontWeight: FontWeight.w700,
                 color: badgePositive ? OmaPalette.success : accent,
               ),
@@ -1092,7 +1090,7 @@ class _PatternCard extends StatelessWidget {
                       AppStrings.patternsForming,
                       style: TextStyle(
                         fontFamily: 'Karla',
-                        fontSize: 14,
+                        fontSize: OmaTypeScale.body,
                         fontWeight: FontWeight.w700,
                         color: context.omaTheme.foreground,
                       ),
@@ -1102,7 +1100,7 @@ class _PatternCard extends StatelessWidget {
                       AppStrings.patternsFormingDescription,
                       style: TextStyle(
                         fontFamily: 'Karla',
-                        fontSize: 12,
+                        fontSize: OmaTypeScale.caption,
                         height: 1.35,
                         color: context.omaTheme.muted,
                       ),
@@ -1180,7 +1178,7 @@ class _PatternRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: 'Karla',
-                    fontSize: 14,
+                    fontSize: OmaTypeScale.body,
                     fontWeight: FontWeight.w700,
                     color: context.omaTheme.foreground,
                   ),
@@ -1372,7 +1370,7 @@ class _AccountRow extends StatelessWidget {
                           title,
                           style: TextStyle(
                             fontFamily: 'Karla',
-                            fontSize: 14,
+                            fontSize: OmaTypeScale.body,
                             fontWeight: FontWeight.w700,
                             color: context.omaTheme.foreground,
                           ),
@@ -1423,13 +1421,7 @@ class _SurfaceCard extends StatelessWidget {
         border: Border.all(
           color: context.omaTheme.border.withValues(alpha: 0.78),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF574C44).withValues(alpha: 0.055),
-            blurRadius: 22,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: context.omaTheme.elevatedShadow,
       ),
       clipBehavior: Clip.antiAlias,
       child: child,

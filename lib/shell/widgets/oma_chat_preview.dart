@@ -38,7 +38,7 @@ class OmaTalkPreview extends StatelessWidget {
             Text(
               'OMA ile günlük deneyimlerini konuşabileceğin alan '
               'yakında burada olacak.',
-              style: OmaText.body(14, color: theme.muted),
+              style: OmaText.body(OmaTypeScale.body, color: theme.muted),
             ),
             const SizedBox(height: 18),
             Wrap(

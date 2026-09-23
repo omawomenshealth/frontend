@@ -130,7 +130,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
                   AppStrings.laboratoryEntryDisclaimer,
                   style: TextStyle(
                     color: context.omaTheme.muted,
-                    fontSize: 12,
+                    fontSize: OmaTypeScale.caption,
                     height: 1.4,
                   ),
                 ),
@@ -218,7 +218,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
           Text(
             AppStrings.testDetails,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: OmaTypeScale.body,
               fontWeight: FontWeight.w700,
               color: oma.foreground,
             ),
@@ -251,7 +251,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
           const SizedBox(height: OmaSpacing.sm),
           Text(
             AppStrings.fastingSampleQuestion,
-            style: TextStyle(fontSize: 12, color: oma.muted),
+            style: TextStyle(fontSize: OmaTypeScale.caption, color: oma.muted),
           ),
           const SizedBox(height: 7),
           Wrap(
@@ -296,7 +296,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
           Text(
             definition.label(_isTurkish),
             style: TextStyle(
-              fontSize: 12,
+              fontSize: OmaTypeScale.caption,
               fontWeight: FontWeight.w600,
               color: context.omaTheme.foreground,
             ),
@@ -338,7 +338,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
                           child: Text(
                             unit,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: OmaTypeScale.caption),
                           ),
                         ),
                       )

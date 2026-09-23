@@ -26,7 +26,7 @@ class OmaLogo extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.omaTheme.surface,
         borderRadius: BorderRadius.circular(radius),
-        boxShadow: OmaShadows.soft,
+        boxShadow: context.omaTheme.softShadow,
       ),
       child: SizedBox(
         width: markSize,

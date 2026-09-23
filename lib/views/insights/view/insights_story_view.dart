@@ -264,7 +264,7 @@ class _StoryProgress extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     color: accent.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(99),
+                    borderRadius: BorderRadius.circular(OmaRadius.full),
                   ),
                   alignment: Alignment.centerLeft,
                   child: FractionallySizedBox(
@@ -303,7 +303,7 @@ class _StoryHeader extends StatelessWidget {
               style: TextStyle(
                 color: accent,
                 fontFamily: 'Karla',
-                fontSize: 10,
+                fontSize: OmaTypeScale.micro,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.9,
               ),
@@ -316,7 +316,7 @@ class _StoryHeader extends StatelessWidget {
               onPressed: onClose,
               style: IconButton.styleFrom(
                 fixedSize: const Size.square(38),
-                backgroundColor: Colors.white.withValues(alpha: 0.72),
+                backgroundColor: OmaPalette.onMedia.withValues(alpha: 0.72),
               ),
               icon: const Icon(Icons.close_rounded, size: 18),
             ),
@@ -354,18 +354,12 @@ class _InsightStoryPage extends StatelessWidget {
             height: 64,
             decoration: BoxDecoration(
               color: accent,
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: accent.withValues(alpha: 0.24),
-                  blurRadius: 24,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+              borderRadius: BorderRadius.circular(OmaRadius.lg),
+              boxShadow: OmaShadows.elevated(accent),
             ),
             child: const Icon(
               Icons.auto_awesome_outlined,
-              color: Colors.white,
+              color: OmaPalette.onMedia,
               size: 25,
             ),
           ),
@@ -375,7 +369,7 @@ class _InsightStoryPage extends StatelessWidget {
             style: TextStyle(
               color: accent,
               fontFamily: 'Karla',
-              fontSize: 10,
+              fontSize: OmaTypeScale.micro,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.9,
             ),
@@ -398,7 +392,7 @@ class _InsightStoryPage extends StatelessWidget {
             style: TextStyle(
               color: context.omaTheme.muted,
               fontFamily: 'Karla',
-              fontSize: 14,
+              fontSize: OmaTypeScale.body,
               height: 1.55,
             ),
           ),
@@ -415,8 +409,8 @@ class _InsightStoryPage extends StatelessWidget {
                     vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.76),
-                    borderRadius: BorderRadius.circular(99),
+                    color: OmaPalette.onMedia.withValues(alpha: 0.76),
+                    borderRadius: BorderRadius.circular(OmaRadius.full),
                   ),
                   child: Text(
                     chain[item],
@@ -442,9 +436,11 @@ class _InsightStoryPage extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.48),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.65)),
+              color: OmaPalette.onMedia.withValues(alpha: 0.48),
+              borderRadius: BorderRadius.circular(OmaRadius.xl),
+              border: Border.all(
+                color: OmaPalette.onMedia.withValues(alpha: 0.65),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -607,9 +603,9 @@ class _StoryNavigation extends StatelessWidget {
               onPressed: canGoBack ? onBack : null,
               style: IconButton.styleFrom(
                 fixedSize: const Size.square(56),
-                backgroundColor: Colors.white.withValues(alpha: 0.58),
+                backgroundColor: OmaPalette.onMedia.withValues(alpha: 0.58),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
               ),
               icon: const Icon(Icons.arrow_back_rounded, size: 21),
@@ -622,13 +618,13 @@ class _StoryNavigation extends StatelessWidget {
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(56),
                 backgroundColor: accent,
-                foregroundColor: Colors.white,
+                foregroundColor: context.omaTheme.onPrimary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
                 textStyle: TextStyle(
                   fontFamily: 'Karla',
-                  fontSize: 14,
+                  fontSize: OmaTypeScale.body,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -663,11 +659,11 @@ class _EmptyInsightStory extends StatelessWidget {
             height: 76,
             decoration: BoxDecoration(
               color: accent,
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(OmaRadius.xl),
             ),
             child: const Icon(
               Icons.auto_awesome_outlined,
-              color: Colors.white,
+              color: OmaPalette.onMedia,
               size: 30,
             ),
           ),
@@ -677,7 +673,7 @@ class _EmptyInsightStory extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'CormorantGaramond',
-              fontSize: 32,
+              fontSize: OmaTypeScale.display,
               fontWeight: FontWeight.w600,
               color: context.omaTheme.foreground,
             ),

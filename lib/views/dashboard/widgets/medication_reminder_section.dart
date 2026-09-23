@@ -143,7 +143,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
               AppStrings.todaysPlannedDoses,
               style: TextStyle(
                 fontFamily: 'CormorantGaramond',
-                fontSize: 20,
+                fontSize: OmaTypeScale.title,
                 fontWeight: FontWeight.w700,
                 color: context.omaTheme.foreground,
               ),
@@ -177,7 +177,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
         color: context.omaTheme.background,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
       ),
       child: Column(
         children: [
@@ -210,7 +210,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                 padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.sm, vertical: OmaSpacing.xs),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(OmaRadius.xl),
                 ),
                 child: Text(
                   statusLabel,
@@ -462,7 +462,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: OmaPalette.info.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(OmaRadius.sm),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -803,7 +803,7 @@ class _MedicationReminderFormSheetState
               Text(
                 AppStrings.notificationTime,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: OmaTypeScale.body,
                   fontWeight: FontWeight.w700,
                   color: context.omaTheme.foreground,
                 ),
@@ -987,7 +987,7 @@ class _MedicationReminderFormSheetState
       padding: const EdgeInsets.fromLTRB(OmaSpacing.md, 5, OmaSpacing.xs, 5),
       decoration: BoxDecoration(
         color: context.omaTheme.background,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(OmaRadius.md),
         border: Border.all(color: context.omaTheme.border),
       ),
       child: Row(

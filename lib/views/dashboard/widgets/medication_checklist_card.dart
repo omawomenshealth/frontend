@@ -30,7 +30,7 @@ class MedicationChecklistCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.surface,
         borderRadius: BorderRadius.circular(OmaRadius.lg),
-        boxShadow: OmaShadows.subtle,
+        boxShadow: theme.subtleShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +42,7 @@ class MedicationChecklistCard extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: OmaTypeScale.bodyLarge,
                   fontWeight: FontWeight.w600,
                   color: theme.foreground,
                 ),
@@ -57,12 +57,12 @@ class MedicationChecklistCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(OmaRadius.sm),
                   ),
                   child: Text(
                     '${items.where((e) => e.taken).length}/${items.length}',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: OmaTypeScale.caption,
                       fontWeight: FontWeight.w600,
                       color: color,
                     ),
@@ -94,7 +94,7 @@ class MedicationChecklistCard extends StatelessWidget {
                       color: item.taken
                           ? color.withValues(alpha: 0.08)
                           : theme.background,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(OmaRadius.sm),
                       border: Border.all(
                         color: item.taken
                             ? color.withValues(alpha: 0.3)
@@ -120,7 +120,7 @@ class MedicationChecklistCard extends StatelessWidget {
                               ? const Icon(
                                   Icons.check,
                                   size: 14,
-                                  color: Colors.white,
+                                  color: OmaPalette.onMedia,
                                 )
                               : null,
                         ),
@@ -131,7 +131,7 @@ class MedicationChecklistCard extends StatelessWidget {
                           child: Text(
                             AppStrings.localizeStoredValue(item.displayName),
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: OmaTypeScale.body,
                               fontWeight: FontWeight.w500,
                               color: item.taken
                                   ? theme.muted
@@ -158,7 +158,7 @@ class MedicationChecklistCard extends StatelessWidget {
                             Text(
                               item.stomachState,
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: OmaTypeScale.micro,
                                 color: theme.muted,
                               ),
                             ),

@@ -95,8 +95,8 @@ class PregnancyHeroCard extends StatelessWidget {
                 children: [
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.72),
-                      borderRadius: BorderRadius.circular(99),
+                      color: OmaPalette.onMedia.withValues(alpha: 0.72),
+                      borderRadius: BorderRadius.circular(OmaRadius.full),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -194,8 +194,8 @@ class PregnancyHeroCard extends StatelessWidget {
                             vertical: 11,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.72),
-                            borderRadius: BorderRadius.circular(18),
+                            color: OmaPalette.onMedia.withValues(alpha: 0.72),
+                            borderRadius: BorderRadius.circular(OmaRadius.lg),
                           ),
                           child: Row(
                             children: [
@@ -278,7 +278,7 @@ class _PregnancyWeekBadge extends StatelessWidget {
       width: 72,
       height: 72,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.82),
+        color: OmaPalette.onMedia.withValues(alpha: 0.82),
         shape: BoxShape.circle,
         border: Border.all(color: color, width: 1.6),
       ),
@@ -339,17 +339,7 @@ class _PregnancyPresentation {
       OmaPalette.primaryDark,
     ];
 
-    final softColors = [
-      OmaPalette.periodLight,
-      const Color(0xFFEAF0E5),
-      const Color(0xFFECE7F3),
-      const Color(0xFFFFF3D9),
-      const Color(0xFFF5E9EC),
-      const Color(0xFFE7F0EB),
-      const Color(0xFFF0EAF4),
-      const Color(0xFFF8E9EB),
-      const Color(0xFFE8EFE7),
-    ];
+    const softColors = OmaPalette.pregnancySoftTones;
 
     final assets = [
       ImageConstants.phaseMenstrualHero,

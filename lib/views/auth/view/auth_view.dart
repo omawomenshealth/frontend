@@ -199,12 +199,12 @@ class _AuthViewState extends State<AuthView>
           children: [
             Text(
               AppStrings.cloudBackupQuestion,
-              style: OmaText.body(14, color: context.omaTheme.foreground),
+              style: OmaText.body(OmaTypeScale.body, color: context.omaTheme.foreground),
             ),
             const SizedBox(height: OmaSpacing.md),
             Text(
               AppStrings.cloudBackupOptions,
-              style: OmaText.body(12, color: context.omaTheme.muted),
+              style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
             ),
           ],
         ),
@@ -258,7 +258,7 @@ class _PrivacyNote extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           t.auth.privacyNote,
-          style: OmaText.body(12, color: context.omaTheme.muted),
+          style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
         ),
       ],
     );

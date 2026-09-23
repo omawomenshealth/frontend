@@ -37,7 +37,7 @@ class OnboardingPrompt extends StatelessWidget {
           child: Text(
             message,
             style: GoogleFonts.dmSans(
-              fontSize: 14,
+              fontSize: OmaTypeScale.body,
               height: 1.6,
               color: context.omaTheme.foreground.withValues(alpha: 0.9),
             ),

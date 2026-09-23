@@ -27,8 +27,8 @@ class AuthActionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.omaTheme.surface,
         border: Border.all(color: context.omaTheme.border),
-        borderRadius: BorderRadius.circular(26),
-        boxShadow: OmaShadows.soft,
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
+        boxShadow: context.omaTheme.softShadow,
       ),
       child: Column(
         children: [
@@ -50,7 +50,7 @@ class AuthActionCard extends StatelessWidget {
                       padding: const EdgeInsets.all(OmaSpacing.md),
                       decoration: BoxDecoration(
                         color: OmaPalette.errorLight,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(OmaRadius.md),
                         border: Border.all(
                           color: OmaPalette.error.withValues(alpha: 0.2),
                         ),

@@ -80,7 +80,10 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: const Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+        icon: Icon(
+          Icons.warning_amber_rounded,
+          color: context.omaTheme.error,
+        ),
         title: Text(AppStrings.withdrawConsent),
         content: Text(AppStrings.withdrawConsentWarning),
         actions: [
@@ -89,7 +92,9 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
             child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: FilledButton.styleFrom(
+              backgroundColor: context.omaTheme.error,
+            ),
             onPressed: () => Navigator.pop(dialogContext, true),
             child: Text(AppStrings.withdrawConsent),
           ),
@@ -187,7 +192,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                           '${AppStrings.privacyNotice}: $_noticeVersion',
                           style: TextStyle(
                             color: context.omaTheme.muted,
-                            fontSize: 12,
+                            fontSize: OmaTypeScale.caption,
                           ),
                         ),
                       ],
@@ -213,7 +218,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                                   ? Icons.check_circle
                                   : Icons.info_outline,
                               color: _granted
-                                  ? Colors.green
+                                  ? context.omaTheme.success
                                   : context.omaTheme.muted,
                             ),
                             const SizedBox(width: OmaSpacing.sm),
@@ -261,7 +266,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                   const SizedBox(height: 14),
                   Text(
                     _error!,
-                    style: TextStyle(color: Colors.redAccent),
+                    style: TextStyle(color: context.omaTheme.error),
                     textAlign: TextAlign.center,
                   ),
                 ],

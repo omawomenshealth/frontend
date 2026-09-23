@@ -80,7 +80,7 @@ class InsightsListView extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: context.omaTheme.surface.withValues(alpha: 0.75),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(OmaRadius.xl),
             border: Border.all(
               color: context.omaTheme.primary.withValues(alpha: 0.16),
             ),
@@ -98,7 +98,7 @@ class InsightsListView extends StatelessWidget {
                 child: Text(
                   AppStrings.insightsPrivacyNote,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: OmaTypeScale.caption,
                     height: 1.45,
                     color: context.omaTheme.muted,
                   ),
@@ -196,20 +196,14 @@ class PersonalInsightCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color.lerp(presentation.color, Colors.white, 0.83)!,
-            Color.lerp(presentation.color, Colors.white, 0.93)!,
+            Color.lerp(presentation.color, context.omaTheme.surface, 0.83)!,
+            Color.lerp(presentation.color, context.omaTheme.surface, 0.93)!,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(OmaRadius.xl),
-        boxShadow: [
-          BoxShadow(
-            color: presentation.color.withValues(alpha: 0.12),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: OmaShadows.soft(presentation.color),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,7 +213,7 @@ class PersonalInsightCard extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               color: presentation.color.withValues(alpha: 0.13),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(OmaRadius.md),
             ),
             child: Icon(presentation.icon, size: 22, color: presentation.color),
           ),
@@ -258,7 +252,7 @@ class PersonalInsightCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: presentation.color.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(9),
+                    borderRadius: BorderRadius.circular(OmaRadius.sm),
                   ),
                   child: Row(
                     children: [
@@ -274,7 +268,7 @@ class PersonalInsightCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: OmaTypeScale.micro,
                             fontWeight: FontWeight.w600,
                             color: presentation.color,
                           ),

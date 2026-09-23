@@ -45,7 +45,7 @@ class PreviewPage extends StatelessWidget {
               Text(
                 name.isEmpty ? review.title : review.titleWithName(name: name),
                 textAlign: TextAlign.center,
-                style: OmaText.display(32, weight: FontWeight.w600),
+                style: OmaText.display(OmaTypeScale.display, weight: FontWeight.w600),
               ),
 
               const SizedBox(height: OmaSpacing.md),

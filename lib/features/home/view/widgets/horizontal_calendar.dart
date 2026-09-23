@@ -81,13 +81,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
       decoration: BoxDecoration(
         color: theme.surface.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF3C2C24).withValues(alpha: 0.07),
-            blurRadius: 26,
-            offset: const Offset(0, 9),
-          ),
-        ],
+        boxShadow: theme.softShadow,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
@@ -182,7 +176,7 @@ class _DayButton extends StatelessWidget {
                 '${date.day}',
                 style: TextStyle(
                   color: selected
-                      ? Colors.white
+                      ? theme.onPrimary
                       : isPredictedPeriod
                       ? OmaPalette.periodPrimary
                       : theme.foreground,

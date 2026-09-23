@@ -70,7 +70,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                   padding: const EdgeInsets.all(OmaSpacing.xs),
                   decoration: BoxDecoration(
                     color: context.omaTheme.backgroundAlt,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(OmaRadius.lg),
                     border: Border.all(color: context.omaTheme.border),
                   ),
                   child: Row(
@@ -163,14 +163,14 @@ class _NotificationsViewState extends State<NotificationsView> {
       child: InkWell(
         key: ValueKey('notification_tab_${type.name}'),
         onTap: () => setState(() => _selected = type),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(OmaRadius.md),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: OmaSpacing.md, horizontal: OmaSpacing.xs),
           decoration: BoxDecoration(
             color: selected ? context.omaTheme.surface : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: selected ? OmaShadows.soft : null,
+            borderRadius: BorderRadius.circular(OmaRadius.md),
+            boxShadow: selected ? context.omaTheme.softShadow : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -212,9 +212,9 @@ class _NotificationsViewState extends State<NotificationsView> {
       padding: const EdgeInsets.all(OmaSpacing.lg),
       decoration: BoxDecoration(
         color: context.omaTheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         border: Border.all(color: context.omaTheme.border),
-        boxShadow: OmaShadows.soft,
+        boxShadow: context.omaTheme.softShadow,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,13 +241,13 @@ class _NotificationsViewState extends State<NotificationsView> {
               children: [
                 Text(
                   entry.title,
-                  style: OmaText.body(14, weight: FontWeight.w600),
+                  style: OmaText.body(OmaTypeScale.body, weight: FontWeight.w600),
                 ),
                 if (entry.description?.isNotEmpty ?? false) ...[
                   const SizedBox(height: OmaSpacing.xs),
                   Text(
                     entry.description!,
-                    style: OmaText.body(12, color: context.omaTheme.muted),
+                    style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
                   ),
                 ],
                 const SizedBox(height: 9),
@@ -285,11 +285,11 @@ class _NotificationsViewState extends State<NotificationsView> {
           end: Alignment.bottomRight,
           colors: [OmaPalette.periodLight, context.omaTheme.surface],
         ),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         border: Border.all(
           color: OmaPalette.periodPrimary.withValues(alpha: 0.25),
         ),
-        boxShadow: OmaShadows.soft,
+        boxShadow: context.omaTheme.softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,7 +332,7 @@ class _NotificationsViewState extends State<NotificationsView> {
           const SizedBox(height: OmaSpacing.xxs),
           Text(
             DateFormat.yMMMMd(locale).format(details.date),
-            style: OmaText.body(12, color: context.omaTheme.muted),
+            style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
           ),
           if (flow != null && flow.isNotEmpty) ...[
             const SizedBox(height: 15),
@@ -341,7 +341,7 @@ class _NotificationsViewState extends State<NotificationsView> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
               decoration: BoxDecoration(
                 color: context.omaTheme.surface.withValues(alpha: 0.88),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(OmaRadius.md),
                 border: Border.all(
                   color: OmaPalette.periodPrimary.withValues(alpha: 0.13),
                 ),
@@ -350,7 +350,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                 children: [
                   Text(
                     labels.periodFlow,
-                    style: OmaText.body(12, color: context.omaTheme.muted),
+                    style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
                   ),
                   const Spacer(),
                   Flexible(

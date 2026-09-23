@@ -142,7 +142,7 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
                           0.08,
                         )
                       : widget.action.background,
-                  borderRadius: BorderRadius.circular(19),
+                  borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
                 child: Icon(
                   widget.action.icon,

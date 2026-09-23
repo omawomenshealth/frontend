@@ -113,6 +113,9 @@ void main() {
     expect(light.calloutForeground, OmaPalette.calloutForeground);
     expect(dark.callout, isNot(light.callout));
     expect(dark.calloutForeground, isNot(light.calloutForeground));
+    expect(light.shadow, isNot(dark.shadow));
+    expect(dark.shadow, Colors.black);
+    expect(light.softShadow, isNot(dark.softShadow));
     expect(AppTheme.fromOmaTheme(light).brightness, Brightness.light);
     expect(AppTheme.fromOmaTheme(dark).brightness, Brightness.dark);
   });

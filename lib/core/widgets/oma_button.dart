@@ -53,7 +53,7 @@ class OmaButton extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(OmaRadius.full),
-          boxShadow: _boxShadow(_visuallyActive),
+          boxShadow: _boxShadow(_visuallyActive, oma),
         ),
         child: _buildButton(oma),
       ),
@@ -199,12 +199,12 @@ class OmaButton extends StatelessWidget {
     };
   }
 
-  List<BoxShadow>? _boxShadow(bool visuallyActive) {
+  List<BoxShadow>? _boxShadow(bool visuallyActive, OmaTheme oma) {
     if (!visuallyActive) return null;
 
     return switch (variant) {
-      OmaButtonVariant.primary => OmaShadows.elevated,
-      OmaButtonVariant.secondary => OmaShadows.soft,
+      OmaButtonVariant.primary => OmaShadows.elevated(oma.primary),
+      OmaButtonVariant.secondary => oma.softShadow,
       OmaButtonVariant.outline ||
       OmaButtonVariant.dashed ||
       OmaButtonVariant.text => null,

@@ -1,15 +1,35 @@
 import 'package:flutter/material.dart';
 
 abstract final class OmaShadows {
-  static const subtle = <BoxShadow>[
-    BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 2)),
+  static List<BoxShadow> subtle(Color color) => [
+    BoxShadow(
+      color: color.withValues(alpha: 0.04),
+      blurRadius: 10,
+      offset: const Offset(0, 2),
+    ),
   ];
 
-  static const soft = <BoxShadow>[
-    BoxShadow(color: Color(0x14503F2E), blurRadius: 18, offset: Offset(0, 6)),
+  static List<BoxShadow> soft(Color color) => [
+    BoxShadow(
+      color: color.withValues(alpha: 0.08),
+      blurRadius: 20,
+      offset: const Offset(0, 6),
+    ),
   ];
 
-  static const elevated = <BoxShadow>[
-    BoxShadow(color: Color(0x22503F2E), blurRadius: 28, offset: Offset(0, 12)),
+  static List<BoxShadow> elevated(Color color) => [
+    BoxShadow(
+      color: color.withValues(alpha: 0.16),
+      blurRadius: 28,
+      offset: const Offset(0, 12),
+    ),
+  ];
+
+  static List<BoxShadow> topSheet(Color color) => [
+    BoxShadow(
+      color: color.withValues(alpha: 0.12),
+      blurRadius: 28,
+      offset: const Offset(0, -8),
+    ),
   ];
 }

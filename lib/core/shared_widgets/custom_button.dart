@@ -77,7 +77,7 @@ class _CustomButtonState extends State<CustomButton>
           decoration: widget.isOutlined
               ? BoxDecoration(
                   color: oma.surface,
-                  borderRadius: BorderRadius.circular(99),
+                  borderRadius: BorderRadius.circular(OmaRadius.full),
                   border: Border.all(color: buttonColor, width: 1.2),
                 )
               : BoxDecoration(
@@ -91,14 +91,8 @@ class _CustomButtonState extends State<CustomButton>
                   color: widget.gradient == null
                       ? widget.backgroundColor
                       : null,
-                  borderRadius: BorderRadius.circular(99),
-                  boxShadow: [
-                    BoxShadow(
-                      color: buttonColor.withValues(alpha: 0.16),
-                      blurRadius: 14,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(OmaRadius.full),
+                  boxShadow: OmaShadows.soft(buttonColor),
                 ),
           child: Center(
             child: widget.isLoading
@@ -136,7 +130,7 @@ class _CustomButtonState extends State<CustomButton>
                               color: widget.isOutlined
                                   ? buttonColor
                                   : contentColor,
-                              fontSize: 16,
+                              fontSize: OmaTypeScale.bodyLarge,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.3,
                             ),

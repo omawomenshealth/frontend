@@ -185,7 +185,7 @@ class _QuickLogButtonState extends State<_QuickLogButton> {
                           0.08,
                         )
                       : widget.log.background,
-                  borderRadius: BorderRadius.circular(19),
+                  borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
                 child: Icon(
                   widget.log.icon,

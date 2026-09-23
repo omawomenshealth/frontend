@@ -24,13 +24,7 @@ class CycleInsightsCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(OmaRadius.xl),
         border: Border.all(color: theme.border),
-        boxShadow: [
-          BoxShadow(
-            color: theme.primary.withValues(alpha: 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: OmaShadows.soft(theme.primary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +35,7 @@ class CycleInsightsCard extends StatelessWidget {
               Text(
                 AppStrings.myCycles,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: OmaTypeScale.bodyLarge,
                   fontWeight: FontWeight.w700,
                   color: theme.foreground,
                 ),
@@ -95,7 +89,7 @@ class CycleInsightsCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: OmaSpacing.sm),
             decoration: BoxDecoration(
               color: theme.primary.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(OmaRadius.sm),
             ),
             child: Row(
               children: [
@@ -149,7 +143,7 @@ class CycleInsightsCard extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: OmaTypeScale.caption,
                     color: theme.muted.withValues(alpha: 0.8),
                   ),
                 ),
@@ -188,7 +182,7 @@ class CycleInsightsCard extends StatelessWidget {
                   Text(
                     statusLabel,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: OmaTypeScale.caption,
                       fontWeight: FontWeight.w700,
                       color: _statusColor(status, theme),
                     ),
@@ -213,24 +207,28 @@ class CycleInsightsCard extends StatelessWidget {
         return Container(
           width: 22,
           height: 22,
-          decoration: const BoxDecoration(
-            color: Color(0xFF4CAF50),
+          decoration: BoxDecoration(
+            color: theme.success,
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.check, size: 14, color: Colors.white),
+          child: Icon(
+            Icons.check,
+            size: 14,
+            color: theme.onPrimary,
+          ),
         );
       case CycleStatus.abnormal:
         return Container(
           width: 22,
           height: 22,
-          decoration: const BoxDecoration(
-            color: Color(0xFFFF9800),
+          decoration: BoxDecoration(
+            color: theme.warning,
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.warning_rounded,
             size: 14,
-            color: Colors.white,
+            color: theme.onPrimary,
           ),
         );
       case CycleStatus.noData:
@@ -241,7 +239,11 @@ class CycleInsightsCard extends StatelessWidget {
             color: theme.muted.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.remove, size: 14, color: Colors.white),
+          child: Icon(
+            Icons.remove,
+            size: 14,
+            color: theme.onPrimary,
+          ),
         );
     }
   }
@@ -249,9 +251,9 @@ class CycleInsightsCard extends StatelessWidget {
   Color _statusColor(CycleStatus status, OmaTheme theme) {
     switch (status) {
       case CycleStatus.normal:
-        return const Color(0xFF4CAF50);
+        return theme.success;
       case CycleStatus.abnormal:
-        return const Color(0xFFFF9800);
+        return theme.warning;
       case CycleStatus.noData:
         return theme.muted;
     }

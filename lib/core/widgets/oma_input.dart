@@ -47,7 +47,7 @@ class OmaInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final oma = context.omaTheme;
-    const radius = BorderRadius.all(Radius.circular(18));
+    const radius = BorderRadius.all(Radius.circular(OmaRadius.lg));
 
     OutlineInputBorder border(Color color, [double width = 1]) {
       return OutlineInputBorder(
@@ -68,14 +68,14 @@ class OmaInput extends StatelessWidget {
       onTap: onTap,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
-      style: OmaText.body(14, color: oma.foreground),
+      style: OmaText.body(OmaTypeScale.body, color: oma.foreground),
       cursorColor: oma.primary,
       decoration: InputDecoration(
         filled: true,
         fillColor: oma.surface,
 
         hintText: hintText,
-        hintStyle: OmaText.body(14, color: oma.muted),
+        hintStyle: OmaText.body(OmaTypeScale.body, color: oma.muted),
 
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
