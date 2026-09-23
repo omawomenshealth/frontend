@@ -1,4 +1,5 @@
 export 'oma_background.dart';
+export 'oma_card.dart';
 export 'oma_chip.dart';
 export 'oma_dialog.dart';
 export 'oma_input.dart';
