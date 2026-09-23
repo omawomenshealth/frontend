@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import '../theme/oma_theme.dart';
 
 const _cardPadding = EdgeInsets.all(20);
+const _compactCardPadding = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
 const _cardRadius = BorderRadius.all(Radius.circular(24));
+
+enum OmaCardContentSize { normal, compact }
 
 /// The standard Oma card surface.
 class OmaCard extends StatelessWidget {
@@ -106,13 +109,23 @@ class OmaCardDescription extends StatelessWidget {
 
 /// Content section for an [OmaCard].
 class OmaCardContent extends StatelessWidget {
-  const OmaCardContent({super.key, required this.child});
+  const OmaCardContent({
+    super.key,
+    required this.child,
+    this.size = OmaCardContentSize.normal,
+  });
 
   final Widget child;
+  final OmaCardContentSize size;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: _cardPadding, child: child);
+    final padding = switch (size) {
+      OmaCardContentSize.normal => _cardPadding,
+      OmaCardContentSize.compact => _compactCardPadding,
+    };
+
+    return Padding(padding: padding, child: child);
   }
 }
 

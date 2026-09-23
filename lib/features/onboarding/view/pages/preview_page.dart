@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/image_constants.dart';
 import '../../../../core/theme/oma_theme.dart';
+import '../../../../core/widgets/oma_callout.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
-
-const _readyPlum = Color(0xFF7A4F63);
-const _readyPlumSoft = Color(0x1A7A4F63);
+import '../widgets/index.dart';
 
 class PreviewPage extends StatelessWidget {
   final OnboardingViewModel vm;
@@ -79,134 +78,39 @@ class PreviewPage extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              _PreviewNote(message: context.t.onboarding.prompt.review),
+              OmaCallout(
+                icon: Icons.auto_awesome_rounded,
+                child: Text(context.t.onboarding.prompt.review),
+              ),
 
               const SizedBox(height: 24),
 
-              _PreviewSummary(
+              ReviewSummaryRow(
                 label: review.conditionsLabel,
                 value: conditionSummary,
               ),
 
-              _PreviewSummary(
+              const SizedBox(height: 8),
+
+              ReviewSummaryRow(
                 label: review.cycleLabel,
                 value: review.dayCount(days: vm.averageCycleLength),
               ),
 
-              _PreviewSummary(
+              const SizedBox(height: 8),
+
+              ReviewSummaryRow(
                 label: review.accountStorageLabel,
                 value: accountStorageSummary,
               ),
 
+              const SizedBox(height: 8),
+
               const SizedBox(height: 24),
 
-              _PreviewPrivacy(label: review.deviceEncryptionNote),
+              ReviewPrivacyNotice(label: review.deviceEncryptionNote),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PreviewNote extends StatelessWidget {
-  final String message;
-
-  const _PreviewNote({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _readyPlumSoft,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 2),
-            child: Icon(
-              Icons.auto_awesome_rounded,
-              color: _readyPlum,
-              size: 16,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(message, style: OmaText.body(12, color: _readyPlum)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PreviewPrivacy extends StatelessWidget {
-  final String label;
-
-  const _PreviewPrivacy({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.favorite_border_rounded,
-          color: context.omaTheme.muted,
-          size: 16,
-        ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: OmaText.body(12, color: context.omaTheme.muted),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PreviewSummary extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _PreviewSummary({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: context.omaTheme.surface.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                textAlign: TextAlign.start,
-                style: OmaText.body(12, color: context.omaTheme.muted),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                value,
-                textAlign: TextAlign.end,
-                style: OmaText.body(12, weight: FontWeight.w600),
-              ),
-            ),
-          ],
         ),
       ),
     );
