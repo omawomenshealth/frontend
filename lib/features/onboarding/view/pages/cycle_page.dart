@@ -21,7 +21,7 @@ class CyclePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final cycle = context.t.onboarding.cycle;
 
-    return OnboardingCard(
+    return OnboardingPageLayout(
       label: cycle.title,
       children: [
         _CycleLengthField(vm: vm, cycle: cycle),

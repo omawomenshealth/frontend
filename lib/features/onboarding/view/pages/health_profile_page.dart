@@ -25,7 +25,7 @@ class HealthProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final healthProfile = context.t.onboarding.health_profile;
 
-    return OnboardingCard(
+    return OnboardingPageLayout(
       label: healthProfile.title,
       children: [
         _BodyMeasurementsField(
