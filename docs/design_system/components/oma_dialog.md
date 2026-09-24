@@ -1,94 +1,173 @@
 # OmaDialog
 
-`OmaDialog`, Flutter `Dialog` primitive'i üzerinde Oma surface, border,
-tipografi ve shadow görünümü sağlar. Onay kararları ve kullanıcının açık bir
-seçim yapması gereken modal durumlar içindir.
-
-Bu component kompakt, slot tabanlı mevcut API'dir. Yeni ve composition ihtiyacı
-olan akışlarda [OmaModal](oma_modal.md) tercih edilmelidir. Görev kapsamı dışında
-mevcut `OmaDialog` kullanımlarını topluca taşımayın.
+`OmaDialog`, Flutter'ın `showDialog` ve `Dialog` altyapısını Oma tema ve
+composition primitive'leriyle birleştirir. Route, barrier, animation, focus,
+keyboard navigation ve accessibility davranışları Material tarafından
+yönetilir.
 
 ## Ne zaman kullanılır?
 
 Kullanın:
 
 - Silme veya geri döndürülemez işlem onayı.
-- Kirli formdan çıkma kararı.
-- Kullanıcının devam etmeden önce açıkça yanıtlaması gereken kısa uyarı.
+- Kullanıcının devam etmeden önce cevaplaması gereken kritik seçim.
+- Centered, blocking bilgi veya kısa form.
+- Header/content/footer composition'ı gerektiren yeni dialog akışları.
 
 Kullanmayın:
 
-- Uzun form veya kaydırılabilir hızlı kayıt akışı için; `OmaSheet` kullanın.
-- Başarılı işlem bildirimi için; `OmaToast` kullanın.
-- Tam ekran ve çok adımlı akış için.
+- Filtre, quick log veya contextual hafif etkileşim için; `OmaSheet` kullanın.
+- Çok adımlı ya da geniş içerikli akış için; feature sayfası kullanın.
+- Basit başarı bildirimi için; `OmaToast` kullanın.
+
+## Composition modeli
+
+```text
+showOmaDialog
+└── OmaDialog
+    └── Column
+        ├── OmaDialogHeader
+        │   ├── OmaDialogTitle
+        │   ├── OmaDialogDescription
+        │   └── OmaDialogClose
+        ├── OmaDialogContent
+        └── OmaDialogFooter
+```
 
 ## Temel kullanım
 
 ```dart
-final strings = context.t.profile.deleteDialog;
+final strings = context.t.entries.deleteDialog;
 
-final confirmed = await showDialog<bool>(
+final result = await showOmaDialog<bool>(
   context: context,
-  builder: (dialogContext) => OmaDialog(
-    icon: Icons.delete_outline,
-    title: strings.title,
-    content: Text(
-      strings.description,
-      style: OmaText.body(OmaTypeScale.body),
-    ),
-    actions: [
-      OmaButton(
-        label: strings.cancel,
-        variant: OmaButtonVariant.text,
-        onPressed: () => Navigator.pop(dialogContext, false),
+  barrierDismissible: false,
+  builder: (dialogContext) {
+    return OmaDialog(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OmaDialogHeader(
+            title: OmaDialogTitle(strings.title),
+            description: OmaDialogDescription(strings.description),
+          ),
+          OmaDialogContent(
+            child: EntrySummary(entry: entry),
+          ),
+          OmaDialogFooter(
+            child: Row(
+              children: [
+                Expanded(
+                  child: OmaButton(
+                    label: strings.cancel,
+                    variant: OmaButtonVariant.secondary,
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                  ),
+                ),
+                const SizedBox(width: OmaSpacing.md),
+                Expanded(
+                  child: OmaButton(
+                    label: strings.confirm,
+                    onPressed: () => Navigator.pop(dialogContext, true),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      OmaButton(
-        label: strings.confirm,
-        onPressed: () => Navigator.pop(dialogContext, true),
-      ),
-    ],
-  ),
+    );
+  },
 );
 ```
 
+## Confirmation convenience API
+
+Tekrarlanan iki butonlu onaylar için ince bir convenience API bulunur:
+
+```dart
+final confirmed = await showOmaConfirmationDialog(
+  context: context,
+  title: strings.title,
+  description: strings.description,
+  confirmLabel: strings.confirm,
+  cancelLabel: strings.cancel,
+);
+```
+
+Varsayılan olarak barrier ile kapanmaz. `cancelLabel` verilmezse Flutter'ın
+locale-aware Material cancel label'ı kullanılır. Bu helper özel içerik gereken
+durumlarda temel primitive'lerin yerine geçmez.
+
 ## Public API
 
-| Alan | Açıklama |
+### `showOmaDialog<T>`
+
+| Parametre | Açıklama |
 | --- | --- |
-| `icon` | Başlık önündeki Material icon. |
-| `title` | Dialog başlığı. Localization kaynağından gelmelidir. |
-| `content` | Açıklama, form veya özel içerik widget'ı. |
-| `actions` | Sıralı action widget listesi. |
+| `context` | Dialog route'un açılacağı context. |
+| `builder` | Dialog widget ağacını üretir. |
+| `barrierDismissible` | Dış alana dokunarak kapanma; varsayılan true. |
+| `useSafeArea` | Native dialog SafeArea davranışı; varsayılan true. |
+| `useRootNavigator` | Root navigator seçimi; varsayılan true. |
 
-Dialog'un açılması ve generic sonucu `showDialog<T>` / `Navigator.pop` ile
-feature tarafından yönetilir.
+### Composition primitive'leri
 
-## Durumlar ve tema
+- `OmaDialog`: native `Dialog` surface'i ve responsive constraint.
+- `OmaDialogHeader`: title, description, leading, trailing ve close düzeni.
+- `OmaDialogTitle`: standart başlık tipografisi.
+- `OmaDialogDescription`: standart destek metni tipografisi.
+- `OmaDialogClose<T>`: generic sonuçla `maybePop` yapan erişilebilir icon button.
+- `OmaDialogContent`: custom padding destekleyen layout primitive'i.
+- `OmaDialogFooter`: opsiyonel divider ve action alanı.
 
-- Surface, border ve shadow `context.omaTheme` üzerinden gelir.
-- İkon `oma.primary`, yüzey `oma.surface`, border `oma.border` kullanır.
-- Açık/koyu ve cycle/pregnancy modları tema değişimiyle uygulanır.
-- Loading gerekiyorsa action olarak `OmaButton(isLoading: true)` kullanın.
-- Action disabled durumu `onPressed: null` ile belirtilmelidir.
+## Responsive sizing ve keyboard
+
+`OmaDialog`, Material 3'ün önerdiği maksimum dialog genişliğini component
+constraint'i olarak kullanır. Küçük ekranlarda Flutter'ın native dialog
+inset'leri genişliği sınırlar; hard-coded telefon genişliği kullanılmaz.
+
+Flutter `Dialog`, `MediaQuery.viewInsets` değerini native inset animation ile
+zaten uygular. Dialog veya feature içinde ikinci keyboard padding katmanı
+eklemeyin. İçerik kullanılabilir yüksekliği aşabiliyorsa scroll kararını feature
+vermelidir; `OmaDialogContent` otomatik scroll eklemez.
+
+## Tema ve durumlar
+
+Surface görünümü `AppTheme.dialogTheme` tarafından belirlenir:
+
+- `oma.surface`
+- transparent surface tint
+- `oma.shadow` ve Material elevation
+- `oma.border`
+- `OmaRadius.xl`
+- `Clip.antiAlias`
+
+Header title/description ve footer renkleri `context.omaTheme` üzerinden gelir.
+Cycle/pregnancy ile açık/koyu temalar otomatik izlenir.
 
 ## Accessibility
 
-Flutter `Dialog` route semantics ve modal focus davranışını sağlar. Başlık kısa
-ve anlamlı olmalı; yalnız ikona dayanılmamalıdır. Destructive action ile cancel
-action aynı label veya ikonla sunulmamalıdır.
+- Dialog semantics, focus ve keyboard navigation Material'a aittir.
+- `OmaDialogClose`, `OmaIconButton` ve localized close tooltip kullanır.
+- Header yalnız ikona dayanmayacak anlamlı title/description sağlamalıdır.
+- Destructive ve cancel actionların label'ları açıkça ayrılmalıdır.
+- Native semantics üzerine gereksiz `Semantics` wrapper eklemeyin.
 
 ## Sık yapılan hatalar
 
-- Kullanıcı metnini Dart içinde hard-code etmek.
-- Dialog içinden repository veya ViewModel iş kuralı çalıştırmak yerine action
-  callback'ine yönlendirmemek.
-- Uzun, taşan içeriği scroll çözümü olmadan dialoga koymak.
-- Kirli form onayını yeni bir sheet ile çözmek.
-- `actions` içine feature genelinde tekrar eden custom button stilleri eklemek.
+- `showDialog` boilerplate'ini feature'larda tekrar etmek.
+- Dialog surface'i `Container + BoxDecoration` ile yeniden çizmek.
+- Sheet için uygun contextual akışı centered modal yapmak.
+- Uzun içeriği scroll olmadan dialog içine koymak.
+- Keyboard inset'ini manuel olarak ikinci kez uygulamak.
+- `barrierDismissible: true` ile kritik confirmation'ı yanlışlıkla kapatılabilir
+  bırakmak.
+- Feature logic veya repository bağımlılığını dialog primitive'lerine taşımak.
 
 ## Kaynak ve test
 
 - [`oma_dialog.dart`](../../../lib/core/widgets/oma_dialog.dart)
-- Kullanım örnekleri: [`auth_view.dart`](../../../lib/views/auth/view/auth_view.dart)
-- Ayrı bir `oma_dialog_test.dart` henüz yoktur. Davranış değişikliğinde dialog
-  için odaklı widget testi eklenmelidir.
+- [`app_theme.dart`](../../../lib/core/theme/app_theme.dart)
+- [`oma_dialog_test.dart`](../../../test/oma_dialog_test.dart)
+- İlişkili rehberler: [OmaSheet](oma_sheet.md), [OmaButton](oma_button.md)

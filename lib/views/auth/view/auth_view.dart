@@ -110,29 +110,44 @@ class _AuthViewState extends State<AuthView>
     bool hasCloudData,
   ) async {
     if (vm.privacyConsentRequired) {
-      final accepted = await showDialog<bool>(
+      final accepted = await showOmaDialog<bool>(
         context: context,
         barrierDismissible: false,
         builder: (dialogContext) => OmaDialog(
-          icon: Icons.health_and_safety_outlined,
-          title: AppStrings.healthCloudConsent,
-          content: Text(
-            AppStrings.consentExplanation,
-            style: OmaText.body(13.5, color: context.omaTheme.muted),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OmaDialogHeader(
+                leading: Icon(
+                  Icons.health_and_safety_outlined,
+                  color: dialogContext.omaTheme.primary,
+                ),
+                title: OmaDialogTitle(AppStrings.healthCloudConsent),
+                description: OmaDialogDescription(
+                  AppStrings.consentExplanation,
+                ),
+                showCloseButton: false,
+              ),
+              OmaDialogFooter(
+                showDivider: false,
+                child: Column(
+                  children: [
+                    OmaButton(
+                      label: AppStrings.continueOffline,
+                      variant: OmaButtonVariant.outline,
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                    ),
+                    const SizedBox(height: OmaSpacing.sm),
+                    OmaButton(
+                      label: AppStrings.grantConsent,
+                      variant: OmaButtonVariant.primary,
+                      onPressed: () => Navigator.pop(dialogContext, true),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          actions: [
-            OmaButton(
-              label: AppStrings.continueOffline,
-              variant: OmaButtonVariant.outline,
-              onPressed: () => Navigator.pop(dialogContext, false),
-            ),
-            const SizedBox(height: 10),
-            OmaButton(
-              label: AppStrings.grantConsent,
-              variant: OmaButtonVariant.primary,
-              onPressed: () => Navigator.pop(dialogContext, true),
-            ),
-          ],
         ),
       );
       if (!context.mounted) return;
@@ -187,59 +202,90 @@ class _AuthViewState extends State<AuthView>
 
   /// Bulutta Veri Bulunduğunda Senkronizasyon Seçim Diyaloğu
   void _showSyncConflictDialog(BuildContext context, AuthViewModel vm) {
-    showDialog(
+    showOmaDialog<void>(
       context: context,
       barrierDismissible: false, // Kullanıcı mutlaka seçim yapmalı
       builder: (ctx) => OmaDialog(
-        icon: Icons.cloud_done_rounded,
-        title: AppStrings.cloudBackupFound,
-        content: Column(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppStrings.cloudBackupQuestion,
-              style: OmaText.body(OmaTypeScale.body, color: context.omaTheme.foreground),
+            OmaDialogHeader(
+              leading: Icon(
+                Icons.cloud_done_rounded,
+                color: ctx.omaTheme.primary,
+              ),
+              title: OmaDialogTitle(AppStrings.cloudBackupFound),
+              showCloseButton: false,
             ),
-            const SizedBox(height: OmaSpacing.md),
-            Text(
-              AppStrings.cloudBackupOptions,
-              style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
+            OmaDialogContent(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppStrings.cloudBackupQuestion,
+                    style: OmaText.body(
+                      OmaTypeScale.body,
+                      color: context.omaTheme.foreground,
+                    ),
+                  ),
+                  const SizedBox(height: OmaSpacing.md),
+                  Text(
+                    AppStrings.cloudBackupOptions,
+                    style: OmaText.body(
+                      OmaTypeScale.caption,
+                      color: context.omaTheme.muted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            OmaDialogFooter(
+              child: Column(
+                children: [
+                  OmaButton(
+                    label: AppStrings.restore,
+                    variant: OmaButtonVariant.outline,
+                    onPressed: () async {
+                      Navigator.pop(ctx);
+                      await _resolveAndNavigate(
+                        context,
+                        vm,
+                        SyncConflictAction.restore,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: OmaSpacing.sm),
+                  OmaButton(
+                    label: AppStrings.overwrite,
+                    variant: OmaButtonVariant.outline,
+                    onPressed: () async {
+                      Navigator.pop(ctx);
+                      await _resolveAndNavigate(
+                        context,
+                        vm,
+                        SyncConflictAction.backup,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: OmaSpacing.sm),
+                  OmaButton(
+                    label: AppStrings.merge,
+                    variant: OmaButtonVariant.primary,
+                    onPressed: () async {
+                      Navigator.pop(ctx);
+                      await _resolveAndNavigate(
+                        context,
+                        vm,
+                        SyncConflictAction.merge,
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-        actions: [
-          OmaButton(
-            label: AppStrings.restore,
-            variant: OmaButtonVariant.outline,
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await _resolveAndNavigate(
-                context,
-                vm,
-                SyncConflictAction.restore,
-              );
-            },
-          ),
-          const SizedBox(height: 10),
-          OmaButton(
-            label: AppStrings.overwrite,
-            variant: OmaButtonVariant.outline,
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await _resolveAndNavigate(context, vm, SyncConflictAction.backup);
-            },
-          ),
-          const SizedBox(height: 10),
-          OmaButton(
-            label: AppStrings.merge,
-            variant: OmaButtonVariant.primary,
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await _resolveAndNavigate(context, vm, SyncConflictAction.merge);
-            },
-          ),
-        ],
       ),
     );
   }
@@ -258,7 +304,10 @@ class _PrivacyNote extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           t.auth.privacyNote,
-          style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
+          style: OmaText.body(
+            OmaTypeScale.caption,
+            color: context.omaTheme.muted,
+          ),
         ),
       ],
     );

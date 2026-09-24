@@ -33,7 +33,6 @@ Tema ve token kullanımı için [theme.md](theme.md) belgesine bakın.
 | Alan | Rehber | Kaynak |
 | --- | --- | --- |
 | Bottom sheet | [OmaSheet](components/oma_sheet.md) | [`oma_sheet.dart`](../../lib/core/widgets/oma_sheet.dart) |
-| Modal | [OmaModal](components/oma_modal.md) | [`oma_modal.dart`](../../lib/core/widgets/oma_modal.dart) |
 | Dialog | [OmaDialog](components/oma_dialog.md) | [`oma_dialog.dart`](../../lib/core/widgets/oma_dialog.dart) |
 | Button | [OmaButton ve OmaIconButton](components/oma_button.md) | [`oma_button.dart`](../../lib/core/widgets/oma_button.dart), [`oma_icon_button.dart`](../../lib/core/widgets/oma_icon_button.dart) |
 | Form alanları | [Forms](components/forms.md) | [`oma_input.dart`](../../lib/core/widgets/oma_input.dart), [`oma_form_field.dart`](../../lib/core/widgets/oma_form_field.dart) |
@@ -48,8 +47,7 @@ Tema ve token kullanımı için [theme.md](theme.md) belgesine bakın.
 ### Overlays ve geri bildirim
 
 - `OmaSheet`: normal veya draggable modal sheet sunumu ve composable parçalar.
-- `OmaModal`: centered Material dialog ve composable modal parçaları.
-- `OmaDialog`: ikon, başlık, içerik ve action listesi olan dialog.
+- `OmaDialog`: centered Material dialog ve composable header/content/footer parçaları.
 - `OmaToast`: kısa süreli kullanıcı geri bildirimi.
 
 ### Formlar ve seçim

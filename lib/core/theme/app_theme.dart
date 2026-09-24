@@ -255,7 +255,11 @@ abstract final class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: oma.surface,
         surfaceTintColor: Colors.transparent,
+        elevation: OmaSpacing.sm,
+        shadowColor: oma.shadow,
+        clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
+          side: BorderSide(color: oma.border),
           borderRadius: BorderRadius.circular(OmaRadius.xl),
         ),
       ),
