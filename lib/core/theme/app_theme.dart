@@ -79,9 +79,21 @@ abstract final class AppTheme {
           height: 1.35,
           fontWeight: FontWeight.w700,
         ),
-        bodyLarge: TextStyle(color: oma.foreground, fontSize: OmaTypeScale.bodyLarge, height: 1.5),
-        bodyMedium: TextStyle(color: oma.foreground, fontSize: OmaTypeScale.body, height: 1.5),
-        bodySmall: TextStyle(color: oma.muted, fontSize: OmaTypeScale.caption, height: 1.45),
+        bodyLarge: TextStyle(
+          color: oma.foreground,
+          fontSize: OmaTypeScale.bodyLarge,
+          height: 1.5,
+        ),
+        bodyMedium: TextStyle(
+          color: oma.foreground,
+          fontSize: OmaTypeScale.body,
+          height: 1.5,
+        ),
+        bodySmall: TextStyle(
+          color: oma.muted,
+          fontSize: OmaTypeScale.caption,
+          height: 1.45,
+        ),
         labelLarge: TextStyle(
           color: oma.primaryStrong,
           fontSize: OmaTypeScale.body,
@@ -105,7 +117,9 @@ abstract final class AppTheme {
         color: oma.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OmaRadius.xl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(OmaRadius.xl),
+        ),
         margin: EdgeInsets.zero,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -113,7 +127,10 @@ abstract final class AppTheme {
           backgroundColor: oma.primary,
           foregroundColor: oma.onPrimary,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xxl, vertical: OmaSpacing.lg),
+          padding: const EdgeInsets.symmetric(
+            horizontal: OmaSpacing.xxl,
+            vertical: OmaSpacing.lg,
+          ),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
@@ -122,7 +139,10 @@ abstract final class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: oma.primaryStrong,
           side: BorderSide(color: oma.primary, width: 1.2),
-          padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xxl, vertical: OmaSpacing.lg),
+          padding: const EdgeInsets.symmetric(
+            horizontal: OmaSpacing.xxl,
+            vertical: OmaSpacing.lg,
+          ),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
@@ -216,18 +236,28 @@ abstract final class AppTheme {
       dividerTheme: DividerThemeData(color: oma.border, thickness: 1, space: 1),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: oma.surface,
-        surfaceTintColor: Colors.transparent,
         modalBackgroundColor: oma.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: OmaSpacing.sm,
+        modalElevation: OmaSpacing.sm,
+        shadowColor: oma.shadow,
+        clipBehavior: Clip.antiAlias,
         showDragHandle: true,
         dragHandleColor: oma.border,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        dragHandleSize: const Size(OmaSpacing.huge, OmaSpacing.xs),
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: oma.border),
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(OmaRadius.xl),
+          ),
         ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: oma.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OmaRadius.xl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(OmaRadius.xl),
+        ),
       ),
     );
   }
