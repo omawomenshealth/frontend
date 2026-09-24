@@ -109,7 +109,10 @@ void main() {
 
     expect(light.background.computeLuminance(), greaterThan(0.5));
     expect(dark.background.computeLuminance(), lessThan(0.5));
+    expect(light.logoSurface, OmaPalette.logoSurface);
+    expect(dark.logoSurface, OmaPalette.logoSurfaceDark);
     expect(light.callout, OmaPalette.callout);
+    expect(light.callout.a, 1.0);
     expect(light.calloutForeground, OmaPalette.calloutForeground);
     expect(dark.callout, isNot(light.callout));
     expect(dark.calloutForeground, isNot(light.calloutForeground));

@@ -1,5 +1,4 @@
 export 'onboarding_header.dart';
-export 'onboarding_prompt.dart';
 export 'onboarding_selection_sheet.dart';
 export 'onboarding_deck_transition.dart';
 export 'onboarding_footer.dart';

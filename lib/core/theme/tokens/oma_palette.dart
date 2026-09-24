@@ -19,6 +19,8 @@ abstract final class OmaPalette {
   static const background = Color(0xFFFBF6EF);
   static const backgroundAlt = Color(0xFFF5EDE2);
   static const card = Color(0xFFFFFDF9);
+  static const logoSurface = Color(0xFFFFFDF9);
+  static const logoSurfaceDark = Color(0xFF25251F);
   static const surfaceMuted = Color(0xFFFAF7F3);
   static const foreground = Color(0xFF3B342C);
   static const muted = Color(0xFF8C8175);
@@ -31,7 +33,7 @@ abstract final class OmaPalette {
   static const primaryForeground = Color(0xFFFFFDF9);
   static const plum = Color(0xFF7A5468);
   static const plumForeground = Color(0xFFFFF6F1);
-  static const callout = Color(0x1A7A4F63);
+  static const callout = Color(0xFFEEE5E1);
   static const calloutForeground = Color(0xFF7A4F63);
 
   static const periodPrimary = Color(0xFFC0606E);

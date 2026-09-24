@@ -31,7 +31,6 @@
   "today": "Bugün",
   "hero": {
     "currentPhase": "MEVCUT FAZ",
-    "phaseWord": "faz",
     "cycleDayLabel": "DÖNGÜ GÜNÜ",
     "semanticLabel": "{phase}, döngünün {day}. günü. {message} {detail}",
     "periodDayNumber": "{count}.",

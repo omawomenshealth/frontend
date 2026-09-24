@@ -8,6 +8,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
     required this.background,
     required this.backgroundAlt,
     required this.surface,
+    required this.logoSurface,
     required this.surfaceMuted,
     required this.foreground,
     required this.muted,
@@ -30,6 +31,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
   final Color background;
   final Color backgroundAlt;
   final Color surface;
+  final Color logoSurface;
   final Color surfaceMuted;
   final Color foreground;
   final Color muted;
@@ -58,6 +60,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
     Color? background,
     Color? backgroundAlt,
     Color? surface,
+    Color? logoSurface,
     Color? surfaceMuted,
     Color? foreground,
     Color? muted,
@@ -80,6 +83,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
       background: background ?? this.background,
       backgroundAlt: backgroundAlt ?? this.backgroundAlt,
       surface: surface ?? this.surface,
+      logoSurface: logoSurface ?? this.logoSurface,
       surfaceMuted: surfaceMuted ?? this.surfaceMuted,
       foreground: foreground ?? this.foreground,
       muted: muted ?? this.muted,
@@ -107,6 +111,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
       background: Color.lerp(background, other.background, t)!,
       backgroundAlt: Color.lerp(backgroundAlt, other.backgroundAlt, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
+      logoSurface: Color.lerp(logoSurface, other.logoSurface, t)!,
       surfaceMuted: Color.lerp(surfaceMuted, other.surfaceMuted, t)!,
       foreground: Color.lerp(foreground, other.foreground, t)!,
       muted: Color.lerp(muted, other.muted, t)!,
@@ -143,6 +148,7 @@ extension OmaThemeContext on BuildContext {
       background: theme.scaffoldBackgroundColor,
       backgroundAlt: colors.surfaceContainerLowest,
       surface: colors.surface,
+      logoSurface: colors.surface,
       surfaceMuted: colors.surfaceContainerHigh,
       foreground: colors.onSurface,
       muted: colors.onSurfaceVariant,

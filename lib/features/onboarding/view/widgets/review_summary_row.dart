@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../../core/widgets/index.dart';
 
 class ReviewSummaryRow extends StatelessWidget {
-  const ReviewSummaryRow({super.key, required this.label, required this.value});
+  const ReviewSummaryRow({
+    super.key,
+    required this.label,
+    required this.value,
+  });
 
   final String label;
   final String value;
@@ -14,13 +18,16 @@ class ReviewSummaryRow extends StatelessWidget {
       child: OmaCardContent(
         size: OmaCardContentSize.compact,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Text(
                 label,
                 textAlign: TextAlign.start,
-                style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
+                style: OmaText.body(
+                  OmaTypeScale.caption,
+                  color: context.omaTheme.muted,
+                ),
               ),
             ),
             const SizedBox(width: OmaSpacing.md),
@@ -28,7 +35,10 @@ class ReviewSummaryRow extends StatelessWidget {
               child: Text(
                 value,
                 textAlign: TextAlign.end,
-                style: OmaText.body(OmaTypeScale.caption, weight: FontWeight.w600),
+                style: OmaText.body(
+                  OmaTypeScale.caption,
+                  weight: FontWeight.w600,
+                ),
               ),
             ),
           ],

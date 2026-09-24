@@ -1,19 +1,19 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
+import 'package:app_proje_a/core/constants/image_constants.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/core/utils/date_extensions.dart';
+import 'package:app_proje_a/core/widgets/oma_bloom_background.dart';
+import 'package:app_proje_a/core/widgets/oma_chip.dart';
+import 'package:app_proje_a/core/widgets/oma_logo.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
 import 'package:app_proje_a/data/services/sync_service.dart';
-import 'package:app_proje_a/localization/generated/strings.g.dart';
 import 'package:app_proje_a/features/onboarding/view/onboarding_view.dart';
 import 'package:app_proje_a/features/onboarding/view/pages/preview_page.dart';
-import 'package:app_proje_a/core/widgets/oma_bloom_background.dart';
-import 'package:app_proje_a/core/constants/image_constants.dart';
-import 'package:app_proje_a/core/widgets/oma_chip.dart';
-import 'package:app_proje_a/core/widgets/oma_logo.dart';
 import 'package:app_proje_a/features/onboarding/viewmodel/onboarding_view_model.dart';
+import 'package:app_proje_a/localization/generated/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -46,11 +46,14 @@ void main() {
         ),
       ),
     );
+
     await tester.pump(const Duration(milliseconds: 700));
+
     final firstPageAssets = tester
         .widgetList<Image>(find.byType(Image))
         .map((image) => (image.image as AssetImage).assetName)
         .toList();
+
     expect(firstPageAssets, hasLength(3));
 
     await tester.pumpWidget(
@@ -70,26 +73,51 @@ void main() {
         ),
       ),
     );
+
     await tester.pump(const Duration(milliseconds: 700));
+
     final secondPageAssets = tester
         .widgetList<Image>(find.byType(Image))
         .map((image) => (image.image as AssetImage).assetName)
         .toList();
+
     expect(secondPageAssets, hasLength(3));
     expect(secondPageAssets, isNot(equals(firstPageAssets)));
-    final visibleAssets = [...firstPageAssets, ...secondPageAssets];
-    for (final phase in ['menstrual', 'follicular', 'ovulation', 'luteal']) {
-      expect(visibleAssets.any((asset) => asset.contains('/$phase/')), isTrue);
+
+    final visibleAssets = [
+      ...firstPageAssets,
+      ...secondPageAssets,
+    ];
+
+    for (final phase in [
+      'menstrual',
+      'follicular',
+      'ovulation',
+      'luteal',
+    ]) {
+      expect(
+        visibleAssets.any((asset) => asset.contains('/$phase/')),
+        isTrue,
+      );
     }
   });
 
-  testWidgets('önizleme kartı bilgilerini sağa hizalar', (tester) async {
+  testWidgets('önizleme sayfası özet bilgilerini doğru gösterir', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
-    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+
+    final storage = LocalStorageService(
+      keyStore: MemoryLocalKeyStore(),
+    );
     await storage.init();
+
     final vm = OnboardingViewModel(
       storage,
-      SyncService(storage, ApiService(storage)),
+      SyncService(
+        storage,
+        ApiService(storage),
+      ),
     );
 
     await tester.pumpWidget(
@@ -104,21 +132,56 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: AppStrings.supportedLocales,
-          home: Scaffold(body: PreviewPage(vm: vm)),
+          home: Scaffold(
+            body: PreviewPage(vm: vm),
+          ),
         ),
       ),
     );
 
+    final preview = t.onboarding.preview;
+
     expect(
-      tester
-          .widget<Text>(find.text(t.onboarding.review.guestStorage))
-          .textAlign,
-      TextAlign.end,
+      find.text(preview.hero.title),
+      findsOneWidget,
     );
+
+    expect(
+      find.text(preview.callout.message),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.summary.conditions.label),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.summary.cycle.label),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.summary.storage.label),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.summary.storage.guest),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.privacy.deviceEncryptionNote),
+      findsOneWidget,
+    );
+
     expect(
       tester.widget<OmaLogo>(find.byType(OmaLogo)).size,
       OmaLogoSize.compact,
     );
+
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('üç auth ekranı kaydırmadan ve iç adımlarla ilerler', (
@@ -126,14 +189,23 @@ void main() {
   ) async {
     tester.view.physicalSize = const Size(360, 640);
     tester.view.devicePixelRatio = 1;
+
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
     SharedPreferences.setMockInitialValues({});
-    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+
+    final storage = LocalStorageService(
+      keyStore: MemoryLocalKeyStore(),
+    );
     await storage.init();
+
     final api = ApiService(storage);
-    final vm = OnboardingViewModel(storage, SyncService(storage, api));
+
+    final vm = OnboardingViewModel(
+      storage,
+      SyncService(storage, api),
+    );
 
     await tester.pumpWidget(
       TranslationProvider(
@@ -150,125 +222,290 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: AppStrings.supportedLocales,
-            routes: {'/home': (_) => const SizedBox.shrink()},
+            routes: {
+              '/home': (_) => const SizedBox.shrink(),
+            },
             home: const OnboardingView(),
           ),
         ),
       ),
     );
+
     await tester.pump(const Duration(milliseconds: 100));
 
+    // Introduction
     expect(find.text('Seni tanıyalım'), findsOneWidget);
-    expect(find.text(t.onboarding.prompt.introduction), findsOneWidget);
-    expect(find.text(t.onboarding.common.skipForNow), findsOneWidget);
-    expect(find.text(t.onboarding.introduction.name), findsOneWidget);
-    expect(find.text(t.onboarding.introduction.nameHint), findsOneWidget);
+    expect(
+      find.text(t.onboarding.prompt.introduction),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.common.skipForNow),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.introduction.name),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.introduction.nameHint),
+      findsOneWidget,
+    );
+
     final nameField = tester.widget<TextField>(
       find.byKey(const ValueKey('onboarding_name')),
     );
+
     expect(nameField.decoration?.labelText, isNull);
-    expect(nameField.decoration?.hintText, t.onboarding.introduction.nameHint);
+    expect(
+      nameField.decoration?.hintText,
+      t.onboarding.introduction.nameHint,
+    );
+
     final nameSize = tester.getSize(
       find.byKey(const ValueKey('onboarding_name')),
     );
+
     final birthDateSize = tester.getSize(
       find.byKey(const ValueKey('onboarding_birth_date')),
     );
+
     expect(nameSize.height, birthDateSize.height);
     expect(nameSize.width, birthDateSize.width);
+
     await tester.enterText(
       find.byKey(const ValueKey('onboarding_birth_date')),
       '18081996',
     );
+
     await tester.enterText(
       find.byKey(const ValueKey('onboarding_name')),
       'Ayse',
     );
+
     await tester.pump();
+
     expect(find.text('18/08/1996'), findsOneWidget);
     expect(vm.age, greaterThan(0));
 
-    await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text(t.onboarding.wellbeing.title), findsOneWidget);
-    expect(find.text(t.onboarding.prompt.wellbeing), findsOneWidget);
-    expect(find.text(t.onboarding.wellbeing.moodQuestion), findsOneWidget);
-    expect(find.text(t.onboarding.wellbeing.multiSelectHint), findsOneWidget);
+    // Wellbeing
+    await tester.tap(
+      find.text(t.onboarding.common.next),
+    );
+    await tester.pump(
+      const Duration(milliseconds: 500),
+    );
 
-    await tester.tap(find.byIcon(Icons.arrow_back));
-    await tester.pump(const Duration(milliseconds: 500));
+    expect(
+      find.text(t.onboarding.wellbeing.title),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.prompt.wellbeing),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.wellbeing.moodQuestion),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.wellbeing.multiSelectHint),
+      findsOneWidget,
+    );
+
+    // Back navigation should preserve entered data
+    await tester.tap(
+      find.byIcon(Icons.arrow_back),
+    );
+    await tester.pump(
+      const Duration(milliseconds: 500),
+    );
+
     expect(
       tester
-          .widget<TextField>(find.byKey(const ValueKey('onboarding_name')))
+          .widget<TextField>(
+            find.byKey(
+              const ValueKey('onboarding_name'),
+            ),
+          )
           .controller!
           .text,
       'Ayse',
     );
 
-    await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pump(const Duration(milliseconds: 500));
-
-    await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text(t.onboarding.health_profile.title), findsOneWidget);
-    expect(find.text(t.onboarding.prompt.healthProfile), findsOneWidget);
-    expect(find.byKey(const ValueKey('onboarding_height')), findsOneWidget);
-    expect(find.byKey(const ValueKey('onboarding_weight')), findsOneWidget);
-    expect(
-      find.text(t.onboarding.health_profile.smokingStatus),
-      findsOneWidget,
+    await tester.tap(
+      find.text(t.onboarding.common.next),
     );
-    expect(
-      find.text(t.onboarding.health_profile.knownConditions),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('onboarding_add_known_disease')),
-      findsOneWidget,
+    await tester.pump(
+      const Duration(milliseconds: 500),
     );
 
-    await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text(t.onboarding.cycle.title), findsOneWidget);
-    expect(find.text(t.onboarding.prompt.cycle), findsOneWidget);
-    expect(find.text(t.onboarding.cycle.menopauseStatus), findsOneWidget);
-    expect(find.text(t.onboarding.cycle.averageCycleLength), findsOneWidget);
-    expect(find.text(t.onboarding.cycle.lastPeriodDays), findsOneWidget);
-    expect(find.text(t.onboarding.cycle.birthControl), findsOneWidget);
-    expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNull);
+    // Health profile
+    await tester.tap(
+      find.text(t.onboarding.common.next),
+    );
+    await tester.pump(
+      const Duration(milliseconds: 500),
+    );
+
+    expect(
+      find.text(t.onboarding.health_profile.title),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.prompt.healthProfile),
+      findsOneWidget,
+    );
+
+    expect(
+      find.byKey(const ValueKey('onboarding_height')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('onboarding_weight')),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(
+        t.onboarding.health_profile.smokingStatus,
+      ),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(
+        t.onboarding.health_profile.knownConditions,
+      ),
+      findsOneWidget,
+    );
+
+    expect(
+      find.byKey(
+        const ValueKey('onboarding_add_known_disease'),
+      ),
+      findsOneWidget,
+    );
+
+    // Cycle
+    await tester.tap(
+      find.text(t.onboarding.common.next),
+    );
+    await tester.pump(
+      const Duration(milliseconds: 500),
+    );
+
+    expect(
+      find.text(t.onboarding.cycle.title),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.prompt.cycle),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.cycle.menopauseStatus),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.cycle.averageCycleLength),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.cycle.lastPeriodDays),
+      findsOneWidget,
+    );
+    expect(
+      find.text(t.onboarding.cycle.birthControl),
+      findsOneWidget,
+    );
+
+    expect(
+      tester.widget<Slider>(find.byType(Slider)).onChanged,
+      isNull,
+    );
+
     expect(
       tester
           .widget<OutlinedButton>(
-            find.byKey(const ValueKey('onboarding_last_period_days')),
+            find.byKey(
+              const ValueKey('onboarding_last_period_days'),
+            ),
           )
           .onPressed,
       isNull,
     );
-    await tester.tap(find.byType(OmaChip).first);
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNotNull);
+
+    await tester.tap(
+      find.byType(OmaChip).first,
+    );
+    await tester.pump(
+      const Duration(milliseconds: 500),
+    );
+
+    expect(
+      tester.widget<Slider>(find.byType(Slider)).onChanged,
+      isNotNull,
+    );
+
     expect(
       tester
           .widget<OutlinedButton>(
-            find.byKey(const ValueKey('onboarding_last_period_days')),
+            find.byKey(
+              const ValueKey('onboarding_last_period_days'),
+            ),
           )
           .onPressed,
       isNotNull,
     );
 
-    await tester.tap(find.text(t.onboarding.common.next));
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(vm.currentPage, 4);
-    expect(find.text(t.onboarding.prompt.review), findsOneWidget);
-    expect(find.text(t.onboarding.review.accountStorageLabel), findsOneWidget);
-    expect(find.text(t.onboarding.review.guestStorage), findsOneWidget);
-    expect(
-      tester
-          .widget<Text>(find.text(t.onboarding.review.guestStorage))
-          .textAlign,
-      TextAlign.end,
+    // Preview
+    await tester.tap(
+      find.text(t.onboarding.common.next),
     );
-    expect(find.text(AppStrings.smokingStatus), findsNothing);
+    await tester.pump(
+      const Duration(milliseconds: 500),
+    );
+
+    expect(vm.currentPage, 4);
+
+    final preview = t.onboarding.preview;
+
+    expect(
+      find.text(preview.callout.message),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.summary.storage.label),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.summary.storage.guest),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.summary.conditions.label),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.summary.cycle.label),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(preview.privacy.deviceEncryptionNote),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text(AppStrings.smokingStatus),
+      findsNothing,
+    );
+
     expect(tester.takeException(), isNull);
   });
 
@@ -276,17 +513,30 @@ void main() {
     'ilk kayıtta seçilen adet günleri hafif akış olarak birlikte saklanır',
     () async {
       SharedPreferences.setMockInitialValues({});
-      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
+
+      final storage = LocalStorageService(
+        keyStore: MemoryLocalKeyStore(),
+      );
       await storage.init();
+
       final vm = OnboardingViewModel(
         storage,
-        SyncService(storage, ApiService(storage)),
+        SyncService(
+          storage,
+          ApiService(storage),
+        ),
       );
+
       final today = DateTime.now().dateOnly;
-      final start = today.subtract(const Duration(days: 5));
+      final start = today.subtract(
+        const Duration(days: 5),
+      );
+
       final selectedDays = List.generate(
         4,
-        (index) => start.add(Duration(days: index)),
+        (index) => start.add(
+          Duration(days: index),
+        ),
       );
 
       vm.setLastPeriodDays(selectedDays);
@@ -294,17 +544,33 @@ void main() {
       expect(vm.lastPeriodDate, start);
       expect(vm.lastPeriodDays, selectedDays);
       expect(vm.averagePeriodLength, 4);
-      expect(await vm.saveAndComplete(), isTrue);
-      expect(storage.loadSettings()!.lastPeriodDate, start);
+
+      expect(
+        await vm.saveAndComplete(),
+        isTrue,
+      );
+
+      expect(
+        storage.loadSettings()!.lastPeriodDate,
+        start,
+      );
 
       for (final day in selectedDays) {
         final log = storage.loadLogsForDate(day).single;
+
         expect(
-          AppStrings.localizeStoredValue(log.flowIntensity!),
+          AppStrings.localizeStoredValue(
+            log.flowIntensity!,
+          ),
           AppStrings.flowOptions[1],
         );
+
         expect(log.hasExplicitTime, isFalse);
-        expect(log.observedSections, contains(DailyLogObservedSection.period));
+
+        expect(
+          log.observedSections,
+          contains(DailyLogObservedSection.period),
+        );
       }
     },
   );
