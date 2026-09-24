@@ -61,7 +61,7 @@ abstract final class AppTheme {
         headlineMedium: TextStyle(
           color: oma.foreground,
           fontFamily: 'CormorantGaramond',
-          fontSize: 24,
+          fontSize: OmaTypeScale.heading,
           height: 1.2,
           fontWeight: FontWeight.w700,
           letterSpacing: -0.35,
@@ -69,22 +69,22 @@ abstract final class AppTheme {
         titleLarge: TextStyle(
           color: oma.foreground,
           fontFamily: 'CormorantGaramond',
-          fontSize: 20,
+          fontSize: OmaTypeScale.title,
           height: 1.25,
           fontWeight: FontWeight.w700,
         ),
         titleMedium: TextStyle(
           color: oma.foreground,
-          fontSize: 16,
+          fontSize: OmaTypeScale.bodyLarge,
           height: 1.35,
           fontWeight: FontWeight.w700,
         ),
-        bodyLarge: TextStyle(color: oma.foreground, fontSize: 16, height: 1.5),
-        bodyMedium: TextStyle(color: oma.foreground, fontSize: 14, height: 1.5),
-        bodySmall: TextStyle(color: oma.muted, fontSize: 12, height: 1.45),
+        bodyLarge: TextStyle(color: oma.foreground, fontSize: OmaTypeScale.bodyLarge, height: 1.5),
+        bodyMedium: TextStyle(color: oma.foreground, fontSize: OmaTypeScale.body, height: 1.5),
+        bodySmall: TextStyle(color: oma.muted, fontSize: OmaTypeScale.caption, height: 1.45),
         labelLarge: TextStyle(
           color: oma.primaryStrong,
-          fontSize: 14,
+          fontSize: OmaTypeScale.body,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -96,7 +96,7 @@ abstract final class AppTheme {
         titleTextStyle: TextStyle(
           color: oma.foreground,
           fontFamily: 'CormorantGaramond',
-          fontSize: 20,
+          fontSize: OmaTypeScale.title,
           fontWeight: FontWeight.w700,
         ),
         iconTheme: IconThemeData(color: oma.primaryStrong),
@@ -105,7 +105,7 @@ abstract final class AppTheme {
         color: oma.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OmaRadius.xl)),
         margin: EdgeInsets.zero,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -113,7 +113,7 @@ abstract final class AppTheme {
           backgroundColor: oma.primary,
           foregroundColor: oma.onPrimary,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xxl, vertical: OmaSpacing.lg),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
@@ -122,7 +122,7 @@ abstract final class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: oma.primaryStrong,
           side: BorderSide(color: oma.primary, width: 1.2),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xxl, vertical: OmaSpacing.lg),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
@@ -138,26 +138,26 @@ abstract final class AppTheme {
         fillColor: oma.surface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 18,
-          vertical: 16,
+          vertical: OmaSpacing.lg,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(OmaRadius.lg),
           borderSide: BorderSide(color: oma.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(OmaRadius.lg),
           borderSide: BorderSide(color: oma.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(OmaRadius.lg),
           borderSide: BorderSide(color: oma.primary, width: 1.6),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(OmaRadius.lg),
           borderSide: BorderSide(color: oma.error, width: 1.4),
         ),
-        hintStyle: TextStyle(color: oma.muted, fontSize: 14),
-        labelStyle: TextStyle(color: oma.muted, fontSize: 14),
+        hintStyle: TextStyle(color: oma.muted, fontSize: OmaTypeScale.body),
+        labelStyle: TextStyle(color: oma.muted, fontSize: OmaTypeScale.body),
       ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: oma.primary,
@@ -227,7 +227,7 @@ abstract final class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: oma.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OmaRadius.xl)),
       ),
     );
   }

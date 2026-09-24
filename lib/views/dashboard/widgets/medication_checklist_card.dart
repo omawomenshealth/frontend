@@ -26,17 +26,11 @@ class MedicationChecklistCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.omaTheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(OmaSpacing.lg),
       decoration: BoxDecoration(
         color: theme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
+        boxShadow: theme.subtleShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,11 +38,11 @@ class MedicationChecklistCard extends StatelessWidget {
           Row(
             children: [
               Icon(icon, color: color, size: 22),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: OmaTypeScale.bodyLarge,
                   fontWeight: FontWeight.w600,
                   color: theme.foreground,
                 ),
@@ -58,17 +52,17 @@ class MedicationChecklistCard extends StatelessWidget {
               if (items.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
+                    horizontal: OmaSpacing.sm,
+                    vertical: OmaSpacing.xxs,
                   ),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(OmaRadius.sm),
                   ),
                   child: Text(
                     '${items.where((e) => e.taken).length}/${items.length}',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: OmaTypeScale.caption,
                       fontWeight: FontWeight.w600,
                       color: color,
                     ),
@@ -77,13 +71,13 @@ class MedicationChecklistCard extends StatelessWidget {
             ],
           ),
           if (items.isEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: OmaSpacing.md),
             Text(
               emptyMessage ?? AppStrings.emptyMedicationList,
               style: TextStyle(fontSize: 13, color: theme.muted),
             ),
           ] else ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: OmaSpacing.md),
             ...List.generate(items.length, (index) {
               final item = items[index];
               return Padding(
@@ -93,14 +87,14 @@ class MedicationChecklistCard extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
+                      horizontal: OmaSpacing.md,
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
                       color: item.taken
                           ? color.withValues(alpha: 0.08)
                           : theme.background,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(OmaRadius.sm),
                       border: Border.all(
                         color: item.taken
                             ? color.withValues(alpha: 0.3)
@@ -126,18 +120,18 @@ class MedicationChecklistCard extends StatelessWidget {
                               ? const Icon(
                                   Icons.check,
                                   size: 14,
-                                  color: Colors.white,
+                                  color: OmaPalette.onMedia,
                                 )
                               : null,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: OmaSpacing.md),
 
                         // İlaç/Takviye adı
                         Expanded(
                           child: Text(
                             AppStrings.localizeStoredValue(item.displayName),
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: OmaTypeScale.body,
                               fontWeight: FontWeight.w500,
                               color: item.taken
                                   ? theme.muted
@@ -164,7 +158,7 @@ class MedicationChecklistCard extends StatelessWidget {
                             Text(
                               item.stomachState,
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: OmaTypeScale.micro,
                                 color: theme.muted,
                               ),
                             ),

@@ -1,0 +1,148 @@
+import 'package:flutter/material.dart';
+
+import '../theme/oma_theme.dart';
+
+const _cardPadding = EdgeInsets.all(OmaSpacing.xl);
+const _compactCardPadding = EdgeInsets.symmetric(
+  horizontal: OmaSpacing.lg,
+  vertical: OmaSpacing.md,
+);
+const _cardRadius = BorderRadius.all(Radius.circular(OmaRadius.xl));
+
+enum OmaCardContentSize { normal, compact }
+
+/// The standard Oma card surface.
+class OmaCard extends StatelessWidget {
+  const OmaCard({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final oma = context.omaTheme;
+
+    return Container(
+      width: double.infinity,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: oma.surface,
+        border: Border.all(color: oma.border),
+        borderRadius: _cardRadius,
+        boxShadow: oma.softShadow,
+      ),
+      child: child,
+    );
+  }
+}
+
+/// Header section for an [OmaCard].
+class OmaCardHeader extends StatelessWidget {
+  const OmaCardHeader({
+    super.key,
+    required this.title,
+    this.description,
+    this.action,
+  });
+
+  final Widget title;
+  final Widget? description;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: _cardPadding,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                title,
+                if (description != null) ...[
+                  const SizedBox(height: OmaSpacing.sm),
+                  description!,
+                ],
+              ],
+            ),
+          ),
+          if (action != null) ...[
+            const SizedBox(width: OmaSpacing.md),
+            action!,
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Standard title text for an [OmaCardHeader].
+class OmaCardTitle extends StatelessWidget {
+  const OmaCardTitle(this.data, {super.key});
+
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      data,
+      style: OmaText.body(
+        18,
+        weight: FontWeight.w600,
+        height: 1.3,
+        color: context.omaTheme.foreground,
+      ),
+    );
+  }
+}
+
+/// Standard supporting text for an [OmaCardHeader].
+class OmaCardDescription extends StatelessWidget {
+  const OmaCardDescription(this.data, {super.key});
+
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      data,
+      style: OmaText.body(OmaTypeScale.body, color: context.omaTheme.muted, height: 1.4),
+    );
+  }
+}
+
+/// Content section for an [OmaCard].
+class OmaCardContent extends StatelessWidget {
+  const OmaCardContent({
+    super.key,
+    required this.child,
+    this.size = OmaCardContentSize.normal,
+  });
+
+  final Widget child;
+  final OmaCardContentSize size;
+
+  @override
+  Widget build(BuildContext context) {
+    final padding = switch (size) {
+      OmaCardContentSize.normal => _cardPadding,
+      OmaCardContentSize.compact => _compactCardPadding,
+    };
+
+    return Padding(padding: padding, child: child);
+  }
+}
+
+/// Footer section for an [OmaCard].
+class OmaCardFooter extends StatelessWidget {
+  const OmaCardFooter({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(padding: _cardPadding, child: child);
+  }
+}

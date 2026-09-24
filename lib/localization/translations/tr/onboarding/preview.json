@@ -1,0 +1,35 @@
+{
+  "review": {
+    "hero": {
+      "title": "You're all set",
+      "titleWithName": "You're all set, $name",
+      "subtitle": "Take a moment to review your information before continuing."
+    },
+
+    "callout": {
+      "message": "We'll use these details to personalize your Oma experience."
+    },
+
+    "summary": {
+      "conditions": {
+        "label": "Health conditions",
+        "empty": "None added"
+      },
+
+      "cycle": {
+        "label": "Average cycle",
+        "dayCount": "$days days"
+      },
+
+      "storage": {
+        "label": "Data storage",
+        "google": "Saved securely to your account",
+        "guest": "Stored on this device"
+      }
+    },
+
+    "privacy": {
+      "deviceEncryptionNote": "Your health information is encrypted and handled securely."
+    }
+  }
+}

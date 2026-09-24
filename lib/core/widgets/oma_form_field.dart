@@ -22,12 +22,12 @@ class OmaField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: OmaText.body(14, weight: FontWeight.w500)),
-        const SizedBox(height: 8),
+        Text(label, style: OmaText.body(OmaTypeScale.body, weight: FontWeight.w500)),
+        const SizedBox(height: OmaSpacing.sm),
         child,
         if (hint != null) ...[
-          const SizedBox(height: 8),
-          Text(hint!, style: OmaText.body(12, color: context.omaTheme.muted)),
+          const SizedBox(height: OmaSpacing.sm),
+          Text(hint!, style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted)),
         ],
       ],
     );

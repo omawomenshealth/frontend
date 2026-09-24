@@ -1,212 +1,159 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/constants/image_constants.dart';
 import '../../../../core/theme/oma_theme.dart';
+import '../../../../core/widgets/oma_callout.dart';
+import '../../../../core/widgets/oma_logo.dart';
+import '../../../../core/widgets/rise_in.dart';
 import '../../../../localization/generated/strings.g.dart';
 import '../../viewmodel/onboarding_view_model.dart';
+import '../widgets/index.dart';
 
-const _readyPlum = Color(0xFF7A4F63);
-const _readyPlumSoft = Color(0x1A7A4F63);
+class PreviewPage extends StatefulWidget {
+  const PreviewPage({
+    super.key,
+    required this.vm,
+    this.isActive = true,
+  });
 
-class PreviewPage extends StatelessWidget {
   final OnboardingViewModel vm;
+  final bool isActive;
 
-  const PreviewPage({super.key, required this.vm});
+  @override
+  State<PreviewPage> createState() => _PreviewPageState();
+}
+
+class _PreviewPageState extends State<PreviewPage>
+    with SingleTickerProviderStateMixin, RiseAnimationMixin {
+  @override
+  void initState() {
+    super.initState();
+
+    if (!widget.isActive) {
+      riseController.stop();
+      riseController.value = 0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant PreviewPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!oldWidget.isActive && widget.isActive) {
+      riseController.forward(from: 0);
+    } else if (oldWidget.isActive && !widget.isActive) {
+      riseController.stop();
+      riseController.value = 0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final preview = context.t.onboarding.preview;
+    final vm = widget.vm;
     final name = vm.userName.trim();
-    final review = context.t.onboarding.review;
 
     final conditionSummary = vm.knownDiseases.isEmpty
-        ? review.noConditions
-        : vm.knownDiseases.map(AppStrings.localizeStoredValue).join(', ');
+        ? preview.summary.conditions.empty
+        : vm.knownDiseases
+            .map(AppStrings.localizeStoredValue)
+            .join(', ');
 
     final accountStorageSummary = vm.isUserLoggedIn
-        ? review.googleStorage
-        : review.guestStorage;
+        ? preview.summary.storage.google
+        : preview.summary.storage.guest;
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+        padding: const EdgeInsets.symmetric(
+          horizontal: OmaSpacing.xl,
+          vertical: OmaSpacing.xxxl,
+        ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 448),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: context.omaTheme.surface.withValues(alpha: 0.86),
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x14705F4A),
-                        blurRadius: 24,
-                        offset: Offset(0, 8),
+              RiseIn(
+                animation: riseAt(0),
+                child: Column(
+                  children: [
+                    const OmaLogo(
+                      size: OmaLogoSize.standard,
+                    ),
+                    const SizedBox(height: OmaSpacing.xxl),
+                    Text(
+                      name.isEmpty
+                          ? preview.hero.title
+                          : preview.hero.titleWithName(name: name),
+                      textAlign: TextAlign.center,
+                      style: OmaText.display(
+                        OmaTypeScale.display,
+                        weight: FontWeight.w600,
                       ),
-                    ],
-                  ),
-                  alignment: Alignment.center,
-                  child: Image.asset(ImageConstants.logo),
+                    ),
+                    const SizedBox(height: OmaSpacing.md),
+                    Text(
+                      preview.hero.subtitle,
+                      textAlign: TextAlign.center,
+                      style: OmaText.body(
+                        14,
+                        color: context.omaTheme.muted,
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: OmaSpacing.xxl),
 
-              Text(
-                name.isEmpty ? review.title : review.titleWithName(name: name),
-                textAlign: TextAlign.center,
-                style: OmaText.display(32, weight: FontWeight.w600),
-              ),
-
-              const SizedBox(height: 12),
-
-              Text(
-                review.subtitle,
-                textAlign: TextAlign.center,
-                style: OmaText.body(
-                  14,
-                  color: context.omaTheme.muted,
-                  height: 1.45,
+              RiseIn(
+                animation: riseAt(0.14),
+                child: OmaCallout(
+                  icon: Icons.auto_awesome_rounded,
+                  child: Text(preview.callout.message),
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: OmaSpacing.xxl),
 
-              _PreviewNote(message: context.t.onboarding.prompt.review),
-
-              const SizedBox(height: 24),
-
-              _PreviewSummary(
-                label: review.conditionsLabel,
-                value: conditionSummary,
+              RiseIn(
+                animation: riseAt(0.28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ReviewSummaryRow(
+                      label: preview.summary.conditions.label,
+                      value: conditionSummary,
+                    ),
+                    const SizedBox(height: OmaSpacing.sm),
+                    ReviewSummaryRow(
+                      label: preview.summary.cycle.label,
+                      value: preview.summary.cycle.dayCount(
+                        days: vm.averageCycleLength,
+                      ),
+                    ),
+                    const SizedBox(height: OmaSpacing.sm),
+                    ReviewSummaryRow(
+                      label: preview.summary.storage.label,
+                      value: accountStorageSummary,
+                    ),
+                  ],
+                ),
               ),
 
-              _PreviewSummary(
-                label: review.cycleLabel,
-                value: review.dayCount(days: vm.averageCycleLength),
+              const SizedBox(height: OmaSpacing.xxxl),
+
+              RiseIn(
+                animation: riseAt(0.42),
+                child: ReviewPrivacyNotice(
+                  label: preview.privacy.deviceEncryptionNote,
+                ),
               ),
-
-              _PreviewSummary(
-                label: review.accountStorageLabel,
-                value: accountStorageSummary,
-              ),
-
-              const SizedBox(height: 24),
-
-              _PreviewPrivacy(label: review.deviceEncryptionNote),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PreviewNote extends StatelessWidget {
-  final String message;
-
-  const _PreviewNote({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _readyPlumSoft,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 2),
-            child: Icon(
-              Icons.auto_awesome_rounded,
-              color: _readyPlum,
-              size: 16,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(message, style: OmaText.body(12, color: _readyPlum)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PreviewPrivacy extends StatelessWidget {
-  final String label;
-
-  const _PreviewPrivacy({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.favorite_border_rounded,
-          color: context.omaTheme.muted,
-          size: 16,
-        ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: OmaText.body(12, color: context.omaTheme.muted),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PreviewSummary extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _PreviewSummary({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: context.omaTheme.surface.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                textAlign: TextAlign.start,
-                style: OmaText.body(12, color: context.omaTheme.muted),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                value,
-                textAlign: TextAlign.end,
-                style: OmaText.body(12, weight: FontWeight.w600),
-              ),
-            ),
-          ],
         ),
       ),
     );

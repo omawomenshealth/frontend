@@ -56,7 +56,7 @@ class HomeView extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(
                   parent: BouncingScrollPhysics(),
                 ),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 132),
+                padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.md, OmaSpacing.lg, 132),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -86,7 +86,7 @@ class HomeView extends StatelessWidget {
                       onOpenInsights: () => _openInsights(context),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: OmaSpacing.xl),
 
                     QuickLogs(
                       accent: accent,

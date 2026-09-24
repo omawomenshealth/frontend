@@ -33,12 +33,12 @@ class OnboardingFooter extends StatelessWidget {
           label: isLast ? common.finish : common.next,
           onPressed: canContinue ? onContinue : null,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: OmaSpacing.md),
         if (isFirst)
           Text(
             common.swipeToContinue,
             textAlign: TextAlign.center,
-            style: OmaText.body(12, color: context.omaTheme.muted),
+            style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
           )
         else if (isSkippable)
           OmaButton(

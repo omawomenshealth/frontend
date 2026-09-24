@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+abstract final class OmaTypeScale {
+  static const double micro = 10;
+  static const double caption = 12;
+  static const double body = 14;
+  static const double bodyLarge = 16;
+  static const double title = 20;
+  static const double heading = 24;
+  static const double display = 32;
+}
+
 abstract final class OmaText {
   static TextStyle display(
     double size, {
@@ -30,10 +40,10 @@ abstract final class OmaText {
   );
 
   static TextStyle label({Color? color, FontWeight weight = FontWeight.w600}) =>
-      body(12, weight: weight, color: color, height: 1.2);
+      body(OmaTypeScale.caption, weight: weight, color: color, height: 1.2);
 
   static TextStyle caption({
     Color? color,
     FontWeight weight = FontWeight.w400,
-  }) => body(12, weight: weight, color: color, height: 1.35);
+  }) => body(OmaTypeScale.caption, weight: weight, color: color, height: 1.35);
 }

@@ -127,13 +127,13 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
 
     final now = DateTime.now();
     return Padding(
-      padding: const EdgeInsets.only(top: 24),
+      padding: const EdgeInsets.only(top: OmaSpacing.xxl),
       child: Container(
         key: const ValueKey('dashboard_planned_doses'),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(OmaSpacing.lg),
         decoration: BoxDecoration(
           color: context.omaTheme.surface,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(OmaRadius.xl),
           border: Border.all(color: widget.color.withValues(alpha: 0.20)),
         ),
         child: Column(
@@ -143,7 +143,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
               AppStrings.todaysPlannedDoses,
               style: TextStyle(
                 fontFamily: 'CormorantGaramond',
-                fontSize: 20,
+                fontSize: OmaTypeScale.title,
                 fontWeight: FontWeight.w700,
                 color: context.omaTheme.foreground,
               ),
@@ -177,7 +177,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
         color: context.omaTheme.background,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
       ),
       child: Column(
         children: [
@@ -187,7 +187,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                 DateFormat.Hm(AppStrings.localeName).format(dose.scheduledAt),
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
               Expanded(
                 child: Text(
                   '${AppStrings.localizeStoredValue(dose.displayName)} • '
@@ -207,10 +207,10 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
               ),
               const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.sm, vertical: OmaSpacing.xs),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(OmaRadius.xl),
                 ),
                 child: Text(
                   statusLabel,
@@ -222,7 +222,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           Row(
             children: [
               Expanded(
@@ -241,7 +241,7 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () =>
@@ -442,7 +442,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
               style: FilledButton.styleFrom(
                 backgroundColor: widget.color,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
+                  horizontal: OmaSpacing.md,
                   vertical: 9,
                 ),
               ),
@@ -462,7 +462,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: OmaPalette.info.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(OmaRadius.sm),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -506,11 +506,11 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
     );
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
+      margin: const EdgeInsets.only(bottom: OmaSpacing.sm),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.md, 10, 6, 10),
       decoration: BoxDecoration(
         color: widget.color.withValues(alpha: plan.enabled ? 0.10 : 0.04),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(OmaRadius.md),
         border: Border.all(
           color: widget.color.withValues(alpha: plan.enabled ? 0.35 : 0.15),
         ),
@@ -706,7 +706,7 @@ class _MedicationReminderFormSheetState
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 16, 20, bottomInset + 20),
+      padding: EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.lg, OmaSpacing.xl, bottomInset + OmaSpacing.xl),
       child: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -731,7 +731,7 @@ class _MedicationReminderFormSheetState
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: OmaSpacing.md),
               DropdownButtonFormField<String>(
                 initialValue: _selectedItem,
                 decoration: InputDecoration(
@@ -764,7 +764,7 @@ class _MedicationReminderFormSheetState
                       : null,
                 ),
               ],
-              const SizedBox(height: 12),
+              const SizedBox(height: OmaSpacing.md),
               InputDecorator(
                 decoration: InputDecoration(
                   labelText: AppStrings.reminderDose,
@@ -799,21 +799,21 @@ class _MedicationReminderFormSheetState
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: OmaSpacing.md),
               Text(
                 AppStrings.notificationTime,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: OmaTypeScale.body,
                   fontWeight: FontWeight.w700,
                   color: context.omaTheme.foreground,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               for (var index = 0; index < _times.length; index++) ...[
                 _buildTimeSlot(index),
-                if (index != _times.length - 1) const SizedBox(height: 8),
+                if (index != _times.length - 1) const SizedBox(height: OmaSpacing.sm),
               ],
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               Align(
                 alignment: Alignment.centerLeft,
                 child: OutlinedButton.icon(
@@ -825,7 +825,7 @@ class _MedicationReminderFormSheetState
                   label: Text(AppStrings.addTime),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: OmaSpacing.md),
               DropdownButtonFormField<MedicationPlanFrequency>(
                 initialValue: _frequency,
                 decoration: InputDecoration(
@@ -872,7 +872,7 @@ class _MedicationReminderFormSheetState
                   }),
                 ),
               ],
-              const SizedBox(height: 12),
+              const SizedBox(height: OmaSpacing.md),
               Text(
                 AppStrings.usageDurationQuestion,
                 style: TextStyle(
@@ -881,7 +881,7 @@ class _MedicationReminderFormSheetState
                   color: context.omaTheme.foreground,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               Wrap(
                 spacing: 7,
                 runSpacing: 7,
@@ -913,7 +913,7 @@ class _MedicationReminderFormSheetState
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: OmaSpacing.md),
               Row(
                 children: [
                   Expanded(
@@ -951,7 +951,7 @@ class _MedicationReminderFormSheetState
                 value: _enabled,
                 onChanged: (value) => setState(() => _enabled = value),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               FilledButton.icon(
                 onPressed: _submit,
                 icon: const Icon(Icons.alarm_add_rounded),
@@ -971,7 +971,7 @@ class _MedicationReminderFormSheetState
     required VoidCallback onTap,
   }) {
     return InkWell(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(OmaRadius.md),
       onTap: onTap,
       child: InputDecorator(
         decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon)),
@@ -984,10 +984,10 @@ class _MedicationReminderFormSheetState
     final value = _times[index];
     return Container(
       key: ValueKey('reminder_time_slot_$index'),
-      padding: const EdgeInsets.fromLTRB(12, 5, 4, 5),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.md, 5, OmaSpacing.xs, 5),
       decoration: BoxDecoration(
         color: context.omaTheme.background,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(OmaRadius.md),
         border: Border.all(color: context.omaTheme.border),
       ),
       child: Row(

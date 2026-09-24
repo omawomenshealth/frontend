@@ -27,7 +27,7 @@ class OmaBottomNavigation extends StatelessWidget {
 
     return SafeArea(
       top: false,
-      minimum: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+      minimum: const EdgeInsets.fromLTRB(14, OmaSpacing.none, 14, OmaSpacing.md),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -38,7 +38,7 @@ class OmaBottomNavigation extends StatelessWidget {
               decoration: BoxDecoration(
                 color: surfaceColor.withValues(alpha: 0.96),
                 borderRadius: BorderRadius.circular(30),
-                boxShadow: OmaShadows.soft,
+                boxShadow: context.omaTheme.softShadow,
               ),
               child: BottomNavigationBar(
                 currentIndex: currentIndex,
@@ -73,7 +73,7 @@ class OmaBottomNavigation extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: surfaceColor.withValues(alpha: 0.96),
                   shape: BoxShape.circle,
-                  boxShadow: OmaShadows.soft,
+                  boxShadow: context.omaTheme.softShadow,
                 ),
                 child: Center(child: OmaSunburst(size: 34, color: activeColor)),
               ),

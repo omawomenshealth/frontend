@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 
 import '../constants/image_constants.dart';
 
-/// Sayfa arkasında hafifçe salınan dekoratif çiçekler.
+/// Renders animated decorative blooms behind page content.
 ///
-/// Çiçekler `seed` değerine göre kenarlarda farklı noktalara dağılır.
-class OmaBackground extends StatelessWidget {
-  const OmaBackground({
+/// Blooms are distributed along the edges according to [seed].
+class OmaBloomBackground extends StatelessWidget {
+  const OmaBloomBackground({
     super.key,
     this.seed = 0,
     this.spotCount = 3,

@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/image_constants.dart';
-import '../../../core/widgets/oma_background.dart';
+import '../../../core/widgets/oma_bloom_background.dart';
+import '../../../core/widgets/oma_callout.dart';
+import '../../../core/widgets/rise_in.dart';
 import '../../../localization/generated/strings.g.dart';
 import '../controller/onboarding_controller.dart';
 import '../utils/onboarding_date_utils.dart';
@@ -24,7 +26,8 @@ class OnboardingView extends StatefulWidget {
   State<OnboardingView> createState() => _OnboardingViewState();
 }
 
-class _OnboardingViewState extends State<OnboardingView> {
+class _OnboardingViewState extends State<OnboardingView>
+    with SingleTickerProviderStateMixin, RiseAnimationMixin {
   late final PageController _pageController;
   late final TextEditingController _nameController;
   late final TextEditingController _birthDateController;
@@ -71,7 +74,7 @@ class _OnboardingViewState extends State<OnboardingView> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: OmaBackground(
+              child: OmaBloomBackground(
                 key: ValueKey('onboarding_background_${vm.currentPage}'),
                 seed: vm.currentPage,
                 spotCount: 3,
@@ -82,12 +85,12 @@ class _OnboardingViewState extends State<OnboardingView> {
             ),
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
+                padding: const EdgeInsets.symmetric(vertical: OmaSpacing.xxl),
                 child: Column(
                   children: [
                     if (!vm.isPreviewPage) ...[
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
                         child: OnboardingHeader(
                           onBack: _goBack,
                           index: vm.currentPage,
@@ -96,9 +99,15 @@ class _OnboardingViewState extends State<OnboardingView> {
                       ),
                       const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: OnboardingPrompt(
-                          message: _promptForPage(context, vm.currentPage),
+                        padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
+                        child: RiseIn(
+                          animation: riseAt(0),
+                          child: OmaCallout(
+                            icon: Icons.auto_awesome_rounded,
+                            child: Text(
+                              _promptForPage(context, vm.currentPage),
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -145,13 +154,16 @@ class _OnboardingViewState extends State<OnboardingView> {
                             onPickLastPeriod: controller.pickLastPeriod,
                           ),
 
-                          PreviewPage(vm: vm),
+                          PreviewPage(
+                            vm: vm,
+                            isActive: vm.isPreviewPage,
+                          ),
                         ],
                       ),
                     ),
 
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
                       child: OnboardingFooter(
                         canContinue: vm.isPreviewPage
                             ? !vm.isSaving
@@ -210,6 +222,7 @@ class _OnboardingViewState extends State<OnboardingView> {
     // Preview → Cycle
     if (vm.isPreviewPage) {
       vm.previousPage();
+      riseController.forward(from: 0);
       _animateToPage(vm.currentPage);
       return;
     }
@@ -221,6 +234,7 @@ class _OnboardingViewState extends State<OnboardingView> {
     }
 
     vm.previousPage();
+    riseController.forward(from: 0);
     _animateToPage(vm.currentPage);
   }
 
@@ -232,6 +246,7 @@ class _OnboardingViewState extends State<OnboardingView> {
     // Normal onboarding sayfaları.
     if (!vm.isPreviewPage) {
       vm.nextPage();
+      riseController.forward(from: 0);
       _animateToPage(vm.currentPage);
       return;
     }

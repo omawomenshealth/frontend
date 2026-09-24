@@ -86,7 +86,7 @@ class QuickLogs extends StatelessWidget {
           title: strings.common.quickLogs.title,
           caption: strings.common.quickLogs.caption,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: OmaSpacing.lg),
         LayoutBuilder(
           builder: (context, constraints) {
             final visualSize = (constraints.maxWidth / logs.length - 6).clamp(
@@ -185,7 +185,7 @@ class _QuickLogButtonState extends State<_QuickLogButton> {
                           0.08,
                         )
                       : widget.log.background,
-                  borderRadius: BorderRadius.circular(19),
+                  borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
                 child: Icon(
                   widget.log.icon,
@@ -193,7 +193,7 @@ class _QuickLogButtonState extends State<_QuickLogButton> {
                   size: 22,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               Text(
                 widget.log.label,
                 maxLines: 2,

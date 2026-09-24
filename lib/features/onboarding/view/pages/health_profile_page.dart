@@ -25,7 +25,7 @@ class HealthProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final healthProfile = context.t.onboarding.health_profile;
 
-    return OnboardingCard(
+    return OnboardingPageLayout(
       label: healthProfile.title,
       children: [
         _BodyMeasurementsField(
@@ -82,7 +82,7 @@ class _BodyMeasurementsField extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: OmaSpacing.lg),
         Expanded(
           child: OmaField(
             label: healthProfile.weight,
@@ -180,7 +180,7 @@ class _KnownConditionsField extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           OmaChip(
             label: healthProfile.addCondition,
             showCheck: false,

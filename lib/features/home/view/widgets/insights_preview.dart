@@ -79,7 +79,7 @@ class InsightsPreview extends StatelessWidget {
               clipBehavior: Clip.none,
               physics: const BouncingScrollPhysics(),
               itemCount: insights.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              separatorBuilder: (_, _) => const SizedBox(width: OmaSpacing.md),
               itemBuilder: (context, index) {
                 final insight = insights[index];
 
@@ -113,7 +113,7 @@ class _InsightPlaceholder extends StatelessWidget {
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: Color.lerp(accent, theme.surface, 0.86),
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
       ),
       child: Row(
         children: [

@@ -34,7 +34,7 @@ class _AuthViewState extends State<AuthView>
             body: Stack(
               children: [
                 const Positioned.fill(
-                  child: OmaBackground(
+                  child: OmaBloomBackground(
                     seed: 1,
                     spotCount: 3,
                     minSize: 94,
@@ -44,8 +44,8 @@ class _AuthViewState extends State<AuthView>
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
+                      horizontal: OmaSpacing.xxl,
+                      vertical: OmaSpacing.lg,
                     ),
                     child: Column(
                       children: [
@@ -65,12 +65,12 @@ class _AuthViewState extends State<AuthView>
                                 _navigateToOnboarding(context),
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         RiseIn(
                           animation: riseAt(0.3),
                           child: const _PrivacyNote(),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: OmaSpacing.sm),
                       ],
                     ),
                   ),
@@ -199,12 +199,12 @@ class _AuthViewState extends State<AuthView>
           children: [
             Text(
               AppStrings.cloudBackupQuestion,
-              style: OmaText.body(14, color: context.omaTheme.foreground),
+              style: OmaText.body(OmaTypeScale.body, color: context.omaTheme.foreground),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: OmaSpacing.md),
             Text(
               AppStrings.cloudBackupOptions,
-              style: OmaText.body(12, color: context.omaTheme.muted),
+              style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
             ),
           ],
         ),
@@ -258,7 +258,7 @@ class _PrivacyNote extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           t.auth.privacyNote,
-          style: OmaText.body(12, color: context.omaTheme.muted),
+          style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
         ),
       ],
     );

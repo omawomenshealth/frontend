@@ -142,7 +142,7 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
                           0.08,
                         )
                       : widget.action.background,
-                  borderRadius: BorderRadius.circular(19),
+                  borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
                 child: Icon(
                   widget.action.icon,
@@ -150,7 +150,7 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
                   size: 22,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               Text(
                 widget.action.label,
                 maxLines: 2,

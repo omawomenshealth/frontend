@@ -31,7 +31,7 @@ class OnboardingSelectionSheet extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 12, 10),
+              padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.lg, OmaSpacing.md, 10),
               child: Row(
                 children: [
                   Container(
@@ -64,13 +64,13 @@ class OnboardingSelectionSheet extends StatelessWidget {
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 18),
+                padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.sm, OmaSpacing.xl, 18),
                 children: [child],
               ),
             ),
             SafeArea(
               top: false,
-              minimum: const EdgeInsets.fromLTRB(20, 8, 20, 14),
+              minimum: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.sm, OmaSpacing.xl, 14),
               child: SizedBox(
                 width: double.infinity,
                 child: FilledButton(

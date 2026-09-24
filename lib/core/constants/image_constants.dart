@@ -4,7 +4,9 @@ class ImageConstants {
 
   static const String _basePath = 'assets/images';
 
-  static const String logo = '$_basePath/brand/logo-mark.png';
+  static const String logoLight = '$_basePath/brand/logo-mark.png';
+  static const String logoDark = '$_basePath/brand/logo-mark-dark.png';
+
   static const String profileCharacters =
       '$_basePath/features/profile/profile-characters.png';
 

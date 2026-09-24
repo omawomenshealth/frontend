@@ -130,16 +130,16 @@ class _OmaToastWidgetState extends State<_OmaToastWidget>
                   onTap: _close,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                      horizontal: OmaSpacing.lg,
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
                       color: oma.surface.withValues(alpha: 0.96),
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(OmaRadius.lg),
                       border: Border.all(
                         color: oma.border.withValues(alpha: 0.7),
                       ),
-                      boxShadow: OmaShadows.soft,
+                      boxShadow: oma.softShadow,
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -153,7 +153,7 @@ class _OmaToastWidgetState extends State<_OmaToastWidget>
                           ),
                           child: Icon(widget.icon, size: 16, color: oma.accent),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: OmaSpacing.md),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +169,7 @@ class _OmaToastWidgetState extends State<_OmaToastWidget>
                                 const SizedBox(height: 3),
                                 Text(
                                   widget.description!,
-                                  style: OmaText.body(12, color: oma.muted),
+                                  style: OmaText.body(OmaTypeScale.caption, color: oma.muted),
                                 ),
                               ],
                             ],

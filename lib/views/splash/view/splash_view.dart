@@ -109,12 +109,12 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                                 height: 144,
                                 fit: BoxFit.contain,
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: OmaSpacing.lg),
                               Text('Oma', style: OmaText.display(56)),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: OmaSpacing.lg),
                         _riseIn(
                           progress: _stagger(0.45, 0.4),
                           child: Text(

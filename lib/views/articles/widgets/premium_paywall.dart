@@ -55,13 +55,13 @@ class _PremiumViewState extends State<PremiumView> {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.close_rounded),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
             ],
           ),
           body: CustomScrollView(
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+                padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.sm, OmaSpacing.xl, 28),
                 sliver: SliverList.list(
                   children: [
                     _PremiumHero(
@@ -88,7 +88,7 @@ class _PremiumViewState extends State<PremiumView> {
                       onTap: () =>
                           setState(() => _selectedTier = MembershipTier.free),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: OmaSpacing.md),
                     _PlanCard(
                       key: const ValueKey('premium_plus_plan'),
                       icon: Icons.insights_outlined,
@@ -103,7 +103,7 @@ class _PremiumViewState extends State<PremiumView> {
                       onTap: () =>
                           setState(() => _selectedTier = MembershipTier.plus),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: OmaSpacing.md),
                     _PlanCard(
                       key: const ValueKey('premium_paid_plan'),
                       icon: Icons.auto_awesome_rounded,
@@ -196,13 +196,7 @@ class _PremiumHero extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: context.omaTheme.primaryStrong.withValues(alpha: 0.18),
-              blurRadius: 28,
-              offset: const Offset(0, 12),
-            ),
-          ],
+          boxShadow: OmaShadows.elevated(context.omaTheme.primaryStrong),
         ),
         child: Stack(
           children: [
@@ -231,7 +225,7 @@ class _PremiumHero extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(22, 24, 22, 26),
+              padding: const EdgeInsets.fromLTRB(22, OmaSpacing.xxl, 22, 26),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -241,10 +235,10 @@ class _PremiumHero extends StatelessWidget {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.14),
+                          color: OmaPalette.onMedia.withValues(alpha: 0.14),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color: OmaPalette.onMedia.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Icon(
@@ -260,8 +254,8 @@ class _PremiumHero extends StatelessWidget {
                         child: Text(
                           isActive ? strings.activeEyebrow : strings.eyebrow,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.82),
-                            fontSize: 12,
+                            color: OmaPalette.onMedia.withValues(alpha: 0.82),
+                            fontSize: OmaTypeScale.caption,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.3,
                           ),
@@ -273,19 +267,19 @@ class _PremiumHero extends StatelessWidget {
                   Text(
                     heroTitle,
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      color: Colors.white,
+                      color: OmaPalette.onMedia,
                       fontSize: 34,
                       height: 1.04,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: OmaSpacing.md),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 330),
                     child: Text(
                       heroDescription,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.78),
-                        fontSize: 14,
+                        color: OmaPalette.onMedia.withValues(alpha: 0.78),
+                        fontSize: OmaTypeScale.body,
                         height: 1.45,
                       ),
                     ),
@@ -349,7 +343,7 @@ class _BenefitsCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.omaTheme.surface,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         border: Border.all(color: context.omaTheme.border),
       ),
       child: Column(
@@ -392,7 +386,7 @@ class _BenefitItem extends StatelessWidget {
       duration: const Duration(milliseconds: 180),
       opacity: included ? 1 : 0.48,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 18, 16),
+        padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.lg, 18, OmaSpacing.lg),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -401,7 +395,7 @@ class _BenefitItem extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(OmaRadius.lg),
               ),
               child: Icon(icon, color: color, size: 22),
             ),
@@ -421,7 +415,7 @@ class _BenefitItem extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: OmaSpacing.xs),
             Padding(
               padding: const EdgeInsets.only(top: 11),
               child: Icon(
@@ -483,18 +477,10 @@ class _PlanCard extends StatelessWidget {
             color: isSelected
                 ? context.omaTheme.primarySoft
                 : context.omaTheme.surface,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(OmaRadius.xl),
             border: Border.all(color: borderColor, width: isSelected ? 1.5 : 1),
             boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: context.omaTheme.primaryStrong.withValues(
-                        alpha: 0.08,
-                      ),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ]
+                ? OmaShadows.soft(context.omaTheme.primaryStrong)
                 : null,
           ),
           child: Row(
@@ -514,7 +500,9 @@ class _PlanCard extends StatelessWidget {
                 ),
                 child: Icon(
                   icon,
-                  color: isSelected ? Colors.white : context.omaTheme.muted,
+                  color: isSelected
+                      ? context.omaTheme.onPrimary
+                      : context.omaTheme.muted,
                   size: 21,
                 ),
               ),
@@ -532,7 +520,7 @@ class _PlanCard extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: OmaSpacing.sm),
                         Flexible(
                           child: Text(
                             price,
@@ -553,19 +541,19 @@ class _PlanCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 9,
-                            vertical: 4,
+                            vertical: OmaSpacing.xs,
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? context.omaTheme.primaryStrong
                                 : context.omaTheme.surfaceMuted,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(OmaRadius.xl),
                           ),
                           child: Text(
                             badge!,
                             style: TextStyle(
                               color: isSelected
-                                  ? Colors.white
+                                  ? context.omaTheme.onPrimary
                                   : context.omaTheme.muted,
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
@@ -616,7 +604,7 @@ class _StatusCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: OmaPalette.tealGradient.colors.first,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(OmaRadius.lg),
           border: Border.all(color: OmaPalette.info.withValues(alpha: 0.35)),
         ),
         child: Row(
@@ -636,7 +624,7 @@ class _StatusCard extends StatelessWidget {
                     t.premium.statusTitle,
                     style: Theme.of(context).textTheme.labelLarge,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: OmaSpacing.xxs),
                   Text(message, style: Theme.of(context).textTheme.bodySmall),
                 ],
               ),
@@ -664,7 +652,7 @@ class _PremiumActionBar extends StatelessWidget {
       shadowColor: context.omaTheme.primaryStrong.withValues(alpha: 0.14),
       child: SafeArea(
         top: false,
-        minimum: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+        minimum: const EdgeInsets.fromLTRB(OmaSpacing.xl, 14, OmaSpacing.xl, 14),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -710,7 +698,7 @@ class _PremiumActionBar extends StatelessWidget {
               ),
             ),
             if (service.isSignedIn) ...[
-              const SizedBox(height: 2),
+              const SizedBox(height: OmaSpacing.xxs),
               Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 6,
@@ -766,7 +754,10 @@ class _PremiumActionBar extends StatelessWidget {
       return const SizedBox(
         width: 18,
         height: 18,
-        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: OmaPalette.onMedia,
+        ),
       );
     }
     if (!service.isSignedIn) return const Icon(Icons.login_rounded);

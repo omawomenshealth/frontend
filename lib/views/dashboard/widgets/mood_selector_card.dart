@@ -19,17 +19,11 @@ class MoodSelectorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.omaTheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(OmaSpacing.lg),
       decoration: BoxDecoration(
         color: theme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
+        boxShadow: theme.subtleShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,13 +31,13 @@ class MoodSelectorCard extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.mood, color: OmaPalette.moodHappy, size: 22),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
               const Spacer(),
               if (selectedEmoji != null)
-                Text(selectedEmoji!, style: const TextStyle(fontSize: 24)),
+                Text(selectedEmoji!, style: const TextStyle(fontSize: OmaTypeScale.heading)),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: OmaSpacing.lg),
           Wrap(
             spacing: 8,
             runSpacing: 10,
@@ -56,14 +50,14 @@ class MoodSelectorCard extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                    horizontal: OmaSpacing.md,
+                    vertical: OmaSpacing.sm,
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? _getMoodColor(entry.value).withValues(alpha: 0.15)
                         : theme.background,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(OmaRadius.xl),
                     border: Border.all(
                       color: isSelected
                           ? _getMoodColor(entry.value)
@@ -75,7 +69,7 @@ class MoodSelectorCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(entry.value, style: const TextStyle(fontSize: 18)),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: OmaSpacing.xs),
                       Text(
                         entry.key,
                         style: TextStyle(

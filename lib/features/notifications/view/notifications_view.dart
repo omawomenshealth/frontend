@@ -33,7 +33,7 @@ class _NotificationsViewState extends State<NotificationsView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 20, 0),
+                padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.md, OmaSpacing.xl, OmaSpacing.none),
                 child: Row(
                   children: [
                     IconButton(
@@ -44,7 +44,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                       icon: const Icon(Icons.arrow_back_rounded),
                       color: context.omaTheme.foreground,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: OmaSpacing.sm),
                     Expanded(
                       child: Text(
                         labels.title,
@@ -58,19 +58,19 @@ class _NotificationsViewState extends State<NotificationsView> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 22),
+                padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, OmaSpacing.md, OmaSpacing.xxl, 22),
                 child: Text(
                   labels.subtitle,
                   style: OmaText.body(13, color: context.omaTheme.muted),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
                 child: Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(OmaSpacing.xs),
                   decoration: BoxDecoration(
                     color: context.omaTheme.backgroundAlt,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(OmaRadius.lg),
                     border: Border.all(color: context.omaTheme.border),
                   ),
                   child: Row(
@@ -89,12 +89,12 @@ class _NotificationsViewState extends State<NotificationsView> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: OmaSpacing.xl),
               Expanded(
                 child: entries.isEmpty
                     ? Center(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(28, 0, 28, 70),
+                          padding: const EdgeInsets.fromLTRB(28, OmaSpacing.none, 28, 70),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -113,7 +113,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                   color: accent,
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              const SizedBox(height: OmaSpacing.xl),
                               Text(
                                 isApp
                                     ? labels.appEmptyTitle
@@ -140,7 +140,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                         ),
                       )
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+                        padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.none, OmaSpacing.xl, OmaSpacing.xxxl),
                         itemCount: entries.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, index) =>
@@ -163,14 +163,14 @@ class _NotificationsViewState extends State<NotificationsView> {
       child: InkWell(
         key: ValueKey('notification_tab_${type.name}'),
         onTap: () => setState(() => _selected = type),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(OmaRadius.md),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: OmaSpacing.md, horizontal: OmaSpacing.xs),
           decoration: BoxDecoration(
             color: selected ? context.omaTheme.surface : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: selected ? OmaShadows.soft : null,
+            borderRadius: BorderRadius.circular(OmaRadius.md),
+            boxShadow: selected ? context.omaTheme.softShadow : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -209,12 +209,12 @@ class _NotificationsViewState extends State<NotificationsView> {
     }
     final locale = Localizations.localeOf(context).toString();
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(OmaSpacing.lg),
       decoration: BoxDecoration(
         color: context.omaTheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         border: Border.all(color: context.omaTheme.border),
-        boxShadow: OmaShadows.soft,
+        boxShadow: context.omaTheme.softShadow,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,20 +234,20 @@ class _NotificationsViewState extends State<NotificationsView> {
               color: accent,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: OmaSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   entry.title,
-                  style: OmaText.body(14, weight: FontWeight.w600),
+                  style: OmaText.body(OmaTypeScale.body, weight: FontWeight.w600),
                 ),
                 if (entry.description?.isNotEmpty ?? false) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: OmaSpacing.xs),
                   Text(
                     entry.description!,
-                    style: OmaText.body(12, color: context.omaTheme.muted),
+                    style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
                   ),
                 ],
                 const SizedBox(height: 9),
@@ -285,11 +285,11 @@ class _NotificationsViewState extends State<NotificationsView> {
           end: Alignment.bottomRight,
           colors: [OmaPalette.periodLight, context.omaTheme.surface],
         ),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         border: Border.all(
           color: OmaPalette.periodPrimary.withValues(alpha: 0.25),
         ),
-        boxShadow: OmaShadows.soft,
+        boxShadow: context.omaTheme.softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +301,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                 height: 36,
                 decoration: BoxDecoration(
                   color: OmaPalette.periodPrimary.withValues(alpha: 0.13),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(OmaRadius.md),
                 ),
                 child: const Icon(
                   Icons.water_drop_outlined,
@@ -329,10 +329,10 @@ class _NotificationsViewState extends State<NotificationsView> {
           ),
           const SizedBox(height: 15),
           Text(entry.title, style: OmaText.body(17, weight: FontWeight.w700)),
-          const SizedBox(height: 2),
+          const SizedBox(height: OmaSpacing.xxs),
           Text(
             DateFormat.yMMMMd(locale).format(details.date),
-            style: OmaText.body(12, color: context.omaTheme.muted),
+            style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
           ),
           if (flow != null && flow.isNotEmpty) ...[
             const SizedBox(height: 15),
@@ -341,7 +341,7 @@ class _NotificationsViewState extends State<NotificationsView> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
               decoration: BoxDecoration(
                 color: context.omaTheme.surface.withValues(alpha: 0.88),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(OmaRadius.md),
                 border: Border.all(
                   color: OmaPalette.periodPrimary.withValues(alpha: 0.13),
                 ),
@@ -350,7 +350,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                 children: [
                   Text(
                     labels.periodFlow,
-                    style: OmaText.body(12, color: context.omaTheme.muted),
+                    style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
                   ),
                   const Spacer(),
                   Flexible(
@@ -374,7 +374,7 @@ class _NotificationsViewState extends State<NotificationsView> {
               labels.periodSymptoms,
               style: OmaText.body(11, color: context.omaTheme.muted),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: OmaSpacing.sm),
             Wrap(
               spacing: 7,
               runSpacing: 7,
@@ -387,7 +387,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                     ),
                     decoration: BoxDecoration(
                       color: context.omaTheme.surface,
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(OmaRadius.full),
                       border: Border.all(
                         color: OmaPalette.periodPrimary.withValues(alpha: 0.2),
                       ),

@@ -27,7 +27,7 @@ class IntroductionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final introduction = context.t.onboarding.introduction;
 
-    return OnboardingCard(
+    return OnboardingPageLayout(
       label: introduction.title,
       children: [
         _NameField(controller: nameController, onChanged: vm.setUserName),

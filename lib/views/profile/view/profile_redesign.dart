@@ -40,14 +40,14 @@ class ProfileView extends StatelessWidget {
                         _mechanics._showBasicInfoSheet(context, profile),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 116),
+                    padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, 18, OmaSpacing.xl, 116),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _PremiumProfileCard(accent: accent),
                         const SizedBox(height: 30),
                         _SectionTitle(text: AppStrings.profileCurrentMode),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         _ProfileModeSelector(accent: accent),
                         const SizedBox(height: 30),
                         _SectionTitle(
@@ -63,7 +63,7 @@ class ProfileView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         _CycleOverviewCard(
                           profile: profile,
                           dashboard: dashboard,
@@ -88,7 +88,7 @@ class ProfileView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         _LabResultsCard(
                           settings: profile.settings,
                           accent: accent,
@@ -100,14 +100,14 @@ class ProfileView extends StatelessWidget {
                         ),
                         const SizedBox(height: 30),
                         _SectionTitle(text: AppStrings.profileSymptomPatterns),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         _PatternCard(
                           insights: dashboard.personalInsights,
                           accent: accent,
                         ),
                         const SizedBox(height: 30),
                         _SectionTitle(text: AppStrings.account),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         _AccountCard(
                           profile: profile,
                           accent: accent,
@@ -126,7 +126,7 @@ class ProfileView extends StatelessWidget {
                               Navigator.of(context).pushNamed('/privacy'),
                           onHelp: () => _showHelpDialog(context),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: OmaSpacing.lg),
                         _mechanics._buildSyncCard(context, profile),
                       ],
                     ),
@@ -221,7 +221,7 @@ class _ProfileHero extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color.lerp(accent, Colors.white, 0.82)!,
+            Color.lerp(accent, context.omaTheme.surface, 0.82)!,
             Color.lerp(accent, context.omaTheme.background, 0.90)!,
           ],
           begin: Alignment.topCenter,
@@ -262,7 +262,7 @@ class _ProfileHero extends StatelessWidget {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.sm),
                     child: Column(
                       children: [
                         Text(
@@ -286,7 +286,7 @@ class _ProfileHero extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Karla',
-                            fontSize: 12,
+                            fontSize: OmaTypeScale.caption,
                             fontWeight: FontWeight.w600,
                             color: Color.lerp(
                               context.omaTheme.muted,
@@ -361,7 +361,9 @@ class _RoundIconButton extends StatelessWidget {
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: Colors.white.withValues(alpha: compact ? 0.72 : 0.84),
+        color: context.omaTheme.surface.withValues(
+          alpha: compact ? 0.72 : 0.84,
+        ),
         shape: const CircleBorder(),
         child: InkWell(
           customBorder: const CircleBorder(),
@@ -387,7 +389,7 @@ class _PremiumProfileCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         onTap: () => showPremiumPaywall(context),
         child: Ink(
           width: double.infinity,
@@ -395,20 +397,14 @@ class _PremiumProfileCard extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.lerp(accent, Colors.white, 0.20)!,
+                Color.lerp(accent, context.omaTheme.onPrimary, 0.20)!,
                 Color.lerp(accent, context.omaTheme.primaryStrong, 0.15)!,
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(25),
-            boxShadow: [
-              BoxShadow(
-                color: accent.withValues(alpha: 0.18),
-                blurRadius: 22,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(OmaRadius.xl),
+            boxShadow: OmaShadows.elevated(accent),
           ),
           child: Row(
             children: [
@@ -416,12 +412,12 @@ class _PremiumProfileCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.22),
+                  color: context.omaTheme.onPrimary.withValues(alpha: 0.22),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.workspace_premium_rounded,
-                  color: Colors.white,
+                  color: OmaPalette.onMedia,
                   size: 27,
                 ),
               ),
@@ -436,27 +432,29 @@ class _PremiumProfileCard extends StatelessWidget {
                         fontFamily: 'CormorantGaramond',
                         fontSize: 21,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: context.omaTheme.onPrimary,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: OmaSpacing.xxs),
                     Text(
                       AppStrings.profilePremiumDescription,
                       style: TextStyle(
                         fontFamily: 'Karla',
-                        fontSize: 12,
+                        fontSize: OmaTypeScale.caption,
                         height: 1.25,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.86),
+                        color: context.omaTheme.onPrimary.withValues(
+                          alpha: 0.86,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
               const Icon(
                 Icons.chevron_right_rounded,
-                color: Colors.white,
+                color: OmaPalette.onMedia,
                 size: 26,
               ),
             ],
@@ -482,7 +480,7 @@ class _SectionTitle extends StatelessWidget {
             text,
             style: TextStyle(
               fontFamily: 'CormorantGaramond',
-              fontSize: 24,
+              fontSize: OmaTypeScale.heading,
               height: 1,
               fontWeight: FontWeight.w700,
               color: context.omaTheme.foreground,
@@ -562,7 +560,7 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
                             key: ValueKey(
                               'profile_mode_${options[index].mode.name}',
                             ),
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(OmaRadius.lg),
                             onTap: options[index].enabled
                                 ? () => _selectMode(
                                     context,
@@ -574,14 +572,14 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
                               duration: const Duration(milliseconds: 180),
                               curve: Curves.easeOut,
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
+                                horizontal: OmaSpacing.xs,
                                 vertical: 13,
                               ),
                               decoration: BoxDecoration(
                                 color: selected == index
                                     ? widget.accent.withValues(alpha: 0.11)
                                     : Colors.transparent,
-                                borderRadius: BorderRadius.circular(18),
+                                borderRadius: BorderRadius.circular(OmaRadius.lg),
                               ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -623,7 +621,7 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
         ),
         const SizedBox(height: 9),
         Padding(
-          padding: const EdgeInsets.only(left: 4),
+          padding: const EdgeInsets.only(left: OmaSpacing.xs),
           child: Text(
             options[selected < 0 ? 0 : selected].subtitle,
             style: TextStyle(
@@ -817,10 +815,10 @@ class _LabResultsCard extends StatelessWidget {
             if (availableDefinitions.isEmpty)
               InkWell(
                 key: const ValueKey('profile_lab_results_empty'),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(OmaRadius.lg),
                 onTap: onEdit,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(vertical: OmaSpacing.xs),
                   child: Row(
                     children: [
                       Container(
@@ -836,13 +834,13 @@ class _LabResultsCard extends StatelessWidget {
                           color: accent,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: OmaSpacing.md),
                       Expanded(
                         child: Text(
                           AppStrings.emptyLaboratoryResultsHint,
                           style: TextStyle(
                             fontFamily: 'Karla',
-                            fontSize: 12,
+                            fontSize: OmaTypeScale.caption,
                             height: 1.35,
                             color: context.omaTheme.muted,
                           ),
@@ -876,7 +874,7 @@ class _LabResultsCard extends StatelessWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: OmaSpacing.md),
               ],
               for (
                 var index = 0;
@@ -915,7 +913,7 @@ class _LabMetaChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(99),
+        borderRadius: BorderRadius.circular(OmaRadius.full),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -955,12 +953,12 @@ class _LabResultRow extends StatelessWidget {
               definition.label(AppStrings.isTurkish),
               style: TextStyle(
                 fontFamily: 'Karla',
-                fontSize: 12,
+                fontSize: OmaTypeScale.caption,
                 color: context.omaTheme.muted,
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: OmaSpacing.md),
           Text(
             '${result.value} ${result.unit}',
             textAlign: TextAlign.end,
@@ -1009,7 +1007,7 @@ class _CycleMetric extends StatelessWidget {
             ),
             child: Icon(icon, size: 19, color: accent),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: OmaSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1018,7 +1016,7 @@ class _CycleMetric extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontFamily: 'Karla',
-                    fontSize: 12,
+                    fontSize: OmaTypeScale.caption,
                     color: context.omaTheme.muted,
                   ),
                 ),
@@ -1035,20 +1033,20 @@ class _CycleMetric extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: OmaSpacing.sm),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
             decoration: BoxDecoration(
               color: (badgePositive ? OmaPalette.success : accent).withValues(
                 alpha: 0.10,
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(OmaRadius.xl),
             ),
             child: Text(
               badge,
               style: TextStyle(
                 fontFamily: 'Karla',
-                fontSize: 10,
+                fontSize: OmaTypeScale.micro,
                 fontWeight: FontWeight.w700,
                 color: badgePositive ? OmaPalette.success : accent,
               ),
@@ -1071,7 +1069,7 @@ class _PatternCard extends StatelessWidget {
     if (insights.isEmpty) {
       return _SurfaceCard(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(OmaSpacing.xl),
           child: Row(
             children: [
               Container(
@@ -1092,17 +1090,17 @@ class _PatternCard extends StatelessWidget {
                       AppStrings.patternsForming,
                       style: TextStyle(
                         fontFamily: 'Karla',
-                        fontSize: 14,
+                        fontSize: OmaTypeScale.body,
                         fontWeight: FontWeight.w700,
                         color: context.omaTheme.foreground,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: OmaSpacing.xs),
                     Text(
                       AppStrings.patternsFormingDescription,
                       style: TextStyle(
                         fontFamily: 'Karla',
-                        fontSize: 12,
+                        fontSize: OmaTypeScale.caption,
                         height: 1.35,
                         color: context.omaTheme.muted,
                       ),
@@ -1161,7 +1159,7 @@ class _PatternRow extends StatelessWidget {
     final rowColor = colors[index % colors.length];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: OmaSpacing.lg),
       child: Row(
         children: [
           Container(
@@ -1180,7 +1178,7 @@ class _PatternRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: 'Karla',
-                    fontSize: 14,
+                    fontSize: OmaTypeScale.body,
                     fontWeight: FontWeight.w700,
                     color: context.omaTheme.foreground,
                   ),
@@ -1372,7 +1370,7 @@ class _AccountRow extends StatelessWidget {
                           title,
                           style: TextStyle(
                             fontFamily: 'Karla',
-                            fontSize: 14,
+                            fontSize: OmaTypeScale.body,
                             fontWeight: FontWeight.w700,
                             color: context.omaTheme.foreground,
                           ),
@@ -1391,7 +1389,7 @@ class _AccountRow extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: OmaSpacing.sm),
                   Icon(
                     Icons.chevron_right_rounded,
                     size: 21,
@@ -1419,17 +1417,11 @@ class _SurfaceCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: context.omaTheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         border: Border.all(
           color: context.omaTheme.border.withValues(alpha: 0.78),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF574C44).withValues(alpha: 0.055),
-            blurRadius: 22,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: context.omaTheme.elevatedShadow,
       ),
       clipBehavior: Clip.antiAlias,
       child: child,

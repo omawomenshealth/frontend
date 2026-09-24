@@ -373,7 +373,7 @@ class _ArticlesViewState extends State<ArticlesView> {
                   }),
                   style: TextButton.styleFrom(
                     foregroundColor: accent,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xs),
                     visualDensity: VisualDensity.compact,
                   ),
                   child: Text(
@@ -388,7 +388,7 @@ class _ArticlesViewState extends State<ArticlesView> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: OmaSpacing.lg),
           if (useRows)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -505,18 +505,12 @@ class _ExploreSearchHeader extends StatelessWidget {
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.95),
-                borderRadius: BorderRadius.circular(17),
+                color: context.omaTheme.surface.withValues(alpha: 0.95),
+                borderRadius: BorderRadius.circular(OmaRadius.lg),
                 border: Border.all(
-                  color: Colors.black.withValues(alpha: 0.045),
+                  color: context.omaTheme.foreground.withValues(alpha: 0.045),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF3C322C).withValues(alpha: 0.035),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                boxShadow: context.omaTheme.subtleShadow,
               ),
               child: TextField(
                 controller: controller,
@@ -553,17 +547,17 @@ class _ExploreSearchHeader extends StatelessWidget {
             style: IconButton.styleFrom(
               fixedSize: const Size(48, 48),
               foregroundColor: savedOnly
-                  ? Colors.white
+                  ? context.omaTheme.onPrimary
                   : context.omaTheme.foreground,
               backgroundColor: savedOnly
                   ? accent
-                  : Colors.white.withValues(alpha: 0.95),
+                  : context.omaTheme.surface.withValues(alpha: 0.95),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(17),
+                borderRadius: BorderRadius.circular(OmaRadius.lg),
                 side: BorderSide(
                   color: savedOnly
                       ? accent
-                      : Colors.black.withValues(alpha: 0.045),
+                      : context.omaTheme.foreground.withValues(alpha: 0.045),
                 ),
               ),
             ),
@@ -607,7 +601,7 @@ class _ExploreHero extends StatelessWidget {
     };
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 18, 22, 0),
+      padding: const EdgeInsets.fromLTRB(22, 18, 22, OmaSpacing.none),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -642,14 +636,14 @@ class _ExploreHero extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Color.lerp(accent, Colors.white, 0.83),
-                borderRadius: BorderRadius.circular(99),
+                color: Color.lerp(accent, context.omaTheme.surface, 0.83),
+                borderRadius: BorderRadius.circular(OmaRadius.full),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.auto_awesome_rounded, color: accent, size: 13),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: OmaSpacing.xs),
                   Text(
                     membershipTier == MembershipTier.premium
                         ? t.premium.premiumPlanName
@@ -703,7 +697,7 @@ class _QuickTopicButton extends StatelessWidget {
                 width: 62,
                 height: 62,
                 decoration: BoxDecoration(
-                  color: selected ? accent : Colors.white,
+                  color: selected ? accent : context.omaTheme.surface,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: accent.withValues(alpha: selected ? 1 : 0.28),
@@ -711,11 +705,11 @@ class _QuickTopicButton extends StatelessWidget {
                 ),
                 child: Icon(
                   icon,
-                  color: selected ? Colors.white : accent,
+                  color: selected ? context.omaTheme.onPrimary : accent,
                   size: 26,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               Text(
                 label.toUpperCase(),
                 maxLines: 1,
@@ -758,20 +752,14 @@ class _EditorialArticleCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: isOpening ? null : onTap,
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         child: Ink(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF3C322C).withValues(alpha: 0.13),
-                blurRadius: 22,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(OmaRadius.xl),
+            boxShadow: context.omaTheme.elevatedShadow,
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(OmaRadius.xl),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -783,8 +771,8 @@ class _EditorialArticleCard extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Color(0x18000000),
-                        Color(0xB3000000),
+                        OmaPalette.mediaScrimLight,
+                        OmaPalette.mediaScrimStrong,
                       ],
                       stops: [0.3, 0.56, 1],
                     ),
@@ -799,7 +787,9 @@ class _EditorialArticleCard extends StatelessWidget {
                       fixedSize: const Size(34, 34),
                       minimumSize: const Size(34, 34),
                       padding: EdgeInsets.zero,
-                      backgroundColor: Colors.white.withValues(alpha: 0.78),
+                      backgroundColor: context.omaTheme.surface.withValues(
+                        alpha: 0.78,
+                      ),
                       foregroundColor: context.omaTheme.foreground,
                     ),
                     icon: Icon(
@@ -825,7 +815,7 @@ class _EditorialArticleCard extends StatelessWidget {
                               padding: EdgeInsets.only(right: 5),
                               child: Icon(
                                 Icons.lock_outline_rounded,
-                                color: Colors.white70,
+                                color: OmaPalette.onMediaMuted,
                                 size: 11,
                               ),
                             ),
@@ -835,7 +825,7 @@ class _EditorialArticleCard extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: OmaPalette.onMedia,
                                 fontSize: 8,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 1.2,
@@ -844,19 +834,22 @@ class _EditorialArticleCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: OmaSpacing.xs),
                       Text(
                         article.title,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: OmaPalette.onMedia,
                           fontFamily: 'CormorantGaramond',
-                          fontSize: 20,
+                          fontSize: OmaTypeScale.title,
                           height: 1.02,
                           fontWeight: FontWeight.w600,
                           shadows: [
-                            Shadow(color: Color(0x33000000), blurRadius: 4),
+                            Shadow(
+                              color: OmaPalette.mediaTextShadow,
+                              blurRadius: 4,
+                            ),
                           ],
                         ),
                       ),
@@ -865,9 +858,11 @@ class _EditorialArticleCard extends StatelessWidget {
                 ),
                 if (isOpening)
                   ColoredBox(
-                    color: Colors.black.withValues(alpha: 0.25),
+                    color: OmaPalette.mediaScrimMedium,
                     child: const Center(
-                      child: CircularProgressIndicator(color: Colors.white),
+                      child: CircularProgressIndicator(
+                        color: OmaPalette.onMedia,
+                      ),
                     ),
                   ),
               ],
@@ -895,17 +890,17 @@ class _RitualArticleRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.58),
-      borderRadius: BorderRadius.circular(23),
+      color: context.omaTheme.surface.withValues(alpha: 0.58),
+      borderRadius: BorderRadius.circular(OmaRadius.xl),
       child: InkWell(
         onTap: isOpening ? null : onTap,
-        borderRadius: BorderRadius.circular(23),
+        borderRadius: BorderRadius.circular(OmaRadius.xl),
         child: Padding(
           padding: const EdgeInsets.all(11),
           child: Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(17),
+                borderRadius: BorderRadius.circular(OmaRadius.lg),
                 child: Image.asset(
                   imagePath,
                   width: 65,
@@ -944,7 +939,7 @@ class _RitualArticleRow extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: OmaSpacing.sm),
               if (isOpening)
                 const SizedBox(
                   width: 20,
@@ -1023,7 +1018,7 @@ class _EmptyArticlesState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 58, 32, 20),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxxl, 58, OmaSpacing.xxxl, OmaSpacing.xl),
       child: Column(
         children: [
           Icon(

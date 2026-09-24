@@ -44,7 +44,7 @@ class ConditionSelector extends StatelessWidget {
             side: BorderSide(color: _isSelected(item) ? color : oma.border),
             shape: const StadiumBorder(),
             labelStyle: TextStyle(
-              fontSize: 12,
+              fontSize: OmaTypeScale.caption,
               color: _isSelected(item) ? color : oma.foreground,
             ),
           ),
@@ -57,7 +57,7 @@ class ConditionSelector extends StatelessWidget {
           side: BorderSide(color: color.withValues(alpha: 0.45)),
           shape: const StadiumBorder(),
           labelStyle: TextStyle(
-            fontSize: 12,
+            fontSize: OmaTypeScale.caption,
             fontWeight: FontWeight.w700,
             color: color,
           ),

@@ -14,7 +14,7 @@ class OmaSoftCard extends StatelessWidget {
   const OmaSoftCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(20),
+    this.padding = const EdgeInsets.all(OmaSpacing.xl),
     this.gradient,
     this.color,
     this.border,
@@ -32,13 +32,7 @@ class OmaSoftCard extends StatelessWidget {
         gradient: gradient,
         borderRadius: BorderRadius.circular(radius),
         border: border,
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF263238).withValues(alpha: 0.055),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: context.omaTheme.softShadow,
       ),
       child: child,
     );
@@ -83,7 +77,7 @@ class OmaPageHeader extends StatelessWidget {
           height: 44,
           decoration: BoxDecoration(
             color: oma.primarySoft,
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(OmaRadius.lg),
           ),
           child: Icon(icon, size: 21, color: oma.primaryStrong),
         ),
@@ -94,7 +88,7 @@ class OmaPageHeader extends StatelessWidget {
             children: [
               Text(title, style: Theme.of(context).textTheme.headlineMedium),
               if (subtitle != null) ...[
-                const SizedBox(height: 2),
+                const SizedBox(height: OmaSpacing.xxs),
                 Text(subtitle!, style: Theme.of(context).textTheme.bodySmall),
               ],
             ],
@@ -133,7 +127,7 @@ class OmaSectionHeader extends StatelessWidget {
                   eyebrow!.toUpperCase(),
                   style: TextStyle(
                     color: oma.primary,
-                    fontSize: 10,
+                    fontSize: OmaTypeScale.micro,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 2.2,
                   ),

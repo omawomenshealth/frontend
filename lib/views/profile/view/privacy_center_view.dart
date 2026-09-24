@@ -80,7 +80,10 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: const Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+        icon: Icon(
+          Icons.warning_amber_rounded,
+          color: context.omaTheme.error,
+        ),
         title: Text(AppStrings.withdrawConsent),
         content: Text(AppStrings.withdrawConsentWarning),
         actions: [
@@ -89,7 +92,9 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
             child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: FilledButton.styleFrom(
+              backgroundColor: context.omaTheme.error,
+            ),
             onPressed: () => Navigator.pop(dialogContext, true),
             child: Text(AppStrings.withdrawConsent),
           ),
@@ -165,7 +170,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(OmaSpacing.xl),
               children: [
                 Card(
                   child: Padding(
@@ -177,17 +182,17 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                           AppStrings.privacyNotice,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         Text(
                           AppStrings.cloudSyncPrivacyNotice,
                           style: TextStyle(height: 1.5),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: OmaSpacing.md),
                         Text(
                           '${AppStrings.privacyNotice}: $_noticeVersion',
                           style: TextStyle(
                             color: context.omaTheme.muted,
-                            fontSize: 12,
+                            fontSize: OmaTypeScale.caption,
                           ),
                         ),
                       ],
@@ -205,7 +210,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                           AppStrings.healthCloudConsent,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: OmaSpacing.sm),
                         Row(
                           children: [
                             Icon(
@@ -213,10 +218,10 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                                   ? Icons.check_circle
                                   : Icons.info_outline,
                               color: _granted
-                                  ? Colors.green
+                                  ? context.omaTheme.success
                                   : context.omaTheme.muted,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: OmaSpacing.sm),
                             Expanded(
                               child: Text(
                                 _granted
@@ -261,7 +266,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
                   const SizedBox(height: 14),
                   Text(
                     _error!,
-                    style: TextStyle(color: Colors.redAccent),
+                    style: TextStyle(color: context.omaTheme.error),
                     textAlign: TextAlign.center,
                   ),
                 ],

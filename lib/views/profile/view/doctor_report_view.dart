@@ -36,7 +36,7 @@ class DoctorReportView extends StatelessWidget {
           AppStrings.doctorReport,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: OmaPalette.documentSurface,
         foregroundColor: context.omaTheme.foreground,
         elevation: 0.5,
         actions: [
@@ -53,20 +53,14 @@ class DoctorReportView extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(OmaSpacing.lg),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            color: OmaPalette.documentSurface,
+            borderRadius: BorderRadius.circular(OmaRadius.lg),
+            boxShadow: context.omaTheme.subtleShadow,
           ),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(OmaSpacing.xl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -87,15 +81,15 @@ class DoctorReportView extends StatelessWidget {
                             letterSpacing: 1.1,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: OmaSpacing.xs),
                         Text(
                           AppStrings.reportDateLine(AppTime.now.toDotFormat()),
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: OmaTypeScale.caption,
                             color: context.omaTheme.muted,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: OmaSpacing.sm),
                         ElevatedButton.icon(
                           onPressed: () => _prepareAndDownloadPdf(
                             context,
@@ -104,20 +98,20 @@ class DoctorReportView extends StatelessWidget {
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: context.omaTheme.primary,
-                            foregroundColor: Colors.white,
+                            foregroundColor: context.omaTheme.onPrimary,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
+                              horizontal: OmaSpacing.md,
+                              vertical: OmaSpacing.sm,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(OmaRadius.sm),
                             ),
                           ),
                           icon: const Icon(Icons.picture_as_pdf, size: 16),
                           label: Text(
                             AppStrings.downloadOrSharePdf,
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: OmaTypeScale.caption,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -132,7 +126,7 @@ class DoctorReportView extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: context.omaTheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(OmaRadius.sm),
                     ),
                     child: Text(
                       AppStrings.medicalSummary,
@@ -145,9 +139,9 @@ class DoctorReportView extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              Divider(thickness: 1.5, color: Color(0xFFEEEEEE)),
-              const SizedBox(height: 16),
+              const SizedBox(height: OmaSpacing.md),
+              Divider(thickness: 1.5, color: OmaPalette.documentDivider),
+              const SizedBox(height: OmaSpacing.lg),
 
               // ── BÖLÜM 1: KİŞİSEL BİLGİLER ───────────────────────────
               _sectionHeader(context, '📋 ${AppStrings.userBasicInformation}'),
@@ -190,7 +184,7 @@ class DoctorReportView extends StatelessWidget {
                   AppStrings.lastBloodValues,
                   _formatLaboratoryResults(settings),
                 ),
-              const SizedBox(height: 24),
+              const SizedBox(height: OmaSpacing.xxl),
 
               // ── BÖLÜM 2: DÖNGÜ ÖZETİ ────────────────────────────────
               _sectionHeader(context, '🩸 ${AppStrings.womenHealthSummary}'),
@@ -231,14 +225,14 @@ class DoctorReportView extends StatelessWidget {
                       .map(AppStrings.localizeStoredValue)
                       .join(', '),
                 ),
-              const SizedBox(height: 24),
+              const SizedBox(height: OmaSpacing.xxl),
 
               // ── BÖLÜM 3: GÜNLÜK KAYITLAR TABLOSU ─────────────────────
               _sectionHeader(context, '📅 ${AppStrings.dailyHealthLogs}'),
-              const SizedBox(height: 8),
+              const SizedBox(height: OmaSpacing.sm),
               if (allLogs.isEmpty)
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  padding: const EdgeInsets.symmetric(vertical: OmaSpacing.xl),
                   child: Center(
                     child: Text(
                       AppStrings.noHealthLogs,
@@ -344,11 +338,11 @@ class DoctorReportView extends StatelessWidget {
 
   Widget _sectionHeader(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: OmaSpacing.md),
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 14,
+          fontSize: OmaTypeScale.body,
           fontWeight: FontWeight.bold,
           color: context.omaTheme.foreground,
         ),
@@ -358,7 +352,7 @@ class DoctorReportView extends StatelessWidget {
 
   Widget _infoRow(BuildContext context, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: OmaSpacing.sm),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -390,46 +384,46 @@ class DoctorReportView extends StatelessWidget {
   ) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFE5E5E5)),
-        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: OmaPalette.documentBorder),
+        borderRadius: BorderRadius.circular(OmaRadius.sm),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(OmaRadius.sm),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
             columnSpacing: 16,
-            headingRowColor: WidgetStateProperty.all(const Color(0xFFF9F9F9)),
+            headingRowColor: WidgetStateProperty.all(OmaPalette.documentHeader),
             headingRowHeight: 40,
             columns: [
               DataColumn(
                 label: Text(
                   AppStrings.date,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.period,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.nutrition,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.medicationsSupplementsAndSkincare,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.mood,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
                 ),
               ),
             ],
@@ -584,7 +578,7 @@ class DoctorReportView extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11,
                             color: isBleeding
-                                ? Colors.red.shade700
+                                ? context.omaTheme.error
                                 : context.omaTheme.muted,
                             fontWeight: isBleeding
                                 ? FontWeight.bold
@@ -990,7 +984,7 @@ class DoctorReportView extends StatelessWidget {
 
   pw.Widget _pdfInfoRow(String label, String value) {
     return pw.Padding(
-      padding: const pw.EdgeInsets.only(bottom: 4),
+      padding: const pw.EdgeInsets.only(bottom: OmaSpacing.xs),
       child: pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
@@ -998,13 +992,13 @@ class DoctorReportView extends StatelessWidget {
             width: 140,
             child: pw.Text(
               label,
-              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+              style: const pw.TextStyle(fontSize: OmaTypeScale.micro, color: PdfColors.grey700),
             ),
           ),
           pw.Expanded(
             child: pw.Text(
               value,
-              style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+              style: pw.TextStyle(fontSize: OmaTypeScale.micro, fontWeight: pw.FontWeight.bold),
             ),
           ),
         ],
@@ -1030,7 +1024,7 @@ class DoctorReportView extends StatelessWidget {
         3: pw.FlexColumnWidth(1.65),
         4: pw.FlexColumnWidth(1.45),
       },
-      cellPadding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+      cellPadding: const pw.EdgeInsets.symmetric(horizontal: OmaSpacing.xs, vertical: 5),
       cellAlignment: pw.Alignment.centerLeft,
       headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
       cellStyle: const pw.TextStyle(fontSize: 8),

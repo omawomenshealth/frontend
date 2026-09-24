@@ -253,7 +253,7 @@ class _StoryProgress extends StatelessWidget {
     return AnimatedBuilder(
       animation: progress,
       builder: (context, _) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+        padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.md, OmaSpacing.xl, OmaSpacing.none),
         child: Row(
           children: [
             for (var item = 0; item < count; item++) ...[
@@ -264,7 +264,7 @@ class _StoryProgress extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     color: accent.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(99),
+                    borderRadius: BorderRadius.circular(OmaRadius.full),
                   ),
                   alignment: Alignment.centerLeft,
                   child: FractionallySizedBox(
@@ -294,7 +294,7 @@ class _StoryHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 18, 20, 0),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, 18, OmaSpacing.xl, OmaSpacing.none),
       child: Row(
         children: [
           Expanded(
@@ -303,7 +303,7 @@ class _StoryHeader extends StatelessWidget {
               style: TextStyle(
                 color: accent,
                 fontFamily: 'Karla',
-                fontSize: 10,
+                fontSize: OmaTypeScale.micro,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.9,
               ),
@@ -316,7 +316,7 @@ class _StoryHeader extends StatelessWidget {
               onPressed: onClose,
               style: IconButton.styleFrom(
                 fixedSize: const Size.square(38),
-                backgroundColor: Colors.white.withValues(alpha: 0.72),
+                backgroundColor: OmaPalette.onMedia.withValues(alpha: 0.72),
               ),
               icon: const Icon(Icons.close_rounded, size: 18),
             ),
@@ -345,7 +345,7 @@ class _InsightStoryPage extends StatelessWidget {
     return SingleChildScrollView(
       key: PageStorageKey<String>('insight_story_${insight.id}'),
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(24, 26, 24, 18),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, 26, OmaSpacing.xxl, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -354,18 +354,12 @@ class _InsightStoryPage extends StatelessWidget {
             height: 64,
             decoration: BoxDecoration(
               color: accent,
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: accent.withValues(alpha: 0.24),
-                  blurRadius: 24,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+              borderRadius: BorderRadius.circular(OmaRadius.lg),
+              boxShadow: OmaShadows.elevated(accent),
             ),
             child: const Icon(
               Icons.auto_awesome_outlined,
-              color: Colors.white,
+              color: OmaPalette.onMedia,
               size: 25,
             ),
           ),
@@ -375,12 +369,12 @@ class _InsightStoryPage extends StatelessWidget {
             style: TextStyle(
               color: accent,
               fontFamily: 'Karla',
-              fontSize: 10,
+              fontSize: OmaTypeScale.micro,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.9,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: OmaSpacing.sm),
           Text(
             presentation.title,
             style: TextStyle(
@@ -398,7 +392,7 @@ class _InsightStoryPage extends StatelessWidget {
             style: TextStyle(
               color: context.omaTheme.muted,
               fontFamily: 'Karla',
-              fontSize: 14,
+              fontSize: OmaTypeScale.body,
               height: 1.55,
             ),
           ),
@@ -411,12 +405,12 @@ class _InsightStoryPage extends StatelessWidget {
               for (var item = 0; item < chain.length; item++) ...[
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: OmaSpacing.md,
                     vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.76),
-                    borderRadius: BorderRadius.circular(99),
+                    color: OmaPalette.onMedia.withValues(alpha: 0.76),
+                    borderRadius: BorderRadius.circular(OmaRadius.full),
                   ),
                   child: Text(
                     chain[item],
@@ -442,9 +436,11 @@ class _InsightStoryPage extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.48),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.65)),
+              color: OmaPalette.onMedia.withValues(alpha: 0.48),
+              borderRadius: BorderRadius.circular(OmaRadius.xl),
+              border: Border.all(
+                color: OmaPalette.onMedia.withValues(alpha: 0.65),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -459,7 +455,7 @@ class _InsightStoryPage extends StatelessWidget {
                     letterSpacing: 1.7,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: OmaSpacing.sm),
                 Text(
                   presentation.evidence,
                   style: TextStyle(
@@ -470,7 +466,7 @@ class _InsightStoryPage extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: OmaSpacing.sm),
                 Text(
                   AppStrings.insightsDisclaimer,
                   style: TextStyle(
@@ -597,7 +593,7 @@ class _StoryNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 22),
+      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, OmaSpacing.sm, OmaSpacing.xxl, 22),
       child: Row(
         children: [
           Semantics(
@@ -607,28 +603,28 @@ class _StoryNavigation extends StatelessWidget {
               onPressed: canGoBack ? onBack : null,
               style: IconButton.styleFrom(
                 fixedSize: const Size.square(56),
-                backgroundColor: Colors.white.withValues(alpha: 0.58),
+                backgroundColor: OmaPalette.onMedia.withValues(alpha: 0.58),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
               ),
               icon: const Icon(Icons.arrow_back_rounded, size: 21),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: OmaSpacing.md),
           Expanded(
             child: FilledButton.icon(
               onPressed: onNext,
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(56),
                 backgroundColor: accent,
-                foregroundColor: Colors.white,
+                foregroundColor: context.omaTheme.onPrimary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
                 textStyle: TextStyle(
                   fontFamily: 'Karla',
-                  fontSize: 14,
+                  fontSize: OmaTypeScale.body,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -654,7 +650,7 @@ class _EmptyInsightStory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(30, 40, 30, 28),
+      padding: const EdgeInsets.fromLTRB(30, OmaSpacing.huge, 30, 28),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -663,21 +659,21 @@ class _EmptyInsightStory extends StatelessWidget {
             height: 76,
             decoration: BoxDecoration(
               color: accent,
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(OmaRadius.xl),
             ),
             child: const Icon(
               Icons.auto_awesome_outlined,
-              color: Colors.white,
+              color: OmaPalette.onMedia,
               size: 30,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: OmaSpacing.xxl),
           Text(
             AppStrings.insightsEmptyTitle,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'CormorantGaramond',
-              fontSize: 32,
+              fontSize: OmaTypeScale.display,
               fontWeight: FontWeight.w600,
               color: context.omaTheme.foreground,
             ),
@@ -693,7 +689,7 @@ class _EmptyInsightStory extends StatelessWidget {
               color: context.omaTheme.muted,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: OmaSpacing.xxl),
           FilledButton(
             onPressed: onClose,
             style: FilledButton.styleFrom(backgroundColor: accent),

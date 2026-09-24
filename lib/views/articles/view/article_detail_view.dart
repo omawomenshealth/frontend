@@ -22,9 +22,9 @@ class ArticleDetailView extends StatelessWidget {
             pinned: true,
             elevation: 0,
             leading: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(OmaSpacing.sm),
               child: CircleAvatar(
-                backgroundColor: Colors.white.withValues(alpha: 0.84),
+                backgroundColor: OmaPalette.onMedia.withValues(alpha: 0.84),
                 child: IconButton(
                   icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
@@ -54,7 +54,9 @@ class ArticleDetailView extends StatelessWidget {
                       top: -30,
                       child: CircleAvatar(
                         radius: 100,
-                        backgroundColor: Colors.white.withValues(alpha: 0.1),
+                        backgroundColor: OmaPalette.onMedia.withValues(
+                          alpha: 0.1,
+                        ),
                       ),
                     ),
                     Positioned(
@@ -62,12 +64,14 @@ class ArticleDetailView extends StatelessWidget {
                       bottom: -20,
                       child: CircleAvatar(
                         radius: 80,
-                        backgroundColor: Colors.white.withValues(alpha: 0.08),
+                        backgroundColor: OmaPalette.onMedia.withValues(
+                          alpha: 0.08,
+                        ),
                       ),
                     ),
                     SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(OmaSpacing.xl),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -78,7 +82,7 @@ class ArticleDetailView extends StatelessWidget {
                                   label: article.localizedTopic.toUpperCase(),
                                 ),
                                 if (article.isPremium) ...[
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: OmaSpacing.sm),
                                   _HeroBadge(
                                     label: AppStrings.premium,
                                     icon: Icons.workspace_premium_rounded,
@@ -86,20 +90,20 @@ class ArticleDetailView extends StatelessWidget {
                                 ],
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: OmaSpacing.md),
                             Text(
                               article.title,
                               style: TextStyle(
                                 fontFamily: 'CormorantGaramond',
-                                fontSize: 32,
+                                fontSize: OmaTypeScale.display,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: OmaPalette.onMedia,
                                 height: 1.02,
                                 shadows: [
                                   Shadow(
                                     offset: Offset(0, 2),
                                     blurRadius: 4,
-                                    color: Colors.black26,
+                                    color: OmaPalette.mediaScrimMedium,
                                   ),
                                 ],
                               ),
@@ -115,14 +119,14 @@ class ArticleDetailView extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+              padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.xxl, OmaSpacing.xl, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildAuthorRow(context),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: OmaSpacing.xxl),
                   _buildSummaryBox(context),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: OmaSpacing.xxl),
                   if (article.contentBlocks.isEmpty)
                     Text(
                       AppStrings.articleNotPublished,
@@ -148,7 +152,7 @@ class ArticleDetailView extends StatelessWidget {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(OmaSpacing.sm),
           decoration: BoxDecoration(
             color: article.cardColor.withValues(alpha: 0.1),
             shape: BoxShape.circle,
@@ -183,16 +187,16 @@ class ArticleDetailView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: context.omaTheme.surface,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(OmaRadius.sm),
           ),
           child: Row(
             children: [
               Icon(Icons.timer_outlined, size: 14, color: article.cardColor),
-              const SizedBox(width: 4),
+              const SizedBox(width: OmaSpacing.xs),
               Text(
                 AppStrings.readTimeMinutes(article.readTimeMinutes),
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: OmaTypeScale.caption,
                   fontWeight: FontWeight.w600,
                   color: article.cardColor,
                 ),
@@ -206,10 +210,10 @@ class ArticleDetailView extends StatelessWidget {
 
   Widget _buildSummaryBox(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(OmaSpacing.lg),
       decoration: BoxDecoration(
         color: context.omaTheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(OmaRadius.lg),
         border: Border.all(
           color: article.cardColor.withValues(alpha: 0.15),
           width: 1.5,
@@ -231,7 +235,7 @@ class ArticleDetailView extends StatelessWidget {
               size: 20,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: OmaSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,12 +244,12 @@ class ArticleDetailView extends StatelessWidget {
                   AppStrings.shortSummary,
                   style: TextStyle(
                     fontFamily: 'CormorantGaramond',
-                    fontSize: 20,
+                    fontSize: OmaTypeScale.title,
                     fontWeight: FontWeight.w600,
                     color: context.omaTheme.foreground,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: OmaSpacing.xs),
                 Text(
                   article.summary,
                   style: TextStyle(
@@ -266,7 +270,7 @@ class ArticleDetailView extends StatelessWidget {
   Widget _buildContentBlock(BuildContext context, String block) {
     if (block.startsWith('###')) {
       return Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 8),
+        padding: const EdgeInsets.only(top: OmaSpacing.xl, bottom: OmaSpacing.sm),
         child: Text(
           block.replaceFirst('###', '').trim(),
           style: TextStyle(
@@ -281,19 +285,19 @@ class ArticleDetailView extends StatelessWidget {
 
     if (block.startsWith('•')) {
       return Padding(
-        padding: const EdgeInsets.only(bottom: 10, left: 8),
+        padding: const EdgeInsets.only(bottom: 10, left: OmaSpacing.sm),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               '•',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: OmaTypeScale.bodyLarge,
                 fontWeight: FontWeight.bold,
                 color: article.cardColor,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: OmaSpacing.sm),
             Expanded(
               child: Text(
                 block.substring(1).trim(),
@@ -310,7 +314,7 @@ class ArticleDetailView extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: OmaSpacing.lg),
       child: Text(
         block,
         style: TextStyle(
@@ -332,24 +336,24 @@ class _HeroBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: OmaSpacing.xs),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.25),
-        borderRadius: BorderRadius.circular(12),
+        color: OmaPalette.onMedia.withValues(alpha: 0.25),
+        borderRadius: BorderRadius.circular(OmaRadius.md),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, color: Colors.white, size: 13),
-            const SizedBox(width: 4),
+            Icon(icon, color: OmaPalette.onMedia, size: 13),
+            const SizedBox(width: OmaSpacing.xs),
           ],
           Text(
             label,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: OmaTypeScale.micro,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: OmaPalette.onMedia,
               letterSpacing: 0.8,
             ),
           ),

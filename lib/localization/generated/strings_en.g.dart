@@ -108,8 +108,8 @@ class Translations$onboarding$en {
 	late final Translations$onboarding$cycle$en cycle = Translations$onboarding$cycle$en.internal(_root);
 	late final Translations$onboarding$health_profile$en health_profile = Translations$onboarding$health_profile$en.internal(_root);
 	late final Translations$onboarding$introduction$en introduction = Translations$onboarding$introduction$en.internal(_root);
+	late final Translations$onboarding$preview$en preview = Translations$onboarding$preview$en.internal(_root);
 	late final Translations$onboarding$prompt$en prompt = Translations$onboarding$prompt$en.internal(_root);
-	late final Translations$onboarding$review$en review = Translations$onboarding$review$en.internal(_root);
 	late final Translations$onboarding$wellbeing$en wellbeing = Translations$onboarding$wellbeing$en.internal(_root);
 }
 
@@ -1425,6 +1425,20 @@ class Translations$onboarding$introduction$en {
 	String age({required Object age}) => '${age} years old';
 }
 
+// Path: onboarding.preview
+class Translations$onboarding$preview$en {
+	Translations$onboarding$preview$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$onboarding$preview$hero$en hero = Translations$onboarding$preview$hero$en.internal(_root);
+	late final Translations$onboarding$preview$callout$en callout = Translations$onboarding$preview$callout$en.internal(_root);
+	late final Translations$onboarding$preview$summary$en summary = Translations$onboarding$preview$summary$en.internal(_root);
+	late final Translations$onboarding$preview$privacy$en privacy = Translations$onboarding$preview$privacy$en.internal(_root);
+	late final Translations$onboarding$preview$action$en action = Translations$onboarding$preview$action$en.internal(_root);
+}
+
 // Path: onboarding.prompt
 class Translations$onboarding$prompt$en {
 	Translations$onboarding$prompt$en.internal(this._root);
@@ -1447,54 +1461,6 @@ class Translations$onboarding$prompt$en {
 
 	/// en: 'When you're ready, let's begin at your own pace. Oma is here for your cycle and wellbeing.'
 	String get review => 'When you\'re ready, let\'s begin at your own pace. Oma is here for your cycle and wellbeing.';
-}
-
-// Path: onboarding.review
-class Translations$onboarding$review$en {
-	Translations$onboarding$review$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Great'
-	String get title => 'Great';
-
-	/// en: 'I'm here with you, $name'
-	String titleWithName({required Object name}) => 'I\'m here with you, ${name}';
-
-	/// en: 'Your profile is ready. Ready to begin?'
-	String get subtitle => 'Your profile is ready. Ready to begin?';
-
-	/// en: 'Health conditions you'd like me to know'
-	String get conditionsLabel => 'Health conditions you\'d like me to know';
-
-	/// en: 'You haven't added a health condition yet'
-	String get noConditions => 'You haven\'t added a health condition yet';
-
-	/// en: 'Your cycle details'
-	String get cycleLabel => 'Your cycle details';
-
-	/// en: '$days days'
-	String dayCount({required Object days}) => '${days} days';
-
-	/// en: 'Your privacy and data'
-	String get privacyAndData => 'Your privacy and data';
-
-	/// en: 'Your data is encrypted and stored only on this device'
-	String get deviceEncryptionNote => 'Your data is encrypted and stored only on this device';
-
-	/// en: 'Let's get started'
-	String get start => 'Let\'s get started';
-
-	/// en: 'Your data'
-	String get accountStorageLabel => 'Your data';
-
-	/// en: 'No account; encrypted on this device'
-	String get guestStorage => 'No account; encrypted on this device';
-
-	/// en: 'Signed in with Google; securely backed up'
-	String get googleStorage => 'Signed in with Google; securely backed up';
 }
 
 // Path: onboarding.wellbeing
@@ -1954,6 +1920,75 @@ class Translations$home$pregnancy$stages$en {
 	late final Translations$home$pregnancy$stages$stage9$en stage9 = Translations$home$pregnancy$stages$stage9$en.internal(_root);
 }
 
+// Path: onboarding.preview.hero
+class Translations$onboarding$preview$hero$en {
+	Translations$onboarding$preview$hero$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Great'
+	String get title => 'Great';
+
+	/// en: 'I'm here with you, $name'
+	String titleWithName({required Object name}) => 'I\'m here with you, ${name}';
+
+	/// en: 'Your profile is ready. Ready to begin?'
+	String get subtitle => 'Your profile is ready. Ready to begin?';
+}
+
+// Path: onboarding.preview.callout
+class Translations$onboarding$preview$callout$en {
+	Translations$onboarding$preview$callout$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'We'll use these details to personalize your Oma experience.'
+	String get message => 'We\'ll use these details to personalize your Oma experience.';
+}
+
+// Path: onboarding.preview.summary
+class Translations$onboarding$preview$summary$en {
+	Translations$onboarding$preview$summary$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final Translations$onboarding$preview$summary$conditions$en conditions = Translations$onboarding$preview$summary$conditions$en.internal(_root);
+	late final Translations$onboarding$preview$summary$cycle$en cycle = Translations$onboarding$preview$summary$cycle$en.internal(_root);
+	late final Translations$onboarding$preview$summary$storage$en storage = Translations$onboarding$preview$summary$storage$en.internal(_root);
+}
+
+// Path: onboarding.preview.privacy
+class Translations$onboarding$preview$privacy$en {
+	Translations$onboarding$preview$privacy$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your privacy and data'
+	String get title => 'Your privacy and data';
+
+	/// en: 'Your data is encrypted and stored only on this device'
+	String get deviceEncryptionNote => 'Your data is encrypted and stored only on this device';
+}
+
+// Path: onboarding.preview.action
+class Translations$onboarding$preview$action$en {
+	Translations$onboarding$preview$action$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Let's get started'
+	String get start => 'Let\'s get started';
+}
+
 // Path: onboarding.wellbeing.moodOptions
 class Translations$onboarding$wellbeing$moodOptions$en {
 	Translations$onboarding$wellbeing$moodOptions$en.internal(this._root);
@@ -2369,6 +2404,54 @@ class Translations$home$pregnancy$stages$stage9$en {
 
 	/// en: 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷'
 	String get body => 'The time to meet is drawing closer. Remember to be a little gentler with yourself in these final weeks. 🌷';
+}
+
+// Path: onboarding.preview.summary.conditions
+class Translations$onboarding$preview$summary$conditions$en {
+	Translations$onboarding$preview$summary$conditions$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Health conditions you'd like me to know'
+	String get label => 'Health conditions you\'d like me to know';
+
+	/// en: 'You haven't added a health condition yet'
+	String get empty => 'You haven\'t added a health condition yet';
+}
+
+// Path: onboarding.preview.summary.cycle
+class Translations$onboarding$preview$summary$cycle$en {
+	Translations$onboarding$preview$summary$cycle$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your cycle details'
+	String get label => 'Your cycle details';
+
+	/// en: '$days days'
+	String dayCount({required Object days}) => '${days} days';
+}
+
+// Path: onboarding.preview.summary.storage
+class Translations$onboarding$preview$summary$storage$en {
+	Translations$onboarding$preview$summary$storage$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your data'
+	String get label => 'Your data';
+
+	/// en: 'No account; encrypted on this device'
+	String get guest => 'No account; encrypted on this device';
+
+	/// en: 'Signed in with Google; securely backed up'
+	String get google => 'Signed in with Google; securely backed up';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -2988,24 +3071,25 @@ extension on Translations {
 			'onboarding.introduction.birthDateHint' => 'dd/mm/yyyy',
 			'onboarding.introduction.chooseFromCalendar' => 'Choose from calendar',
 			'onboarding.introduction.age' => ({required Object age}) => '${age} years old',
+			'onboarding.preview.hero.title' => 'Great',
+			'onboarding.preview.hero.titleWithName' => ({required Object name}) => 'I\'m here with you, ${name}',
+			'onboarding.preview.hero.subtitle' => 'Your profile is ready. Ready to begin?',
+			'onboarding.preview.callout.message' => 'We\'ll use these details to personalize your Oma experience.',
+			'onboarding.preview.summary.conditions.label' => 'Health conditions you\'d like me to know',
+			'onboarding.preview.summary.conditions.empty' => 'You haven\'t added a health condition yet',
+			'onboarding.preview.summary.cycle.label' => 'Your cycle details',
+			'onboarding.preview.summary.cycle.dayCount' => ({required Object days}) => '${days} days',
+			'onboarding.preview.summary.storage.label' => 'Your data',
+			'onboarding.preview.summary.storage.guest' => 'No account; encrypted on this device',
+			'onboarding.preview.summary.storage.google' => 'Signed in with Google; securely backed up',
+			'onboarding.preview.privacy.title' => 'Your privacy and data',
+			'onboarding.preview.privacy.deviceEncryptionNote' => 'Your data is encrypted and stored only on this device',
+			'onboarding.preview.action.start' => 'Let\'s get started',
 			'onboarding.prompt.introduction' => 'Hi, I\'m Oma 🌿 What would you like me to call you?',
 			'onboarding.prompt.wellbeing' => 'How have you been lately? I\'d like to hear how you\'re feeling so I can understand you better.',
 			'onboarding.prompt.healthProfile' => 'Let\'s talk about a few things about your body. Knowing them helps me support you with more care.',
 			'onboarding.prompt.cycle' => 'Let\'s look at what your cycle has been telling you. A few details help me understand you better.',
 			'onboarding.prompt.review' => 'When you\'re ready, let\'s begin at your own pace. Oma is here for your cycle and wellbeing.',
-			'onboarding.review.title' => 'Great',
-			'onboarding.review.titleWithName' => ({required Object name}) => 'I\'m here with you, ${name}',
-			'onboarding.review.subtitle' => 'Your profile is ready. Ready to begin?',
-			'onboarding.review.conditionsLabel' => 'Health conditions you\'d like me to know',
-			'onboarding.review.noConditions' => 'You haven\'t added a health condition yet',
-			'onboarding.review.cycleLabel' => 'Your cycle details',
-			'onboarding.review.dayCount' => ({required Object days}) => '${days} days',
-			'onboarding.review.privacyAndData' => 'Your privacy and data',
-			'onboarding.review.deviceEncryptionNote' => 'Your data is encrypted and stored only on this device',
-			'onboarding.review.start' => 'Let\'s get started',
-			'onboarding.review.accountStorageLabel' => 'Your data',
-			'onboarding.review.guestStorage' => 'No account; encrypted on this device',
-			'onboarding.review.googleStorage' => 'Signed in with Google; securely backed up',
 			'onboarding.wellbeing.title' => 'How are you?',
 			'onboarding.wellbeing.moodQuestion' => 'How have you been feeling lately?',
 			'onboarding.wellbeing.supportQuestion' => 'Where could I support you most today?',

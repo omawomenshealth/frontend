@@ -106,8 +106,8 @@ class _Translations$onboarding$tr extends Translations$onboarding$en {
 	@override late final _Translations$onboarding$cycle$tr cycle = _Translations$onboarding$cycle$tr._(_root);
 	@override late final _Translations$onboarding$health_profile$tr health_profile = _Translations$onboarding$health_profile$tr._(_root);
 	@override late final _Translations$onboarding$introduction$tr introduction = _Translations$onboarding$introduction$tr._(_root);
+	@override late final _Translations$onboarding$preview$tr preview = _Translations$onboarding$preview$tr._(_root);
 	@override late final _Translations$onboarding$prompt$tr prompt = _Translations$onboarding$prompt$tr._(_root);
-	@override late final _Translations$onboarding$review$tr review = _Translations$onboarding$review$tr._(_root);
 	@override late final _Translations$onboarding$wellbeing$tr wellbeing = _Translations$onboarding$wellbeing$tr._(_root);
 }
 
@@ -1153,6 +1153,20 @@ class _Translations$onboarding$introduction$tr extends Translations$onboarding$i
 	@override String age({required Object age}) => '${age} yaş';
 }
 
+// Path: onboarding.preview
+class _Translations$onboarding$preview$tr extends Translations$onboarding$preview$en {
+	_Translations$onboarding$preview$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$onboarding$preview$hero$tr hero = _Translations$onboarding$preview$hero$tr._(_root);
+	@override late final _Translations$onboarding$preview$callout$tr callout = _Translations$onboarding$preview$callout$tr._(_root);
+	@override late final _Translations$onboarding$preview$summary$tr summary = _Translations$onboarding$preview$summary$tr._(_root);
+	@override late final _Translations$onboarding$preview$privacy$tr privacy = _Translations$onboarding$preview$privacy$tr._(_root);
+	@override late final _Translations$onboarding$preview$action$tr action = _Translations$onboarding$preview$action$tr._(_root);
+}
+
 // Path: onboarding.prompt
 class _Translations$onboarding$prompt$tr extends Translations$onboarding$prompt$en {
 	_Translations$onboarding$prompt$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -1165,28 +1179,6 @@ class _Translations$onboarding$prompt$tr extends Translations$onboarding$prompt$
 	@override String get healthProfile => 'Bedeninle ilgili birkaç şey konuşalım. Bunları bilirsem sana daha özenli eşlik edebilirim.';
 	@override String get cycle => 'Döngün sana neler söylüyor, birlikte bakalım. Birkaç küçük bilgiyle seni daha iyi anlayabilirim.';
 	@override String get review => 'Hazırsan kendi ritminde başlayalım. Oma, döngün ve iyi oluşun için burada.';
-}
-
-// Path: onboarding.review
-class _Translations$onboarding$review$tr extends Translations$onboarding$review$en {
-	_Translations$onboarding$review$tr._(TranslationsTr root) : this._root = root, super.internal(root);
-
-	final TranslationsTr _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Harika';
-	@override String titleWithName({required Object name}) => 'Yanındayım, ${name}';
-	@override String get subtitle => 'Profilin hazır. Başlamaya hazır mısın?';
-	@override String get conditionsLabel => 'Bilmemi istediğin sağlık durumları';
-	@override String get noConditions => 'Henüz bir sağlık durumu eklemedin';
-	@override String get cycleLabel => 'Döngü bilgilerin';
-	@override String dayCount({required Object days}) => '${days} gün';
-	@override String get privacyAndData => 'Gizlilik ve verilerin';
-	@override String get deviceEncryptionNote => 'Verilerin yalnızca bu cihazda şifreli saklanır';
-	@override String get start => 'Hazırsan başlayalım';
-	@override String get accountStorageLabel => 'Verilerin';
-	@override String get guestStorage => 'Hesapsız kullanıyorsun; bu cihazda şifreli';
-	@override String get googleStorage => 'Google ile giriş yaptın; şifreli yedekleniyor';
 }
 
 // Path: onboarding.wellbeing
@@ -1340,7 +1332,6 @@ class _Translations$home$common$hero$tr extends Translations$home$common$hero$en
 
 	// Translations
 	@override String get currentPhase => 'MEVCUT FAZ';
-	String get phaseWord => 'faz';
 	@override String get cycleDayLabel => 'DÖNGÜ GÜNÜ';
 	@override String get semanticLabel => '{phase}, döngünün {day}. günü. {message} {detail}';
 	@override String get periodDayNumber => '{count}.';
@@ -1524,6 +1515,61 @@ class _Translations$home$pregnancy$stages$tr extends Translations$home$pregnancy
 	@override late final _Translations$home$pregnancy$stages$stage7$tr stage7 = _Translations$home$pregnancy$stages$stage7$tr._(_root);
 	@override late final _Translations$home$pregnancy$stages$stage8$tr stage8 = _Translations$home$pregnancy$stages$stage8$tr._(_root);
 	@override late final _Translations$home$pregnancy$stages$stage9$tr stage9 = _Translations$home$pregnancy$stages$stage9$tr._(_root);
+}
+
+// Path: onboarding.preview.hero
+class _Translations$onboarding$preview$hero$tr extends Translations$onboarding$preview$hero$en {
+	_Translations$onboarding$preview$hero$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Harika';
+	@override String titleWithName({required Object name}) => 'Yanındayım, ${name}';
+	@override String get subtitle => 'Profilin hazır. Başlamaya hazırsın.';
+}
+
+// Path: onboarding.preview.callout
+class _Translations$onboarding$preview$callout$tr extends Translations$onboarding$preview$callout$en {
+	_Translations$onboarding$preview$callout$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get message => 'Hazırsan başlayalım. OMA, döngünü ve kendini daha yakından takip etmene yardımcı olmak için burada.';
+}
+
+// Path: onboarding.preview.summary
+class _Translations$onboarding$preview$summary$tr extends Translations$onboarding$preview$summary$en {
+	_Translations$onboarding$preview$summary$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override late final _Translations$onboarding$preview$summary$conditions$tr conditions = _Translations$onboarding$preview$summary$conditions$tr._(_root);
+	@override late final _Translations$onboarding$preview$summary$cycle$tr cycle = _Translations$onboarding$preview$summary$cycle$tr._(_root);
+	@override late final _Translations$onboarding$preview$summary$storage$tr storage = _Translations$onboarding$preview$summary$storage$tr._(_root);
+}
+
+// Path: onboarding.preview.privacy
+class _Translations$onboarding$preview$privacy$tr extends Translations$onboarding$preview$privacy$en {
+	_Translations$onboarding$preview$privacy$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Gizlilik ve verilerin';
+	@override String get deviceEncryptionNote => 'Verilerin yalnızca bu cihazda, şifreli şekilde saklanır.';
+}
+
+// Path: onboarding.preview.action
+class _Translations$onboarding$preview$action$tr extends Translations$onboarding$preview$action$en {
+	_Translations$onboarding$preview$action$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get start => 'Hazırsan başlayalım';
 }
 
 // Path: onboarding.wellbeing.moodOptions
@@ -1813,6 +1859,40 @@ class _Translations$home$pregnancy$stages$stage9$tr extends Translations$home$pr
 	// Translations
 	@override String get title => '36–40+ hafta · Son haftalar';
 	@override String get body => 'Doğum bu haftalarda başlayabilir. Doğum belirtileri veya ne zaman sağlık kuruluşuna başvuracağın konusunda sağlık ekibinin önerilerini izleyebilirsin.';
+}
+
+// Path: onboarding.preview.summary.conditions
+class _Translations$onboarding$preview$summary$conditions$tr extends Translations$onboarding$preview$summary$conditions$en {
+	_Translations$onboarding$preview$summary$conditions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Takip etmek istediğin sağlık durumları';
+	@override String get empty => 'Şimdilik eklediğin bir sağlık durumu yok.';
+}
+
+// Path: onboarding.preview.summary.cycle
+class _Translations$onboarding$preview$summary$cycle$tr extends Translations$onboarding$preview$summary$cycle$en {
+	_Translations$onboarding$preview$summary$cycle$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Döngü bilgilerin';
+	@override String dayCount({required Object days}) => '${days} gün';
+}
+
+// Path: onboarding.preview.summary.storage
+class _Translations$onboarding$preview$summary$storage$tr extends Translations$onboarding$preview$summary$storage$en {
+	_Translations$onboarding$preview$summary$storage$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get label => 'Veri gizliliğin';
+	@override String get guest => 'Hesap oluşturmadan devam ediyorsun. Verilerin bu cihazda şifreli olarak saklanıyor.';
+	@override String get google => 'Google ile giriş yaptın; Verilerin şifreli olarak yedekleniyor';
 }
 
 /// The flat map containing all translations for locale <tr>.
@@ -2240,7 +2320,6 @@ extension on TranslationsTr {
 			'home.common.insightsPreview.learning' => 'Kayıtlar arttıkça kişisel bağlantılar daha net hesaplanır.',
 			'home.common.today' => 'Bugün',
 			'home.common.hero.currentPhase' => 'MEVCUT FAZ',
-			'home.common.hero.phaseWord' => 'faz',
 			'home.common.hero.cycleDayLabel' => 'DÖNGÜ GÜNÜ',
 			'home.common.hero.semanticLabel' => '{phase}, döngünün {day}. günü. {message} {detail}',
 			'home.common.hero.periodDayNumber' => '{count}.',
@@ -2335,9 +2414,9 @@ extension on TranslationsTr {
 			'home.phase.luteal.messages.0' => 'İştahının arttığını fark edebilirsin.',
 			'home.phase.luteal.messages.1' => 'Öğünleri çok geciktirmemeye çalış.',
 			'home.phase.luteal.messages.2' => 'Karbonhidrat isteğin artabilir.',
+			'home.phase.luteal.messages.3' => 'Şişkinlik hissediyorsan su içmeyi unutma.',
 			_ => null,
 		} ?? switch (path) {
-			'home.phase.luteal.messages.3' => 'Şişkinlik hissediyorsan su içmeyi unutma.',
 			'home.phase.luteal.messages.4' => 'Çok tuzlu yiyecekler şişkinliği artırabilir.',
 			'home.phase.luteal.messages.5' => 'Kahve bugün seni her zamankinden farklı etkileyebilir.',
 			'home.phase.luteal.messages.6' => 'Uykunun biraz daha hassaslaştığını fark edebilirsin.',
@@ -2432,24 +2511,25 @@ extension on TranslationsTr {
 			'onboarding.introduction.birthDateHint' => 'gg/aa/yyyy',
 			'onboarding.introduction.chooseFromCalendar' => 'Takvimden seç',
 			'onboarding.introduction.age' => ({required Object age}) => '${age} yaş',
+			'onboarding.preview.hero.title' => 'Harika',
+			'onboarding.preview.hero.titleWithName' => ({required Object name}) => 'Yanındayım, ${name}',
+			'onboarding.preview.hero.subtitle' => 'Profilin hazır. Başlamaya hazırsın.',
+			'onboarding.preview.callout.message' => 'Hazırsan başlayalım. OMA, döngünü ve kendini daha yakından takip etmene yardımcı olmak için burada.',
+			'onboarding.preview.summary.conditions.label' => 'Takip etmek istediğin sağlık durumları',
+			'onboarding.preview.summary.conditions.empty' => 'Şimdilik eklediğin bir sağlık durumu yok.',
+			'onboarding.preview.summary.cycle.label' => 'Döngü bilgilerin',
+			'onboarding.preview.summary.cycle.dayCount' => ({required Object days}) => '${days} gün',
+			'onboarding.preview.summary.storage.label' => 'Veri gizliliğin',
+			'onboarding.preview.summary.storage.guest' => 'Hesap oluşturmadan devam ediyorsun. Verilerin bu cihazda şifreli olarak saklanıyor.',
+			'onboarding.preview.summary.storage.google' => 'Google ile giriş yaptın; Verilerin şifreli olarak yedekleniyor',
+			'onboarding.preview.privacy.title' => 'Gizlilik ve verilerin',
+			'onboarding.preview.privacy.deviceEncryptionNote' => 'Verilerin yalnızca bu cihazda, şifreli şekilde saklanır.',
+			'onboarding.preview.action.start' => 'Hazırsan başlayalım',
 			'onboarding.prompt.introduction' => 'Selam, ben Oma 🌿 Sana nasıl seslenmemi istersin?',
 			'onboarding.prompt.wellbeing' => 'Bugünlerde nasılsın? Seni daha iyi anlayabilmem için nasıl hissettiğini duymak isterim.',
 			'onboarding.prompt.healthProfile' => 'Bedeninle ilgili birkaç şey konuşalım. Bunları bilirsem sana daha özenli eşlik edebilirim.',
 			'onboarding.prompt.cycle' => 'Döngün sana neler söylüyor, birlikte bakalım. Birkaç küçük bilgiyle seni daha iyi anlayabilirim.',
 			'onboarding.prompt.review' => 'Hazırsan kendi ritminde başlayalım. Oma, döngün ve iyi oluşun için burada.',
-			'onboarding.review.title' => 'Harika',
-			'onboarding.review.titleWithName' => ({required Object name}) => 'Yanındayım, ${name}',
-			'onboarding.review.subtitle' => 'Profilin hazır. Başlamaya hazır mısın?',
-			'onboarding.review.conditionsLabel' => 'Bilmemi istediğin sağlık durumları',
-			'onboarding.review.noConditions' => 'Henüz bir sağlık durumu eklemedin',
-			'onboarding.review.cycleLabel' => 'Döngü bilgilerin',
-			'onboarding.review.dayCount' => ({required Object days}) => '${days} gün',
-			'onboarding.review.privacyAndData' => 'Gizlilik ve verilerin',
-			'onboarding.review.deviceEncryptionNote' => 'Verilerin yalnızca bu cihazda şifreli saklanır',
-			'onboarding.review.start' => 'Hazırsan başlayalım',
-			'onboarding.review.accountStorageLabel' => 'Verilerin',
-			'onboarding.review.guestStorage' => 'Hesapsız kullanıyorsun; bu cihazda şifreli',
-			'onboarding.review.googleStorage' => 'Google ile giriş yaptın; şifreli yedekleniyor',
 			'onboarding.wellbeing.title' => 'Nasılsın?',
 			'onboarding.wellbeing.moodQuestion' => 'Bugünlerde kendini nasıl hissediyorsun?',
 			'onboarding.wellbeing.supportQuestion' => 'Bugün sana en çok nerede iyi gelebilirim?',

@@ -14,7 +14,7 @@ class WellbeingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final wellbeing = context.t.onboarding.wellbeing;
 
-    return OnboardingCard(
+    return OnboardingPageLayout(
       label: wellbeing.title,
       children: [
         OmaField(

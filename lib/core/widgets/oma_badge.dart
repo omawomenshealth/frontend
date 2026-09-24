@@ -101,7 +101,7 @@ class OmaBadge extends StatelessWidget {
 
     return Container(
       padding:
-          padding ?? const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+          padding ?? const EdgeInsets.symmetric(horizontal: 9, vertical: OmaSpacing.xs),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(borderRadius ?? 20),
