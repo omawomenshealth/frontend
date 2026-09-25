@@ -67,6 +67,13 @@ semantics davranışlarını component içinde yeniden oluşturmayın.
 Widget'ın ihtiyacı bir Material component varsayılanıysa `Theme.of(context)`;
 Oma'ya özgü semantik roldeyse `context.omaTheme` kullanın.
 
+Ortak widget kullanıcısı temel Oma görünümünü her çağrıda tekrar etmemelidir.
+Native Material wrapper'ları varsayılanlarını `AppTheme.fromOmaTheme(...)`
+tarafından üretilen ilgili `*ThemeData`dan; özel Oma yüzeyleri ise doğrudan
+`context.omaTheme` ve Oma tokenlarından çözer. Widget parametreleri bu
+varsayılanların yerine geçen bilinçli override'lardır. Feature kodunda yalnızca
+alan anlamı taşıyan accent veya yerleşim farkları geçirilmelidir.
+
 `border`, yüzey ve alan sınırlarını; `divider` ise içerik grupları arasındaki
 ayrımı temsil eder. Material divider varsayılanları `divider` rolünden
 `DividerThemeData` aracılığıyla çözülür.

@@ -24,7 +24,11 @@ class OmaField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: OmaText.body(OmaTypeScale.body, weight: FontWeight.w500),
+          style: OmaText.body(
+            OmaTypeScale.body,
+            weight: FontWeight.w500,
+            color: context.omaTheme.foreground,
+          ),
         ),
         const SizedBox(height: OmaSpacing.sm),
         child,
