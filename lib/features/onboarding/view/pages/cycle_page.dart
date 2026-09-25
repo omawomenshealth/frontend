@@ -45,12 +45,11 @@ class _CycleLengthField extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Slider(
+            child: OmaSlider(
               value: vm.averageCycleLength.toDouble(),
               min: 21,
               max: 40,
               divisions: 19,
-              activeColor: context.omaTheme.primary,
               onChanged: (value) {
                 vm.setAverageCycleLength(value.round());
               },

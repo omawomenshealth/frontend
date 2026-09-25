@@ -58,6 +58,8 @@ Tema ve token kullanımı için [theme.md](theme.md) belgesine bakın.
 
 - `OmaCheckbox`: boolean veya tristate seçim için native Material
   `Checkbox`.
+- `OmaSlider`: bir değer aralığından continuous veya discrete seçim
+  sağlayan native Material `Slider`.
 - `OmaInput`: Oma stilli `TextField`.
 - `OmaField`: label, field ve opsiyonel hint düzeni.
 - `OmaSingleSelect<T>`: chip tabanlı tekli seçim.

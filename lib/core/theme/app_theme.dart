@@ -260,8 +260,21 @@ abstract final class AppTheme {
       sliderTheme: SliderThemeData(
         activeTrackColor: oma.primary,
         inactiveTrackColor: oma.primary.withValues(alpha: 0.18),
+        secondaryActiveTrackColor: oma.primary.withValues(alpha: 0.54),
+        disabledActiveTrackColor: oma.muted.withValues(alpha: 0.38),
+        disabledInactiveTrackColor: oma.muted.withValues(alpha: 0.18),
+        disabledSecondaryActiveTrackColor: oma.muted.withValues(alpha: 0.24),
+        activeTickMarkColor: oma.onPrimary,
+        inactiveTickMarkColor: oma.primary.withValues(alpha: 0.42),
+        disabledActiveTickMarkColor: oma.muted.withValues(alpha: 0.38),
+        disabledInactiveTickMarkColor: oma.muted.withValues(alpha: 0.38),
         thumbColor: oma.primary,
+        disabledThumbColor: oma.muted.withValues(alpha: 0.38),
         overlayColor: oma.primary.withValues(alpha: 0.1),
+        valueIndicatorColor: oma.primary,
+        valueIndicatorStrokeColor: oma.primaryStrong,
+        valueIndicatorTextStyle: OmaText.label(color: oma.onPrimary),
+        showValueIndicator: ShowValueIndicator.onlyForDiscrete,
       ),
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {

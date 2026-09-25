@@ -11,6 +11,7 @@ import '../../../core/widgets/oma_toast.dart';
 import '../../../core/widgets/oma_chip.dart';
 import '../../../core/widgets/oma_divider.dart';
 import '../../../core/widgets/list_tile/oma_list_tile.dart';
+import '../../../core/widgets/oma_slider.dart';
 import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
@@ -4359,7 +4360,7 @@ class _StepSelector extends StatelessWidget {
             trackHeight: 7,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
           ),
-          child: Slider(
+          child: OmaSlider(
             value: selectedIndex.toDouble(),
             min: 0,
             max: (labels.length - 1).toDouble(),
@@ -4609,7 +4610,7 @@ class _SymptomTile extends StatelessWidget {
                   activeTickMarkColor: context.omaTheme.onPrimary,
                   inactiveTickMarkColor: tone.withValues(alpha: 0.42),
                 ),
-                child: Slider(
+                child: OmaSlider(
                   key: ValueKey('symptom_severity_${item.label}'),
                   value: severity.toDouble(),
                   min: 1,

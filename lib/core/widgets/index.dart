@@ -12,6 +12,7 @@ export 'oma_icon_button.dart';
 export 'list_tile/oma_list_tile.dart';
 export 'oma_single_select.dart';
 export 'oma_sheet.dart';
+export 'oma_slider.dart';
 export 'oma_multi_select.dart';
 export 'list_tile/oma_radio_list_tile.dart';
 export 'oma_form_field.dart';
