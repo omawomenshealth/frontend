@@ -1,6 +1,6 @@
 import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/theme/oma_theme.dart';
-import 'package:app_proje_a/core/shared_widgets/condition_selector.dart';
+import 'package:app_proje_a/views/profile/view/widgets/condition_selector.dart';
 import 'package:app_proje_a/data/services/api_service.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';

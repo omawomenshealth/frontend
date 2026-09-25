@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/image_constants.dart';
-import '../../../core/shared_widgets/condition_selector.dart';
-import '../../../core/shared_widgets/lab_results_form.dart';
 import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/medication_identity_model.dart';
 import '../../../data/models/user_settings_model.dart';
@@ -23,6 +21,8 @@ import '../../calendar/viewmodel/calendar_view_model.dart';
 import '../viewmodel/profile_view_model.dart';
 import '../../../features/home/viewmodel/home_view_model.dart';
 import '../../dashboard/widgets/medication_reminder_section.dart';
+import 'widgets/condition_selector.dart';
+import 'widgets/lab_results_form.dart';
 import '../../articles/widgets/premium_paywall.dart';
 
 import 'doctor_report_view.dart';

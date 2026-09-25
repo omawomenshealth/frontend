@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../constants/app_strings.dart';
-import '../theme/oma_theme.dart';
-import '../../data/models/lab_result_model.dart';
-import '../widgets/oma_chip.dart';
-import '../widgets/oma_wrap.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/theme/oma_theme.dart';
+import '../../../../core/widgets/oma_chip.dart';
+import '../../../../core/widgets/oma_wrap.dart';
+import '../../../../data/models/lab_result_model.dart';
 
 /// İlk giriş ve profil ekranında ortak kullanılan yapılandırılmış laboratuvar
 /// sonuçları formu.

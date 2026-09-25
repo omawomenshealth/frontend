@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../constants/app_strings.dart';
-import '../theme/oma_theme.dart';
-import '../widgets/oma_chip.dart';
-import '../widgets/oma_wrap.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/theme/oma_theme.dart';
+import '../../../../core/widgets/oma_chip.dart';
+import '../../../../core/widgets/oma_wrap.dart';
 
 /// Hazır sağlık seçeneklerini ve kullanıcının eklediği özel değerleri birlikte
 /// gösterir. Eski "Diğer" seçeneği yerine doğrudan ad girilmesini sağlar.

@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/oma_theme.dart';
-import '../../../core/shared_widgets/oma_design_widgets.dart';
 import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../viewmodel/insights_view_model.dart';
@@ -83,7 +82,7 @@ class InsightsListView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        OmaPageHeader(
+        _InsightsPageHeader(
           title: AppStrings.insights,
           subtitle: AppStrings.insightsSubtitle,
           icon: Icons.auto_awesome_outlined,
@@ -192,6 +191,50 @@ class InsightsListView extends StatelessWidget {
               height: 1.45,
               color: OmaPalette.textHint,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InsightsPageHeader extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final IconData icon;
+
+  const _InsightsPageHeader({
+    required this.title,
+    required this.icon,
+    this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final oma = context.omaTheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: oma.primarySoft,
+            borderRadius: BorderRadius.circular(OmaRadius.lg),
+          ),
+          child: Icon(icon, size: 21, color: oma.primaryStrong),
+        ),
+        const SizedBox(width: 13),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: Theme.of(context).textTheme.headlineMedium),
+              if (subtitle != null) ...[
+                const SizedBox(height: OmaSpacing.xxs),
+                Text(subtitle!, style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ],
           ),
         ),
       ],
