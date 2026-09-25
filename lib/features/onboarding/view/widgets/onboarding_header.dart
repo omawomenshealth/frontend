@@ -70,7 +70,10 @@ class OnboardingHeader extends StatelessWidget {
         const SizedBox(width: OmaSpacing.md),
         Text(
           '${index + 1}/$safeTotal',
-          style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
+          style: OmaText.body(
+            OmaTypeScale.caption,
+            color: context.omaTheme.muted,
+          ),
         ),
       ],
     );

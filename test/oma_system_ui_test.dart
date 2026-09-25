@@ -53,7 +53,6 @@ void main() {
       );
       expect(systemBarBackground.color, oma.background);
       expect(tester.widget<SafeArea>(find.byType(SafeArea)).top, isFalse);
-
     }
   });
 }

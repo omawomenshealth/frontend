@@ -1,122 +1,96 @@
 import 'package:flutter/material.dart';
 
-import '../theme/oma_theme.dart';
-
-enum OmaBadgeLabelVariant { standard, eyebrow }
-
+/// A Material [Badge] with Oma defaults supplied by [BadgeThemeData].
+///
+/// This wrapper preserves Material's content model: a null [label] produces
+/// the native small badge, while a non-null [label] produces the native large
+/// stadium badge. Explicit style values take precedence over the app theme.
 class OmaBadge extends StatelessWidget {
+  /// Creates a badge with the same inputs and behavior as [Badge.new].
   const OmaBadge({
     super.key,
-    this.icon,
+    this.backgroundColor,
+    this.textColor,
+    this.smallSize,
+    this.largeSize,
+    this.textStyle,
+    this.padding,
+    this.alignment,
+    this.offset,
     this.label,
-    this.foreground,
-    this.background,
-    this.size = 40,
-    this.padding,
-    this.iconSize,
-    this.borderRadius,
-    this.border,
-    this.labelVariant = OmaBadgeLabelVariant.standard,
-  }) : assert(
-         icon != null || label != null,
-         'OmaBadge requires either an icon or a label.',
-       );
+    this.isLabelVisible = true,
+    this.child,
+  }) : _count = null,
+       _maxCount = null;
 
-  const OmaBadge.icon({
+  /// Creates a numeric badge using Material's native [Badge.count] behavior.
+  const OmaBadge.count({
     super.key,
-    required this.icon,
-    this.foreground,
-    this.background,
-    this.size = 40,
+    this.backgroundColor,
+    this.textColor,
+    this.smallSize,
+    this.largeSize,
+    this.textStyle,
     this.padding,
-    this.iconSize,
-    this.borderRadius,
-    this.border,
-    this.labelVariant = OmaBadgeLabelVariant.standard,
-  }) : label = null;
+    this.alignment,
+    this.offset,
+    required int count,
+    int maxCount = 999,
+    this.isLabelVisible = true,
+    this.child,
+  }) : assert(count >= 0, 'count must be non-negative'),
+       assert(maxCount > 0, 'maxCount must be positive'),
+       label = null,
+       _count = count,
+       _maxCount = maxCount;
 
-  const OmaBadge.label(
-    this.label, {
-    super.key,
-    this.foreground,
-    this.background,
-    this.size = 40,
-    this.padding,
-    this.iconSize,
-    this.borderRadius,
-    this.border,
-    this.labelVariant = OmaBadgeLabelVariant.standard,
-  }) : icon = null;
-
-  final IconData? icon;
-  final String? label;
-
-  final Color? foreground;
-  final Color? background;
-
-  /// Icon-only badge size.
-  final double size;
-
-  /// Label / icon+label badge padding.
+  final Color? backgroundColor;
+  final Color? textColor;
+  final double? smallSize;
+  final double? largeSize;
+  final TextStyle? textStyle;
   final EdgeInsetsGeometry? padding;
+  final AlignmentGeometry? alignment;
+  final Offset? offset;
+  final Widget? label;
+  final bool isLabelVisible;
+  final Widget? child;
 
-  final double? iconSize;
-  final double? borderRadius;
-  final BoxBorder? border;
-  final OmaBadgeLabelVariant labelVariant;
-
-  bool get isIconOnly => icon != null && label == null;
+  final int? _count;
+  final int? _maxCount;
 
   @override
   Widget build(BuildContext context) {
-    final oma = context.omaTheme;
-    final foregroundColor = foreground ?? oma.primary;
-
-    final backgroundColor = background ?? oma.primarySoft;
-
-    if (isIconOnly) {
-      return Container(
-        width: size,
-        height: size,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(borderRadius ?? size * 0.34),
-        ),
-        child: Icon(
-          icon,
-          size: iconSize ?? size * 0.45,
-          color: foregroundColor,
-        ),
+    final count = _count;
+    if (count != null) {
+      return Badge.count(
+        backgroundColor: backgroundColor,
+        textColor: textColor,
+        smallSize: smallSize,
+        largeSize: largeSize,
+        textStyle: textStyle,
+        padding: padding,
+        alignment: alignment,
+        offset: offset,
+        count: count,
+        maxCount: _maxCount!,
+        isLabelVisible: isLabelVisible,
+        child: child,
       );
     }
 
-    final labelStyle = switch (labelVariant) {
-      OmaBadgeLabelVariant.standard => OmaText.label(color: foregroundColor),
-      OmaBadgeLabelVariant.eyebrow => OmaText.label(
-        color: foregroundColor,
-        weight: FontWeight.w700,
-      ).copyWith(fontSize: 9, letterSpacing: 2.3),
-    };
-
-    return Container(
-      padding:
-          padding ?? const EdgeInsets.symmetric(horizontal: 9, vertical: OmaSpacing.xs),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(borderRadius ?? 20),
-        border: border,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: iconSize ?? 14, color: foregroundColor),
-            const SizedBox(width: 5),
-          ],
-          Text(label!, style: labelStyle),
-        ],
-      ),
+    return Badge(
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      smallSize: smallSize,
+      largeSize: largeSize,
+      textStyle: textStyle,
+      padding: padding,
+      alignment: alignment,
+      offset: offset,
+      label: label,
+      isLabelVisible: isLabelVisible,
+      child: child,
     );
   }
 }

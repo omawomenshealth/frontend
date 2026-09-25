@@ -56,7 +56,12 @@ class HomeView extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(
                   parent: BouncingScrollPhysics(),
                 ),
-                padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.md, OmaSpacing.lg, 132),
+                padding: const EdgeInsets.fromLTRB(
+                  OmaSpacing.lg,
+                  OmaSpacing.md,
+                  OmaSpacing.lg,
+                  132,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

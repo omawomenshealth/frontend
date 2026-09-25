@@ -12,6 +12,9 @@ import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/widgets/oma_toast.dart';
+import '../../../core/widgets/oma_chip.dart';
+import '../../../core/widgets/oma_divider.dart';
+import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/services/local_storage_service.dart';
@@ -46,7 +49,12 @@ class _ProfileMechanics extends StatelessWidget {
           backgroundColor: context.omaTheme.background,
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.xl, OmaSpacing.xl, 100),
+              padding: const EdgeInsets.fromLTRB(
+                OmaSpacing.xl,
+                OmaSpacing.xl,
+                OmaSpacing.xl,
+                100,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -640,9 +648,7 @@ class _ProfileMechanics extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: OmaSpacing.sm),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                OmaWrap(
                   children: [
                     _menopauseChip(
                       context,
@@ -690,9 +696,7 @@ class _ProfileMechanics extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: OmaSpacing.sm),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                OmaWrap(
                   children: [
                     ..._uniqueProfileLabels([
                       AppStrings.noBirthControl,
@@ -707,7 +711,7 @@ class _ProfileMechanics extends StatelessWidget {
                             s.birthControlMethod ?? '',
                           ) ==
                           method;
-                      return ChoiceChip(
+                      return OmaChoiceChip(
                         label: Text(method),
                         selected: isSelected,
                         onSelected: (_) {
@@ -730,7 +734,7 @@ class _ProfileMechanics extends StatelessWidget {
                         ),
                       );
                     }),
-                    ActionChip(
+                    OmaActionChip(
                       key: const ValueKey('profile_add_birth_control'),
                       avatar: const Icon(
                         Icons.add_rounded,
@@ -864,11 +868,9 @@ class _ProfileMechanics extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: OmaSpacing.sm),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                OmaWrap(
                   children: vm.settings.dailyMedications.map((med) {
-                    return Chip(
+                    return OmaChip(
                       label: Text(
                         AppStrings.localizeStoredValue(med.displayName),
                         style: TextStyle(fontSize: OmaTypeScale.caption),
@@ -914,11 +916,9 @@ class _ProfileMechanics extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: OmaSpacing.sm),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                OmaWrap(
                   children: vm.settings.dailySupplements.map((sup) {
-                    return Chip(
+                    return OmaChip(
                       label: Text(
                         AppStrings.localizeStoredValue(sup),
                         style: TextStyle(fontSize: OmaTypeScale.caption),
@@ -976,11 +976,9 @@ class _ProfileMechanics extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: OmaSpacing.sm),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                OmaWrap(
                   children: vm.settings.dailySkincare.map((item) {
-                    return Chip(
+                    return OmaChip(
                       label: Text(
                         AppStrings.localizeStoredValue(item),
                         style: TextStyle(fontSize: OmaTypeScale.caption),
@@ -1048,7 +1046,7 @@ class _ProfileMechanics extends StatelessWidget {
     StateSetter setSheetState,
   ) {
     final isSelected = s.menopauseStatus == status;
-    return ChoiceChip(
+    return OmaChoiceChip(
       label: Text(label),
       selected: isSelected,
       onSelected: (_) {
@@ -1147,7 +1145,10 @@ class _ProfileMechanics extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: OmaSpacing.xl,
+          vertical: 10,
+        ),
         decoration: BoxDecoration(
           color: isSelected
               ? context.omaTheme.primary.withValues(alpha: 0.12)
@@ -1223,13 +1224,19 @@ class _ProfileMechanics extends StatelessWidget {
             const SizedBox(height: OmaSpacing.xs),
             Text(
               '${AppStrings.lastSync}: ${vm.lastSyncDisplay}',
-              style: TextStyle(fontSize: OmaTypeScale.caption, color: context.omaTheme.muted),
+              style: TextStyle(
+                fontSize: OmaTypeScale.caption,
+                color: context.omaTheme.muted,
+              ),
             ),
             if (vm.syncError != null) ...[
               const SizedBox(height: OmaSpacing.sm),
               Text(
                 vm.syncError!,
-                style: TextStyle(fontSize: OmaTypeScale.caption, color: context.omaTheme.error),
+                style: TextStyle(
+                  fontSize: OmaTypeScale.caption,
+                  color: context.omaTheme.error,
+                ),
               ),
             ],
             const SizedBox(height: OmaSpacing.lg),
@@ -1335,7 +1342,7 @@ class _ProfileMechanics extends StatelessWidget {
             ),
           ],
           const SizedBox(height: OmaSpacing.lg),
-          Divider(height: 1),
+          const OmaDivider(height: 1),
           const SizedBox(height: OmaSpacing.lg),
           if (isLoggedIn) ...[
             SizedBox(
@@ -1663,7 +1670,12 @@ class _EditSheet extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(18, OmaSpacing.md, 14, OmaSpacing.md),
+                  padding: const EdgeInsets.fromLTRB(
+                    18,
+                    OmaSpacing.md,
+                    14,
+                    OmaSpacing.md,
+                  ),
                   child: Row(
                     children: [
                       Container(
@@ -1709,7 +1721,7 @@ class _EditSheet extends StatelessWidget {
                     ],
                   ),
                 ),
-                Divider(height: 1, color: accent.withValues(alpha: 0.12)),
+                OmaDivider(height: 1, color: accent.withValues(alpha: 0.12)),
                 Expanded(
                   child: SingleChildScrollView(
                     controller: scrollController,

@@ -9,16 +9,13 @@ CycleHeroData buildCycleHeroData({
   required DateTime selectedDate,
   CycleForecast? forecast,
 }) {
-  final cycleLength =
-      forecast?.expectedCycleLength ?? fallbackCycleLength;
+  final cycleLength = forecast?.expectedCycleLength ?? fallbackCycleLength;
 
   return CycleHeroData(
     phase: phase,
     cycleDay: cycleDay,
     cycleLength: cycleLength,
-    periodDay: phase == CyclePhase.menstrual
-        ? cycleDay
-        : null,
+    periodDay: phase == CyclePhase.menstrual ? cycleDay : null,
     daysUntilPeriod: phase != CyclePhase.menstrual
         ? forecast?.daysUntilMedian(selectedDate)
         : null,

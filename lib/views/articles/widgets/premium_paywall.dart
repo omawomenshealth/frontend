@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/oma_theme.dart';
+import '../../../core/widgets/oma_divider.dart';
+import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/services/premium_purchase_service.dart';
 import '../../../localization/generated/strings.g.dart';
 
@@ -61,7 +63,12 @@ class _PremiumViewState extends State<PremiumView> {
           body: CustomScrollView(
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.sm, OmaSpacing.xl, 28),
+                padding: const EdgeInsets.fromLTRB(
+                  OmaSpacing.xl,
+                  OmaSpacing.sm,
+                  OmaSpacing.xl,
+                  28,
+                ),
                 sliver: SliverList.list(
                   children: [
                     _PremiumHero(
@@ -357,7 +364,7 @@ class _BenefitsCard extends StatelessWidget {
               included: selectedTier.includes(benefits[index].$5),
             ),
             if (index != benefits.length - 1)
-              Divider(indent: 76, endIndent: 18),
+              const OmaDivider(indent: 76, endIndent: 18),
           ],
         ],
       ),
@@ -386,7 +393,12 @@ class _BenefitItem extends StatelessWidget {
       duration: const Duration(milliseconds: 180),
       opacity: included ? 1 : 0.48,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.lg, 18, OmaSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(
+          OmaSpacing.lg,
+          OmaSpacing.lg,
+          18,
+          OmaSpacing.lg,
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -652,7 +664,12 @@ class _PremiumActionBar extends StatelessWidget {
       shadowColor: context.omaTheme.primaryStrong.withValues(alpha: 0.14),
       child: SafeArea(
         top: false,
-        minimum: const EdgeInsets.fromLTRB(OmaSpacing.xl, 14, OmaSpacing.xl, 14),
+        minimum: const EdgeInsets.fromLTRB(
+          OmaSpacing.xl,
+          14,
+          OmaSpacing.xl,
+          14,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -699,7 +716,7 @@ class _PremiumActionBar extends StatelessWidget {
             ),
             if (service.isSignedIn) ...[
               const SizedBox(height: OmaSpacing.xxs),
-              Wrap(
+              OmaWrap(
                 alignment: WrapAlignment.center,
                 spacing: 6,
                 children: [

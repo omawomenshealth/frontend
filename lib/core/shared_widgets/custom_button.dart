@@ -105,7 +105,9 @@ class _CustomButtonState extends State<CustomButton>
                     ),
                   )
                 : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: OmaSpacing.lg,
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/widgets/oma_circle_avatar.dart';
 import '../model/article_model.dart';
 
 /// Yalnızca sunucu tarafından erişim izni verilmiş makale içeriğini gösterir.
@@ -23,7 +24,7 @@ class ArticleDetailView extends StatelessWidget {
             elevation: 0,
             leading: Padding(
               padding: const EdgeInsets.all(OmaSpacing.sm),
-              child: CircleAvatar(
+              child: OmaCircleAvatar(
                 backgroundColor: OmaPalette.onMedia.withValues(alpha: 0.84),
                 child: IconButton(
                   icon: Icon(
@@ -52,7 +53,7 @@ class ArticleDetailView extends StatelessWidget {
                     Positioned(
                       right: -30,
                       top: -30,
-                      child: CircleAvatar(
+                      child: OmaCircleAvatar(
                         radius: 100,
                         backgroundColor: OmaPalette.onMedia.withValues(
                           alpha: 0.1,
@@ -62,7 +63,7 @@ class ArticleDetailView extends StatelessWidget {
                     Positioned(
                       left: -20,
                       bottom: -20,
-                      child: CircleAvatar(
+                      child: OmaCircleAvatar(
                         radius: 80,
                         backgroundColor: OmaPalette.onMedia.withValues(
                           alpha: 0.08,
@@ -119,7 +120,12 @@ class ArticleDetailView extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.xxl, OmaSpacing.xl, 100),
+              padding: const EdgeInsets.fromLTRB(
+                OmaSpacing.xl,
+                OmaSpacing.xxl,
+                OmaSpacing.xl,
+                100,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -270,7 +276,10 @@ class ArticleDetailView extends StatelessWidget {
   Widget _buildContentBlock(BuildContext context, String block) {
     if (block.startsWith('###')) {
       return Padding(
-        padding: const EdgeInsets.only(top: OmaSpacing.xl, bottom: OmaSpacing.sm),
+        padding: const EdgeInsets.only(
+          top: OmaSpacing.xl,
+          bottom: OmaSpacing.sm,
+        ),
         child: Text(
           block.replaceFirst('###', '').trim(),
           style: TextStyle(
@@ -336,7 +345,10 @@ class _HeroBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: OmaSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: OmaSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: OmaPalette.onMedia.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(OmaRadius.md),

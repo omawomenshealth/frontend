@@ -11,6 +11,9 @@ import '../../../core/utils/app_time.dart';
 import '../../../core/utils/daily_log_formatters.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/widgets/oma_toast.dart';
+import '../../../core/widgets/oma_circle_avatar.dart';
+import '../../../core/widgets/oma_divider.dart';
+import '../../../core/widgets/list_tile/oma_list_tile.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../features/home/viewmodel/home_view_model.dart';
 import '../../dashboard/widgets/daily_log_sheet.dart';
@@ -173,7 +176,12 @@ class _CalendarViewState extends State<CalendarView> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(OmaSpacing.md, OmaSpacing.sm, OmaSpacing.md, OmaSpacing.md),
+      padding: const EdgeInsets.fromLTRB(
+        OmaSpacing.md,
+        OmaSpacing.sm,
+        OmaSpacing.md,
+        OmaSpacing.md,
+      ),
       child: Row(
         children: [
           SizedBox(
@@ -258,12 +266,7 @@ class _CalendarViewState extends State<CalendarView> {
             ),
             SizedBox(
               height: _monthDividerExtent,
-              child: Divider(
-                height: 1,
-                indent: 20,
-                endIndent: 20,
-                color: context.omaTheme.border,
-              ),
+              child: const OmaDivider(height: 1, indent: 20, endIndent: 20),
             ),
           ],
         );
@@ -474,7 +477,10 @@ class _WeekdayStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: OmaSpacing.md,
+        vertical: 10,
+      ),
       decoration: BoxDecoration(
         border: Border.symmetric(
           horizontal: BorderSide(color: context.omaTheme.border),
@@ -524,7 +530,10 @@ class _MonthGrid extends StatelessWidget {
     final cellCount = compact ? 42 : ((populatedCells + 6) ~/ 7) * 7;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: OmaSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: OmaSpacing.md,
+        vertical: OmaSpacing.xs,
+      ),
       child: GridView.builder(
         shrinkWrap: true,
         primary: false,
@@ -640,7 +649,7 @@ class _CalendarDayCell extends StatelessWidget {
           const Positioned(
             right: -2,
             top: -2,
-            child: CircleAvatar(
+            child: OmaCircleAvatar(
               radius: 6.5,
               backgroundColor: OmaPalette.onMedia,
               child: Icon(
@@ -661,7 +670,7 @@ class _CalendarDayCell extends StatelessWidget {
           const Positioned(
             right: -2,
             top: -2,
-            child: CircleAvatar(
+            child: OmaCircleAvatar(
               radius: 6.5,
               backgroundColor: OmaPalette.periodPrimary,
               child: Icon(
@@ -682,7 +691,7 @@ class _CalendarDayCell extends StatelessWidget {
           const Positioned(
             right: -2,
             top: -2,
-            child: CircleAvatar(
+            child: OmaCircleAvatar(
               radius: 6.5,
               backgroundColor: OmaPalette.onMedia,
               child: Icon(
@@ -828,7 +837,12 @@ class _CalendarLegendSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, OmaSpacing.md, OmaSpacing.xxl, 28),
+        padding: const EdgeInsets.fromLTRB(
+          OmaSpacing.xxl,
+          OmaSpacing.md,
+          OmaSpacing.xxl,
+          28,
+        ),
         decoration: BoxDecoration(
           color: context.omaTheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
@@ -1070,7 +1084,12 @@ Future<void> _showDailyLogTypePicker(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(OmaSpacing.sm, OmaSpacing.xs, OmaSpacing.sm, 10),
+              padding: const EdgeInsets.fromLTRB(
+                OmaSpacing.sm,
+                OmaSpacing.xs,
+                OmaSpacing.sm,
+                10,
+              ),
               child: Text(
                 AppStrings.addDailyLog,
                 style: TextStyle(
@@ -1082,11 +1101,11 @@ Future<void> _showDailyLogTypePicker(
               ),
             ),
             for (var index = 0; index < options.length; index++)
-              ListTile(
+              OmaListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),
-                leading: CircleAvatar(
+                leading: OmaCircleAvatar(
                   backgroundColor: options[index].color.withValues(alpha: 0.12),
                   foregroundColor: options[index].color,
                   child: Icon(options[index].icon),
@@ -1118,7 +1137,12 @@ class _DayDetailSection extends StatelessWidget {
         final canLog = !selectedDay.dateOnly.isAfter(AppTime.now.dateOnly);
 
         return Container(
-          padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.md, OmaSpacing.xl, OmaSpacing.xl),
+          padding: const EdgeInsets.fromLTRB(
+            OmaSpacing.xl,
+            OmaSpacing.md,
+            OmaSpacing.xl,
+            OmaSpacing.xl,
+          ),
           decoration: BoxDecoration(
             color: context.omaTheme.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
@@ -1227,8 +1251,7 @@ class _DayDetailSection extends StatelessWidget {
                 Expanded(
                   child: ListView.separated(
                     itemCount: logs.length,
-                    separatorBuilder: (_, _) =>
-                        Divider(color: context.omaTheme.border, height: 24),
+                    separatorBuilder: (_, _) => const OmaDivider(height: 24),
                     itemBuilder: (context, index) =>
                         _DailyLogDetails(log: logs[index]),
                   ),

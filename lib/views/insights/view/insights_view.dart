@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/oma_theme.dart';
 import '../../../core/shared_widgets/oma_design_widgets.dart';
+import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../viewmodel/insights_view_model.dart';
 
@@ -26,7 +27,12 @@ class InsightsListView extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.xxl, OmaSpacing.lg, OmaSpacing.md),
+                    padding: const EdgeInsets.fromLTRB(
+                      OmaSpacing.lg,
+                      OmaSpacing.xxl,
+                      OmaSpacing.lg,
+                      OmaSpacing.md,
+                    ),
                     sliver: SliverToBoxAdapter(child: _buildHeader(context)),
                   ),
                   if (vm.isLoading && vm.insights.isEmpty)
@@ -41,16 +47,24 @@ class InsightsListView extends StatelessWidget {
                     )
                   else ...[
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.lg),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: OmaSpacing.lg,
+                      ),
                       sliver: SliverList.separated(
                         itemCount: vm.insights.length,
                         itemBuilder: (context, index) =>
                             PersonalInsightCard(insight: vm.insights[index]),
-                        separatorBuilder: (_, _) => const SizedBox(height: OmaSpacing.md),
+                        separatorBuilder: (_, _) =>
+                            const SizedBox(height: OmaSpacing.md),
                       ),
                     ),
                     SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.xl, OmaSpacing.xl, 110),
+                      padding: const EdgeInsets.fromLTRB(
+                        OmaSpacing.xl,
+                        OmaSpacing.xl,
+                        OmaSpacing.xl,
+                        110,
+                      ),
                       sliver: SliverToBoxAdapter(
                         child: _buildDisclaimer(context),
                       ),
@@ -113,7 +127,12 @@ class InsightsListView extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxxl, OmaSpacing.xl, OmaSpacing.xxxl, 120),
+      padding: const EdgeInsets.fromLTRB(
+        OmaSpacing.xxxl,
+        OmaSpacing.xl,
+        OmaSpacing.xxxl,
+        120,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

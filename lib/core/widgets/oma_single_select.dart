@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'oma_chip.dart';
+import 'oma_wrap.dart';
 
 class OmaSingleSelect<T> extends StatelessWidget {
   const OmaSingleSelect({
@@ -20,13 +21,13 @@ class OmaSingleSelect<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OmaChipWrap(
+    return OmaWrap(
       children: [
         for (final option in options)
-          OmaChip(
-            label: labelBuilder(option),
+          OmaChoiceChip(
+            label: Text(labelBuilder(option)),
             selected: selectedValue == option,
-            onTap: () {
+            onSelected: (_) {
               if (allowDeselect && selectedValue == option) {
                 return;
               }

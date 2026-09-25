@@ -38,6 +38,7 @@ abstract final class AppTheme {
       surface: oma.surface,
       onSurface: oma.foreground,
       outline: oma.border,
+      outlineVariant: oma.divider,
     );
 
     return ThemeData(
@@ -79,9 +80,21 @@ abstract final class AppTheme {
           height: 1.35,
           fontWeight: FontWeight.w700,
         ),
-        bodyLarge: TextStyle(color: oma.foreground, fontSize: OmaTypeScale.bodyLarge, height: 1.5),
-        bodyMedium: TextStyle(color: oma.foreground, fontSize: OmaTypeScale.body, height: 1.5),
-        bodySmall: TextStyle(color: oma.muted, fontSize: OmaTypeScale.caption, height: 1.45),
+        bodyLarge: TextStyle(
+          color: oma.foreground,
+          fontSize: OmaTypeScale.bodyLarge,
+          height: 1.5,
+        ),
+        bodyMedium: TextStyle(
+          color: oma.foreground,
+          fontSize: OmaTypeScale.body,
+          height: 1.5,
+        ),
+        bodySmall: TextStyle(
+          color: oma.muted,
+          fontSize: OmaTypeScale.caption,
+          height: 1.45,
+        ),
         labelLarge: TextStyle(
           color: oma.primaryStrong,
           fontSize: OmaTypeScale.body,
@@ -105,7 +118,9 @@ abstract final class AppTheme {
         color: oma.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OmaRadius.xl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(OmaRadius.xl),
+        ),
         margin: EdgeInsets.zero,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -113,7 +128,10 @@ abstract final class AppTheme {
           backgroundColor: oma.primary,
           foregroundColor: oma.onPrimary,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xxl, vertical: OmaSpacing.lg),
+          padding: const EdgeInsets.symmetric(
+            horizontal: OmaSpacing.xxl,
+            vertical: OmaSpacing.lg,
+          ),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
@@ -122,7 +140,10 @@ abstract final class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: oma.primaryStrong,
           side: BorderSide(color: oma.primary, width: 1.2),
-          padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xxl, vertical: OmaSpacing.lg),
+          padding: const EdgeInsets.symmetric(
+            horizontal: OmaSpacing.xxl,
+            vertical: OmaSpacing.lg,
+          ),
           shape: const StadiumBorder(),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
@@ -191,43 +212,242 @@ abstract final class AppTheme {
           ),
         ),
       ),
+      tabBarTheme: TabBarThemeData(
+        indicatorColor: oma.primary,
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: oma.divider,
+        dividerHeight: 1,
+        labelColor: oma.foreground,
+        labelPadding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md),
+        labelStyle: OmaText.label(color: oma.foreground),
+        unselectedLabelColor: oma.muted,
+        unselectedLabelStyle: OmaText.label(
+          color: oma.muted,
+          weight: FontWeight.w500,
+        ),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.focused)) {
+            return oma.primary.withValues(alpha: 0.10);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return oma.primary.withValues(alpha: 0.08);
+          }
+          return null;
+        }),
+        indicatorAnimation: TabIndicatorAnimation.linear,
+        splashBorderRadius: BorderRadius.circular(OmaRadius.md),
+      ),
+      badgeTheme: BadgeThemeData(
+        backgroundColor: oma.error,
+        textColor: oma.onPrimary,
+        smallSize: OmaSpacing.sm,
+        largeSize: OmaSpacing.xl,
+        textStyle: OmaText.label(color: oma.onPrimary),
+        padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xs),
+      ),
       chipTheme: ChipThemeData(
         backgroundColor: oma.surface,
+        disabledColor: oma.surface,
         selectedColor: oma.primarySoft,
-        labelStyle: TextStyle(color: oma.foreground, fontSize: 13),
+        secondarySelectedColor: oma.primarySoft,
+        labelStyle: OmaText.label(color: oma.foreground),
+        secondaryLabelStyle: OmaText.label(color: oma.primaryStrong),
+        checkmarkColor: oma.primary,
+        deleteIconColor: oma.muted,
+        iconTheme: IconThemeData(color: oma.primaryStrong),
         shape: const StadiumBorder(),
         side: BorderSide(color: oma.border),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(
+          horizontal: OmaSpacing.sm,
+          vertical: OmaSpacing.xs,
+        ),
+      ),
+      listTileTheme: ListTileThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(OmaRadius.lg),
+        ),
+        selectedColor: oma.primaryStrong,
+        iconColor: oma.muted,
+        textColor: oma.foreground,
+        titleTextStyle: OmaText.body(
+          OmaTypeScale.bodyLarge,
+          weight: FontWeight.w600,
+          color: oma.foreground,
+        ),
+        subtitleTextStyle: OmaText.body(OmaTypeScale.body, color: oma.muted),
+        leadingAndTrailingTextStyle: OmaText.label(color: oma.muted),
+        contentPadding: const EdgeInsets.symmetric(horizontal: OmaSpacing.lg),
+        tileColor: oma.surface,
+        selectedTileColor: oma.primarySoft,
+        horizontalTitleGap: OmaSpacing.md,
+        minVerticalPadding: OmaSpacing.sm,
       ),
       sliderTheme: SliderThemeData(
         activeTrackColor: oma.primary,
         inactiveTrackColor: oma.primary.withValues(alpha: 0.18),
+        secondaryActiveTrackColor: oma.primary.withValues(alpha: 0.54),
+        disabledActiveTrackColor: oma.muted.withValues(alpha: 0.38),
+        disabledInactiveTrackColor: oma.muted.withValues(alpha: 0.18),
+        disabledSecondaryActiveTrackColor: oma.muted.withValues(alpha: 0.24),
+        activeTickMarkColor: oma.onPrimary,
+        inactiveTickMarkColor: oma.primary.withValues(alpha: 0.42),
+        disabledActiveTickMarkColor: oma.muted.withValues(alpha: 0.38),
+        disabledInactiveTickMarkColor: oma.muted.withValues(alpha: 0.38),
         thumbColor: oma.primary,
+        disabledThumbColor: oma.muted.withValues(alpha: 0.38),
         overlayColor: oma.primary.withValues(alpha: 0.1),
+        valueIndicatorColor: oma.primary,
+        valueIndicatorStrokeColor: oma.primaryStrong,
+        valueIndicatorTextStyle: OmaText.label(color: oma.onPrimary),
+        showValueIndicator: ShowValueIndicator.onlyForDiscrete,
       ),
       checkboxTheme: CheckboxThemeData(
-        fillColor: WidgetStateProperty.resolveWith(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return states.contains(WidgetState.selected)
+                ? oma.muted.withValues(alpha: 0.38)
+                : Colors.transparent;
+          }
+          if (states.contains(WidgetState.selected)) {
+            return states.contains(WidgetState.error) ? oma.error : oma.primary;
+          }
+          return Colors.transparent;
+        }),
+        checkColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? oma.primary
+              ? oma.onPrimary
               : Colors.transparent,
         ),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          final color = states.contains(WidgetState.error)
+              ? oma.error
+              : states.contains(WidgetState.selected)
+              ? oma.primary
+              : oma.foreground;
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.focused)) {
+            return color.withValues(alpha: 0.10);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return color.withValues(alpha: 0.08);
+          }
+          return Colors.transparent;
+        }),
+        side: WidgetStateBorderSide.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return BorderSide.none;
+          }
+          if (states.contains(WidgetState.disabled)) {
+            return BorderSide(
+              color: oma.muted.withValues(alpha: 0.38),
+              width: 2,
+            );
+          }
+          if (states.contains(WidgetState.error)) {
+            return BorderSide(color: oma.error, width: 2);
+          }
+          return BorderSide(color: oma.border, width: 2);
+        }),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       ),
-      dividerTheme: DividerThemeData(color: oma.border, thickness: 1, space: 1),
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return oma.muted.withValues(alpha: 0.38);
+          }
+          if (states.contains(WidgetState.selected)) {
+            return oma.primary;
+          }
+          return oma.border;
+        }),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          final color = states.contains(WidgetState.selected)
+              ? oma.primary
+              : oma.foreground;
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.focused)) {
+            return color.withValues(alpha: 0.10);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return color.withValues(alpha: 0.08);
+          }
+          return Colors.transparent;
+        }),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return oma.muted.withValues(alpha: 0.38);
+          }
+          return states.contains(WidgetState.selected)
+              ? oma.onPrimary
+              : oma.surface;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return oma.muted.withValues(alpha: 0.18);
+          }
+          return states.contains(WidgetState.selected)
+              ? oma.primary
+              : oma.surfaceMuted;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.transparent;
+          }
+          if (states.contains(WidgetState.disabled)) {
+            return oma.muted.withValues(alpha: 0.38);
+          }
+          return oma.border;
+        }),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          final color = states.contains(WidgetState.selected)
+              ? oma.primary
+              : oma.foreground;
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.focused)) {
+            return color.withValues(alpha: 0.10);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return color.withValues(alpha: 0.08);
+          }
+          return Colors.transparent;
+        }),
+      ),
+      dividerTheme: DividerThemeData(
+        color: oma.divider,
+        thickness: 1,
+        space: 1,
+      ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: oma.surface,
-        surfaceTintColor: Colors.transparent,
         modalBackgroundColor: oma.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: OmaSpacing.sm,
+        modalElevation: OmaSpacing.sm,
+        shadowColor: oma.shadow,
+        clipBehavior: Clip.antiAlias,
         showDragHandle: true,
         dragHandleColor: oma.border,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        dragHandleSize: const Size(OmaSpacing.huge, OmaSpacing.xs),
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: oma.border),
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(OmaRadius.xl),
+          ),
         ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: oma.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OmaRadius.xl)),
+        elevation: OmaSpacing.sm,
+        shadowColor: oma.shadow,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: oma.border),
+          borderRadius: BorderRadius.circular(OmaRadius.xl),
+        ),
       ),
     );
   }

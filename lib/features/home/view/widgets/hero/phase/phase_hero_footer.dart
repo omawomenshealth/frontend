@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../core/widgets/oma_button.dart';
+import '../../../../../../core/widgets/oma_icon_button.dart';
 import '../../../../../../core/theme/oma_theme.dart';
 import '../../../../../../localization/generated/strings.g.dart';
 

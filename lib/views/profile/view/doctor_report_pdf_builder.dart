@@ -31,7 +31,12 @@ class DoctorReportPdfBuilder {
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.fromLTRB(OmaSpacing.xxxl, OmaSpacing.xxxl, OmaSpacing.xxxl, 38),
+        margin: const pw.EdgeInsets.fromLTRB(
+          OmaSpacing.xxxl,
+          OmaSpacing.xxxl,
+          OmaSpacing.xxxl,
+          38,
+        ),
         theme: pw.ThemeData.withFont(
           base: regularFont,
           bold: regularFont,
@@ -69,10 +74,17 @@ class DoctorReportPdfBuilder {
         ),
         build: (context) => [
           pw.Container(
-            padding: const pw.EdgeInsets.fromLTRB(OmaSpacing.lg, 14, OmaSpacing.lg, 14),
+            padding: const pw.EdgeInsets.fromLTRB(
+              OmaSpacing.lg,
+              14,
+              OmaSpacing.lg,
+              14,
+            ),
             decoration: pw.BoxDecoration(
               color: const PdfColor.fromInt(0xFFF4F6F0),
-              borderRadius: const pw.BorderRadius.all(pw.Radius.circular(OmaRadius.sm)),
+              borderRadius: const pw.BorderRadius.all(
+                pw.Radius.circular(OmaRadius.sm),
+              ),
               border: pw.Border.all(color: accent, width: 0.8),
             ),
             child: pw.Row(
@@ -132,8 +144,8 @@ class DoctorReportPdfBuilder {
           reportView._pdfInfoRow(
             AppStrings.smoking,
             settings.smokingStatus == SmokingStatus.current
-              ? AppStrings.yes
-              : AppStrings.no,
+                ? AppStrings.yes
+                : AppStrings.no,
           ),
           reportView._pdfInfoRow(
             AppStrings.chronicDiseases,

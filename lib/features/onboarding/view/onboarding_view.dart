@@ -90,7 +90,9 @@ class _OnboardingViewState extends State<OnboardingView>
                   children: [
                     if (!vm.isPreviewPage) ...[
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: OmaSpacing.xl,
+                        ),
                         child: OnboardingHeader(
                           onBack: _goBack,
                           index: vm.currentPage,
@@ -99,7 +101,9 @@ class _OnboardingViewState extends State<OnboardingView>
                       ),
                       const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: OmaSpacing.xl,
+                        ),
                         child: RiseIn(
                           animation: riseAt(0),
                           child: OmaCallout(
@@ -154,16 +158,15 @@ class _OnboardingViewState extends State<OnboardingView>
                             onPickLastPeriod: controller.pickLastPeriod,
                           ),
 
-                          PreviewPage(
-                            vm: vm,
-                            isActive: vm.isPreviewPage,
-                          ),
+                          PreviewPage(vm: vm, isActive: vm.isPreviewPage),
                         ],
                       ),
                     ),
 
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: OmaSpacing.xl,
+                      ),
                       child: OnboardingFooter(
                         canContinue: vm.isPreviewPage
                             ? !vm.isSaving

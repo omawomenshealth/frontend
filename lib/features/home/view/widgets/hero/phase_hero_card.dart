@@ -84,7 +84,12 @@ class PhaseHeroCard extends StatelessWidget {
           children: [
             PhaseArtwork(presentation: presentation),
             Padding(
-              padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, 18, OmaSpacing.xl, 14),
+              padding: const EdgeInsets.fromLTRB(
+                OmaSpacing.xl,
+                18,
+                OmaSpacing.xl,
+                14,
+              ),
               child: Column(
                 children: [
                   Expanded(

@@ -84,21 +84,10 @@ void main() {
     expect(secondPageAssets, hasLength(3));
     expect(secondPageAssets, isNot(equals(firstPageAssets)));
 
-    final visibleAssets = [
-      ...firstPageAssets,
-      ...secondPageAssets,
-    ];
+    final visibleAssets = [...firstPageAssets, ...secondPageAssets];
 
-    for (final phase in [
-      'menstrual',
-      'follicular',
-      'ovulation',
-      'luteal',
-    ]) {
-      expect(
-        visibleAssets.any((asset) => asset.contains('/$phase/')),
-        isTrue,
-      );
+    for (final phase in ['menstrual', 'follicular', 'ovulation', 'luteal']) {
+      expect(visibleAssets.any((asset) => asset.contains('/$phase/')), isTrue);
     }
   });
 
@@ -107,17 +96,12 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
 
-    final storage = LocalStorageService(
-      keyStore: MemoryLocalKeyStore(),
-    );
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
     await storage.init();
 
     final vm = OnboardingViewModel(
       storage,
-      SyncService(
-        storage,
-        ApiService(storage),
-      ),
+      SyncService(storage, ApiService(storage)),
     );
 
     await tester.pumpWidget(
@@ -132,49 +116,26 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: AppStrings.supportedLocales,
-          home: Scaffold(
-            body: PreviewPage(vm: vm),
-          ),
+          home: Scaffold(body: PreviewPage(vm: vm)),
         ),
       ),
     );
 
     final preview = t.onboarding.preview;
 
-    expect(
-      find.text(preview.hero.title),
-      findsOneWidget,
-    );
+    expect(find.text(preview.hero.title), findsOneWidget);
 
-    expect(
-      find.text(preview.callout.message),
-      findsOneWidget,
-    );
+    expect(find.text(preview.callout.message), findsOneWidget);
 
-    expect(
-      find.text(preview.summary.conditions.label),
-      findsOneWidget,
-    );
+    expect(find.text(preview.summary.conditions.label), findsOneWidget);
 
-    expect(
-      find.text(preview.summary.cycle.label),
-      findsOneWidget,
-    );
+    expect(find.text(preview.summary.cycle.label), findsOneWidget);
 
-    expect(
-      find.text(preview.summary.storage.label),
-      findsOneWidget,
-    );
+    expect(find.text(preview.summary.storage.label), findsOneWidget);
 
-    expect(
-      find.text(preview.summary.storage.guest),
-      findsOneWidget,
-    );
+    expect(find.text(preview.summary.storage.guest), findsOneWidget);
 
-    expect(
-      find.text(preview.privacy.deviceEncryptionNote),
-      findsOneWidget,
-    );
+    expect(find.text(preview.privacy.deviceEncryptionNote), findsOneWidget);
 
     expect(
       tester.widget<OmaLogo>(find.byType(OmaLogo)).size,
@@ -195,17 +156,12 @@ void main() {
 
     SharedPreferences.setMockInitialValues({});
 
-    final storage = LocalStorageService(
-      keyStore: MemoryLocalKeyStore(),
-    );
+    final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
     await storage.init();
 
     final api = ApiService(storage);
 
-    final vm = OnboardingViewModel(
-      storage,
-      SyncService(storage, api),
-    );
+    final vm = OnboardingViewModel(storage, SyncService(storage, api));
 
     await tester.pumpWidget(
       TranslationProvider(
@@ -222,9 +178,7 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: AppStrings.supportedLocales,
-            routes: {
-              '/home': (_) => const SizedBox.shrink(),
-            },
+            routes: {'/home': (_) => const SizedBox.shrink()},
             home: const OnboardingView(),
           ),
         ),
@@ -235,32 +189,17 @@ void main() {
 
     // Introduction
     expect(find.text('Seni tanıyalım'), findsOneWidget);
-    expect(
-      find.text(t.onboarding.prompt.introduction),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.common.skipForNow),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.introduction.name),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.introduction.nameHint),
-      findsOneWidget,
-    );
+    expect(find.text(t.onboarding.prompt.introduction), findsOneWidget);
+    expect(find.text(t.onboarding.common.skipForNow), findsOneWidget);
+    expect(find.text(t.onboarding.introduction.name), findsOneWidget);
+    expect(find.text(t.onboarding.introduction.nameHint), findsOneWidget);
 
     final nameField = tester.widget<TextField>(
       find.byKey(const ValueKey('onboarding_name')),
     );
 
     expect(nameField.decoration?.labelText, isNull);
-    expect(
-      nameField.decoration?.hintText,
-      t.onboarding.introduction.nameHint,
-    );
+    expect(nameField.decoration?.hintText, t.onboarding.introduction.nameHint);
 
     final nameSize = tester.getSize(
       find.byKey(const ValueKey('onboarding_name')),
@@ -289,222 +228,111 @@ void main() {
     expect(vm.age, greaterThan(0));
 
     // Wellbeing
-    await tester.tap(
-      find.text(t.onboarding.common.next),
-    );
-    await tester.pump(
-      const Duration(milliseconds: 500),
-    );
+    await tester.tap(find.text(t.onboarding.common.next));
+    await tester.pump(const Duration(milliseconds: 500));
 
-    expect(
-      find.text(t.onboarding.wellbeing.title),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.prompt.wellbeing),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.wellbeing.moodQuestion),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.wellbeing.multiSelectHint),
-      findsOneWidget,
-    );
+    expect(find.text(t.onboarding.wellbeing.title), findsOneWidget);
+    expect(find.text(t.onboarding.prompt.wellbeing), findsOneWidget);
+    expect(find.text(t.onboarding.wellbeing.moodQuestion), findsOneWidget);
+    expect(find.text(t.onboarding.wellbeing.multiSelectHint), findsOneWidget);
 
     // Back navigation should preserve entered data
-    await tester.tap(
-      find.byIcon(Icons.arrow_back),
-    );
-    await tester.pump(
-      const Duration(milliseconds: 500),
-    );
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(
       tester
-          .widget<TextField>(
-            find.byKey(
-              const ValueKey('onboarding_name'),
-            ),
-          )
+          .widget<TextField>(find.byKey(const ValueKey('onboarding_name')))
           .controller!
           .text,
       'Ayse',
     );
 
-    await tester.tap(
-      find.text(t.onboarding.common.next),
-    );
-    await tester.pump(
-      const Duration(milliseconds: 500),
-    );
+    await tester.tap(find.text(t.onboarding.common.next));
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Health profile
-    await tester.tap(
-      find.text(t.onboarding.common.next),
-    );
-    await tester.pump(
-      const Duration(milliseconds: 500),
-    );
+    await tester.tap(find.text(t.onboarding.common.next));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text(t.onboarding.health_profile.title), findsOneWidget);
+    expect(find.text(t.onboarding.prompt.healthProfile), findsOneWidget);
+
+    expect(find.byKey(const ValueKey('onboarding_height')), findsOneWidget);
+    expect(find.byKey(const ValueKey('onboarding_weight')), findsOneWidget);
 
     expect(
-      find.text(t.onboarding.health_profile.title),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.prompt.healthProfile),
-      findsOneWidget,
-    );
-
-    expect(
-      find.byKey(const ValueKey('onboarding_height')),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('onboarding_weight')),
+      find.text(t.onboarding.health_profile.smokingStatus),
       findsOneWidget,
     );
 
     expect(
-      find.text(
-        t.onboarding.health_profile.smokingStatus,
-      ),
+      find.text(t.onboarding.health_profile.knownConditions),
       findsOneWidget,
     );
 
     expect(
-      find.text(
-        t.onboarding.health_profile.knownConditions,
-      ),
-      findsOneWidget,
-    );
-
-    expect(
-      find.byKey(
-        const ValueKey('onboarding_add_known_disease'),
-      ),
+      find.byKey(const ValueKey('onboarding_add_known_disease')),
       findsOneWidget,
     );
 
     // Cycle
-    await tester.tap(
-      find.text(t.onboarding.common.next),
-    );
-    await tester.pump(
-      const Duration(milliseconds: 500),
-    );
+    await tester.tap(find.text(t.onboarding.common.next));
+    await tester.pump(const Duration(milliseconds: 500));
 
-    expect(
-      find.text(t.onboarding.cycle.title),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.prompt.cycle),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.cycle.menopauseStatus),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.cycle.averageCycleLength),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.cycle.lastPeriodDays),
-      findsOneWidget,
-    );
-    expect(
-      find.text(t.onboarding.cycle.birthControl),
-      findsOneWidget,
-    );
+    expect(find.text(t.onboarding.cycle.title), findsOneWidget);
+    expect(find.text(t.onboarding.prompt.cycle), findsOneWidget);
+    expect(find.text(t.onboarding.cycle.menopauseStatus), findsOneWidget);
+    expect(find.text(t.onboarding.cycle.averageCycleLength), findsOneWidget);
+    expect(find.text(t.onboarding.cycle.lastPeriodDays), findsOneWidget);
+    expect(find.text(t.onboarding.cycle.birthControl), findsOneWidget);
 
-    expect(
-      tester.widget<Slider>(find.byType(Slider)).onChanged,
-      isNull,
-    );
+    expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNull);
 
     expect(
       tester
           .widget<OutlinedButton>(
-            find.byKey(
-              const ValueKey('onboarding_last_period_days'),
-            ),
+            find.byKey(const ValueKey('onboarding_last_period_days')),
           )
           .onPressed,
       isNull,
     );
 
-    await tester.tap(
-      find.byType(OmaChip).first,
-    );
-    await tester.pump(
-      const Duration(milliseconds: 500),
-    );
+    await tester.tap(find.byType(OmaChip).first);
+    await tester.pump(const Duration(milliseconds: 500));
 
-    expect(
-      tester.widget<Slider>(find.byType(Slider)).onChanged,
-      isNotNull,
-    );
+    expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNotNull);
 
     expect(
       tester
           .widget<OutlinedButton>(
-            find.byKey(
-              const ValueKey('onboarding_last_period_days'),
-            ),
+            find.byKey(const ValueKey('onboarding_last_period_days')),
           )
           .onPressed,
       isNotNull,
     );
 
     // Preview
-    await tester.tap(
-      find.text(t.onboarding.common.next),
-    );
-    await tester.pump(
-      const Duration(milliseconds: 500),
-    );
+    await tester.tap(find.text(t.onboarding.common.next));
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(vm.currentPage, 4);
 
     final preview = t.onboarding.preview;
 
-    expect(
-      find.text(preview.callout.message),
-      findsOneWidget,
-    );
+    expect(find.text(preview.callout.message), findsOneWidget);
 
-    expect(
-      find.text(preview.summary.storage.label),
-      findsOneWidget,
-    );
+    expect(find.text(preview.summary.storage.label), findsOneWidget);
 
-    expect(
-      find.text(preview.summary.storage.guest),
-      findsOneWidget,
-    );
+    expect(find.text(preview.summary.storage.guest), findsOneWidget);
 
-    expect(
-      find.text(preview.summary.conditions.label),
-      findsOneWidget,
-    );
+    expect(find.text(preview.summary.conditions.label), findsOneWidget);
 
-    expect(
-      find.text(preview.summary.cycle.label),
-      findsOneWidget,
-    );
+    expect(find.text(preview.summary.cycle.label), findsOneWidget);
 
-    expect(
-      find.text(preview.privacy.deviceEncryptionNote),
-      findsOneWidget,
-    );
+    expect(find.text(preview.privacy.deviceEncryptionNote), findsOneWidget);
 
-    expect(
-      find.text(AppStrings.smokingStatus),
-      findsNothing,
-    );
+    expect(find.text(AppStrings.smokingStatus), findsNothing);
 
     expect(tester.takeException(), isNull);
   });
@@ -514,29 +342,20 @@ void main() {
     () async {
       SharedPreferences.setMockInitialValues({});
 
-      final storage = LocalStorageService(
-        keyStore: MemoryLocalKeyStore(),
-      );
+      final storage = LocalStorageService(keyStore: MemoryLocalKeyStore());
       await storage.init();
 
       final vm = OnboardingViewModel(
         storage,
-        SyncService(
-          storage,
-          ApiService(storage),
-        ),
+        SyncService(storage, ApiService(storage)),
       );
 
       final today = DateTime.now().dateOnly;
-      final start = today.subtract(
-        const Duration(days: 5),
-      );
+      final start = today.subtract(const Duration(days: 5));
 
       final selectedDays = List.generate(
         4,
-        (index) => start.add(
-          Duration(days: index),
-        ),
+        (index) => start.add(Duration(days: index)),
       );
 
       vm.setLastPeriodDays(selectedDays);
@@ -545,32 +364,21 @@ void main() {
       expect(vm.lastPeriodDays, selectedDays);
       expect(vm.averagePeriodLength, 4);
 
-      expect(
-        await vm.saveAndComplete(),
-        isTrue,
-      );
+      expect(await vm.saveAndComplete(), isTrue);
 
-      expect(
-        storage.loadSettings()!.lastPeriodDate,
-        start,
-      );
+      expect(storage.loadSettings()!.lastPeriodDate, start);
 
       for (final day in selectedDays) {
         final log = storage.loadLogsForDate(day).single;
 
         expect(
-          AppStrings.localizeStoredValue(
-            log.flowIntensity!,
-          ),
+          AppStrings.localizeStoredValue(log.flowIntensity!),
           AppStrings.flowOptions[1],
         );
 
         expect(log.hasExplicitTime, isFalse);
 
-        expect(
-          log.observedSections,
-          contains(DailyLogObservedSection.period),
-        );
+        expect(log.observedSections, contains(DailyLogObservedSection.period));
       }
     },
   );

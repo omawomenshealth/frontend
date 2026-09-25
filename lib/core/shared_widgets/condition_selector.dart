@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_strings.dart';
 import '../theme/oma_theme.dart';
+import '../widgets/oma_chip.dart';
+import '../widgets/oma_wrap.dart';
 
 /// Hazır sağlık seçeneklerini ve kullanıcının eklediği özel değerleri birlikte
 /// gösterir. Eski "Diğer" seçeneği yerine doğrudan ad girilmesini sağlar.
@@ -29,12 +31,10 @@ class ConditionSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final oma = context.omaTheme;
     final items = _visibleItems();
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+    return OmaWrap(
       children: [
         for (final item in items)
-          FilterChip(
+          OmaFilterChip(
             label: Text(item),
             selected: _isSelected(item),
             onSelected: (_) => onToggle(item),
@@ -48,7 +48,7 @@ class ConditionSelector extends StatelessWidget {
               color: _isSelected(item) ? color : oma.foreground,
             ),
           ),
-        ActionChip(
+        OmaActionChip(
           key: ValueKey(addButtonKey),
           avatar: Icon(Icons.add_rounded, size: 17, color: color),
           label: Text(AppStrings.add),

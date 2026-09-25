@@ -27,7 +27,10 @@ class LoadingIndicator extends StatelessWidget {
             const SizedBox(height: OmaSpacing.lg),
             Text(
               message!,
-              style: TextStyle(color: context.omaTheme.muted, fontSize: OmaTypeScale.body),
+              style: TextStyle(
+                color: context.omaTheme.muted,
+                fontSize: OmaTypeScale.body,
+              ),
             ),
           ],
         ],

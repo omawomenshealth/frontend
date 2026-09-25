@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'oma_chip.dart';
+import 'oma_wrap.dart';
 
 class OmaMultiSelect<T> extends StatelessWidget {
   const OmaMultiSelect({
@@ -30,13 +31,13 @@ class OmaMultiSelect<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OmaChipWrap(
+    return OmaWrap(
       children: [
         for (final option in options)
-          OmaChip(
-            label: labelBuilder(option),
+          OmaFilterChip(
+            label: Text(labelBuilder(option)),
             selected: selectedValues.contains(option),
-            onTap: () => _toggle(option),
+            onSelected: (_) => _toggle(option),
           ),
       ],
     );

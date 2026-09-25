@@ -169,7 +169,10 @@ class _OmaToastWidgetState extends State<_OmaToastWidget>
                                 const SizedBox(height: 3),
                                 Text(
                                   widget.description!,
-                                  style: OmaText.body(OmaTypeScale.caption, color: oma.muted),
+                                  style: OmaText.body(
+                                    OmaTypeScale.caption,
+                                    color: oma.muted,
+                                  ),
                                 ),
                               ],
                             ],

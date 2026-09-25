@@ -46,7 +46,12 @@ class _DreamsViewState extends State<DreamsView> {
       body: SafeArea(
         top: false,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.md, OmaSpacing.xl, 28),
+          padding: const EdgeInsets.fromLTRB(
+            OmaSpacing.xl,
+            OmaSpacing.md,
+            OmaSpacing.xl,
+            28,
+          ),
           children: [
             Container(
               padding: const EdgeInsets.all(OmaSpacing.lg),

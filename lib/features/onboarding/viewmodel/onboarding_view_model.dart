@@ -145,17 +145,13 @@ class OnboardingViewModel extends ChangeNotifier {
   double? get height => _height;
   SmokingStatus? get smokingStatus => _smokingStatus;
 
-  List<String> get chronicDiseases =>
-      List.unmodifiable(_conditions);
+  List<String> get chronicDiseases => List.unmodifiable(_conditions);
 
-  List<String> get womenDiseases =>
-      List.unmodifiable(_conditions);
+  List<String> get womenDiseases => List.unmodifiable(_conditions);
 
-  List<String> get customConditions =>
-      List.unmodifiable(_customConditions);
+  List<String> get customConditions => List.unmodifiable(_customConditions);
 
-  List<String> get knownDiseases =>
-      List.unmodifiable(_conditions);
+  List<String> get knownDiseases => List.unmodifiable(_conditions);
 
   // Setters / Actions
 
@@ -189,10 +185,7 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void addChronicDisease(String disease) {
-    final value = _rememberCustomValue(
-      _customConditions,
-      disease,
-    );
+    final value = _rememberCustomValue(_customConditions, disease);
 
     if (value.isEmpty || _containsCondition(_conditions, value)) {
       return;
@@ -211,9 +204,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
     final existingIndex = diseases.indexWhere(
       (value) =>
-          AppStrings.localizeStoredValue(value)
-              .trim()
-              .toLowerCase() ==
+          AppStrings.localizeStoredValue(value).trim().toLowerCase() ==
           disease.trim().toLowerCase(),
     );
 
@@ -228,10 +219,7 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void addKnownDisease(String disease) {
-    final value = _rememberCustomValue(
-      _customConditions,
-      disease,
-    );
+    final value = _rememberCustomValue(_customConditions, disease);
 
     if (value.isEmpty || _containsCondition(knownDiseases, value)) {
       return;
@@ -247,11 +235,9 @@ class OnboardingViewModel extends ChangeNotifier {
 
   // State
 
-  int _averageCycleLength =
-      CycleRules.defaultCycleLength;
+  int _averageCycleLength = CycleRules.defaultCycleLength;
 
-  int _averagePeriodLength =
-      CycleRules.defaultPeriodLength;
+  int _averagePeriodLength = CycleRules.defaultPeriodLength;
 
   DateTime? _lastPeriodDate;
   List<DateTime> _lastPeriodDays = [];
@@ -267,11 +253,9 @@ class OnboardingViewModel extends ChangeNotifier {
 
   DateTime? get lastPeriodDate => _lastPeriodDate;
 
-  List<DateTime> get lastPeriodDays =>
-      List.unmodifiable(_lastPeriodDays);
+  List<DateTime> get lastPeriodDays => List.unmodifiable(_lastPeriodDays);
 
-  String? get birthControlMethod =>
-      _birthControlMethod;
+  String? get birthControlMethod => _birthControlMethod;
 
   List<String> get customBirthControlMethods =>
       List.unmodifiable(_customBirthControlMethods);
@@ -279,51 +263,38 @@ class OnboardingViewModel extends ChangeNotifier {
   // Setters / Actions
 
   void setAverageCycleLength(int value) {
-    _averageCycleLength =
-        CycleRules.sanitizeCycleLength(value);
+    _averageCycleLength = CycleRules.sanitizeCycleLength(value);
 
     notifyListeners();
   }
 
   void setAveragePeriodLength(int value) {
-    _averagePeriodLength =
-        CycleRules.sanitizePeriodLength(value);
+    _averagePeriodLength = CycleRules.sanitizePeriodLength(value);
 
     notifyListeners();
   }
 
   void setLastPeriodDate(DateTime? value) {
-    setLastPeriodDays(
-      value == null ? const [] : [value],
-    );
+    setLastPeriodDays(value == null ? const [] : [value]);
   }
 
   void setLastPeriodDays(Iterable<DateTime> values) {
     final today = DateTime.now();
 
-    final days = values
-        .map(
-          (value) => DateTime(
-            value.year,
-            value.month,
-            value.day,
-          ),
-        )
-        .where((value) => !value.isAfter(today))
-        .toSet()
-        .toList()
-      ..sort();
+    final days =
+        values
+            .map((value) => DateTime(value.year, value.month, value.day))
+            .where((value) => !value.isAfter(today))
+            .toSet()
+            .toList()
+          ..sort();
 
-    _lastPeriodDays =
-        days.take(CycleRules.maxPeriodLength).toList();
+    _lastPeriodDays = days.take(CycleRules.maxPeriodLength).toList();
 
-    _lastPeriodDate = _lastPeriodDays.isEmpty
-        ? null
-        : _lastPeriodDays.first;
+    _lastPeriodDate = _lastPeriodDays.isEmpty ? null : _lastPeriodDays.first;
 
     if (_lastPeriodDays.isNotEmpty) {
-      _averagePeriodLength =
-          CycleRules.sanitizePeriodLength(
+      _averagePeriodLength = CycleRules.sanitizePeriodLength(
         _lastPeriodDays.length,
       );
     }
@@ -337,10 +308,7 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   void addBirthControlMethod(String method) {
-    final value = _rememberCustomValue(
-      _customBirthControlMethods,
-      method,
-    );
+    final value = _rememberCustomValue(_customBirthControlMethods, method);
 
     if (value.isEmpty) return;
 
@@ -361,9 +329,7 @@ class OnboardingViewModel extends ChangeNotifier {
     _isSaving = true;
     notifyListeners();
 
-    var success = await _storage.saveSettings(
-      _buildSettings(),
-    );
+    var success = await _storage.saveSettings(_buildSettings());
 
     if (success) {
       for (final day in _lastPeriodDays) {
@@ -372,9 +338,7 @@ class OnboardingViewModel extends ChangeNotifier {
             date: day,
             hasExplicitTime: false,
             flowIntensity: AppStrings.flowOptions[1],
-            observedSections: const {
-              DailyLogObservedSection.period,
-            },
+            observedSections: const {DailyLogObservedSection.period},
           ),
         );
 
@@ -409,8 +373,7 @@ class OnboardingViewModel extends ChangeNotifier {
       lastPeriodDate: _lastPeriodDate,
       birthControlMethod: _birthControlMethod,
       customConditions: _customConditions,
-      customBirthControlMethods:
-          _customBirthControlMethods,
+      customBirthControlMethods: _customBirthControlMethods,
     );
   }
 
@@ -418,31 +381,20 @@ class OnboardingViewModel extends ChangeNotifier {
   // Private Helpers
   // ===========================================================================
 
-  bool _containsCondition(
-    List<String> values,
-    String candidate,
-  ) {
+  bool _containsCondition(List<String> values, String candidate) {
     return values.any(
       (value) =>
-          _normalizeCustomValue(
-            AppStrings.localizeStoredValue(value),
-          ) ==
+          _normalizeCustomValue(AppStrings.localizeStoredValue(value)) ==
           _normalizeCustomValue(candidate),
     );
   }
 
-  String _rememberCustomValue(
-    List<String> values,
-    String rawValue,
-  ) {
-    final cleaned = rawValue
-        .trim()
-        .replaceAll(RegExp(r'\s+'), ' ');
+  String _rememberCustomValue(List<String> values, String rawValue) {
+    final cleaned = rawValue.trim().replaceAll(RegExp(r'\s+'), ' ');
 
     if (cleaned.isEmpty) return '';
 
-    final normalized =
-        _normalizeCustomValue(cleaned);
+    final normalized = _normalizeCustomValue(cleaned);
 
     for (final value in values) {
       if (_normalizeCustomValue(value) == normalized) {

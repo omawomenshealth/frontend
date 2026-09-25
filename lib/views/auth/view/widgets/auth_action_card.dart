@@ -120,7 +120,7 @@ class _OrDivider extends StatelessWidget {
 
     return Row(
       children: [
-        Expanded(child: Divider(color: context.omaTheme.border, height: 1)),
+        const Expanded(child: OmaDivider(height: 1)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md),
           child: Text(
@@ -128,7 +128,7 @@ class _OrDivider extends StatelessWidget {
             style: OmaText.body(11.5, color: context.omaTheme.muted),
           ),
         ),
-        Expanded(child: Divider(color: context.omaTheme.border, height: 1)),
+        const Expanded(child: OmaDivider(height: 1)),
       ],
     );
   }

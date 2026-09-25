@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/oma_theme.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/widgets/oma_wrap.dart';
 
 /// Emoji tabanlı ruh hali seçici kartı.
 class MoodSelectorCard extends StatelessWidget {
@@ -34,11 +35,14 @@ class MoodSelectorCard extends StatelessWidget {
               const SizedBox(width: OmaSpacing.sm),
               const Spacer(),
               if (selectedEmoji != null)
-                Text(selectedEmoji!, style: const TextStyle(fontSize: OmaTypeScale.heading)),
+                Text(
+                  selectedEmoji!,
+                  style: const TextStyle(fontSize: OmaTypeScale.heading),
+                ),
             ],
           ),
           const SizedBox(height: OmaSpacing.lg),
-          Wrap(
+          OmaWrap(
             spacing: 8,
             runSpacing: 10,
             children: AppStrings.moodOptions.entries.map((entry) {

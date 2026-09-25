@@ -32,7 +32,10 @@ class OmaCallout extends StatelessWidget {
             ],
             Expanded(
               child: DefaultTextStyle(
-                style: OmaText.body(OmaTypeScale.caption, color: oma.calloutForeground),
+                style: OmaText.body(
+                  OmaTypeScale.caption,
+                  color: oma.calloutForeground,
+                ),
                 child: child,
               ),
             ),

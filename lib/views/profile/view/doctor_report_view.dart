@@ -10,6 +10,7 @@ import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/daily_log_formatters.dart';
 import '../../../core/widgets/oma_toast.dart';
+import '../../../core/widgets/oma_divider.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/user_settings_model.dart';
@@ -140,7 +141,10 @@ class DoctorReportView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: OmaSpacing.md),
-              Divider(thickness: 1.5, color: OmaPalette.documentDivider),
+              const OmaDivider(
+                thickness: 1.5,
+                color: OmaPalette.documentDivider,
+              ),
               const SizedBox(height: OmaSpacing.lg),
 
               // ── BÖLÜM 1: KİŞİSEL BİLGİLER ───────────────────────────
@@ -399,31 +403,46 @@ class DoctorReportView extends StatelessWidget {
               DataColumn(
                 label: Text(
                   AppStrings.date,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: OmaTypeScale.caption,
+                  ),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.period,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: OmaTypeScale.caption,
+                  ),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.nutrition,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: OmaTypeScale.caption,
+                  ),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.medicationsSupplementsAndSkincare,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: OmaTypeScale.caption,
+                  ),
                 ),
               ),
               DataColumn(
                 label: Text(
                   AppStrings.mood,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: OmaTypeScale.caption),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: OmaTypeScale.caption,
+                  ),
                 ),
               ),
             ],
@@ -992,13 +1011,19 @@ class DoctorReportView extends StatelessWidget {
             width: 140,
             child: pw.Text(
               label,
-              style: const pw.TextStyle(fontSize: OmaTypeScale.micro, color: PdfColors.grey700),
+              style: const pw.TextStyle(
+                fontSize: OmaTypeScale.micro,
+                color: PdfColors.grey700,
+              ),
             ),
           ),
           pw.Expanded(
             child: pw.Text(
               value,
-              style: pw.TextStyle(fontSize: OmaTypeScale.micro, fontWeight: pw.FontWeight.bold),
+              style: pw.TextStyle(
+                fontSize: OmaTypeScale.micro,
+                fontWeight: pw.FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -1024,7 +1049,10 @@ class DoctorReportView extends StatelessWidget {
         3: pw.FlexColumnWidth(1.65),
         4: pw.FlexColumnWidth(1.45),
       },
-      cellPadding: const pw.EdgeInsets.symmetric(horizontal: OmaSpacing.xs, vertical: 5),
+      cellPadding: const pw.EdgeInsets.symmetric(
+        horizontal: OmaSpacing.xs,
+        vertical: 5,
+      ),
       cellAlignment: pw.Alignment.centerLeft,
       headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
       cellStyle: const pw.TextStyle(fontSize: 8),

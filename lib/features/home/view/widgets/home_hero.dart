@@ -60,7 +60,10 @@ class _HeroEmptyState extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl, vertical: 18),
+      padding: const EdgeInsets.symmetric(
+        horizontal: OmaSpacing.xl,
+        vertical: 18,
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(OmaRadius.xl),
         border: Border.all(color: theme.border),
@@ -78,7 +81,11 @@ class _HeroEmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             strings.emptyMessage,
-            style: OmaText.body(OmaTypeScale.body, color: theme.muted, height: 1.4),
+            style: OmaText.body(
+              OmaTypeScale.body,
+              color: theme.muted,
+              height: 1.4,
+            ),
           ),
         ],
       ),

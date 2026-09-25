@@ -24,8 +24,7 @@ class HomeViewModel extends ChangeNotifier {
   final CyclePredictionCoordinator _cyclePredictions;
   final bool _ownsCyclePredictions;
 
-  final PersonalInsightEngine _insightEngine =
-      const PersonalInsightEngine();
+  final PersonalInsightEngine _insightEngine = const PersonalInsightEngine();
 
   static const int _previewInsightLimit = 2;
 
@@ -60,8 +59,7 @@ class HomeViewModel extends ChangeNotifier {
 
   List<DailyLog> get todayLogs => _todayLogs;
 
-  DailyLog? get latestLog =>
-      _todayLogs.isNotEmpty ? _todayLogs.first : null;
+  DailyLog? get latestLog => _todayLogs.isNotEmpty ? _todayLogs.first : null;
 
   PeriodCalculator? get periodCalculator => _periodCalculator;
 
@@ -69,11 +67,9 @@ class HomeViewModel extends ChangeNotifier {
 
   CycleForecast? get cycleForecast => _cycleForecast;
 
-  List<PersonalInsight> get personalInsights =>
-      _personalInsights;
+  List<PersonalInsight> get personalInsights => _personalInsights;
 
-  PregnancyEstimate? get pregnancyEstimate =>
-      _pregnancyEstimate;
+  PregnancyEstimate? get pregnancyEstimate => _pregnancyEstimate;
 
   bool get isLoading => _isLoading;
 
@@ -94,34 +90,23 @@ class HomeViewModel extends ChangeNotifier {
 
     final phase = calculator.phaseAt(_selectedDate);
 
-    final cycleDay = _cycleDayFor(
-      calculator,
-      _selectedDate,
-    );
+    final cycleDay = _cycleDayFor(calculator, _selectedDate);
 
     final cycleLength =
-        _cycleForecast?.expectedCycleLength ??
-        calculator.cycleLength;
+        _cycleForecast?.expectedCycleLength ?? calculator.cycleLength;
 
     return CycleHeroData(
       phase: phase,
       cycleDay: cycleDay,
       cycleLength: cycleLength,
-      periodDay:
-          phase == CyclePhase.menstrual ? cycleDay : null,
+      periodDay: phase == CyclePhase.menstrual ? cycleDay : null,
       daysUntilPeriod: phase == CyclePhase.menstrual
           ? null
-          : _daysUntilPeriodFor(
-              calculator,
-              _selectedDate,
-            ),
+          : _daysUntilPeriodFor(calculator, _selectedDate),
     );
   }
 
-  int _cycleDayFor(
-    PeriodCalculator calculator,
-    DateTime date,
-  ) {
+  int _cycleDayFor(PeriodCalculator calculator, DateTime date) {
     final difference = date.dateOnly
         .difference(calculator.lastPeriodDate.dateOnly)
         .inDays;
@@ -135,10 +120,7 @@ class HomeViewModel extends ChangeNotifier {
     return difference + 1;
   }
 
-  int _daysUntilPeriodFor(
-    PeriodCalculator calculator,
-    DateTime date,
-  ) {
+  int _daysUntilPeriodFor(PeriodCalculator calculator, DateTime date) {
     final forecast = _cycleForecast;
 
     if (forecast != null) {
@@ -148,9 +130,7 @@ class HomeViewModel extends ChangeNotifier {
       return days < 0 ? 0 : days;
     }
 
-    final days = calculator.nextPeriodDate
-        .difference(date.dateOnly)
-        .inDays;
+    final days = calculator.nextPeriodDate.difference(date.dateOnly).inDays;
 
     return days < 0 ? 0 : days;
   }
@@ -180,9 +160,7 @@ class HomeViewModel extends ChangeNotifier {
       // Birleşik hızlı işlem, eski sürümlerde ayrı kaydedilmiş
       // takviyeyi de açar.
       if (section == DailyLogObservedSection.medication &&
-          log.observedSections.contains(
-            DailyLogObservedSection.supplement,
-          ) &&
+          log.observedSections.contains(DailyLogObservedSection.supplement) &&
           log.supplements.isNotEmpty) {
         matchingLog = log;
         break;
@@ -190,9 +168,7 @@ class HomeViewModel extends ChangeNotifier {
 
       // Eski sürümlerde takviyeler ilaç bölümü altında tutuluyordu.
       if (section == DailyLogObservedSection.supplement &&
-          log.observedSections.contains(
-            DailyLogObservedSection.medication,
-          ) &&
+          log.observedSections.contains(DailyLogObservedSection.medication) &&
           log.supplements.isNotEmpty) {
         matchingLog = log;
         break;
@@ -203,9 +179,7 @@ class HomeViewModel extends ChangeNotifier {
       return matchingLog;
     }
 
-    final initialDate = targetDate.isToday
-        ? AppTime.now
-        : targetDate.dateOnly;
+    final initialDate = targetDate.isToday ? AppTime.now : targetDate.dateOnly;
 
     return DailyLog.empty(initialDate);
   }
@@ -227,10 +201,7 @@ class HomeViewModel extends ChangeNotifier {
   String get greeting {
     final name = _settings?.userName ?? '';
 
-    return AppStrings.greeting(
-      hour: AppTime.now.hour,
-      name: name,
-    );
+    return AppStrings.greeting(hour: AppTime.now.hour, name: name);
   }
 
   String get cleanGreeting {
@@ -276,9 +247,7 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _syncStateAfterSave(
-    DateTime dateForLogs,
-  ) async {
+  Future<void> _syncStateAfterSave(DateTime dateForLogs) async {
     _todayLogs = _storage.loadLogsForDate(dateForLogs);
 
     await _cyclePredictions.refresh(force: true);
@@ -292,13 +261,10 @@ class HomeViewModel extends ChangeNotifier {
     _rebuildCycleState();
   }
 
-  void _refreshPregnancyEstimate(
-    List<DailyLog> allLogs,
-  ) {
+  void _refreshPregnancyEstimate(List<DailyLog> allLogs) {
     final settings = _settings;
 
-    _pregnancyEstimate =
-        settings?.trackingMode == TrackingMode.pregnant
+    _pregnancyEstimate = settings?.trackingMode == TrackingMode.pregnant
         ? PregnancyCalculator.estimate(
             settings: settings!,
             logs: allLogs,
@@ -309,14 +275,12 @@ class HomeViewModel extends ChangeNotifier {
 
   void _rebuildCycleState() {
     _cycleForecast = _cyclePredictions.forecast;
-    _bleedingDays =
-        _cyclePredictions.menstrualBleedingDays;
+    _bleedingDays = _cyclePredictions.menstrualBleedingDays;
 
     final history = _cyclePredictions.history;
 
     final lastPeriodDate =
-        history?.lastPeriodStart ??
-        _settings?.lastPeriodDate;
+        history?.lastPeriodStart ?? _settings?.lastPeriodDate;
 
     final forecast = _cycleForecast;
 
@@ -331,10 +295,8 @@ class HomeViewModel extends ChangeNotifier {
           start: forecast.p80Window.start,
           end: forecast.p80Window.end,
         ),
-        allowCalendarOvulationEstimates:
-            forecast.calendarOvulationEligible,
-        hasBleedingLog: (date) =>
-            _bleedingDays.contains(date.dateOnly),
+        allowCalendarOvulationEstimates: forecast.calendarOvulationEligible,
+        hasBleedingLog: (date) => _bleedingDays.contains(date.dateOnly),
       );
 
       _cycleInsights = _storage.getCycleInsights();
@@ -344,9 +306,7 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  void _refreshPersonalInsights(
-    List<DailyLog> allLogs,
-  ) {
+  void _refreshPersonalInsights(List<DailyLog> allLogs) {
     final generated = _insightEngine.generate(
       allLogs,
       doseRecords: _storage.loadMedicationDoseRecords(),
@@ -366,8 +326,7 @@ class HomeViewModel extends ChangeNotifier {
     final beforeIds = _insightEngine
         .generate(
           _storage.loadAllLogs(),
-          doseRecords:
-              _storage.loadMedicationDoseRecords(),
+          doseRecords: _storage.loadMedicationDoseRecords(),
           settings: _storage.loadSettings(),
         )
         .where((insight) => insight.shouldNotify)
@@ -407,9 +366,7 @@ class HomeViewModel extends ChangeNotifier {
   // Insight notifications
   // ---------------------------------------------------------------------------
 
-  Future<void> _notifyForNewInsight(
-    Set<String> beforeIds,
-  ) async {
+  Future<void> _notifyForNewInsight(Set<String> beforeIds) async {
     final notifications = _notifications;
 
     if (notifications == null ||
@@ -418,15 +375,13 @@ class HomeViewModel extends ChangeNotifier {
       return;
     }
 
-    final sentIds =
-        _storage.loadNotifiedInsightIds();
+    final sentIds = _storage.loadNotifiedInsightIds();
 
     final candidates =
         _insightEngine
             .generate(
               _storage.loadAllLogs(),
-              doseRecords:
-                  _storage.loadMedicationDoseRecords(),
+              doseRecords: _storage.loadMedicationDoseRecords(),
               settings: _settings,
             )
             .where(
@@ -437,8 +392,7 @@ class HomeViewModel extends ChangeNotifier {
             )
             .toList()
           ..sort((left, right) {
-            final urgency =
-                right.notificationLevel.index.compareTo(
+            final urgency = right.notificationLevel.index.compareTo(
               left.notificationLevel.index,
             );
 
@@ -446,9 +400,7 @@ class HomeViewModel extends ChangeNotifier {
               return urgency;
             }
 
-            return right.priority.compareTo(
-              left.priority,
-            );
+            return right.priority.compareTo(left.priority);
           });
 
     if (candidates.isEmpty) {
@@ -456,8 +408,7 @@ class HomeViewModel extends ChangeNotifier {
     }
 
     try {
-      final permissionGranted =
-          await notifications.requestInsightPermissions();
+      final permissionGranted = await notifications.requestInsightPermissions();
 
       if (!permissionGranted) {
         return;
@@ -465,20 +416,15 @@ class HomeViewModel extends ChangeNotifier {
 
       final candidate = candidates.first;
 
-      final scheduled =
-          await notifications.scheduleInsightReady(
+      final scheduled = await notifications.scheduleInsightReady(
         insightId: candidate.id,
       );
 
       if (scheduled) {
-        await _storage.markInsightNotificationSent(
-          candidate.id,
-        );
+        await _storage.markInsightNotificationSent(candidate.id);
       }
     } catch (error) {
-      debugPrint(
-        'Insight bildirimi planlanamadı: $error',
-      );
+      debugPrint('Insight bildirimi planlanamadı: $error');
     }
   }
 
@@ -486,17 +432,12 @@ class HomeViewModel extends ChangeNotifier {
   // Period
   // ---------------------------------------------------------------------------
 
-  Future<bool> recordPeriodAndRecalculate(
-    DailyLog log,
-  ) async {
+  Future<bool> recordPeriodAndRecalculate(DailyLog log) async {
     return saveLog(log);
   }
 
-  Future<bool> deletePeriodForDate(
-    DateTime date,
-  ) async {
-    final success =
-        await _storage.deletePeriodLogsForDate(date);
+  Future<bool> deletePeriodForDate(DateTime date) async {
+    final success = await _storage.deletePeriodLogsForDate(date);
 
     if (!success) {
       return false;
@@ -513,13 +454,8 @@ class HomeViewModel extends ChangeNotifier {
   // Mood
   // ---------------------------------------------------------------------------
 
-  Future<void> updateMood(
-    String mood,
-    String emoji,
-  ) async {
-    final log =
-        (latestLog ?? DailyLog.empty(AppTime.now))
-            .copyWith(
+  Future<void> updateMood(String mood, String emoji) async {
+    final log = (latestLog ?? DailyLog.empty(AppTime.now)).copyWith(
       mood: mood,
       moodEmoji: emoji,
     );
@@ -531,57 +467,31 @@ class HomeViewModel extends ChangeNotifier {
   // Medication / supplements
   // ---------------------------------------------------------------------------
 
-  Future<void> toggleMedication(
-    int index,
-    bool taken,
-  ) async {
-    final log =
-        latestLog ?? DailyLog.empty(AppTime.now);
+  Future<void> toggleMedication(int index, bool taken) async {
+    final log = latestLog ?? DailyLog.empty(AppTime.now);
 
-    final medications =
-        List<MedicationEntry>.from(
-      log.medications,
-    );
+    final medications = List<MedicationEntry>.from(log.medications);
 
     if (index < medications.length) {
-      medications[index] =
-          medications[index].copyWith(
-        takenDoseCount:
-            taken ? medications[index].doseCount : 0,
+      medications[index] = medications[index].copyWith(
+        takenDoseCount: taken ? medications[index].doseCount : 0,
       );
 
-      await saveLog(
-        log.copyWith(
-          medications: medications,
-        ),
-      );
+      await saveLog(log.copyWith(medications: medications));
     }
   }
 
-  Future<void> toggleSupplement(
-    int index,
-    bool taken,
-  ) async {
-    final log =
-        latestLog ?? DailyLog.empty(AppTime.now);
+  Future<void> toggleSupplement(int index, bool taken) async {
+    final log = latestLog ?? DailyLog.empty(AppTime.now);
 
-    final supplements =
-        List<MedicationEntry>.from(
-      log.supplements,
-    );
+    final supplements = List<MedicationEntry>.from(log.supplements);
 
     if (index < supplements.length) {
-      supplements[index] =
-          supplements[index].copyWith(
-        takenDoseCount:
-            taken ? supplements[index].doseCount : 0,
+      supplements[index] = supplements[index].copyWith(
+        takenDoseCount: taken ? supplements[index].doseCount : 0,
       );
 
-      await saveLog(
-        log.copyWith(
-          supplements: supplements,
-        ),
-      );
+      await saveLog(log.copyWith(supplements: supplements));
     }
   }
 
@@ -594,9 +504,7 @@ class HomeViewModel extends ChangeNotifier {
       return 0;
     }
 
-    final hasMood = _todayLogs.any(
-      (log) => log.mood != null,
-    );
+    final hasMood = _todayLogs.any((log) => log.mood != null);
 
     final hasNutrition = _todayLogs.any(
       (log) =>

@@ -8,6 +8,11 @@ import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/pregnancy_calculator.dart';
 import '../../../core/widgets/oma_toast.dart';
+import '../../../core/widgets/oma_chip.dart';
+import '../../../core/widgets/oma_divider.dart';
+import '../../../core/widgets/list_tile/oma_list_tile.dart';
+import '../../../core/widgets/oma_slider.dart';
+import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
 import '../../../data/models/medication_identity_model.dart';
@@ -338,7 +343,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   child: ListView(
                     key: ValueKey('$_logType-$_moodStep'),
                     controller: scrollController,
-                    padding: const EdgeInsets.fromLTRB(18, OmaSpacing.xs, 18, 104),
+                    padding: const EdgeInsets.fromLTRB(
+                      18,
+                      OmaSpacing.xs,
+                      18,
+                      104,
+                    ),
                     children: [_buildContent()],
                   ),
                 ),
@@ -527,7 +537,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 11),
         Align(
           alignment: Alignment.centerLeft,
-          child: Wrap(
+          child: OmaWrap(
             key: const ValueKey('period_symptom_choices'),
             spacing: 8,
             runSpacing: 8,
@@ -664,7 +674,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                         onTap: () => setState(() => _waterGlasses = index + 1),
                         child: Container(
                           height: 41,
-                          margin: EdgeInsets.only(right: index == 7 ? OmaSpacing.none : 6),
+                          margin: EdgeInsets.only(
+                            right: index == 7 ? OmaSpacing.none : 6,
+                          ),
                           decoration: BoxDecoration(
                             color: filled
                                 ? Color.lerp(
@@ -720,7 +732,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
         const SizedBox(height: 25),
         _SectionTitle(AppStrings.cravingsQuestion),
         const SizedBox(height: 11),
-        Wrap(
+        OmaWrap(
           spacing: 8,
           runSpacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -845,12 +857,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               itemType: MedicationPlanItemType.supplement,
             ),
           const SizedBox(height: OmaSpacing.xxl),
-          Divider(color: _tone.withValues(alpha: 0.24)),
+          OmaDivider(color: _tone.withValues(alpha: 0.24)),
           const SizedBox(height: OmaSpacing.xxl),
         ],
         _buildMedicationCatalogPage(),
         const SizedBox(height: 30),
-        Divider(color: _tone.withValues(alpha: 0.24)),
+        OmaDivider(color: _tone.withValues(alpha: 0.24)),
         const SizedBox(height: OmaSpacing.xxl),
         _buildSupplementCatalogPage(),
       ],
@@ -1429,7 +1441,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       builder: (context, constraints) {
         const spacing = 8.0;
         final tileWidth = (constraints.maxWidth - spacing) / 2;
-        return Wrap(
+        return OmaWrap(
           spacing: spacing,
           runSpacing: spacing,
           children: [
@@ -1646,7 +1658,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           const SizedBox(height: 5),
           Text(
             AppStrings.sexualActivityQuestion,
-            style: TextStyle(fontSize: OmaTypeScale.caption, color: context.omaTheme.muted),
+            style: TextStyle(
+              fontSize: OmaTypeScale.caption,
+              color: context.omaTheme.muted,
+            ),
           ),
           const SizedBox(height: 11),
           _buildTrackingChoices(
@@ -1675,7 +1690,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               ),
             ),
             const SizedBox(height: 9),
-            Wrap(
+            OmaWrap(
               key: const ValueKey('sexual_after_feeling_choices'),
               spacing: 8,
               runSpacing: 8,
@@ -1723,7 +1738,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           const SizedBox(height: 5),
           Text(
             AppStrings.dischargePresent,
-            style: TextStyle(fontSize: OmaTypeScale.caption, color: context.omaTheme.muted),
+            style: TextStyle(
+              fontSize: OmaTypeScale.caption,
+              color: context.omaTheme.muted,
+            ),
           ),
           const SizedBox(height: 11),
           _buildTrackingChoices(
@@ -1789,7 +1807,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               ),
             ),
             const SizedBox(height: 9),
-            Wrap(
+            OmaWrap(
               spacing: 8,
               runSpacing: 8,
               children: [
@@ -1854,7 +1872,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       builder: (context, constraints) {
         const spacing = 8.0;
         final width = (constraints.maxWidth - spacing) / 2;
-        return Wrap(
+        return OmaWrap(
           spacing: spacing,
           runSpacing: spacing,
           children: [
@@ -1925,7 +1943,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
           ),
         ),
         const SizedBox(height: 9),
-        Wrap(
+        OmaWrap(
           spacing: 8,
           runSpacing: 8,
           children: [
@@ -2185,7 +2203,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           !_medicationSectionExpanded,
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 11, OmaSpacing.sm, 11),
+                      padding: const EdgeInsets.fromLTRB(
+                        14,
+                        11,
+                        OmaSpacing.sm,
+                        11,
+                      ),
                       child: Row(
                         children: [
                           Container(
@@ -2257,7 +2280,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ],
           ),
           if (_medicationSectionExpanded) ...[
-            Divider(height: 1, color: _tone.withValues(alpha: 0.18)),
+            OmaDivider(height: 1, color: _tone.withValues(alpha: 0.18)),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 14, 14, OmaSpacing.lg),
               child: _buildNutritionMedicationDetails(),
@@ -2330,16 +2353,26 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       showDragHandle: true,
       builder: (sheetContext) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.none, OmaSpacing.lg, 18),
+          padding: const EdgeInsets.fromLTRB(
+            OmaSpacing.lg,
+            OmaSpacing.none,
+            OmaSpacing.lg,
+            18,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(OmaSpacing.sm, OmaSpacing.xxs, OmaSpacing.sm, OmaSpacing.sm),
+                padding: const EdgeInsets.fromLTRB(
+                  OmaSpacing.sm,
+                  OmaSpacing.xxs,
+                  OmaSpacing.sm,
+                  OmaSpacing.sm,
+                ),
                 child: _SectionTitle(AppStrings.medicationAndSupplement),
               ),
-              ListTile(
+              OmaListTile(
                 leading: Icon(Icons.medication_outlined, color: tone),
                 title: Text(AppStrings.newMedication),
                 onTap: () => Navigator.pop(
@@ -2347,7 +2380,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   _MedicationNutritionAction.addMedication,
                 ),
               ),
-              ListTile(
+              OmaListTile(
                 leading: Icon(Icons.spa_outlined, color: tone),
                 title: Text(AppStrings.newSupplement),
                 onTap: () => Navigator.pop(
@@ -2355,7 +2388,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   _MedicationNutritionAction.addSupplement,
                 ),
               ),
-              ListTile(
+              OmaListTile(
                 leading: Icon(Icons.add_alarm_rounded, color: tone),
                 title: Text(AppStrings.createReminder),
                 onTap: () => Navigator.pop(
@@ -2632,7 +2665,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                           _expandedMedicationEntry = expanded ? null : entryKey,
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(9, OmaSpacing.sm, OmaSpacing.xs, OmaSpacing.sm),
+                      padding: const EdgeInsets.fromLTRB(
+                        9,
+                        OmaSpacing.sm,
+                        OmaSpacing.xs,
+                        OmaSpacing.sm,
+                      ),
                       child: Row(
                         children: [
                           Container(
@@ -2701,7 +2739,10 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 icon: Icon(Icons.add_alarm_rounded, size: 19, color: _tone),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.sm, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: OmaSpacing.sm,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: _tone.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(OmaRadius.xl),
@@ -2740,7 +2781,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ],
           ),
           if (expanded) ...[
-            Divider(height: 1, color: _tone.withValues(alpha: 0.14)),
+            OmaDivider(height: 1, color: _tone.withValues(alpha: 0.14)),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 11),
               child: Column(
@@ -2756,7 +2797,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
                   ),
                   const SizedBox(height: 7),
-                  Wrap(
+                  OmaWrap(
                     spacing: 7,
                     runSpacing: 7,
                     children: [
@@ -2780,12 +2821,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   ),
                   if (customTimes.isNotEmpty) ...[
                     const SizedBox(height: OmaSpacing.sm),
-                    Wrap(
+                    OmaWrap(
                       spacing: 7,
                       runSpacing: 7,
                       children: [
                         for (final time in customTimes)
-                          InputChip(
+                          OmaInputChip(
                             key: ValueKey(
                               'medication_custom_time_${entryKey}_$time',
                             ),
@@ -2882,7 +2923,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                     ),
                   ),
                   const SizedBox(height: 7),
-                  Wrap(
+                  OmaWrap(
                     spacing: 7,
                     children: [
                       for (final state in AppStrings.stomachStates)
@@ -2909,7 +2950,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     MedicationEntry entry,
     ValueChanged<MedicationEntry> onChanged,
   ) {
-    return Wrap(
+    return OmaWrap(
       spacing: 8,
       runSpacing: 8,
       children: [
@@ -3249,7 +3290,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       ...(companion ? _customMoodCompanions : _customMoodPlaces),
       ...selected,
     ]);
-    return Wrap(
+    return OmaWrap(
       spacing: 8,
       runSpacing: 8,
       children: [
@@ -3282,7 +3323,9 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: context.omaTheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OmaRadius.xl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(OmaRadius.xl),
+        ),
         title: Text(
           companion ? AppStrings.moodWhoWith : AppStrings.moodWhere,
           style: TextStyle(
@@ -3395,7 +3438,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   child: InkWell(
                     onTap: () => _toggleMeal(meal),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(13, 11, OmaSpacing.sm, 11),
+                      padding: const EdgeInsets.fromLTRB(
+                        13,
+                        11,
+                        OmaSpacing.sm,
+                        11,
+                      ),
                       child: Row(
                         children: [
                           AnimatedContainer(
@@ -3482,7 +3530,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return Container(
       key: ValueKey('meal_details_$mealIndex'),
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(OmaSpacing.md, 11, OmaSpacing.md, OmaSpacing.md),
+      padding: const EdgeInsets.fromLTRB(
+        OmaSpacing.md,
+        11,
+        OmaSpacing.md,
+        OmaSpacing.md,
+      ),
       decoration: BoxDecoration(
         color: context.omaTheme.surface,
         border: Border(top: BorderSide(color: tone.withValues(alpha: 0.26))),
@@ -3526,7 +3579,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ),
           ),
           const SizedBox(height: OmaSpacing.sm),
-          Wrap(
+          OmaWrap(
             spacing: 7,
             runSpacing: 7,
             children: [
@@ -3594,7 +3647,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
     return SafeArea(
       top: false,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(OmaSpacing.sm, OmaSpacing.sm, OmaSpacing.sm, 9),
+        padding: const EdgeInsets.fromLTRB(
+          OmaSpacing.sm,
+          OmaSpacing.sm,
+          OmaSpacing.sm,
+          9,
+        ),
         color: context.omaTheme.background.withValues(alpha: 0.97),
         child: SizedBox(
           width: double.infinity,
@@ -4302,7 +4360,7 @@ class _StepSelector extends StatelessWidget {
             trackHeight: 7,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
           ),
-          child: Slider(
+          child: OmaSlider(
             value: selectedIndex.toDouble(),
             min: 0,
             max: (labels.length - 1).toDouble(),
@@ -4404,7 +4462,12 @@ class _DreamRecorderTile extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(5, OmaSpacing.xs, OmaSpacing.sm, OmaSpacing.xs),
+            padding: const EdgeInsets.fromLTRB(
+              5,
+              OmaSpacing.xs,
+              OmaSpacing.sm,
+              OmaSpacing.xs,
+            ),
             child: Row(
               children: [
                 Container(
@@ -4489,7 +4552,12 @@ class _SymptomTile extends StatelessWidget {
             child: InkWell(
               onTap: onTap,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(5, OmaSpacing.xs, OmaSpacing.sm, OmaSpacing.xs),
+                padding: const EdgeInsets.fromLTRB(
+                  5,
+                  OmaSpacing.xs,
+                  OmaSpacing.sm,
+                  OmaSpacing.xs,
+                ),
                 child: Row(
                   children: [
                     Container(
@@ -4542,7 +4610,7 @@ class _SymptomTile extends StatelessWidget {
                   activeTickMarkColor: context.omaTheme.onPrimary,
                   inactiveTickMarkColor: tone.withValues(alpha: 0.42),
                 ),
-                child: Slider(
+                child: OmaSlider(
                   key: ValueKey('symptom_severity_${item.label}'),
                   value: severity.toDouble(),
                   min: 1,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/oma_theme.dart';
+import '../../../core/widgets/oma_chip.dart';
+import '../../../core/widgets/oma_wrap.dart';
 
 /// Beslenme, ilaç, takviye ve cilt bakımı için ortak akıllı katalog seçicisi.
 class TrackingCatalogSelector extends StatefulWidget {
@@ -134,12 +136,12 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
         ],
         if (widget.selected.isNotEmpty) ...[
           const SizedBox(height: OmaSpacing.lg),
-          Wrap(
+          OmaWrap(
             spacing: 7,
             runSpacing: 7,
             children: [
               for (final item in widget.selected)
-                InputChip(
+                OmaInputChip(
                   key: ValueKey('selected_catalog_$item'),
                   label: Text(item),
                   selected: true,
@@ -165,12 +167,12 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
             ),
           ),
           const SizedBox(height: OmaSpacing.sm),
-          Wrap(
+          OmaWrap(
             spacing: 7,
             runSpacing: 7,
             children: [
               for (final item in savedCustomItems)
-                FilterChip(
+                OmaFilterChip(
                   label: Text(item),
                   selected: widget.selected.contains(item),
                   selectedColor: widget.color.withValues(alpha: 0.13),
@@ -340,7 +342,12 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
             duration: const Duration(milliseconds: 180),
             child: _categoryGroupExpanded
                 ? Padding(
-                    padding: const EdgeInsets.fromLTRB(10, OmaSpacing.none, 10, 10),
+                    padding: const EdgeInsets.fromLTRB(
+                      10,
+                      OmaSpacing.none,
+                      10,
+                      10,
+                    ),
                     child: Column(
                       children: [
                         for (final entry in categories.entries) ...[
@@ -388,7 +395,12 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                 if (!_expanded.remove(entry.key)) _expanded.add(entry.key);
               }),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, OmaSpacing.md, 10, OmaSpacing.md),
+                padding: const EdgeInsets.fromLTRB(
+                  14,
+                  OmaSpacing.md,
+                  10,
+                  OmaSpacing.md,
+                ),
                 child: Row(
                   children: [
                     Container(
@@ -448,11 +460,16 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
             child: expanded
                 ? Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(OmaSpacing.md, OmaSpacing.xxs, OmaSpacing.md, 13),
+                    padding: const EdgeInsets.fromLTRB(
+                      OmaSpacing.md,
+                      OmaSpacing.xxs,
+                      OmaSpacing.md,
+                      13,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Wrap(
+                        OmaWrap(
                           spacing: 7,
                           runSpacing: 7,
                           children: [
@@ -497,7 +514,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
             ));
 
     if (details.isEmpty) {
-      return FilterChip(
+      return OmaFilterChip(
         key: ValueKey('catalog_item_$item'),
         label: Text(item),
         selected: selected,
@@ -517,7 +534,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: FilterChip(
+            child: OmaFilterChip(
               key: ValueKey('catalog_item_$item'),
               label: Text(item),
               selected: selected,
@@ -560,7 +577,12 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
     final selectedDetail = _selectedDetail(item);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, 7, OmaSpacing.none, OmaSpacing.xs),
+      padding: const EdgeInsets.fromLTRB(
+        OmaSpacing.xl,
+        7,
+        OmaSpacing.none,
+        OmaSpacing.xs,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -574,13 +596,13 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
             ),
           ),
           const SizedBox(height: 7),
-          Wrap(
+          OmaWrap(
             spacing: 7,
             runSpacing: 7,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               for (final detail in visible)
-                ChoiceChip(
+                OmaChoiceChip(
                   key: ValueKey('catalog_detail_${item}_$detail'),
                   label: Text(detail),
                   selected: selectedDetail == detail,
@@ -597,7 +619,7 @@ class _TrackingCatalogSelectorState extends State<TrackingCatalogSelector> {
                       ),
                 ),
               if (query.isEmpty && visible.length < maximumVisible)
-                ActionChip(
+                OmaActionChip(
                   key: ValueKey('catalog_detail_more_$item'),
                   avatar: Icon(
                     Icons.add_rounded,
@@ -672,7 +694,10 @@ class _EmptyResult extends StatelessWidget {
       child: Text(
         AppStrings.noSearchResults,
         textAlign: TextAlign.center,
-        style: TextStyle(color: context.omaTheme.muted, fontSize: OmaTypeScale.caption),
+        style: TextStyle(
+          color: context.omaTheme.muted,
+          fontSize: OmaTypeScale.caption,
+        ),
       ),
     );
   }
