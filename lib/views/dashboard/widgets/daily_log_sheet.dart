@@ -10,6 +10,7 @@ import '../../../core/utils/pregnancy_calculator.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../core/widgets/oma_chip.dart';
 import '../../../core/widgets/oma_divider.dart';
+import '../../../core/widgets/list_tile/oma_list_tile.dart';
 import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
@@ -2370,7 +2371,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                 ),
                 child: _SectionTitle(AppStrings.medicationAndSupplement),
               ),
-              ListTile(
+              OmaListTile(
                 leading: Icon(Icons.medication_outlined, color: tone),
                 title: Text(AppStrings.newMedication),
                 onTap: () => Navigator.pop(
@@ -2378,7 +2379,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   _MedicationNutritionAction.addMedication,
                 ),
               ),
-              ListTile(
+              OmaListTile(
                 leading: Icon(Icons.spa_outlined, color: tone),
                 title: Text(AppStrings.newSupplement),
                 onTap: () => Navigator.pop(
@@ -2386,7 +2387,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
                   _MedicationNutritionAction.addSupplement,
                 ),
               ),
-              ListTile(
+              OmaListTile(
                 leading: Icon(Icons.add_alarm_rounded, color: tone),
                 title: Text(AppStrings.createReminder),
                 onTap: () => Navigator.pop(

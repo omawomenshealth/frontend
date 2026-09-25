@@ -7,6 +7,7 @@ import '../../../../core/theme/oma_theme.dart';
 import '../../../../core/widgets/oma_toast.dart';
 import '../../../../core/widgets/oma_chip.dart';
 import '../../../../core/widgets/oma_divider.dart';
+import '../../../../core/widgets/list_tile/oma_switch_list_tile.dart';
 import '../../../../core/widgets/oma_wrap.dart';
 import '../../../../data/models/medication_identity_model.dart';
 import '../../../../data/models/medication_reminder_model.dart';
@@ -957,7 +958,7 @@ class _MedicationReminderFormSheetState
                     child: Text(AppStrings.noEndDate),
                   ),
                 ),
-              SwitchListTile(
+              OmaSwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(AppStrings.reminderEnabled),
                 value: _enabled,

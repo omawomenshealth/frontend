@@ -13,6 +13,7 @@ import '../../../core/utils/date_extensions.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../core/widgets/oma_circle_avatar.dart';
 import '../../../core/widgets/oma_divider.dart';
+import '../../../core/widgets/list_tile/oma_list_tile.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../features/home/viewmodel/home_view_model.dart';
 import '../../dashboard/widgets/daily_log_sheet.dart';
@@ -1100,7 +1101,7 @@ Future<void> _showDailyLogTypePicker(
               ),
             ),
             for (var index = 0; index < options.length; index++)
-              ListTile(
+              OmaListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(OmaRadius.lg),
                 ),

@@ -237,6 +237,26 @@ abstract final class AppTheme {
           vertical: OmaSpacing.xs,
         ),
       ),
+      listTileTheme: ListTileThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(OmaRadius.lg),
+        ),
+        selectedColor: oma.primaryStrong,
+        iconColor: oma.muted,
+        textColor: oma.foreground,
+        titleTextStyle: OmaText.body(
+          OmaTypeScale.bodyLarge,
+          weight: FontWeight.w600,
+          color: oma.foreground,
+        ),
+        subtitleTextStyle: OmaText.body(OmaTypeScale.body, color: oma.muted),
+        leadingAndTrailingTextStyle: OmaText.label(color: oma.muted),
+        contentPadding: const EdgeInsets.symmetric(horizontal: OmaSpacing.lg),
+        tileColor: oma.surface,
+        selectedTileColor: oma.primarySoft,
+        horizontalTitleGap: OmaSpacing.md,
+        minVerticalPadding: OmaSpacing.sm,
+      ),
       sliderTheme: SliderThemeData(
         activeTrackColor: oma.primary,
         inactiveTrackColor: oma.primary.withValues(alpha: 0.18),
@@ -291,6 +311,70 @@ abstract final class AppTheme {
           return BorderSide(color: oma.border, width: 2);
         }),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      ),
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return oma.muted.withValues(alpha: 0.38);
+          }
+          if (states.contains(WidgetState.selected)) {
+            return oma.primary;
+          }
+          return oma.border;
+        }),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          final color = states.contains(WidgetState.selected)
+              ? oma.primary
+              : oma.foreground;
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.focused)) {
+            return color.withValues(alpha: 0.10);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return color.withValues(alpha: 0.08);
+          }
+          return Colors.transparent;
+        }),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return oma.muted.withValues(alpha: 0.38);
+          }
+          return states.contains(WidgetState.selected)
+              ? oma.onPrimary
+              : oma.surface;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return oma.muted.withValues(alpha: 0.18);
+          }
+          return states.contains(WidgetState.selected)
+              ? oma.primary
+              : oma.surfaceMuted;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.transparent;
+          }
+          if (states.contains(WidgetState.disabled)) {
+            return oma.muted.withValues(alpha: 0.38);
+          }
+          return oma.border;
+        }),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          final color = states.contains(WidgetState.selected)
+              ? oma.primary
+              : oma.foreground;
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.focused)) {
+            return color.withValues(alpha: 0.10);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return color.withValues(alpha: 0.08);
+          }
+          return Colors.transparent;
+        }),
       ),
       dividerTheme: DividerThemeData(
         color: oma.divider,
