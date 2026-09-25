@@ -22,7 +22,10 @@ class ReviewPrivacyNotice extends StatelessWidget {
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
+            style: OmaText.body(
+              OmaTypeScale.caption,
+              color: context.omaTheme.muted,
+            ),
           ),
         ),
       ],

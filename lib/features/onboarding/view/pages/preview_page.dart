@@ -10,11 +10,7 @@ import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
 
 class PreviewPage extends StatefulWidget {
-  const PreviewPage({
-    super.key,
-    required this.vm,
-    this.isActive = true,
-  });
+  const PreviewPage({super.key, required this.vm, this.isActive = true});
 
   final OnboardingViewModel vm;
   final bool isActive;
@@ -55,9 +51,7 @@ class _PreviewPageState extends State<PreviewPage>
 
     final conditionSummary = vm.knownDiseases.isEmpty
         ? preview.summary.conditions.empty
-        : vm.knownDiseases
-            .map(AppStrings.localizeStoredValue)
-            .join(', ');
+        : vm.knownDiseases.map(AppStrings.localizeStoredValue).join(', ');
 
     final accountStorageSummary = vm.isUserLoggedIn
         ? preview.summary.storage.google
@@ -79,9 +73,7 @@ class _PreviewPageState extends State<PreviewPage>
                 animation: riseAt(0),
                 child: Column(
                   children: [
-                    const OmaLogo(
-                      size: OmaLogoSize.standard,
-                    ),
+                    const OmaLogo(size: OmaLogoSize.standard),
                     const SizedBox(height: OmaSpacing.xxl),
                     Text(
                       name.isEmpty

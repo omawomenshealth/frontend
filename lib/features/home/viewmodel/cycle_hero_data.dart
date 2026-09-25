@@ -15,8 +15,7 @@ final class CycleHeroData {
     this.daysUntilPeriod,
   });
 
-  bool get isMenstrual =>
-      phase == CyclePhase.menstrual;
+  bool get isMenstrual => phase == CyclePhase.menstrual;
 
   double get cycleProgress {
     if (cycleLength <= 0 || cycleDay <= 0) {

@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/oma_theme.dart';
 import '../../../../core/widgets/oma_toast.dart';
+import '../../../../core/widgets/oma_chip.dart';
+import '../../../../core/widgets/oma_wrap.dart';
 import '../../../../data/models/medication_identity_model.dart';
 import '../../../../data/models/medication_reminder_model.dart';
 import '../../../../data/services/local_storage_service.dart';
@@ -207,7 +209,10 @@ class _TodaysMedicationDosesCardState extends State<TodaysMedicationDosesCard> {
               ),
               const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.sm, vertical: OmaSpacing.xs),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: OmaSpacing.sm,
+                  vertical: OmaSpacing.xs,
+                ),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(OmaRadius.xl),
@@ -706,7 +711,12 @@ class _MedicationReminderFormSheetState
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.lg, OmaSpacing.xl, bottomInset + OmaSpacing.xl),
+      padding: EdgeInsets.fromLTRB(
+        OmaSpacing.xl,
+        OmaSpacing.lg,
+        OmaSpacing.xl,
+        bottomInset + OmaSpacing.xl,
+      ),
       child: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -811,7 +821,8 @@ class _MedicationReminderFormSheetState
               const SizedBox(height: OmaSpacing.sm),
               for (var index = 0; index < _times.length; index++) ...[
                 _buildTimeSlot(index),
-                if (index != _times.length - 1) const SizedBox(height: OmaSpacing.sm),
+                if (index != _times.length - 1)
+                  const SizedBox(height: OmaSpacing.sm),
               ],
               const SizedBox(height: OmaSpacing.sm),
               Align(
@@ -854,11 +865,11 @@ class _MedicationReminderFormSheetState
               ),
               if (_frequency == MedicationPlanFrequency.selectedWeekdays) ...[
                 const SizedBox(height: 10),
-                Wrap(
+                OmaWrap(
                   spacing: 6,
                   children: List.generate(7, (index) {
                     final day = index + 1;
-                    return FilterChip(
+                    return OmaFilterChip(
                       label: Text(AppStrings.shortWeekdays[index]),
                       selected: _weekdays.contains(day),
                       onSelected: (selected) => setState(() {
@@ -882,11 +893,11 @@ class _MedicationReminderFormSheetState
                 ),
               ),
               const SizedBox(height: OmaSpacing.sm),
-              Wrap(
+              OmaWrap(
                 spacing: 7,
                 runSpacing: 7,
                 children: [
-                  ChoiceChip(
+                  OmaChoiceChip(
                     key: const ValueKey('reminder_duration_long_term'),
                     label: Text(
                       _isRoutineItem
@@ -897,13 +908,13 @@ class _MedicationReminderFormSheetState
                     onSelected: (_) => _setUsageDuration(null),
                   ),
                   for (final days in _durationPresets)
-                    ChoiceChip(
+                    OmaChoiceChip(
                       key: ValueKey('reminder_duration_$days'),
                       label: Text(AppStrings.durationDays(days)),
                       selected: _usageDurationDays == days,
                       onSelected: (_) => _setUsageDuration(days),
                     ),
-                  ChoiceChip(
+                  OmaChoiceChip(
                     key: const ValueKey('reminder_duration_custom'),
                     label: Text(AppStrings.customEndDate),
                     selected:

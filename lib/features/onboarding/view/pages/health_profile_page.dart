@@ -181,10 +181,9 @@ class _KnownConditionsField extends StatelessWidget {
             },
           ),
           const SizedBox(height: OmaSpacing.sm),
-          OmaChip(
-            label: healthProfile.addCondition,
-            showCheck: false,
-            onTap: onOpenDiseases,
+          OmaActionChip(
+            label: Text(healthProfile.addCondition),
+            onPressed: onOpenDiseases,
           ),
         ],
       ),

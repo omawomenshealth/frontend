@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/widgets/index.dart';
 
 class ReviewSummaryRow extends StatelessWidget {
-  const ReviewSummaryRow({
-    super.key,
-    required this.label,
-    required this.value,
-  });
+  const ReviewSummaryRow({super.key, required this.label, required this.value});
 
   final String label;
   final String value;

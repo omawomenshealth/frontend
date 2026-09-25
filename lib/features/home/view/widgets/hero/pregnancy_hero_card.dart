@@ -89,7 +89,12 @@ class PregnancyHeroCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, 18, OmaSpacing.xxl, OmaSpacing.xl),
+              padding: const EdgeInsets.fromLTRB(
+                OmaSpacing.xxl,
+                18,
+                OmaSpacing.xxl,
+                OmaSpacing.xl,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

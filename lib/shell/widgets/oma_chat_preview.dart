@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import '../../core/widgets/oma_badge.dart';
 import '../../core/widgets/index.dart';
 
 class OmaTalkPreview extends StatelessWidget {
@@ -14,7 +13,12 @@ class OmaTalkPreview extends StatelessWidget {
     final theme = context.omaTheme;
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, OmaSpacing.xs, OmaSpacing.xxl, 28),
+        padding: const EdgeInsets.fromLTRB(
+          OmaSpacing.xxl,
+          OmaSpacing.xs,
+          OmaSpacing.xxl,
+          28,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,7 +32,10 @@ class OmaTalkPreview extends StatelessWidget {
                     children: [
                       Text(AppStrings.appName, style: OmaText.display(28)),
                       const SizedBox(width: 10),
-                      const OmaBadge.label('Yakında ✨'),
+                      Text(
+                        'Yakında ✨',
+                        style: OmaText.label(color: theme.primary),
+                      ),
                     ],
                   ),
                 ),
@@ -41,7 +48,7 @@ class OmaTalkPreview extends StatelessWidget {
               style: OmaText.body(OmaTypeScale.body, color: theme.muted),
             ),
             const SizedBox(height: 18),
-            Wrap(
+            OmaWrap(
               spacing: 9,
               runSpacing: 9,
               children: [
@@ -51,19 +58,7 @@ class OmaTalkPreview extends StatelessWidget {
                   AppStrings.mood,
                   AppStrings.nutrition,
                 ])
-                  OmaBadge.label(
-                    label,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 13,
-                      vertical: 9,
-                    ),
-                    foreground: theme.primary.withValues(alpha: 0.72),
-                    background: theme.primary.withValues(alpha: 0.07),
-                    border: Border.all(
-                      color: theme.primary.withValues(alpha: 0.22),
-                    ),
-                    borderRadius: 20,
-                  ),
+                  OmaChip(label: Text(label)),
               ],
             ),
           ],

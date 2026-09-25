@@ -27,7 +27,12 @@ class OmaBottomNavigation extends StatelessWidget {
 
     return SafeArea(
       top: false,
-      minimum: const EdgeInsets.fromLTRB(14, OmaSpacing.none, 14, OmaSpacing.md),
+      minimum: const EdgeInsets.fromLTRB(
+        14,
+        OmaSpacing.none,
+        14,
+        OmaSpacing.md,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/oma_theme.dart';
+import '../../../core/widgets/oma_wrap.dart';
 import '../../../localization/generated/strings.g.dart';
 import '../model/notification_entry.dart';
 import '../viewmodel/notification_inbox.dart';
@@ -33,7 +34,12 @@ class _NotificationsViewState extends State<NotificationsView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(OmaSpacing.lg, OmaSpacing.md, OmaSpacing.xl, OmaSpacing.none),
+                padding: const EdgeInsets.fromLTRB(
+                  OmaSpacing.lg,
+                  OmaSpacing.md,
+                  OmaSpacing.xl,
+                  OmaSpacing.none,
+                ),
                 child: Row(
                   children: [
                     IconButton(
@@ -58,7 +64,12 @@ class _NotificationsViewState extends State<NotificationsView> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, OmaSpacing.md, OmaSpacing.xxl, 22),
+                padding: const EdgeInsets.fromLTRB(
+                  OmaSpacing.xxl,
+                  OmaSpacing.md,
+                  OmaSpacing.xxl,
+                  22,
+                ),
                 child: Text(
                   labels.subtitle,
                   style: OmaText.body(13, color: context.omaTheme.muted),
@@ -94,7 +105,12 @@ class _NotificationsViewState extends State<NotificationsView> {
                 child: entries.isEmpty
                     ? Center(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(28, OmaSpacing.none, 28, 70),
+                          padding: const EdgeInsets.fromLTRB(
+                            28,
+                            OmaSpacing.none,
+                            28,
+                            70,
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -140,7 +156,12 @@ class _NotificationsViewState extends State<NotificationsView> {
                         ),
                       )
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.none, OmaSpacing.xl, OmaSpacing.xxxl),
+                        padding: const EdgeInsets.fromLTRB(
+                          OmaSpacing.xl,
+                          OmaSpacing.none,
+                          OmaSpacing.xl,
+                          OmaSpacing.xxxl,
+                        ),
                         itemCount: entries.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, index) =>
@@ -166,7 +187,10 @@ class _NotificationsViewState extends State<NotificationsView> {
         borderRadius: BorderRadius.circular(OmaRadius.md),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: OmaSpacing.md, horizontal: OmaSpacing.xs),
+          padding: const EdgeInsets.symmetric(
+            vertical: OmaSpacing.md,
+            horizontal: OmaSpacing.xs,
+          ),
           decoration: BoxDecoration(
             color: selected ? context.omaTheme.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(OmaRadius.md),
@@ -241,13 +265,19 @@ class _NotificationsViewState extends State<NotificationsView> {
               children: [
                 Text(
                   entry.title,
-                  style: OmaText.body(OmaTypeScale.body, weight: FontWeight.w600),
+                  style: OmaText.body(
+                    OmaTypeScale.body,
+                    weight: FontWeight.w600,
+                  ),
                 ),
                 if (entry.description?.isNotEmpty ?? false) ...[
                   const SizedBox(height: OmaSpacing.xs),
                   Text(
                     entry.description!,
-                    style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
+                    style: OmaText.body(
+                      OmaTypeScale.caption,
+                      color: context.omaTheme.muted,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 9),
@@ -332,7 +362,10 @@ class _NotificationsViewState extends State<NotificationsView> {
           const SizedBox(height: OmaSpacing.xxs),
           Text(
             DateFormat.yMMMMd(locale).format(details.date),
-            style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
+            style: OmaText.body(
+              OmaTypeScale.caption,
+              color: context.omaTheme.muted,
+            ),
           ),
           if (flow != null && flow.isNotEmpty) ...[
             const SizedBox(height: 15),
@@ -350,7 +383,10 @@ class _NotificationsViewState extends State<NotificationsView> {
                 children: [
                   Text(
                     labels.periodFlow,
-                    style: OmaText.body(OmaTypeScale.caption, color: context.omaTheme.muted),
+                    style: OmaText.body(
+                      OmaTypeScale.caption,
+                      color: context.omaTheme.muted,
+                    ),
                   ),
                   const Spacer(),
                   Flexible(
@@ -375,7 +411,7 @@ class _NotificationsViewState extends State<NotificationsView> {
               style: OmaText.body(11, color: context.omaTheme.muted),
             ),
             const SizedBox(height: OmaSpacing.sm),
-            Wrap(
+            OmaWrap(
               spacing: 7,
               runSpacing: 7,
               children: [

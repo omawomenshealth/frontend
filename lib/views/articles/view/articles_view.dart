@@ -373,7 +373,9 @@ class _ArticlesViewState extends State<ArticlesView> {
                   }),
                   style: TextButton.styleFrom(
                     foregroundColor: accent,
-                    padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xs),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: OmaSpacing.xs,
+                    ),
                     visualDensity: VisualDensity.compact,
                   ),
                   child: Text(
@@ -1018,7 +1020,12 @@ class _EmptyArticlesState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxxl, 58, OmaSpacing.xxxl, OmaSpacing.xl),
+      padding: const EdgeInsets.fromLTRB(
+        OmaSpacing.xxxl,
+        58,
+        OmaSpacing.xxxl,
+        OmaSpacing.xl,
+      ),
       child: Column(
         children: [
           Icon(

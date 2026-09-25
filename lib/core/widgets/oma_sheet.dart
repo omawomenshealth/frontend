@@ -24,10 +24,7 @@ class OmaSheetDragConfiguration {
 /// [scrollController] is non-null only when [OmaSheetDragConfiguration]
 /// is provided. Attach it to the sheet's primary vertical scrollable.
 typedef OmaSheetBuilder =
-    Widget Function(
-      BuildContext context,
-      ScrollController? scrollController,
-    );
+    Widget Function(BuildContext context, ScrollController? scrollController);
 
 /// Opens an Oma modal sheet using Flutter's native Material bottom-sheet
 /// presentation.
@@ -172,30 +169,22 @@ class OmaSheetHeader extends StatelessWidget {
         children: [
           if (leading != null) ...[
             Padding(
-              padding: const EdgeInsets.only(
-                top: OmaSpacing.xs,
-              ),
+              padding: const EdgeInsets.only(top: OmaSpacing.xs),
               child: leading!,
             ),
-            const SizedBox(
-              width: OmaSpacing.md,
-            ),
+            const SizedBox(width: OmaSpacing.md),
           ],
 
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(
-                top: OmaSpacing.xs,
-              ),
+              padding: const EdgeInsets.only(top: OmaSpacing.xs),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ?title,
 
                   if (title != null && description != null)
-                    const SizedBox(
-                      height: OmaSpacing.xs,
-                    ),
+                    const SizedBox(height: OmaSpacing.xs),
 
                   ?description,
                 ],
@@ -204,9 +193,7 @@ class OmaSheetHeader extends StatelessWidget {
           ),
 
           if (trailing != null) ...[
-            const SizedBox(
-              width: OmaSpacing.sm,
-            ),
+            const SizedBox(width: OmaSpacing.sm),
             trailing!,
           ],
 
@@ -219,10 +206,7 @@ class OmaSheetHeader extends StatelessWidget {
 
 /// Standard title typography for an Oma sheet.
 class OmaSheetTitle extends StatelessWidget {
-  const OmaSheetTitle(
-    this.data, {
-    super.key,
-  });
+  const OmaSheetTitle(this.data, {super.key});
 
   final String data;
 
@@ -240,10 +224,7 @@ class OmaSheetTitle extends StatelessWidget {
 
 /// Standard supporting typography for an Oma sheet.
 class OmaSheetDescription extends StatelessWidget {
-  const OmaSheetDescription(
-    this.data, {
-    super.key,
-  });
+  const OmaSheetDescription(this.data, {super.key});
 
   final String data;
 
@@ -251,10 +232,7 @@ class OmaSheetDescription extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       data,
-      style: OmaText.body(
-        OmaTypeScale.body,
-        color: context.omaTheme.muted,
-      ),
+      style: OmaText.body(OmaTypeScale.body, color: context.omaTheme.muted),
     );
   }
 }
@@ -263,10 +241,7 @@ class OmaSheetDescription extends StatelessWidget {
 ///
 /// Uses Flutter's native [IconButton] interaction and accessibility behavior.
 class OmaSheetClose<T extends Object?> extends StatelessWidget {
-  const OmaSheetClose({
-    super.key,
-    this.result,
-  });
+  const OmaSheetClose({super.key, this.result});
 
   final T? result;
 
@@ -275,16 +250,11 @@ class OmaSheetClose<T extends Object?> extends StatelessWidget {
     return SizedBox.square(
       dimension: OmaSpacing.massive,
       child: IconButton(
-        tooltip: MaterialLocalizations.of(
-          context,
-        ).closeButtonTooltip,
+        tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
         onPressed: () {
           Navigator.of(context).maybePop<T>(result);
         },
-        icon: Icon(
-          Icons.close,
-          color: context.omaTheme.foreground,
-        ),
+        icon: Icon(Icons.close, color: context.omaTheme.foreground),
       ),
     );
   }
@@ -311,10 +281,7 @@ class OmaSheetContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: padding,
-      child: child,
-    );
+    return Padding(padding: padding, child: child);
   }
 }
 
@@ -347,20 +314,11 @@ class OmaSheetFooter extends StatelessWidget {
       key: const ValueKey('oma_sheet_footer'),
       decoration: BoxDecoration(
         color: oma.surface,
-        border: showDivider
-            ? Border(
-                top: BorderSide(
-                  color: oma.border,
-                ),
-              )
-            : null,
+        border: showDivider ? Border(top: BorderSide(color: oma.border)) : null,
       ),
       child: Padding(
         padding: padding,
-        child: SizedBox(
-          width: double.infinity,
-          child: child,
-        ),
+        child: SizedBox(width: double.infinity, child: child),
       ),
     );
   }

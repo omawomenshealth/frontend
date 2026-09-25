@@ -36,6 +36,7 @@ Tema ve token kullanımı için [theme.md](theme.md) belgesine bakın.
 | Dialog | [OmaDialog](components/oma_dialog.md) | [`oma_dialog.dart`](../../lib/core/widgets/oma_dialog.dart) |
 | Button | [OmaButton ve OmaIconButton](components/oma_button.md) | [`oma_button.dart`](../../lib/core/widgets/oma_button.dart), [`oma_icon_button.dart`](../../lib/core/widgets/oma_icon_button.dart) |
 | Form alanları | [Forms](components/forms.md) | [`oma_input.dart`](../../lib/core/widgets/oma_input.dart), [`oma_form_field.dart`](../../lib/core/widgets/oma_form_field.dart) |
+| Badge, chip ve ilişkili primitive'ler | [Badge, chip, avatar ve wrap](components/oma_badge_and_chip.md) | [`oma_badge.dart`](../../lib/core/widgets/oma_badge.dart), [`oma_chip.dart`](../../lib/core/widgets/oma_chip.dart), [`oma_circle_avatar.dart`](../../lib/core/widgets/oma_circle_avatar.dart), [`oma_wrap.dart`](../../lib/core/widgets/oma_wrap.dart) |
 
 ## Ortak widget kataloğu
 
@@ -56,14 +57,24 @@ Tema ve token kullanımı için [theme.md](theme.md) belgesine bakın.
 - `OmaField`: label, field ve opsiyonel hint düzeni.
 - `OmaSingleSelect<T>`: chip tabanlı tekli seçim.
 - `OmaMultiSelect<T>`: chip tabanlı çoklu seçim.
-- `OmaChip` / `OmaChipWrap`: seçim ve filtre primitive'leri.
+- `OmaChip`: attribute, entity veya kısa bilgi gösteren native Material `Chip`.
+- `OmaInputChip`: karmaşık girdi veya entity gösteren native `InputChip`.
+- `OmaChoiceChip`: tekli seçim için native `ChoiceChip`.
+- `OmaFilterChip`: filtre veya çoklu seçim için native `FilterChip`.
+- `OmaActionChip`: kısa eylemler için native `ActionChip`.
+- `OmaWrap`: Oma spacing varsayılanlarını kullanan native `Wrap`.
+- `OmaChipWrap`: geriye uyumlu chip gruplama API'si; layout'u `OmaWrap`'a
+  devreder.
 
 ### Yüzey ve içerik
 
 - `OmaCard` ailesi: kart yüzeyi, header, title, description, content ve footer.
 - `OmaCallout`: semantik vurgu veya bilgi yüzeyi.
-- `OmaBadge`: kısa durum etiketi.
+- `OmaBadge`: bir child üzerinde küçük durum veya sayaç bilgisi gösteren native
+  Material `Badge`.
 - `OmaDivider`: Oma renkleriyle içerik ayracı.
+- `OmaCircleAvatar`: Oma `ColorScheme` rollerini kullanan native
+  `CircleAvatar`.
 
 ### Marka ve dekorasyon
 

@@ -99,7 +99,9 @@ iletir. ViewModel veya parent widget yeni değeri state'e yazmalıdır.
 - `readOnly`, değeri gösterip düzenlemeyi kapatır; disabled ile aynı değildir.
 - Surface, foreground, muted, border, focus ve cursor renkleri OmaTheme'den
   gelir.
-- Chip seçim görünümü `OmaChip` tarafından yönetilir.
+- `OmaSingleSelect`, `OmaChoiceChip`; `OmaMultiSelect`, `OmaFilterChip`
+  kullanır. Bu primitive'ler native `ChoiceChip` ve `FilterChip` davranışını
+  korur; görünüm ortak `ChipThemeData` üzerinden yönetilir.
 - Açık/koyu ve cycle/pregnancy görünümleri semantik tema rollerini izler.
 
 `OmaInput` şu anda `TextField` primitive'idir; `Form` validation API'sine sahip
@@ -130,6 +132,8 @@ metni ve state yönetimi sağlayın veya ortak API değişikliğini ayrıca tasa
 - [`oma_single_select.dart`](../../../lib/core/widgets/oma_single_select.dart)
 - [`oma_multi_select.dart`](../../../lib/core/widgets/oma_multi_select.dart)
 - [`oma_chip.dart`](../../../lib/core/widgets/oma_chip.dart)
+- Badge ve chip semantiği için
+  [`oma_badge_and_chip.md`](oma_badge_and_chip.md)
 - Kullanım örnekleri: [`features/onboarding/view/pages/`](../../../lib/features/onboarding/view/pages)
 - Bu primitive'ler için ayrı bir forms test dosyası henüz yoktur. Davranış/API
   değişikliğinde odaklı widget testleri eklenmelidir.

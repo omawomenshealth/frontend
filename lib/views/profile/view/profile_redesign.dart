@@ -40,7 +40,12 @@ class ProfileView extends StatelessWidget {
                         _mechanics._showBasicInfoSheet(context, profile),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, 18, OmaSpacing.xl, 116),
+                    padding: const EdgeInsets.fromLTRB(
+                      OmaSpacing.xl,
+                      18,
+                      OmaSpacing.xl,
+                      116,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -262,7 +267,9 @@ class _ProfileHero extends StatelessWidget {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.sm),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: OmaSpacing.sm,
+                    ),
                     child: Column(
                       children: [
                         Text(
@@ -579,7 +586,9 @@ class _ProfileModeSelectorState extends State<_ProfileModeSelector> {
                                 color: selected == index
                                     ? widget.accent.withValues(alpha: 0.11)
                                     : Colors.transparent,
-                                borderRadius: BorderRadius.circular(OmaRadius.lg),
+                                borderRadius: BorderRadius.circular(
+                                  OmaRadius.lg,
+                                ),
                               ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -854,7 +863,7 @@ class _LabResultsCard extends StatelessWidget {
             else ...[
               if (settings.labTestDate != null ||
                   settings.labTestFasting != null) ...[
-                Wrap(
+                OmaWrap(
                   spacing: 8,
                   runSpacing: 7,
                   children: [
@@ -1159,7 +1168,10 @@ class _PatternRow extends StatelessWidget {
     final rowColor = colors[index % colors.length];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: OmaSpacing.lg),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 17,
+        vertical: OmaSpacing.lg,
+      ),
       child: Row(
         children: [
           Container(

@@ -1,4 +1,6 @@
 export 'oma_bloom_background.dart';
+export 'oma_badge.dart';
+export 'oma_circle_avatar.dart';
 export 'oma_card.dart';
 export 'oma_callout.dart';
 export 'oma_chip.dart';
@@ -14,3 +16,4 @@ export 'oma_divider.dart';
 export '../theme/oma_theme.dart';
 export 'oma_toast.dart';
 export 'oma_sunburst.dart';
+export 'oma_wrap.dart';

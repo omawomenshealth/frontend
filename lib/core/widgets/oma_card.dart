@@ -108,7 +108,11 @@ class OmaCardDescription extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       data,
-      style: OmaText.body(OmaTypeScale.body, color: context.omaTheme.muted, height: 1.4),
+      style: OmaText.body(
+        OmaTypeScale.body,
+        color: context.omaTheme.muted,
+        height: 1.4,
+      ),
     );
   }
 }

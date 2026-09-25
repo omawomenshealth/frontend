@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../core/widgets/oma_badge.dart';
+import '../../../../../../core/widgets/oma_chip.dart';
 import '../../../../../../core/widgets/oma_divider.dart';
 import '../../../../../../core/theme/oma_theme.dart';
 import '../../../../../../localization/generated/strings.g.dart';
@@ -28,13 +28,14 @@ class PhaseContent extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        OmaBadge.label(
+        Text(
           context.t.home.common.hero.currentPhase,
-          foreground: theme.primary,
-          background: Colors.transparent,
-          padding: EdgeInsets.zero,
-          borderRadius: 0,
-          labelVariant: OmaBadgeLabelVariant.eyebrow,
+          maxLines: 1,
+          softWrap: false,
+          style: OmaText.label(
+            color: theme.primary,
+            weight: FontWeight.w700,
+          ).copyWith(fontSize: 9, letterSpacing: 2.3),
         ),
         const SizedBox(height: 5),
         Text(
@@ -55,14 +56,7 @@ class PhaseContent extends StatelessWidget {
         ),
         if (periodValue != null) ...[
           const SizedBox(height: 9),
-          OmaBadge.label(
-            '$periodValue $periodUnitLabel'.toUpperCase(),
-            foreground: theme.primary,
-            background: theme.surface.withValues(alpha: 0.75),
-            padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: 7),
-            borderRadius: 100,
-            border: Border.all(color: theme.border),
-          ),
+          OmaChip(label: Text('$periodValue $periodUnitLabel'.toUpperCase())),
         ],
       ],
     );

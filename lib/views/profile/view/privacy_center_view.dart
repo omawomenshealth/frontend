@@ -80,10 +80,7 @@ class _PrivacyCenterViewState extends State<PrivacyCenterView> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: Icon(
-          Icons.warning_amber_rounded,
-          color: context.omaTheme.error,
-        ),
+        icon: Icon(Icons.warning_amber_rounded, color: context.omaTheme.error),
         title: Text(AppStrings.withdrawConsent),
         content: Text(AppStrings.withdrawConsentWarning),
         actions: [

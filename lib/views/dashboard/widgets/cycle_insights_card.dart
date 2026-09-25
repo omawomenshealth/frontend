@@ -86,7 +86,10 @@ class CycleInsightsCard extends StatelessWidget {
           // Kayıt sayısı bilgisi
           const SizedBox(height: OmaSpacing.lg),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md, vertical: OmaSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: OmaSpacing.md,
+              vertical: OmaSpacing.sm,
+            ),
             decoration: BoxDecoration(
               color: theme.primary.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(OmaRadius.sm),
@@ -211,11 +214,7 @@ class CycleInsightsCard extends StatelessWidget {
             color: theme.success,
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            Icons.check,
-            size: 14,
-            color: theme.onPrimary,
-          ),
+          child: Icon(Icons.check, size: 14, color: theme.onPrimary),
         );
       case CycleStatus.abnormal:
         return Container(
@@ -225,11 +224,7 @@ class CycleInsightsCard extends StatelessWidget {
             color: theme.warning,
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            Icons.warning_rounded,
-            size: 14,
-            color: theme.onPrimary,
-          ),
+          child: Icon(Icons.warning_rounded, size: 14, color: theme.onPrimary),
         );
       case CycleStatus.noData:
         return Container(
@@ -239,11 +234,7 @@ class CycleInsightsCard extends StatelessWidget {
             color: theme.muted.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            Icons.remove,
-            size: 14,
-            color: theme.onPrimary,
-          ),
+          child: Icon(Icons.remove, size: 14, color: theme.onPrimary),
         );
     }
   }

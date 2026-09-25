@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/constants/app_strings.dart';
 import '../../../../../core/theme/oma_theme.dart';
+import '../../../../../core/widgets/oma_chip.dart';
+import '../../../../../core/widgets/oma_wrap.dart';
 import '../../utils/onboarding_label_utils.dart';
 import '../../viewmodel/onboarding_view_model.dart';
 import '../widgets/index.dart';
@@ -67,15 +69,17 @@ Future<void> showDiseaseSelectionSheet(
                 ),
               ),
               const SizedBox(height: 14),
-              Wrap(
+              OmaWrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
                   for (final disease in visible)
-                    FilterChip(
+                    OmaFilterChip(
                       label: Text(disease),
                       selected: selected.contains(disease),
-                      selectedColor: OmaPalette.periodPrimary.withValues(alpha: 0.14),
+                      selectedColor: OmaPalette.periodPrimary.withValues(
+                        alpha: 0.14,
+                      ),
                       onSelected: (_) {
                         if (selected.contains(disease)) {
                           selected.remove(disease);
@@ -85,7 +89,7 @@ Future<void> showDiseaseSelectionSheet(
                         setSheetState(() {});
                       },
                     ),
-                  ActionChip(
+                  OmaActionChip(
                     key: const ValueKey('onboarding_add_known_disease'),
                     avatar: const Icon(Icons.add_rounded, size: 17),
                     label: Text(AppStrings.add),

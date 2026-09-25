@@ -38,8 +38,10 @@ void main() {
       inbox.entriesFor(NotificationEntryType.log).single.description,
       'Breakfast, 500 ml',
     );
-    expect(NotificationInbox(storage).entriesFor(NotificationEntryType.log),
-        hasLength(1));
+    expect(
+      NotificationInbox(storage).entriesFor(NotificationEntryType.log),
+      hasLength(1),
+    );
 
     for (var index = 0; index < 55; index++) {
       await inbox.add(type: NotificationEntryType.app, title: '$index');
@@ -120,7 +122,10 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('notification_tab_log')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('period_notification_card')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('period_notification_card')),
+      findsOneWidget,
+    );
     expect(find.text('PERIOD LOG'), findsOneWidget);
     expect(find.text('Flow'), findsOneWidget);
     expect(find.text('Heavy'), findsOneWidget);

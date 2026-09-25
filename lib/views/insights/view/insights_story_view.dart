@@ -253,7 +253,12 @@ class _StoryProgress extends StatelessWidget {
     return AnimatedBuilder(
       animation: progress,
       builder: (context, _) => Padding(
-        padding: const EdgeInsets.fromLTRB(OmaSpacing.xl, OmaSpacing.md, OmaSpacing.xl, OmaSpacing.none),
+        padding: const EdgeInsets.fromLTRB(
+          OmaSpacing.xl,
+          OmaSpacing.md,
+          OmaSpacing.xl,
+          OmaSpacing.none,
+        ),
         child: Row(
           children: [
             for (var item = 0; item < count; item++) ...[
@@ -294,7 +299,12 @@ class _StoryHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, 18, OmaSpacing.xl, OmaSpacing.none),
+      padding: const EdgeInsets.fromLTRB(
+        OmaSpacing.xxl,
+        18,
+        OmaSpacing.xl,
+        OmaSpacing.none,
+      ),
       child: Row(
         children: [
           Expanded(
@@ -345,7 +355,12 @@ class _InsightStoryPage extends StatelessWidget {
     return SingleChildScrollView(
       key: PageStorageKey<String>('insight_story_${insight.id}'),
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, 26, OmaSpacing.xxl, 18),
+      padding: const EdgeInsets.fromLTRB(
+        OmaSpacing.xxl,
+        26,
+        OmaSpacing.xxl,
+        18,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -397,7 +412,7 @@ class _InsightStoryPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 22),
-          Wrap(
+          OmaWrap(
             spacing: 8,
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
@@ -593,7 +608,12 @@ class _StoryNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(OmaSpacing.xxl, OmaSpacing.sm, OmaSpacing.xxl, 22),
+      padding: const EdgeInsets.fromLTRB(
+        OmaSpacing.xxl,
+        OmaSpacing.sm,
+        OmaSpacing.xxl,
+        22,
+      ),
       child: Row(
         children: [
           Semantics(

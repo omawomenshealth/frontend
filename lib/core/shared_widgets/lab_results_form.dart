@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../constants/app_strings.dart';
 import '../theme/oma_theme.dart';
 import '../../data/models/lab_result_model.dart';
+import '../widgets/oma_chip.dart';
+import '../widgets/oma_wrap.dart';
 
 /// İlk giriş ve profil ekranında ortak kullanılan yapılandırılmış laboratuvar
 /// sonuçları formu.
@@ -254,7 +256,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
             style: TextStyle(fontSize: OmaTypeScale.caption, color: oma.muted),
           ),
           const SizedBox(height: 7),
-          Wrap(
+          OmaWrap(
             spacing: 7,
             runSpacing: 7,
             children: [
@@ -272,7 +274,7 @@ class _LabResultsFormState extends State<LabResultsForm> {
     final oma = context.omaTheme;
     final accent = widget.accent ?? oma.primary;
     final selected = _fasting == value;
-    return ChoiceChip(
+    return OmaChoiceChip(
       key: ValueKey('lab_fasting_${value ?? 'unknown'}'),
       label: Text(label),
       selected: selected,
@@ -338,7 +340,9 @@ class _LabResultsFormState extends State<LabResultsForm> {
                           child: Text(
                             unit,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: OmaTypeScale.caption),
+                            style: const TextStyle(
+                              fontSize: OmaTypeScale.caption,
+                            ),
                           ),
                         ),
                       )
@@ -390,8 +394,16 @@ class _LabGroupTile extends StatelessWidget {
           initiallyExpanded: initiallyExpanded,
           iconColor: accent,
           collapsedIconColor: oma.muted,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: OmaSpacing.xxs),
-          childrenPadding: const EdgeInsets.fromLTRB(14, OmaSpacing.xs, 14, OmaSpacing.xs),
+          tilePadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: OmaSpacing.xxs,
+          ),
+          childrenPadding: const EdgeInsets.fromLTRB(
+            14,
+            OmaSpacing.xs,
+            14,
+            OmaSpacing.xs,
+          ),
           title: Text(
             title,
             style: TextStyle(

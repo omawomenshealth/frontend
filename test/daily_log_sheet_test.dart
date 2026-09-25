@@ -2,6 +2,7 @@ import 'package:app_proje_a/core/constants/app_strings.dart';
 import 'package:app_proje_a/core/theme/oma_theme.dart';
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/core/utils/date_extensions.dart';
+import 'package:app_proje_a/core/widgets/oma_chip.dart';
 import 'package:app_proje_a/data/models/period_log_model.dart';
 import 'package:app_proje_a/data/models/medication_identity_model.dart';
 import 'package:app_proje_a/data/models/user_settings_model.dart';
@@ -203,7 +204,7 @@ void main() {
 
     final selected = find.byKey(const ValueKey('selected_catalog_Retinol'));
     expect(selected, findsOneWidget);
-    tester.widget<InputChip>(selected).onDeleted!();
+    tester.widget<OmaInputChip>(selected).onDeleted!();
     await tester.pumpAndSettle();
     await tester.tap(find.text(AppStrings.saveSkincare));
     await tester.pumpAndSettle();
@@ -1438,15 +1439,15 @@ void main() {
     final longTermChip = find.byKey(
       const ValueKey('reminder_duration_long_term'),
     );
-    expect(tester.widget<ChoiceChip>(longTermChip).selected, isTrue);
+    expect(tester.widget<OmaChoiceChip>(longTermChip).selected, isTrue);
 
     final sevenDayChip = find.byKey(const ValueKey('reminder_duration_7'));
     await tester.ensureVisible(sevenDayChip);
     await tester.tap(sevenDayChip);
     await tester.pumpAndSettle();
 
-    expect(tester.widget<ChoiceChip>(sevenDayChip).selected, isTrue);
-    expect(tester.widget<ChoiceChip>(longTermChip).selected, isFalse);
+    expect(tester.widget<OmaChoiceChip>(sevenDayChip).selected, isTrue);
+    expect(tester.widget<OmaChoiceChip>(longTermChip).selected, isFalse);
   });
 
   testWidgets('dört ilaç saati hatırlatıcı formuna birlikte aktarılır', (
@@ -1586,7 +1587,7 @@ void main() {
 
     final caffeinatedFood = caffeineCategory.value.first;
     final food = find.byKey(ValueKey('catalog_item_$caffeinatedFood'));
-    tester.widget<FilterChip>(food).onSelected!(true);
+    tester.widget<OmaFilterChip>(food).onSelected!(true);
     await tester.pumpAndSettle();
 
     await tester.tap(find.text(AppStrings.saveNutrition));

@@ -26,9 +26,7 @@ void main() {
                                 'How are you feeling today?',
                               ),
                             ),
-                            OmaSheetContent(
-                              child: Text('Sheet body'),
-                            ),
+                            OmaSheetContent(child: Text('Sheet body')),
                           ],
                         ),
                       );
@@ -46,10 +44,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Log mood'), findsOneWidget);
-      expect(
-        find.text('How are you feeling today?'),
-        findsOneWidget,
-      );
+      expect(find.text('How are you feeling today?'), findsOneWidget);
       expect(find.text('Sheet body'), findsOneWidget);
     });
 
@@ -64,9 +59,7 @@ void main() {
                     context: context,
                     builder: (context, _) {
                       return const OmaSheet(
-                        child: OmaSheetContent(
-                          child: Text('Sheet body'),
-                        ),
+                        child: OmaSheetContent(child: Text('Sheet body')),
                       );
                     },
                   );
@@ -90,43 +83,40 @@ void main() {
       expect(find.text('Sheet body'), findsNothing);
     });
 
-    testWidgets(
-      'does not dismiss from barrier when isDismissible is false',
-      (tester) async {
-        await tester.pumpWidget(
-          _TestApp(
-            child: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    showOmaSheet<void>(
-                      context: context,
-                      isDismissible: false,
-                      builder: (context, _) {
-                        return const OmaSheet(
-                          child: OmaSheetContent(
-                            child: Text('Persistent sheet'),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: const Text('Open'),
-                );
-              },
-            ),
+    testWidgets('does not dismiss from barrier when isDismissible is false', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _TestApp(
+          child: Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  showOmaSheet<void>(
+                    context: context,
+                    isDismissible: false,
+                    builder: (context, _) {
+                      return const OmaSheet(
+                        child: OmaSheetContent(child: Text('Persistent sheet')),
+                      );
+                    },
+                  );
+                },
+                child: const Text('Open'),
+              );
+            },
           ),
-        );
+        ),
+      );
 
-        await tester.tap(find.text('Open'));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
 
-        await tester.tapAt(const Offset(20, 20));
-        await tester.pumpAndSettle();
+      await tester.tapAt(const Offset(20, 20));
+      await tester.pumpAndSettle();
 
-        expect(find.text('Persistent sheet'), findsOneWidget);
-      },
-    );
+      expect(find.text('Persistent sheet'), findsOneWidget);
+    });
 
     testWidgets('supports returning a result', (tester) async {
       String? result;
@@ -186,10 +176,7 @@ void main() {
       );
 
       expect(find.text('Symptoms'), findsOneWidget);
-      expect(
-        find.text('Select everything that applies.'),
-        findsOneWidget,
-      );
+      expect(find.text('Select everything that applies.'), findsOneWidget);
     });
 
     testWidgets('renders leading and trailing widgets', (tester) async {
@@ -197,49 +184,36 @@ void main() {
         const _TestApp(
           child: OmaSheet(
             child: OmaSheetHeader(
-              leading: Icon(
-                Icons.favorite,
-                key: ValueKey('leading'),
-              ),
+              leading: Icon(Icons.favorite, key: ValueKey('leading')),
               title: OmaSheetTitle('Title'),
-              trailing: Icon(
-                Icons.info,
-                key: ValueKey('trailing'),
-              ),
+              trailing: Icon(Icons.info, key: ValueKey('trailing')),
               showCloseButton: false,
             ),
           ),
         ),
       );
 
-      expect(
-        find.byKey(const ValueKey('leading')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('leading')), findsOneWidget);
 
-      expect(
-        find.byKey(const ValueKey('trailing')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('trailing')), findsOneWidget);
     });
 
-    testWidgets(
-      'does not render close button when showCloseButton is false',
-      (tester) async {
-        await tester.pumpWidget(
-          const _TestApp(
-            child: OmaSheet(
-              child: OmaSheetHeader(
-                title: OmaSheetTitle('Title'),
-                showCloseButton: false,
-              ),
+    testWidgets('does not render close button when showCloseButton is false', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const _TestApp(
+          child: OmaSheet(
+            child: OmaSheetHeader(
+              title: OmaSheetTitle('Title'),
+              showCloseButton: false,
             ),
           ),
-        );
+        ),
+      );
 
-        expect(find.byIcon(Icons.close), findsNothing);
-      },
-    );
+      expect(find.byIcon(Icons.close), findsNothing);
+    });
   });
 
   group('OmaSheetClose', () {
@@ -257,12 +231,8 @@ void main() {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            OmaSheetHeader(
-                              title: OmaSheetTitle('Sheet'),
-                            ),
-                            OmaSheetContent(
-                              child: Text('Content'),
-                            ),
+                            OmaSheetHeader(title: OmaSheetTitle('Sheet')),
+                            OmaSheetContent(child: Text('Content')),
                           ],
                         ),
                       );
@@ -302,9 +272,7 @@ void main() {
                       return const OmaSheet(
                         child: OmaSheetHeader(
                           title: OmaSheetTitle('Sheet'),
-                          trailing: OmaSheetClose<String>(
-                            result: 'closed',
-                          ),
+                          trailing: OmaSheetClose<String>(result: 'closed'),
                           showCloseButton: false,
                         ),
                       );
@@ -331,11 +299,7 @@ void main() {
   group('OmaSheetContent', () {
     testWidgets('renders its child', (tester) async {
       await tester.pumpWidget(
-        const _TestApp(
-          child: OmaSheetContent(
-            child: Text('Content'),
-          ),
-        ),
+        const _TestApp(child: OmaSheetContent(child: Text('Content'))),
       );
 
       expect(find.text('Content'), findsOneWidget);
@@ -346,18 +310,14 @@ void main() {
 
       await tester.pumpWidget(
         const _TestApp(
-          child: OmaSheetContent(
-            padding: padding,
-            child: Text('Content'),
-          ),
+          child: OmaSheetContent(padding: padding, child: Text('Content')),
         ),
       );
 
       final paddingWidget = tester.widget<Padding>(
-        find.ancestor(
-          of: find.text('Content'),
-          matching: find.byType(Padding),
-        ).first,
+        find
+            .ancestor(of: find.text('Content'), matching: find.byType(Padding))
+            .first,
       );
 
       expect(paddingWidget.padding, padding);
@@ -367,27 +327,17 @@ void main() {
   group('OmaSheetFooter', () {
     testWidgets('renders footer content', (tester) async {
       await tester.pumpWidget(
-        const _TestApp(
-          child: OmaSheetFooter(
-            child: Text('Save'),
-          ),
-        ),
+        const _TestApp(child: OmaSheetFooter(child: Text('Save'))),
       );
 
       expect(find.text('Save'), findsOneWidget);
-      expect(
-        find.byKey(const ValueKey('oma_sheet_footer')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('oma_sheet_footer')), findsOneWidget);
     });
 
     testWidgets('can hide divider', (tester) async {
       await tester.pumpWidget(
         const _TestApp(
-          child: OmaSheetFooter(
-            showDivider: false,
-            child: Text('Save'),
-          ),
+          child: OmaSheetFooter(showDivider: false, child: Text('Save')),
         ),
       );
 
@@ -395,87 +345,72 @@ void main() {
         find.byKey(const ValueKey('oma_sheet_footer')),
       );
 
-      final decoration =
-          decoratedBox.decoration as BoxDecoration;
+      final decoration = decoratedBox.decoration as BoxDecoration;
 
       expect(decoration.border, isNull);
     });
 
     testWidgets('renders divider by default', (tester) async {
       await tester.pumpWidget(
-        const _TestApp(
-          child: OmaSheetFooter(
-            child: Text('Save'),
-          ),
-        ),
+        const _TestApp(child: OmaSheetFooter(child: Text('Save'))),
       );
 
       final decoratedBox = tester.widget<DecoratedBox>(
         find.byKey(const ValueKey('oma_sheet_footer')),
       );
 
-      final decoration =
-          decoratedBox.decoration as BoxDecoration;
+      final decoration = decoratedBox.decoration as BoxDecoration;
 
       expect(decoration.border, isNotNull);
     });
   });
 
   group('draggable Oma sheet', () {
-    testWidgets(
-      'provides DraggableScrollableSheet controller to builder',
-      (tester) async {
-        ScrollController? receivedController;
+    testWidgets('provides DraggableScrollableSheet controller to builder', (
+      tester,
+    ) async {
+      ScrollController? receivedController;
 
-        await tester.pumpWidget(
-          _TestApp(
-            child: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    showOmaSheet<void>(
-                      context: context,
-                      dragConfiguration:
-                          const OmaSheetDragConfiguration(),
-                      builder: (context, scrollController) {
-                        receivedController = scrollController;
+      await tester.pumpWidget(
+        _TestApp(
+          child: Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  showOmaSheet<void>(
+                    context: context,
+                    dragConfiguration: const OmaSheetDragConfiguration(),
+                    builder: (context, scrollController) {
+                      receivedController = scrollController;
 
-                        return OmaSheet(
-                          child: ListView(
-                            controller: scrollController,
-                            children: const [
-                              OmaSheetHeader(
-                                title: OmaSheetTitle(
-                                  'Draggable sheet',
-                                ),
-                              ),
-                              OmaSheetContent(
-                                child: Text('Content'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: const Text('Open'),
-                );
-              },
-            ),
+                      return OmaSheet(
+                        child: ListView(
+                          controller: scrollController,
+                          children: const [
+                            OmaSheetHeader(
+                              title: OmaSheetTitle('Draggable sheet'),
+                            ),
+                            OmaSheetContent(child: Text('Content')),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: const Text('Open'),
+              );
+            },
           ),
-        );
+        ),
+      );
 
-        await tester.tap(find.text('Open'));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
 
-        expect(receivedController, isNotNull);
+      expect(receivedController, isNotNull);
 
-        expect(
-          find.byType(DraggableScrollableSheet),
-          findsOneWidget,
-        );
-      },
-    );
+      expect(find.byType(DraggableScrollableSheet), findsOneWidget);
+    });
 
     testWidgets(
       'does not create DraggableScrollableSheet without configuration',
@@ -494,9 +429,7 @@ void main() {
                         receivedController = scrollController;
 
                         return const OmaSheet(
-                          child: OmaSheetContent(
-                            child: Text('Normal sheet'),
-                          ),
+                          child: OmaSheetContent(child: Text('Normal sheet')),
                         );
                       },
                     );
@@ -513,65 +446,54 @@ void main() {
 
         expect(receivedController, isNull);
 
-        expect(
-          find.byType(DraggableScrollableSheet),
-          findsNothing,
-        );
+        expect(find.byType(DraggableScrollableSheet), findsNothing);
       },
     );
   });
 
   group('keyboard handling', () {
-    testWidgets(
-      'adds bottom padding based on keyboard viewInsets',
-      (tester) async {
-        await tester.pumpWidget(
-          MediaQuery(
-            data: const MediaQueryData(
-              viewInsets: EdgeInsets.only(bottom: 300),
-            ),
-            child: _TestApp(
-              child: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      showOmaSheet<void>(
-                        context: context,
-                        builder: (context, _) {
-                          return const OmaSheet(
-                            child: OmaSheetContent(
-                              child: TextField(),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: const Text('Open'),
-                  );
-                },
-              ),
+    testWidgets('adds bottom padding based on keyboard viewInsets', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(viewInsets: EdgeInsets.only(bottom: 300)),
+          child: _TestApp(
+            child: Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    showOmaSheet<void>(
+                      context: context,
+                      builder: (context, _) {
+                        return const OmaSheet(
+                          child: OmaSheetContent(child: TextField()),
+                        );
+                      },
+                    );
+                  },
+                  child: const Text('Open'),
+                );
+              },
             ),
           ),
-        );
+        ),
+      );
 
-        await tester.tap(find.text('Open'));
-        await tester.pump();
+      await tester.tap(find.text('Open'));
+      await tester.pump();
 
-        final animatedPadding = tester.widget<AnimatedPadding>(
-          find
-              .descendant(
-                of: find.byType(BottomSheet),
-                matching: find.byType(AnimatedPadding),
-              )
-              .first,
-        );
+      final animatedPadding = tester.widget<AnimatedPadding>(
+        find
+            .descendant(
+              of: find.byType(BottomSheet),
+              matching: find.byType(AnimatedPadding),
+            )
+            .first,
+      );
 
-        expect(
-          animatedPadding.padding,
-          const EdgeInsets.only(bottom: 300),
-        );
-      },
-    );
+      expect(animatedPadding.padding, const EdgeInsets.only(bottom: 300));
+    });
   });
 }
 
@@ -580,9 +502,7 @@ void main() {
 /// Replace the theme configuration with the project's real Oma theme builder
 /// if `context.omaTheme` requires a custom ThemeExtension.
 class _TestApp extends StatelessWidget {
-  const _TestApp({
-    required this.child,
-  });
+  const _TestApp({required this.child});
 
   final Widget child;
 
@@ -594,11 +514,7 @@ class _TestApp extends StatelessWidget {
       //
       // theme: buildOmaTheme(...),
       //
-      home: Scaffold(
-        body: Center(
-          child: child,
-        ),
-      ),
+      home: Scaffold(body: Center(child: child)),
     );
   }
 }
