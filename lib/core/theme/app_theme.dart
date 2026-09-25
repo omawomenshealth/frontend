@@ -244,11 +244,52 @@ abstract final class AppTheme {
         overlayColor: oma.primary.withValues(alpha: 0.1),
       ),
       checkboxTheme: CheckboxThemeData(
-        fillColor: WidgetStateProperty.resolveWith(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return states.contains(WidgetState.selected)
+                ? oma.muted.withValues(alpha: 0.38)
+                : Colors.transparent;
+          }
+          if (states.contains(WidgetState.selected)) {
+            return states.contains(WidgetState.error) ? oma.error : oma.primary;
+          }
+          return Colors.transparent;
+        }),
+        checkColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? oma.primary
+              ? oma.onPrimary
               : Colors.transparent,
         ),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          final color = states.contains(WidgetState.error)
+              ? oma.error
+              : states.contains(WidgetState.selected)
+              ? oma.primary
+              : oma.foreground;
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.focused)) {
+            return color.withValues(alpha: 0.10);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return color.withValues(alpha: 0.08);
+          }
+          return Colors.transparent;
+        }),
+        side: WidgetStateBorderSide.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return BorderSide.none;
+          }
+          if (states.contains(WidgetState.disabled)) {
+            return BorderSide(
+              color: oma.muted.withValues(alpha: 0.38),
+              width: 2,
+            );
+          }
+          if (states.contains(WidgetState.error)) {
+            return BorderSide(color: oma.error, width: 2);
+          }
+          return BorderSide(color: oma.border, width: 2);
+        }),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       ),
       dividerTheme: DividerThemeData(

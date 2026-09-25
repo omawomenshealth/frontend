@@ -4,6 +4,7 @@ export 'oma_circle_avatar.dart';
 export 'oma_card.dart';
 export 'oma_callout.dart';
 export 'oma_chip.dart';
+export 'oma_checkbox.dart';
 export 'oma_dialog.dart';
 export 'oma_input.dart';
 export 'oma_icon_button.dart';
