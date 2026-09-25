@@ -341,13 +341,13 @@ void main() {
         ),
       );
 
-      final decoratedBox = tester.widget<DecoratedBox>(
-        find.byKey(const ValueKey('oma_sheet_footer')),
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('oma_sheet_footer')),
+          matching: find.byType(OmaDivider),
+        ),
+        findsNothing,
       );
-
-      final decoration = decoratedBox.decoration as BoxDecoration;
-
-      expect(decoration.border, isNull);
     });
 
     testWidgets('renders divider by default', (tester) async {
@@ -355,13 +355,13 @@ void main() {
         const _TestApp(child: OmaSheetFooter(child: Text('Save'))),
       );
 
-      final decoratedBox = tester.widget<DecoratedBox>(
-        find.byKey(const ValueKey('oma_sheet_footer')),
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('oma_sheet_footer')),
+          matching: find.byType(OmaDivider),
+        ),
+        findsOneWidget,
       );
-
-      final decoration = decoratedBox.decoration as BoxDecoration;
-
-      expect(decoration.border, isNotNull);
     });
   });
 

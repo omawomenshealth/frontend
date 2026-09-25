@@ -6,6 +6,7 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/oma_theme.dart';
 import '../../../../core/widgets/oma_toast.dart';
 import '../../../../core/widgets/oma_chip.dart';
+import '../../../../core/widgets/oma_divider.dart';
 import '../../../../core/widgets/oma_wrap.dart';
 import '../../../../data/models/medication_identity_model.dart';
 import '../../../../data/models/medication_reminder_model.dart';
@@ -426,7 +427,7 @@ class _MedicationReminderSectionState extends State<MedicationReminderSection> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 14),
-        const Divider(),
+        const OmaDivider(),
         const SizedBox(height: 6),
         Row(
           children: [

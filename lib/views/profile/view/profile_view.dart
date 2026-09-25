@@ -13,6 +13,7 @@ import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/period_calculator.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../core/widgets/oma_chip.dart';
+import '../../../core/widgets/oma_divider.dart';
 import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/models/personal_insight_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
@@ -1341,7 +1342,7 @@ class _ProfileMechanics extends StatelessWidget {
             ),
           ],
           const SizedBox(height: OmaSpacing.lg),
-          Divider(height: 1),
+          const OmaDivider(height: 1),
           const SizedBox(height: OmaSpacing.lg),
           if (isLoggedIn) ...[
             SizedBox(
@@ -1720,7 +1721,7 @@ class _EditSheet extends StatelessWidget {
                     ],
                   ),
                 ),
-                Divider(height: 1, color: accent.withValues(alpha: 0.12)),
+                OmaDivider(height: 1, color: accent.withValues(alpha: 0.12)),
                 Expanded(
                   child: SingleChildScrollView(
                     controller: scrollController,

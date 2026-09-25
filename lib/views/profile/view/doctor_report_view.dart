@@ -10,6 +10,7 @@ import '../../../core/utils/app_time.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/daily_log_formatters.dart';
 import '../../../core/widgets/oma_toast.dart';
+import '../../../core/widgets/oma_divider.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/lab_result_model.dart';
 import '../../../data/models/user_settings_model.dart';
@@ -140,7 +141,10 @@ class DoctorReportView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: OmaSpacing.md),
-              Divider(thickness: 1.5, color: OmaPalette.documentDivider),
+              const OmaDivider(
+                thickness: 1.5,
+                color: OmaPalette.documentDivider,
+              ),
               const SizedBox(height: OmaSpacing.lg),
 
               // ── BÖLÜM 1: KİŞİSEL BİLGİLER ───────────────────────────

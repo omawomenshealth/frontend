@@ -73,7 +73,8 @@ Tema ve token kullanımı için [theme.md](theme.md) belgesine bakın.
 - `OmaCallout`: semantik vurgu veya bilgi yüzeyi.
 - `OmaBadge`: bir child üzerinde küçük durum veya sayaç bilgisi gösteren native
   Material `Badge`.
-- `OmaDivider`: Oma renkleriyle içerik ayracı.
+- `OmaDivider` ve `OmaVerticalDivider`: Oma temalı yatay ve dikey içerik
+  ayraçları.
 - `OmaCircleAvatar`: Oma `ColorScheme` rollerini kullanan native
   `CircleAvatar`.
 

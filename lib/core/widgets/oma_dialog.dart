@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/oma_theme.dart';
 import 'oma_button.dart';
+import 'oma_divider.dart';
 import 'oma_icon_button.dart';
 
 /// Material 3 recommended maximum width for a standard dialog.
@@ -259,14 +260,17 @@ class OmaDialogFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final oma = context.omaTheme;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: oma.surface,
-        border: showDivider ? Border(top: BorderSide(color: oma.border)) : null,
-      ),
-      child: Padding(
-        padding: padding,
-        child: SizedBox(width: double.infinity, child: child),
+    return ColoredBox(
+      color: oma.surface,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (showDivider) const OmaDivider(),
+          Padding(
+            padding: padding,
+            child: SizedBox(width: double.infinity, child: child),
+          ),
+        ],
       ),
     );
   }

@@ -57,7 +57,7 @@ semantics davranışlarını component içinde yeniden oluşturmayın.
 
 - `background`, `backgroundAlt`
 - `surface`, `surfaceMuted`, `logoSurface`
-- `foreground`, `muted`, `border`
+- `foreground`, `muted`, `border`, `divider`
 - `primary`, `primarySoft`, `primaryStrong`, `onPrimary`
 - `accent`, `accentSoft`
 - `callout`, `calloutForeground`
@@ -66,6 +66,10 @@ semantics davranışlarını component içinde yeniden oluşturmayın.
 
 Widget'ın ihtiyacı bir Material component varsayılanıysa `Theme.of(context)`;
 Oma'ya özgü semantik roldeyse `context.omaTheme` kullanın.
+
+`border`, yüzey ve alan sınırlarını; `divider` ise içerik grupları arasındaki
+ayrımı temsil eder. Material divider varsayılanları `divider` rolünden
+`DividerThemeData` aracılığıyla çözülür.
 
 ## Modlar ve brightness
 

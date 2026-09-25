@@ -1,6 +1,7 @@
 import 'package:app_proje_a/core/theme/app_theme.dart';
 import 'package:app_proje_a/core/theme/oma_theme.dart';
 import 'package:app_proje_a/core/widgets/oma_dialog.dart';
+import 'package:app_proje_a/core/widgets/oma_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -188,16 +189,20 @@ void main() {
       ),
     );
 
-    BoxDecoration decorationFor(Key key) {
-      final finder = find.descendant(
-        of: find.byKey(key),
-        matching: find.byType(DecoratedBox),
-      );
-      return (tester.widget<DecoratedBox>(finder).decoration as BoxDecoration);
-    }
-
-    expect(decorationFor(const ValueKey('with_divider')).border, isNotNull);
-    expect(decorationFor(const ValueKey('without_divider')).border, isNull);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('with_divider')),
+        matching: find.byType(OmaDivider),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('without_divider')),
+        matching: find.byType(OmaDivider),
+      ),
+      findsNothing,
+    );
   });
 
   testWidgets('confirmation convenience returns the selected result', (

@@ -47,7 +47,10 @@ class PhaseContent extends StatelessWidget {
           ).copyWith(height: 0.92, letterSpacing: -1.4, color: theme.primary),
         ),
         const SizedBox(height: 10),
-        OmaDivider(width: 26, color: theme.primary.withValues(alpha: 0.45)),
+        SizedBox(
+          width: 26,
+          child: OmaDivider(color: theme.primary.withValues(alpha: 0.45)),
+        ),
         const SizedBox(height: 10),
         Text(
           '$message\n$detail',

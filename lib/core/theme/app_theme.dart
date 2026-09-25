@@ -38,6 +38,7 @@ abstract final class AppTheme {
       surface: oma.surface,
       onSurface: oma.foreground,
       outline: oma.border,
+      outlineVariant: oma.divider,
     );
 
     return ThemeData(
@@ -250,7 +251,11 @@ abstract final class AppTheme {
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       ),
-      dividerTheme: DividerThemeData(color: oma.border, thickness: 1, space: 1),
+      dividerTheme: DividerThemeData(
+        color: oma.divider,
+        thickness: 1,
+        space: 1,
+      ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: oma.surface,
         modalBackgroundColor: oma.surface,

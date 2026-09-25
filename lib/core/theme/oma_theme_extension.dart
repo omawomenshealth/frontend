@@ -13,6 +13,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
     required this.foreground,
     required this.muted,
     required this.border,
+    required this.divider,
     required this.primary,
     required this.primarySoft,
     required this.primaryStrong,
@@ -36,6 +37,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
   final Color foreground;
   final Color muted;
   final Color border;
+  final Color divider;
   final Color primary;
   final Color primarySoft;
   final Color primaryStrong;
@@ -65,6 +67,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
     Color? foreground,
     Color? muted,
     Color? border,
+    Color? divider,
     Color? primary,
     Color? primarySoft,
     Color? primaryStrong,
@@ -88,6 +91,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
       foreground: foreground ?? this.foreground,
       muted: muted ?? this.muted,
       border: border ?? this.border,
+      divider: divider ?? this.divider,
       primary: primary ?? this.primary,
       primarySoft: primarySoft ?? this.primarySoft,
       primaryStrong: primaryStrong ?? this.primaryStrong,
@@ -116,6 +120,7 @@ class OmaTheme extends ThemeExtension<OmaTheme> {
       foreground: Color.lerp(foreground, other.foreground, t)!,
       muted: Color.lerp(muted, other.muted, t)!,
       border: Color.lerp(border, other.border, t)!,
+      divider: Color.lerp(divider, other.divider, t)!,
       primary: Color.lerp(primary, other.primary, t)!,
       primarySoft: Color.lerp(primarySoft, other.primarySoft, t)!,
       primaryStrong: Color.lerp(primaryStrong, other.primaryStrong, t)!,
@@ -153,6 +158,7 @@ extension OmaThemeContext on BuildContext {
       foreground: colors.onSurface,
       muted: colors.onSurfaceVariant,
       border: colors.outline,
+      divider: colors.outlineVariant,
       primary: colors.primary,
       primarySoft: colors.primaryContainer,
       primaryStrong: colors.onPrimaryContainer,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/oma_theme.dart';
+import 'oma_divider.dart';
 
 /// Sizing behavior for a draggable Oma sheet.
 @immutable
@@ -310,15 +311,18 @@ class OmaSheetFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final oma = context.omaTheme;
 
-    return DecoratedBox(
+    return ColoredBox(
       key: const ValueKey('oma_sheet_footer'),
-      decoration: BoxDecoration(
-        color: oma.surface,
-        border: showDivider ? Border(top: BorderSide(color: oma.border)) : null,
-      ),
-      child: Padding(
-        padding: padding,
-        child: SizedBox(width: double.infinity, child: child),
+      color: oma.surface,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (showDivider) const OmaDivider(),
+          Padding(
+            padding: padding,
+            child: SizedBox(width: double.infinity, child: child),
+          ),
+        ],
       ),
     );
   }

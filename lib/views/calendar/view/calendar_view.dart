@@ -12,6 +12,7 @@ import '../../../core/utils/daily_log_formatters.dart';
 import '../../../core/utils/date_extensions.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../core/widgets/oma_circle_avatar.dart';
+import '../../../core/widgets/oma_divider.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../features/home/viewmodel/home_view_model.dart';
 import '../../dashboard/widgets/daily_log_sheet.dart';
@@ -264,12 +265,7 @@ class _CalendarViewState extends State<CalendarView> {
             ),
             SizedBox(
               height: _monthDividerExtent,
-              child: Divider(
-                height: 1,
-                indent: 20,
-                endIndent: 20,
-                color: context.omaTheme.border,
-              ),
+              child: const OmaDivider(height: 1, indent: 20, endIndent: 20),
             ),
           ],
         );
@@ -1254,8 +1250,7 @@ class _DayDetailSection extends StatelessWidget {
                 Expanded(
                   child: ListView.separated(
                     itemCount: logs.length,
-                    separatorBuilder: (_, _) =>
-                        Divider(color: context.omaTheme.border, height: 24),
+                    separatorBuilder: (_, _) => const OmaDivider(height: 24),
                     itemBuilder: (context, index) =>
                         _DailyLogDetails(log: logs[index]),
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/oma_theme.dart';
+import '../../../core/widgets/oma_divider.dart';
 import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/services/premium_purchase_service.dart';
 import '../../../localization/generated/strings.g.dart';
@@ -363,7 +364,7 @@ class _BenefitsCard extends StatelessWidget {
               included: selectedTier.includes(benefits[index].$5),
             ),
             if (index != benefits.length - 1)
-              Divider(indent: 76, endIndent: 18),
+              const OmaDivider(indent: 76, endIndent: 18),
           ],
         ],
       ),

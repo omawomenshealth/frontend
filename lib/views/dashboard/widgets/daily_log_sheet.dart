@@ -9,6 +9,7 @@ import '../../../core/utils/date_extensions.dart';
 import '../../../core/utils/pregnancy_calculator.dart';
 import '../../../core/widgets/oma_toast.dart';
 import '../../../core/widgets/oma_chip.dart';
+import '../../../core/widgets/oma_divider.dart';
 import '../../../core/widgets/oma_wrap.dart';
 import '../../../data/models/period_log_model.dart';
 import '../../../data/models/medication_reminder_model.dart';
@@ -854,12 +855,12 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
               itemType: MedicationPlanItemType.supplement,
             ),
           const SizedBox(height: OmaSpacing.xxl),
-          Divider(color: _tone.withValues(alpha: 0.24)),
+          OmaDivider(color: _tone.withValues(alpha: 0.24)),
           const SizedBox(height: OmaSpacing.xxl),
         ],
         _buildMedicationCatalogPage(),
         const SizedBox(height: 30),
-        Divider(color: _tone.withValues(alpha: 0.24)),
+        OmaDivider(color: _tone.withValues(alpha: 0.24)),
         const SizedBox(height: OmaSpacing.xxl),
         _buildSupplementCatalogPage(),
       ],
@@ -2277,7 +2278,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ],
           ),
           if (_medicationSectionExpanded) ...[
-            Divider(height: 1, color: _tone.withValues(alpha: 0.18)),
+            OmaDivider(height: 1, color: _tone.withValues(alpha: 0.18)),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 14, 14, OmaSpacing.lg),
               child: _buildNutritionMedicationDetails(),
@@ -2778,7 +2779,7 @@ class _DailyLogSheetState extends State<DailyLogSheet> {
             ],
           ),
           if (expanded) ...[
-            Divider(height: 1, color: _tone.withValues(alpha: 0.14)),
+            OmaDivider(height: 1, color: _tone.withValues(alpha: 0.14)),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 11),
               child: Column(

@@ -1448,10 +1448,10 @@ class _SoftDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 68),
-      child: Divider(
+      child: OmaDivider(
         height: 1,
         thickness: 1,
-        color: context.omaTheme.border.withValues(alpha: 0.70),
+        color: context.omaTheme.divider.withValues(alpha: 0.70),
       ),
     );
   }
