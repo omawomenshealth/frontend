@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/oma_theme.dart';
+import '../../../core/widgets/oma_tabs.dart';
 import '../../../core/widgets/oma_wrap.dart';
 import '../../../localization/generated/strings.g.dart';
 import '../model/notification_entry.dart';
@@ -22,9 +23,7 @@ class _NotificationsViewState extends State<NotificationsView> {
   @override
   Widget build(BuildContext context) {
     final labels = context.t.notifications.common;
-    final entries = context.watch<NotificationInbox>().entriesFor(_selected);
-    final isApp = _selected == NotificationEntryType.app;
-    final accent = isApp ? OmaPalette.plum : context.omaTheme.primary;
+    final inbox = context.watch<NotificationInbox>();
 
     return Scaffold(
       backgroundColor: context.omaTheme.background,
@@ -75,98 +74,51 @@ class _NotificationsViewState extends State<NotificationsView> {
                   style: OmaText.body(13, color: context.omaTheme.muted),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: OmaSpacing.xl),
-                child: Container(
-                  padding: const EdgeInsets.all(OmaSpacing.xs),
-                  decoration: BoxDecoration(
-                    color: context.omaTheme.backgroundAlt,
-                    borderRadius: BorderRadius.circular(OmaRadius.lg),
-                    border: Border.all(color: context.omaTheme.border),
-                  ),
-                  child: Row(
-                    children: [
-                      _tab(
-                        NotificationEntryType.app,
-                        labels.appTab,
-                        Icons.notifications_none_rounded,
-                      ),
-                      _tab(
-                        NotificationEntryType.log,
-                        labels.logTab,
-                        Icons.edit_note_rounded,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: OmaSpacing.xl),
               Expanded(
-                child: entries.isEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            28,
-                            OmaSpacing.none,
-                            28,
-                            70,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 76,
-                                height: 76,
-                                decoration: BoxDecoration(
-                                  color: accent.withValues(alpha: 0.12),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  isApp
-                                      ? Icons.notifications_none_rounded
-                                      : Icons.edit_note_rounded,
-                                  size: 34,
-                                  color: accent,
-                                ),
-                              ),
-                              const SizedBox(height: OmaSpacing.xl),
-                              Text(
-                                isApp
-                                    ? labels.appEmptyTitle
-                                    : labels.logEmptyTitle,
-                                textAlign: TextAlign.center,
-                                style: OmaText.body(
-                                  17,
-                                  weight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 7),
-                              Text(
-                                isApp
-                                    ? labels.appEmptyDescription
-                                    : labels.logEmptyDescription,
-                                textAlign: TextAlign.center,
-                                style: OmaText.body(
-                                  13,
-                                  color: context.omaTheme.muted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(
-                          OmaSpacing.xl,
-                          OmaSpacing.none,
-                          OmaSpacing.xl,
-                          OmaSpacing.xxxl,
-                        ),
-                        itemCount: entries.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) =>
-                            _entryCard(entries[index], accent),
+                child: OmaTabs<NotificationEntryType>(
+                  defaultValue: NotificationEntryType.app,
+                  onValueChanged: (value) {
+                    if (value != _selected) {
+                      setState(() => _selected = value);
+                    }
+                  },
+                  spacing: OmaSpacing.xl,
+                  expandContent: true,
+                  children: [
+                    OmaTabsList<NotificationEntryType>(
+                      key: const ValueKey('notifications_tabs_container'),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: OmaSpacing.xl,
                       ),
+                      children: [
+                        _notificationTab(
+                          NotificationEntryType.app,
+                          labels.appTab,
+                          Icons.notifications_none_rounded,
+                        ),
+                        _notificationTab(
+                          NotificationEntryType.log,
+                          labels.logTab,
+                          Icons.edit_note_rounded,
+                        ),
+                      ],
+                    ),
+                    OmaTabsContent<NotificationEntryType>(
+                      value: NotificationEntryType.app,
+                      child: _notificationContent(
+                        NotificationEntryType.app,
+                        inbox.entriesFor(NotificationEntryType.app),
+                      ),
+                    ),
+                    OmaTabsContent<NotificationEntryType>(
+                      value: NotificationEntryType.log,
+                      child: _notificationContent(
+                        NotificationEntryType.log,
+                        inbox.entriesFor(NotificationEntryType.log),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -175,52 +127,99 @@ class _NotificationsViewState extends State<NotificationsView> {
     );
   }
 
-  Widget _tab(NotificationEntryType type, String label, IconData icon) {
+  OmaTabsTrigger<NotificationEntryType> _notificationTab(
+    NotificationEntryType type,
+    String label,
+    IconData icon,
+  ) {
     final selected = _selected == type;
     final accent = type == NotificationEntryType.app
         ? OmaPalette.plum
         : context.omaTheme.primary;
-    return Expanded(
-      child: InkWell(
-        key: ValueKey('notification_tab_${type.name}'),
-        onTap: () => setState(() => _selected = type),
-        borderRadius: BorderRadius.circular(OmaRadius.md),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(
-            vertical: OmaSpacing.md,
-            horizontal: OmaSpacing.xs,
-          ),
-          decoration: BoxDecoration(
-            color: selected ? context.omaTheme.surface : Colors.transparent,
-            borderRadius: BorderRadius.circular(OmaRadius.md),
-            boxShadow: selected ? context.omaTheme.softShadow : null,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 17,
-                color: selected ? accent : context.omaTheme.muted,
+    final color = selected ? accent : context.omaTheme.muted;
+
+    return OmaTabsTrigger<NotificationEntryType>(
+      key: ValueKey('notification_tab_${type.name}'),
+      value: type,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 18, color: color),
+          const SizedBox(width: OmaSpacing.sm),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: OmaText.label(
+                weight: selected ? FontWeight.w600 : FontWeight.w500,
+                color: selected
+                    ? context.omaTheme.foreground
+                    : context.omaTheme.muted,
               ),
-              const SizedBox(width: 7),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: OmaText.body(
-                    13,
-                    weight: selected ? FontWeight.w600 : FontWeight.w500,
-                    color: selected
-                        ? context.omaTheme.foreground
-                        : context.omaTheme.muted,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _notificationContent(
+    NotificationEntryType type,
+    List<NotificationEntry> entries,
+  ) {
+    final labels = context.t.notifications.common;
+    final isApp = type == NotificationEntryType.app;
+    final accent = isApp ? OmaPalette.plum : context.omaTheme.primary;
+
+    if (entries.isNotEmpty) {
+      return ListView.separated(
+        padding: const EdgeInsets.fromLTRB(
+          OmaSpacing.xl,
+          OmaSpacing.none,
+          OmaSpacing.xl,
+          OmaSpacing.xxxl,
+        ),
+        itemCount: entries.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 10),
+        itemBuilder: (context, index) => _entryCard(entries[index], accent),
+      );
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(28, OmaSpacing.none, 28, 70),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isApp
+                    ? Icons.notifications_none_rounded
+                    : Icons.edit_note_rounded,
+                size: 34,
+                color: accent,
+              ),
+            ),
+            const SizedBox(height: OmaSpacing.xl),
+            Text(
+              isApp ? labels.appEmptyTitle : labels.logEmptyTitle,
+              textAlign: TextAlign.center,
+              style: OmaText.body(17, weight: FontWeight.w600),
+            ),
+            const SizedBox(height: 7),
+            Text(
+              isApp ? labels.appEmptyDescription : labels.logEmptyDescription,
+              textAlign: TextAlign.center,
+              style: OmaText.body(13, color: context.omaTheme.muted),
+            ),
+          ],
         ),
       ),
     );

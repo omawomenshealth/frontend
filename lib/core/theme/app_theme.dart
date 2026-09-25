@@ -212,6 +212,32 @@ abstract final class AppTheme {
           ),
         ),
       ),
+      tabBarTheme: TabBarThemeData(
+        indicatorColor: oma.primary,
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: oma.divider,
+        dividerHeight: 1,
+        labelColor: oma.foreground,
+        labelPadding: const EdgeInsets.symmetric(horizontal: OmaSpacing.md),
+        labelStyle: OmaText.label(color: oma.foreground),
+        unselectedLabelColor: oma.muted,
+        unselectedLabelStyle: OmaText.label(
+          color: oma.muted,
+          weight: FontWeight.w500,
+        ),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.focused)) {
+            return oma.primary.withValues(alpha: 0.10);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return oma.primary.withValues(alpha: 0.08);
+          }
+          return null;
+        }),
+        indicatorAnimation: TabIndicatorAnimation.linear,
+        splashBorderRadius: BorderRadius.circular(OmaRadius.md),
+      ),
       badgeTheme: BadgeThemeData(
         backgroundColor: oma.error,
         textColor: oma.onPrimary,

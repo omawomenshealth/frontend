@@ -22,4 +22,5 @@ export '../theme/oma_theme.dart';
 export 'oma_toast.dart';
 export 'oma_sunburst.dart';
 export 'list_tile/oma_switch_list_tile.dart';
+export 'oma_tabs.dart';
 export 'oma_wrap.dart';

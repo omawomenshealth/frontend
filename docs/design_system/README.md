@@ -56,6 +56,30 @@ Tema ve token kullanımı için [theme.md](theme.md) belgesine bakın.
 
 ### Formlar ve seçim
 
+- `OmaTabs<T>`: `defaultValue` ve trigger/content değerlerini native
+  `TabController` seçimiyle eşleyen composition root'u.
+- `OmaTabsList<T>`, `OmaTabsTrigger<T>` ve `OmaTabsContent<T>`: Native Material
+  `TabBar`/`Tab` davranışını value-temelli içerik panelleriyle birleştiren sekme
+  parçaları. `OmaTabsList` varsayılan olarak contained görünümü doğrudan
+  `OmaTheme` ve Oma spacing/radius/shadow tokenlarından çözer; klasik underline
+  görünümü için `variant: OmaTabsVariant.line` kullanılır.
+
+```dart
+OmaTabs<String>(
+  defaultValue: 'account',
+  children: const [
+    OmaTabsList<String>(
+      children: [
+        OmaTabsTrigger(value: 'account', text: 'Account'),
+        OmaTabsTrigger(value: 'password', text: 'Password'),
+      ],
+    ),
+    OmaTabsContent(value: 'account', child: AccountPanel()),
+    OmaTabsContent(value: 'password', child: PasswordPanel()),
+  ],
+)
+```
+
 - `OmaCheckbox`: boolean veya tristate seçim için native Material
   `Checkbox`.
 - `OmaSlider`: bir değer aralığından continuous veya discrete seçim

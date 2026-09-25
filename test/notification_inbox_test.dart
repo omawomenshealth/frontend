@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_proje_a/data/services/local_encrypted_store.dart';
 import 'package:app_proje_a/data/services/local_storage_service.dart';
+import 'package:app_proje_a/core/theme/oma_theme.dart';
+import 'package:app_proje_a/core/widgets/oma_tabs.dart';
 import 'package:app_proje_a/features/notifications/model/notification_entry.dart';
 import 'package:app_proje_a/features/notifications/view/notifications_view.dart';
 import 'package:app_proje_a/features/notifications/viewmodel/notification_inbox.dart';
@@ -92,6 +94,79 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('notification_tab_log')));
     await tester.pumpAndSettle();
     expect(find.text('No log activity yet'), findsOneWidget);
+
+    await inbox.add(type: NotificationEntryType.log, title: 'Log saved');
+    await tester.pump();
+    expect(find.text('Log saved'), findsOneWidget);
+    expect(find.text('Saved'), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('notification_tab_app')));
+    await tester.pumpAndSettle();
+    expect(find.text('Saved'), findsOneWidget);
+    expect(find.text('Log saved'), findsNothing);
+  });
+
+  testWidgets('uses the contained Oma tab presentation', (tester) async {
+    await LocaleSettings.setLocale(AppLocale.en);
+    final inbox = NotificationInbox(_MemoryStorage());
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: ChangeNotifierProvider.value(
+          value: inbox,
+          child: const MaterialApp(home: NotificationsView()),
+        ),
+      ),
+    );
+
+    final tabsListFinder = find.byKey(
+      const ValueKey('notifications_tabs_container'),
+    );
+    final tabsList = tester.widget<OmaTabsList<NotificationEntryType>>(
+      tabsListFinder,
+    );
+    final context = tester.element(tabsListFinder);
+    final container = tester
+        .widgetList<Container>(
+          find.descendant(of: tabsListFinder, matching: find.byType(Container)),
+        )
+        .singleWhere(
+          (candidate) =>
+              (candidate.decoration as BoxDecoration?)?.color ==
+              context.omaTheme.backgroundAlt,
+        );
+    final decoration = container.decoration! as BoxDecoration;
+    expect(tabsList.decoration, isNull);
+    expect(tabsList.contentPadding, isNull);
+    expect(decoration.color, context.omaTheme.backgroundAlt);
+    expect(decoration.borderRadius, BorderRadius.circular(OmaRadius.lg));
+    expect(decoration.border, isNotNull);
+
+    final tabBar = tester.widget<TabBar>(
+      find.descendant(of: tabsListFinder, matching: find.byType(TabBar)),
+    );
+    final indicator = tabBar.indicator! as BoxDecoration;
+    expect(indicator.color, context.omaTheme.surface);
+    expect(indicator.borderRadius, BorderRadius.circular(OmaRadius.md));
+    expect(indicator.boxShadow, context.omaTheme.softShadow);
+    expect(tabBar.dividerHeight, OmaSpacing.none);
+    expect(
+      find.descendant(
+        of: tabsListFinder,
+        matching: find.byIcon(Icons.notifications_none_rounded),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: tabsListFinder,
+        matching: find.byIcon(Icons.edit_note_rounded),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byType(OmaTabsContent<NotificationEntryType>),
+      findsNWidgets(2),
+    );
   });
 
   testWidgets('period log shows its date, flow and symptoms', (tester) async {
