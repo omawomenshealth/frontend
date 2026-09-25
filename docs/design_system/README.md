@@ -32,6 +32,7 @@ Tema ve token kullanımı için [theme.md](theme.md) belgesine bakın.
 
 | Alan | Rehber | Kaynak |
 | --- | --- | --- |
+| Card | [OmaCard](components/oma_card.md) | [`oma_card.dart`](../../lib/core/widgets/oma_card.dart) |
 | Bottom sheet | [OmaSheet](components/oma_sheet.md) | [`oma_sheet.dart`](../../lib/core/widgets/oma_sheet.dart) |
 | Dialog | [OmaDialog](components/oma_dialog.md) | [`oma_dialog.dart`](../../lib/core/widgets/oma_dialog.dart) |
 | Button | [OmaButton ve OmaIconButton](components/oma_button.md) | [`oma_button.dart`](../../lib/core/widgets/oma_button.dart), [`oma_icon_button.dart`](../../lib/core/widgets/oma_icon_button.dart) |
